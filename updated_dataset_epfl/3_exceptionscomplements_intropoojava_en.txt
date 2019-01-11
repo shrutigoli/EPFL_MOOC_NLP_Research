@@ -1,0 +1,173 @@
+In this episode, we will discuss several complements on exception handling.
+We will begin with the notion of rethrowing.
+That is, how to partially handle an exception and rethrow it further.
+We will also discuss a particular rule in Java : the handle or declare rule.
+We will also see how to declare our own exception classes.
+Let us begin with the rethrowing.
+You probably remember our little introductory example.
+In that example, the lowest level method "inverse" was throwing the exception.
+This thrown exception was not caught by the intermediary level which was simply tasked with the graphical printing of the temperatures' inverse.
+However, we suggested to intercept the thrown exception in the main program so that we could handle it there.
+If we decide to handle the exception at this program's level, we will know if an exception has been thrown, if something abnormal has occured while trying to execute "graphiqueInverse".
+However, we will not have much information on the precise conditions behind this abnormal situation.
+For example, we might want to know what is the array position of the value that triggered the issue.
+The part of the program knowing where in the array the exception has been triggered is actually this one.
+It could be interesting to have it so that this part reports to the rest of the program that there has been a problem at this part of the array.
+Thus, this method could intercept the thrown exception to handle it here, reporting to the rest of the program at what index the problem has occured.
+For example, we could imagine to intercept the exception here.
+Unfortunately, this method is not aware of the context of its call.
+Therefore, it cannot take decisions regarding the array.
+It cannot run the same processing as the ones performed in the main program
+(for example deciding to aquire all temperatures anew since the formers are erroneous).
+The sole possible action of this method is to relay the problematic index to the rest of the program, and to rethrow the exception to a higher level; this level being more knowledgeable on how to solve this abnormal situation.
+Consequently, the method "graphiqueInverse" could itself throw an exception, informing the rest of the program at what index the problem has occured.
+For example, like this
+(we are stretching beyond this course's frame; we will manage though).
+Of course, we need for the index to be handled.
+For example, we can proceed like this.
+From now on, whenever an exception is thrown during the loop's execution, the main program will intercept it and receive a message potentially informing on the index at which the problem has occured.
+An intermediary part of the program has decided here to rethrow an exception which is more informed than the previous one.
+This way, a more informed part of the program will make better use of it.
+Here, we have partially handled the original exception.
+As we have seen in this example, an exception can be partially treated in an intermediary level of the program with a dedicated "catch" block. 
+Then, we will wait for a subsequent handling.
+To this end, the intermediary level must "rethrow" the exception, the same one or a more informed one.
+Naturally, the higher level must be equipped with a corresponding
+"try" and "catch" blocks able to intercept and handle the rethrown exception properly.
+The idea is that, at an intermediary level of the program, we intercept an exception thrown level.
+Then, we will handle it partially, and decide we do not have enough information to handle completely.
+Thus, we will rethrow either the same exception or a new one with another message or content.
+Now, you know that an exception can intercepted at an intermediary level of the program, be handled partially, and be rethrown at a higher level, more informed of the error context.
+Now, we will move on to another topic : the rule "handle or declare", which is specific to Java.
+When a method throws an exception, and delegate its handling to a higher level of the program
+(thus, it does not handle the exception locally), it must, in genere, inform that it is throwing an exception.
+Thus, whoever uses this method at a higher level knows that it can throw the exception, thus getting ready either to handle this exception or rethrow it to a higher level.
+So that a method may delcare and potentially throw one or several exceptions, we have to use a particular syntax after the method header indicated by the reserved keyword "throws", followed by the list of exceptions this method can throw, separated by semicolons.
+For example, here, the "inverse" method throws an exception when a division by 0 occurs.
+It does not treat this exception locally; there is no "try" and "catch" block catching this exception inside the "inverse" method.
+Therefore, it must report it to the rest of the program, thus granting it the handling of this type of exception it has thrown.
+This is done through the reserved keyword "throws" followed by a list of the exceptions thrown by this method.
+In Java, we shall apply the following rule: every exception which is neither a "RunTimeException" nor an "Error" must respect the
+"handle or declare" rule.
+Concretely, this means that exceptions must either be directly intercepted in the method where they are thrown
+(this is only possible in certain situations) or they must be "declared" by the method to inform the rest of the program that the method delegates exception handling to the rest of the program.
+This means that, in Java, if an exception's type is neither "RunTimeException" nor "Error", and it if is now intercepted in the method where it is thrown, nor declared by the method, the compiler will return an error message.
+In this case, we talk of "Checked exceptions".
+These are exceptions controlled by the compiler by opposition to "Unchecked" exceptions for which the compiler does not necessarily enforce a specific processing or indication once such an exception has been thrown.
+These controls enforced by the compiler are tasked with forcing exception handling.
+However, the compiler does not wish to force the handling of exceptions of the types "RunTime" or "Error".
+Indeed, "Error" corresponds to situations the programmer is not able to handle himself : for example, not enough available memory on the computer on which the program is executed.
+Thus, it makes no sense for the compiler to force the programmer to handle these kinds of exception.
+On the other hand, "RunTimeExceptions" very often correspond to situations that can be solved properly simply through better programming.
+For example, when we go past the possible indices in an array, or when we execute a division by 0, it can corresponds to situations solvable through better programming.
+However, they can also be situations we whish to handle through exceptions.
+The problems that can be solved by better programming should be solved this way rather than by exception handling.
+This is why the compiler is not forcing us to declare or handle the
+"RunTimeExceptions" either.
+Java provides a wide range of possible exceptions; it is recommanded to use them in the more informative way possible.
+This means, we should use the exception type more suited to the problem we wish to invest or handle through exceptions.
+However, in certain situations, it can be useful to define our own exceptions classes.
+The language provides us with this possibility.
+In order to define our own exception classes, we simpy have to have them inherit from the exception or one of its derived classes.
+As we have had the chance to see it in a previous episode, the exception class offers a method "getMessage".
+It is useful to call it in order to give informations on the nature of the exception.
+The message returned by "getMessage" is initialized by the constructors of the exception class.
+In order to have the message associated with our own exception classes correctly initialized, it is thus recommanded for a custom exception class without other content, to contain at least the two following constructors.
+The default one will initialize the message with a default value.
+The other constructor will take a string as parameter and use it to initialize the message.
+This way, we will preserve the behavoir expected from "getMessage".
+Naturally, when we define our own custom exception classes, it is to provide them with more content.
+At our level, we are compltetely free to add as many methods or attributes as we wish to.
+For example, it could be useful to add, inside the class, attributes referring to error codes.
+Also, we could add informations on the content of exception detection, and so on.
+Let us now see a concrete example.
+For example, let us imagine we wish to create an exception class able to handle abnormal situations regarding temperatures.
+Thus, this exception class will contain informations indicating which abnormal temperature has been detected.
+Then it will give instructions regarding this temperature:
+What should we do concretely in case of such or such abnormal temperature.
+By the way, you will note that, in Java, it is recommanded to call our exception  classes with a name ending in "Exception".
+I think we here reached a limit in the naming coventions that combine French and English!...
+But we can live with it.
+Our class can also include any content potentially useful for the handling of such exceptions.
+Typically, here, a constructor able to initialize the obtained temperature and the associated order.
+This constructor will also have to call the constructor of of the base class in order to initialize the associated message.
+This message could naturally be a parameter.
+Here, we have chosen to give it a default value.
+We can also add any method we deem useful.
+Here, we have simply chosen to add a "getter" for each of the attributes; that is, one for the temperature, another for the order.
+Let us see an example of its use.
+Let us imagine that the temperature reaches a critical level.
+We could imagine throwing such an exception of this newly-defined type by initializing it with the abnormal obtained temperature and a particular order to follow when this temperature is encountered.
+Thus, the intercepting block will be able to provide several interesting informations on the nature of the exception.
+It will be able to report the abnormal obtained temperature.
+Then, it will, for example here, give instructions on what to do regarding this temperature here.
+We could also imagine giving more informative messages.
+For example here, we have obtained a temperature of
+150 degrees
+[TN: Celcius, which is here supposed to be too high].
+In this case, the order is to verify our meter.
+VoilÃ ! We are just about done with the complements we wish to share on exceptions in Java.
+To close this chapter, we will simply review the little introductory example, coded in Java this time.
+This is our program tasked with printing the inverse of a few measured temperatures.
+Let us begin with the coding of the main program the way we can imagine it in Java.
+The main program will store a few measures in a dynamic array of doubles.
+Those temperatures are aquired through a method tasked with the filling of the array.
+Now, we wish to print the inverses of these temperatures stored in the array.
+If the array of measures contains null values, the printing of these temperatures' inverses will result in an error.
+However, we wish to give a few chances to the program user.
+Thus, we will let him input the array with new measures if an abnormal situation has occured.
+We will grant them only two trials to try and input a new array that does not contain any null values.
+The idea is the following : we know that the call to this method may result in the triggering of an exception.
+We will indicate that this instruction is a block receptive to errors.
+Thus, we will frame it with a "try" block.
+If the array of measures contains a null measure, this method's execution will trigger an exception.
+Let's assume that this exception's type is "ArithmeticException".
+It will then be caught by a corresponding "catch" block.
+We have not yet reached the maximum amount of trials, we will simply inform that the user that they are to reinput the values.
+Otherwise, we will tell them, with another message, that they have ran out of trials, and that we will consequently give up on aquiring the measures.
+We thus close the execution of this "catch" block. the execution continues sequentially until it reaches the evaluation of the "while" continuation condition.
+The "while" will keep looping if the number of attempts has not yet been reached.
+This will make it possible to reinput the array of measures as long as the maximum number of attempts has not been reached.
+The method tasked with printing the inverses of the temperatures thus takes an array of temperatures as parameter.
+It will iterate the elements in this array.
+For each index 'i', it will print the inverse of the temperature stored at position 'i'.
+Since the computation of the inverse can throw an exception
+(here, we suppose its type to be "ArithmeticException" ), we take care to indicate that this instruction is an error-receptive block; thus framed with a "try" block".
+This will make it possible to report that the problem has occured with the index 'i'.
+Since, at this level, we do not know how to solve this problem completely, we will rethrow the exception.
+Here, we rethrow the exception just as we have received it.
+We could have created another one.
+By the way, you may have noticed that we have declared the exception potentially thrown in "plotTempInverse".
+Was that truly mandatory here?
+Well, in fact it is not compulsory to declare the exception thrown here.
+Why? Because "ArithmeticException" is of the type "RunTimeException", and is therefore not subject to the rule "handle or declare".
+Here, declaring it simply provides a little more information.
+Someone reading this method's header will see that it can throw an "ArithmeticException", thus taking measures accordingly.
+Now, let us go all the way for this example.
+We will suppose that there is a drawing method stricto sensu, able to draw a point.
+We thus imagine that there is a graphical method, able to fulfill this processing.
+Of course, we also have our famous method "inverse" which returns the inverse of a number.
+We have also chosen, here, to declare that it throws an "ArithmeticException".
+Once again, it is not necessary since it is a "RunTimeException".
+Now, if the given number is zero, this method will thow an exception of the type "ArithmeticException" with an appropriate message.
+The execution stream is the following.
+Let us imagine that there is a null value in our array of measures.
+Now, we will thus call "plotTempInverse", which will call the method calculating a number's inverse.
+Now, if the number is zero, the method will throw an exception of the type "ArithmeticException".
+This exception will now be caught at a higher level, that is, in "plotTempInverse".
+Now, it will print "ProblÃ¨me Ã  l'indice i"
+(TN: means "Problem at the index i" ).
+The exception is then rethrown to be caught again at a higher level.
+This time, "plotTempInverse" has thrown the exception. We will thus connect on the corresponding
+"catch" block in the main program.
+Now, we will start counting the attempts of our user.
+This is how such a program will unfold when exceptions are thrown.
+Now, to wrap this chapter on exceptions, let us tell you that exception handling is an extremely flexible and practical approach in order to deal with abnormal situations.
+However, this way is significantly more resource-expensing than the good old "if... then... else".
+The general rule is that, if at all possible, do deal with the error where it occured without passing by exception handling.
+For example, let us imagine that, in a program, we ask the user to enter values between 0 and 100.
+Now, our wayward user decides to enter a value greater than 100.
+Obviously, we know how to deal with this error locally, ordering the user to reenter the values.
+This means we do not have to pass by exceptions in this case.
+Finally, when we can choose between several exception types, it is better to go for the most specific: this will be more useful and informative.
+This concludes our episode about exceptions.

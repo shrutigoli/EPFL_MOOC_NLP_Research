@@ -1,0 +1,717 @@
+1
+00:00:00,025 --> 00:00:10,025
+[AUDIO_VIDE]
+
+2
+00:00:12,270 --> 00:00:13,140
+Bonjour.
+
+3
+00:00:13,140 --> 00:00:17,240
+Lorsqu'on coupe le courant sur une
+enseigne ou un afficheur à LED,
+
+4
+00:00:17,240 --> 00:00:23,525
+on souhaite retrouver nos animations ou
+nos textes, lorsqu'on va la rallumer.
+
+5
+00:00:23,525 --> 00:00:27,705
+Après avoir rappelé le type de mémoire
+disponible sur les micro contrôleurs,
+
+6
+00:00:27,705 --> 00:00:32,515
+nous parlerons plus en détail des EEPROM,
+des mémoires Flash et de leur
+
+7
+00:00:32,515 --> 00:00:37,355
+programmation, ainsi que des mémoires
+externes que nous pouvons aussi utiliser.
+
+8
+00:00:38,675 --> 00:00:42,805
+On sait qu'il existe principalement deux
+types de mémoire dans un microcontrôleur,
+
+9
+00:00:43,990 --> 00:00:49,180
+la mémoire Flash, prévue habituellement
+pour les programmes, et la mémoire vive,
+
+10
+00:00:49,180 --> 00:00:50,710
+pour les données.
+
+11
+00:00:50,710 --> 00:00:52,620
+La mémoire Flash est permanente,
+
+12
+00:00:52,620 --> 00:00:58,100
+le programme va rester, par contre la
+mémoire vive n'est pas permanente.
+
+13
+00:00:58,100 --> 00:01:02,300
+Comment va-t-on pouvoir
+conserver des données,
+
+14
+00:01:02,300 --> 00:01:06,220
+par exemple les textes qui
+défilent sur un afficheur à LED?
+
+15
+00:01:06,220 --> 00:01:11,470
+Certains micro contrôleurs disposent
+d'une mémoire du type EEPROM.
+
+16
+00:01:11,470 --> 00:01:17,712
+Je rappelle que cela signifie
+Electrically-Erasable, c'est-à-dire,
+
+17
+00:01:17,712 --> 00:01:24,105
+effaçable électriquement,
+Programmable Read-Only Memory.
+
+18
+00:01:24,105 --> 00:01:26,645
+Donc, une mémoire morte,
+
+19
+00:01:26,645 --> 00:01:32,125
+mais qui est programmable et qu'on
+va pouvoir effacer électriquement.
+
+20
+00:01:32,125 --> 00:01:33,325
+C'est le cas, par exemple,
+
+21
+00:01:33,325 --> 00:01:38,955
+de l'ATmega328, bien connu pour être
+le micro contrôleur de l'Arduino.
+
+22
+00:01:38,955 --> 00:01:44,170
+Il dispose, en plus de sa mémoire
+Flash et de sa mémoire RAM,
+
+23
+00:01:44,170 --> 00:01:46,510
+de un kiloByte d'EEPROM.
+
+24
+00:01:47,840 --> 00:01:51,390
+Cette mémoire n'est pas
+dans l'espace habituel
+
+25
+00:01:51,390 --> 00:01:54,180
+des mémoires Flash ou de la mémoire vive.
+
+26
+00:01:55,250 --> 00:01:57,430
+Elle est autonome.
+
+27
+00:01:57,430 --> 00:02:05,050
+Un registre permet de donner les adresses,
+EEPROM Address Register.
+
+28
+00:02:05,050 --> 00:02:11,210
+Un autre registre permet de préciser
+les données, EEPROM Data Register.
+
+29
+00:02:11,210 --> 00:02:15,050
+À noter qu'on va toujours,
+écrire, une adresse.
+
+30
+00:02:15,050 --> 00:02:19,780
+Par contre, les données vont
+pouvoir être lues ou être écrites.
+
+31
+00:02:19,780 --> 00:02:23,130
+On aura également des
+circuits qui permettent de
+
+32
+00:02:23,130 --> 00:02:26,290
+lancer les cycles d'écriture,
+ou de lecture.
+
+33
+00:02:27,650 --> 00:02:29,660
+La programmation est
+particulièrement simple.
+
+34
+00:02:30,920 --> 00:02:35,920
+Pour lire à une adresse donnée,
+on spécifie cette adresse
+
+35
+00:02:35,920 --> 00:02:42,410
+dans le registre d'adresses,
+on active le fanion de lecture,
+
+36
+00:02:42,410 --> 00:02:47,620
+et la valeur se trouve dans
+le registre de données.
+
+37
+00:02:48,860 --> 00:02:52,770
+On peut préciser que la lecture
+est quasiment immédiate,
+
+38
+00:02:52,770 --> 00:02:54,560
+il n'y a pas d'attente particulière.
+
+39
+00:02:55,580 --> 00:02:58,680
+Par contre, pour l'écriture,
+c'est un petit peu plus compliqué.
+
+40
+00:02:58,680 --> 00:03:04,690
+Tout d'abord, on va s'assurer,
+par la lecture d'un fanion, qu'une
+
+41
+00:03:04,690 --> 00:03:10,690
+éventuelle écriture précédente, qui va
+durer un certain temps, est bien terminée.
+
+42
+00:03:10,690 --> 00:03:14,148
+Donc, on attend la fin d'une
+éventuelle écriture précédente.
+
+43
+00:03:14,148 --> 00:03:19,910
+Ensuite, on précise l'adresse
+dans le registre d'adresses,
+
+44
+00:03:19,910 --> 00:03:26,470
+la valeur, cette fois donc on écrit cette
+valeur, dans le registre de données.
+
+45
+00:03:28,200 --> 00:03:33,180
+Ici, on va lancer le cycle
+d'écriture par le fanion,
+
+46
+00:03:33,180 --> 00:03:38,400
+Write Enable, ou, Program Enable ; et,
+
+47
+00:03:38,400 --> 00:03:42,630
+si on se contente de cette instruction,
+aucune écriture ne va se produire.
+
+48
+00:03:42,630 --> 00:03:45,220
+Il va falloir, auparavant,
+
+49
+00:03:45,220 --> 00:03:50,980
+autoriser une écriture avec ce fanion,
+Master Write Enable.
+
+50
+00:03:50,980 --> 00:03:54,980
+Son rôle, c'est d'éviter des
+écritures intempestives,
+
+51
+00:03:54,980 --> 00:04:00,140
+des écritures erronées dans la mémoire
+; il est nécessaire pour qu'une
+
+52
+00:04:00,140 --> 00:04:05,930
+écriture soit validée, que l'écriture
+dans ce fanion se fasse, juste avant,
+
+53
+00:04:05,930 --> 00:04:11,810
+quelques cycles d'horloge,
+l'écriture du fanion, Write Enable.
+
+54
+00:04:11,810 --> 00:04:15,950
+Tous les micro contrôleurs
+n'ont pas de mémoire EEPROM.
+
+55
+00:04:15,950 --> 00:04:19,530
+Mais il est généralement possible
+d'accéder à la mémoire Flash,
+
+56
+00:04:19,530 --> 00:04:24,840
+dans un microcontrôleur, alors qu'elle
+est normalement réservée au programme.
+
+57
+00:04:24,840 --> 00:04:28,740
+Il faut évidemment faire attention de ne
+pas détruire le programme à ce moment.
+
+58
+00:04:29,990 --> 00:04:34,350
+C'est un peu plus difficile sur les micro
+contrôleurs dont l'architecture n'est pas
+
+59
+00:04:34,350 --> 00:04:35,630
+du type Von Neumann.
+
+60
+00:04:36,640 --> 00:04:41,350
+Je rappelle que dans les ordinateurs
+de type Von Neumann, un seul espace
+
+61
+00:04:41,350 --> 00:04:45,980
+d'adressage est utilisé, à la fois
+pour les programmes et les données.
+
+62
+00:04:45,980 --> 00:04:46,960
+C'est le cas du MSP430.
+
+63
+00:04:48,910 --> 00:04:49,900
+Dans tous les cas,
+
+64
+00:04:49,900 --> 00:04:54,790
+il faut noter que pour une mémoire Flash,
+l'effacement s'effectue par bloc.
+
+65
+00:04:54,790 --> 00:04:58,580
+Il n'est pas question de pouvoir
+écrire à n'importe quel moment,
+
+66
+00:04:58,580 --> 00:05:00,410
+n'importe quelle position,
+
+67
+00:05:00,410 --> 00:05:05,670
+on peut écrire dans des positions qui
+n'ont pas encore précédemment été écrites.
+
+68
+00:05:05,670 --> 00:05:11,970
+Puis il faudra effacer le bloc,
+si on souhaite changer une donnée.
+
+69
+00:05:11,970 --> 00:05:16,100
+Voilà les instructions
+nécessaires sur un MSP430.
+
+70
+00:05:16,100 --> 00:05:23,590
+On doit avoir un pointeur, par exemple
+à une donnée du type, entier huit bits.
+
+71
+00:05:24,885 --> 00:05:30,375
+On va affecter ce pointeur à une
+adresse particulière qu'on a choisie,
+
+72
+00:05:30,375 --> 00:05:33,805
+qui correspond donc à une adresse
+en mémoire Flash, et finalement,
+
+73
+00:05:33,805 --> 00:05:38,095
+on peut lire la donnée,
+en la prenant à partir du pointeur.
+
+74
+00:05:39,245 --> 00:05:41,965
+Pour l'écriture,
+ce sera le mécanisme inverse.
+
+75
+00:05:43,110 --> 00:05:49,560
+Le pointeur sera la zone de destination
+de la valeur, mais auparavant,
+
+76
+00:05:49,560 --> 00:05:54,940
+il faudra mettre à zéro un bit
+de blocage qui, de nouveau,
+
+77
+00:05:54,940 --> 00:06:00,130
+évite des écritures intempestives
+; et on va le rétablir,
+
+78
+00:06:00,130 --> 00:06:03,139
+pour revenir en mode sécurisé,
+après une écriture.
+
+79
+00:06:04,610 --> 00:06:10,680
+Mais je rappelle que, si l'on écrit une
+deuxième fois sur cette même position,
+
+80
+00:06:10,680 --> 00:06:13,200
+la valeur écrite sera fausse.
+
+81
+00:06:13,200 --> 00:06:18,050
+On aura écrit seulement les zéros,
+on ne peut pas remettre à un les bits.
+
+82
+00:06:18,050 --> 00:06:20,260
+Il est donc nécessaire,
+dans beaucoup de cas,
+
+83
+00:06:20,260 --> 00:06:25,440
+d'effacer tout un bloc et on
+le fera avec ces instructions.
+
+84
+00:06:25,440 --> 00:06:29,180
+On va dire qu'on souhaite
+passer en mode effacement,
+
+85
+00:06:30,700 --> 00:06:36,070
+on va supprimer le bit de blocage, on va
+
+86
+00:06:36,070 --> 00:06:41,480
+écrire n'importe quelle
+valeur dans la zone mémoire,
+
+87
+00:06:41,480 --> 00:06:46,070
+et ça va avoir pour conséquence de
+lancer un cycle d'effacement du bloc,
+
+88
+00:06:47,830 --> 00:06:53,790
+et finalement, on remet les
+fanions dans leur état protégé.
+
+89
+00:06:55,190 --> 00:06:58,300
+On a l'habitude de pouvoir écrire et lire,
+
+90
+00:06:58,300 --> 00:07:02,120
+par exemple dans une RAM,
+autant de fois qu'on veut.
+
+91
+00:07:02,120 --> 00:07:06,570
+Par contre, toutes les mémoires non
+volatiles ont des nombres de cycles
+
+92
+00:07:06,570 --> 00:07:10,440
+limités, et il faut vraiment
+garder cet aspect à l'esprit.
+
+93
+00:07:11,630 --> 00:07:17,110
+Typiquement, on a 10 000 cycles
+possibles pour une Flash,
+
+94
+00:07:17,110 --> 00:07:21,090
+et je dirai qu'a priori,
+ce nombre semble extrêmement grand.
+
+95
+00:07:21,090 --> 00:07:23,675
+Il faudra beaucoup de
+temps pour par exemple,
+
+96
+00:07:23,675 --> 00:07:27,445
+écrire 10 000 fois un programme
+dans un microcontrôleur.
+
+97
+00:07:29,065 --> 00:07:34,995
+Seulement 100 000 pour une EEPROM,
+et là, ce nombre me semble plutôt petit.
+
+98
+00:07:34,995 --> 00:07:40,145
+En effet, si toutes les secondes,
+on met une nouvelle valeur dans l'EEPROM,
+
+99
+00:07:40,145 --> 00:07:46,620
+eh bien on risque après un jour d'avoir
+déjà atteint cette fameuse limite.
+
+100
+00:07:47,900 --> 00:07:52,300
+Bien entendu, il est possible d'ajouter
+des mémoires non volatiles, externes,
+
+101
+00:07:52,300 --> 00:07:55,110
+à un montage à micro contrôleur.
+
+102
+00:07:55,110 --> 00:07:55,720
+Par exemple,
+
+103
+00:07:55,720 --> 00:08:00,330
+dans un afficheur, on souhaitera mettre
+des textes relativement importants.
+
+104
+00:08:00,330 --> 00:08:03,780
+Les mémoires du micro contrôleur
+seront peut-être trop petites,
+
+105
+00:08:03,780 --> 00:08:06,620
+et on va alors utiliser
+des circuits externes.
+
+106
+00:08:08,400 --> 00:08:11,050
+On peut utiliser des RAM secourues.
+
+107
+00:08:12,710 --> 00:08:18,250
+Ce n'est pas très fréquent,
+mais il en existe qui sont associées à
+
+108
+00:08:18,250 --> 00:08:23,930
+des horloges temps réel, donc si on en a à
+disposition, pourquoi ne pas les utiliser.
+
+109
+00:08:25,915 --> 00:08:29,365
+On utilisera beaucoup plus
+souvent des EEPROM série,
+
+110
+00:08:29,365 --> 00:08:33,825
+elles se présentent sous
+forme de petits boîtiers,
+
+111
+00:08:33,825 --> 00:08:38,575
+généralement à huit pattes, soit du,
+Alu line huit, soit des boîtiers SMD.
+
+112
+00:08:38,575 --> 00:08:43,365
+Elles dialoguent avec le microcontrôleur,
+en série,
+
+113
+00:08:43,365 --> 00:08:46,425
+généralement en, I carré C, ou en SPI.
+
+114
+00:08:48,935 --> 00:08:54,155
+Par exemple, ici,
+cette mémoire M95256, a une capacité
+
+115
+00:08:55,995 --> 00:09:01,485
+de 256, mais attention,
+il s'agit de kilobits.
+
+116
+00:09:01,485 --> 00:09:06,284
+On sait que 256 kilobits,
+c'est égal à 32 kiloByte.
+
+117
+00:09:08,575 --> 00:09:11,601
+Ici, on reconnaît les signaux MOSI, MISO,
+
+118
+00:09:11,601 --> 00:09:17,155
+c'est-à-dire les données transmises
+dans un sens ou dans l'autre,
+
+119
+00:09:17,155 --> 00:09:22,125
+et l'horloge, on est donc bien
+en présence du standard SPI.
+
+120
+00:09:23,505 --> 00:09:26,890
+Et il suffit donc de quatre lignes
+
+121
+00:09:26,890 --> 00:09:29,750
+pour connecter cette mémoire
+à un micro contrôleur.
+
+122
+00:09:29,750 --> 00:09:32,620
+Les trois lignes, plus la sélection.
+
+123
+00:09:34,140 --> 00:09:38,040
+Lorsqu'on souhaite disposer de
+quantités de mémoire plus importantes,
+
+124
+00:09:38,040 --> 00:09:43,780
+la solution des cartes SD semble la
+plus appropriée, en particulier les
+
+125
+00:09:43,780 --> 00:09:50,010
+cartes microSD, qui sont particulièrement
+petites et pratiques à utiliser.
+
+126
+00:09:51,590 --> 00:09:53,900
+Le nombre de broches est
+relativement limité.
+
+127
+00:09:54,970 --> 00:10:00,090
+C'est assez facile de connecter une
+carte SD à un micro contrôleur.
+
+128
+00:10:01,130 --> 00:10:06,185
+Par contre, la programmation peut être
+relativement complexe, en particulier,
+
+129
+00:10:06,185 --> 00:10:10,765
+on doit être capable de gérer les
+données par bloc, selon des protocoles
+
+130
+00:10:10,765 --> 00:10:14,555
+d'écrit pour les cartes SD,
+qui sont relativement compliqués.
+
+131
+00:10:15,665 --> 00:10:18,805
+Par ailleurs, on va souhaiter
+utiliser un système de fichiers,
+
+132
+00:10:20,055 --> 00:10:24,135
+de telle manière que la mémoire
+puisse être, par exemple, chargée,
+
+133
+00:10:24,135 --> 00:10:29,110
+depuis un ordinateur, puis utilisée
+par exemple, par un afficheur.
+
+134
+00:10:29,110 --> 00:10:31,830
+Les systèmes de fichiers
+les plus standards,
+
+135
+00:10:31,830 --> 00:10:34,910
+les plus utilisés,
+c'est par exemple FAT32.
+
+136
+00:10:36,490 --> 00:10:40,590
+Programmer tout ça n'est pas très
+difficile, mais ça prend un petit peu du
+
+137
+00:10:40,590 --> 00:10:45,990
+temps, ce sera plus pratique d'utiliser
+des libraires qui sont disponibles.
+
+138
+00:10:45,990 --> 00:10:50,880
+À titre d'exemple, la librairie,
+qui s'appelle PetitFat,
+
+139
+00:10:50,880 --> 00:10:56,370
+fournit un certain nombre de
+procédures qui permettent de monter
+
+140
+00:10:56,370 --> 00:11:01,980
+un volume, donc une mémoire,
+qui permettent d'ouvrir un fichier,
+
+141
+00:11:01,980 --> 00:11:05,860
+de lire et d'écrire dans ce fichier
+
+142
+00:11:05,860 --> 00:11:11,190
+et également de se déplacer dans ce
+fichier, pour la lecture ou l'écriture.
+
+143
+00:11:11,190 --> 00:11:16,730
+Il est également possible de gérer des
+directoires, des dossiers, opendir,
+
+144
+00:11:16,730 --> 00:11:21,070
+pour l'ouvrir et lecture
+du contenu d'un dossier.
+
+145
+00:11:22,760 --> 00:11:27,460
+Nos avons donc vu les types de mémoire
+disponibles dans les micro contrôleurs,
+
+146
+00:11:27,460 --> 00:11:32,440
+nous avons regardé comment fonctionnent,
+comment on utilise les EEPROM,
+
+147
+00:11:32,440 --> 00:11:36,650
+les Flash et quelles sont leurs
+limites de cycles d'écriture.
+
+148
+00:11:36,650 --> 00:11:41,700
+Nous avons aussi signalé que nous
+pouvions utiliser des mémoires externes,
+
+149
+00:11:41,700 --> 00:11:46,310
+en particulier des cartes SD,
+très utiles dans les afficheurs à LED.

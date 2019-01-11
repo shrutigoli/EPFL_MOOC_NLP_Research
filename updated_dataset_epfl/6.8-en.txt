@@ -1,0 +1,195 @@
+Welcome back,
+Nature, In Code.
+We are in Chapter 6, Lecture 8.
+We just learned about negative frequency dependent selection.
+Which is what occurs for example when host... 
+...and parasites co-evolve with each other.
+And so in this lecture we will start...
+...implementing a host parasite system... in Java script, so let's get going.
+So this is our fitness model if you will.
+Again this is called the matching alleles model.
+Matching alleles.
+Why?
+Because we have two alleles, A1, A2 
+...and if the parasite matches the allele of the host...
+...then there is infection.
+The parasite can infect.
+This will be bad for the host so the host...
+...will have a reduction in fitness so reduction...
+...of this default value 1 of sh, so that's the selection.
+...coefficient in the host, and the parasite will have the maximum fitness 1. the maximum fitness 1.
+Vise versa if there is no match, there is no infection.
+This will be great for the host so the host will have a maximum... 
+...fitness of 1 and the parasite will have a reduced fitness.
+So the fitness will be reduced by this factor sp...
+...which is the selection coefficient for the parasite.
+So our job is now to implement this model...
+...in Java script, let's go ahead and do that.
+Alright, so here we are, text editor, empty file, let's start from scratch.
+As always we will define the doc type...
+...doc type html, then i set up the html tag... and within the html tag we have the head, and the body... and once again this will be a simulation with some output, visual output... using the three, so I'm gonna develop my code here in the script tag, directly. here in the script tag, directly.
+We will get the D3 the necessary library later on .
+And before I get started, 
+I want to save this file right away, ..
+...so save as I'm gonna go here to codec samples, you should go where ever you. store your code and I'm gonna save this as co-evolution.html.
+Alright, good!
+So let's get started.
+Now how are we going to do this?
+Well we'll do this as always, I'll think about a few variables that I'll probably...
+...need then I will just start with the first function that I probably want to call.
+So what kind of variables do I need here?
+Well, we are going to keep track of genotype frequencies that we wanna plot... so I'm gonna need this data array where I'm going to store all the values... store all the values, that will eventually be plotted.
+Okay, I'm gonna plot genotype or allele frequencies over time.
+For how long? 
+Well let's say for 400 generations.
+So I'm gonna define this generations variable that you can change if you want to. if you want to.
+Okay, so I have four different genotypes that I want to keep track of.
+So I have two in the host, A1 and A2 and 
+I have two in the parasites. two in the parasites.
+So what I'm gonna do is I'm gonna generate here or create host... frequencies array and this array will have two values and that is... the frequency of the A1 and the frequency of the A2 genotypes.
+So I'm gonna initialize this at  zero zero, just to also show... 
+...that there will be two values in here.
+Obviously those should not be both zero, 
+...but you know as an initialization it's okay.
+Same for the parasites I'm going to say here, parasite frequencies...
+and I'm actually going to initialize those...
+...oops, at zero and zero.
+Good!
+And then the only other two variable 
+I think I need are the selection coefficients.
+ coefficients.
+So for the host's selection coefficient 
+I'm going to set it at 0.2, 
+...by the way of host parasite interactions... interactions particularly in the context
+...of the evolutionary dynamics, this is what we would call "virulence".
+And then I'm gonna set sp, the selection coefficient of the parasite to some value i'm gonna use a higher value here, we can change these later... we can change these later
+...but I'm generally thinking that, when a parasite infects a host that's usually bad...
+...for a host but it is not usually the end of a host, 
+I mean not always, it can be... of a host, i mean not always, it can be, but not always.
+Whereas for parasites in fact if they cannot infect a host that's usually... very bad to the extent that is could actually be a fitness cost of 1.
+But we are now just going to set it to 0.5, just want to make sure... it's a really high fitness cost here of not being able to infect a host. 
+Good!
+So what will be the first, the first function that I would want to call?
+Well I would probably want to initialize these frequencies here.
+So I'm gonna call a function, initialize, initialize frequencies.
+Frequencies, okay.
+For this function, I haven't defined yet so I'm gonna go ahead and do this.
+So function, initialize frequencies.
+What should this do?
+It should obviously initialize the frequencies of the host and the parasite. and the parasite.
+Alright, so let's just initialize these at random values.
+So, for example, I could pick a random value for the A1 host frequency... so you know for example var A1 host frequency.
+I could set this to a random number between 0 and 1 and of course...
+...our good old friend math random is perfectly suited for this.
+Good!
+So now I have the A1 host frequency.
+So this is the frequency that I would like to have stored here...
+in this first position in this array.
+The second element is for the A1 host frequency.
+Alright, so that means, host frequencies...
+I'm just going to copy these... to avoid spelling mistakes.
+The first element which as of course index 0...
+...is exactly now this value, okay.
+So that's great but again keep in mind that these two arrays here just only keep... track of the current frequencies of the current four genotypes. four genotypes.
+That's why they have only 4 elements, two here and two here...
+...but of course I wanna keep track also over all these values over time...
+...in particular here over 400 generations.
+So I have to push these values into the data array.
+So what I would like to have here eventually, I'd like to have... four arrays in this data array.
+Each of these four arrays keeping track of the corresponding four genotypes. four genotypes.
+So that I'm getting four lines when I'm going to plot this.
+So what that means is I need to push something here into data...
+...so data push, okay.
+What would I like to push?
+Well, it should be an array right, should be an array...
+...and then I could add this value to this array and then it consequently...
+...and then I could add this value to this array and then it consequently...
+...be filling up this array and I would do this now for the A2 host...
+..for the A1 parasite and for the A2 parasite as well.
+But rather than pushing an empty array then adding a value.
+As you know you can also initialize arrays with a value in there.
+So I'm just gonna say, okay, I'm gonna put this A1 host frequency value...
+...in there as the first value of this array, so I don't have to push an...
+...empty array I can already put in the first element of this array.
+Alright, so I hope you understand how this works.
+We're getting here a random value for the A1 host frequency and then we are... 
+...going to store this in the array that keeps track of the frequencies at each... 
+...moment and ultimately we store this in this data array here... that keeps track of all the data over the p...
+entire simulation, so we can plot it later.
+Now that I actually look at this, it does look a bit verbose.
+But I wanted to be sure I did this the verbose way first, 
+...so that you understand what's going on... but you can see here that we are actually utilizing... some kind of variable here that is not really necessary...
+...and so I'm gonna change this slightly here.
+I'm basically going to get rid of this A1 host frequency... variable here, local variable.
+It really seems quite unnecessary, 
+I'm simply going to say... host frequency 0 equals math random.
+So I'm just going to replace this directly with math random.
+Okay, math random, so I don't need this line anymore... and now here, I don't have this variable A1 host frequency anymore.. but we know it's stored in this array here.
+So I'm simply going to replace the A1 host frequency variable...
+which I don't have anymore, with this host frequency 0.
+Okay now that's now shorter, it is actually quite dense and it may...
+be confusing if I, if I hadn't done this first step of using this... intermediary variable, but now that I have used it first then removed it...
+I hope it's very clear now to you how this exactly works.
+And so this is for the A1 host so now I can do.
+the exact same thing for the A2 host frequency...
+So, host frequencies, frequencies 1, so that's now the second value here right.
+Here, right?
+The element with index 1, this is were I keep track of the A2 host genotype. host genotype.
+What is this?
+Well is simply 1- host frequency 0 because the two need to add up to one. add up to one.
+So they are now both random values the first one directly through...
+...math random, and the other one simply one minus that value.
+Good, and now I need to push this also into this data array...
+...and I'm going to use the exact same line except...
+I'm now referencing host frequencies element with... index 1.
+So that's for the two initial host frequencies all set up.
+Now we can essentially just copy these lines here and paste them... and now replace the host here with parasite, okay.
+So this is parasite frequencies, 
+0=math random... so the A1 frequency of the parasite is a random number. 
+Then we are gonna push, data push, parasite frequency 0.
+So we are gonna push this value here into an array and then the array into data.
+So the exact same logic is above and then here same thing.
+Parasite frequency is 1, so this is the A2 parasite genotype is
+1 minus parasite frequency zero.
+So these need to add up to 1 as well of course and then we are gonna push into data this array which already has the parasite frequencies 1 and that's of course again the A2 parasite genotype.
+So this is now how we set up the frequencies in our array.
+Good!
+So this is the initialization, 
+I think this works great.
+No what do we need to do after we initialize this?
+Well we wanna run this simulation for a couple of generations so, we are gonna use here the for loop and this is now totally old news for you.
+So var i=0, i smaller than generations and of course
+ the increment, alright.
+And now we are going to say we would like to do a couple of things in each generation.
+What is it that we want to do?
+Well we wanna have two processes really.
+On the one hand, selection needs to act on the host, depending on the fitness values that we defined and of course importantly on the genotype frequencies.
+Then we also want to do the same with the parasites.
+We want selection to act on the parasite genotypes and again the fitness there will depend crucially on the genotype frequencies.
+But so these are two things we will have to do and we will just call two functions host selection and parasite selection.
+So these will happen in each generation  for the four genotype and this is where we calculate the new frequencies for the four possible genotypes.
+So then once we have done this, we do this in the next lecture to implement those two methods, but once we have done that
+then we basically wanna push these values into our data array
+So, recall that the data array itself now has four arrays and these arrays keep track of the A1 host genotype, the A2 host genotype, the A1 parasite genotype and the A2 parasite genotype in that order.
+So what we are going to do is we are going to say alright data, the first array, so the one with index zero.
+This is the that holds the values for the A1 host genotype.
+So we are gonna push into this array whatever we currently have in fact, here in this host frequencies array at the first element, because that is exactly, oops sorry, that was copied in the wrong parentheses.
+Exactly what we have here in host frequency zero which is where we currently store the A1 host genotype.
+So this we're gonna to push into the first of the four arrays in data.
+So the second array in data, so data 1.
+What are we going to push in there?
+Well correspondingly we are going to push host frequencies 1 cause that's were we store the A2 host genotype.
+And so on, so data 2, so the third array within data.
+What do we push there?
+Well we want to push the parasite frequencies and particularly the element 0 which contains the A1 parasite genotype frequency.
+And then finally last but not least,
+I'm gonna copy but then you get the idea.
+In data 3, we are going to push the parasite frequencies element with index 1, so that's the A2 parasite genotypes.
+So after we have executed these two functions, which we have yet to define.
+We would have updated the host and parasite frequencies and we need to make sure we push those into the corresponding data arrays, so that after we have all the generations we have all the necessary data, in the data array and we can easily plot this.
+And we would of course plot this using our good old friend the draw line chart function which we have used many, many times before starting in chapter 3, so draw line chart and here what we're gonna do is pass in data as always.
+On the X-axis we are going to say generation because we are simply plotting the generations on the X-axis.
+The Y-axis we are gonna simply say p because these are the frequencies and we don't need a legend, so I'm gonna pass in here an empty array.
+Alright so now what remains to be done is to implement these two functions and also get the draw line chart in the D3 library.
+...and also get the draw line chart in the D3 library.
+So let's do that in the next lecture, I'll see you there.

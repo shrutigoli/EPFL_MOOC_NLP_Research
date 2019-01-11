@@ -1,0 +1,1528 @@
+1
+00:00:21,499 --> 00:00:23,349
+So we continue in this lesson
+
+2
+00:00:23,549 --> 00:00:25,887
+our discovery of the richness
+
+3
+00:00:26,087 --> 00:00:27,975
+and subtleties of the SQL language
+
+4
+00:00:28,175 --> 00:00:31,350
+by addressing the issue of
+aggregation and sorting
+
+5
+00:00:31,550 --> 00:00:34,199
+namely how to extract
+
+6
+00:00:35,124 --> 00:00:36,987
+synthetic information
+
+7
+00:00:37,187 --> 00:00:39,349
+from a set or a subset of data,
+
+8
+00:00:39,812 --> 00:00:41,887
+to group them, filter them
+
+9
+00:00:42,087 --> 00:00:43,362
+and sort them.
+
+10
+00:00:43,849 --> 00:00:46,149
+The objective of the lesson is therefore
+
+11
+00:00:46,349 --> 00:00:48,499
+to understand the aggregation logic
+
+12
+00:00:48,699 --> 00:00:51,524
+and how to sort the results of a query
+
+13
+00:00:51,724 --> 00:00:53,112
+so that you can
+
+14
+00:00:53,299 --> 00:00:56,274
+thereafter write aggregation and
+sorting requests.
+
+15
+00:00:56,799 --> 00:01:00,162
+We will discuss successively
+the functions of aggregation,
+
+16
+00:01:00,837 --> 00:01:02,574
+the concept of grouping,
+
+17
+00:01:03,412 --> 00:01:05,274
+conditional aggregation
+
+18
+00:01:05,774 --> 00:01:06,949
+and finally
+
+19
+00:01:07,149 --> 00:01:10,062
+the elements of sorting and
+limitation of the results.
+
+20
+00:01:16,037 --> 00:01:18,424
+Coming back to our summary table
+
+21
+00:01:18,624 --> 00:01:21,912
+of the basic syntax of the SQL language,
+
+22
+00:01:22,387 --> 00:01:26,049
+we find the clauses of aggregation
+that interest us here
+
+23
+00:01:26,237 --> 00:01:29,124
+with the GROUP BY and HAVING keywords.
+
+24
+00:01:30,162 --> 00:01:33,462
+But we will start with the
+aggregation functions
+
+25
+00:01:33,662 --> 00:01:36,149
+which allow to carry out
+statistical operations
+
+26
+00:01:36,349 --> 00:01:39,462
+on a set or subset of records
+
+27
+00:01:39,962 --> 00:01:42,262
+with a type of syntax...
+
+28
+00:01:43,124 --> 00:01:44,462
+the SELECT keyword,
+
+29
+00:01:44,649 --> 00:01:46,674
+the keyword of the function
+
+30
+00:01:46,874 --> 00:01:50,087
+with the attribute name on what
+the function is
+
+31
+00:01:50,624 --> 00:01:53,399
+and then the FROM clause
+and the name of the table.
+
+32
+00:01:53,599 --> 00:01:56,924
+And these functions are of
+various types, including the sum,
+
+33
+00:01:57,912 --> 00:02:00,162
+the counting of the number of elements,
+
+34
+00:02:00,362 --> 00:02:02,699
+the average, the minimum
+and the maximum.
+
+35
+00:02:03,012 --> 00:02:04,499
+The COUNT function,
+
+36
+00:02:04,699 --> 00:02:07,162
+with an attribute or asterisk as argument,
+
+37
+00:02:07,362 --> 00:02:09,574
+gives the number of elements of the table
+
+38
+00:02:09,774 --> 00:02:11,749
+whereas by adding the
+DISTINCT function,
+
+39
+00:02:11,924 --> 00:02:13,162
+we obtain the number of values
+
+40
+00:02:13,362 --> 00:02:15,400
+that the attribute used
+in argument can take.
+
+41
+00:02:17,050 --> 00:02:20,137
+An example of the application of
+these aggregation functions
+
+42
+00:02:20,962 --> 00:02:23,337
+in Spatialite with
+
+43
+00:02:24,224 --> 00:02:27,924
+the number of rooms of the hotel table
+
+44
+00:02:28,924 --> 00:02:32,224
+and we would like to have
+a table that gives us
+
+45
+00:02:33,262 --> 00:02:35,562
+all the rooms present on the island
+
+46
+00:02:35,749 --> 00:02:37,149
+so 2,518 rooms.
+
+47
+00:02:39,074 --> 00:02:42,149
+We would also like to be able to count
+
+48
+00:02:44,649 --> 00:02:47,074
+the STATUS column of this hotel,
+we see that there is
+
+49
+00:02:47,274 --> 00:02:51,212
+124 status corresponding
+to the 124 existing hotels
+
+50
+00:02:51,699 --> 00:02:54,087
+and with the DISTINCT keyword,
+
+51
+00:02:54,287 --> 00:02:56,437
+we will be able to regroup
+
+52
+00:02:56,637 --> 00:02:58,787
+the different status
+
+53
+00:02:58,987 --> 00:03:01,899
+which are 7 in total.
+
+54
+00:03:04,587 --> 00:03:07,599
+Another example of using
+these aggregation functions,
+
+55
+00:03:08,074 --> 00:03:10,799
+with the calculation of the
+average number of hotel beds
+
+56
+00:03:11,537 --> 00:03:14,749
+obtained by dividing the total number
+of beds by the number of hotels.
+
+57
+00:03:15,449 --> 00:03:17,387
+Note that we would obtain the same result
+
+58
+00:03:17,587 --> 00:03:20,599
+using directly the average
+aggregation function
+
+59
+00:03:20,787 --> 00:03:22,012
+or AVG.
+
+60
+00:03:23,799 --> 00:03:26,099
+We thus obtain an average number of 38.
+
+61
+00:03:26,924 --> 00:03:29,887
+If we want to have this value 
+in real number in SpatiaLite,
+
+62
+00:03:30,087 --> 00:03:32,874
+it is necessary to transform the sum 
+which is an integer into a real one
+
+63
+00:03:33,074 --> 00:03:34,837
+which is done with the CAST function
+
+64
+00:03:35,037 --> 00:03:36,787
+on the "element" variable
+
+65
+00:03:36,987 --> 00:03:38,837
+and followed by the "as float" suffix.
+
+66
+00:03:45,262 --> 00:03:47,899
+The maximum, the maximum number
+
+67
+00:03:48,099 --> 00:03:50,312
+of hotel beds is obtained
+
+68
+00:03:50,512 --> 00:03:51,799
+with this max function,
+
+69
+00:03:52,662 --> 00:03:54,649
+so 464.
+
+70
+00:03:55,199 --> 00:03:58,724
+And then what is of interest to us
+is to see which of these hotels has
+
+71
+00:03:58,924 --> 00:04:01,674
+the maximum of beds so we can add
+
+72
+00:04:02,424 --> 00:04:04,299
+in SpatiaLite
+
+73
+00:04:04,499 --> 00:04:06,662
+the NAME field as the result of the query
+
+74
+00:04:06,862 --> 00:04:08,662
+and we see that it is
+the Berjaya B. Vallon.
+
+75
+00:04:08,862 --> 00:04:11,662
+It should be noted that this addition
+of the name is not an SQL standard
+
+76
+00:04:11,862 --> 00:04:14,525
+and will cause an error with most DBMS.
+
+77
+00:04:14,725 --> 00:04:16,975
+We will see later the correct SQL syntax
+
+78
+00:04:17,175 --> 00:04:18,887
+to obtain this type of result.
+
+79
+00:04:19,825 --> 00:04:22,950
+Same example, same situation for
+
+80
+00:04:23,150 --> 00:04:24,450
+pgAdmin
+
+81
+00:04:24,650 --> 00:04:27,650
+where we use the graphic constructor
+but we do not go very far
+
+82
+00:04:27,850 --> 00:04:28,675
+because the
+
+83
+00:04:29,800 --> 00:04:32,425
+aggregation functions must be written
+
+84
+00:04:32,600 --> 00:04:35,062
+in the SQL editor in the same way
+
+85
+00:04:35,262 --> 00:04:37,837
+as in SpatiaLite.
+
+86
+00:04:39,512 --> 00:04:43,125
+So we saw the case of the 
+sum of the rooms.
+
+87
+00:04:43,812 --> 00:04:46,825
+Now, the counting of status
+
+88
+00:04:47,387 --> 00:04:51,162
+against the 124 status corresponding 
+to the 124 hotels again
+
+89
+00:04:51,350 --> 00:04:53,725
+and with the DISTINCT keyword,
+
+90
+00:04:54,300 --> 00:04:57,587
+we obtain the 7 types of status again
+
+91
+00:04:58,875 --> 00:05:02,000
+characterizing the hotels of the islands.
+
+92
+00:05:03,612 --> 00:05:05,550
+In the same way as previously,
+
+93
+00:05:05,750 --> 00:05:06,562
+we can
+
+94
+00:05:06,950 --> 00:05:09,262
+use these aggregation functions
+
+95
+00:05:09,537 --> 00:05:12,262
+to compute a calculation so here the
+
+96
+00:05:12,887 --> 00:05:16,325
+total of the hotel beds in relation
+to the number of hotels
+
+97
+00:05:16,525 --> 00:05:18,275
+to obtain
+
+98
+00:05:18,475 --> 00:05:19,825
+the average
+
+99
+00:05:20,750 --> 00:05:22,850
+of the island hotels.
+
+100
+00:05:23,050 --> 00:05:26,637
+And here we see that with Postgres
+we obtain directly a result
+
+101
+00:05:26,837 --> 00:05:29,787
+in real number and not in integer number.
+
+102
+00:05:31,262 --> 00:05:33,875
+Here we can also use the max function
+
+103
+00:05:34,075 --> 00:05:36,987
+to obtain the number of beds
+of the biggest hotel of the Seychelles.
+
+104
+00:05:38,637 --> 00:05:40,650
+And we will see later how
+
+105
+00:05:40,850 --> 00:05:42,937
+when we will speak of nested query,
+
+106
+00:05:43,137 --> 00:05:46,075
+how to deal with this kind of questioning.
+
+107
+00:05:47,200 --> 00:05:49,200
+The same example
+
+108
+00:05:49,400 --> 00:05:52,025
+with the Navicat software,
+
+109
+00:05:52,762 --> 00:05:54,850
+we add graphically again
+
+110
+00:05:55,775 --> 00:05:57,975
+the elements and then the
+
+111
+00:05:59,487 --> 00:06:01,175
+request can be composed
+
+112
+00:06:01,375 --> 00:06:04,037
+in the graphic interface, 
+so we can add the sum,
+
+113
+00:06:04,825 --> 00:06:09,025
+add the counting section,
+change the attribute.
+
+114
+00:06:09,825 --> 00:06:12,725
+We find the 124 status
+
+115
+00:06:12,925 --> 00:06:14,150
+of the 124 hotels.
+
+116
+00:06:14,350 --> 00:06:17,187
+On the other hand, to add
+the DISTINCT keyword, we must go
+
+117
+00:06:17,387 --> 00:06:18,687
+also in this case
+
+118
+00:06:18,887 --> 00:06:20,662
+to the SQL editor
+
+119
+00:06:20,862 --> 00:06:22,887
+to write
+
+120
+00:06:23,812 --> 00:06:26,662
+this keyword.
+
+121
+00:06:29,550 --> 00:06:31,675
+Returning to the editor,
+
+122
+00:06:31,862 --> 00:06:33,087
+we can
+
+123
+00:06:33,725 --> 00:06:37,050
+this time replace the status with beds
+
+124
+00:06:37,350 --> 00:06:39,637
+and then, and actually it is simpler
+
+125
+00:06:39,837 --> 00:06:42,837
+to write this somewhat complicated
+query and which does the calculation
+
+126
+00:06:43,037 --> 00:06:44,275
+of the average
+
+127
+00:06:45,575 --> 00:06:48,812
+in the editor rather than 
+in the graphic interface.
+
+128
+00:06:49,012 --> 00:06:50,611
+And here again, we find the result.
+
+129
+00:06:50,799 --> 00:06:52,774
+So it is because it is Postgres 
+that is behind
+
+130
+00:06:52,949 --> 00:06:54,799
+directly in real number.
+
+131
+00:07:06,186 --> 00:07:08,637
+The principle of the GROUP BY clause
+
+132
+00:07:08,837 --> 00:07:11,974
+is to allow the grouping of several results
+
+133
+00:07:12,299 --> 00:07:15,424
+and to apply an aggregation
+function to this group.
+
+134
+00:07:15,724 --> 00:07:17,549
+The basic syntax
+
+135
+00:07:17,886 --> 00:07:19,812
+includes the SELECT keyword
+
+136
+00:07:20,012 --> 00:07:22,062
+with the attributes we want to see
+
+137
+00:07:22,262 --> 00:07:23,662
+in the result
+
+138
+00:07:23,862 --> 00:07:26,162
+with possibly a function
+
+139
+00:07:26,362 --> 00:07:28,512
+which is exercised on one
+or the other of these attributes.
+
+140
+00:07:29,512 --> 00:07:32,287
+The FROM keyword with the original table
+
+141
+00:07:33,187 --> 00:07:34,512
+which is questioned 
+
+142
+00:07:34,712 --> 00:07:37,524
+and then the GROUP BY
+keyword followed by the attribute
+
+143
+00:07:37,724 --> 00:07:40,262
+which will be used for grouping.
+
+144
+00:07:42,487 --> 00:07:46,087
+We take an example again with
+the SQL SpatiaLite query constructor
+
+145
+00:07:46,599 --> 00:07:49,287
+integrated into QGIS.
+
+146
+00:07:50,424 --> 00:07:52,274
+So, we write a query
+
+147
+00:07:52,474 --> 00:07:54,637
+where we seek to obtain
+
+148
+00:07:55,724 --> 00:07:57,574
+the set of
+
+149
+00:07:57,774 --> 00:08:00,624
+hotel rooms available by district.
+
+150
+00:08:00,937 --> 00:08:02,937
+So, this request
+
+151
+00:08:03,137 --> 00:08:05,112
+includes as resulting field
+the names of districts
+
+152
+00:08:05,312 --> 00:08:08,312
+and the sum made on
+
+153
+00:08:08,512 --> 00:08:10,212
+the number of hotel rooms
+
+154
+00:08:11,037 --> 00:08:14,674
+from the DISTRICTS table 
+and HOTELS table
+
+155
+00:08:14,874 --> 00:08:18,499
+with a joint as we have just seen
+between these 2 tables
+
+156
+00:08:18,699 --> 00:08:21,699
+between the district identifier
+of the HOTELS table
+
+157
+00:08:21,899 --> 00:08:25,624
+and the identifier, this same
+identifier in the DISTRICTS table itself.
+
+158
+00:08:27,362 --> 00:08:30,674
+A regrouping clause must be added to this
+
+159
+00:08:30,999 --> 00:08:32,274
+since
+
+160
+00:08:32,474 --> 00:08:33,824
+the numbers ...
+
+161
+00:08:34,262 --> 00:08:37,137
+the number of hotel rooms is
+linked to each district name
+
+162
+00:08:37,324 --> 00:08:38,099
+and that,
+
+163
+00:08:38,299 --> 00:08:41,474
+the different hotels and districts,
+must be grouped together.
+
+164
+00:08:41,674 --> 00:08:43,512
+And we find about twenty results
+
+165
+00:08:43,712 --> 00:08:46,587
+since there are 5 districts
+that do not have hotels.
+
+166
+00:08:47,149 --> 00:08:49,787
+The same thing happens in pgAdmin,
+
+167
+00:08:49,987 --> 00:08:52,287
+where this time we construct the
+query graphically
+
+168
+00:08:52,487 --> 00:08:54,474
+with DISTRICTS tables and HOTELS tables.
+
+169
+00:08:55,374 --> 00:08:56,461
+The joint,
+
+170
+00:08:56,661 --> 00:08:59,199
+the 2 fields we would like to
+have in the result
+
+171
+00:08:59,399 --> 00:09:00,311
+and we...
+
+172
+00:09:00,511 --> 00:09:03,961
+we have to complete the 
+request in the textual
+
+173
+00:09:05,437 --> 00:09:06,624
+editor
+
+174
+00:09:06,824 --> 00:09:08,336
+by adding
+
+175
+00:09:08,649 --> 00:09:10,524
+the sum on the hotel rooms
+
+176
+00:09:10,686 --> 00:09:11,936
+and adding
+
+177
+00:09:12,424 --> 00:09:14,036
+the group clause,
+
+178
+00:09:15,086 --> 00:09:17,086
+the GROUP BY, which is about
+
+179
+00:09:17,286 --> 00:09:19,286
+the names of the districts
+since we will group
+
+180
+00:09:19,611 --> 00:09:22,199
+the rooms by district.
+
+181
+00:09:26,124 --> 00:09:28,736
+And we see that we also get again
+
+182
+00:09:28,936 --> 00:09:30,924
+the same 20 results as before.
+
+183
+00:09:31,911 --> 00:09:35,399
+In Navicat, things happen a
+little bit in the same way.
+
+184
+00:09:36,186 --> 00:09:37,674
+We add
+
+185
+00:09:38,099 --> 00:09:40,411
+the tables in the graphical constructor
+
+186
+00:09:40,611 --> 00:09:41,436
+we make the join,
+
+187
+00:09:41,636 --> 00:09:44,249
+we select the fields we 
+want to see appearing 
+
+188
+00:09:44,449 --> 00:09:45,374
+in the result
+
+189
+00:09:46,124 --> 00:09:49,524
+and then we can this time in the
+integrated SQL editor,
+
+190
+00:09:49,724 --> 00:09:52,974
+directly select the aggregation function
+
+191
+00:09:53,386 --> 00:09:56,749
+and then we see that automatically,
+the grouping has been added,
+
+192
+00:09:56,949 --> 00:09:58,986
+the same 20 results are obtained.
+
+193
+00:10:08,124 --> 00:10:10,974
+The HAVING clause is similar to
+the WHERE clause
+
+194
+00:10:11,174 --> 00:10:13,212
+but allows to filter the results
+
+195
+00:10:13,412 --> 00:10:14,986
+with the help of aggregation functions,
+
+196
+00:10:15,186 --> 00:10:18,761
+it is the reason why this time we refer
+to conditional aggregation.
+
+197
+00:10:19,424 --> 00:10:21,049
+In terms of syntax,
+
+198
+00:10:21,887 --> 00:10:24,849
+the basic syntax always includes
+the SELECT keyword,
+
+199
+00:10:25,049 --> 00:10:26,961
+the list of attributes
+
+200
+00:10:27,161 --> 00:10:28,886
+that we want to group,
+
+201
+00:10:29,824 --> 00:10:32,524
+that we want to have 
+in the resulting table
+
+202
+00:10:32,724 --> 00:10:35,399
+with possibly a function on
+one of these attributes.
+
+203
+00:10:35,824 --> 00:10:37,886
+The FROM with the original table,
+
+204
+00:10:38,086 --> 00:10:41,837
+the group clause with the
+attribute or attributes
+
+205
+00:10:42,037 --> 00:10:44,449
+which intervene in this group clause
+
+206
+00:10:44,649 --> 00:10:47,337
+and finally a filter function
+
+207
+00:10:47,937 --> 00:10:50,049
+based on the HAVING keyword
+
+208
+00:10:50,249 --> 00:10:52,399
+which combines an attribute
+
+209
+00:10:52,599 --> 00:10:55,599
+function, an operator and a criterion.
+
+210
+00:10:56,749 --> 00:10:58,761
+So, we will see right away how it happens
+
+211
+00:10:58,961 --> 00:11:01,349
+with the same example as before
+
+212
+00:11:01,512 --> 00:11:02,899
+where we have this request
+
+213
+00:11:03,099 --> 00:11:05,111
+which allows to collect the
+
+214
+00:11:05,874 --> 00:11:07,949
+number of rooms per district
+
+215
+00:11:08,161 --> 00:11:10,636
+but we will simply filter this result
+
+216
+00:11:10,836 --> 00:11:12,149
+to get
+
+217
+00:11:12,511 --> 00:11:14,549
+all the districts
+
+218
+00:11:14,736 --> 00:11:17,586
+in which this number of rooms
+
+219
+00:11:17,786 --> 00:11:20,424
+is greater than 100.
+
+220
+00:11:21,224 --> 00:11:25,136
+And we see that there are 8
+districts that have more rooms,
+
+221
+00:11:25,386 --> 00:11:26,961
+that have more than 100 rooms.
+
+222
+00:11:27,774 --> 00:11:29,986
+The same applies to the request
+
+223
+00:11:30,186 --> 00:11:32,224
+we had earlier in the case of
+
+224
+00:11:32,424 --> 00:11:34,724
+PostgreSQL with the same way,
+
+225
+00:11:34,924 --> 00:11:37,924
+we are obliged to use the SQL editor
+
+226
+00:11:38,986 --> 00:11:41,211
+to add
+
+227
+00:11:41,411 --> 00:11:42,924
+this filter clause.
+
+228
+00:11:43,936 --> 00:11:47,311
+The graphic constructor being
+in this case of no use.
+
+229
+00:11:47,624 --> 00:11:50,474
+And again, we find the same 8 results.
+
+230
+00:11:52,786 --> 00:11:55,949
+Finally, in the case of Navicat,
+
+231
+00:11:56,136 --> 00:11:58,174
+we also start from the previous request
+
+232
+00:11:58,374 --> 00:12:00,924
+and we see that we have
+in the integrated editor
+
+233
+00:12:01,124 --> 00:12:03,436
+the possibility of
+
+234
+00:12:03,636 --> 00:12:06,636
+graphically constructing this query,
+
+235
+00:12:08,174 --> 00:12:10,674
+which makes life a little bit easier
+
+236
+00:12:10,874 --> 00:12:13,549
+compared to a standard SQL editor.
+
+237
+00:12:14,861 --> 00:12:16,961
+And in the result, we find again
+
+238
+00:12:17,161 --> 00:12:19,761
+these 8 hotels, these 8 districts, sorry.
+
+239
+00:12:29,024 --> 00:12:30,911
+The sorting and limitation clauses
+
+240
+00:12:31,111 --> 00:12:33,749
+are also part of the series of
+
+241
+00:12:33,949 --> 00:12:36,949
+basic syntactic elements of the
+SQL language
+
+242
+00:12:37,474 --> 00:12:40,486
+with the ORDER BY and LIMIT keywords.
+
+243
+00:12:42,011 --> 00:12:43,824
+ORDER BY is an SQL clause
+
+244
+00:12:44,024 --> 00:12:46,474
+which allows to sort the lines in a result
+
+245
+00:12:46,674 --> 00:12:47,974
+on one or more columns
+
+246
+00:12:48,174 --> 00:12:50,249
+in ascending or descending order.
+
+247
+00:12:50,999 --> 00:12:52,411
+The basic syntax
+
+248
+00:12:52,611 --> 00:12:54,636
+is the following: the SELECT keyword,
+
+249
+00:12:54,899 --> 00:12:58,811
+the attributes we want to see 
+appearing in the result,
+
+250
+00:12:59,899 --> 00:13:02,361
+the FROM clause with the name of the table
+
+251
+00:13:02,561 --> 00:13:04,424
+which hosts these attributes
+
+252
+00:13:04,624 --> 00:13:06,686
+and then the ORDER BY
+
+253
+00:13:06,886 --> 00:13:08,986
+sort clause with
+
+254
+00:13:09,186 --> 00:13:12,236
+successively the different attributes
+that will be used
+
+255
+00:13:12,436 --> 00:13:13,499
+as a sorting key
+
+256
+00:13:13,699 --> 00:13:16,186
+with the attribute number 1
+
+257
+00:13:16,386 --> 00:13:17,711
+in descending order,
+
+258
+00:13:17,911 --> 00:13:20,574
+the attribute number 2 in ascending order
+
+259
+00:13:20,774 --> 00:13:21,949
+and so on.
+
+260
+00:13:22,149 --> 00:13:23,573
+By default,
+
+261
+00:13:23,773 --> 00:13:26,648
+if nothing is specified, the sortig
+order will be ascending
+
+262
+00:13:26,848 --> 00:13:27,773
+but it is often
+
+263
+00:13:27,973 --> 00:13:31,161
+preferable to specify the sorting
+order to eliminate
+
+264
+00:13:31,836 --> 00:13:33,636
+any ambiguity
+
+265
+00:13:33,836 --> 00:13:37,536
+and especially to facilitate
+the reading of the request.
+
+266
+00:13:38,336 --> 00:13:40,861
+The LIMIT keyword allows 
+to specify the number
+
+267
+00:13:41,061 --> 00:13:43,111
+of results we wish to obtain
+
+268
+00:13:43,311 --> 00:13:46,849
+and the OFFSET keyword is used
+to define an offset
+
+269
+00:13:47,599 --> 00:13:49,649
+in the RESULTS table
+
+270
+00:13:49,849 --> 00:13:53,449
+to search for that maximum
+number of results.
+
+271
+00:13:53,799 --> 00:13:55,661
+The syntax is then
+
+272
+00:13:55,861 --> 00:13:58,149
+SELECT name of the attribute,
+FROM name of the table
+
+273
+00:13:58,624 --> 00:14:00,324
+LIMIT the number of lines
+
+274
+00:14:00,524 --> 00:14:02,936
+and optionally OFFSET 
+the number of lines.
+
+275
+00:14:04,611 --> 00:14:07,211
+By applying these ideas in the case of
+
+276
+00:14:07,411 --> 00:14:08,986
+the SpatiaLite database,
+
+277
+00:14:09,186 --> 00:14:11,761
+we write a SELECT query with
+
+278
+00:14:12,511 --> 00:14:15,636
+several attributes, hotel names,
+
+279
+00:14:15,836 --> 00:14:18,286
+number of beds.
+
+280
+00:14:20,724 --> 00:14:22,286
+And that is it actually.
+
+281
+00:14:23,911 --> 00:14:26,511
+The FROM clause with the name of the table
+
+282
+00:14:27,936 --> 00:14:29,286
+and then
+
+283
+00:14:29,836 --> 00:14:32,011
+an ORDER BY sorting request
+
+284
+00:14:32,723 --> 00:14:34,873
+and we will sort
+
+285
+00:14:35,073 --> 00:14:36,611
+by decreasing
+
+286
+00:14:37,598 --> 00:14:39,048
+number of beds.
+
+287
+00:14:39,498 --> 00:14:42,536
+So the BEDS fields is added
+
+288
+00:14:44,074 --> 00:14:46,848
+with the DECREASING keyword
+
+289
+00:14:47,048 --> 00:14:49,561
+then a second sorting criterion 
+which will simply be
+
+290
+00:14:49,761 --> 00:14:51,436
+the name of the hotels
+
+291
+00:14:51,623 --> 00:14:53,573
+in ascending alphabetical order.
+
+292
+00:14:54,636 --> 00:14:56,048
+So, we find
+
+293
+00:14:56,248 --> 00:14:58,773
+the biggest hotel in the lead and then…
+
+294
+00:14:59,661 --> 00:15:02,186
+within each class of beds
+
+295
+00:15:02,386 --> 00:15:03,298
+a alphabetical sorting
+
+296
+00:15:03,823 --> 00:15:05,848
+of hotels.
+
+297
+00:15:07,711 --> 00:15:09,336
+We can now limit
+
+298
+00:15:09,536 --> 00:15:11,798
+this result and say that we are
+only interested
+
+299
+00:15:11,998 --> 00:15:13,286
+in the first 5 values.
+
+300
+00:15:13,486 --> 00:15:15,198
+So we have the biggest five
+
+301
+00:15:16,236 --> 00:15:18,398
+and in each category in alphabetical order
+
+302
+00:15:18,898 --> 00:15:21,548
+and possibly shifting
+
+303
+00:15:21,748 --> 00:15:23,898
+this selection 5, 15 lines
+
+304
+00:15:24,098 --> 00:15:27,136
+and we land at the beginning
+
+305
+00:15:27,336 --> 00:15:29,698
+with a series of hotels in the
+
+306
+00:15:29,898 --> 00:15:31,211
+60 lines.
+
+307
+00:15:32,711 --> 00:15:35,386
+Same operation in the 
+pgAdmin environment
+
+308
+00:15:35,586 --> 00:15:37,348
+for the Postgres database
+
+309
+00:15:37,548 --> 00:15:39,548
+where we select graphically
+
+310
+00:15:40,411 --> 00:15:41,423
+the fields
+
+311
+00:15:41,623 --> 00:15:44,248
+and we can also write 
+in the ad hoc tab,
+
+312
+00:15:44,448 --> 00:15:45,798
+also graphically,
+
+313
+00:15:46,373 --> 00:15:48,648
+the sorting request.
+
+314
+00:15:49,773 --> 00:15:53,823
+We get the same result with
+the hotels sorted by
+
+315
+00:15:54,023 --> 00:15:55,348
+number of beds
+
+316
+00:15:55,548 --> 00:15:57,273
+and then by names
+
+317
+00:15:57,473 --> 00:15:59,586
+and we can then add this time
+
+318
+00:15:59,836 --> 00:16:02,361
+in the SQL editor
+
+319
+00:16:02,561 --> 00:16:04,523
+the limit of 5
+
+320
+00:16:04,723 --> 00:16:06,898
+so we see very well
+
+321
+00:16:07,098 --> 00:16:09,511
+the same 5 hotels as earlier
+
+322
+00:16:09,886 --> 00:16:11,861
+and the possible OFFSET
+
+323
+00:16:12,061 --> 00:16:14,223
+here of 15 lines as before.
+
+324
+00:16:21,911 --> 00:16:23,411
+Last example,
+
+325
+00:16:23,611 --> 00:16:26,611
+with Navicat, where we compose again
+
+326
+00:16:26,811 --> 00:16:29,011
+graphically the query with the name,
+
+327
+00:16:29,211 --> 00:16:31,261
+of the hotel and the beds,
+
+328
+00:16:31,461 --> 00:16:32,723
+and then
+
+329
+00:16:32,923 --> 00:16:35,723
+in the SQL graphic editor we can
+
+330
+00:16:36,148 --> 00:16:37,536
+add the sorting
+
+331
+00:16:38,573 --> 00:16:39,573
+fields,
+
+332
+00:16:40,211 --> 00:16:41,936
+define the sorting type
+
+333
+00:16:42,711 --> 00:16:45,623
+here the beds in descending order,
+so beds in descending number
+
+334
+00:16:45,823 --> 00:16:47,686
+and the hotels in alphabetical order.
+
+335
+00:16:47,886 --> 00:16:50,523
+The result corresponds well 
+to what was expected
+
+336
+00:16:50,723 --> 00:16:51,761
+and as for
+
+337
+00:16:51,961 --> 00:16:54,236
+the LIMIT and OFFSET, it happens
+in the same way as
+
+338
+00:16:54,436 --> 00:16:55,661
+in pgAdmin III.
+
+339
+00:17:04,873 --> 00:17:06,973
+We have seen in this lesson
+
+340
+00:17:07,486 --> 00:17:10,823
+the main aggregation 
+functions which allow
+
+341
+00:17:11,136 --> 00:17:14,023
+to perform statistical calculations on
+
+342
+00:17:14,223 --> 00:17:16,148
+sets or subsets
+
+343
+00:17:17,111 --> 00:17:18,248
+of data.
+
+344
+00:17:18,448 --> 00:17:19,886
+We saw that
+
+345
+00:17:20,086 --> 00:17:23,086
+these aggregation functions could be used
+
+346
+00:17:23,361 --> 00:17:25,636
+with group clauses
+
+347
+00:17:25,811 --> 00:17:27,473
+to extract
+
+348
+00:17:27,673 --> 00:17:30,785
+sets of statistical values ​​by data group
+
+349
+00:17:30,985 --> 00:17:33,148
+in specific requests
+
+350
+00:17:33,348 --> 00:17:36,960
+and that these grouping requests can
+be filtered
+
+351
+00:17:37,160 --> 00:17:39,848
+using HAVING type of queries
+
+352
+00:17:40,048 --> 00:17:42,285
+to extract
+
+353
+00:17:42,485 --> 00:17:45,485
+the parts, the most relevant elements
+
+354
+00:17:45,785 --> 00:17:47,560
+of these results.
+
+355
+00:17:47,760 --> 00:17:51,272
+We also saw how to use the 
+sorting functions
+
+356
+00:17:51,472 --> 00:17:53,771
+of the results by using 
+the ORDER BY keyword
+
+357
+00:17:53,971 --> 00:17:56,971
+and how to use the 
+limitation functions
+
+358
+00:17:57,847 --> 00:17:59,509
+of the number of objects
+
+359
+00:17:59,709 --> 00:18:01,896
+that we wish to see appearing 
+in a result.
+

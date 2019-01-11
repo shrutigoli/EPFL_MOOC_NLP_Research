@@ -1,0 +1,1638 @@
+1
+00:00:04,946 --> 00:00:07,345
+In this video, we are going
+to discuss a concrete example
+
+2
+00:00:07,345 --> 00:00:08,704
+of an out-of-core algorithm.
+
+3
+00:00:08,704 --> 00:00:12,142
+That means an algorithm that is going
+to work with large amounts of data
+
+4
+00:00:12,142 --> 00:00:16,733
+and where concerns about memory locality
+are highly relevant.
+
+5
+00:00:17,134 --> 00:00:19,499
+We're going to talk
+about join processing.
+
+6
+00:00:20,097 --> 00:00:23,633
+In general by a join of two relations,
+let's say R and S,
+
+7
+00:00:23,633 --> 00:00:27,421
+we think of trying to consider
+all pairs of tuples
+
+8
+00:00:27,421 --> 00:00:28,831
+from the first relation, R
+
+9
+00:00:28,831 --> 00:00:30,117
+and the second relation, S
+
+10
+00:00:30,117 --> 00:00:31,566
+that match a join condition.
+
+11
+00:00:31,566 --> 00:00:35,929
+And those pairs,
+for which this join condition is true,
+
+12
+00:00:35,929 --> 00:00:37,101
+we output.
+
+13
+00:00:37,676 --> 00:00:40,780
+So, you see this in tuple quote
+in a couple of the slides.
+
+14
+00:00:40,780 --> 00:00:43,567
+So, we loop away each tuple in R
+and each tuple in S,
+
+15
+00:00:44,027 --> 00:00:45,698
+and we test the join condition.
+
+16
+00:00:45,698 --> 00:00:49,130
+And if the join condition is true,
+in this case some particular field
+
+17
+00:00:49,130 --> 00:00:53,232
+in tuple of R and another field
+in tuple of S match,
+
+18
+00:00:53,612 --> 00:00:55,256
+then we add the result.
+
+19
+00:00:56,284 --> 00:01:00,444
+Now, conceptually here for each tuple
+in the outer relation,
+
+20
+00:01:00,724 --> 00:01:03,073
+we scan the the entire inner relation.
+
+21
+00:01:03,159 --> 00:01:06,815
+The outer relation being the outer loop
+of these nested loops.
+
+22
+00:01:07,860 --> 00:01:10,871
+Now, let's assume an example,
+where we've got, let's say,
+
+23
+00:01:10,871 --> 00:01:13,679
+1,000 pages of R tuples
+
+24
+00:01:13,679 --> 00:01:17,647
+and 500 pages of S tuples.
+
+25
+00:01:17,647 --> 00:01:20,727
+And in each page,
+let's say we've got 100 R tuples.
+
+26
+00:01:21,353 --> 00:01:23,299
+So, why this page-based abstraction?
+
+27
+00:01:23,299 --> 00:01:25,632
+Well, we think of data coming
+from our hard drive,
+
+28
+00:01:25,632 --> 00:01:28,731
+it's too large to make memory a priority,
+let's say,
+
+29
+00:01:28,731 --> 00:01:31,961
+and this example is, of course, small 
+and there would be enough memory
+
+30
+00:01:31,961 --> 00:01:35,603
+but with transferring the data
+from main memory to RAM,
+
+31
+00:01:35,603 --> 00:01:38,166
+the process concepts the data there
+
+32
+00:01:38,166 --> 00:01:41,732
+we will not think in more detail
+about caches, etc.
+
+33
+00:01:42,034 --> 00:01:46,159
+So, essentially it's the cost
+of transferring the data
+
+34
+00:01:46,159 --> 00:01:48,698
+from this into random access memory.
+
+35
+00:01:48,698 --> 00:01:54,264
+And we're going to see that in this case,
+the cost of this overall joint processing
+
+36
+00:01:54,264 --> 00:01:58,068
+is dominated by the cost of transfers
+from the disk and to the disk.
+
+37
+00:01:58,867 --> 00:02:03,266
+The cost of these seeks and transfers,
+it dominates what the CPU does,
+
+38
+00:02:03,266 --> 00:02:06,434
+because the CPU has to do
+relatively easy things here.
+
+39
+00:02:06,827 --> 00:02:12,449
+So, in this example, conceptually
+we're going to read all the data of R ones
+
+40
+00:02:12,449 --> 00:02:14,896
+that means we're going to read
+1,000 pages.
+
+41
+00:02:14,896 --> 00:02:19,328
+And we're going to read,
+for each tuple in R
+
+42
+00:02:19,758 --> 00:02:21,397
+that is 100 times,
+
+43
+00:02:21,397 --> 00:02:24,800
+because there are 100 tuples
+in each page times 1,000
+
+44
+00:02:24,800 --> 00:02:26,656
+there's 1,000 pages of R.
+
+45
+00:02:26,656 --> 00:02:28,564
+For each of those tuples in R,
+
+46
+00:02:28,564 --> 00:02:32,405
+we have to make a complete loop of S,
+S is 500 pages.
+
+47
+00:02:32,405 --> 00:02:34,813
+That means for each of these loops
+we'll read 500 pages.
+
+48
+00:02:34,813 --> 00:02:39,868
+So, overall the cost is about
+50 million IOs.
+
+49
+00:02:40,400 --> 00:02:43,959
+That of course is quite huge
+given these small relations.
+
+50
+00:02:44,851 --> 00:02:49,467
+Now, one immediate improvement you can do
+is to make this page-oriented.
+
+51
+00:02:49,828 --> 00:02:53,264
+That means we are going to still have
+the same looping structure.
+
+52
+00:02:53,264 --> 00:02:55,730
+We read over each tuple of R,
+
+53
+00:02:55,730 --> 00:02:57,691
+by reading R page by page,
+
+54
+00:02:57,691 --> 00:03:01,524
+that means we read a page from R,
+we loophole every tuple of R in there,
+
+55
+00:03:02,684 --> 00:03:04,467
+and then we go to the next page of R.
+
+56
+00:03:04,767 --> 00:03:08,832
+And in the inner loop we're going to,
+again, read S page by page
+
+57
+00:03:08,832 --> 00:03:11,211
+and in each page read the tuples
+and compare them.
+
+58
+00:03:11,941 --> 00:03:16,955
+We're not going to do this
+for each entire page of R,
+
+59
+00:03:16,955 --> 00:03:19,280
+we're going to make a single scan of S
+
+60
+00:03:19,800 --> 00:03:22,715
+and compare all the tuples
+in that page of R
+
+61
+00:03:22,715 --> 00:03:24,901
+with the tuples
+in that scan of S.
+
+62
+00:03:25,942 --> 00:03:28,968
+So, on a high level,
+R is still the outer relation,
+
+63
+00:03:28,968 --> 00:03:30,071
+S is the inner relation,
+
+64
+00:03:30,071 --> 00:03:32,131
+but the looping structure
+has changed a bit.
+
+65
+00:03:32,131 --> 00:03:36,089
+That means S a scan of R over S,
+we're not just comparing a single R tuple
+
+66
+00:03:36,089 --> 00:03:37,545
+to all of these S tuples,
+
+67
+00:03:37,545 --> 00:03:39,668
+but we're comparing all of the R tuples
+
+68
+00:03:39,668 --> 00:03:43,370
+in the page that we have not buffered
+in main memory to S.
+
+69
+00:03:44,090 --> 00:03:46,100
+How much main memory does this need?
+
+70
+00:03:46,100 --> 00:03:50,003
+Conceptually it needs space
+for one page of R and one page of S.
+
+71
+00:03:50,003 --> 00:03:52,704
+The page for S is raised very quickly,
+very frequently,
+
+72
+00:03:52,704 --> 00:03:55,456
+and only after we've done
+a complete scan of S
+
+73
+00:03:55,456 --> 00:03:57,214
+you're going to read a new page of R.
+
+74
+00:03:57,214 --> 00:03:59,243
+The cost of that is, of course,
+greatly reduced,
+
+75
+00:03:59,243 --> 00:04:02,935
+it's going to be the cost of reading R
+completely once,
+
+76
+00:04:03,605 --> 00:04:07,601
+1,000 pages plus 1,000 times 500 pages,
+the number of pages in R
+
+77
+00:04:07,601 --> 00:04:09,325
+times the number of pages in S,
+
+78
+00:04:09,325 --> 00:04:13,447
+which is, of course, 100 times faster
+than the first solution.
+
+79
+00:04:14,471 --> 00:04:17,980
+Well, even with such a nested loops join,
+we can do better.
+
+80
+00:04:18,360 --> 00:04:21,973
+And a famous technique here
+is the so-called block nested loops join.
+
+81
+00:04:21,973 --> 00:04:24,301
+And that's a technique that's actually
+implemented
+
+82
+00:04:24,301 --> 00:04:26,228
+in real relation database systems,
+
+83
+00:04:26,228 --> 00:04:28,856
+and in some cases,
+actually the best technique to use.
+
+84
+00:04:30,633 --> 00:04:32,997
+Beating other things
+that might sound more sophisticated
+
+85
+00:04:32,997 --> 00:04:36,627
+like, let's say for example,
+hash joins, or sort-merge joins.
+
+86
+00:04:37,220 --> 00:04:39,431
+Now, how does that block nested
+loop join work?
+
+87
+00:04:39,431 --> 00:04:40,926
+So, the idea is as follows:
+
+88
+00:04:40,926 --> 00:04:42,621
+We've got main memory
+
+89
+00:04:42,621 --> 00:04:46,429
+at the granularity of a number
+of certain pages, right?
+
+90
+00:04:46,640 --> 00:04:51,602
+And let's say we've got P number of pages
+of main memory available
+
+91
+00:04:51,602 --> 00:04:53,415
+to process this join.
+
+92
+00:04:53,798 --> 00:04:57,332
+So, we're going to partition this
+into a certain amount of pages for R
+
+93
+00:04:57,332 --> 00:04:59,235
+and a certain number of pages for S.
+
+94
+00:04:59,235 --> 00:05:03,866
+And then we're going in each step
+read as many pages, new pages,
+
+95
+00:05:03,866 --> 00:05:07,747
+into this R buffer or S buffer,
+whenever something's exhausted.
+
+96
+00:05:07,824 --> 00:05:09,063
+How are we going to do this?
+
+97
+00:05:09,063 --> 00:05:11,980
+Let's assume R is still
+the outer relation.
+
+98
+00:05:12,561 --> 00:05:16,232
+We're going to assign a number of pages
+to R, as we said,
+
+99
+00:05:16,872 --> 00:05:21,837
+we're going to enter it or R by reading
+many page of R at once together.
+
+100
+00:05:22,506 --> 00:05:24,377
+And then we're going to make a scan of S,
+
+101
+00:05:24,377 --> 00:05:27,196
+by reading as many pages
+with results for S
+
+102
+00:05:27,196 --> 00:05:28,573
+at once into S,
+
+103
+00:05:28,573 --> 00:05:31,733
+compare them to all the R tuples
+occuring in this big, big R buffer
+
+104
+00:05:31,733 --> 00:05:33,413
+that consists of several pages now.
+
+105
+00:05:33,413 --> 00:05:35,156
+And then you're going to take
+the next chunk of S,
+
+106
+00:05:35,156 --> 00:05:36,128
+put into the buffer.
+
+107
+00:05:36,128 --> 00:05:38,875
+Compare to all the R tuples
+in that big R buffer
+
+108
+00:05:38,875 --> 00:05:40,512
+until we've done the complete scan of S
+
+109
+00:05:40,512 --> 00:05:42,944
+and then we take a new
+complete chunk of R tuples
+
+110
+00:05:43,624 --> 00:05:46,334
+and put into the R buffer,
+replacing all the old R tuples.
+
+111
+00:05:46,506 --> 00:05:49,037
+And then again make a complete scan of S.
+
+112
+00:05:49,521 --> 00:05:53,216
+Now, how do we decide how
+to split the main memory buffers?
+
+113
+00:05:53,216 --> 00:05:56,016
+We will assign, assuming that you want
+to have out buffer,
+
+114
+00:05:56,016 --> 00:05:57,687
+one page is out-buffer,
+
+115
+00:05:57,687 --> 00:05:59,645
+and of the remaining pages,
+
+116
+00:05:59,645 --> 00:06:01,399
+one is the import buffer of S
+
+117
+00:06:01,399 --> 00:06:04,421
+and all the rest,
+for the import buffer of R.
+
+118
+00:06:04,933 --> 00:06:07,497
+The reason for this will become clear
+a bit later.
+
+119
+00:06:08,034 --> 00:06:12,875
+So, how do we calculate the cost
+of this join operation in numbers of IOs?
+
+120
+00:06:12,875 --> 00:06:15,740
+It means in number of pages read
+from this.
+
+121
+00:06:16,570 --> 00:06:21,710
+Conceptually, we need to make a single
+complete scan of the outer relation, R.
+
+122
+00:06:22,102 --> 00:06:27,717
+And for each of these big chunks
+of outer relation tuples.
+
+123
+00:06:28,187 --> 00:06:30,108
+That means, every time
+we fill a block of R,
+
+124
+00:06:30,108 --> 00:06:32,631
+and then make a complete scan
+of the inner relation,
+
+125
+00:06:33,111 --> 00:06:34,870
+we have to calculate
+these correspondingly.
+
+126
+00:06:34,870 --> 00:06:39,203
+That means the number of outer blocks
+times the number of pages
+
+127
+00:06:39,753 --> 00:06:40,951
+in the inner relation,
+
+128
+00:06:40,951 --> 00:06:42,997
+because we make a complete scan
+of this inner relation.
+
+129
+00:06:42,997 --> 00:06:45,410
+Then for other blocks
+it's the number of pages
+
+130
+00:06:46,550 --> 00:06:50,327
+of the outer relation,
+divided by the block size available for R.
+
+131
+00:06:50,734 --> 00:06:52,396
+So, for example,
+
+132
+00:06:52,396 --> 00:06:56,403
+if you assign 100 pages to R
+in main memory,
+
+133
+00:06:56,813 --> 00:07:00,037
+and the page number of R
+is over 1,000
+
+134
+00:07:00,037 --> 00:07:02,373
+we will need 10 iterations of S.
+
+135
+00:07:02,373 --> 00:07:05,255
+That means, the number of the blocks
+will be ten,
+
+136
+00:07:05,255 --> 00:07:07,223
+the size of the other blocks
+will be 100,
+
+137
+00:07:07,223 --> 00:07:09,623
+that multiplies up to 1,000 pages an hour.
+
+138
+00:07:09,623 --> 00:07:12,671
+And for these ten times,
+we fill some part,
+
+139
+00:07:12,866 --> 00:07:15,924
+100 pages actually into 
+the main memory block.
+
+140
+00:07:16,494 --> 00:07:18,696
+We will have to make a complete scan
+of the inner relation.
+
+141
+00:07:18,696 --> 00:07:20,000
+That means we have to count
+
+142
+00:07:20,000 --> 00:07:22,326
+that many pages there are
+in the inner relation.
+
+143
+00:07:22,326 --> 00:07:23,833
+Now, that's the number of IOs.
+
+144
+00:07:25,551 --> 00:07:29,434
+We have, of course, abstracted away
+from real costs.
+
+145
+00:07:29,548 --> 00:07:32,357
+Real costs also involve CPU costs,
+
+146
+00:07:32,357 --> 00:07:35,395
+but that might be completely dominated
+by hard drive costs,
+
+147
+00:07:35,395 --> 00:07:39,159
+particular you mightn't believe this,
+that you actually do the CPU computations
+
+148
+00:07:39,159 --> 00:07:41,565
+while data is being fetched from the disk,
+
+149
+00:07:41,565 --> 00:07:43,691
+but the other big important thing
+you have to keep in mind
+
+150
+00:07:43,691 --> 00:07:45,532
+is the number of seeks involved.
+
+151
+00:07:45,532 --> 00:07:49,233
+The number of times you have to place
+or read/write it in the hard drive
+
+152
+00:07:49,233 --> 00:07:50,531
+to a different position,
+
+153
+00:07:50,531 --> 00:07:52,510
+just be able to again
+to do a sequential scan.
+
+154
+00:07:52,510 --> 00:07:54,999
+So, how many sequential scans
+do we have there?
+
+155
+00:07:54,999 --> 00:07:58,032
+Conceptually, we have about two--
+
+156
+00:07:58,134 --> 00:08:01,681
+Actually we've got exactly 
+two times the number of scans
+
+157
+00:08:01,681 --> 00:08:03,528
+we do of the inner relation.
+
+158
+00:08:03,528 --> 00:08:06,475
+That means two times the number
+of all the blocks.
+
+159
+00:08:06,475 --> 00:08:07,498
+Why is that?
+
+160
+00:08:07,498 --> 00:08:09,493
+Well, every time you have
+to read an outer block
+
+161
+00:08:09,493 --> 00:08:11,503
+you have to move
+to the right position in R,
+
+162
+00:08:11,503 --> 00:08:16,232
+read that piece of R into main memory
+and then move to the beginning of S
+
+163
+00:08:16,232 --> 00:08:18,346
+and make a sequential scan
+of all of S.
+
+164
+00:08:18,346 --> 00:08:21,067
+And again,
+we jump to the next position in R
+
+165
+00:08:21,067 --> 00:08:23,035
+to read one big outer block,
+
+166
+00:08:23,035 --> 00:08:26,432
+then we jump again to the beginning of S
+and read S entirely.
+
+167
+00:08:26,589 --> 00:08:29,100
+That means, two times
+the number of outer blocks
+
+168
+00:08:29,100 --> 00:08:30,787
+that's the number of seeks.
+
+169
+00:08:30,787 --> 00:08:34,006
+So, we could calculate the overall cost
+of accessing the hard drive,
+
+170
+00:08:34,006 --> 00:08:36,981
+which might be quite accurate
+as an estimation of the overall cost
+
+171
+00:08:36,981 --> 00:08:40,324
+of the join, as the cost of the seeks
+plus the cost for the transfers.
+
+172
+00:08:40,324 --> 00:08:42,093
+The cost of the transfers, IOs,
+
+173
+00:08:42,093 --> 00:08:44,801
+is the cost that is given
+by the formula here on this slide.
+
+174
+00:08:45,833 --> 00:08:48,192
+Now, how do you minimize that cost?
+
+175
+00:08:48,192 --> 00:08:51,080
+You do this by assigning as many
+main memory pages
+
+176
+00:08:51,080 --> 00:08:52,627
+as possible to the outer relation,
+
+177
+00:08:52,627 --> 00:08:54,930
+all but one of those input pages.
+
+178
+00:08:56,341 --> 00:09:00,317
+That way, you minimize
+the number of iterations
+
+179
+00:09:00,317 --> 00:09:01,628
+you have to do over S.
+
+180
+00:09:01,884 --> 00:09:05,205
+You minimize the number of outer blocks
+needed scanned.
+
+181
+00:09:05,277 --> 00:09:08,059
+And that way you minimize the number
+of iterations of S.
+
+182
+00:09:08,059 --> 00:09:10,294
+It's worth noting
+that this analysis changes
+
+183
+00:09:10,824 --> 00:09:13,627
+if, you have to assume that S
+in a join edition
+
+184
+00:09:13,627 --> 00:09:16,115
+is expensive enough that the CPU
+cannot always keep up
+
+185
+00:09:16,115 --> 00:09:17,997
+with the sequential reads in that case.
+
+186
+00:09:17,997 --> 00:09:19,857
+You might actually partition
+the data differently
+
+187
+00:09:19,857 --> 00:09:23,445
+for example, assigning equally
+many memory buffers to R and S.
+
+188
+00:09:23,530 --> 00:09:25,465
+One further comment also
+
+189
+00:09:25,465 --> 00:09:28,972
+is that you would like to make
+the outer relation the smaller relation.
+
+190
+00:09:29,294 --> 00:09:33,780
+That yet is another strategy to minimize
+the number of iterations used overall.
+
+191
+00:09:33,780 --> 00:09:36,226
+That means R would by a smaller relation.
+
+192
+00:09:37,527 --> 00:09:39,684
+Now let's look at another 
+important join operation,
+
+193
+00:09:39,684 --> 00:09:41,895
+in database systems,
+the so-called grace hash-join.
+
+194
+00:09:41,895 --> 00:09:44,845
+This is actually a sophisticated technique
+that is more complicated
+
+195
+00:09:44,845 --> 00:09:46,163
+than what you might assume.
+
+196
+00:09:46,163 --> 00:09:48,331
+It's not simply a join operation
+
+197
+00:09:48,331 --> 00:09:52,880
+that consists of looping our old tuples
+of one relation and then making a lookup
+
+198
+00:09:52,880 --> 00:09:55,499
+in a hash index for the other relation.
+
+199
+00:09:55,658 --> 00:09:57,091
+It works as follows:
+
+200
+00:09:57,941 --> 00:09:59,693
+It consists conceptually
+of three phases.
+
+201
+00:10:00,871 --> 00:10:04,010
+In the first phase, we take one
+of the relations,
+
+202
+00:10:04,010 --> 00:10:05,337
+let's call it R,
+
+203
+00:10:05,337 --> 00:10:07,433
+and scan it completely.
+
+204
+00:10:07,766 --> 00:10:09,631
+And as we make the scan,
+
+205
+00:10:10,201 --> 00:10:15,200
+we create an in-memory hash table
+of that relation on the join condition,
+
+206
+00:10:15,607 --> 00:10:18,297
+or on the columns that we will join on.
+
+207
+00:10:20,175 --> 00:10:25,876
+As we fill up the buffers
+for the packets of the hash table,
+
+208
+00:10:26,216 --> 00:10:28,770
+we will have to write it out to disk.
+
+209
+00:10:29,201 --> 00:10:34,374
+And you create as many partitions
+as there are buffer pages available
+
+210
+00:10:34,894 --> 00:10:36,822
+for hash buckets in the hash structure.
+
+211
+00:10:37,023 --> 00:10:39,387
+So, I'll make a complete scan
+of the first relation,
+
+212
+00:10:39,387 --> 00:10:42,981
+and build a hash table on disk
+for that relation.
+
+213
+00:10:43,344 --> 00:10:47,145
+Then I'll do the same thing independently
+for the second relation,
+
+214
+00:10:47,145 --> 00:10:51,864
+using the same hash function
+on the join column of the other relation.
+
+215
+00:10:51,927 --> 00:10:54,748
+This, of course, assumes that you
+actually do an equal join,
+
+216
+00:10:54,748 --> 00:10:58,932
+that means we compare by equality
+of two columns of the two relations.
+
+217
+00:10:59,264 --> 00:11:01,822
+It would not work, for example,
+for an unequal join,
+
+218
+00:11:01,822 --> 00:11:03,682
+where we test, for example,
+for less than.
+
+219
+00:11:03,682 --> 00:11:06,053
+For such a join condition,
+we would really have to resort
+
+220
+00:11:06,053 --> 00:11:07,834
+to the block-nested loop join.
+
+221
+00:11:07,834 --> 00:11:09,550
+But for an equal join,
+this works.
+
+222
+00:11:09,550 --> 00:11:13,367
+So, we use one hash function
+to hash the two relations
+
+223
+00:11:14,312 --> 00:11:17,136
+into two hash tables
+that we then write out to disk.
+
+224
+00:11:17,473 --> 00:11:20,734
+So, we will have, let's say,
+B main memory buffers,
+
+225
+00:11:20,734 --> 00:11:25,769
+we will assign one page for reading
+in the input, step by step,
+
+226
+00:11:25,769 --> 00:11:27,496
+we will have B minus 1,
+
+227
+00:11:27,496 --> 00:11:30,041
+all the other pages available
+for hash buckets.
+
+228
+00:11:30,135 --> 00:11:34,929
+So, we'll have a hash function that hashes
+the tuples into B minus 1 buckets.
+
+229
+00:11:34,942 --> 00:11:37,568
+Whenever one of these 
+bucket pages fills up,
+
+230
+00:11:37,568 --> 00:11:41,488
+we write it out and you produce 
+B minus 1 partitions on disk.
+
+231
+00:11:41,608 --> 00:11:45,305
+So, we're reading the relations 
+and we're writing them out
+
+232
+00:11:45,305 --> 00:11:46,782
+again back to disk.
+
+233
+00:11:47,402 --> 00:11:49,371
+That's the first two phases,
+so to say,
+
+234
+00:11:49,371 --> 00:11:51,003
+it's used for both relations.
+
+235
+00:11:51,003 --> 00:11:55,535
+And then we're going to start
+reading in again the two relations,
+
+236
+00:11:56,105 --> 00:11:57,326
+partition by partition,
+
+237
+00:11:57,326 --> 00:11:59,327
+it means we read in the first partition
+
+238
+00:11:59,327 --> 00:12:01,384
+of the first relation
+and the second relation,
+
+239
+00:12:01,384 --> 00:12:02,870
+then the second partition
+
+240
+00:12:02,870 --> 00:12:05,398
+of the first relation
+and the second relation etc.
+
+241
+00:12:06,095 --> 00:12:08,630
+And as we do this,
+so to say, in parallel
+
+242
+00:12:08,630 --> 00:12:12,297
+read the corresponding partitions
+of the two relations
+
+243
+00:12:12,297 --> 00:12:15,845
+we take one relation's partition,
+
+244
+00:12:16,167 --> 00:12:20,136
+and we hash it into main memory
+using a different hash function.
+
+245
+00:12:20,229 --> 00:12:22,399
+Of course, if you use
+the same hash functions,
+
+246
+00:12:22,399 --> 00:12:26,862
+we would map that partition
+all to the same bucket,
+
+247
+00:12:26,862 --> 00:12:28,261
+which is, of course, useless.
+
+248
+00:12:28,261 --> 00:12:31,006
+But now we're going to use
+so to say, a different hash function
+
+249
+00:12:31,006 --> 00:12:33,960
+to create a higher resolution hash table
+in memory.
+
+250
+00:12:33,960 --> 00:12:35,097
+How do we do this?
+
+251
+00:12:35,097 --> 00:12:37,702
+Well, we're going to use essentially
+all the available main memory
+
+252
+00:12:37,702 --> 00:12:39,363
+for this hash table.
+
+253
+00:12:40,153 --> 00:12:41,892
+Let's say, all but one page.
+
+254
+00:12:42,102 --> 00:12:44,406
+And that remaining page
+we will then use
+
+255
+00:12:44,406 --> 00:12:49,051
+to make a scan of the second relation's
+partition, the corresponding partition.
+
+256
+00:12:49,051 --> 00:12:52,864
+And as we scan over the second relation
+for the corresponding partition,
+
+257
+00:12:52,864 --> 00:12:55,960
+we compare the tuples we see
+with the hash table.
+
+258
+00:12:55,965 --> 00:12:59,699
+That means we do an in-memory hash lookup
+to find the matching tuples.
+
+259
+00:12:59,699 --> 00:13:01,797
+That way we actually pass
+the join condition.
+
+260
+00:13:02,197 --> 00:13:03,788
+Once we have completely done this
+
+261
+00:13:03,788 --> 00:13:06,103
+and have produced the tuples
+we wanted to produce,
+
+262
+00:13:06,103 --> 00:13:08,022
+we're going to take the second partition.
+
+263
+00:13:08,022 --> 00:13:11,699
+That means, for the first relation,
+we make a scan of the second partition,
+
+264
+00:13:11,699 --> 00:13:13,202
+we build an in-memory hash table
+
+265
+00:13:13,202 --> 00:13:15,583
+using B minus 1 buckets
+for that first relation
+
+266
+00:13:15,583 --> 00:13:17,029
+and then we make a scan
+
+267
+00:13:17,029 --> 00:13:18,821
+of the second partition
+of the second relation
+
+268
+00:13:18,821 --> 00:13:22,332
+and compare the tuples
+with the corresponding hash table
+
+269
+00:13:22,332 --> 00:13:24,596
+that has been produced
+for the first relation.
+
+270
+00:13:24,655 --> 00:13:26,814
+And we do the same thing
+for the third partition
+
+271
+00:13:26,814 --> 00:13:30,135
+and the fourth partition etc.
+until you've exhausted the relations.
+
+272
+00:13:30,457 --> 00:13:31,728
+So that's how we do this.
+
+273
+00:13:31,728 --> 00:13:34,292
+So, there are actually several phases
+and there's two different ways
+
+274
+00:13:34,292 --> 00:13:38,564
+we use hashing to produce
+our join results.
+
+275
+00:13:42,729 --> 00:13:46,033
+The analysis of the hash-join
+is a bit more complicated
+
+276
+00:13:46,033 --> 00:13:48,633
+but one important thing has to be seen.
+
+277
+00:13:49,583 --> 00:13:52,064
+We will use essentially B,
+
+278
+00:13:52,064 --> 00:13:54,066
+B minus 1, to be exact.
+
+279
+00:13:54,306 --> 00:13:58,831
+Different main memory buffers
+are for pages for creating a hash table.
+
+280
+00:13:59,541 --> 00:14:02,676
+That means, that way we can
+split up the relations
+
+281
+00:14:02,676 --> 00:14:04,766
+into B minus 1 parts,
+
+282
+00:14:04,766 --> 00:14:07,227
+hopefully of equal size
+if the hash function is good.
+
+283
+00:14:07,227 --> 00:14:08,636
+Let's assume that.
+
+284
+00:14:08,636 --> 00:14:10,490
+And then the second phase,
+
+285
+00:14:10,490 --> 00:14:13,632
+you're going to have
+to fit the smaller relations,
+
+286
+00:14:13,632 --> 00:14:15,727
+let's assume you do this
+for the smaller relations.
+
+287
+00:14:15,727 --> 00:14:17,627
+Partition entirely into main memory.
+
+288
+00:14:17,627 --> 00:14:19,763
+That means we have
+to have enough main memory
+
+289
+00:14:19,763 --> 00:14:23,828
+then you can do the hash table for 
+that partition of the smaller relation.
+
+290
+00:14:24,144 --> 00:14:25,443
+And then you scan
+
+291
+00:14:25,443 --> 00:14:28,469
+the corresponding partition
+of the other relation to compare.
+
+292
+00:14:28,469 --> 00:14:33,238
+But this means that the size
+of the smaller relation
+
+293
+00:14:33,968 --> 00:14:37,030
+has to be upper-bounded
+by, essentially, B squared.
+
+294
+00:14:37,202 --> 00:14:39,068
+We take the relation,
+
+295
+00:14:39,068 --> 00:14:42,600
+we split it into about B
+equally-sized parts,
+
+296
+00:14:42,600 --> 00:14:46,822
+and each of these parts has to fit
+down to the hash table
+
+297
+00:14:46,822 --> 00:14:48,568
+into main memory.
+
+298
+00:14:48,968 --> 00:14:50,830
+Again, into these B pages.
+
+299
+00:14:50,830 --> 00:14:54,532
+Let's assume that the hash table
+doesn't take more space
+
+300
+00:14:54,532 --> 00:14:59,134
+than actually, just simply 
+the relation partition here.
+
+301
+00:14:59,134 --> 00:15:02,733
+It means that the relations 
+are bounded by B squared,
+
+302
+00:15:02,733 --> 00:15:03,953
+or in other words,
+
+303
+00:15:03,953 --> 00:15:09,405
+that B has to be at least the square root
+of the smaller relation's size.
+
+304
+00:15:10,080 --> 00:15:12,047
+So, if that is not true,
+
+305
+00:15:12,047 --> 00:15:14,303
+that means we have 
+less main memory than that,
+
+306
+00:15:15,033 --> 00:15:17,457
+we, in practice, cannot use
+the hash-join.
+
+307
+00:15:19,185 --> 00:15:22,973
+There are some refinements
+that work different
+
+308
+00:15:22,973 --> 00:15:25,909
+and again allows to work 
+with larger data.
+
+309
+00:15:25,909 --> 00:15:28,069
+There's all kinds of tricks
+and refinements,
+
+310
+00:15:28,069 --> 00:15:31,216
+but ultimately this is
+not a big constraint,
+
+311
+00:15:31,216 --> 00:15:35,932
+because given the gigabytes of RAM
+that we now have,
+
+312
+00:15:35,932 --> 00:15:38,999
+squaring that is actually
+quite large data.
+
+313
+00:15:41,088 --> 00:15:43,665
+So, if you think about the cost of this,
+
+314
+00:15:44,325 --> 00:15:47,599
+the cost is basically
+in this partitioning phase
+
+315
+00:15:48,179 --> 00:15:51,729
+two times complete scans
+of both relations,
+
+316
+00:15:52,429 --> 00:15:53,931
+and in this matching phase,
+
+317
+00:15:54,711 --> 00:15:56,072
+we are reading the partitions in,
+
+318
+00:15:56,072 --> 00:15:59,132
+and that's again just the cost
+of reading both partitions in.
+
+319
+00:15:59,132 --> 00:16:03,682
+That means, overall, the cost
+in terms of IOs, pages read and written,
+
+320
+00:16:04,012 --> 00:16:07,691
+is just three times the size
+of the two relations.
+
+321
+00:16:08,666 --> 00:16:12,422
+If you think about the seeks,
+
+322
+00:16:12,702 --> 00:16:14,367
+it's more difficult to analyze,
+
+323
+00:16:14,367 --> 00:16:16,801
+because it depends on how 
+we write out the buckets.
+
+324
+00:16:17,035 --> 00:16:18,864
+The seeks can be considerable.
+
+325
+00:16:18,864 --> 00:16:24,137
+But, overall, this cost is really linear
+in terms of transfers.
+
+326
+00:16:25,202 --> 00:16:28,351
+That's at least true if you don't have
+large sets of tuples
+
+327
+00:16:28,351 --> 00:16:30,334
+that all agree on this jointly.
+
+328
+00:16:30,698 --> 00:16:32,699
+Because then, of course,
+in the worst case,
+
+329
+00:16:32,699 --> 00:16:34,880
+we have to produce
+a contracting-sized output.
+
+330
+00:16:34,880 --> 00:16:36,609
+And, of course,
+that's not being dominated
+
+331
+00:16:36,609 --> 00:16:39,843
+by this linearly sized upper bound
+on the transfers.
+
+332
+00:16:41,478 --> 00:16:44,126
+In summary, we've talked about two joins.
+
+333
+00:16:44,866 --> 00:16:48,476
+There's others like the sort-merge join
+that I don't want to talk about now,
+
+334
+00:16:48,476 --> 00:16:50,987
+but talk about the block-nested loop join
+and the hash-join,
+
+335
+00:16:51,074 --> 00:16:54,598
+they're both quite nice examples
+of outer-core algorithms
+
+336
+00:16:54,598 --> 00:16:56,890
+where locality concerns
+come into play.
+
+337
+00:16:56,970 --> 00:16:59,598
+In both cases, there is a lot
+to be thought about
+
+338
+00:16:59,598 --> 00:17:02,450
+in terms of how to optimize
+sequential access.
+
+339
+00:17:02,450 --> 00:17:05,297
+Both algorithms do a lot about this.
+
+340
+00:17:05,587 --> 00:17:08,354
+You probably don't want to call
+the kind of buffering to caching,
+
+341
+00:17:08,354 --> 00:17:10,638
+because in a sense
+they have complete control
+
+342
+00:17:10,638 --> 00:17:13,968
+over what data is put into main memory,
+
+343
+00:17:13,968 --> 00:17:17,755
+and it's not just opportunistically reused
+as you would do in caching usually.
+
+344
+00:17:18,223 --> 00:17:20,628
+However, the second algorithm,
+the hash-join,
+
+345
+00:17:20,628 --> 00:17:23,280
+also makes important use
+of partitioning strategies
+
+346
+00:17:23,280 --> 00:17:26,867
+to kind of divide and conquer
+to make the problems simpler.
+
+347
+00:17:27,033 --> 00:17:29,147
+You can do the hash-join,
+
+348
+00:17:29,147 --> 00:17:31,203
+partition by partition,
+the final phase,
+
+349
+00:17:31,913 --> 00:17:34,645
+completely without having to look
+at the other partitions.
+
+350
+00:17:34,767 --> 00:17:37,419
+So, really have achieved these kind of
+
+351
+00:17:37,419 --> 00:17:40,443
+embarrassing data parallelism
+that we have mentioned.

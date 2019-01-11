@@ -1,0 +1,982 @@
+1
+00:00:00,600 --> 00:00:04,660
+In this unit, we are going to do a recap
+of Scala's collections.
+
+2
+00:00:04,660 --> 00:00:06,440
+You've already seen them at length if
+
+3
+00:00:06,440 --> 00:00:09,370
+you followed the previous course on
+functional programming.
+
+4
+00:00:09,370 --> 00:00:14,550
+So, what we do now is just review some of
+the core principles and highlights.
+
+5
+00:00:14,550 --> 00:00:17,350
+If you have seen the material before, then
+you might
+
+6
+00:00:17,350 --> 00:00:20,040
+want to fast forward to parts of this
+course now.
+
+7
+00:00:21,560 --> 00:00:25,960
+First, Scala has a, quite a rich hierarchy
+of collection classes.
+
+8
+00:00:25,960 --> 00:00:32,900
+The base class is one of the base classes
+is called iterable, and it gives
+
+9
+00:00:32,900 --> 00:00:37,800
+you collections you can iterate through.
+And then there would be sub-categories.
+
+10
+00:00:37,800 --> 00:00:42,440
+there would be the sequences, the sets,
+and the maps.
+
+11
+00:00:44,680 --> 00:00:47,420
+if you look at sequences, in turn, they
+could
+
+12
+00:00:47,420 --> 00:00:51,710
+be indexed, which means you have fast
+random access.
+
+13
+00:00:52,820 --> 00:00:57,930
+Or they could be linear, which means they
+are optimized for sequential scan.
+
+14
+00:00:57,930 --> 00:01:00,580
+And then you would have concrete
+implementations, a
+
+15
+00:01:00,580 --> 00:01:03,960
+standard one for indexed sequence would be
+vector.
+
+16
+00:01:03,960 --> 00:01:06,145
+A standard one for linear sequence would
+be
+
+17
+00:01:06,145 --> 00:01:09,920
+list; that's a list, you have already
+seen.
+
+18
+00:01:09,920 --> 00:01:12,020
+And then there are also types that, in
+
+19
+00:01:12,020 --> 00:01:15,340
+a sense get imported into this hierarchy
+from Java.
+
+20
+00:01:15,340 --> 00:01:19,443
+So there would be the Java arrays, which
+are a kind of index sequence.
+
+21
+00:01:19,443 --> 00:01:23,861
+And the Scala strings, sorry, the Java
+strings,
+
+22
+00:01:23,861 --> 00:01:27,660
+which are also a kind of indexed sequence.
+
+23
+00:01:27,660 --> 00:01:31,610
+I've drawn the line here dotted because
+these
+
+24
+00:01:31,610 --> 00:01:35,630
+cannot be by their nature subtypes of
+indexed sequence.
+
+25
+00:01:35,630 --> 00:01:39,110
+We can't really add new super types to a
+Java class.
+
+26
+00:01:39,110 --> 00:01:41,683
+What we do instead is make them behave
+
+27
+00:01:41,683 --> 00:01:46,170
+like indexed sequences through the use of
+implicit wrappers.
+
+28
+00:01:46,170 --> 00:01:48,650
+Similar to sequences, sets and maps would
+
+29
+00:01:48,650 --> 00:01:53,690
+also have several sub-categories and
+several implementations.
+
+30
+00:01:53,690 --> 00:01:57,450
+Having so many collection types could be
+confusing, except for the
+
+31
+00:01:57,450 --> 00:02:01,100
+fact that they all share a common set of
+general methods.
+
+32
+00:02:01,100 --> 00:02:04,470
+So it's very easy to apply a usage
+
+33
+00:02:04,470 --> 00:02:08,250
+profile that you know from one collection
+to another.
+
+34
+00:02:08,250 --> 00:02:11,040
+The methods that the collections share are
+things
+
+35
+00:02:11,040 --> 00:02:15,320
+like picking the first element picking
+some arbitrary element.
+
+36
+00:02:15,320 --> 00:02:19,380
+But in our case, more importantly, core
+methods such
+
+37
+00:02:19,380 --> 00:02:23,870
+as map, flatMap, and filter, are shared by
+all collections.
+
+38
+00:02:23,870 --> 00:02:26,863
+Other important methods would be the fold
+operations,
+
+39
+00:02:26,863 --> 00:02:31,510
+foldLeft and foldRight, that map a binary
+operations to,
+
+40
+00:02:31,510 --> 00:02:34,220
+on a collection and reduce it to a single
+value.
+
+41
+00:02:35,550 --> 00:02:38,590
+Let's have a look at map, flatMap, and
+filter in more detail.
+
+42
+00:02:40,640 --> 00:02:42,700
+What we are going to do is study how
+
+43
+00:02:42,700 --> 00:02:46,710
+they're implemented on the List class that
+you've already seen.
+
+44
+00:02:46,710 --> 00:02:48,460
+Let's do map first.
+
+45
+00:02:48,460 --> 00:02:52,360
+So, idealized, map takes a function from
+the
+
+46
+00:02:52,360 --> 00:02:56,180
+list element type T, to some arbitrary
+type U.
+
+47
+00:02:56,180 --> 00:02:58,680
+So U is a type parameter of map.
+
+48
+00:02:58,680 --> 00:03:01,050
+And it would give you back a list of U.
+
+49
+00:03:01,050 --> 00:03:05,020
+And what it would do is it would do a
+pattern match over the list itself.
+
+50
+00:03:05,020 --> 00:03:05,690
+If this list
+
+51
+00:03:05,690 --> 00:03:12,040
+is a cons cell consisting of a head
+element x and a tail xs, then we would
+
+52
+00:03:12,040 --> 00:03:19,528
+apply f to the head, map f over the tail,
+and compose the results with a cons.
+
+53
+00:03:19,528 --> 00:03:23,400
+If the li-, current list is Nil, then the
+result list is also Nil.
+
+54
+00:03:24,860 --> 00:03:25,890
+So that was map.
+
+55
+00:03:25,890 --> 00:03:28,740
+If you want to learn about flatMap, the
+easiest
+
+56
+00:03:28,740 --> 00:03:31,420
+way to do that is to study the differences
+
+57
+00:03:31,420 --> 00:03:35,730
+with respect to map.
+So the first difference you see here, the
+
+58
+00:03:35,730 --> 00:03:41,310
+function we pass to flatMap now doesn't
+return a single element, but a list
+
+59
+00:03:41,310 --> 00:03:46,580
+of elements of an arbitrary type U.
+But it, again, returns a list of Us.
+
+60
+00:03:46,580 --> 00:03:49,010
+So its implementation is, again, a pattern
+match.
+
+61
+00:03:50,100 --> 00:03:53,790
+the function f gets applied to the first
+element head.
+
+62
+00:03:53,790 --> 00:03:56,630
+But since it's a list, now it gets
+concatenated
+
+63
+00:03:56,630 --> 00:04:02,090
+with a recursive call to flatMap, rather
+than just prepended with a, with a cons.
+
+64
+00:04:02,090 --> 00:04:06,100
+So instead of a cons here, a double colon,
+
+65
+00:04:06,100 --> 00:04:11,030
+you have the concatenation operation,
+which is written plus plus.
+
+66
+00:04:11,030 --> 00:04:13,800
+And again for Nil, flatMap gives you back,
+a Nil.
+
+67
+00:04:15,360 --> 00:04:18,280
+The last operation we're going to look at
+is filter.
+
+68
+00:04:18,280 --> 00:04:21,950
+So filter takes a predicate that's a
+function from the List element
+
+69
+00:04:21,950 --> 00:04:25,200
+type T to Boolean and gives you back a
+list of T.
+
+70
+00:04:25,200 --> 00:04:29,010
+It keeps all the elements of the list that
+satisfy the predicate.
+
+71
+00:04:29,010 --> 00:04:31,580
+The way it does that is again with a
+pattern match.
+
+72
+00:04:31,580 --> 00:04:36,550
+If the list is not empty with a head x,
+then if the predicate holds for x.
+
+73
+00:04:36,550 --> 00:04:41,470
+Then you get back x followed by filter on
+the tail with a predicate.
+
+74
+00:04:41,470 --> 00:04:45,840
+Otherwise, you just filter on the tail,
+and you drop the first element.
+
+75
+00:04:45,840 --> 00:04:47,380
+And in the case of Nil,
+
+76
+00:04:47,380 --> 00:04:49,020
+you get back Nil, as before.
+
+77
+00:04:50,420 --> 00:04:53,790
+In practice, the types and implementations
+of these
+
+78
+00:04:53,790 --> 00:04:57,530
+methods are quite different in the Scala
+collection library.
+
+79
+00:04:57,530 --> 00:04:59,030
+And that's for two reasons.
+
+80
+00:04:59,030 --> 00:05:00,828
+The first one is that in the
+
+81
+00:05:00,828 --> 00:05:04,120
+Scala collection library, map, filter and
+flatMap
+
+82
+00:05:04,120 --> 00:05:05,770
+are not just defined for lists that
+
+83
+00:05:05,770 --> 00:05:10,110
+are defined for arbitrary collections and
+iterables.
+
+84
+00:05:10,110 --> 00:05:12,900
+and that means that their types need to be
+more general
+
+85
+00:05:12,900 --> 00:05:14,580
+than what you see here.
+
+86
+00:05:14,580 --> 00:05:18,415
+The second difference is that in the
+implementations of map, flatMap
+
+87
+00:05:18,415 --> 00:05:22,870
+and filter for lists, we want these
+methods to be tail-recursive.
+
+88
+00:05:22,870 --> 00:05:27,028
+If they weren't tail-recursive, then
+applying them to lists over a certain
+
+89
+00:05:27,028 --> 00:05:31,860
+length, probably over a couple thousand
+elements, would give you a stack overflow.
+
+90
+00:05:31,860 --> 00:05:34,450
+So to make map, flatMap, and filter work
+even
+
+91
+00:05:34,450 --> 00:05:38,740
+for very, very long lists, we need a
+tail-recursive implementation.
+
+92
+00:05:38,740 --> 00:05:41,980
+This one is not because you see for
+instance here, the
+
+93
+00:05:41,980 --> 00:05:45,521
+call to filter is actually nested inside
+the call to cons.
+
+94
+00:05:45,521 --> 00:05:49,701
+So we need to refactor this implementation
+to give,
+
+95
+00:05:49,701 --> 00:05:54,123
+give us something that works in constant
+stack space.
+
+96
+00:05:54,123 --> 00:05:59,635
+The second thing I want to cover which is
+related to collections is for-expressions.
+
+97
+00:05:59,635 --> 00:06:04,020
+For-expressions are useful because they
+give you a simpler notation for
+
+98
+00:06:04,020 --> 00:06:06,720
+something that comes down to combinations
+of
+
+99
+00:06:06,720 --> 00:06:09,840
+these core methods; map, flatMap, and
+filter.
+
+100
+00:06:09,840 --> 00:06:11,640
+Here's an example that you've seen already
+
+101
+00:06:11,640 --> 00:06:14,270
+in the first course on functional
+programming.
+
+102
+00:06:14,270 --> 00:06:17,780
+It's a combination of flatMap, filter, and
+map.
+
+103
+00:06:17,780 --> 00:06:20,290
+If you look at it for a sufficiently
+
+104
+00:06:20,290 --> 00:06:23,060
+long time, you probably figure out what it
+does.
+
+105
+00:06:23,060 --> 00:06:25,990
+But why go through all the trouble if
+
+106
+00:06:25,990 --> 00:06:28,720
+there's a simpler notation like this one
+here?
+
+107
+00:06:28,720 --> 00:06:29,090
+So this
+
+108
+00:06:29,090 --> 00:06:32,500
+one here, I would argue it's immediately
+clear what it does.
+
+109
+00:06:32,500 --> 00:06:39,060
+You let i step to the integers between 1
+and 10, j between 1 and i.
+
+110
+00:06:39,060 --> 00:06:42,450
+You ask whether the sum of i plus j
+isPrime
+
+111
+00:06:42,450 --> 00:06:45,230
+and then you yield the pairs of i and j.
+
+112
+00:06:46,360 --> 00:06:48,280
+So you yield the pairs of all
+
+113
+00:06:48,280 --> 00:06:52,050
+those integers in these ranges whose sum
+isPrime.
+
+114
+00:06:52,050 --> 00:06:54,560
+And it actually turns out that if you have
+
+115
+00:06:54,560 --> 00:06:58,950
+these for-expressions, then what the
+compiler of Scala would do is give
+
+116
+00:06:58,950 --> 00:07:01,660
+you something that's equivalent to
+precisely
+
+117
+00:07:01,660 --> 00:07:06,060
+this combination of map, filter, and
+flatMap.
+
+118
+00:07:06,060 --> 00:07:09,180
+So the way this is done, we are going to
+show next.
+
+119
+00:07:10,790 --> 00:07:14,250
+Here's how the Scala compiler translates
+for-expressions in terms
+
+120
+00:07:14,250 --> 00:07:18,240
+of map, flatMap and a lazy variant of
+filter.
+
+121
+00:07:18,240 --> 00:07:19,700
+There are three rules that apply
+
+122
+00:07:19,700 --> 00:07:22,810
+to the different shapes of the
+for-expressions.
+
+123
+00:07:22,810 --> 00:07:25,640
+The first one applies to for-expressions
+that consist of
+
+124
+00:07:25,640 --> 00:07:29,080
+a simple generator, written with a left
+arrow here.
+
+125
+00:07:29,080 --> 00:07:35,150
+So, you have for x taken from some
+expression e1, yield some expression e2.
+
+126
+00:07:35,150 --> 00:07:38,020
+And that's translated into a simple call
+of map.
+
+127
+00:07:38,020 --> 00:07:41,930
+So it would be translated to e1.map, and
+then you
+
+128
+00:07:41,930 --> 00:07:45,270
+have the closure that takes x as an
+argument and
+
+129
+00:07:45,270 --> 00:07:46,930
+gives you back the expression e2.
+
+130
+00:07:48,290 --> 00:07:51,070
+The second rule applies to for-expressions
+that follow the
+
+131
+00:07:51,070 --> 00:07:54,560
+initial generator with a filter, here
+written if f.
+
+132
+00:07:54,560 --> 00:07:59,196
+And there could be also other fields that
+I expressed as s that follow this in turn.
+
+133
+00:07:59,196 --> 00:08:05,420
+Such a for-expression is translated to
+this one that you see here.
+
+134
+00:08:05,420 --> 00:08:10,530
+The idea is that the filter f would appear
+as an argument x
+
+135
+00:08:10,530 --> 00:08:13,310
+arrow f of an anonymous function that
+
+136
+00:08:13,310 --> 00:08:16,230
+gets passed to withFilter of the first
+expression.
+
+137
+00:08:16,230 --> 00:08:21,220
+So essentially what you do is, you take
+the generator expression e1, and you
+
+138
+00:08:21,220 --> 00:08:26,800
+immediately prune down all the elements to
+those that satisfy the filter f.
+
+139
+00:08:26,800 --> 00:08:29,915
+And then you continue with the rest of the
+for-expressions.
+
+140
+00:08:31,310 --> 00:08:35,660
+You can think of withFilter as a lazy
+variant of filter that does
+
+141
+00:08:35,660 --> 00:08:41,780
+not, allocate a, a new list consisting of
+the elements that are kept by the filter.
+
+142
+00:08:41,780 --> 00:08:44,710
+But instead, passes on only those elements
+to
+
+143
+00:08:44,710 --> 00:08:47,568
+any following cause to map, flatMap or
+withFilter.
+
+144
+00:08:49,820 --> 00:08:51,790
+The third rule applies to for-expressions
+
+145
+00:08:51,790 --> 00:08:54,900
+that start with two generators in
+sequence.
+
+146
+00:08:54,900 --> 00:08:58,210
+These for-expressions are translated to a
+call of flatMap.
+
+147
+00:08:58,210 --> 00:09:02,250
+So the flatMap would apply to the first
+generator here.
+
+148
+00:09:02,250 --> 00:09:05,900
+And it would contain in its result a
+for-expression that
+
+149
+00:09:05,900 --> 00:09:09,140
+is essentially the all the rest of the
+original for-expressions.
+
+150
+00:09:09,140 --> 00:09:15,284
+So it starts with the second generator,
+then keeps the, any other elements
+
+151
+00:09:15,284 --> 00:09:18,050
+s and the result expression e3.
+
+152
+00:09:18,050 --> 00:09:22,416
+So you've seen that each of these rules
+translates a for-expression
+
+153
+00:09:22,416 --> 00:09:27,177
+to a for-expression that has one fewer
+elements between the parentheses.
+
+154
+00:09:27,177 --> 00:09:31,364
+First for-expression eliminates the single
+generator, the
+
+155
+00:09:31,364 --> 00:09:35,160
+second one eliminates a filter element
+here.
+
+156
+00:09:35,160 --> 00:09:37,260
+And the third one eliminates the leading
+
+157
+00:09:37,260 --> 00:09:41,760
+generator in the for-expression that is
+nested here.
+
+158
+00:09:41,760 --> 00:09:45,450
+So if we apply these rules repeatedly, at
+some point we
+
+159
+00:09:45,450 --> 00:09:48,910
+will be left without any generators or
+filters in the list.
+
+160
+00:09:48,910 --> 00:09:51,570
+And that is then the final result of the
+translation.
+
+161
+00:09:53,590 --> 00:09:57,730
+So one thing that we haven't seen yet is
+that the left-hand side of
+
+162
+00:09:57,730 --> 00:10:00,510
+a generator in a for-expression can also
+
+163
+00:10:00,510 --> 00:10:03,450
+be a pattern, not just the simple
+variable.
+
+164
+00:10:03,450 --> 00:10:09,550
+An example of that you see here, so it's a
+query over JSON data.
+
+165
+00:10:09,550 --> 00:10:13,910
+we are given a list of JSON objects in
+this data value.
+
+166
+00:10:13,910 --> 00:10:18,860
+And what we do now then is we step through
+the data we match
+
+167
+00:10:18,860 --> 00:10:22,050
+on all JObjects that contain some
+bindings.
+
+168
+00:10:22,050 --> 00:10:26,440
+So we would in that case, discard any
+other JSON
+
+169
+00:10:26,440 --> 00:10:29,920
+values like sequences or strings that
+appear on top level here.
+
+170
+00:10:31,030 --> 00:10:33,100
+We then look at the phone numbers
+
+171
+00:10:33,100 --> 00:10:37,120
+binding in bindings, that's a simple map
+application.
+
+172
+00:10:37,120 --> 00:10:42,330
+We pattern match to say, well that should
+be a JSequence of phones.
+
+173
+00:10:42,330 --> 00:10:44,277
+We go-, step through all the phones,
+
+174
+00:10:44,277 --> 00:10:49,037
+each one gives, gives us a phone.
+the phone is itself an object.
+
+175
+00:10:49,037 --> 00:10:53,756
+We pick its number field, that should give
+us a JString of digits.
+
+176
+00:10:53,756 --> 00:10:57,976
+And we demand whether the digits start
+with the number 212.
+
+177
+00:10:57,976 --> 00:11:00,024
+And if that's the case, then we yield
+
+178
+00:11:00,024 --> 00:11:02,731
+bindings of first name and bindings of
+last name.
+
+179
+00:11:02,731 --> 00:11:06,098
+So what this would do, in a nutshell,
+would
+
+180
+00:11:06,098 --> 00:11:09,556
+give us the first and last names of all
+persons
+
+181
+00:11:09,556 --> 00:11:14,790
+that have a telephone number that starts
+with the area code 212.
+
+182
+00:11:14,790 --> 00:11:18,270
+Patterns in generators act as implicit
+filters.
+
+183
+00:11:18,270 --> 00:11:22,740
+Essentially, what happens here when you
+have a generator like this is then that
+
+184
+00:11:22,740 --> 00:11:29,470
+the match with JObject bindings gets added
+as an implicit filter to these data.
+
+185
+00:11:29,470 --> 00:11:34,680
+We'll see how in the translation scheme.
+So, we look
+
+186
+00:11:34,680 --> 00:11:39,460
+at a generator pat left arrow expression,
+where pat is a pattern.
+
+187
+00:11:39,460 --> 00:11:44,730
+For simplicity's sake, we assume it has
+only a single variable x in the pattern.
+
+188
+00:11:44,730 --> 00:11:48,350
+And that then would be translated to this
+expression, here.
+
+189
+00:11:48,350 --> 00:11:54,900
+So, we take the generator expression,
+expression run it through withFilter.
+
+190
+00:11:54,900 --> 00:11:58,570
+Here we say, keep only those elements that
+match the pattern.
+
+191
+00:11:58,570 --> 00:11:59,996
+Otherwise return false and
+
+192
+00:11:59,996 --> 00:12:02,470
+so the elements would be dropped.
+
+193
+00:12:02,470 --> 00:12:06,750
+And then that result, in turn, gets mapped
+with the function that
+
+194
+00:12:06,750 --> 00:12:11,670
+takes a pattern and returns x, the
+variable that is in the pattern.
+
+195
+00:12:13,450 --> 00:12:15,120
+Here's an exercise.
+
+196
+00:12:15,120 --> 00:12:17,170
+According to the rules that you've seen
+for
+
+197
+00:12:17,170 --> 00:12:22,820
+the translation for-expressions, what
+would this expression translate to?
+
+198
+00:12:22,820 --> 00:12:24,170
+This one, or this one.
+
+199
+00:12:26,780 --> 00:12:29,020
+I guess the answer is quite easy to come
+by.
+
+200
+00:12:30,580 --> 00:12:36,180
+one indication already is that, that
+for-expression starts with two generators.
+
+201
+00:12:36,180 --> 00:12:39,740
+We have seen that, that should map into
+something that starts with a flatMap.
+
+202
+00:12:39,740 --> 00:12:42,350
+So, that would rule out the second one.
+
+203
+00:12:42,350 --> 00:12:44,950
+And also, if we check all the other
+details, then we see
+
+204
+00:12:44,950 --> 00:12:48,180
+that indeed this for-expression maps into
+
+205
+00:12:48,180 --> 00:12:51,280
+this combination of map, flatMap, and
+withFilter.
+

@@ -1,0 +1,1297 @@
+1
+00:00:04,482 --> 00:00:07,112
+Let's now look at the case 
+of distributed transactions.
+
+2
+00:00:07,863 --> 00:00:09,203
+Our model is as follows:
+
+3
+00:00:09,203 --> 00:00:12,643
+We assume there is multiple database
+servers that can talk to each other.
+
+4
+00:00:13,143 --> 00:00:14,293
+In a network.
+
+5
+00:00:14,531 --> 00:00:15,721
+There is no replication.
+
+6
+00:00:15,721 --> 00:00:18,311
+That means each database object
+is on one server only.
+
+7
+00:00:18,801 --> 00:00:22,801
+And transactions access objects
+on multiple servers, in general.
+
+8
+00:00:23,074 --> 00:00:26,214
+That means a transaction will 
+probably originate from one client,
+
+9
+00:00:26,214 --> 00:00:30,714
+that communicates via some middleware, 
+with, by default, maybe one machine,
+
+10
+00:00:30,714 --> 00:00:33,634
+but potentially several of these 
+database servers.
+
+11
+00:00:33,634 --> 00:00:36,984
+A transaction can involve several objects
+that are read or written,
+
+12
+00:00:37,334 --> 00:00:40,154
+and the database servers
+have to figure out among themselves
+
+13
+00:00:40,154 --> 00:00:42,674
+how to properly execute
+these transactions.
+
+14
+00:00:43,687 --> 00:00:46,127
+There is a number of issues
+that we have to look at.
+
+15
+00:00:46,341 --> 00:00:50,591
+The first one is, how to achieve,
+so to say, serializability.
+
+16
+00:00:51,079 --> 00:00:54,429
+One way to do this is by locking.
+That's probably the simplest form.
+
+17
+00:00:54,745 --> 00:00:59,015
+And what one could do is to use
+a global version of two-phase locking.
+
+18
+00:00:59,574 --> 00:01:01,954
+What would that mean?
+That would mean that there is
+
+19
+00:01:01,954 --> 00:01:06,384
+maybe a single dedicated server
+that globally maintains locks
+
+20
+00:01:06,384 --> 00:01:08,454
+for all the objects of all the machines,
+
+21
+00:01:08,454 --> 00:01:11,984
+and executes a classical
+two-phase locking protocol.
+
+22
+00:01:13,285 --> 00:01:15,685
+Alternatively, one could have
+some clever scheme
+
+23
+00:01:15,685 --> 00:01:17,565
+of not leaving this
+to a single node,
+
+24
+00:01:17,565 --> 00:01:20,185
+but achieving the same 
+performance behavior.
+
+25
+00:01:20,891 --> 00:01:25,021
+Alternatively, we could simply use
+local, strict two-phase locking
+
+26
+00:01:25,201 --> 00:01:26,751
+on each side.
+
+27
+00:01:26,751 --> 00:01:30,561
+That means strict, rather than classical
+two-phase locking, where all the locks
+
+28
+00:01:30,561 --> 00:01:33,791
+have to be released together
+at commit time, and not before.
+
+29
+00:01:34,636 --> 00:01:38,552
+If you do that, actually it's sufficient
+to do locking on each node,
+
+30
+00:01:38,552 --> 00:01:40,668
+on each so, individually,
+
+31
+00:01:40,668 --> 00:01:43,686
+and overall, serializability 
+will be maintained.
+
+32
+00:01:44,214 --> 00:01:45,557
+Let's first see why,
+
+33
+00:01:45,557 --> 00:01:47,740
+if you would locally use
+two-phase locking,
+
+34
+00:01:47,740 --> 00:01:49,514
+rather than strict two-phase locking,
+
+35
+00:01:49,514 --> 00:01:50,754
+that would not be enough.
+
+36
+00:01:50,934 --> 00:01:52,144
+So here's an example.
+
+37
+00:01:52,144 --> 00:01:54,907
+I have shown you two transactions.
+T1, and T2.
+
+38
+00:01:54,907 --> 00:01:57,447
+And there is two database objects
+that you care about.
+
+39
+00:01:57,447 --> 00:02:00,417
+Well actually database object A
+is stored at the first machine,
+
+40
+00:02:00,417 --> 00:02:01,657
+which is machine number 1,
+
+41
+00:02:01,657 --> 00:02:05,117
+and object B is stored 
+and maintained by machine 2.
+
+42
+00:02:05,668 --> 00:02:08,088
+So, transaction T1 first greets object A,
+
+43
+00:02:08,088 --> 00:02:10,698
+then transaction T2 writes object A,
+
+44
+00:02:10,698 --> 00:02:12,748
+then transaction T2 reads object B,
+
+45
+00:02:12,753 --> 00:02:15,923
+and finally, transaction T2,
+writes object B.
+
+46
+00:02:16,103 --> 00:02:20,103
+If you now ignore this allocation,
+that A is at node 1,
+
+47
+00:02:20,103 --> 00:02:22,123
+and B is at node 2,
+
+48
+00:02:22,123 --> 00:02:26,713
+we can really see that classical example
+of a non-serializable transaction.
+
+49
+00:02:27,113 --> 00:02:29,783
+We've got a read-write 
+conflict from T1 to T2,
+
+50
+00:02:29,783 --> 00:02:32,043
+and a read-write 
+conflict from T2 to T1.
+
+51
+00:02:32,205 --> 00:02:33,405
+So there's a cycle,
+
+52
+00:02:33,405 --> 00:02:36,575
+this transaction schedule
+is not conflict serializable,
+
+53
+00:02:36,575 --> 00:02:38,505
+and it's actually also not serializable.
+
+54
+00:02:38,981 --> 00:02:42,471
+However, if we look at individual nodes,
+
+55
+00:02:42,471 --> 00:02:44,851
+maintaining ANP respectively,
+
+56
+00:02:45,168 --> 00:02:48,768
+we could do an extreme thing
+and could locally, at each node,
+
+57
+00:02:48,768 --> 00:02:53,308
+think of each of these individual
+operations as the transaction.
+
+58
+00:02:53,508 --> 00:02:56,268
+That means, from the viewpoint of node 1,
+
+59
+00:02:56,268 --> 00:03:00,138
+it sees an operation that T1 executes,
+
+60
+00:03:00,138 --> 00:03:03,258
+that asks for a reading of A.
+
+61
+00:03:03,715 --> 00:03:07,945
+And later it sees 
+transaction T2 writing A.
+
+62
+00:03:08,307 --> 00:03:09,997
+But then there's nothing else left,
+
+63
+00:03:09,997 --> 00:03:12,577
+there's no more work to be done
+for either transaction.
+
+64
+00:03:12,577 --> 00:03:16,067
+So we could actually think of,
+locally, if locking and unlocking
+
+65
+00:03:16,067 --> 00:03:18,367
+are completely maintained
+by the database system,
+
+66
+00:03:18,367 --> 00:03:20,817
+that since there is no more 
+work to be done,
+
+67
+00:03:20,817 --> 00:03:25,367
+this transaction, T1 for example,
+is finished after the first operation,
+
+68
+00:03:25,367 --> 00:03:28,937
+and we can start unlocking this object A.
+
+69
+00:03:29,088 --> 00:03:30,898
+Which would then immediately allow us
+
+70
+00:03:30,898 --> 00:03:34,148
+to get a write-lock on object A
+for transaction T2.
+
+71
+00:03:34,480 --> 00:03:37,090
+And the same thing on the second node.
+
+72
+00:03:38,071 --> 00:03:39,331
+And of course, overall,
+
+73
+00:03:39,331 --> 00:03:42,731
+this leads to something that looks like
+four different transactions,
+
+74
+00:03:42,731 --> 00:03:45,111
+T1 on the first node,
+
+75
+00:03:45,111 --> 00:03:46,321
+T1 on the second node,
+
+76
+00:03:46,321 --> 00:03:47,461
+T2 on the first node,
+
+77
+00:03:47,461 --> 00:03:49,241
+and T2 on the second node.
+
+78
+00:03:49,504 --> 00:03:52,724
+Of course, the semantic is not the same,
+and this is not correct.
+
+79
+00:03:53,525 --> 00:03:57,275
+So this is a consequence of basically,
+
+80
+00:03:57,275 --> 00:04:01,275
+unlocking as soon as, 
+from the viewpoint of a node,
+
+81
+00:04:01,275 --> 00:04:03,685
+nothing more needs to be done
+in this transaction.
+
+82
+00:04:04,577 --> 00:04:07,437
+This is allowed, so to say,
+under two-phase locking.
+
+83
+00:04:07,902 --> 00:04:11,902
+However, if you use strict two-phase
+locking in each case, on both local nodes,
+
+84
+00:04:11,902 --> 00:04:15,522
+then this scenario would be avoided
+because the locks would be maintained
+
+85
+00:04:15,522 --> 00:04:18,922
+until globally, on all the nodes,
+we do a commit.
+
+86
+00:04:19,511 --> 00:04:22,701
+And this would,
+in the case of this example,
+
+87
+00:04:22,701 --> 00:04:25,801
+lock transaction T2
+as soon as it tries to write to A.
+
+88
+00:04:27,109 --> 00:04:30,439
+So clearly, using classical 
+two-phase locking,
+
+89
+00:04:30,439 --> 00:04:32,299
+non-strict two-phase locking,
+
+90
+00:04:32,299 --> 00:04:34,909
+is not sufficient if you do it locally
+in each machine.
+
+91
+00:04:35,763 --> 00:04:40,633
+But we have said that strict two-phase
+locking, doing it locally, <i>is</i> sufficient.
+
+92
+00:04:40,763 --> 00:04:41,903
+So why is this?
+
+93
+00:04:41,903 --> 00:04:44,093
+Well if you think about it,
+it's not that surprising
+
+94
+00:04:44,103 --> 00:04:50,303
+because all we need to do when locking
+is avoid conflicts between accesses,
+
+95
+00:04:50,303 --> 00:04:53,749
+by two different transactions,
+on the same resource.
+
+96
+00:04:54,169 --> 00:04:57,519
+And right now, each resource
+is one node only.
+
+97
+00:04:57,893 --> 00:05:02,383
+That means we can locally deal with
+every conflict that arises,
+
+98
+00:05:02,783 --> 00:05:05,973
+some node maintains the object
+on which the conflict arises,
+
+99
+00:05:05,973 --> 00:05:08,333
+and then we realize that
+one transaction has to be
+
+100
+00:05:08,333 --> 00:05:12,093
+ordered before the other, 
+by blocking one transaction,
+
+101
+00:05:12,093 --> 00:05:14,173
+because another transaction has to lock.
+
+102
+00:05:14,760 --> 00:05:18,450
+Now, if we then not unlock
+until a commit happens,
+
+103
+00:05:18,450 --> 00:05:21,180
+then things will be maintained properly,
+
+104
+00:05:21,180 --> 00:05:23,980
+and serializability will be assured.
+
+105
+00:05:25,485 --> 00:05:29,485
+So now we have a way of maintaining
+serializability using locking.
+
+106
+00:05:29,853 --> 00:05:33,853
+One thing that can arise in lock-based
+concurrency control is deadlocks.
+
+107
+00:05:34,398 --> 00:05:39,548
+And we have dealt with this by either
+avoiding deadlocks, or by detecting them.
+
+108
+00:05:39,741 --> 00:05:42,311
+How do we detect deadlocks
+at this particular scenario?
+
+109
+00:05:42,311 --> 00:05:44,841
+So what we can do is have each side,
+
+110
+00:05:44,841 --> 00:05:47,071
+each different individual database server,
+
+111
+00:05:47,071 --> 00:05:49,091
+maintain a local waits-for graph
+
+112
+00:05:49,091 --> 00:05:52,721
+that basically has a node switch 
+transaction, and and edge.
+
+113
+00:05:52,721 --> 00:05:54,971
+When one transaction is blocked,
+
+114
+00:05:54,971 --> 00:05:57,801
+it waits for a lock
+held by another transaction.
+
+115
+00:05:58,071 --> 00:06:00,921
+Now it can absolutely arise,
+and we've got an example here,
+
+116
+00:06:00,921 --> 00:06:02,891
+that there is, let's say,
+two database servers,
+
+117
+00:06:02,891 --> 00:06:04,161
+Site A, and and Site B,
+
+118
+00:06:04,161 --> 00:06:08,031
+and they individually have 
+an acyclic waits-for graph,
+
+119
+00:06:08,031 --> 00:06:11,291
+but if you combine those 
+by combining the edges,
+
+120
+00:06:11,291 --> 00:06:12,581
+adding them up,
+
+121
+00:06:12,581 --> 00:06:16,131
+we get a cyclic waits-for graph,
+which means there is a deadlock.
+
+122
+00:06:16,396 --> 00:06:19,986
+That means, maintaining waits-for
+graphs locally is not enough.
+
+123
+00:06:20,414 --> 00:06:24,104
+What we can do, of course, is
+have a single centralized database server
+
+124
+00:06:24,104 --> 00:06:29,254
+responsible for maintaining the edges
+of waits-for graphs of all the nodes.
+
+125
+00:06:29,254 --> 00:06:32,004
+That means, a machine
+that collects all these edges,
+
+126
+00:06:32,004 --> 00:06:35,384
+and then maintains, globally,
+the waits-for graph for all the machines,
+
+127
+00:06:35,384 --> 00:06:38,354
+and does detect cycles and deadlocks.
+
+128
+00:06:38,354 --> 00:06:41,984
+And then can let machines know
+that they have to deal with deadlocks
+
+129
+00:06:41,984 --> 00:06:43,604
+by killing transactions.
+
+130
+00:06:44,183 --> 00:06:47,823
+Alternatively, you can optimize this a bit
+by having some hierarchical scheme
+
+131
+00:06:47,823 --> 00:06:51,033
+of propagating edges towards
+something like a central node,
+
+132
+00:06:51,033 --> 00:06:54,363
+and there are certain optimizations 
+that can be done using this idea.
+
+133
+00:06:54,534 --> 00:06:58,914
+The alternative would be, of course,
+having a time-out to detect deadlocks.
+
+134
+00:06:59,334 --> 00:07:01,804
+If nothing progresses
+in the system anymore,
+
+135
+00:07:01,804 --> 00:07:03,683
+we can start killing transactions.
+
+136
+00:07:03,683 --> 00:07:06,093
+In that case, we don't need
+such a waits-for graph.
+
+137
+00:07:08,221 --> 00:07:12,221
+One thing that we have not discussed yet,
+is performing commits.
+
+138
+00:07:12,221 --> 00:07:14,581
+So far we didn't have much
+to say about this.
+
+139
+00:07:14,581 --> 00:07:19,201
+In a single-node scenario, once we decide,
+in a single-fronted scenario,
+
+140
+00:07:19,201 --> 00:07:21,081
+once we decided that we want to commit,
+
+141
+00:07:21,081 --> 00:07:23,191
+it was relatively clear 
+what has to be done.
+
+142
+00:07:23,988 --> 00:07:26,158
+In certain schemes, locking-based schemes,
+
+143
+00:07:26,158 --> 00:07:29,228
+data was already in place,
+and all we had to do is not roll back.
+
+144
+00:07:29,228 --> 00:07:30,638
+Not undo changes.
+
+145
+00:07:30,638 --> 00:07:34,738
+In other scenarios, lets say,
+the scenarios that use multiple versions,
+
+146
+00:07:34,738 --> 00:07:38,278
+or snapshots, these snapshots
+would be just deleted,
+
+147
+00:07:38,497 --> 00:07:40,797
+and not propagated back to the database.
+
+148
+00:07:41,646 --> 00:07:45,646
+Now in this one scenario,
+the committing problem is harder,
+
+149
+00:07:45,646 --> 00:07:49,426
+because we really have make sure
+that whenever we decide to commit,
+
+150
+00:07:49,426 --> 00:07:51,356
+we commit on all nodes.
+
+151
+00:07:51,356 --> 00:07:52,626
+And not just on some.
+
+152
+00:07:52,776 --> 00:07:55,016
+If we did the latter,
+if we commit only on some,
+
+153
+00:07:55,016 --> 00:07:57,206
+we could get into serious 
+consistency issues.
+
+154
+00:07:57,443 --> 00:07:59,913
+A very famous technique here,
+a very famous algorithm,
+
+155
+00:07:59,913 --> 00:08:01,435
+is so-called, "two-phase commit".
+
+156
+00:08:01,435 --> 00:08:04,035
+Which is a committing algorithm
+in this particular scenario.
+
+157
+00:08:04,035 --> 00:08:06,878
+And it shouldn't be confused, of course,
+with two-phase locking,
+
+158
+00:08:06,878 --> 00:08:08,768
+which is something completely different.
+
+159
+00:08:08,768 --> 00:08:10,558
+Although, there is again, two phases.
+
+160
+00:08:10,559 --> 00:08:14,179
+Now, in the two-phase commit scenario,
+there is one coordinator
+
+161
+00:08:14,179 --> 00:08:17,049
+among all these database servers,
+which initiates the commit,
+
+162
+00:08:17,049 --> 00:08:21,019
+and then is responsible for collecting
+certain votes and answers
+
+163
+00:08:21,019 --> 00:08:23,079
+to make sure that everything
+works properly.
+
+164
+00:08:23,206 --> 00:08:24,716
+Well, if for example,
+
+165
+00:08:24,716 --> 00:08:29,362
+our client has been most recently
+in contact with a single machine to say,
+
+166
+00:08:29,362 --> 00:08:31,148
+"Now I want to commit my transaction,"
+
+167
+00:08:31,148 --> 00:08:33,416
+then, this could be, for example,
+the coordinator.
+
+168
+00:08:33,416 --> 00:08:35,626
+Or we could have some 
+lead election scheme
+
+169
+00:08:35,626 --> 00:08:38,186
+to decide which machine
+to coordinate this.
+
+170
+00:08:38,186 --> 00:08:40,176
+This is not a very heavy-load job,
+
+171
+00:08:40,176 --> 00:08:43,586
+so we don't have to worry very much
+about paralyzing this.
+
+172
+00:08:44,614 --> 00:08:48,614
+Now, when the message from the client
+
+173
+00:08:48,614 --> 00:08:50,144
+lets say, arrives,
+
+174
+00:08:50,144 --> 00:08:52,204
+that we want to commit,
+we do the following:
+
+175
+00:08:52,204 --> 00:08:56,284
+the coordinator receives this message,
+and decides to send a prepare signal
+
+176
+00:08:56,284 --> 00:08:58,554
+to all the machines
+involved in the transaction.
+
+177
+00:08:58,554 --> 00:09:00,874
+If the coordinator itself
+is one of those machines,
+
+178
+00:09:00,874 --> 00:09:02,704
+it also has to act as a subordinate.
+
+179
+00:09:03,198 --> 00:09:06,058
+Now, the subordinates
+receive this prepare signal,
+
+180
+00:09:06,468 --> 00:09:11,038
+and have to force-write
+a prepare record to the log.
+
+181
+00:09:11,768 --> 00:09:14,528
+Then they decide,
+based on their own constraints,
+
+182
+00:09:14,528 --> 00:09:18,228
+whether their part in satisfying 
+the integrated constraints
+
+183
+00:09:18,228 --> 00:09:20,578
+that have to be maintained,
+can be satisfied.
+
+184
+00:09:20,578 --> 00:09:22,958
+That means they will check 
+locally at the objects
+
+185
+00:09:23,548 --> 00:09:27,613
+whether all the potential integrated 
+constraints can be maintained.
+
+186
+00:09:27,816 --> 00:09:29,586
+And if there is any reason to believe
+
+187
+00:09:29,586 --> 00:09:31,406
+that this is not going to be possible,
+
+188
+00:09:31,406 --> 00:09:34,886
+then that subordinate has to say "no"
+as an answer to the coordinator.
+
+189
+00:09:34,886 --> 00:09:36,866
+If however, the subordinate can say,
+
+190
+00:09:36,866 --> 00:09:40,216
+"Locally aside, my part 
+in the committing can be satisfied,"
+
+191
+00:09:40,216 --> 00:09:42,296
+then it will send a "yes".
+
+192
+00:09:42,559 --> 00:09:44,849
+The coordinator has to wait
+for all the responses
+
+193
+00:09:44,849 --> 00:09:46,439
+from all the subordinates.
+
+194
+00:09:46,439 --> 00:09:50,239
+And then decides, based on these votes,
+whether every of the subordinates --
+
+195
+00:09:50,239 --> 00:09:51,959
+each of the subordinates can commit.
+
+196
+00:09:51,959 --> 00:09:53,969
+Only then, it decides to commit.
+
+197
+00:09:53,969 --> 00:09:56,619
+Otherwise, if there's at least 
+one machine that says,
+
+198
+00:09:56,619 --> 00:09:57,759
+"I cannot commit,"
+
+199
+00:09:57,759 --> 00:09:59,469
+then all of them have to abort.
+
+200
+00:09:59,951 --> 00:10:01,391
+So, it collects the votes.
+
+201
+00:10:01,391 --> 00:10:02,961
+When it has received only yes's,
+
+202
+00:10:02,961 --> 00:10:04,491
+and everybody has answered,
+
+203
+00:10:04,491 --> 00:10:08,491
+then it will send a commit signal
+to all the subordinates again.
+
+204
+00:10:08,491 --> 00:10:09,681
+That's the second phase.
+
+205
+00:10:09,681 --> 00:10:12,781
+Otherwise, it tells all the subordinates
+that they have to abort.
+
+206
+00:10:13,506 --> 00:10:15,216
+The subordinates, again,
+
+207
+00:10:15,216 --> 00:10:19,446
+have to force-write this decision 
+to abort a commit to the log,
+
+208
+00:10:19,446 --> 00:10:21,256
+and then they send 
+an acknowledgement.
+
+209
+00:10:21,256 --> 00:10:22,836
+And of course they do the action.
+
+210
+00:10:22,836 --> 00:10:24,966
+That means they either abort, locally,
+
+211
+00:10:24,966 --> 00:10:26,796
+or they commit their part locally.
+
+212
+00:10:27,670 --> 00:10:31,000
+Finally, the coordinator waits for
+all these acknowledgments to arrive,
+
+213
+00:10:31,000 --> 00:10:33,200
+and then writes an end record to its log.
+
+214
+00:10:33,921 --> 00:10:37,051
+We haven't talked about logs before,
+in the previous lectures,
+
+215
+00:10:37,051 --> 00:10:39,231
+but the log is actually important
+
+216
+00:10:39,231 --> 00:10:41,931
+to be able to deal with failures
+during to the commit.
+
+217
+00:10:42,898 --> 00:10:46,468
+So, assume a protocol where data is,
+
+218
+00:10:46,468 --> 00:10:49,038
+change data of a transactions
+in a local copy,
+
+219
+00:10:49,038 --> 00:10:51,718
+lets say, multi-versional
+concurrency control,
+
+220
+00:10:51,718 --> 00:10:53,688
+or optimistic concurrency control,
+
+221
+00:10:53,688 --> 00:10:56,032
+then dealing with aborts is very easy.
+
+222
+00:10:56,032 --> 00:10:58,142
+Just, we want to make sure,
+when they commit,
+
+223
+00:10:58,142 --> 00:10:59,912
+that they write everything correctly.
+
+224
+00:11:00,193 --> 00:11:00,907
+And of course,
+
+225
+00:11:00,907 --> 00:11:03,381
+the two-phase commit protocol
+is not bound in any way
+
+226
+00:11:03,381 --> 00:11:05,816
+to lock-based concurrency controls,
+
+227
+00:11:05,816 --> 00:11:09,466
+it can be used with any distributed
+concurrency control protocol,
+
+228
+00:11:09,466 --> 00:11:12,596
+be it multi-version based,
+snapshot isolation based, or whatever.
+
+229
+00:11:13,430 --> 00:11:15,230
+So the challenge is,
+
+230
+00:11:15,230 --> 00:11:19,250
+what happens if at least one machine 
+breaks while the commit is executed?
+
+231
+00:11:20,269 --> 00:11:23,779
+In that case, we must be sure
+that we proceed as planned,
+
+232
+00:11:23,779 --> 00:11:25,929
+and don't forget what we've decided.
+
+233
+00:11:26,028 --> 00:11:28,668
+So for that reason,
+when the core data makes a decision,
+
+234
+00:11:28,668 --> 00:11:30,678
+and it communicates to the other machines,
+
+235
+00:11:30,678 --> 00:11:34,678
+it has to make sure that this decision
+is logged and written,
+
+236
+00:11:34,678 --> 00:11:36,348
+so it will save to the log,
+
+237
+00:11:36,616 --> 00:11:40,016
+so that when it crashes, it can recover
+and is still in the same state,
+
+238
+00:11:40,016 --> 00:11:43,206
+and similarly, the subordinates
+will have to make the same decision.
+
+239
+00:11:43,541 --> 00:11:47,231
+Now there are many details
+about this protocol.
+
+240
+00:11:47,231 --> 00:11:50,241
+There is many corner cases
+that have to be dealt with,
+
+241
+00:11:50,241 --> 00:11:52,711
+and they're really beyond
+the scope of this lecture.
+
+242
+00:11:52,995 --> 00:11:55,545
+For that one, we'll have to read
+the specific literature
+
+243
+00:11:55,545 --> 00:11:57,445
+to implement two-phase commit correctly.
+
+244
+00:11:57,445 --> 00:12:00,625
+There's many potential pitfalls,
+including all these fine-grain details
+
+245
+00:12:00,625 --> 00:12:03,055
+about how to deal with 
+failures during commit.
+
+246
+00:12:03,055 --> 00:12:05,625
+In general, there may be
+many database machines involved,
+
+247
+00:12:05,625 --> 00:12:07,445
+and the more machines that are involved,
+
+248
+00:12:07,445 --> 00:12:09,675
+the more likely that 
+at least one of them fails.
+
+249
+00:12:09,675 --> 00:12:11,285
+So this has to be handled properly.
+
+250
+00:12:11,287 --> 00:12:14,270
+But, again, just to say
+the high-level things,
+
+251
+00:12:14,270 --> 00:12:16,270
+two-phase commit is called 
+two-phase commit,
+
+252
+00:12:16,270 --> 00:12:17,880
+because there is these two phases.
+
+253
+00:12:17,880 --> 00:12:19,790
+The first, the voting phase,
+where together,
+
+254
+00:12:19,790 --> 00:12:22,709
+the distributed fashion will decide
+whether we can actually commit.
+
+255
+00:12:22,779 --> 00:12:24,976
+There's the coordinator
+which collects these votes,
+
+256
+00:12:24,976 --> 00:12:26,636
+and then, based on the votes,
+
+257
+00:12:26,636 --> 00:12:28,336
+counts them, so to say,
+
+258
+00:12:28,336 --> 00:12:29,366
+and makes a decision.
+
+259
+00:12:29,366 --> 00:12:32,056
+And then all of these guys
+who have to commit themselves,
+
+260
+00:12:32,056 --> 00:12:33,566
+have to follow this decision.
+
+261
+00:12:33,566 --> 00:12:36,096
+So it's not possible 
+that a machine says "commit",
+
+262
+00:12:36,096 --> 00:12:39,536
+and later, after it has been confirmed
+that it should commit,
+
+263
+00:12:39,536 --> 00:12:41,226
+by the coordinator, it decides,
+
+264
+00:12:41,226 --> 00:12:43,386
+"Actually, I cannot commit."
+I have to abort."
+
+265
+00:12:43,386 --> 00:12:44,486
+This is not possible.
+
+266
+00:12:44,486 --> 00:12:45,656
+And in this first phase,
+
+267
+00:12:45,656 --> 00:12:47,769
+the subordinates make sure
+that if it says,
+
+268
+00:12:47,769 --> 00:12:48,872
+"Yes, I can commit,"
+
+269
+00:12:48,872 --> 00:12:50,036
+it can really commit.
+
+270
+00:12:52,095 --> 00:12:55,495
+So, in summary,
+
+271
+00:12:56,245 --> 00:12:58,335
+distributed transaction management,
+
+272
+00:12:58,335 --> 00:13:00,925
+at least on this high-level
+that we have now discussed,
+
+273
+00:13:01,592 --> 00:13:02,812
+is not that hard.
+
+274
+00:13:03,056 --> 00:13:06,356
+We have talked about two-phase commit,
+which is an important protocol,
+
+275
+00:13:06,356 --> 00:13:08,856
+not to be confused with two-phase locking.
+
+276
+00:13:09,642 --> 00:13:12,932
+We've talked about lock-based
+concurrency control,
+
+277
+00:13:12,932 --> 00:13:16,802
+and why local, strict two-phase
+locking does the job.
+
+278
+00:13:16,802 --> 00:13:19,142
+We've talked about deadlock
+protection avoidance,
+
+279
+00:13:19,546 --> 00:13:22,456
+and that said, of course,
+we have only scratched the surface.
+
+280
+00:13:22,456 --> 00:13:24,496
+There is much more
+to be said about this topic.
+
+281
+00:13:24,496 --> 00:13:28,496
+And there could be special-purpose
+lectures on this, and courses for this.

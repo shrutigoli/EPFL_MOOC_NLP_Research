@@ -1,0 +1,104 @@
+Hi, I'm Ed Bugnion, welcome to POCS.
+This week in POCS we'll be talking about two related and important concepts.
+The first one is virtualization, which is a broadly used technique in computer systems, and the second one is virtual machines, which is the application of the virtualization technique as applied to a computer's desktops or servers.
+I've actually spent many years, probably well over a decade of my career in the area of virtualization.
+Hope to share some of those perspectives with you this week.
+This is a pretty broad area, so we've broken it up into different topics.
+The first one, which is the module you're watching right now, will only focus on an introduction and overview of the broad topic of virtualization.
+Some of that topic content comes from the Saltzer and Kaashoek textbook.
+Now the other modules are not available in the Saltzer and Kaashoek textbook.
+I'll first walk you through a history of virtual machines... why we are where we are today.
+That's kind of an interesting history to think about.
+Then we'll go into the area of VMM construction, and we'll do that in a system-independent manner, just looking at the fundamental principles that are required in order to build a virtual machine monitor that can efficiently run virtual machines.
+And then we'll go from theory to practice in the next two modules.
+There's a first case study, which is of a system called <i>Disco</i>, which I worked on in the 90's at Stanford.
+And this was a precursor to ESX server, which is covered in the paper from Carl Waldspurger
+So I recommend that you watch this module on memory resource management in Disco before reading the paper.
+And then finally, the last module is an optional module.
+It is a case study on VMM 1.0, which is a system that I worked on at VMware in 1998 and 1999.
+It's also described in a recent paper, and again, this is an optional module, and it'll give you a sense of how you can build a virtual machine monitor that is commercial grade, even on an architecture that is not designed with architectural support for virtualization.
+So let's get started.
+And let's get started with a basic definition of what virtualization is about, and why it is important.
+Virtualization is not a principle in the same way that we've raised other aspects of computer systems to the level of principles.
+It's not as important as abstraction or as modularity, but it actually <i>uses</i> abstraction and modularity.
+It creates an abstraction in a virtualized... a resource that is virtualized is an abstraction, from a computer systems perspective.
+And that abstraction is used in order to enforce modularity.
+Virtualization is associated with an enforced modularity, and that enforced modularity, of course, is enabled through the use of layering.
+So we use layering and we use indirection in order to create an abstraction, and that abstraction enforces modularity.
+Now, there are additional fundamental principles of computer systems that are brought into the mix, in order to create a virtualized environment, in particular a virtual machine, and one worth mentioning is interpretation.
+In order to create a computer that is virtualized, that computer has a processing unit, and that processing unit, and the instructions in that processing unit need to be interpreted in some way, and so interpretation is fundamental to the art of building efficient virtual machine monitors.
+Now, why do you virtualize?
+Well, there are actually a number of motivations.
+The original motivation for virtualization, whether it applies to computers, or storage, or networking, or other parts of computer systems, has been largely to reduce complexity, and that is one of the overriding themes that we have in this class, is that complexity is the single largest evil that one must constantly fight in order to create systems that are ever more powerful and have additional new capabilities.
+So virtualization is an efficient and effective technique to reduce the complexity in computer systems.
+More recently, virtualization has been extremely popular because it enables automation.
+There's one important saying that applies to data centers, that says, "screwdrivers don't scale."
+Which basically means that the physical world, that any manipulation of the physical world, is impossible to scale, and impossible to automate.
+If you apply virtualization on top of physical resources then the idea, or the premise, is that you can start manipulating these virtual abstractions as if they were physical resources without having to touch either physical screwdrivers, or the moral equivalent of screwdrivers.
+Now, as I mentioned earlier, virtualization is a broad technique, virtual machine is a specific use of that technique, so I'm first actually going to define virtualization in the broad sense, and then we'll go back to virtual machines.
+So virtualization is a layer, and it is a layer that exports the same abstraction as the layer that it relies upon.
+It doesn't get any simpler, or any more basic than that, but that is actually fundamental.
+So if you picture this representation, you take any physical resource, "X", picture, for now, a disk drive.
+A virtualization layer is a piece of software that takes one or more of those physical "X" resources, those disk drives, and exports an abstraction of a disk.
+Now that disk, that virtual X, that virtual disk, is not a physical disk, but it is something that is functionally equivalent to the underlying characteristics of a disk drive...
+If X is, of course, a disk drive.
+Now you can substitute X to being an address space, a CPU, a messaging interface, a port, and you get the same idea.
+So one of the key common themes around virtualization is that the piece of soft that creates the abstraction hides the physical names from the consumer of that abstraction.
+So as a consumer of the virtual X resource, you actually should never be able to determine what are the underlying resources they consume in order to create this abstraction, and this is both useful, as an implementation technique, but more importantly it is fundamental because it allows the decoupling of the responsibility.
+The consumer of the abstraction uses the abstraction as if it was a well-understood physical building block.
+The producer of the abstraction, the software layer between the two, has full flexibility to change the mappings between the virtual names and the physical names, at any point in time, and that is the level of flexibility that is enabled by the fact that the physical names are hidden from the underlying abstraction.
+Now, because we hide the physical names we naturally enforce modularity.
+For example, we'll talk about multiplexing as a technique, as part of virtualization.
+We can multiplex one resource into multiple independent resources, and those are naturally isolated from each other, because each virtual resource operates on virtual names, and the physical names, are never available to the consumer of the virtual resource.
+Now, I mentioned multiplexing... there actually are three ways in which we can create virtualized abstractions, and these are broadly named as multiplexing, aggregation and emulation.
+The textbook actually goes over those techniques in detail.
+I'm going to give you a brief overview of how these three techniques apply, with some specific examples.
+So, to illustrate how virtualization is used, the Saltzer and Kaashoek textbook has a couple of examples which come from the field of operating systems, so the use of virtualization within an actual operating system.
+And the first example that they provide is that of threads, so if you think about it in this particular way, an operating system and its scheduler, a multiplex is a finite set of resources, a finite set of cores, and onto a larger set of threads, and it's scheduled these threads onto those limited set of cores.
+So you can think of a thread as a virtual CPU, and indeed, a thread resembles the characteristics of the physical CPU, in particular critically, it has the same register file as the physical CPU, and it runs the same instructions and architecture as the physical CPU.
+So a thread, by that definition, is a multiplexed instance of a core.
+Now, a thread is actually a little bit more than simply a multiplexed instance of a core, because a thread can issue system calls, and so it is an augmented abstraction... is not only a virtualized instance of a core, it is a virtualized instance of a core augmented with the ability to perform system calls.
+The second example that is provided in the book is that of virtual memory.
+And I want to emphasize, and certainly I think no one can overemphasize the importance of virtual memory in computer systems.
+Some people even argue it's the single biggest improvement over the original von Neumann architectural model.
+Not only can we store instructions in memory, but these instructions can operate on virtual addresses rather than physical addresses.
+And every computer has architectural support for virtual memory in the form of a TLB, which caches these translations between virtual names, and physical names.
+So if you think about an address space, a virtual address space, it is a multiplex abstraction of the underlying physical resource, which is that of byte-addressable, or word-addressable memory.
+There are other examples of the use of virtualization beyond simply threads and virtual memory, for example sockets, pipes, virtual disks, are all examples of virtualized instances or virtualized abstractions that are created by an operating system, and exposed by the operating system, that have a corresponding physical analog.
+Now, there are three mechanisms that are used to achieve virtualization: multiplexing, aggregation and emulation.
+I'm just going to spend a few minutes going over some of these basic techniques, and give some basic examples.
+So I mentioned earlier the three mechanisms used to virtualize, so let's talk about them in a little bit of detail.
+The first one, and by far the most important one, is called <i>multiplexing</i>, and multiplexing exposes a single resource multiple times.
+But there's a level of indirection, and that level of indirection ensures that each virtual resource is isolated from each other.
+Multiplexing is often implemented with hardware support.
+And the canonical example for that, of course, is virtual memory, in which the operating system, with hardware support, multiplexes physical memory at a page-level granularity, and exposes that into virtual resources, which are the address space of the various processes.
+Now the second mechanism provides the inverse function.
+Rather than taking one physical resource and exposing it multiple times, you take multiple physical resources, and you expose them as a single resource.
+Sometimes you do that just to simplify management, but generally you actually do that to provide enhanced capabilities to the aggregate resources, capabilities not found in the underlying physical resource.
+And RAID is the canonical example of aggregation.
+You turn multiple unreliables, small and slow disks, into one very reliable, bigger, and faster disk.
+Of course, you can only do that if you RAID enough disks together, but the mechanism allows you to aggregate and get the enhanced capabilities.
+There are other examples of aggregation, for example, the networking domain where you turn multiple links into one virtual link with higher aggregate capacity.
+And then, finally, there's a third mechanism which is the big hammer of computer systems, which is virtualization through emulation... you add a level of interaction, and you do that through general-purpose software.
+This is the ability for software to emulate a virtual resource that is different from the physical resource.
+It turns out there are actually many examples of this, all around us, in particular how you emulate i/o devices, such as disk tapes or communication channels using different physical resources than you expose as a virtual resource.
+And the approach is also used in the computing domain, for example to emulate a legacy architecture on a newer one...
+Apple did that very successfully to allow the transition from Power PC CPU's onto X86 CPU's.
+So I mentioned that emulation is the big hammer for virtualization.
+It always works in theory; it's not always fast in practice.
+And before that I mentioned that multiplexing often relies on hardware support for performance, and that brings us to the topic of architectural support for virtualization.
+And by that we're trying to define, or put a characteristic or a label on a hardware component, whether than hardware component was designed to support a particular form of virtualization.
+A classic example is the memory management unit of a processor.
+Since the 1960's it's had hardware support for virtualization, and it has architectural support for virtual memory built into the memory management unit.
+The concept of [harder] virtualization has taken on a more important meaning over the last few years, as we've added support or advanced capabilities of virtualization into various pieces of a computer system, for example, the CPU, the memory management unit, or the i/o devices, and that has specifically been driven by the rising importance in virtual machines in computer systems.
+Now that brings us to a closing thought for this first module.
+A few weeks ago, in the layering cycle, we talked about the value of adding a layer in a computer system stack in order to built a new feature or deliver additional capabilities, and this week we're talking about a specific way of creating a new layer, one that re-exports the same interface as the underlying resource that it relies on.
+And so for every particular problem that you're faced with, you have the choice...
+First of all, whether it is wise or appropriate, to add a new layer of abstraction, and by doing so, whether you should expose a new abstraction, different from the underlying one, or re-expose the same abstraction as the underlying one, and create a form of virtualization for the particular problem that you're trying to solve.
+Now, we've also seen in this module that virtualization applies to a very broad set of topics, not just virtual machines... a computer system, a disk, a database, broadcast domains have been virtualized.
+Anywhere you look in the field of computer systems, the notion that you can virtualize, and apply the virtualization principle, has been applied at least one or a few times.
+So, as we break for this first module, let me leave you with a closing thought, and something to think about at home.
+For any given problem, one that you are familiar with, in your domain, should you actually create a new layer, with a different abstraction?
+And when should you actually try to expose the same abstraction by virtualizing it?
+What are the trade-offs, and the pros and cons in each particular approach?
+So that's something for you to think about at home, and next up we'll talk about the history of virtual machines.

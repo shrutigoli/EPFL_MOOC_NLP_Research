@@ -1,0 +1,1223 @@
+1
+00:00:03,166 --> 00:00:04,528
+Bienvenue, Nature, dans le code.
+
+2
+00:00:04,679 --> 00:00:06,493
+Nous sommes dans le chapitre 6, leçon 8.
+
+3
+00:00:06,712 --> 00:00:10,113
+Nous venons d'apprendre sur
+le choix dépendant de la fréquence négative.
+
+4
+00:00:10,279 --> 00:00:12,797
+C'est ce qui se produit par exemple
+lorsque l'hôte
+
+5
+00:00:12,968 --> 00:00:15,514
+et les parasites co-évoluer
+les uns avec les autres.
+
+6
+00:00:15,742 --> 00:00:18,682
+Et dans cette leçon, nous allons commencer,
+
+7
+00:00:18,846 --> 00:00:20,704
+la mise en œuvre d'un système
+de parasite hôte
+
+8
+00:00:20,926 --> 00:00:22,985
+dans le script Java, donc allons-y.
+
+9
+00:00:23,158 --> 00:00:25,771
+Voici donc notre modèle d'aptitude
+si vous voulez.
+
+10
+00:00:26,276 --> 00:00:30,081
+Encore une fois ce qu'on appelle
+le modèle des allèles correspondant.
+
+11
+00:00:30,633 --> 00:00:32,117
+allèles correspondants.
+
+12
+00:00:32,569 --> 00:00:33,024
+Pourquoi ?
+
+13
+00:00:33,206 --> 00:00:35,742
+Parce que nous avons deux allèles, A1, A2
+
+14
+00:00:35,929 --> 00:00:38,879
+et si le parasite correspond
+à l'allèle de l'hôte,
+
+15
+00:00:39,050 --> 00:00:40,628
+alors il y a infection.
+
+16
+00:00:40,803 --> 00:00:41,970
+Le parasite peut infecter.
+
+17
+00:00:42,676 --> 00:00:45,423
+Ce sera mauvais pour l'hôte donc l'hôte
+
+18
+00:00:45,640 --> 00:00:49,100
+aura une réduction de l'aptitude
+donc la réduction
+
+19
+00:00:49,300 --> 00:00:53,229
+de cette valeur par défaut 1 de sh,
+donc c'est le coefficient de sélection.
+
+20
+00:00:53,430 --> 00:00:56,509
+dans l'hôte et le parasite aura
+l'aptitude maximale 1.
+
+21
+00:00:56,716 --> 00:00:58,741
+l'aptitude maximum 1.
+
+22
+00:00:58,970 --> 00:01:02,659
+Vice-versa, s'il n'y a pas
+de correspondance, il n'y a pas d'infection.
+
+23
+00:01:02,805 --> 00:01:05,744
+Ce sera grand pour l'hôte de sorte
+que le hôte aura une aptitude maximale
+
+24
+00:01:05,894 --> 00:01:08,894
+de 1 et le parasite auront une aptitude réduite.
+
+25
+00:01:09,810 --> 00:01:12,885
+Ainsi, la remise en forme
+sera réduit par ce facteur sp
+
+26
+00:01:13,060 --> 00:01:16,035
+qui est le coefficient de sélection
+pour le parasite.
+
+27
+00:01:16,206 --> 00:01:19,196
+Donc, notre travail est maintenant
+de mettre en œuvre ce modèle
+
+28
+00:01:19,371 --> 00:01:22,346
+dans le script Java, nous allons
+continuer et le faire cela.
+
+29
+00:01:22,563 --> 00:01:27,052
+Bon, nous sommes ici, l'éditeur de texte, fichier vide,
+nous allons commencer à partir de zéro.
+
+30
+00:01:27,504 --> 00:01:30,522
+Comme toujours,
+nous allons définir le type de doc,
+
+31
+00:01:30,727 --> 00:01:36,695
+... Type de doc html,
+puis-je configurer la balise html ...
+
+32
+00:01:36,882 --> 00:01:47,081
+et dans la balise html,
+nous avons la tête, et le corps ...
+
+33
+00:01:48,034 --> 00:01:52,926
+et encore une fois ce sera une simulation
+avec une certaine sortie, sortie visuelle
+
+34
+00:01:53,100 --> 00:01:56,821
+en utilisant les trois, donc je vais développer
+mon code ici dans la balise de script, directement.
+
+35
+00:01:57,076 --> 00:02:00,076
+ici dans la balise de script, directement.
+
+36
+00:02:01,391 --> 00:02:06,278
+Nous allons obtenir le D3
+la bibliothèque nécessaire plus tard.
+
+37
+00:02:07,240 --> 00:02:10,434
+Et avant que je commence,
+je veux enregistrer ce fichier tout de suite,
+
+38
+00:02:10,616 --> 00:02:15,308
+alors enregistrons comme je vais aller ici pour
+des échantillons de codec, vous devriez aller où vous
+
+39
+00:02:17,106 --> 00:02:23,288
+stockez votre code et je vais l'enregistrer
+comme co-evolution.html.
+
+40
+00:02:24,054 --> 00:02:25,543
+Bon, bon!
+
+41
+00:02:25,712 --> 00:02:26,741
+Alors, commençons.
+
+42
+00:02:27,233 --> 00:02:30,233
+Maintenant, comment allons-nous faire cela?
+
+43
+00:02:30,607 --> 00:02:33,447
+Eh bien, nous allons faire cela comme toujours,
+je vais réfléchir sur quelques variables que j'aurais probablement
+
+44
+00:02:33,618 --> 00:02:36,967
+besoin alors je vais commencer par la première
+fonction que je veux sans doute appeler.
+
+45
+00:02:37,125 --> 00:02:39,971
+Alors, quel genre de variables dois-je ici?
+
+46
+00:02:40,122 --> 00:02:43,367
+Eh bien, nous allons garder la trace des fréquences
+génotypiques que nous voulons tracer
+
+47
+00:02:44,492 --> 00:02:47,109
+donc j'aurais besoin de ce tableau de données
+où je vais stocker toutes les valeurs
+
+48
+00:02:47,288 --> 00:02:50,063
+qui seront éventuellement tracés.
+
+49
+00:02:51,302 --> 00:02:56,529
+Ok, je vais tracer le génotype ou
+les fréquences des allèles au fil du temps.
+
+50
+00:02:56,962 --> 00:03:02,546
+Pour combien de temps?
+Eh bien, disons pour 400 générations.
+
+51
+00:03:03,006 --> 00:03:06,400
+Donc, je vais définir cette variable de génération
+que vous pouvez changer si vous voulez.
+
+52
+00:03:06,612 --> 00:03:07,899
+Et si vous voulez.
+
+53
+00:03:08,048 --> 00:03:12,852
+Ok, donc j'ai quatre génotypes
+différents que je veux garder la trace.
+
+54
+00:03:13,018 --> 00:03:17,113
+Donc j'ai deux dans l'hôte, A1 et A2
+et j'ai deux dans les parasites.
+
+55
+00:03:17,372 --> 00:03:20,372
+deux des parasites.
+
+56
+00:03:20,547 --> 00:03:26,590
+Donc ce que je vais faire est que
+je vais produire ici ou créer le tableau
+
+57
+00:03:26,765 --> 00:03:33,429
+de fréquences d'hôte et ce tableau
+aura deux valeurs et qui est
+
+58
+00:03:33,617 --> 00:03:38,339
+la fréquence de A1
+et la fréquence des génotypes A2.
+
+59
+00:03:38,787 --> 00:03:45,397
+Donc, je vais initialiser cela
+à zéro zéro, juste pour montrer aussi
+
+60
+00:03:45,572 --> 00:03:47,682
+qu'il y aura deux valeurs ici.
+
+61
+00:03:47,858 --> 00:03:50,175
+Il est évident que ceux-là
+ne devraient pas être à la fois zéro,
+
+62
+00:03:50,365 --> 00:03:53,327
+mais vous savez comme
+une initialisation, il est correct.
+
+63
+00:03:53,897 --> 00:03:58,374
+Idem pour les parasites, je vais dire ici,
+les fréquences parasites
+
+64
+00:03:58,587 --> 00:04:01,587
+et je vais en fait pour les initialiser
+
+65
+00:04:01,831 --> 00:04:04,328
+Oops, à zéro et zéro.
+
+66
+00:04:06,409 --> 00:04:06,831
+Bon!
+
+67
+00:04:07,016 --> 00:04:10,797
+Et puis les deux autres seule variable, je pense
+que j'ai besoin des coefficients de sélection.
+
+68
+00:04:10,981 --> 00:04:12,069
+coefficients.
+
+69
+00:04:12,212 --> 00:04:16,369
+Donc, pour le coefficient de sélection
+de l'hôte, je vais le mettre à 0,2,
+
+70
+00:04:16,544 --> 00:04:20,446
+par la façon dont les interactions hôte-parasite,
+
+71
+00:04:21,558 --> 00:04:23,106
+interactions en particulier dans le contexte
+
+72
+00:04:23,275 --> 00:04:27,015
+de la dynamique d'évolution,
+ce que nous appelons la "virulence".
+
+73
+00:04:28,066 --> 00:04:31,855
+Et puis je vais mettre en place sp,
+le coefficient du parasite de sélection
+
+74
+00:04:32,017 --> 00:04:36,544
+à une valeur que je vais utiliser une valeur
+plus élevée ici, nous pouvons changer plus tard
+
+75
+00:04:36,707 --> 00:04:38,107
+nous pouvons changer plus tard
+
+76
+00:04:38,271 --> 00:04:42,887
+Mais je pense généralement que, quand
+un parasite infecte un hôte qui est généralement mal
+
+77
+00:04:44,250 --> 00:04:46,161
+pour un hôte, mais il est généralement pas la fin
+d'un hôte, je veux dire pas toujours, il peut être
+
+78
+00:04:48,531 --> 00:04:49,083
+d'un hôte, je veux dire pas toujours,
+il peut être, mais pas toujours.
+
+79
+00:04:49,660 --> 00:04:54,874
+Considérant que, pour les parasites en fait si elles ne
+peuvent pas infecter un hôte qui est généralement
+
+80
+00:04:55,160 --> 00:04:58,508
+très mauvaise dans la mesure où ceci
+pourrait en fait être un coût d'aptitude de 1.
+
+81
+00:04:58,802 --> 00:05:01,972
+Mais nous allons maintenant juste le régler
+à 0,5, je veux juste vais m'assurer
+
+82
+00:05:02,185 --> 00:05:07,621
+que c'est un coût très élevé d'aptitude ici
+n'étant pas capable d'infecter un hôte.
+
+83
+00:05:08,486 --> 00:05:09,006
+Bon!
+
+84
+00:05:09,604 --> 00:05:14,868
+Alors, quel sera le premier, la première fonction
+que je voudrais appeler?
+
+85
+00:05:15,120 --> 00:05:18,607
+Eh bien, je voudrais probablement
+initialiser ces fréquences ici.
+
+86
+00:05:18,760 --> 00:05:27,791
+Donc, je vais appeler une fonction,
+initialiser, initialiser les fréquences.
+
+87
+00:05:29,498 --> 00:05:31,509
+Fréquences, d'accord.
+
+88
+00:05:32,573 --> 00:05:36,745
+Pour cette fonction, je ne l'ai pas encore défini
+alors je vais continuer et le faire.
+
+89
+00:05:37,500 --> 00:05:40,658
+Donc, la fonction, l'initialisation
+des fréquences.
+
+90
+00:05:41,771 --> 00:05:42,792
+Qu'est-ce que cela devrait faire?
+
+91
+00:05:42,988 --> 00:05:45,996
+Il convient évidemment d'initialiser
+les fréquences de l'hôte et du parasite.
+
+92
+00:05:46,216 --> 00:05:48,403
+et le parasite.
+
+93
+00:05:48,587 --> 00:05:53,458
+Bon, disons simplement initialiser
+ceux-ci à des valeurs aléatoires.
+
+94
+00:05:54,763 --> 00:05:58,980
+Ainsi, par exemple, je pouvais choisir
+une valeur aléatoire pour la fréquence d'hôte A1
+
+95
+00:05:59,180 --> 00:06:04,692
+de sorte que vous savez
+par exemple var fréquence A1 hôte.
+
+96
+00:06:04,968 --> 00:06:08,746
+Je pourrais mettre cela à
+un nombre aléatoire entre 0 et 1 et bien sûr
+
+97
+00:06:09,025 --> 00:06:13,093
+notre vieil ami maths aléatoire
+est parfaitement adapté pour cela.
+
+98
+00:06:14,172 --> 00:06:14,881
+Bon!
+
+99
+00:06:15,073 --> 00:06:18,526
+Alors maintenant, j'ai la fréquence hôte A1.
+
+100
+00:06:19,254 --> 00:06:22,809
+Donc, ceci est la fréquence que
+je voudrais stocker ici
+
+101
+00:06:23,020 --> 00:06:25,362
+dans cette première position
+dans ce tableau.
+
+102
+00:06:25,562 --> 00:06:28,562
+Le deuxième élément
+est la fréquence hôte A1.
+
+103
+00:06:29,652 --> 00:06:34,194
+D'accord, ce qui signifie que,
+les fréquences d'accueil.
+
+104
+00:06:34,369 --> 00:06:37,850
+Je vais les copier,
+pour éviter les erreurs d'orthographe.
+
+105
+00:06:38,231 --> 00:06:41,822
+Le premier élément qui,
+comme l'indice du cours 0
+
+106
+00:06:42,035 --> 00:06:47,329
+est exactement maintenant
+cette valeur, d'accord.
+
+107
+00:06:50,432 --> 00:06:54,723
+Donc c'est super mais encore une fois garder à l'esprit
+que ces deux tableaux ici juste seulement garde
+
+108
+00:06:54,882 --> 00:06:59,214
+des traces des fréquences actuelles
+des quatre génotypes actuels.
+
+109
+00:06:59,373 --> 00:07:00,848
+quatre génotypes.
+
+110
+00:07:00,993 --> 00:07:04,463
+Voilà pourquoi ils ont seulement
+4 éléments, deux ici et deux ici,
+
+111
+00:07:04,663 --> 00:07:08,973
+mais bien sûr, je veux garder une trace aussi
+sur toutes ces valeurs au fil du temps,
+
+112
+00:07:09,170 --> 00:07:11,432
+en particulier, ici plus de 400 générations.
+
+113
+00:07:11,885 --> 00:07:15,158
+Donc, je dois pousser ces valeurs
+dans le tableau de données.
+
+114
+00:07:16,002 --> 00:07:19,773
+Donc ce que je voudrais avoir
+ici finalement, je voudrais avoir
+
+115
+00:07:19,948 --> 00:07:22,433
+quatre tableaux dans ce tableau de données.
+
+116
+00:07:22,775 --> 00:07:26,354
+Chacun de ces quatre tableaux garde la trace
+des quatre génotypes correspondants.
+
+117
+00:07:26,537 --> 00:07:27,799
+quatre génotypes.
+
+118
+00:07:27,981 --> 00:07:31,334
+Alors que je suis en train de quatre
+lignes quand je vais tracer cela.
+
+119
+00:07:31,903 --> 00:07:36,115
+Alors ce que cela signifie est que je dois
+pousser quelque chose ici en données
+
+120
+00:07:36,290 --> 00:07:39,207
+donc pousser les données, d'accord.
+
+121
+00:07:39,688 --> 00:07:41,150
+Qu'est-ce que je voudrais pousser?
+
+122
+00:07:41,616 --> 00:07:44,317
+Eh bien, il devrait être un tableau
+ok, doit être un tableau
+
+123
+00:07:44,492 --> 00:07:47,854
+et alors je pourrais ajouter cette valeur
+à ce tableau et par conséquent il,
+
+124
+00:07:48,016 --> 00:07:52,877
+et alors je pourrais ajouter cette valeur
+à ce tableau et par conséquent il
+
+125
+00:07:53,126 --> 00:07:57,594
+remplis ce tableau et je voudrais
+le faire maintenant pour l'hôte A2
+
+126
+00:07:57,794 --> 00:08:01,017
+pour le parasite A1 et A2 pour
+le parasite aussi bien.
+
+127
+00:08:01,329 --> 00:08:04,194
+Mais plutôt que de pousser un tableau
+vide puis en ajoutant une valeur.
+
+128
+00:08:04,395 --> 00:08:08,164
+Comme vous le savez, vous pouvez également
+initialiser des tableaux d'une valeur là-dedans.
+
+129
+00:08:08,538 --> 00:08:14,038
+Donc, je vais juste dire, d'accord, je vais mettre
+cette valeur de la fréquence de l'hôte A1
+
+130
+00:08:14,251 --> 00:08:18,386
+là comme la première valeur de ce tableau,
+donc je ne dois pas pousser un
+
+131
+00:08:18,553 --> 00:08:22,961
+tableau vide je peux déjà mis dans
+le premier élément de ce tableau.
+
+132
+00:08:23,135 --> 00:08:25,424
+D'accord, donc j'espère que
+vous comprenez comment cela fonctionne.
+
+133
+00:08:25,600 --> 00:08:28,779
+Nous obtenons ici une valeur aléatoire
+pour la fréquence A1 hôte, puis nous
+
+134
+00:08:28,943 --> 00:08:32,184
+allons stocker ceci dans le tableau
+qui garde la trace des fréquences à chaque
+
+135
+00:08:32,358 --> 00:08:36,650
+moment et en fin de compte, nous stockons
+cela dans ces données tableau ici
+
+136
+00:08:36,826 --> 00:08:41,313
+qui garde la trace de toutes
+les données sur la
+
+137
+00:08:41,483 --> 00:08:44,160
+simulation entière p, afin que
+nous puissions tracer plus tard.
+
+138
+00:08:45,009 --> 00:08:50,214
+Maintenant que je regarde en fait cela,
+il a l'air un peu verbeux.
+
+139
+00:08:50,407 --> 00:08:53,431
+Mais je voulais être sûr que
+je l'ai fait de manière verbeuse d'abord,
+
+140
+00:08:53,593 --> 00:08:55,419
+Afin que vous compreniez ce qui se passe,
+
+141
+00:08:55,581 --> 00:08:58,519
+mais vous pouvez voir ici que nous utilisons
+
+142
+00:08:58,707 --> 00:09:03,865
+une sorte de variables ici qui
+ne sont pas vraiment nécessaire
+
+143
+00:09:04,058 --> 00:09:08,382
+et donc je vais changer cela un peu ici.
+
+144
+00:09:08,824 --> 00:09:13,307
+Je vais me débarrasser de cette variable
+de fréquence d'hôte A1
+
+145
+00:09:13,494 --> 00:09:15,566
+ici, variable locale.
+
+146
+00:09:15,735 --> 00:09:18,504
+Il semble vraiment tout à fait inutile,
+je vais simplement dire
+
+147
+00:09:18,654 --> 00:09:22,240
+fréquence hôte 0 égale maths aléatoire.
+
+148
+00:09:23,980 --> 00:09:27,752
+Donc, je vais juste remplacer directement ceci
+avec les mathématiques aléatoires.
+
+149
+00:09:28,909 --> 00:09:33,612
+D'accord, les mathématiques aléatoires,
+donc je ne ai plus besoin de cette ligne.
+
+150
+00:09:33,849 --> 00:09:39,284
+et maintenant ici, je n'ai plus cette variable de fréquence d'hôte A1
+
+151
+00:09:39,448 --> 00:09:43,569
+mais nous savons qu'il est stocké
+dans ce tableau ici.
+
+152
+00:09:43,742 --> 00:09:48,375
+Je vais donc tout simplement remplacer
+la variable fréquence d'hôte A1
+
+153
+00:09:48,600 --> 00:09:52,366
+que je ne l'ai plus, avec
+cette fréquence hôte 0.
+
+154
+00:09:52,892 --> 00:09:57,546
+Bon maintenant cela est maintenant plus court,
+il est en fait assez dense et il peut
+
+155
+00:09:57,746 --> 00:10:01,632
+être source de confusion si je, si je ne l'avais pas
+fait cette première étape d'utilisation de cette
+
+156
+00:10:01,773 --> 00:10:05,915
+variable intermédiaire, mais maintenant
+que je l'ai utilisé d'abord, puis l'enlevé
+
+157
+00:10:06,090 --> 00:10:09,872
+J'espère, que c'est très clair maintenant
+pour vous comment cela fonctionne exactement.
+
+158
+00:10:10,315 --> 00:10:13,658
+Et ceci est pour l'hôte A1
+alors maintenant je peux faire
+
+159
+00:10:13,871 --> 00:10:17,352
+exactement la même chose
+pour la fréquence d'hôte A2
+
+160
+00:10:17,525 --> 00:10:24,663
+Ainsi, les fréquences d'accueil, les fréquences 1,
+de sorte que maintenant c'est la deuxième valeur ici à droite.
+
+161
+00:10:24,840 --> 00:10:26,140
+Ici, à droite?
+
+162
+00:10:26,322 --> 00:10:29,403
+L'élément d'indice 1, cela est si
+je garde la trace du génotype hôte A2,
+
+163
+00:10:29,625 --> 00:10:31,766
+génotype d'hôte . Qu'est-ce que c'est?
+
+164
+00:10:31,943 --> 00:10:36,846
+Eh bien est tout simplement 1- la fréquence hôte 0
+parce que les deux ont besoin d'ajouter jusqu'à un.
+
+165
+00:10:37,014 --> 00:10:38,426
+ajouter jusqu'à un.
+
+166
+00:10:38,598 --> 00:10:43,621
+Donc, ils sont maintenant les deux
+valeurs aléatoires le premier directement par
+
+167
+00:10:43,808 --> 00:10:47,965
+calcul aléatoire, et l'autre simplement
+une moins cette valeur.
+
+168
+00:10:49,363 --> 00:10:54,135
+Bon, et maintenant je dois pousser
+ceci aussi dans ce tableau de données,
+
+169
+00:10:54,310 --> 00:10:56,798
+et je vais utiliser la même ligne, sauf,
+
+170
+00:10:56,985 --> 00:10:59,985
+Je référence maintenant l'élément fréquences d'hôte avec
+
+171
+00:11:00,276 --> 00:11:01,701
+index 1.
+
+172
+00:11:02,127 --> 00:11:06,243
+Voilà donc pour les deux fréquences initiales
+de l'hôte tout mis en place.
+
+173
+00:11:06,503 --> 00:11:11,558
+Maintenant, nous pouvons essentiellement j
+uste copier ces lignes ici et les coller
+
+174
+00:11:11,733 --> 00:11:16,582
+et remplacer maintenant l'hôte
+ici avec le parasite, d'accord.
+
+175
+00:11:16,773 --> 00:11:20,880
+Donc, c'est des fréquences parasites,
+0 = math aléatoire
+
+176
+00:11:21,055 --> 00:11:25,934
+de sorte que la fréquence A1
+du parasite est un nombre aléatoire.
+
+177
+00:11:26,148 --> 00:11:31,112
+Ensuite, nous allons pousser des données,
+la fréquence parasite 0.
+
+178
+00:11:31,308 --> 00:11:34,036
+Nous allons donc pousser
+cette valeur ici dans un tableau
+
+179
+00:11:34,204 --> 00:11:36,304
+puis le tableau en données.
+
+180
+00:11:36,460 --> 00:11:40,529
+Donc exactement la même logique
+est au-dessus et ici même chose.
+
+181
+00:11:41,041 --> 00:11:45,652
+fréquence de Parasite est 1,
+donc c'est le génotype de parasite A2 est
+
+182
+00:11:45,827 --> 00:11:49,090
+1 moins la fréquence parasite zéro.
+
+183
+00:11:49,277 --> 00:11:52,351
+Donc, ce besoin d'ajouter jusqu'à 1
+ainsi bien sûr, et puis nous allons
+
+184
+00:11:52,601 --> 00:11:57,031
+pousser dans les données de ce tableau
+qui a déjà les fréquences de parasite
+
+185
+00:11:57,200 --> 00:12:01,850
+1 et qui est bien sûr à nouveau
+le génotype du parasite A2.
+
+186
+00:12:02,192 --> 00:12:10,994
+Donc, cela est maintenant la façon dont nous mettons
+en place les fréquences dans notre tableau.
+
+187
+00:12:12,970 --> 00:12:13,446
+Bon!
+
+188
+00:12:13,709 --> 00:12:18,930
+Donc, ceci est l'initialisation, je pense
+que cela fonctionne très bien.
+
+189
+00:12:19,525 --> 00:12:22,878
+Alors que devons-nous faire
+après avoir initialisé cela?
+
+190
+00:12:23,393 --> 00:12:26,577
+Eh bien, nous voulonsexécuter
+cette simulation pour quelque
+
+191
+00:12:26,752 --> 00:12:30,202
+générations donc, nous allons
+utiliser ici la boucle et cela est
+
+192
+00:12:30,352 --> 00:12:32,864
+maintenant totalement des
+nouvelles vieilles pour vous.
+
+193
+00:12:33,022 --> 00:12:38,976
+Donc var i = 0, i plus petit que
+les générations et bien sûr
+
+194
+00:12:39,139 --> 00:12:47,192
+l'incrément, d'accord.
+Et maintenant, nous allons dire
+
+195
+00:12:48,062 --> 00:12:52,013
+nous aimerions faire une ou deux
+choses à chaque génération.
+
+196
+00:12:52,192 --> 00:12:54,104
+Qu'est-ce que nous voulons faire?
+
+197
+00:12:54,494 --> 00:12:56,624
+Eh bien, nous voulons avoir
+deux processus vraiment.
+
+198
+00:12:56,802 --> 00:13:01,624
+D'une part, la sélection doit agir
+sur l'hôte, en fonction
+
+199
+00:13:01,849 --> 00:13:06,890
+des valeurs d'aptitude que nous avons
+définies et bien sûr important
+
+200
+00:13:07,327 --> 00:13:08,925
+sur les fréquences de génotype.
+
+201
+00:13:09,820 --> 00:13:12,363
+Ensuite, nous voulons aussi faire
+la même chose avec les parasites.
+
+202
+00:13:12,538 --> 00:13:16,201
+Nous voulons que la sélection agir
+sur les génotypes parasitaires
+
+203
+00:13:16,388 --> 00:13:18,299
+et encore une fois l'aptitude il y aura
+
+204
+00:13:18,499 --> 00:13:21,499
+dépendra essentiellement
+sur les fréquences de génotype.
+
+205
+00:13:21,710 --> 00:13:24,909
+Mais alors ce sont deux choses que nous devrons
+faire et nous allons simplement appeler
+
+206
+00:13:25,184 --> 00:13:29,978
+deux fonctions de sélection d'hôte
+et de sélection des parasites.
+
+207
+00:13:30,726 --> 00:13:33,734
+Donc, ce qui se passera dans chaque
+génération pour les quatre génotypes
+
+208
+00:13:33,922 --> 00:13:36,922
+et voilà où nous calculons
+les nouvelles fréquences
+
+209
+00:13:37,118 --> 00:13:40,043
+pour les quatre génotypes possibles.
+
+210
+00:13:40,280 --> 00:13:42,691
+Alors une fois que nous l'avons fait,
+nous le faisons dans la prochaine
+
+211
+00:13:42,842 --> 00:13:43,904
+leçon pour mettre en œuvre
+
+212
+00:13:44,092 --> 00:13:47,067
+ces deux méthodes, mais
+une fois que nous l'avons fait
+
+213
+00:13:47,450 --> 00:13:52,759
+puis nous voulons essentiellement pousser
+ces valeurs dans notre tableau de données
+
+214
+00:13:52,947 --> 00:13:58,954
+Donc, rappelons que le tableau de données
+lui-même a maintenant quatre tableaux
+
+215
+00:13:59,129 --> 00:14:02,672
+et ces tableaux de garder trace de
+
+216
+00:14:02,921 --> 00:14:08,743
+génotype de l'hôte A1, le génotype hôte A2,
+A1 parasite génotype
+
+217
+00:14:08,918 --> 00:14:11,842
+et le parasite du génotype A2,
+dans cet ordre.
+
+218
+00:14:12,016 --> 00:14:14,601
+Donc, ce que nous allons faire
+est que nous allons dire bien
+
+219
+00:14:14,764 --> 00:14:18,519
+données, le premier réseau,
+de sorte que l'une avec l'index zéro.
+
+220
+00:14:18,975 --> 00:14:24,577
+Ceci est celui qui contient les valeurs
+pour le génotype de l'hôte A1.
+
+221
+00:14:24,750 --> 00:14:30,559
+Nous allons donc pousser dans ce tableau
+tout ce que nous avons actuellement
+
+222
+00:14:30,759 --> 00:14:35,303
+en fait, ici, dans cette fréquence
+d'accueil au tableau
+
+223
+00:14:35,455 --> 00:14:38,470
+le premier élément,
+car c'est exactement, oops désolé,
+
+224
+00:14:38,645 --> 00:14:42,698
+qui a été copié
+dans les mauvaises parenthèses.
+
+225
+00:14:43,062 --> 00:14:48,296
+Exactement ce que nous avons ici
+dans l'hôte fréquence zéro qui est où nous
+
+226
+00:14:48,496 --> 00:14:51,555
+stockons actuellement
+le génotype de l'hôte A1.
+
+227
+00:14:52,042 --> 00:14:56,839
+Donc, ce qu'on va pousser dans la première
+des quatre tableaux dans les données.
+
+228
+00:14:58,576 --> 00:15:02,117
+Donc, le deuxième réseau
+de données, afin que les données 1.
+
+229
+00:15:02,841 --> 00:15:04,446
+Qu'est-ce que nous allons pousser là-dedans?
+
+230
+00:15:04,626 --> 00:15:09,689
+Eh bien en conséquence, nous allons
+pousser les fréquences d'accueil 1
+
+231
+00:15:09,876 --> 00:15:13,734
+Parce que c'est là où nous stockons
+le génotype hôte A2.
+
+232
+00:15:15,224 --> 00:15:19,278
+Et ainsi de suite, les données 2,
+le troisième tableau dans les données.
+
+233
+00:15:20,019 --> 00:15:21,184
+Que poussons-nous là-bas?
+
+234
+00:15:22,057 --> 00:15:25,750
+Eh bien, nous voulons pousser
+les fréquences parasites
+
+235
+00:15:25,954 --> 00:15:29,824
+et en particulier l'élément 0
+
+236
+00:15:29,999 --> 00:15:33,724
+A1 qui contient la fréquence
+parasite du génotype.
+
+237
+00:15:34,145 --> 00:15:36,754
+Et puis enfin, last but not least,
+je vais copie
+
+238
+00:15:36,910 --> 00:15:38,710
+mais vous voyez l'idée.
+
+239
+00:15:38,900 --> 00:15:44,508
+Dans les données 3, nous allons pousser
+l'élément de fréquences parasites
+
+240
+00:15:44,686 --> 00:15:48,929
+avec l'index 1, donc cela est
+le génotypes du parasite A2.
+
+241
+00:15:49,116 --> 00:15:52,147
+Donc, après avoir exécuté
+ces deux fonctions, que nous avons
+
+242
+00:15:52,334 --> 00:15:53,796
+encore à définir.
+
+243
+00:15:53,960 --> 00:15:57,033
+Nous avons mis à jour
+les hôtes et parasites fréquences
+
+244
+00:15:57,242 --> 00:16:00,537
+et nous devons nous assurer que nous poussons
+ceux-là dans
+
+245
+00:16:00,696 --> 00:16:05,094
+tableaux de données correspondant, de sorte que,
+après que nous avons toutes les générations nous avons tous
+
+246
+00:16:05,294 --> 00:16:10,231
+les données nécessaires, dans le tableau de
+données et nous pouvons facilement tracer cela.
+
+247
+00:16:10,531 --> 00:16:14,019
+Et nous tracerons cela en utilisant
+notre bon vieil ami
+
+248
+00:16:14,182 --> 00:16:17,757
+la fonction graphique de la ligne de traçage
+que nous avons utilisé de nombreuses fois avant
+
+249
+00:16:17,927 --> 00:16:22,037
+commençant au chapitre 3,
+donc dessiner un graphique linéaire
+
+250
+00:16:22,287 --> 00:16:29,093
+et voici ce que nous allons faire est
+de passer dans les données comme toujours.
+
+251
+00:16:30,006 --> 00:16:33,511
+Sur l'axe des X, nous allons dire la génération
+parce que nous
+
+252
+00:16:33,699 --> 00:16:35,774
+traçant les générations sur l'axe X.
+
+253
+00:16:36,043 --> 00:16:41,478
+L'axe des Y nous allons simplement
+dire p parce que ce sont les fréquences
+
+254
+00:16:41,666 --> 00:16:45,720
+et on n'a pas besoin d'une légende,
+alors je vais passer ici un tableau vide.
+
+255
+00:16:46,174 --> 00:16:51,082
+Bon maintenant ce qui reste à faire
+est de mettre en œuvre ces deux
+
+256
+00:16:51,248 --> 00:16:54,960
+fonctions et également obtenir le graphique
+de la ligne de traçage dans la bibliothèque D3.
+
+257
+00:16:51,826 --> 00:16:54,751
+et aussi obtenir le graphique de la ligne
+de traçage dans la bibliothèque D3.
+
+258
+00:16:55,140 --> 00:16:58,140
+Donc, nous allons faire cela dans la prochaine
+session, je vous verrai là-bas.
+

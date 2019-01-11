@@ -1,0 +1,149 @@
+In the introduction episode on pointers, you learned that they serve essentially three purposes: they allow referencing, that is, to point indirectly to a memory area; genericity, to choose, to select an element that is unknown at the time of programming; and finally, they can also be used for what we call dynamic allocation. This is what we will focus on now.
+When a program needs to manipulate data, it will have to allocate memory to store this data.
+And in C++, you have two ways of allocating memory.
+The first, which you already know, is what you do when you write a line of code like this one, a variable declaration.
+At this moment, a so-called static allocation is made.
+Why static?
+This means that we do not need to wait for the execution of the program to know the memory requirements.
+Here, when we compile this line of code, we already know that the program will need a memory area dedicated to storing an integer, and which is named v.
+There are however situations where the memory requirements are known only when the program is executed.
+And a typical example is linked to the use of dynamic arrays of <i>vector</i> type, which you have already encountered.
+Suppose that we come across a vector of integers v, in our program.
+I can easily add, during execution of the program, a new element, a new cell to my array, using a line such as this one.
+At the moment I execute this line of code, this routine will allocate the memory necessary to store this new integer.
+So it is only at the time that this line is executed that allocation happens, that the new memory area is reserved for the needs of your program.
+So of course in this case, we speak of dynamic allocation, because we need to wait for the program's execution, and not just its compilation, to know the memory needs.
+Why? Well, we aren't sure that this line will necessarily be executed, so we cannot, at compilation time, know what memory area to reserve.
+We must wait for execution.
+Here, the memory area that we allocated dynamically via the push_back statement was allocated to contain a value of 3, and we are thus in this situation.
+Note that in the case of pointers, dynamic allocation allows us to manipulate data without them having to be associated with explicit names -- they don't have to correspond to variables.
+For example if, in a program, we have declared a pointer named px, it can easily store the address of an object that we allocated dynamically during the program's execution.
+We can absolutely store the address of the new object in this pointer.
+And what we notice is that it is not necessary for this object to have a name.
+We can simply access it via its associated pointer.
+Basically, if you want to do dynamic allocation in a C++ program, then you can use two operators defined by the language: the <i>new</i> operator which allows you to allocate the memory you need, and the <i>delete</i> operator, its converse, which allows you to free this memory once you do not need it anymore in your program.
+Usage of the <i>new</i> operator follows this syntax: one writes the name of a pointer which will store the address, and one uses the following syntax:
+<i>new</i> followed by a type name.
+This will reserve a memory area capable of storing data of this type, and will return the address of this memory area, allowing it to be assigned to the pointer.
+Let's look at a real situation.
+Imagine, for example, that a program contains the following line of code: this line declares a pointer capable of pointing to an integer.
+So I will now use the syntax that we have just seen to do dynamic allocation.
+So I take the name of my pointer and I write px, followed by "=" and followed by my new little instruction: "new <i>type</i>;".
+Here, my pointer is a pointer to an integer, so "type", corresponding to the type to which my pointer can point, will be "int".
+What I have just done is what we call dynamic allocation.
+So, how will this happen, really?
+When you compile this line of code,
+-- compile, not execute -- you will have a static allocation for a variable of pointer type, named px, and capable of storing the address of an integer.
+However, it is at the moment you execute this line of code that you will have a dynamic allocation.
+And at that moment, you will have allocated a memory area for an integer, which is this area.
+This area will have an address, and it is precisely this address that you will store in px like so.
+So this happens at the moment...
+So what we have here is a static allocation.
+However here, you have a dynamic allocation.
+It is this instruction, the "new int", which allows this, which effects this allocation
+If we use this syntax to do dynamic allocation, the newly allocated area is reserved, indeed, but it does not contain any value.
+So if, when we allocate memory, we also want to assign a value in the memory area, we must use the following option: for an instruction for dynamic allocation.
+If we refer to the example we used earlier, so for example if I have a px pointer declared in a program, we can use this variant of the dynamic allocation instruction.
+Like so.
+We write "px = new int;". So, I reserve a memory area for an integer and I put a value in it, for example a value of 3.
+When this line of code is executed, this will reserve a memory area for an integer, which is what "new int;" means.
+We put a value in it, that is, 3.
+"new int(3)" returns the address of the newly-allocated area, and the assignment will make sure that this address is copied into px.
+You now know how to allocate memory dynamically.
+What should you do to free this memory when you do not need it anymore?
+Actually, first, why is it necessary to free this memory?
+Let's take another real example.
+Imagine that in a program, in a bloc,
+I declare a variable which I use in that bloc.
+I obviously use static allocation.
+Since I am declaring a variable,
+I can know my memory requirements at compile time.
+We know, thanks to the notion of scope, that this variable is not accessible outside of this bloc.
+So, when we execute this set of instructions, and we reach the end of this bloc, then we know that this variable v will never be used again.
+And so, statically-allocated variables have the property of being deallocated automatically.
+You do not need to worry about what will become of the memory area which is, here, no longer accessible.
+Let's look at an analogous example but where, this time, we use dynamic allocation.
+So here, say I declare, for example, a pointer px.
+Then, in a bloc,
+I decide to dynamically allocate memory that I retrieve in the px pointer.
+What is important to note here is that the memory area that you have just allocated is not destroyed, it is not freed as long as you have not done it explicitely.
+So, when we reach the end of this bloc here during execution, this memory area stays totally accessible as long as you do not deallocate it.
+This is what makes it possible for dynamic allocation to create memory areas which have a lifespan greater than the scope in which they were created.
+And if, at any given time, we wish to free this area, it is up to us to do it explicitly and for that, we will need to use the <i>delete</i> operator.
+So for example, I can decide after this bloc that I do not need this memory area anymore, and I can free the area by calling <i>delete</i> on its associated pointer.
+Basically, imagine that in a program, you have a px pointer that points to a dynamically-allocated memory area.
+Imagine that this memory area contains
+3, and of course px contains the address of this area.
+What happens when we free memory by deallocating the memory area associated to px by using this statement?
+Remember the little analogy with the houses on a piece of land. well, when we call <i>delete</i>, we destroy the house.
+Which means, really, that the contents of this memory area are no longer predictable and can no longer be used safely by the program.
+Your value of 3 might well stay there for a little while, but you cannot be sure, you cannot predict what the contents of this memory area will be.
+So we see here that by simply using delete px, we are in a situation where this memory area no longer has usable content.
+However, of course, the address still exists in memory
+And this address is still stored, at this point, in the px pointer.
+So this justifies one of the guidelines which
+I highly recommend that you follow: that every <i>delete</i> instruction must be followed by the instruction, "pointer = nullptr;".
+Which will translate to something like
+"px = nullptr;".
+This means that you are explicitly saying that, as of that moment, px points to nothing valid and you do not keep, within px, an address which means nothing for the program which cannot be used safely for the program.
+To summarize dynamic allocation, and to return to our little analogy of the address book, what I am doing when I execute a statement such as this one, is to add a new page to my address book, a page named ptr.
+What exactly am I putting on this ptr page? Well, I am writing down the address of this dynamically-allocated area.
+So allocation can be viewed, in the context of the address book, as reservation of land, of the memory area that will store the value.
+I build a house on this land; we can see this house as being a bit like the value 3 that I am storing in the int memory area.
+And what is returned is the address of this memory area, which I am storing in my address book.
+I can, in a program, allocate memory areas dynamically for any type of data, and it is up to the programmer to make sure to free the memory area once he needs it no more.
+For example, if I do not need this memory area anymore then what I must do is to call
+<i>delete ptr</i> to deallocate, to free the memory area.
+This means that my land no longer contains any usable data.
+And that it is now available to anyone else.
+If I simply do this, then in my address book, I will still have the address of this piece of land which is for sale, which is available to someone else.
+So, I must absolutely take care to indicate that ptr no longer points to anything by assigning nullptr to it.
+This is analogous to removing the page from my address book.
+I am deleting this link, which is no longer relevant or useful.
+If however we assign the nullptr value without having first deallocated the linked memory area, we will end up in the following situation
+Suppose that on the analog of this page from the address book, we wrote "ptr3 = nullptr;".
+Well, we know now that this means that we are erasing this page and that the link to this area is lost.
+This means that I cannot access it anymore via this page from my address book, but that the area itself is intact.
+The land is not made available to anyone else, and is left as-is.
+So if, for example, no other page from my address book references this memory area, then this area is lost, it cannot be reused in my program. It is not available for reuse and this causes what is known as a memory leak.
+This is something that must absolutely be avoided in any program.
+To end on good practices: Any memory area that was allocated dynamically, i.e, that was made using <i>new</i>, must imperatively be deallocated, as we discussed earlier. Indeed, a memory area that was allocated dynamically is not freed until we do it explicitely.
+There, now you know a lot of essential information about pointers and we will summarize all of this with a small example
+Here is a program we will go over step-by-step.
+Here, we declare a variable px which is a pointer that can point to an integer, and I take the precaution of initializing it to nullptr, which means that it points to nothing.
+Second line of code, there is a dynamic allocation.
+This dynamic allocation reserves a memory area capable of storing an integer.
+And this memory area has an address, and this address is returned by the execution of "new int".
+This is the address I will assign to px.
+So now, I am making the px pointer point to this newly allocated memory area.
+Then, third instruction.
+I use the famous little star to access the content pointer to by px.
+The content pointed to by px is this.
+In this pointed-to content, I will store the value 20, which corresponds to this.
+Then, I want to make sure that
+I have stored the right value in this memory area, and so I want to display its contents.
+Once again, I access the content that px points to with the star operator, and this will simply display the value 20, followed by a newline, a line break.
+Then, I suppose that I no longer need my memory area, and so I call delete, which means that this memory area no longer has any usable content.
+And I want to make sure that px doesn't point towards obsolete content, that it doesn't point to an address that cannot be used safely and so, once again, I assign nullptr to the pointer's value.
+The first version of the program that we have examined can be written in a more concise way, given that these two instructions, which consist in allocating memory and storing a value within it, can actually be written as a single line with this syntax.
+To make it shorter still, I can replace these two lines of code by a single line, this one.
+In this line, I start by declaring the pointer, except that instead of starting by initializing it to nullptr and then assigning to it the result of
+"new int(20)", I simply put the value of "new int(20)" directly into px.
+This means that I spare one statement.
+When you write your first programs with pointers, and even for the following ones, it is likely that, from time to time, you will encounter a dreadful error, the "segmentation fault", which will cause your program to crash.
+What is it?
+Typically, "segmentation fault"-type errors will occur when we try, via a pointer, to access a memory area which was not reserved.
+If we look at this example, this statement declares a px pointer but does not reserve any allocated memory area.
+There is no initialization, no new, no nothing.
+So here, the contents of px are unknown and here, what we are trying to do is to access the content pointed to by px, which does not exist, since we never allocated it, and to store a value of 20 in it.
+Obviously, this is impossible and it will result in a segmentation fault error, causing your program to crash.
+The correct solution would of course be to allocate some memory to associate to the px pointer, which is done like so, at execution time. So we allocate the memory area, and at that moment, our px pointer will contain the address of this newly-allocated memory area.
+So of course, once this memory area exists, we can access it with no trouble, to store a value of 20 in it.
+So now, this statement will execute without any errors.
+We have just seen that it is essential to allocate before using; some advice follows, good practice concerning initialization of pointers.
+It is recommended to always initialize pointers, even just to the nullptr value.
+Thus, if, when we declare the pointer, we do not yet know where it will point to, it is recommended to initialize it by using nullptr, which means that the pointers points to nothing, but that it is known explicitly.
+And thanks to this initialization, it becomes possible to implement a certain number of safeguards.
+For example, before accessing a memory area pointed to by a pointer, I can now take care to check if this pointer does indeed point to something or not.
+Thus, it is possible, thanks to this initialization, to test whether the pointer points to something before accessing this area, as I could do here.
+So we see that, thanks to this initialization, a certain number of safeguards can be implemented to protect access to memory areas pointed to by pointers.

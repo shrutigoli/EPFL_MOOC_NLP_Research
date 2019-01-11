@@ -1,0 +1,94 @@
+This is the last series of episodes in this MOOC
+"Introduction to object-oriented programming in C++"!
+In this last series of episodes, we wished to present you a problem in its entirety, a very general problem, to make a case study.
+It will consist in presenting different watches: there will be analog watches, digital watches, and watches that will be both; watches will have accessories such as bracelets (straps), bodies, etc.
+So a rather general frame which could be used for example as management software for a jeweler's or as sales software, or even for printing catalogs.
+Through this, we will illustrate different concepts presented all along this course.
+The themes we have chosen to present to you in these summary episodes include first of all the notion of design, to model the problem from an object-oriented point of view, which classes have to inherit from which other ones, whether some abstract classes are needed or not, how to make the calculation of the watches' price polymorphic, or how to make the output polymorphic.
+Output will be treated in a very specific way, with an overload of the output operator, and then we will review how to implement an output that adapts to each of the classes, a polymorphic output.
+We also introduced operator overloading with the += operator, which will allow us to add components to watches that we want to build.
+Finaly, we will go over multiple inheritance with the different mechanisms, the digital mechanism and the analog mechanism, or even double mechanisms, which are both digital and analog and we will end with a last episode that will present a problem that we have not yet covered in the course, the concept of polymorphic copying, how to copy heterogeneous collections. how do we copy watches that contain different components, each behaving in a different way either with regards to the price, or the output.
+This is the menu for this final week.
+But let's start by presenting the problem in more detail.
+We want to model watches, let's say that watches are products, in the sense that a product is something that we can sell, that has a price.
+Besides, watches will have basic mechanisms, typically hands to display the time, and will be made of different accessories, such as a body, a bracelet, the glass, the clasp...
+The products we discussed earlier have a price, and the calculation of this price can vary
+-- this aspect is interesting for the design -- from a base value which should be fixed at the level of the product.
+All products can be displayed, and this output can vary; each product must be displayed in its own way
+Of course, behind these notions of
+"can vary" and "displayed in its own way", we have the concept of polymorphism.
+Then, we have the mechanisms which we have just discussed, and the accessories that make up the watches, these mechanisms and accessories are also products.
+We have used the verb "to be" several times, which refers to inheritance relationships.
+We could for example buy accessories or mechanisms separately, so each of these could behave like a product, each of these could have its own price, and its own way of calculating its price.
+Fundamentally, there are three sorts of mechanisms, mechanisms we will refer to as analog, to represent watches with hands, digital watches will have a digital mechanism, and then we will have watches which will be both analog and digital.
+Finally, for these mechanisms that we call "double mechanisms", we will suppose that they display only one time.
+So we can say that there is only one time associated to a watch here, and that it will have two ways of representing it.
+This is a point of view chosen for this exercise, we could of course have chosen a different point of view which would consist in associating a time to each of the representation mechanisms, either analog or digital, but it is not the point of view that we took here.
+This way, we introduce an interesting problem when coding these classes.
+To summarize, regarding classes, that is, regarding the types of objects that we will have in our program, we will have watches ("Montre"), we will have products ("Produit"), mechanisms ("Mecanisme") and accessories ("Accessoire); accessories can be bodies ("Boitier") or bracelets
+All of these will be classes.
+Regarding mechanisms, we can have analog mechanisms, digital mechanisms, or double mechanisms.
+That is the whole set of classes.
+Regarding inheritance relationships, we have seen that watches are products, so they will inherit from products.
+We have seen that analog, digital and double mechanisms are types of mechanisms, so all three classes here will inherit from the mechanism class.
+We have also seen that mechanisms and accessories are also products.
+All of this will lead us to the following hierarchic model: right at the top, we have the concept of a product; accessories, mechanisms and watches are products (TN: "montre" means "watch")
+However, a watch will have a mechanism and will have accessories, so it will encapsulate these classes.
+Among the accessories, we have bodies (TN: "boitier"), bracelets, clasps, glasses (TN: "fermoir" and "vitre", resp.), all of these are accessories.
+Mechanisms can be analog or digital, they are both mechanisms.
+Finally, a double mechanism is basically a mechanism, but we have decided, as we mentioned earlier, that it would indicate only one time, which we will certainly represent at the level of the concept of a mechanism, and they will behave both as analog mechanisms and digital mechanisms.
+So naturally we can say that a double mechanism is an analog mechanism and at the same time is a digital mechanism, all the while being just one
+-- that was the remark on it having only one time -- all the while being only one mechanism and not two mechanisms.
+This is the constraint we wanted to impose in the design to have virtual inheritance here to make "Mecanisme" a virtual class.
+Let's see how all of this can be translated into code.
+By the way, we suggest that while you watch these videos, you take breaks from time to time to write the code yourselves in your favorite development environment.
+First point: watches are products.
+This is translated as a "Montre" class which "is a", which inherits from "Produit".
+And of course, we introduce a "Produit" class, from which "Montre" inherits.
+And for now, we simply have an empty "main".
+Second point: watches have a mechanism, so they will encapsulate a Mecanisme.
+Watches have a mechanism, they are made of, so they have, different accessories.
+So, how do we translate
+"different accessories"?
+This is simply a collection of accessories, a vector of Accessoires.
+This introduces two new classes, a "Mecanisme" class and an
+"Accessoire" class.
+That said, we know that these 
+"Accessoire" and "Mecanisme" classes are very general classes; we want them to be very general to allow them to behave in a polymorphic way as we will have several accessories such as bracelets,... we will have several mechanisms, and so here we certainly want polymorphism, so we will add pointers to mechanisms and pointers to accessories.
+What we are doing right away!
+In the version presented here, we are using C++ 2011 pointers, so-called "smart pointers".
+So we will have "unique pointers" to mechanisms, and similarly, "unique pointers" for the accessories, which requires that we include the "memory" library
+(for the "unique pointers").
+Of course, we included the
+"vector" library as well, for the vectors that we need here.
+And since we have just introduced pointers in the Montre class, we must have the reflex, as programmers, to think about
+-- as soon as we use pointers, we should indeed -- think about the question of copying:
+"shallow copy" or "deep copy"?..
+Let's leave this problem aside for a while. we will discuss this in the very last episode.
+For now, let's just say that we cannot copy watches, nor assign a watch, nor use the assignment operator, the "operator=".
+So here, this is the copy constructor,
+"Montre" in the "Montre" class is indeed a constructor.
+This is the copy constructor that we delete, and then the operator= is also deleted; we will come back to this later.
+Next aspect: products have a price
+So here, we could simply encapsulate a price naturally represented as a "double", but we have a constraint saying that the price can vary, which shows that we will have to calculate the price.
+For example, later on, we will decide that the price of a watch is the price of its mechanism and the sum of the prices of its accessories,
+And so a price can no longer be data but shall become a function, which we will represent as a method (= member function).
+Calculating the price of a product will not modify the product as such, so the method will be qualified as "const".
+Of course, it returns a price, as a "double".
+Then, we want the price to be able to vary, so this means that we will want to have a polymorphic behavior here.
+Let's say that by default, we will return the base price, which will be defined here, "base value"
+(TN: "valeur"), what we had called "a price" earlier, will simply become one component of the price, its "base value".
+By default, this "base value" will be the product's price, but perhaps later, in other subclasses of the Produit class, it will simply be used to calculate the actual price of other products that are subclasses of the Produit class.
+Moreover, all products can be displayed.
+This means, in C++, that we will overload the output operator for products.
+Products can be displayed, but each in its own way, meaning that we will have a polymorphic behavior
+-- we will leave this for the next episode, we will come back to this in that episode.
+For now, we will simply write a prototype to remember that we want to overload the output operator for products.
+Regarding mechanisms and accessories, we said that mechanisms and accessories were products.
+So here too, we have an inheritance relationship: the "Accessoire" class inherits from the "Produit" class, which was defined earlier, and the "Mecanisme" class also inherits from the "Produit" class.
+About mechanisms: there are three kinds of mechanisms, so here too, these three mechanisms are of course mechanisms, so we have "MecanismeAnalogique" which is a mechanism, which inherits from "Mecanisme",
+"MecanismeDigital" which inherits from
+"Mecanisme", and "MecanismeDouble" which inherits from "Mecanisme".
+And finally, concerning "double mechanisms", we will suppose that there is only one time for the double mechanism, but that double mechanisms behave both as analog mechanisms and as digital mechanisms, which we haven't represented here at all, and which will potentially change this inheritance relationship, but we will come back to this aspect in an episode specifically dedicated to it.
+Voila! This concludes this first episode presenting the big picture, the object-oriented design of the problem.
+The next episode will focus on polymorphic output and on filling the "Produit" class.

@@ -1,0 +1,717 @@
+1
+00:00:00,810 --> 00:00:02,030
+For the rest of this week, we will
+
+2
+00:00:02,030 --> 00:00:04,880
+do a larger example on Discrete Event
+Simulation.
+
+3
+00:00:04,880 --> 00:00:07,830
+The essential idea is that we will use
+mutable
+
+4
+00:00:07,830 --> 00:00:12,830
+variables to simulate change in quantities
+in the real world.
+
+5
+00:00:12,830 --> 00:00:18,300
+As a side effect, so to speak, we will
+also learn how to structure a system into
+
+6
+00:00:18,300 --> 00:00:22,881
+a sequence of layers and some of these
+layers will be domain specific languages.
+
+7
+00:00:24,450 --> 00:00:26,125
+Concretely we'll construct
+
+8
+00:00:26,125 --> 00:00:29,475
+the digital circuit simulator and that
+simulator itself is
+
+9
+00:00:29,475 --> 00:00:33,108
+based on the general framework for
+Discrete Event Simulation.
+
+10
+00:00:33,108 --> 00:00:38,000
+Simulation and digital circuits by
+themselves could probably take up
+
+11
+00:00:38,000 --> 00:00:41,420
+a complete course but with the right tools
+at our
+
+12
+00:00:41,420 --> 00:00:44,739
+disposal, we are going to see, that we can
+simplify
+
+13
+00:00:44,739 --> 00:00:47,780
+it enough to compress it into less than
+one hour.
+
+14
+00:00:47,780 --> 00:00:48,960
+So, then lets get started.
+
+15
+00:00:51,280 --> 00:00:54,343
+Let's start with a small description
+language for digital circuits.
+
+16
+00:00:55,390 --> 00:00:59,810
+A digit circuit is composed of wires and
+functional components.
+
+17
+00:00:59,810 --> 00:01:04,440
+The wires transport signals that are
+transformed by the components.
+
+18
+00:01:04,440 --> 00:01:06,470
+Because we are dealing with digital
+circuits
+
+19
+00:01:06,470 --> 00:01:09,215
+and not analogue ones, we represent the
+signals
+
+20
+00:01:09,215 --> 00:01:09,540
+[INAUDIBLE]
+
+21
+00:01:09,540 --> 00:01:13,410
+simply using the booleans true and false.
+
+22
+00:01:13,410 --> 00:01:18,288
+The base components are also called Gates
+and they are the Inverter
+
+23
+00:01:18,288 --> 00:01:19,670
+[INAUDIBLE]
+
+24
+00:01:19,670 --> 00:01:22,960
+whose output is the inverse of its input.
+
+25
+00:01:22,960 --> 00:01:27,270
+The AND Gate, that forms the conjunction
+of its two inputs.
+
+26
+00:01:27,270 --> 00:01:31,720
+And the OR Gate, that forms the
+disjunction of its two inputs.
+
+27
+00:01:31,720 --> 00:01:35,260
+From these basic components, we can
+construct others,
+
+28
+00:01:35,260 --> 00:01:38,830
+by combining them using wires to connect
+them.
+
+29
+00:01:40,120 --> 00:01:42,130
+Another thing that's important is that the
+
+30
+00:01:42,130 --> 00:01:44,790
+components have a reaction time that's
+called
+
+31
+00:01:44,790 --> 00:01:49,680
+delay, that means the outputs don't change
+immediately after a change
+
+32
+00:01:49,680 --> 00:01:53,670
+to their inputs there's a delay until that
+change takes place.
+
+33
+00:01:55,070 --> 00:01:59,310
+Digital circuits are usually described by
+diagrams and the basic
+
+34
+00:01:59,310 --> 00:02:03,410
+components of these diagrams the Gates,
+they are drawn as follows.
+
+35
+00:02:03,410 --> 00:02:05,010
+Let's start with the Inverter.
+
+36
+00:02:05,010 --> 00:02:10,020
+So the Inverter is simply a triangle with
+a dot at the end that transforms its
+
+37
+00:02:10,020 --> 00:02:14,980
+input here on the left hand side to its
+output on the right hand side, and
+
+38
+00:02:14,980 --> 00:02:20,750
+it's called an Inverter.
+The second basic case is the AND Gate.
+
+39
+00:02:20,750 --> 00:02:26,280
+So that's a written like this.
+It takes two inputs and transform them.
+
+40
+00:02:26,280 --> 00:02:28,970
+Takes the conjunction of the two inputs
+and their outputs.
+
+41
+00:02:28,970 --> 00:02:32,000
+So the output is true if both inputs are
+true.
+
+42
+00:02:33,740 --> 00:02:35,389
+And finally we have the OR Gate,
+
+43
+00:02:36,460 --> 00:02:40,660
+which takes two inputs and converts them
+to an output
+
+44
+00:02:40,660 --> 00:02:44,110
+which is true if either of the two inputs
+is true.
+
+45
+00:02:45,570 --> 00:02:50,694
+From these basic Gates, we can now
+construct more interesting circuits.
+
+46
+00:02:50,694 --> 00:02:56,170
+So, we are going to show how to construct
+a half-adder that takes two inputs
+
+47
+00:02:56,170 --> 00:03:01,680
+and converts them into a sum and a carry.
+So, lets take the two inputs,
+
+48
+00:03:01,680 --> 00:03:07,270
+call them a and b.
+What we would do is, we would form first
+
+49
+00:03:07,270 --> 00:03:12,500
+the AND of the a and the b.
+That's written like this.
+
+50
+00:03:12,500 --> 00:03:17,907
+And at the same time form the OR of the
+two inputs.
+
+51
+00:03:17,907 --> 00:03:23,036
+That's written like this.
+Then we place an Inverter
+
+52
+00:03:23,036 --> 00:03:27,266
+after the AND.
+And finally, another AND Gate here.
+
+53
+00:03:27,266 --> 00:03:33,280
+And that gives us the sum on this wire and
+the carry on this one.
+
+54
+00:03:35,600 --> 00:03:42,885
+So if you do the math, then we will see
+that the sum is
+
+55
+00:03:42,885 --> 00:03:48,768
+computed by taking the a OR b.
+Then we have an AND here.
+
+56
+00:03:48,768 --> 00:03:54,230
+AND NOT a and b.
+So the sum
+
+57
+00:03:56,270 --> 00:04:00,610
+is set if either a and b are set and not
+both, both of them are set.
+
+58
+00:04:00,610 --> 00:04:04,570
+Where as the carry is a AND b, so if both
+a and
+
+59
+00:04:04,570 --> 00:04:08,230
+b are set, then the carry is one but the
+sum is zero.
+
+60
+00:04:08,230 --> 00:04:12,660
+If either a and b are set, then the sum is
+one, and the carry is zero.
+
+61
+00:04:13,820 --> 00:04:17,210
+So let's wrap this up.
+Draw a box around it,
+
+62
+00:04:19,310 --> 00:04:23,275
+and call it a half-adder, or I've going to
+abbreviate that to HA.
+
+63
+00:04:23,275 --> 00:04:27,630
+You have seen the circuit diagrams.
+
+64
+00:04:27,630 --> 00:04:31,640
+What we are now after is a textual
+language that describes these circuits.
+
+65
+00:04:31,640 --> 00:04:37,260
+So the idea is that we would have wires,
+and the wires are here, named.
+
+66
+00:04:37,260 --> 00:04:38,128
+So they have names.
+
+67
+00:04:38,128 --> 00:04:41,850
+What we're going to do also is name the
+internal wires,
+
+68
+00:04:41,850 --> 00:04:44,950
+so there would be a wire here, and a wire
+here.
+
+69
+00:04:46,230 --> 00:04:50,620
+And those wires we can create using a
+class wire.
+
+70
+00:04:50,620 --> 00:04:54,890
+So we can new, create new wires by writing
+val a
+
+71
+00:04:54,890 --> 00:04:59,170
+equals new wire, then b equals new wire, c
+equals new wire.
+
+72
+00:04:59,170 --> 00:05:04,550
+That would create the three new wires a, b
+and c or equivalently we can abbreviate
+
+73
+00:05:04,550 --> 00:05:09,777
+to that to just writing val a, b, c equals
+new Wire.
+
+74
+00:05:09,777 --> 00:05:11,870
+And that way we can create
+
+75
+00:05:11,870 --> 00:05:16,850
+all the wires in our circuit diagram, that
+you see here.
+
+76
+00:05:16,850 --> 00:05:20,830
+And finally, we can place the Gates
+between the wires.
+
+77
+00:05:20,830 --> 00:05:25,250
+So one thing that's important here is that
+a wire is just, not
+
+78
+00:05:25,250 --> 00:05:30,740
+just a single straight line but everything
+that's connected until it hits a Gate.
+
+79
+00:05:30,740 --> 00:05:32,680
+So the b wire for instance would con,
+
+80
+00:05:32,680 --> 00:05:36,390
+consist of this line but also this line
+here.
+
+81
+00:05:36,390 --> 00:05:37,040
+But not that
+
+82
+00:05:37,040 --> 00:05:41,050
+line here because there's the OR Gate
+between that line and that line.
+
+83
+00:05:41,050 --> 00:05:48,080
+So that's why we have renamed that wire to
+be d and that wire to e.
+
+84
+00:05:48,080 --> 00:05:50,990
+So once we have wires, we still need to
+place
+
+85
+00:05:50,990 --> 00:05:54,320
+the Gates, and that we do with the
+following functions.
+
+86
+00:05:54,320 --> 00:05:58,120
+we have an Inverter function that takes as
+inputs
+
+87
+00:05:58,120 --> 00:06:02,160
+two wires, the input and output wire and
+places so
+
+88
+00:06:02,160 --> 00:06:06,790
+to speak the Inverter as a side effect
+onto the circuit board.
+
+89
+00:06:06,790 --> 00:06:08,830
+And the AND Gate would do the same thing.
+
+90
+00:06:08,830 --> 00:06:11,090
+It gets two inputs, a1 and a2 and
+
+91
+00:06:11,090 --> 00:06:15,140
+an output places the AND Gate between
+those wires.
+
+92
+00:06:15,140 --> 00:06:19,470
+And the OR Gate analogously for two inputs
+and one output.
+
+93
+00:06:22,910 --> 00:06:27,688
+So let's see how we would express our
+half-adder using this language.
+
+94
+00:06:27,688 --> 00:06:33,252
+So a half-adder then is a circuit that
+takes four wires,
+
+95
+00:06:33,252 --> 00:06:37,264
+the two inputs a and b and the outputs s
+and c.
+
+96
+00:06:37,264 --> 00:06:40,449
+What we need to create them is two
+internal
+
+97
+00:06:40,449 --> 00:06:43,846
+wires that's a d and e, that's done here.
+
+98
+00:06:43,846 --> 00:06:47,974
+And then we place an OR Gate between a, b
+and d that's that
+
+99
+00:06:47,974 --> 00:06:49,400
+Gate here.
+
+100
+00:06:49,400 --> 00:06:54,670
+We place the AND Gate between a, b, and c,
+that's that Gate here.
+
+101
+00:06:54,670 --> 00:06:59,340
+You place the Inverter between c and e.
+Here you see it.
+
+102
+00:06:59,340 --> 00:07:03,370
+And finally we place the AND Gate between
+d, e, and s.
+
+103
+00:07:03,370 --> 00:07:06,620
+And that together wrapped up gives us a
+component
+
+104
+00:07:06,620 --> 00:07:10,970
+which we call a half-adder which is its
+own function.
+
+105
+00:07:10,970 --> 00:07:13,490
+And therefore can be used as another
+
+106
+00:07:13,490 --> 00:07:19,070
+component just in the same way we can use
+OR Gates, AND Gates, and Inverters.
+
+107
+00:07:19,070 --> 00:07:24,560
+So we can use that the half-adder then to
+place between the input and output wires.
+
+108
+00:07:27,000 --> 00:07:29,400
+So here you see a full-adder that can
+
+109
+00:07:29,400 --> 00:07:33,820
+be constructed from two half-adders and an
+OR Gate.
+
+110
+00:07:33,820 --> 00:07:36,892
+To understand that, let's draw the diagram
+first.
+
+111
+00:07:36,892 --> 00:07:42,630
+A full-adder takes three inputs, the a,
+and the b, and an input carry.
+
+112
+00:07:44,120 --> 00:07:50,170
+And it works by placing a half-adder
+between the b and the input carry.
+
+113
+00:07:54,720 --> 00:07:59,660
+Then placing another half-adder between
+the a and the sum of the first one.
+
+114
+00:08:02,210 --> 00:08:05,830
+That sum result would give us the final
+sum.
+
+115
+00:08:05,830 --> 00:08:09,050
+And as to the carries, they, we produce
+them by
+
+116
+00:08:09,050 --> 00:08:15,130
+taking the OR of the two carries of the
+half-adder.
+
+117
+00:08:15,130 --> 00:08:19,710
+So here we get the sum, and here we get
+the output carry.
+
+118
+00:08:22,170 --> 00:08:26,710
+Let's name the internal wires.
+So we would have the internal sum of the
+
+119
+00:08:26,710 --> 00:08:32,520
+first half-adder and the two carries call
+them c, c1, and c2.
+
+120
+00:08:34,080 --> 00:08:38,604
+So that would give us a full-adder, of one
+bit
+
+121
+00:08:38,604 --> 00:08:39,450
+[NOISE].
+
+122
+00:08:44,200 --> 00:08:47,850
+Now to put that in text, ,you see the
+function here.
+
+123
+00:08:47,850 --> 00:08:51,920
+Full-adder takes the three inputs and the
+two outputs.
+
+124
+00:08:51,920 --> 00:08:56,142
+It, there are three internal wires s, c1
+and c2.
+
+125
+00:08:56,142 --> 00:09:01,040
+And there is a half-adder between b,, c
+in, s and c1.
+
+126
+00:09:01,040 --> 00:09:03,781
+There is a half-adder between a.
+
+127
+00:09:03,781 --> 00:09:09,289
+If the sum of the first one s, sum and c2
+and an OR gate between
+
+128
+00:09:09,289 --> 00:09:11,720
+c1 and c2, and c out.
+
+129
+00:09:11,720 --> 00:09:16,450
+And now we have a full one bit adder,
+which in turn of course, we could use to
+
+130
+00:09:16,450 --> 00:09:21,880
+produce a eight bit adder, 16 bit adder or
+any other circuit you like.
+
+131
+00:09:23,760 --> 00:09:25,220
+So here's an exercise for you.
+
+132
+00:09:25,220 --> 00:09:28,410
+I have a mystery function called it f that
+connects
+
+133
+00:09:28,410 --> 00:09:32,240
+three wires a and b the way you see it
+here.
+
+134
+00:09:32,240 --> 00:09:35,040
+And I want you to answer what
+
+135
+00:09:35,040 --> 00:09:40,380
+logical function does this circuit produce
+on
+
+136
+00:09:40,380 --> 00:09:46,090
+the output wire c.
+Is it a AND NOT b, or a AND NOT b AND a?
+
+137
+00:09:46,090 --> 00:09:53,010
+Or maybe b AND NOT a, or a equals b, or a
+NOT equals b, or a multiplied with b?
+
+138
+00:09:54,910 --> 00:09:57,950
+So to figure out what the circuit
+computes, a
+
+139
+00:09:57,950 --> 00:10:00,270
+good way to proceed is to look at the
+
+140
+00:10:00,270 --> 00:10:05,160
+internal wires and see what logical
+function they would produce.
+
+141
+00:10:05,160 --> 00:10:10,000
+So if you look at the f for instance, so
+as it says that
+
+142
+00:10:10,000 --> 00:10:15,060
+would be the AND between the a and the e,
+and the e itself
+
+143
+00:10:15,060 --> 00:10:20,260
+is the Inverter of the b.
+So that would be AND a AND not
+
+144
+00:10:20,260 --> 00:10:25,370
+b.
+Likewise, the g would be b AND NOT a.
+
+145
+00:10:27,280 --> 00:10:32,060
+And then we have in the final result f OR
+g.
+
+146
+00:10:32,060 --> 00:10:40,010
+So it means that either a is true and b is
+false or b is true and a is false.
+
+147
+00:10:40,010 --> 00:10:43,910
+And that, those are the two possibilities
+that turn the result true.
+
+148
+00:10:43,910 --> 00:10:48,190
+So that means the result is true whenever
+a and b are different.
+
+149
+00:10:49,600 --> 00:10:51,820
+So the right solution is this one here.
+

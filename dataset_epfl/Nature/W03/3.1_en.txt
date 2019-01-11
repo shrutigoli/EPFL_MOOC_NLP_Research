@@ -1,0 +1,128 @@
+Welcome back: Nature, In Code.
+We're now in Chapter 3, Lecture 1.
+This is the first video of Chapter 3.
+In Chapter 3, we'll learn a couple of things, first of all we'll learn about genetic drift, a really key idea in evolutionary biology.
+Number 2, as we learn about genetic drift, we'll learn about new JavaScript ideas, because we'll be implementing a genetic drift, of course, in JavaScript, in the browser, and as we do this we'll come across new concepts in JavaScript.
+And then last but not least, around the middle of Chapter 3 we'll learn to visualize data in the browser, and that's quite cool, I think, because we are now outputting our data into the console using mostly numbers and strings, and that's a great capability that we can always look at the raw data, but it's quite important very quickly that we have a good way to visualize the data, especially as our models become more complex, and JavaScript has this really fantastic capability of visualizing data in the browser and we'll learn how to do this around the middle of this chapter.
+So let's get started.
+In the Hardy Weinberg world that we developed in the chapter previously, Chapter 2, the assumption was that we had an infinite population size.
+And the reason why we made that assumption was because it kept things things relatively easy in terms of the math.
+Now what we're going to do is we're going to relax this assumption.
+We know that this assumption is actually not realistic: all populations are finite.
+So this is what we're going to assume here in this chapter.
+And the population size is typically denoted with this capital "N" letter.
+Now a finite population size can mean many things.
+We can talk about only tens of individuals, or perhaps hundreds of individuals, but we can also talk about a very, very large population size, even billions of individuals, or sometimes even trillions of individuals.
+If you think about, for example, single-celled organisms, bacteria, for example, these can often be-- the population sizes of these species can often be very, very large.
+But even in this case, occasionally these populations will go through so-called bottlenecks, for various reasons, reasons we'll learn about throughout this chapter, where their population sizes shrink down to very small numbers, but in any case, the key aspect about this is that when you have a finite population sizes, what's happening is that chance effects start to play a role, and this is the key effect of this chapter and the principal cause of genetic drift.
+And the key intuition that I would like to develop in this video is that these chance effects will be stronger in smaller populations.
+So when populations are smaller, these chance effects will be much stronger.
+We'll start using a metaphor of a perfect coin flip.
+So what is a perfect coin?
+Well, a coin, as you know, has two sides, often called heads and tails, but you can call them whatever you want to, and a fair coin is one that when you flip it, each side comes up with equal probability of exactly 50%.
+This is a fair coin.
+So imagine that you would now flip such a coin a number of times, say you would flip it 10 times.
+So what would happen?
+Well, and now let's go through this thought example, okay, I've got heads and tails here.
+So let's say I flip this, okay, heads comes up.
+I flip it again, tails.
+Flip it again, heads.
+Heads, tails, tails, tails.
+Heads, heads, tails.
+So in this case, we have a 5:5 ratio.
+But of course it could also be, and on another example, where I have heads and tails,
+I could maybe flip the coin 10 times, and I get something like heads, heads, tails, tails, heads, tails, heads, tails, tails-- no, sorry undo tails.
+That's the correct way to do it, and maybe tails again.
+So in this case, we'd have a 4:6 ratio.
+That will also happen quite frequently.
+In fact, we could have any type of ratio.
+We could have 3:7, we could have 2:8, even 8:9-- sorry 1:9, or even 0:10.
+This will be very rare, but it could, in principle happen.
+So the question is, if we do this many, many times, flipping a fair coin 10 times, then how often will each of these scenarios-- and of course the reverse, as well-- 6: 4, 7:3, 8:2,
+How often will that happen?
+So that's one of the fundamental questions here.
+And another question, of course, is well, okay, what if I do this 10 times, or rather than 10 times, maybe what if I do this 100 times?
+So in order to develop those intuitions,
+I'd actually like to flip fair coins, and to do that,
+I'm now going to turn to a website where we can virtually flip coins.
+Alright, here I'm back in the browser.
+What I'm going to do is I'm simply going to search for a random coin flip.
+Here, "random coin flip."
+Actually, it's kind of neat here,
+Google already does a coin flip, and I can just flip it again and it comes up heads, tails and so on, so that's kind of neat, but what we want to do is we want to do it, you know, multiple times, not just a single coin, so I'm going to go to this
+<i>random.org</i> coin flipper here.
+Okay. It's at <i>random.org/coins</i>.
+And now I can choose to flip a coin 10 times.
+And I'm going to choose... I'm going to actually choose the Swiss franc, simply because I'm in Switzerland and it's also a nice coin, but of course you can choose whichever coin you want to here.
+So I'm going to flip 10 coins here, flip coins, and here's what we'll get.
+So we'll get six heads, and four, well, tails or numbers, whatever you want to call them.
+Actually they're called here obverse and reverse.
+Doesn't matter-- It's a 6:4 ratio here.
+Okay, so let's flip this again.
+We have a 4:6 ratio here, a 5:5, a 6:4,
+So let's just see... 5:5 quite often.
+Let's see if we get an extreme example of maybe 2:8 or so.
+This should occasionally happen--
+Here we go.
+We have 2 heads and 8 numbers.
+So I could do this a couple of times.
+I would occasionally even get a 1:9, or even a 0:10.
+This happens not very frequently, but it does happen.
+So let's go back now, and let's choose here to flip 100 coins instead of just 10.
+Alright, let's flip 100 coins.
+So here's the outcome.
+Now the only downside of this page is that you cannot actually see how often heads or tails comes up, but we're programmers, so we can find a way.
+We're simply going to right-click here, and take a look at the page source, and this you can do in any browser, and we've done this before.
+Take a look at the HTML page source here.
+And if you look at this, you scroll down a little bit, here you actually find all the tags that render the corresponding image.
+So here they're called
+<i>obverse.jpg</i> and <i>reverse.jpg</i>.
+And I can just search now in this source code, so I'm going to search using <i>Command + F</i>.
+You can do this however you want to.
+<i>Command + F</i>, here <i>reverse.jpg</i>--
+Actually, let me search for <i>obverse.jpg</i>, doesn't matter which one, a JPEG.
+So this image is shown 52 times, because their random coin algorithm has generated a set of 52 obverse coins.
+So that means the reverse one must show up 48 times.
+And we can double check this:
+<i>reverse.jpg</i>...
+Indeed 48, because there are exactly 100 coins, so 48:52.
+The important observation here is that this is actually pretty close in terms of a ratio to the 50:50.
+Let's flip those 100 coins again.
+We actually don't have to go back into this view, we can actually remain in the source view, and simply hit <i>reload</i> here, and the page gets reloaded.
+And now we can search for it again.
+Okay.
+<i>reverse.jpg</i>... 37.
+Wow! That's actually quite extreme, but it's still fairly close; it's in the 40:60 kind of ratio.
+Let's reload it again.
+Okay, again let's search for <i>reverse.jpg</i>... 39.
+Okay that's also close, that's sort of 40:60.
+Let's reload it once more, and search for <i>reverse.jpg</i>.
+And we're at 49-- very close.
+Actually let's do this just one more time, just to be sure.
+Okay let's search <i>reverse.jpg</i>...52.
+So most of the time we get values extremely close to 50:50.
+Sometimes now we got something that was closer to 40:60, but we've never seen a 30:70, or something like that, and in fact something like a 20:80 would be astronomically a low improbability.
+And that's because even though each single coin flip has a 50:50 chance, the random effects that you get from just flipping a few coins can be actually quite extreme, as we've seen.
+I mean it's very easy to get a 2:8 ratio in 10 coin flips, but the more often you do this, the closer you get to this 50:50 example, and if you were actually to flip an infinite number of coins, you would be exactly at 50:50.
+Now, we don't have the time to flip an infinite number of coins, unfortunately, and even if we had, that's probably not how we should spend our infinite time, but nevertheless, if we were to do this we would go to exactly 50:50.
+The take-home message here is that as you increase this number, your ratio of heads to tails will be closer and closer.
+The one that you observe will be closer and closer to the exact 50:50 ratio.
+And the fewer coins you flip, the more extreme the outliers can be, and this is something that we can capture with a so-called binomial distribution, because the binomial distribution captures exactly this phenomenon where you flip a coin, or you have some event that has two outcomes, two possible outcomes: yes or no, or heads or tails.
+And you can calculate exactly what this probability distribution looks like, given the probabilities of these two outcomes, and given the number of events, so in our case here, the flip coin.
+Okay, so you can see that we can flip a coin a certain number of times, 10 or 100, or however often we want to.
+If this coin flip has exactly two outcomes, which of course it does have, then the probability distribution is called the binomial distribution, and this is what the binomial distribution will look like.
+Looks something like this.
+So here you basically have the probability or the frequency of this happening.
+So you know, it doesn't matter whether that's heads or tails.
+But the point is, most of the time it will be a 5:5 ratio.
+Quite often as well, you'll get the 4:6 or the 6:4 ratio, and then with decreasing probability, you will get these more extreme ratios and even to 0:10 and 10:0 are possible.
+But the point is that we can actually now exactly calculate how often this happens, and this assumption simply assumes that you do this essentially infinitely many times, and then you calculate how often each of these scenarios has occurred.
+And this is the binomial distribution, and you can precisely calculate these expected probabilities.
+So this is an important concept.
+So these probabilities here are the expected probabilities.
+Now, when you run these experiments in the real world, you will not always see the expected probabilities.
+You will typically observe certain probabilities, and if you had infinite time, then you would get very, very close.
+Well, in fact, if you had infinite time you would get exactly to these expected probabilities, but if you had a long, but still limited time, you would increasingly go to these expected probabilities, and what we'll do in the next video, we'll actually calculate these probabilities in JavaScript, using a method that allows us to essentially flip a coin, and that's going to be a key element of most of the course that we'll do here.
+You may wonder at the moment,
+Hmm, I wonder what flipping a coin has to do with biology or genetics, but as you'll find out in the next couple of videos, it actually has a lot to do with it.
+So I'll see you in the next video.

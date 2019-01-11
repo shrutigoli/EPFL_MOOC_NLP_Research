@@ -1,0 +1,86 @@
+Hello and welcome to this second lesson dedicated to the interactions between spatial information layers.
+We are going to focus on the operations which allow to connect several raster layers.
+It is this type of interaction that gave birth to the map algebra, whose theory has been introduced in 1983 by Dana Tomlin in the Proceedings of the Harvard
+Computer Graphics Conference, then formalized in 1990 in a book called
+Geographic Information Systems and Cartographic Modeling.
+We will see some applications in a moment.
+The goals of this lesson are to present you the basis of the interaction between several raster layers and explain the principle of the map algebra.
+After this lesson, you will be able to combine the information contained by several raster files and also to use the QGIS raster calculator.
+The constraints discussed in the last lesson about the raster-vector interactions also exist in the case of the raster-raster interaction.
+The layer projection system used must be the same and the considered geographical area must be common, but there is an additional constraint which concerns the spatial resolution, so the size of the pixels which must be identical.
+Tomlin's idea is that the raster files can be subjected to algebraic operations whose results are also stored in rasters.
+Tomlin developed a standardized language and a formalized representation of all the possible combinations of information layers.
+Rasters are treated like point grids and the map algebra describes arithmetic operations on cells, on groups of cells or classes of objects in all the cells.
+In this introductory course, we will describe some useful global operations and for more details on local, focal and zonal operations, we refer you to the references mentioned here on the screen.
+The first example concerns the study of precipitations during the rainy season in Burkina Faso and some neighboring countries.
+We would like to know the total precipitations during the four months in question, but we only have the raster images corresponding to the amount of monthly precipitations.
+To obtain the total, we must add up the monthly values â€‹â€‹of each pixel for the months of June,
+July, August and September and store the result in a new layer.
+In the pixel located in the
+South-West of our schematic example, the total annual precipitation is a height of 757 millimeters on a flat surface of one square meter. let's see how to implement the map algebra in QGIS with the help of the raster calculator.
+In the QGIS project, we have at our disposal the geographical limits of the countries of Africa and raster files containing the precipitations for the months of June, July,
+August and September.
+All these files are in the same projection system and have the same spatial resolution.
+To calculate the sum of precipitations during the rainy season, we will use the raster tool, the raster calculator.
+In the raster calculator, at the top, on the left, we find the list of raster layers available for calculations.
+On the right side, we have the parameters to define for the result file, the file name, the spatial grip of the result and the format.
+Finally in the lower part we find the calculator with the different operators we can use.
+We will calculate the sum of the values â€‹â€‹of the pixels for the four layers that interest us.
+By double-clicking on the layer, it appears in the expression.
+We double-click on the precipitation file in June, then click on "plus" and add the other raster files in the same way.
+The name of the result file and its location are then specified.
+For the grip of the layer, we want the same grip than the monthly precipitation layers.
+A precipitation layer is selected in the list on the left, then we click on the current grip of the layer, we can then click on OK.
+The newly created file is added to the project.
+We will place it in front of the other layers, then change the style to display a color gradation.
+We go in the properties of the layer, under the "style" tab.
+We choose a pseudo-color rendering type with a single band, then we select a color palette.
+We then click on "classify", then on "apply" and OK.
+With this second example, we will explain how to calculate an index used a lot in image analysis.
+This is the normalized difference vegetation index, known by its abbreviation in English as NDVI, or Tucker Index, and applied here to a region in the North of Tunisia with the help of a Landsat satellite image.
+The NDVI is sensitive to the vigor and to the amount of vegetation.
+Its biophysical interpretation is the fraction of active photosynthetic radiation which is absorbed. it is based on arithmetic operations between two spectral bands: on the red, our number one raster layer and the near infrared, our number two raster layer.
+The NDVI highlights the difference between the visible band of  the red and that of the near infrared.
+The normalization by the sum of the two bands allows to limit the index and the effects of reflectance.
+The NDVI values â€‹â€‹are between -1 and +1.
+Negative values â€‹â€‹correspond to surfaces other than vegetal covers, such as snow, water or clouds.
+And for bare floors, the NDVI presents values â€‹â€‹close to zero.
+Vegetal formations have positive values, generally between 0.1 and 0.7.
+The highest values corresponding to the densest vegetation covers.
+The QGIS raster calculator will allow us to implement the calculation of the NDVI for this region of Tunisia.
+In the QGIS project, we find the two corresponding raster files with red and infrared spectral bands of the Landsat image.
+To calculate the NDVI,
+We will use the raster calculator again.
+We have tp enter the corresponding expression.
+We open a bracket in which the red band is subtracted from the infrared band.
+The bracket is then closed.
+We have to divide this result by the sum of the two bands.
+We open a new bracket in which we write the sum of the two bands, then the bracket is closed.
+We save the the result file and indicate the grip of a current layer.
+The result is loaded into the QGIS project.
+We will display the NDVI with a color palette.
+In the layer properties, under the "style" tab, we choose a pseudo-color type with a single band, then a color palette.
+We click on "classify", then on OK.
+The result shows us in green the regions with a strong NDVI, so a lot of vegetation and in red the regions with very little vegetation, typically in the sea.
+Among the calculations made possible by the map algebra we find the relational operators and the logical functions.
+Relational operators are useful when searching for portions of territory corresponding to specific criteria.
+These criteria can be combined and the map algebra allows to quickly determine all the pixels that correspond to these multiple conditions.
+In the example proposed here, we are looking for land with a slope greater than 45Â°.
+So we need a first raster with the slope of all the pixels.
+A second requirement is that these lands should be exposed in a portion located between the West and the North.
+This is our second raster that contains the degree orientation of all the pixels.
+On this basis, we would like to calculate a resulting layer which will contain a boolean result, showing us all the pixels that meet both criteria.
+Let's see how the QGIS raster calculator allows us to perform this operation.
+In QGIS, we have the raster file with the slope and the file with the orientation.
+We will use the raster calculator to find the land whose slope is greater than the value of 100 and the orientation between values â€‹â€‹of 10 and 270.
+In the raster calculator, we write the expression corresponding to these conditions.
+It is necessary to open a first bracket in which the first condition is written, the slope is greater than 100.
+Then, we have to use the AND operator to ensure that both conditions will be verified.
+Then, in a second bracket, we write the conditions applying to the orientation,
+"orientation is less than 10" or "orientation is greater than 270".
+We save the result by giving it the grip of a current layer, then click on OK.
+The result is displayed in QGIS. we have in white the zones which have obtained a value of one, that is to say the land which correspond to the defined criteria, all the other areas in black do not meet these requirements.
+The interactions between several raster layers with the same spatial resolution have been theoretically defined in the context of map algebra developed by Charles Dana Tomlin during the 1980s.
+This theory describes four types of possible operations, including global operations which involve all the pixels of all the layers in the calculations and these are the ones we have described and illustrated in this lesson.
+In the QGIS software, it is the raster calculator tool that allows us to perform calculations based on the pixel values â€‹ of an existing raster and to store the results in a new raster layer.
+We still have to study the interactions between vectorial layers and it is this theme that will be the subject of the next lesson, the last of module three on the analysis of geographic information.

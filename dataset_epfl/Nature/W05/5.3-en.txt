@@ -1,0 +1,81 @@
+Welcome back. Nature in Code.
+We're in Chapter 5, Lecture 3.
+In this lecture we're going to implement the function that get's called in each generation so this is where all the interesting things happen; reproduction, finding a mating partner and so on.
+As we do this, we'll come across a very common pitfall in individual- based models as this one and of course we'll find a way around it so let's do it.
+Alright, this is our code. We have the init_grid function.
+It initialises the grid, sets 1 of 3 genotypes on each cell in the grid. This works well. 
+We tested this.
+Now, what do we have to do after the init_grid? Well now it's time to run the generations.
+What I'm going to do is, I'm going to setup a loop and then call a function 'run_generation'.
+I'm going to say for (var i = 0;. Then I'm going to say i is smaller than 100 and I'm obviously going to change this later on. As you know, I don't like these hard coded values here but for the time being that's good enough. We'll change it later.
+Then i = i + 1 to prevent infinate loops. Here we'd like to call this function run_generation and somewhere of course, we have to impliment this function. I'm going to do this here: function run_generation().
+What does this function need to do?
+Well, this function needs to do a couple of things.
+What we need to do is, we need to go through each individual or through each cell, take a look at the individual in that cell, choose a mating partner for that individual, generate  the correct offspring given the options and then ultimately replace the parent- generation with the offspring generation.
+We'll do all of these things in the near future.
+Now, the first thing though that
+I want to mention is a potential pitfall we may run into with these individual-based models.
+Here's what I mean:
+Here's a problem. Imagine this is your grid and we're going now through each of these cells using our double for loop.
+Let's zoom in on a situation here. 
+Let's say we're at this cell here right now and this is the individual that lives on this grid.
+We have a mating distance of say 1.
+Our mating distance here is 1 so the mating neighborhood is this area here.
+Let's say we have now chosen by random choice, this individual here as a mating partner
+These 2 are now going to mate and they're going to create an offspring individual.
+What are we now going to do with this offspring individual?
+Well, the first intuition may be to simply replace this parent individual with the offspring individual which is what we're ultimately planning to do, right?
+This is the next generation so the parents just mated
+The offspring will replace the parent. However, if you did it like this you would introduce quite a substantial but tricky error which is the following: Let's say we move on to the next cell. Now we're considering this cell here; this individual over here.
+It's mating range would be this space here. Correspondingly, let's now say just by random chance we pick this individual over here as a mating partner because it is in this individual's mating range.
+These 2 would mate and now I hope you can see the big problem here.
+This is potentially a big problem because what effectively happens here is that you have an individual from the current parent-generation mating with a next generation individual because replaced the parent here with the offspring individual already. That's the real problem if you do this. It's that individuals in this generation will be able to mate with individuals in the next generation.
+Of course that can't be.
+The solution here is to not immediately replace the parent individuals as you go through each parent-individual here one by one but you actually put the offspring onto a temp grid.
+You could have this temp grid which is simply a grid now with the same dimensions; so assume these would simply be the same dimension. Okay, a grid with the same dimensions. This is your temp grid here. This is where you're going to put the offspring in the corresponding locations so say these 2 individuals mate you calculate or you generate the offspring and rather than replacing the parent individual here immediately, you're now going to put this on the temp grid on the correct cell.
+When it's this individual's turn and it picks this cell to mate then it will still mate with the parent so with the same generation individual over here and not with a next generation individual.
+Then, when you've done all this, when you've gone through each of the individuals and you've created all the offspring individuals then you will have a full temp grid here with all the offspring individuals and then you can go ahead and replace all the individuals on the grid so the parent generation with the ones you have in the temp grid and you do this each generation.
+Like this, you would avoid this potential pitfall where you have individuals from different generations mating with each other.
+Alright so with this knowledge in hand let's implement the run_generation function.
+Like I said, we need a temp grid and this is something we only need in this function. The rest of the simulation doesn't need to know about this at all but here in run_generation we need this
+I'm going to setup here a temp grid that is also a 2 dimensional array.
+I'm going to initialize this here simply as an empty array.
+Now I'm going to go through each cell in the grid so I'm going to have a 2 dimensional grid, well my grid is a 2 dimensional array so I need this double nested for loop so for (var i = 0;and then i is smaller than grid_length because that's fixed and of course i = i + 1) and I'm going to put the next one right away here. for (var ii = 0; again ii is smaller than grid_length; and ii = ii + 1).
+Now we have a way to iterate over our 2 dimensional array that is grid.
+Good. Now what do we need to do?
+Well, first of all as we're iterating over our grid, we can use this iteration, this doubly nested loop as we actually have done it here where we setup the grid in the first place using this line here and we can do the exact same thing.
+Here, after the first loop, we're simply going to say temp_grid [i] = []
+Now we've essentially setup the temp grid in the exact same way as we've setup the grid up here in the init_grid function; at least initialized. It doesn't have any values but that's going to come now.
+Now I'm here and so at grid [i][ii]
+I have my current individual on this current cell that I'm on. Now, the first thing that I'd like to do is
+I'd like to pick a mating partner for this individual.
+I'm going to say here var mating_partner =
+Now how am I going to choose this mating partner? Well, again, this seems like something that we should probably hand over to a function. I'm going to call the function; I will have to define this but the idea is that I have this function which
+I'm going to call pick_mating_partner and what I'm going to do is, I'm simply going to pass it the co-ordinates as arguments; the co- ordinates where I am currently on the grid namely a position (i, ii) in the array then this function should take care of all the rest.
+It should pick a mating partner given it's location, given the mating distance and so on.
+I'm just sort of outsourcing this to this function which we'll have to implement later and then it will return a mating partner.
+Now that I have a mating partner in principle, what I need to do is, I now need to produce offspring.
+This is mendelian inheritance so I can't just pick a random offspring. The offspring will very much depend on the 2 genotypes that we have here.
+What I'm going to do is, I'm again
+ going to outsource this problem.
+I'm going to call a function
+'get offspring' so get_offspring(); and then what I'm going to do is, 
+I'm essentially going to pass these
+2 genotypes of the parents as arguments. The first one is of course simply what we have at grid[i][ii] and the second one is this mating partner that we just selected; mating_partner. I'm going to hand these 2 genotypes, I'm going to pass them to this function. We'll have to implement this and then this function will return an offspring genotype.
+Now again, it would be wrong to do it like this; to say whatever this returns, I'm going to put this here on grid[i][ii]. 
+I'm essentially going to replace the parent right away with the get_offspring for the reasons we just talked about. This doesn't need to be stored into the grid to replace the parent right away but that's exactly where the temp grid comes in.
+I'm going to store this now in this temp grid at the corresponding position. That's where the offspring lives for the time being. Then after this loop here; this double loop has iterated, now the temp grid is full with the offspring so now we can go ahead and basically just replace the grid with whatever we have on temp grid.
+I'm again going to setup a double loop so I'm just going to copy this now. First iteration here and then of course parentheses and second; this one.
+I'm now again going over the grid and I'm saying, you know what?
+I'm going to now write the values into grid[i][ii] that i'm reading from temp_grid[i][ii].
+That's one straightforward way to copy the values from one
+2 dimensional array into the other
+2 dimensional array replacing it cell by cell. I'm simply iterating again over the grid and I'm going to say okay, whatever you have at temp_grid at these positions, [i] and [ii], please put them into grid [i] and [ii] and thereby here in exactly this line of code replacing the parent generation.
+That's pretty much it. Then when I'm done I also want to make sure
+I keep track of the generations so as you know, we have this generation_counter variable.
+We're going to up this by 1. generation_counter = generation_counter + 1
+Now we're going to save this but we can't test ityet because this code will not be executed; the browser would balk at us, justifiably so because we're calling here a function pick_mating_partner that we haven't defined yet.
+We're also calling function here, get_offspring that we haven't defined yet. We're going to do that in the future.
+Okay, the run_generation function is implemented but of course we just outsourced many of the problems to these 
+2 other functions. Now we now need to implement that.
+We'll do that in the next lectures.

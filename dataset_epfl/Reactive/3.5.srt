@@ -1,0 +1,1235 @@
+1
+00:00:00,920 --> 00:00:05,870
+We ended the last lesson with a promise
+that we would talk about promises.
+
+2
+00:00:05,870 --> 00:00:09,190
+So, here we're going to going to fulfill
+that promise.
+
+3
+00:00:11,290 --> 00:00:16,410
+Let's remind ourselves of the
+implementation of filter without await.
+
+4
+00:00:16,410 --> 00:00:20,240
+And that was the implementation where we
+first discovered.
+
+5
+00:00:20,240 --> 00:00:24,500
+This new type Promise that we're going to
+talk about in this lesson.
+
+6
+00:00:25,680 --> 00:00:28,250
+Let's leave this code for now, because the
+first thing before we
+
+7
+00:00:28,250 --> 00:00:34,070
+can understand this code, we first have to
+understand what Promise really is.
+
+8
+00:00:35,230 --> 00:00:37,180
+Here's the definition
+
+9
+00:00:37,180 --> 00:00:43,410
+of the Promise trait.
+The promise trait has a couple of methods
+
+10
+00:00:43,410 --> 00:00:49,510
+but the three most important ones are the
+ones that are here on the slide.
+
+11
+00:00:51,090 --> 00:00:58,580
+First of all a promise contains a future,
+and then a promise has two methods,
+
+12
+00:00:58,580 --> 00:01:03,100
+complete, two variations of complete.
+That take a try, and
+
+13
+00:01:03,100 --> 00:01:05,370
+then the only difference here is that one
+
+14
+00:01:05,370 --> 00:01:08,680
+returns a unit and then one returns a
+Boolean.
+
+15
+00:01:09,780 --> 00:01:12,590
+Now when you have a promise, when you
+create a promise.
+
+16
+00:01:12,590 --> 00:01:15,050
+You can take a future out of the promise.
+
+17
+00:01:16,170 --> 00:01:20,450
+So, if I take the future out of the
+promise, I get a future.
+
+18
+00:01:20,450 --> 00:01:24,620
+And this future will be notified.
+
+19
+00:01:24,620 --> 00:01:29,450
+It's call back will be called whenever you
+call complete
+
+20
+00:01:29,450 --> 00:01:34,200
+on the promise.
+So think of a promise as a mailbox.
+
+21
+00:01:34,200 --> 00:01:37,430
+So the mail man comes in, puts a value in
+
+22
+00:01:37,430 --> 00:01:41,330
+the mailbox, turns up the flag, which is
+now calling
+
+23
+00:01:41,330 --> 00:01:43,820
+the call back and then, you know, you get
+your
+
+24
+00:01:43,820 --> 00:01:48,600
+mail delivered here in the uncompleted
+call backs of the future.
+
+25
+00:01:48,600 --> 00:01:53,150
+So a Promise, again, is very much like a
+mail box.
+
+26
+00:01:53,150 --> 00:01:54,580
+You can take a future out
+
+27
+00:01:54,580 --> 00:01:57,700
+of the Promise, then you know that
+
+28
+00:01:57,700 --> 00:02:00,920
+you will be called whenever the future
+completes.
+
+29
+00:02:00,920 --> 00:02:04,490
+So that value that you pass into the
+complete will
+
+30
+00:02:04,490 --> 00:02:07,679
+be the value that will be passed into the
+callback.
+
+31
+00:02:09,300 --> 00:02:14,180
+Now, you may ask yourself, why are there
+two methods here?
+
+32
+00:02:14,180 --> 00:02:19,860
+Complete and tryComplete.
+Remember, a few lessons ago,
+
+33
+00:02:19,860 --> 00:02:24,350
+when we called on completed twice on the
+same future.
+
+34
+00:02:24,350 --> 00:02:27,350
+we said that you would always get the same
+value.
+
+35
+00:02:27,350 --> 00:02:29,590
+So once a future is completed.
+
+36
+00:02:29,590 --> 00:02:32,310
+It contains a single value and whenever
+you call
+
+37
+00:02:32,310 --> 00:02:35,070
+the call back that's the value that you
+get.
+
+38
+00:02:35,070 --> 00:02:39,040
+And that is here kind of, you know, shown
+in this type when
+
+39
+00:02:39,040 --> 00:02:44,720
+you complete and you try to complete again
+and the future is already completed,
+
+40
+00:02:44,720 --> 00:02:50,330
+this one will throw.
+Or otherwise you can do tryComplete.
+
+41
+00:02:50,330 --> 00:02:54,000
+And if it's already completed, this one
+returns false.
+
+42
+00:02:54,000 --> 00:03:00,620
+So the fact that a future's item potent is
+also reflected in the fact that
+
+43
+00:03:00,620 --> 00:03:07,150
+really, you can only call complete once.
+You can only complete a promise once.
+
+44
+00:03:07,150 --> 00:03:10,320
+Or you can try to complete it, but if it's
+already
+
+45
+00:03:10,320 --> 00:03:13,790
+is completed, you're returned false.
+In this case.
+
+46
+00:03:15,610 --> 00:03:20,360
+Here's an example of trying to complete a
+single Promise twice.
+
+47
+00:03:21,460 --> 00:03:25,210
+And, in this case, we're going to use
+concurrency.
+
+48
+00:03:25,210 --> 00:03:30,460
+And I'm going to import here the standard
+ExecutionContext.
+
+49
+00:03:30,460 --> 00:03:35,460
+And I'm going to let two threads race.
+To complete
+
+50
+00:03:35,460 --> 00:03:39,550
+the Promise.
+So I define, we define a Promise here.
+
+51
+00:03:39,550 --> 00:03:43,920
+And then we have two Futures, Future left
+and Future right.
+
+52
+00:03:43,920 --> 00:03:46,510
+And what we're going to do is we're going
+to
+
+53
+00:03:46,510 --> 00:03:51,110
+say, if left completes, we're going to
+complete the promise.
+
+54
+00:03:51,110 --> 00:03:55,350
+And if right completes, we're going to try
+to complete the Promise.
+
+55
+00:03:55,350 --> 00:04:01,900
+And since the onComplete runs on the
+context here.
+
+56
+00:04:01,900 --> 00:04:06,920
+The two tracks here will compete and the
+first one that is able to complete a
+
+57
+00:04:06,920 --> 00:04:13,780
+promise will set the value of the future
+that is returned from this promise here.
+
+58
+00:04:16,700 --> 00:04:21,120
+Okay, so this was a simple race between
+two futures.
+
+59
+00:04:21,120 --> 00:04:24,160
+The first future that completes will win.
+
+60
+00:04:25,400 --> 00:04:30,860
+Now in the exercises for this lecture, you
+will have to write
+
+61
+00:04:30,860 --> 00:04:36,800
+a couple of other operators on futures
+just like this race one.
+
+62
+00:04:36,800 --> 00:04:42,070
+You may ask yourself, is this race
+combinator here useful at all?
+
+63
+00:04:42,070 --> 00:04:45,720
+Well it actually is because suppose that
+one of the futures is
+
+64
+00:04:45,720 --> 00:04:51,120
+a computation that you want to do but you
+don't want to wait
+
+65
+00:04:51,120 --> 00:04:53,560
+for that computation all the time, so what
+you can do is you
+
+66
+00:04:53,560 --> 00:04:58,480
+can have a second computation that is like
+a time out that will.
+
+67
+00:04:58,480 --> 00:05:02,790
+First complete or maybe you know, complete
+ahead of the other one.
+
+68
+00:05:02,790 --> 00:05:06,920
+And so that you're not waiting forever on
+this computation.
+
+69
+00:05:08,640 --> 00:05:13,190
+Another example of using race is when we
+want to do send email.
+
+70
+00:05:13,190 --> 00:05:15,560
+Remember that we tried to use zip.
+
+71
+00:05:15,560 --> 00:05:19,370
+But zip would fail if you know, either of
+them would fail.
+
+72
+00:05:19,370 --> 00:05:28,400
+Well in this case we can use race to try
+to do sent email to Europe and to the US.
+
+73
+00:05:28,400 --> 00:05:32,620
+And then the one that fails or completes
+fastest will win.
+
+74
+00:05:35,100 --> 00:05:37,720
+In the rest of the slides, we'll use two
+
+75
+00:05:37,720 --> 00:05:42,750
+simple helper functions that are defined
+in the promise trait.
+
+76
+00:05:42,750 --> 00:05:46,290
+and that those are just simple wrappers on
+
+77
+00:05:46,290 --> 00:05:50,300
+the success and the fail constructors for
+try.
+
+78
+00:05:50,300 --> 00:05:53,290
+So we can just call success with a value
+and failure with
+
+79
+00:05:53,290 --> 00:05:57,630
+a throwable so we don't have to kind of
+call the constructor explicitly.
+
+80
+00:05:57,630 --> 00:06:00,660
+Very simple methods but we will use them
+
+81
+00:06:00,660 --> 00:06:01,640
+as we're going forward.
+
+82
+00:06:03,550 --> 00:06:09,610
+Let's look if we can understand now how
+filter is defined using promises.
+
+83
+00:06:09,610 --> 00:06:14,420
+Remember that filter was defined on a
+future of t, it takes a
+
+84
+00:06:14,420 --> 00:06:19,910
+predicate from t to bool, and it has to
+return another future of t.
+
+85
+00:06:19,910 --> 00:06:22,830
+The way we do it, is we first allocate a
+promise.
+
+86
+00:06:22,830 --> 00:06:26,480
+That's the promise whose future we're
+going to return here.
+
+87
+00:06:26,480 --> 00:06:31,440
+And that we're going to complete, once the
+
+88
+00:06:31,440 --> 00:06:35,400
+future here completes.
+So, what we're going to do, is we're going
+
+89
+00:06:35,400 --> 00:06:42,840
+to install a callback on this when.
+That fails.
+
+90
+00:06:42,840 --> 00:06:46,550
+Well, in this case, our predicate, our
+filter will
+
+91
+00:06:46,550 --> 00:06:50,990
+fail, so we just complete the promise with
+a failure.
+
+92
+00:06:50,990 --> 00:06:52,210
+In case
+
+93
+00:06:52,210 --> 00:06:57,470
+the future this will succeed with some
+value x.
+
+94
+00:06:57,470 --> 00:07:00,150
+We have to check whether the predicate
+holds.
+
+95
+00:07:00,150 --> 00:07:04,730
+If the predicate holds, we will complete
+the promise with success.
+
+96
+00:07:04,730 --> 00:07:08,030
+So, now that value will be propagated to
+the future.
+
+97
+00:07:08,030 --> 00:07:12,010
+So, whoever is listening to the future
+will receive the value.
+
+98
+00:07:12,010 --> 00:07:13,750
+That's as intended.
+
+99
+00:07:13,750 --> 00:07:17,940
+When the predicate does not hold, we will
+complete the promise
+
+100
+00:07:17,940 --> 00:07:21,590
+with a failure, namely that there is no
+such exception.
+
+101
+00:07:21,590 --> 00:07:24,550
+So anybody waiting on the future will be
+
+102
+00:07:24,550 --> 00:07:28,540
+notified that the filter returned an empty
+future.
+
+103
+00:07:30,870 --> 00:07:33,310
+When we try to make our send a package
+
+104
+00:07:33,310 --> 00:07:37,550
+to Europe robust, we, our first attempt
+used zip.
+
+105
+00:07:37,550 --> 00:07:40,350
+And remember that I said, that zip would
+not
+
+106
+00:07:40,350 --> 00:07:43,720
+work because if either of the futures
+would fail.
+
+107
+00:07:43,720 --> 00:07:47,130
+The whole result of zip would fail.
+
+108
+00:07:47,130 --> 00:07:49,800
+And, now we can look, if that was
+
+109
+00:07:49,800 --> 00:07:52,970
+actually true, by looking at the
+implementation of zip.
+
+110
+00:07:54,200 --> 00:07:56,550
+Just for fun, I'm using
+
+111
+00:07:56,550 --> 00:07:59,830
+a slightly different signature than the
+zip
+
+112
+00:07:59,830 --> 00:08:02,080
+as it's defined in the standard library.
+
+113
+00:08:02,080 --> 00:08:07,830
+To zip in the standard library returns a
+future of a pair of t and s.
+
+114
+00:08:07,830 --> 00:08:12,940
+But what I'm going to do instead, I'm
+going to pass in a function here that
+
+115
+00:08:12,940 --> 00:08:18,860
+takes the results of the, this, and the
+future debt.
+
+116
+00:08:18,860 --> 00:08:21,630
+In case both of them have succeeded.
+And then it computes
+
+117
+00:08:21,630 --> 00:08:24,690
+the R.
+And it returns a future of R.
+
+118
+00:08:24,690 --> 00:08:28,690
+And you can easily define the regular zip
+function.
+
+119
+00:08:28,690 --> 00:08:30,975
+By just passing here the constructor for
+
+120
+00:08:30,975 --> 00:08:31,040
+[UNKNOWN],
+
+121
+00:08:31,040 --> 00:08:31,710
+okay?
+
+122
+00:08:31,710 --> 00:08:34,580
+But this is a slightly more general
+signature.
+
+123
+00:08:36,050 --> 00:08:40,340
+The pattern for zip is very similar to the
+pattern for filter.
+
+124
+00:08:40,340 --> 00:08:46,449
+We allocate a promise and we hand out the
+future corresponding to that promise.
+
+125
+00:08:48,140 --> 00:08:52,680
+And then the rest of the implementation is
+also pretty straightforward.
+
+126
+00:08:52,680 --> 00:08:56,380
+We install a call back on this, in case
+this
+
+127
+00:08:57,990 --> 00:08:59,930
+completes with failure.
+
+128
+00:08:59,930 --> 00:09:03,680
+Well, we complete the promise with
+failure.
+
+129
+00:09:03,680 --> 00:09:07,770
+So, we already see that this happened in
+the email.
+
+130
+00:09:07,770 --> 00:09:12,920
+If one of the sending messages failed, the
+whole thing fails.
+
+131
+00:09:12,920 --> 00:09:20,460
+If, onComplete succeeds with a value x, in
+that case, we install a handler on that.
+
+132
+00:09:22,800 --> 00:09:26,600
+And when that succeeds, with y.
+
+133
+00:09:26,600 --> 00:09:30,180
+Then we call our function f, and send that
+on the Promise.
+
+134
+00:09:31,180 --> 00:09:35,748
+But, if that failed, then we fail the
+Promise, okay?
+
+135
+00:09:36,820 --> 00:09:40,070
+So really, this code is pretty
+straightforward.
+
+136
+00:09:40,070 --> 00:09:45,310
+But what I don't like about it, is that
+there's all this case distinctions here.
+
+137
+00:09:46,340 --> 00:09:47,880
+Let's see if we can remove
+
+138
+00:09:47,880 --> 00:09:56,170
+that using async await.
+Here is zip defined using async await.
+
+139
+00:09:56,170 --> 00:09:58,950
+And you see that it looks beautifully
+short.
+
+140
+00:09:58,950 --> 00:10:02,660
+So, what we do is again, we define an
+async block.
+
+141
+00:10:02,660 --> 00:10:05,650
+And then we really do what we were
+
+142
+00:10:05,650 --> 00:10:08,790
+kind of encoding in the previous
+implementation of zip.
+
+143
+00:10:08,790 --> 00:10:12,930
+Because what we said is we have to await
+this, and we
+
+144
+00:10:12,930 --> 00:10:15,040
+have to await that.
+
+145
+00:10:15,040 --> 00:10:18,820
+And if both of them succeeded, if both of
+them returned
+
+146
+00:10:18,820 --> 00:10:22,730
+a value, a value of type t, a value of
+type s.
+
+147
+00:10:22,730 --> 00:10:23,990
+We.
+
+148
+00:10:23,990 --> 00:10:28,650
+Called a function f and re-, return this,
+that as a future.
+
+149
+00:10:28,650 --> 00:10:33,330
+So, here you see that, really the code
+that we write here
+
+150
+00:10:33,330 --> 00:10:38,800
+captures the essence and all this pattern
+matching and all that noise
+
+151
+00:10:38,800 --> 00:10:42,110
+is taken care of by the compiler.
+
+152
+00:10:42,110 --> 00:10:45,270
+And that's what a high-level language
+should do.
+
+153
+00:10:45,270 --> 00:10:49,470
+As programmers, we should be able to focus
+on the essence.
+
+154
+00:10:49,470 --> 00:10:51,640
+This is the essence of the algorithm.
+
+155
+00:10:51,640 --> 00:10:56,020
+And then all the rest is take care by the
+infrastructure of the language.
+
+156
+00:10:57,530 --> 00:11:03,990
+And I think the async await is a extremely
+powerful addition to the Scala language.
+
+157
+00:11:05,200 --> 00:11:10,380
+We are going to end this sequence of
+lessons by
+
+158
+00:11:10,380 --> 00:11:15,040
+implementing a slightly more complicated
+operation on
+
+159
+00:11:15,040 --> 00:11:20,200
+future of t.
+And in particular we are going to
+
+160
+00:11:20,200 --> 00:11:25,730
+implement the function sequence that takes
+a list of futures.
+
+161
+00:11:25,730 --> 00:11:30,680
+Into a future of lists.
+And this function,
+
+162
+00:11:31,750 --> 00:11:35,550
+you will see this for many, many monads,
+so you can do this the same
+
+163
+00:11:35,550 --> 00:11:40,140
+thing if you have a list of tries, you
+turn that into a try of lists.
+
+164
+00:11:40,140 --> 00:11:45,160
+And for many, many monads, this function
+can be defined.
+
+165
+00:11:45,160 --> 00:11:48,610
+And in this case, we will do it for our
+future time.
+
+166
+00:11:49,820 --> 00:11:53,550
+And the simplest implementation, really is
+with async
+
+167
+00:11:53,550 --> 00:11:57,700
+here, we again, we learned async block and
+
+168
+00:11:57,700 --> 00:12:03,410
+now we can write a regular control fill.
+So what we do is we, copy our list.
+
+169
+00:12:05,200 --> 00:12:07,290
+Into a mutable variable.
+
+170
+00:12:07,290 --> 00:12:12,510
+We create a list buffer, that holds the
+result values because
+
+171
+00:12:12,510 --> 00:12:16,710
+we have to return a future that has a
+list, since
+
+172
+00:12:16,710 --> 00:12:19,660
+we are in an async block, really what we
+have to
+
+173
+00:12:19,660 --> 00:12:22,910
+return is a list because the async will
+turn that into
+
+174
+00:12:22,910 --> 00:12:23,860
+a future.
+
+175
+00:12:23,860 --> 00:12:28,400
+So, we can already see that this will be
+our return value.
+
+176
+00:12:28,400 --> 00:12:35,090
+And what we'll do is we will just walk
+through the input list.
+
+177
+00:12:35,090 --> 00:12:39,250
+And await all the values in the input
+list.
+
+178
+00:12:39,250 --> 00:12:45,690
+Add them to the result list.
+And then, at the end, return the result.
+
+179
+00:12:45,690 --> 00:12:47,630
+So again, this is baby code,
+
+180
+00:12:47,630 --> 00:12:48,280
+right?
+
+181
+00:12:48,280 --> 00:12:52,510
+This is how anybody can imagine that this
+works.
+
+182
+00:12:52,510 --> 00:12:53,980
+I get a list of futures.
+
+183
+00:12:55,000 --> 00:12:59,780
+I have to produce a list of results.
+What do I do?
+
+184
+00:12:59,780 --> 00:13:03,230
+I allocate a new list.
+I walk to the import list.
+
+185
+00:13:03,230 --> 00:13:07,730
+Awaiting every future in it and then
+return the result.
+
+186
+00:13:07,730 --> 00:13:12,760
+And I do that inside an async block which
+allowed me to forget about the fact that
+
+187
+00:13:12,760 --> 00:13:18,280
+I was actually in the future monad.
+It made the future monad implicit.
+
+188
+00:13:19,780 --> 00:13:22,200
+Just to compare and contrast this.
+
+189
+00:13:22,200 --> 00:13:27,180
+Let's look at the implementation that uses
+promises explicitly.
+
+190
+00:13:28,240 --> 00:13:31,980
+Let's compare and contrast our
+implementation of sequence
+
+191
+00:13:31,980 --> 00:13:37,740
+using async await, with the old-fashioned
+implementation using promises.
+
+192
+00:13:37,740 --> 00:13:42,800
+And as real functional programmers, since
+we have a list of.
+
+193
+00:13:42,800 --> 00:13:49,210
+Futures here, as our input.
+We will, we are going to use a foldRight.
+
+194
+00:13:49,210 --> 00:13:54,120
+But the algorithm will be very similar to
+what we did with the async await.
+
+195
+00:13:54,120 --> 00:13:57,750
+And again, what you, what, if you think
+about this a little more.
+
+196
+00:13:57,750 --> 00:14:02,760
+You will see that the async await allows
+us to focus on the essence whereas here
+
+197
+00:14:02,760 --> 00:14:05,845
+we have encode things with you know
+promises and
+
+198
+00:14:05,845 --> 00:14:10,470
+folds and, and so on and even here, four
+comprehensions.
+
+199
+00:14:10,470 --> 00:14:12,380
+So this, this is quite hairy code.
+
+200
+00:14:12,380 --> 00:14:17,820
+So let's focus, and drill down into this.
+So, the first thing we do.
+
+201
+00:14:17,820 --> 00:14:23,890
+We are going to do a, a fold right and we
+are going to fold right with a future.
+
+202
+00:14:23,890 --> 00:14:24,250
+Okay?
+
+203
+00:14:24,250 --> 00:14:28,490
+So we are going to start with a future
+that contains the empty list.
+
+204
+00:14:28,490 --> 00:14:34,620
+So the way we do that is we have our, we
+start here with a promise and then we
+
+205
+00:14:34,620 --> 00:14:39,950
+succeeds the promise with the empty list.
+And that's the seat.
+
+206
+00:14:39,950 --> 00:14:43,740
+The future of that is the seat that we're
+going to use in our foldRight.
+
+207
+00:14:45,030 --> 00:14:52,320
+And, as we're folding, from the right, our
+accumulator is a future, okay?
+
+208
+00:14:52,320 --> 00:14:54,720
+And it's a future of lists.
+
+209
+00:14:54,720 --> 00:14:59,740
+So this guy here is of type Future.
+Of
+
+210
+00:14:59,740 --> 00:15:05,440
+list, of t.
+
+211
+00:15:05,440 --> 00:15:10,510
+And the values in our list were of type,
+future of t.
+
+212
+00:15:13,190 --> 00:15:19,270
+So now we have in our hand a.
+Oh, well I should've called that future.
+
+213
+00:15:19,270 --> 00:15:22,320
+But you know, you can get that as f,
+future.
+
+214
+00:15:22,320 --> 00:15:25,330
+Future of list of T and a future of T.
+
+215
+00:15:25,330 --> 00:15:29,970
+So, I have both the future with the list
+that comes from the right.
+
+216
+00:15:29,970 --> 00:15:32,620
+And what we're going to do, is we're
+
+217
+00:15:32,620 --> 00:15:37,220
+using a four comprehension here to first
+get the.
+
+218
+00:15:37,220 --> 00:15:38,990
+Value out
+
+219
+00:15:38,990 --> 00:15:42,450
+of the future here so we say x from f.
+
+220
+00:15:42,450 --> 00:15:45,440
+And then the accumulator was a future of
+list so we
+
+221
+00:15:45,440 --> 00:15:49,510
+get, you know, use the four comprehensions
+to get the list
+
+222
+00:15:49,510 --> 00:15:52,460
+out of that so now if you look at the
+types
+
+223
+00:15:52,460 --> 00:15:56,390
+this has type t and this has type list of
+t.
+
+224
+00:15:58,870 --> 00:16:04,030
+And then we yield a new value of type list
+
+225
+00:16:04,030 --> 00:16:08,470
+of t by counting the value on top of this
+thing.
+
+226
+00:16:10,020 --> 00:16:12,260
+And then we see that the result of this
+
+227
+00:16:12,260 --> 00:16:16,710
+guy should be of type, future of list of
+t.
+
+228
+00:16:16,710 --> 00:16:18,010
+For the fold right to be right.
+
+229
+00:16:18,010 --> 00:16:21,080
+So lets check if that's the case.
+That's correct, right?
+
+230
+00:16:21,080 --> 00:16:24,610
+Because this a list of t and the result of
+a for comprehension
+
+231
+00:16:24,610 --> 00:16:32,280
+is a future, of list, of t.
+Okay?
+
+232
+00:16:32,280 --> 00:16:33,860
+So, as you can see.
+
+233
+00:16:33,860 --> 00:16:39,020
+This is quite, quite hairy code but on the
+other hand.
+
+234
+00:16:39,020 --> 00:16:43,770
+It is doing essentially the same as our
+previous solution.
+
+235
+00:16:43,770 --> 00:16:50,280
+So, we are working to the list and we are
+going to be awaiting all the futures in,
+
+236
+00:16:50,280 --> 00:16:54,300
+in, in this list and the only trick is
+that in this
+
+237
+00:16:54,300 --> 00:17:00,360
+case, we had to do this kind of double
+waiting because our accumulator.
+
+238
+00:17:00,360 --> 00:17:03,260
+We have to make this everything
+asynchronous, here.
+
+239
+00:17:05,290 --> 00:17:10,600
+This ends our first lecture.
+What we have seen in this first lecture
+
+240
+00:17:10,600 --> 00:17:15,740
+is synchronous and asynchronous
+computations that return one
+
+241
+00:17:15,740 --> 00:17:21,220
+result.
+We have looked in depth at the try monad,
+
+242
+00:17:21,220 --> 00:17:25,850
+the monad of computations that can fail.
+And we
+
+243
+00:17:25,850 --> 00:17:30,410
+looked in depth at the future monad, the
+monad
+
+244
+00:17:30,410 --> 00:17:36,350
+of computations that have latency, that
+take a long time and that can fail.
+
+245
+00:17:36,350 --> 00:17:45,570
+And we also have seen that, computations
+that's returned a try or t are blocking.
+
+246
+00:17:45,570 --> 00:17:48,550
+So, they blocked the main threat where the
+
+247
+00:17:48,550 --> 00:17:53,050
+computations that return a future t were
+asynchronous, okay?
+
+248
+00:17:53,050 --> 00:17:55,330
+And they were based on the call backs.
+
+249
+00:17:55,330 --> 00:18:00,380
+In the next, lecture we will switch
+
+250
+00:18:00,380 --> 00:18:04,970
+attention to computations that return many
+values.
+
+251
+00:18:04,970 --> 00:18:10,560
+And just like with one values we have
+synchronous and asynchronous computations.
+
+252
+00:18:10,560 --> 00:18:14,750
+When we have computations that return
+multiple values, we have the same.
+
+253
+00:18:14,750 --> 00:18:17,520
+We will first look at iterables, which
+
+254
+00:18:17,520 --> 00:18:21,180
+are computations that return many values
+synchronously
+
+255
+00:18:21,180 --> 00:18:22,490
+by blocking.
+
+256
+00:18:22,490 --> 00:18:24,460
+And then we will generalize that
+
+257
+00:18:24,460 --> 00:18:28,290
+to asynchronous computations that return
+multiple values.
+
+258
+00:18:28,290 --> 00:18:32,420
+And for that, we will introduce a new
+type, called Observable.
+
+259
+00:18:33,760 --> 00:18:35,140
+So see you next time.
+

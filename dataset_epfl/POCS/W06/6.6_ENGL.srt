@@ -1,0 +1,1088 @@
+1
+00:00:04,058 --> 00:00:05,296
+Welcome back.
+
+2
+00:00:05,296 --> 00:00:08,404
+By now you have an appreciation
+on the importance and the ubiquity
+
+3
+00:00:08,455 --> 00:00:10,781
+of the redundancy principle
+in computer system.
+
+4
+00:00:11,441 --> 00:00:13,111
+By now hopefully you also have
+an appreciation
+
+5
+00:00:13,111 --> 00:00:15,987
+there are different ways in which
+redundancy could be applied
+
+6
+00:00:15,987 --> 00:00:18,607
+in order to achieve different
+levels of fault tolerance
+
+7
+00:00:18,607 --> 00:00:20,244
+or high availability.
+
+8
+00:00:20,354 --> 00:00:23,434
+Now in this module we're actually
+going to look at two different systems
+
+9
+00:00:23,944 --> 00:00:26,184
+that both try to achieve
+roughly speaking
+
+10
+00:00:26,184 --> 00:00:29,364
+the same degrees of availability
+but have a very different
+
+11
+00:00:29,364 --> 00:00:32,594
+set of operating and design
+principles and how to achieve that.
+
+12
+00:00:33,224 --> 00:00:37,624
+The first case study is
+an extension of the enterprise grade
+
+13
+00:00:37,624 --> 00:00:39,974
+clustering design
+presented in the prior module.
+
+14
+00:00:39,974 --> 00:00:44,114
+And the second case study is an in-depth
+discussion on how Microsoft Azure
+
+15
+00:00:44,892 --> 00:00:48,152
+uses distributed systems
+and commodity components
+
+16
+00:00:48,262 --> 00:00:51,822
+in order to achieve a highly available
+storage and service stack.
+
+17
+00:00:52,436 --> 00:00:54,266
+So let's get started.
+
+18
+00:00:54,299 --> 00:00:57,879
+Let's first talk about our first
+case study which is
+
+19
+00:00:57,879 --> 00:01:00,002
+the enterprise data base clustering model.
+
+20
+00:01:00,002 --> 00:01:03,042
+If you remember
+there are two sweeping simplifications
+
+21
+00:01:03,042 --> 00:01:04,542
+that were made in this design.
+
+22
+00:01:04,542 --> 00:01:08,502
+The first one is the separation
+between transient state and durable state.
+
+23
+00:01:08,877 --> 00:01:12,007
+Now I'm not going to revisit
+this sweeping simplification again.
+
+24
+00:01:12,115 --> 00:01:15,645
+I'm actually going to go in depth
+into the second sweeping simplification
+
+25
+00:01:15,645 --> 00:01:19,995
+which is that the two servers,
+the active server and the backup server
+
+26
+00:01:20,635 --> 00:01:24,855
+both had access to a logically-shared disc
+that can serve as an arbiter.
+
+27
+00:01:25,638 --> 00:01:28,208
+Now this is actually a very,
+very important point.
+
+28
+00:01:28,208 --> 00:01:30,088
+The disc has to be logically shared.
+
+29
+00:01:30,088 --> 00:01:32,738
+So it has to be logically
+accessible by both sides
+
+30
+00:01:32,738 --> 00:01:35,751
+and it also has to serve as an arbiter.
+
+31
+00:01:35,751 --> 00:01:39,704
+And the reason why having an arbiter
+is fundamental is that the arbiter
+
+32
+00:01:39,704 --> 00:01:43,488
+is what guarantees that the system
+will operate correctly at all times
+
+33
+00:01:43,488 --> 00:01:46,918
+and in particular will never suffer
+from a split brain syndrome.
+
+34
+00:01:47,508 --> 00:01:52,208
+And the split brain syndrome would occur
+if both the active and the passive server
+
+35
+00:01:52,618 --> 00:01:56,558
+were to concurrently conclude
+that they were actually
+
+36
+00:01:56,558 --> 00:01:59,858
+the primary server and would
+start to modify the database.
+
+37
+00:01:59,858 --> 00:02:03,168
+Corruption would immediately ensure
+and that needs to be avoided.
+
+38
+00:02:04,168 --> 00:02:07,348
+Now in this case
+there is a hardware mechanism
+
+39
+00:02:07,348 --> 00:02:10,778
+that is used as the foundation
+of the clustering model
+
+40
+00:02:10,778 --> 00:02:13,178
+that guarantees the absence of split brain
+
+41
+00:02:13,438 --> 00:02:15,768
+and that mechanism is called
+SCSI reservations.
+
+42
+00:02:15,768 --> 00:02:19,248
+So deep into the hardware
+of the logically-shared disc,
+
+43
+00:02:19,818 --> 00:02:22,658
+we have an abstraction which is called
+SCSI reservations,
+
+44
+00:02:22,658 --> 00:02:26,378
+in which basically the primary server
+or every server that believes
+
+45
+00:02:26,378 --> 00:02:30,168
+to be the primary server
+must with every disc transaction
+
+46
+00:02:30,708 --> 00:02:33,788
+guarantee the fact that it can prove
+that it is the primary server
+
+47
+00:02:33,788 --> 00:02:35,688
+by passing a key.
+
+48
+00:02:35,688 --> 00:02:37,178
+And that key can change
+
+49
+00:02:37,178 --> 00:02:40,538
+and it's the change of the key
+that actually ensures that
+
+50
+00:02:40,538 --> 00:02:43,838
+a takeover is explicit
+and that two servers can never
+
+51
+00:02:43,838 --> 00:02:46,728
+concurrently access the same
+storage device.
+
+52
+00:02:47,818 --> 00:02:52,988
+Now there's a lot of implementation
+issues associated with creating
+
+53
+00:02:52,988 --> 00:02:56,658
+this abstraction of a logically-shared
+arbiter, one of which
+
+54
+00:02:56,658 --> 00:02:59,288
+and a non-trivial one is that
+the disc itself obviously
+
+55
+00:02:59,288 --> 00:03:01,158
+cannot be a single point of failure.
+
+56
+00:03:01,354 --> 00:03:04,114
+So if we actually drill into the next
+level of detail,
+
+57
+00:03:04,114 --> 00:03:06,334
+the disc is never a traditional disc.
+
+58
+00:03:06,334 --> 00:03:08,764
+And you remember that
+from our layering discussion.
+
+59
+00:03:08,764 --> 00:03:11,357
+As a matter of fact, the disc 
+is typically a very complex
+
+60
+00:03:11,357 --> 00:03:12,650
+computer system of it's own.
+
+61
+00:03:12,650 --> 00:03:17,534
+So think about the logically-shared disc
+as being a rack-size computer system
+
+62
+00:03:18,044 --> 00:03:20,924
+with lots of rotating media inside it.
+
+63
+00:03:21,754 --> 00:03:26,174
+Now those systems themselves
+are designed with a very high degree
+
+64
+00:03:26,174 --> 00:03:31,104
+of availability, durability, they're also
+designed explicitly for servicability.
+
+65
+00:03:31,104 --> 00:03:35,414
+So they actually meet many of these
+exact same design principles
+
+66
+00:03:35,414 --> 00:03:39,054
+that we saw in the context
+of the tandem computer system design
+
+67
+00:03:39,054 --> 00:03:41,734
+but this time applied
+to the storage subsystem.
+
+68
+00:03:42,643 --> 00:03:46,093
+Now let's double click on what we mean
+and what is inside those systems.
+
+69
+00:03:46,493 --> 00:03:49,743
+So the first requirement is to ensure
+that the logically-shared disc
+
+70
+00:03:49,743 --> 00:03:52,783
+could be made available at all times
+including in the presence of
+
+71
+00:03:52,783 --> 00:03:55,313
+component failures 
+within the disc subsystem
+
+72
+00:03:55,313 --> 00:03:59,093
+or within the ways in which we connect
+the servers to the disc subsystem.
+
+73
+00:03:59,539 --> 00:04:02,419
+If you remember our conversation
+in the context of the tandem
+
+74
+00:04:02,419 --> 00:04:05,459
+nonstop system, there was
+a key hardware design principle
+
+75
+00:04:05,459 --> 00:04:10,199
+which stated that all paths to storage
+had to be fully duplexed.
+
+76
+00:04:10,646 --> 00:04:13,426
+Now that principle still holds
+20 or 30 years later.
+
+77
+00:04:13,916 --> 00:04:16,346
+And what you see on screen
+is the canonical design
+
+78
+00:04:16,346 --> 00:04:20,186
+on how you connect servers
+to enterprise-grade storage subsystems.
+
+79
+00:04:20,890 --> 00:04:25,790
+You have a fully redundant fabric design
+with redundant adapters
+
+80
+00:04:25,790 --> 00:04:29,790
+connecting the servers to the fabric,
+redundant switches connecting the switches
+
+81
+00:04:29,790 --> 00:04:34,410
+to the storage arrays ensuring
+that the storage subsystem
+
+82
+00:04:34,410 --> 00:04:36,670
+will be available and
+reachable at all times
+
+83
+00:04:36,670 --> 00:04:39,730
+including in the presence
+of path failures.
+
+84
+00:04:40,414 --> 00:04:42,304
+Now the second requirement
+of course is to ensure
+
+85
+00:04:42,304 --> 00:04:44,804
+that the storage subsystem
+itself never fails.
+
+86
+00:04:45,477 --> 00:04:49,327
+And here also the tandem design
+principle is the primary guide
+
+87
+00:04:49,327 --> 00:04:52,587
+for the design of an enterprise-grade
+storage subsystem.
+
+88
+00:04:52,763 --> 00:04:54,693
+Now the components of 
+the storage subsystem
+
+89
+00:04:54,693 --> 00:04:56,443
+are not particularly important here.
+
+90
+00:04:56,443 --> 00:04:58,194
+I'm not going to go through
+them in detail.
+
+91
+00:04:58,194 --> 00:05:02,104
+What's important is to realize that
+we applied those exact same principles
+
+92
+00:05:02,104 --> 00:05:07,684
+of redundancy and fault tolerance
+within the inside of a storage subsystem.
+
+93
+00:05:07,759 --> 00:05:11,759
+For example, a storage subsystem
+has redundant front-end controllers.
+
+94
+00:05:11,979 --> 00:05:15,469
+Those are both the recipients of
+connectivity from the servers
+
+95
+00:05:15,810 --> 00:05:18,580
+but they actually need to work in pairs
+in order to ensure
+
+96
+00:05:18,580 --> 00:05:22,800
+that the logically-shared arbiter
+can actually be implemented.
+
+97
+00:05:22,800 --> 00:05:25,840
+And so the abstraction of that
+logically-shared arbiter
+
+98
+00:05:25,840 --> 00:05:29,330
+is actually implemented
+by having a collection of front-end
+
+99
+00:05:29,330 --> 00:05:33,850
+controllers coordinate their state
+using a process-pair model
+
+100
+00:05:33,850 --> 00:05:36,760
+or something very similar
+to the tandem process-pair model
+
+101
+00:05:37,253 --> 00:05:39,203
+for their own implementation.
+
+102
+00:05:39,203 --> 00:05:42,860
+At other aspects of the system,
+storage subsystems also use
+
+103
+00:05:42,860 --> 00:05:46,740
+the fundamental redundancy principles
+to ensure durability and availability.
+
+104
+00:05:46,745 --> 00:05:49,015
+The cache memory uses
+error-correcting code.
+
+105
+00:05:49,015 --> 00:05:52,135
+That was one of the primary applications
+of error-correcting codes
+
+106
+00:05:52,135 --> 00:05:53,915
+when they were introduced.
+
+107
+00:05:54,844 --> 00:05:57,664
+The backing storage controls are also
+replicated and redundant.
+
+108
+00:05:58,433 --> 00:06:02,213
+The connectivity between the backing
+controllers and the rotating discs
+
+109
+00:06:02,213 --> 00:06:05,923
+is also duplexed to ensure that
+you can always reach a disc
+
+110
+00:06:05,923 --> 00:06:07,603
+at any particular point in time.
+
+111
+00:06:07,603 --> 00:06:10,833
+And then obviously we use raiding coding
+and various forms of RAIDs
+
+112
+00:06:10,833 --> 00:06:14,573
+in order to ensure the data
+will be durable including in the presence
+
+113
+00:06:14,573 --> 00:06:16,813
+of rotating media failure.
+
+114
+00:06:17,332 --> 00:06:18,922
+So there you have it.
+
+115
+00:06:18,922 --> 00:06:21,642
+All the details and the
+implementation principles
+
+116
+00:06:21,642 --> 00:06:24,932
+of modern storage arrays
+are actually very much inspired
+
+117
+00:06:24,932 --> 00:06:28,612
+by the original tandem
+system of the 1980s.
+
+118
+00:06:30,269 --> 00:06:33,029
+So to summarize, to create
+an enterprise-grade
+
+119
+00:06:33,029 --> 00:06:36,689
+high availability system you need 
+to have redundancy between components.
+
+120
+00:06:37,007 --> 00:06:40,057
+You need to have redundancy of data
+through replication in coding
+
+121
+00:06:40,507 --> 00:06:43,157
+and you need to have redundancy
+of the paths connecting
+
+122
+00:06:43,157 --> 00:06:44,797
+the components together.
+
+123
+00:06:45,279 --> 00:06:48,299
+And the key insight here is that
+there's a magic number of two,
+
+124
+00:06:48,709 --> 00:06:51,989
+which means that by having two sets
+of components at all levels
+
+125
+00:06:52,090 --> 00:06:54,400
+and duplex paths between the layers,
+
+126
+00:06:54,400 --> 00:06:57,980
+you can actually achieve
+an enterprise-grade high availability
+
+127
+00:06:57,980 --> 00:06:59,690
+with no single point of failure.
+
+128
+00:06:59,690 --> 00:07:02,470
+And that is because some of these
+abstractions even though
+
+129
+00:07:02,470 --> 00:07:06,690
+they're replicated in pairs of two 
+actually create arbiters
+
+130
+00:07:06,690 --> 00:07:10,250
+that appear as a hardware
+abstraction to the layer above.
+
+131
+00:07:10,844 --> 00:07:14,844
+Now let's keep this number of two in mind
+especially as we look at our second
+
+132
+00:07:14,844 --> 00:07:17,474
+case study which is from Calder et al.
+
+133
+00:07:17,474 --> 00:07:20,674
+This is based on an SOSP paper
+describing the design
+
+134
+00:07:20,674 --> 00:07:24,144
+and implementation of the 
+Windows Azure Storage System.
+
+135
+00:07:25,179 --> 00:07:28,199
+Now one of the important aspects
+of the paper is the consistency
+
+136
+00:07:28,199 --> 00:07:30,089
+semantics of Azure Storage.
+
+137
+00:07:30,089 --> 00:07:31,769
+We're not going to talk about that at all.
+
+138
+00:07:31,769 --> 00:07:34,519
+We're actually going to talk about
+some of the high availability,
+
+139
+00:07:34,519 --> 00:07:36,426
+characteristics of this design.
+
+140
+00:07:36,426 --> 00:07:40,066
+So Azure Storage is premised around
+the notion of a system.
+
+141
+00:07:40,066 --> 00:07:42,426
+A system is called a stamp.
+
+142
+00:07:43,556 --> 00:07:45,056
+A stamp is quite large.
+
+143
+00:07:45,056 --> 00:07:48,156
+It can actually be deployed on multiple
+racks, ten to 20 racks.
+
+144
+00:07:48,156 --> 00:07:52,916
+It could hold 30 petabytes of data
+but it is a single system
+
+145
+00:07:52,916 --> 00:07:56,616
+running a single software stack
+and all the components are designed
+
+146
+00:07:56,616 --> 00:07:59,796
+to work with each other
+in order to create an abstraction
+
+147
+00:07:59,796 --> 00:08:03,166
+delivered by this single system
+at a large scale.
+
+148
+00:08:03,846 --> 00:08:06,186
+Now the components
+that are within the rack
+
+149
+00:08:06,186 --> 00:08:07,376
+are all commodity based.
+
+150
+00:08:07,376 --> 00:08:09,776
+You have commodity-based
+Ethernet switches,
+
+151
+00:08:09,776 --> 00:08:13,776
+commodity-based servers
+and lots of obviously rotating media
+
+152
+00:08:13,776 --> 00:08:15,846
+within each server instance.
+
+153
+00:08:16,616 --> 00:08:20,776
+And we'll focus on how
+Azure designed its system to ensure
+
+154
+00:08:20,776 --> 00:08:22,656
+the highest degree of availability.
+
+155
+00:08:23,725 --> 00:08:26,695
+So this is achieved through layering
+and replication.
+
+156
+00:08:26,695 --> 00:08:30,935
+So layering is used first 
+as a design principle to provide
+
+157
+00:08:30,935 --> 00:08:35,470
+various abstractions, modularity
+in how these abstractions are implemented
+
+158
+00:08:35,470 --> 00:08:37,568
+and the management 
+of different namespaces
+
+159
+00:08:37,568 --> 00:08:40,317
+at each layer within the stack.
+
+160
+00:08:40,317 --> 00:08:43,315
+Now the stamp again is the system
+and the stamp ensures
+
+161
+00:08:43,315 --> 00:08:45,675
+the durability and
+the availability of data.
+
+162
+00:08:45,675 --> 00:08:49,905
+And for this it actually uses replication
+synchronously within the stamp.
+
+163
+00:08:49,912 --> 00:08:55,292
+So we're applying redundancy by using
+three-way replication within the stamp
+
+164
+00:08:55,292 --> 00:08:56,982
+in a synchronous manner.
+
+165
+00:08:57,322 --> 00:09:00,939
+It also provides a greater degree
+of availability and durability
+
+166
+00:09:01,299 --> 00:09:03,269
+through a geo-replication mechanism
+
+167
+00:09:03,269 --> 00:09:05,889
+which this time is 
+asynchronous across stamps.
+
+168
+00:09:05,889 --> 00:09:09,319
+So within the stamp,
+you replicate synchronously
+
+169
+00:09:09,319 --> 00:09:12,409
+and across stamps you replicate
+asynchronously.
+
+170
+00:09:13,198 --> 00:09:15,848
+And again we have to think of a stamp
+as a single system
+
+171
+00:09:17,038 --> 00:09:20,608
+and in particular as from a fault and 
+availability perspective
+
+172
+00:09:20,608 --> 00:09:24,108
+as one domain that will ensure
+the availability of the service
+
+173
+00:09:24,108 --> 00:09:26,824
+even in the presence
+of component failures.
+
+174
+00:09:27,724 --> 00:09:29,544
+And so you have to assume
+that there are other elements
+
+175
+00:09:29,544 --> 00:09:32,134
+within the stamp such as
+power distribution units,
+
+176
+00:09:32,134 --> 00:09:35,574
+power supplies, air-conditioning units,
+network switches.
+
+177
+00:09:35,574 --> 00:09:38,904
+All of which also have to be redundantly
+deployed in order to ensure
+
+178
+00:09:38,904 --> 00:09:41,734
+the availability of the system as a whole.
+
+179
+00:09:41,734 --> 00:09:45,774
+One of the key observations is that
+different stamps will ideally share
+
+180
+00:09:45,774 --> 00:09:49,044
+as few of these global infrastructure
+components as possible.
+
+181
+00:09:49,044 --> 00:09:52,174
+And this simplifies
+the monitoring of the stamp
+
+182
+00:09:52,174 --> 00:09:55,734
+and the availability of the data
+that is replicated across stamps.
+
+183
+00:09:57,709 --> 00:09:59,779
+Now let's double-click
+on the different aspects.
+
+184
+00:09:59,779 --> 00:10:02,289
+And first a stream layer
+managers the data.
+
+185
+00:10:02,289 --> 00:10:05,339
+And specifically it exposed
+the abstraction of a highly-available
+
+186
+00:10:05,339 --> 00:10:08,259
+stream to the partition
+layer of the stamp.
+
+187
+00:10:09,049 --> 00:10:12,679
+Now each stamp has a logically-centralized
+stream manager,
+
+188
+00:10:13,138 --> 00:10:17,698
+it's written SM in the figure,
+which manages the stream name space
+
+189
+00:10:17,698 --> 00:10:19,338
+for the entire stamp.
+
+190
+00:10:19,338 --> 00:10:22,668
+Now of course having a single instance
+of a stream manager would create
+
+191
+00:10:22,668 --> 00:10:26,618
+a massive single point of failure
+and therefore the stream manager's
+
+192
+00:10:26,618 --> 00:10:30,568
+database is replicated on the
+multiple independent servers.
+
+193
+00:10:31,328 --> 00:10:37,118
+Now because there's no shared hardware
+state, the authors chose to use PAXOS
+
+194
+00:10:37,118 --> 00:10:40,758
+which is the de facto standard
+mechanist to replicate state machines
+
+195
+00:10:40,859 --> 00:10:43,599
+across fully distributed systems.
+
+196
+00:10:44,286 --> 00:10:48,186
+Now once the stream has been created,
+the partition layer which is the client
+
+197
+00:10:48,456 --> 00:10:51,596
+to the stream layer can directly
+connect to the extent nodes.
+
+198
+00:10:51,596 --> 00:10:54,706
+And the extent nodes
+are responsible to hold storage.
+
+199
+00:10:54,706 --> 00:10:57,426
+They're equivalent to the chunk nodes
+or the chunk servers
+
+200
+00:10:57,776 --> 00:10:59,886
+in Hadoop-based systems.
+
+201
+00:11:00,906 --> 00:11:05,486
+And by doing that you ensure that
+the stream manager is off
+
+202
+00:11:05,486 --> 00:11:07,276
+the critical path for data access.
+
+203
+00:11:07,276 --> 00:11:11,126
+It is only there to provide metadata
+capabilities to look up
+
+204
+00:11:11,126 --> 00:11:13,406
+where the data should actually be stored.
+
+205
+00:11:13,740 --> 00:11:18,030
+And then at the layer below each 
+extent node manages its local discs.
+
+206
+00:11:18,110 --> 00:11:21,130
+And on any write which is 
+actually the pen within the stream.
+
+207
+00:11:21,130 --> 00:11:24,090
+The first extent node
+that replicates the request,
+
+208
+00:11:24,090 --> 00:11:27,800
+to the two secondary extent nodes
+before acknowledging the request.
+
+209
+00:11:27,800 --> 00:11:31,980
+This is how you implement synchronous
+three-way replication within the stamp.
+
+210
+00:11:34,270 --> 00:11:36,570
+If you're interested
+in learning more about
+
+211
+00:11:36,570 --> 00:11:38,950
+the Azure system,
+I refer you to the paper.
+
+212
+00:11:38,950 --> 00:11:42,460
+But now let's see if we can
+compare these two case studies.
+
+213
+00:11:42,460 --> 00:11:44,780
+As a matter of fact,
+it's even interesting to question
+
+214
+00:11:44,780 --> 00:11:47,040
+whether these two systems are comparable.
+
+215
+00:11:47,040 --> 00:11:50,640
+They're radically different on nearly
+every point in this spectrum.
+
+216
+00:11:51,229 --> 00:11:53,319
+They scale very differently.
+
+217
+00:11:53,319 --> 00:11:57,569
+They provide different abstractions which
+has implications for the applications.
+
+218
+00:11:57,569 --> 00:12:02,549
+These abstractions are presented using
+very different networking technologies.
+
+219
+00:12:02,768 --> 00:12:07,628
+They also use different mechanisms
+to ensure the atomicity of transitions.
+
+220
+00:12:07,628 --> 00:12:11,118
+In one case, we use a hardware mechanism
+which is SCSI reservations
+
+221
+00:12:11,118 --> 00:12:14,218
+and in the other we use the
+PAXOS consensus algorithm.
+
+222
+00:12:15,066 --> 00:12:17,776
+They offer different
+quality of service characteristics.
+
+223
+00:12:18,236 --> 00:12:20,186
+They have different deployment models
+
+224
+00:12:20,186 --> 00:12:22,466
+but they're both designed to never fail
+
+225
+00:12:22,466 --> 00:12:24,066
+or more accurately said,
+
+226
+00:12:24,066 --> 00:12:27,466
+they're both designed to ensure
+maximum availability.
+
+227
+00:12:28,253 --> 00:12:32,253
+This wraps it up for this week.
+Thank you! Enjoy the papers.

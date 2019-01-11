@@ -1,0 +1,141 @@
+Welcome back: Nature, In Code.
+We're in Chapter 7, Lecture 2.
+So our task is to implement the spatial spread of an infectious disease in JavaScript, so let's go ahead and do it.
+Alright, so here we are with our friend the empty document, and we're just going to go ahead and get started, so I'm going to again start with the doc type HTML, as always, and I'm going to set up my HTML template, so <i>&lt;html&gt; &lt;/html&gt;</i> and then the head tag, which is eventually going to contain the d3 library, and the body tag, which is going to contain the rest of the code.
+Okay, I'm going to go ahead and save this right now, so that I have the proper syntax highlighting;
+I'm here in code examples.
+I'm going to call this <i>epidemics.html</i>
+Good, so let's do it as we've always done it in the past.
+We are just going to set up a few global variables, and then we're just going to define the first function that we need to call.
+So the global variables are: <i>grid_length</i>, and here I am now being inspired, essentially, by what we--
+Whoops! Sorry.
+Here first of all, of course, we need the script tag.
+That's why we didn't get the syntax highlighting.
+So we're inspired by what we did in Chapter 5, and in Chapter 5 we also had a spatial simulation, and as you remember, we had to first define the grid length here, which was 100, and this is to span, essentially, the size of the grid.
+We're going to have a squared grid.
+And then, of course, we need that grid variable itself, which is going to hold the two-dimensional array--
+I'm just going to initialize this as an empty array here-- and then we have this concept of a temp grid, where we could store values as we're going through each individual, and as we're trying to figure out what the state of the grid will be in the next generation.
+And in order to avoid any complications between this time step and the next time step, we use this temp grid.
+If this sounds completely alien to you, please go back to Chapter 5, where we discussed this in great detail.
+And then I need two variables here for this particular simulation, which is <i>beta</i> and <i>gamma</i>.
+So these are the transmission probabilities, and the recovery probabilities, and I'm going to set this here to 0.05, the <i>beta</i>, and the <i>gamma</i> to 0.1.
+So again, just as a reminder,
+<i>beta</i> is the per time unit and per contact transmission probability.
+So if an infected individual is connected to a susceptible individual, per times the probability of the infected infecting the susceptible individual is here now 5%, that's <i>beta</i>, and the <i>gamma</i> is the per time step probability that an infected individual recovers.
+Good. So, what else do we need?
+Well, I think that's about it in terms of global variables.
+So the first thing we need to do, as we needed to do in Chapter 5, is to <i>init</i>, or to initialize this grid.
+So I'm going to call again this function <i>init_grid()</i>, and now I have to define it: <i>init_grid</i>
+And, like in Chapter 5,
+I'm now simply going to set up this nested loop, so <i>for (var i = 0; i &lt; grid_length;</i> and then of course <i>i = i + 1)</i>
+So the first thing I do here is to actually ensure that this grid is indeed a two-dimensional array, by setting the <i>i</i> th element of grid to an empty array.
+So now we have this two-dimensional array, so now I can go over <i>grid_length</i> again.
+Okay, let me just copy this, and use <i>ii</i> here, as always.
+And now I'm in a position where
+I can set the cell values, at grid <i>iii</i>.
+So previously we set those to three possible genotypes,
+A1A1, A1A2, and A2A2.
+Here the three different states are not genetic states, but they're <i>S</i>, <i>I</i> and <i>R</i>, so susceptible, infected, or recovered.
+So I'm going to initialize these values here simply to <i>S</i>.
+Alright and then, I need to make sure
+I'm going to close the curly bracket here.
+So now each of the individuals, the 10,000 individuals here, are susceptible.
+Now that would be a boring world. 
+Well, it would be a healthy world, but it would be boring for the perspective of our example here, because we wouldn't get an epidemic, because there are no infectious individuals as of yet.
+So what we want to do is we want to pick now a random individual or a random location on this grid, and set its value to <i>i</i> so that this individual will be infectious.
+How do we do this?
+Well basically we're going to pick some individual here, and we have to choose the corresponding coordinates here, and then we're going to set this poor individual to <i>I</i>.
+So this individual is now infected.
+Okay, what values do we need here?
+Well, we need randomly picked values between zero-- that's the minimum index of course, and the maximum index of this array is <i>grid_length</i> minus one, and it's minus one, as you know, because the index in an array starts at 0.
+So how do we get an integer value between a minimum and a maximum value?
+Hm, that should ring a bell.
+This is something we've used in Chapter 5, where we developed this function
+<i>get_random_int</i> with a min and a max value.
+So you can either copy this function from there, or I'm just going to develop it here once again:
+<i>get_random_int(min, max)</i>
+So just as as a reminder, how do we do this?
+Well, anything random we will need, eventually, to call <i>Math.random()</i>
+Now, <i>Math.random()</i> alone here, of course, is not nearly sufficient, because it has three problems.
+First of all, it doesn't return an integer, but a floating point number.
+Second, it only spans from 
+0 to 1, so it only has a range of 1, but here our range could be much larger.
+And then, finally, it's also placed wrongly-- it starts at zero, but our range actually starts at <i>min</i> here, so we need to fix these three things.
+How did we do this?
+Well, the first action item here, so to speak, is to multiply this <i>Math.random</i> with <i>(max - min + 1)</i> to get the correct range.
+Why? Because <i>max - min</i> exactly gives us the range, so for example if <i>max</i> is 8 and <i>min</i> is 3 then <i>max - min</i> is 5, which is the correct range, but we want to, of course, include 5, and in order to not lose this max value, we have to add 1, specifically, as we're going to now <i>floor</i> this whole term here, because that will give us the integer.
+And now we have to solve two problems.
+We have an integer; it has the correct range, but it's at the wrong location because it starts still at zero, but it should start at <i>min</i>.
+This is why we're simply going to add <i>min</i> here at the end.
+Alright, so now that we have this <i>random_int</i> function, we can use this here.
+So we're going to call this here
+<i>get_random_int</i>, and the two arguments that we want to pass here are the minimum value, which is zero, and the maximum value which is <i>grid_length-1</i>
+And the exact same thing happens here.
+Okay, we can just copy this, move it over here.
+And by the way, of course you may have noticed that this would have technically not been necessary right now, because the minimum value is actually zero, but nevertheless, this should be a generic function that can deal with all kinds of <i>min</i> and <i>max</i> values.
+Good, so now we have this grid, it's initialized, everyone's susceptible, there's one poor individual that's basically patient zero, and that's now infected.
+Well, how about we go ahead and visualize this.
+So we need two things.
+First of all we need to call this upgrade-- sorry, this <i>draw_grid()</i> function, and we need to pass in some parameters here, which we're going to do in a second, but we also need to define this <i>draw_grid</i>, or, rather, copy it over from our previous example, and then, of course, we also need to load <i>d3</i>.
+So let's just go ahead and do this.
+Let me go over here to a browser and if I search for <i>d3</i>, typically the first page that should come up is <i>d3.js</i>, which is the home of <i>d3</i>.
+And again, as we've done before, we can simply copy the snippet here to directly link to the latest release,
+I'm going to copy this, going to go over to my code, and I'm going to put this here in the head, as we've done before, and then I need this <i>draw_grid</i> function, which we've used before in Chapter 5, so you can either copy it from there, or you can once again go to <i>natureincode.com</i>, and click here and see the code in action.
+And then, for example, here in spatial models.
+Here's the code for the simulation, and here it says, "note the <i>draw_grid</i> and <i>update_grid</i> functions are built with <i>d3</i>, and can be found here."
+So I'm going to just copy this code here, the <i>draw_grid</i> function, and the <i>update_grid</i> function.
+But again, we've already used this in Chapter 5, so if you want to, you can go and copy this from your HTML files that you developed in the context of Chapter 5, the spatial simulation.
+Okay, so I'm going to copy this here in the body at the top of my simulation code here, and what I'm going to do, again, is I'm going to indent this correctly, and you may or may not want to do this, really up to you.
+It's just I like to do it.
+Alright, so observe here that <i>draw_grid</i> has two parameters:
+<i>data</i>, which is the data to be visualized, and this is our grid, and <i>colors</i>.
+And <i>colors</i> Is not necessary.
+There's a default value, and we've used these default values before.
+This happens when you don't pass a second argument.
+And this will then generate this blue-black-white color pattern.
+Here I want to use slightly different colors.
+I want to use grey for the infected.
+I want to use--
+No, sorry grey for the susceptible, indeed, red for the infected, and then green for the recovered.
+And so I'm going to pass these color values here as an array.
+And how this works is as follows.
+So <i>draw_grid</i> needs first the grid, our data, and then this array.
+And here this array needs to be structured in the following way.
+It basically needs to be a sequence of what is the content of the grid.
+So for example, we have three types here of values in our grid, <i>S</i>, <i>I</i>, and <i>R</i>.
+So first <i>"S"</i> and then comma.
+Now what is the color code here for <i>S</i>?
+So I'm going to use the hex color notation, which is basically as follows.
+You use the hash symbol, and then you have these six values, and because it's hexadecimal, it goes from 0 to 9, and then <i>a, b, c, d, e or f.</i>
+So we have <i>dcdcdc</i>.
+Then we have <i>I</i>.
+For <i>I</i> we're going to use <i>c82605</i>.
+Why? Well, it simply because it's a value I've chosen, and we should not forget the hashtag here.
+And then finally for <i>R</i>, we are going to use the value of a green, which is 6fc401.
+So again, you can use any values here these color codes that you would like.
+I recommend you stick with those for the time being, so it actually makes sense, what you see in the video, and would you will see in your browser, but if you decide you want your own values, you can really just go to any website.
+So you can, for example, get hex color codes.
+You can search for <i>hex color codes</i>, and then here you have an explanation, for example:
+"A hex triplet is a six-digit, three-byte hexadecimal number used in HTML
+[...] and other computing applications to represent colors."
+So these triplets will go from-- well these duplets, rather.
+I mean it's a triplet of these two numbers that go from 00 to FF in hexadecimal notation.
+In decimal notation this would be zero to 255 as a max value.
+And so if you, for example, click here on the first link,
+<i>color-hex</i>, you can see here users' latest favorite colors, and you can always see this hex code here, so the hash and then these three couples,
+88, 1a, and 1b, and these are for the corresponding bonding color channels, so RGB: red, green, blue.
+So this is a value 13 here, for example, for red, for the red channel, a value 92 for the green channel, and value 8e for the blue channel.
+So, by the way, if you just want to pick a color, you can, for example, click here, and then you can choose the color band.
+Let's say you would like to have this blue here, you quite like this blue.
+So this would be the hex color code here: #282bdd.
+So, back to the code.
+I think we're all set up.
+We have here our <i>init_grid</i> call.
+This initializes the grid, puts each individual in the susceptible state, then it picks a random individual which is going to be patient zero.
+So we're going to set this individual status to <i>"I"</i>, and then the <i>draw_grid</i> function is called, which should now draw the grid in the browser.
+So let's save this, and go back here to the browser, and open this file, so <i>Open File &gt; epidemics.html &gt; Open</i>
+And here it is.
+So we have here a sea of 9,999 individuals in grey that are susceptible, and here this poor soul, that's patient zero, and it's randomly placed on the grid, so if you reload this and out here, now it's here, now it's down here, now it's here and so on.
+So this is truly a randomly chosen individual that is now patient zero.
+Now nothing's happening at the moment because we haven't now implemented the simulation over many time steps, and the infection and the recovery steps, but this we're going to start in the next lecture.
+I'll see you there.

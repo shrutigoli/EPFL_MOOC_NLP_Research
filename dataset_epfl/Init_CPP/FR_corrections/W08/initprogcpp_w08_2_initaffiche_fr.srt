@@ -1,0 +1,1763 @@
+1
+00:00:05,549 --> 00:00:07,293
+Le codage d'une application, 
+quelle qu'elle soit,
+
+2
+00:00:07,293 --> 00:00:09,703
+nécessite de réfléchir 
+au type de données impliquées
+
+3
+00:00:09,703 --> 00:00:12,350
+ainsi qu'aux fonctionnalités fondamentales
+
+4
+00:00:12,350 --> 00:00:14,795
+qui vont permettre de mettre en œuvre
+les traitements souhaités.
+
+5
+00:00:14,795 --> 00:00:17,646
+Nous avons entamé cette démarche
+lors de la séquence précédente
+
+6
+00:00:17,646 --> 00:00:19,909
+pour le codage du jeu du Puissance 4.
+
+7
+00:00:19,909 --> 00:00:22,242
+Ce qui nous a permis d'identifier 
+les types fondamentaux
+
+8
+00:00:22,242 --> 00:00:24,653
+pour représenter la grille de jeu.
+
+9
+00:00:24,653 --> 00:00:26,423
+Nous allons aujourd'hui 
+poursuivre notre réflexion
+
+10
+00:00:26,423 --> 00:00:28,980
+en nous penchant 
+sur les fonctionnalités de bases.
+
+11
+00:00:29,340 --> 00:00:32,107
+Pour rappel, lors de la séquence 
+précédente
+
+12
+00:00:32,107 --> 00:00:34,318
+nous avions réfléchi 
+aux types de données impliquées.
+
+13
+00:00:34,318 --> 00:00:39,280
+Très naturellement, nous avions réfléchi 
+à comment modéliser la grille de jeu.
+
+14
+00:00:39,280 --> 00:00:43,534
+Ceci nous avait conduit à définir 
+un nouveau type, le type « Grille »,
+
+15
+00:00:43,534 --> 00:00:45,784
+comme un tableau à deux dimensions.
+
+16
+00:00:45,784 --> 00:00:51,215
+Nous avions également réfléchi à modéliser
+le contenu de chacune des cellules
+
+17
+00:00:51,215 --> 00:00:53,322
+de chacun des éléments de ce tableau.
+
+18
+00:00:53,322 --> 00:00:56,242
+Ce qui nous avait conduit 
+à introduire un type énuméré,
+
+19
+00:00:56,242 --> 00:00:59,906
+le type « Couleur », qui nous permet 
+justement de représenter
+
+20
+00:00:59,906 --> 00:01:02,747
+le contenu de chacune 
+des cellules du tableau.
+
+21
+00:01:03,700 --> 00:01:06,340
+La grille étant de taille fixe notre choix 
+s'est naturellement porté
+
+22
+00:01:06,340 --> 00:01:11,311
+sur l'utilisation du type « array » de C++2011
+qui nous permet effectivement
+
+23
+00:01:11,311 --> 00:01:13,050
+de représenter un tableau de taille fixe.
+
+24
+00:01:13,050 --> 00:01:17,207
+Nous avons simplement déclaré 
+le type « Grille » comme étant
+
+25
+00:01:17,207 --> 00:01:21,176
+un type capable de représenter 
+un tableau à deux dimensions
+
+26
+00:01:21,176 --> 00:01:24,053
+de taille fixe ayant 
+6 lignes et 7 colonnes.
+
+27
+00:01:24,053 --> 00:01:26,256
+Chacun des éléments de la grille 
+est de type « Couleur »,
+
+28
+00:01:26,256 --> 00:01:31,121
+« Couleur » étant le type énuméré permettant
+les valeurs « vides », « rouge », « jaune ».
+
+29
+00:01:31,633 --> 00:01:33,814
+Une fois ces types introduits 
+je peux tout à fait dans un programme
+
+30
+00:01:33,814 --> 00:01:38,676
+déclarer une variable de type « Grille »
+et affecter des valeurs
+
+31
+00:01:38,676 --> 00:01:40,439
+à ces différents éléments.
+
+32
+00:01:40,625 --> 00:01:43,698
+Ces valeurs seront prises 
+dans le cadre du type énuméré.
+
+33
+00:01:43,698 --> 00:01:47,256
+c'est à dire pouvant être vide,
+rouge ou jaune.
+
+34
+00:01:47,256 --> 00:01:49,827
+Les types fondamentaux utiles 
+étant définis,
+
+35
+00:01:49,827 --> 00:01:52,359
+nous nous intéressons maintenant 
+aux premières fonctionnalités
+
+36
+00:01:52,359 --> 00:01:53,882
+à mettre en œuvre sur la grille.
+
+37
+00:01:53,882 --> 00:01:56,370
+Il est vraisemblable que 
+lorsque nous commençons à jouer,
+
+38
+00:01:56,370 --> 00:01:59,380
+nous souhaitons commencer à jouer 
+sur une grille qui est vide.
+
+39
+00:01:59,380 --> 00:02:04,457
+Il faudra nous pencher sur l'initialisation
+permettant d'initialiser
+
+40
+00:02:04,457 --> 00:02:08,282
+chacune des cellules du tableau 
+à la valeur vide.
+
+41
+00:02:08,282 --> 00:02:12,138
+Et bien évidemment, il faudra aussi 
+permettre l'affichage de la grille,
+
+42
+00:02:12,138 --> 00:02:15,722
+afin que les joueurs puissent 
+se rendre compte de la progression du jeu.
+
+43
+00:02:15,722 --> 00:02:18,144
+Nous allons 
+dans le cadre de cette séquence,
+
+44
+00:02:18,144 --> 00:02:22,286
+nous intéresser à l'implémentation 
+concrète de ces deux fonctionnalités.
+
+45
+00:02:22,286 --> 00:02:25,930
+Nous prévoyons le codage 
+d'une fonction « initialise »
+
+46
+00:02:25,930 --> 00:02:28,181
+qui permet l'initialisation de la grille,
+
+47
+00:02:28,181 --> 00:02:31,394
+ainsi que le codage 
+d'une seconde fonction appelée « affiche »
+
+48
+00:02:31,394 --> 00:02:33,519
+qui permet l'affichage de la grille.
+
+49
+00:02:33,519 --> 00:02:36,049
+Commençons par l'initialisation.
+
+50
+00:02:36,049 --> 00:02:38,804
+Commençons par imaginer 
+comment s'utiliserait concrètement
+
+51
+00:02:38,804 --> 00:02:41,193
+cette fonction « initialise »
+dans un programme.
+
+52
+00:02:41,193 --> 00:02:44,899
+On peut imaginer que dans un programme 
+j'ai au préalable déclaré
+
+53
+00:02:44,899 --> 00:02:50,063
+une variable « grille » de type « Grille »
+et pour initialiser cette grille
+
+54
+00:02:50,063 --> 00:02:52,470
+je peux imaginer que 
+je vais rédiger une fonction
+
+55
+00:02:52,470 --> 00:02:55,121
+qui pourrait être invoquée comme ceci.
+
+56
+00:02:55,121 --> 00:02:59,976
+Donc j'appelle la fonction initialise 
+qui prendrait en paramètre la grille
+
+57
+00:02:59,976 --> 00:03:01,395
+pour en modifier le contenu.
+
+58
+00:03:01,395 --> 00:03:02,802
+Modifier le contenu de quelle façon ?
+
+59
+00:03:02,802 --> 00:03:08,222
+Et bien simplement, en remplissant 
+chacune des cellules avec la valeur « vide ».
+
+60
+00:03:08,222 --> 00:03:11,482
+Intéressons-nous maintenant 
+au codage de cette fonction « initialise ».
+
+61
+00:03:11,482 --> 00:03:14,504
+Je vois que tel que j'ai imaginé 
+de l'invoquer ici,
+
+62
+00:03:14,512 --> 00:03:17,423
+cette fonction initialise n'a pas besoin 
+de me fournir un résultat.
+
+63
+00:03:17,440 --> 00:03:19,889
+Sa vocation est de modifier la grille,
+de l'initialiser.
+
+64
+00:03:19,889 --> 00:03:24,938
+Donc très naturellement, je vais décrire 
+une fonction « initialise »
+
+65
+00:03:24,938 --> 00:03:28,863
+dont le type de retour est « void »
+puisque je n'ai pas besoin
+
+66
+00:03:28,863 --> 00:03:31,898
+de récupérer une valeur 
+à la sortie de l'exécution
+
+67
+00:03:31,898 --> 00:03:33,856
+de cette fonction « initialise ».
+
+68
+00:03:34,370 --> 00:03:38,116
+Je rédige ma fonction initialise 
+en lui passant en paramètre une « Grille ».
+
+69
+00:03:38,116 --> 00:03:40,699
+La fonction « initialise »
+doit modifier la grille.
+
+70
+00:03:40,950 --> 00:03:43,424
+Donc une fois que j'ai terminé 
+l'exécution de ma fonction,
+
+71
+00:03:44,006 --> 00:03:46,664
+à ce stade du programme,
+
+72
+00:03:46,664 --> 00:03:49,701
+je dois récupérer une grille 
+dont le contenu a été modifié.
+
+73
+00:03:49,701 --> 00:03:52,428
+Donc pour cette raison, je suis 
+dans l'obligation
+
+74
+00:03:52,428 --> 00:03:56,171
+d'utiliser un passage par référence
+
+75
+00:03:56,171 --> 00:04:00,786
+afin que la grille sorte bel et bien 
+modifiée de la fonction d'initialisation.
+
+76
+00:04:00,786 --> 00:04:04,548
+Notez que cette façon de concevoir 
+la fonction « initialise »
+
+77
+00:04:04,548 --> 00:04:07,120
+n'est évidemment pas 
+la seule solution possible.
+
+78
+00:04:07,120 --> 00:04:12,273
+On pourrait imaginer ici qu'au lieu 
+que la fonction « initialise » travaille
+
+79
+00:04:12,273 --> 00:04:14,279
+directement sur une grille fournie 
+pour la remplir,
+
+80
+00:04:14,279 --> 00:04:17,116
+on pourrait imaginer que cette fonction 
+« initialise » retourne une grille
+
+81
+00:04:17,116 --> 00:04:19,213
+initialisée de la bonne façon.
+
+82
+00:04:19,213 --> 00:04:21,058
+Ce qui correspondrait à un appel suivant.
+
+83
+00:04:21,058 --> 00:04:25,663
+Ici on remplacerait les deux lignes 
+de codes que l'on a écrites ici
+
+84
+00:04:25,663 --> 00:04:28,045
+par quelque chose 
+qui ressemblerait plutôt à cela.
+
+85
+00:04:28,839 --> 00:04:31,209
+On invoquerait 
+une fonction « initialise » qui
+
+86
+00:04:31,394 --> 00:04:34,956
+au lieu de construire une grille 
+donnée, retourne une grille.
+
+87
+00:04:35,680 --> 00:04:38,273
+A ce moment-là le type de retour 
+ne serait plus « void »
+
+88
+00:04:38,309 --> 00:04:40,174
+mais on retournerait bel et bien une grille.
+
+89
+00:04:40,174 --> 00:04:41,772
+Ici, il n'y aurait plus besoin d'argument,
+
+90
+00:04:41,772 --> 00:04:43,869
+puisque la fonction « initialise »
+retourne une grille.
+
+91
+00:04:43,869 --> 00:04:46,707
+Donc c'est une autre façon possible
+que nous avons déjà ébauchée
+
+92
+00:04:46,707 --> 00:04:48,508
+dans notre cours sur les structures,
+
+93
+00:04:48,720 --> 00:04:51,166
+lorsque nous avons pris l'exemple 
+de la fonction
+
+94
+00:04:51,166 --> 00:04:53,109
+qui permettait 
+de faire naître une personne.
+
+95
+00:04:53,109 --> 00:04:56,428
+Aujourd'hui, nous avons choisi 
+une conception alternative
+
+96
+00:04:56,428 --> 00:04:59,117
+pour illustrer notamment 
+l'idée du passage par référence.
+
+97
+00:04:59,117 --> 00:05:02,111
+L'en-tête de la fonction est maintenant 
+clairement défini
+
+98
+00:05:02,111 --> 00:05:05,384
+et il s'agit de commencer à développer 
+le corps de la fonction.
+
+99
+00:05:05,849 --> 00:05:09,279
+Intéressons-nous au contenu 
+du corps de la fonction.
+
+100
+00:05:09,279 --> 00:05:11,973
+Ce que doit faire cette fonction 
+c'est pour chacune des lignes du tableau,
+
+101
+00:05:11,973 --> 00:05:18,930
+itérer sur chacune des cellules 
+et y mettre la valeur vide.
+
+102
+00:05:19,126 --> 00:05:21,968
+Commençons par voir comment 
+ce traitement se réalise
+
+103
+00:05:21,968 --> 00:05:24,179
+pour initialiser une seule ligne.
+
+104
+00:05:24,179 --> 00:05:27,610
+Imaginons de le faire 
+pour la première ligne de la grille.
+
+105
+00:05:27,610 --> 00:05:31,652
+Il faudrait évidement 
+écrire une « boucle for ».
+
+106
+00:05:31,652 --> 00:05:35,119
+Cette « boucle for » va itérer sur chacun 
+des éléments de la ligne.
+
+107
+00:05:35,119 --> 00:05:38,085
+Donc on peut imaginer une
+« itération sur ensemble de valeurs »
+
+108
+00:05:38,085 --> 00:05:41,081
+qui s'écrit de cette façon.
+
+109
+00:05:41,081 --> 00:05:46,015
+Je le fais d'abord pour la première ligne 
+de ma grille, en guise d'introduction ici,
+
+110
+00:05:47,926 --> 00:05:51,479
+pour chacune des cases 
+de la première ligne de la grille.
+
+111
+00:05:51,479 --> 00:05:53,140
+Ce qui se rédige comme ça.
+
+112
+00:05:53,140 --> 00:05:56,103
+Je vais remplir le contenu de sorte 
+à y mettre la valeur vide.
+
+113
+00:05:56,849 --> 00:05:59,826
+A ce stade, en guise d'exercice, 
+j'ai écrit les lignes de codes
+
+114
+00:05:59,826 --> 00:06:02,722
+me permettant d'initialiser 
+la première ligne de la grille
+
+115
+00:06:02,722 --> 00:06:05,625
+en mettant dans chacune 
+de ces cellules la valeur vide.
+
+116
+00:06:06,006 --> 00:06:08,335
+Ici, je peux simplement 
+clore ma fonction.
+
+117
+00:06:09,065 --> 00:06:12,248
+Vous noterez au passage 
+l'utilisation d'un type « référence »
+
+118
+00:06:12,248 --> 00:06:16,766
+pour la variable d'itération dans mon 
+« itération sur ensemble de valeurs ».
+
+119
+00:06:16,766 --> 00:06:20,044
+Ceci est impératif 
+si je veux que
+
+120
+00:06:20,044 --> 00:06:22,182
+le contenu de chaque case soit modifié.
+
+121
+00:06:23,345 --> 00:06:25,103
+Si je compile ce programme en l'état,
+
+122
+00:06:25,103 --> 00:06:27,075
+je vais cependant butter 
+sur un petit problème.
+
+123
+00:06:27,081 --> 00:06:31,311
+L'identificateur « case » très naturel
+en français pour identifier
+
+124
+00:06:31,311 --> 00:06:35,209
+une case du tableau est 
+en réalité un mot réservé du langage C++.
+
+125
+00:06:35,715 --> 00:06:39,458
+Je ne peux pas l'utiliser 
+comme un identificateur de variable.
+
+126
+00:06:39,696 --> 00:06:42,030
+Dans ce cas-là, je dois apporter 
+une petite rectification
+
+127
+00:06:42,030 --> 00:06:44,195
+pour que ce programme 
+puisse effectivement compiler.
+
+128
+00:06:45,065 --> 00:06:47,461
+Je vais changer 
+le nom de cet identificateur.
+
+129
+00:06:47,713 --> 00:06:51,985
+Je peux prendre la précaution 
+de commenter la raison de ce choix.
+
+130
+00:06:51,985 --> 00:06:54,504
+En expliquant que je ne peux pas 
+utiliser le mot réservé « case »
+
+131
+00:06:54,616 --> 00:06:56,453
+puisque c'est un mot réservé du langage.
+
+132
+00:06:56,453 --> 00:07:01,404
+Evidemment, il faudra rectifier 
+l'identificateur là où il est utilisé.
+
+133
+00:07:01,404 --> 00:07:02,883
+Comme ceci.
+
+134
+00:07:04,223 --> 00:07:07,532
+Evidemment, ce traitement 
+que j'ai mis en œuvre pour initialiser
+
+135
+00:07:07,764 --> 00:07:12,564
+la première ligne de ma grille doit 
+être répété pour chacune des lignes
+
+136
+00:07:12,564 --> 00:07:14,749
+afin d'initialiser 
+l'ensemble de la grille.
+
+137
+00:07:14,749 --> 00:07:17,921
+Il est naturel ici d'imaginer 
+d'imbriquer ces traitements
+
+138
+00:07:17,921 --> 00:07:20,511
+dans une première « boucle for »
+
+139
+00:07:20,511 --> 00:07:24,243
+qui elle va être en charge d'itérer 
+sur l'ensemble des lignes
+
+140
+00:07:24,243 --> 00:07:26,363
+et réaliser exactement le même traitement.
+
+141
+00:07:26,363 --> 00:07:29,902
+Réalisons et écrivons 
+cette première « boucle for »,
+
+142
+00:07:29,902 --> 00:07:33,495
+qui va itérer sur l'ensemble 
+des lignes de la grille.
+
+143
+00:07:33,495 --> 00:07:36,896
+A nouveau, je peux utiliser une
+« itération sur ensemble de valeurs ».
+
+144
+00:07:36,896 --> 00:07:39,806
+Donc avec une variable « ligne »
+qui me permet d'itérer
+
+145
+00:07:39,806 --> 00:07:41,541
+sur chacune des lignes de ma grille.
+
+146
+00:07:41,541 --> 00:07:45,033
+Pour chacune des lignes, 
+je remplace ici « grille0 » par « ligne ».
+
+147
+00:07:45,645 --> 00:07:47,626
+Je réalise le même traitement 
+que tout à l'heure,
+
+148
+00:07:47,626 --> 00:07:51,098
+à savoir mettre la valeur « vide »
+dans chacune des cases.
+
+149
+00:07:52,349 --> 00:07:54,533
+Je corrige un peu mon indentation.
+
+150
+00:07:54,533 --> 00:07:58,247
+Donc j'obtiens au final 
+un ensemble de lignes de codes
+
+151
+00:07:58,247 --> 00:08:00,807
+qui vont me permettre d'itérer
+sur l'ensemble des lignes
+
+152
+00:08:00,807 --> 00:08:02,498
+pour en modifier le contenu.
+
+153
+00:08:02,498 --> 00:08:06,667
+Vous noterez au passage également 
+l'utilisation du passage par référence
+
+154
+00:08:06,667 --> 00:08:11,085
+pour la variable « d'itération sur ensemble 
+de valeurs » afin de garantir
+
+155
+00:08:11,085 --> 00:08:14,121
+que la grille va effectivement 
+être modifiée. [inaudible]
+
+156
+00:08:14,802 --> 00:08:20,095
+Nous savons désormais initialiser 
+une grille qui a été au préalable déclarée
+
+157
+00:08:20,095 --> 00:08:23,253
+au moyen du type « grille »
+qui a été défini à l'étape précédente.
+
+158
+00:08:23,253 --> 00:08:25,810
+Intéressons-nous maintenant 
+à l'affichage de la grille.
+
+159
+00:08:25,810 --> 00:08:29,075
+Comme tout à l'heure, 
+imaginons l'utilisation concrète
+
+160
+00:08:29,075 --> 00:08:30,823
+de cette fonction d'affichage.
+
+161
+00:08:30,823 --> 00:08:35,193
+Il est toujours bon de commencer à imaginer
+comment la fonction va être utilisée
+
+162
+00:08:35,193 --> 00:08:37,802
+avant de s'intéresser 
+à son codage effectif.
+
+163
+00:08:38,165 --> 00:08:42,141
+Typiquement on peut imaginer 
+qu'une fois la grille initialisée,
+
+164
+00:08:42,141 --> 00:08:44,327
+réalisés d'autres traitements sur la grille,
+
+165
+00:08:44,582 --> 00:08:46,474
+je puisse avoir besoin de l'afficher.
+
+166
+00:08:46,942 --> 00:08:50,064
+Il est naturel d'imaginer que simplement
+j'invoque une fonction « affiche »
+
+167
+00:08:50,064 --> 00:08:52,325
+qui prend en paramètre la grille « affiche ».
+
+168
+00:08:52,591 --> 00:08:54,857
+Intéressons-nous maintenant au prototype.
+
+169
+00:08:55,303 --> 00:08:58,928
+Comme tout à l'heure, un type « void » est 
+naturel car une fonction d'affichage
+
+170
+00:08:58,928 --> 00:09:02,578
+va simplement afficher 
+la grille sur le terminal
+
+171
+00:09:02,578 --> 00:09:04,777
+et n'a pas besoin 
+de me retourner de résultat.
+
+172
+00:09:05,365 --> 00:09:07,114
+Donc ici je lui passe la grille.
+
+173
+00:09:07,114 --> 00:09:09,019
+Maintenant va se poser la question de :
+
+174
+00:09:09,210 --> 00:09:12,017
+« Sous quelle forme passer 
+le paramètre « grille » ? »
+
+175
+00:09:12,017 --> 00:09:15,069
+Est-ce que je fais un passage 
+par valeur ou par référence ?
+
+176
+00:09:15,069 --> 00:09:18,317
+La fonction d'affichage a pour vocation 
+d'afficher les valeurs
+
+177
+00:09:18,317 --> 00:09:20,204
+des différentes cases 
+de la grille de jeux.
+
+178
+00:09:20,204 --> 00:09:23,498
+Elle n'a donc certainement pas pour but 
+de modifier le contenu de cette grille.
+
+179
+00:09:23,498 --> 00:09:26,404
+Du coup, il est tout à fait naturel 
+d'imaginer
+
+180
+00:09:26,404 --> 00:09:30,677
+que le passage du paramètre 
+« grille » va se faire par valeur.
+
+181
+00:09:30,677 --> 00:09:32,654
+Parce qu'il n'est pas nécessaire,
+
+182
+00:09:32,654 --> 00:09:35,558
+la fonction « affiche » modifie
+le contenu de la grille.
+
+183
+00:09:35,558 --> 00:09:39,478
+Nous avons vu cependant que lors 
+d'un passage par valeur, ce qui se produit
+
+184
+00:09:39,478 --> 00:09:43,343
+c'est qu'il y a une copie de l'argument 
+passé à la fonction
+
+185
+00:09:43,343 --> 00:09:45,063
+dans une zone locale à la fonction « affiche ».
+
+186
+00:09:46,621 --> 00:09:49,429
+Si l'objet passé en argument 
+est un objet volumineux,
+
+187
+00:09:49,511 --> 00:09:51,688
+cette copie peut être relativement coûteuse.
+
+188
+00:09:51,979 --> 00:09:55,073
+A ce moment là, on a recours 
+à une alternative
+
+189
+00:09:55,073 --> 00:10:00,364
+qui est une optimisation qui consiste 
+à passer le paramètre par référence.
+
+190
+00:10:01,088 --> 00:10:04,353
+Ce qui va autoriser la fonction « affiche »
+à travailler directement
+
+191
+00:10:04,353 --> 00:10:07,523
+sur la zone mémoire qui correspond 
+à l'argument qui lui est passé.
+
+192
+00:10:07,952 --> 00:10:08,885
+Sans faire de copie.
+
+193
+00:10:09,336 --> 00:10:12,728
+Mais on prend la précaution 
+de le passer par référence constante
+
+194
+00:10:12,728 --> 00:10:15,595
+afin de garantir que la fonction « affiche »,
+
+195
+00:10:15,595 --> 00:10:18,264
+même si elle a le droit d'opérer 
+directement sur l'argument,
+
+196
+00:10:18,264 --> 00:10:20,687
+ne va pas pour autant 
+en modifier le contenu.
+
+197
+00:10:20,687 --> 00:10:23,112
+Si par exemple dans le corps 
+de la fonction « affiche »
+
+198
+00:10:23,112 --> 00:10:25,893
+je commence à modifier le contenu,
+
+199
+00:10:25,893 --> 00:10:28,050
+et bien j'aurais 
+un message d'erreur à la compilation.
+
+200
+00:10:28,050 --> 00:10:31,825
+Notez qu'on aurait parfaitement pu 
+écrire ceci :
+
+201
+00:10:31,825 --> 00:10:35,443
+Il s'agit d'une notation parfaitement 
+équivalente à la précédente.
+
+202
+00:10:35,443 --> 00:10:38,512
+On peut utiliser indifféremment 
+l'une ou l'autre des notations.
+
+203
+00:10:39,292 --> 00:10:43,099
+Il s'agit ici d'une optimisation 
+qui va permettre à la fonction
+
+204
+00:10:43,099 --> 00:10:44,956
+de travailler directement sur l'argument
+
+205
+00:10:44,956 --> 00:10:47,209
+mais en mettant en place 
+un certain nombre de garde-fou
+
+206
+00:10:47,209 --> 00:10:49,314
+qui empêchent quand même 
+la fonction de modifier le contenu
+
+207
+00:10:49,314 --> 00:10:50,539
+puisque ce n'est pas sa vocation.
+
+208
+00:10:50,539 --> 00:10:53,743
+Cette précaution était 
+indispensable en C++98.
+
+209
+00:10:54,198 --> 00:10:58,341
+Elle ne l'est pas systématiquement 
+dans tous les cas en C++2011
+
+210
+00:10:58,658 --> 00:11:02,824
+Cependant, les considérations appliquées 
+vont au-delà du cadre de ce cours.
+
+211
+00:11:03,205 --> 00:11:08,084
+Nous allons simplement ici nous contenter 
+de la mettre en œuvre comme précaution
+
+212
+00:11:08,302 --> 00:11:10,458
+et comme bonne pratique 
+pour éviter la copie.
+
+213
+00:11:10,803 --> 00:11:14,607
+Ici, le prototype de notre fonction « affiche »
+va utiliser
+
+214
+00:11:14,607 --> 00:11:17,526
+le passage par référence constante 
+pour éviter la copie.
+
+215
+00:11:17,953 --> 00:11:20,559
+Procédons maintenant au codage 
+du corps de la fonction « affiche ».
+
+216
+00:11:20,559 --> 00:11:22,222
+Ici le codage est assez naturel.
+
+217
+00:11:22,222 --> 00:11:24,978
+Il ressemble beaucoup à ce que nous 
+avons fait pour la fonction « initialise ».
+
+218
+00:11:24,978 --> 00:11:30,391
+Il s'agit d'itérer sur 
+chacune des lignes de la grille
+
+219
+00:11:30,391 --> 00:11:33,473
+et pour chacune des lignes de la grille, 
+itérer sur chacune des cases
+
+220
+00:11:33,473 --> 00:11:36,870
+pour en afficher le contenu 
+sous un format particulier.
+
+221
+00:11:36,870 --> 00:11:39,436
+Ici nous n'allons pas procéder 
+à l'affichage graphique
+
+222
+00:11:39,720 --> 00:11:42,439
+nous allons simplement afficher 
+le contenu de chaque cellule
+
+223
+00:11:42,697 --> 00:11:45,314
+selon une convention particulière
+sur le terminal.
+
+224
+00:11:45,853 --> 00:11:47,856
+Pour itérer sur l'ensemble 
+des lignes de la grille,
+
+225
+00:11:47,856 --> 00:11:50,506
+une « itération sur ensemble de valeurs » 
+est tout à fait naturel.
+
+226
+00:11:50,720 --> 00:11:54,439
+Je sais exactement combien de lignes, 
+combien de colonnes a ma grille.
+
+227
+00:11:54,439 --> 00:11:58,221
+Donc ici, pour chacune des lignes de la grille,
+
+228
+00:11:59,501 --> 00:12:02,583
+ce qui s'écrit comme ceci avec 
+une « itération sur ensemble de valeurs ».
+
+229
+00:12:02,583 --> 00:12:07,832
+Je vais itérer sur chacune des cases 
+de la ligne en question.
+
+230
+00:12:08,252 --> 00:12:10,752
+Donc pour chacune de ces cases, 
+en afficher le contenu
+
+231
+00:12:10,762 --> 00:12:12,096
+sous un format particulier.
+
+232
+00:12:12,490 --> 00:12:15,332
+Ici je dois procéder à des tests 
+pour savoir, en fonction du contenu,
+
+233
+00:12:15,444 --> 00:12:17,748
+ce qu'il faut afficher exactement.
+
+234
+00:12:17,748 --> 00:12:21,140
+Par exemple, si la case 
+contient la valeur « vide »,
+
+235
+00:12:21,140 --> 00:12:23,301
+donc la valeur du type énuméré « Couleur »
+est « vide »,
+
+236
+00:12:23,763 --> 00:12:28,085
+alors je peux choisir, par convention, 
+d'afficher sur le terminal un espace,
+
+237
+00:12:28,786 --> 00:12:31,126
+sinon procéder à d'autres tests.
+
+238
+00:12:31,126 --> 00:12:35,345
+Si la valeur de la case correspond 
+à la valeur du type énuméré « rouge »,
+
+239
+00:12:35,345 --> 00:12:39,307
+seconde convention possible
+-- je peux choisir une convention quelconque --
+
+240
+00:12:39,307 --> 00:12:42,332
+ici par exemple 'O' pour la valeur « rouge ».
+
+241
+00:12:42,428 --> 00:12:45,073
+Et puis dernier cas, je sais 
+qu'il s'agit de la valeur « jaune »;
+
+242
+00:12:45,417 --> 00:12:50,175
+je fais un choix d'affichage 
+quelconque, par exemple 'X'
+
+243
+00:12:50,208 --> 00:12:52,252
+pour afficher la valeur « jaune ».
+
+244
+00:12:53,505 --> 00:12:56,470
+Ici, se termine le corps 
+de ma première « boucle for »,
+
+245
+00:12:56,632 --> 00:12:58,123
+la « boucle for » la plus interne.
+
+246
+00:12:58,123 --> 00:13:01,760
+A ce stade j'ai affiché 
+le contenu d'une ligne.
+
+247
+00:13:02,470 --> 00:13:06,078
+Je prends la précaution 
+de faire un saut de ligne
+
+248
+00:13:06,078 --> 00:13:07,936
+pour séparer les différentes lignes
+
+249
+00:13:07,936 --> 00:13:09,396
+une fois qu'une ligne 
+a été entièrement affichée.
+
+250
+00:13:09,396 --> 00:13:13,586
+Ce qui clôt le corps 
+de la toute première « boucle for ».
+
+251
+00:13:13,991 --> 00:13:17,245
+Ensuite je peux terminer 
+le corps de ma fonction « affiche ».
+
+252
+00:13:17,668 --> 00:13:19,763
+Vous noterez ici qu'il n'a pas été 
+nécessaire
+
+253
+00:13:19,779 --> 00:13:21,536
+dans mes « itérations 
+sur ensemble de valeurs »
+
+254
+00:13:21,536 --> 00:13:23,964
+d'avoir recours au symbole &.
+
+255
+00:13:23,964 --> 00:13:24,879
+Pourquoi ?
+
+256
+00:13:24,879 --> 00:13:28,429
+Parce que je ne fais que consulter
+le contenu des différents éléments.
+
+257
+00:13:28,429 --> 00:13:29,962
+Je ne veux pas en modifier le contenu
+
+258
+00:13:30,182 --> 00:13:33,550
+Dans ce cas là, « auto » sans le symbole 
+du passage par référence
+
+259
+00:13:33,550 --> 00:13:34,957
+est entièrement suffisant.
+
+260
+00:13:34,957 --> 00:13:37,361
+En bon programmeur, 
+je vais maintenant m'atteler
+
+261
+00:13:37,361 --> 00:13:39,199
+à commenter ma fonction « affiche ».
+
+262
+00:13:39,199 --> 00:13:41,768
+En effet, les choix d'affichage 
+auxquels j'ai procédé
+
+263
+00:13:41,768 --> 00:13:43,450
+ne sont pas forcément prévisibles,
+
+264
+00:13:43,450 --> 00:13:46,373
+donc il est bien que quelqu'un 
+qui consulte mon code
+
+265
+00:13:46,373 --> 00:13:48,817
+puisse connaître ces conventions 
+sans pour autant
+
+266
+00:13:48,817 --> 00:13:51,137
+aller lire l'intégralité 
+du corps de la fonction.
+
+267
+00:13:51,137 --> 00:13:55,757
+A ce moment-là, je prends la précaution 
+de commenter mon code
+
+268
+00:13:55,757 --> 00:13:59,002
+en précisant les conventions 
+adoptées pour le codage.
+
+269
+00:13:59,002 --> 00:14:05,679
+Je précise que je vais afficher un O 
+pour une case rouge et X pour une jaune.
+
+270
+00:14:07,079 --> 00:14:09,749
+Tester les fonctionnalités 
+au fur et à mesure que l'on progresse
+
+271
+00:14:09,749 --> 00:14:11,668
+dans le codage d'une application 
+est absolument indispensable
+
+272
+00:14:11,835 --> 00:14:14,451
+pour produire 
+du code robuste et de qualité.
+
+273
+00:14:14,717 --> 00:14:16,267
+C'est une recommandation 
+qui vous a été faite
+
+274
+00:14:16,267 --> 00:14:19,335
+tout au début de notre étude de cas 
+sur le Puissance 4.
+
+275
+00:14:19,335 --> 00:14:22,612
+Nous allons donc maintenant commencer 
+à tester nos premières fonctionnalités,
+
+276
+00:14:22,612 --> 00:14:25,721
+à savoir l'initialisation 
+de la grille et son affichage.
+
+277
+00:14:26,681 --> 00:14:28,401
+Pour tester les fonctionnalités 
+en question,
+
+278
+00:14:28,590 --> 00:14:30,639
+il me suffit d'écrire 
+un petit programme principal.
+
+279
+00:14:30,639 --> 00:14:37,359
+qui va simplement invoquer les fonctions
+« initialise » et « affiche » sur une grille
+
+280
+00:14:37,622 --> 00:14:40,309
+que j'aurais au préalable déclarée.
+
+281
+00:14:40,309 --> 00:14:46,327
+Ici, j'invoque ma fonctionnalité 
+d'initialisation sur la grille
+
+282
+00:14:46,327 --> 00:14:48,893
+et l'affichage de la grille.
+
+283
+00:14:50,243 --> 00:14:54,214
+Il peut être naturel ici d'avoir envie
+de tester les affichages
+
+284
+00:14:54,214 --> 00:14:55,632
+sous toutes les formes possibles.
+
+285
+00:14:55,632 --> 00:14:58,479
+Si je me contente d'initialiser la grille 
+puis de l'afficher directement
+
+286
+00:14:58,479 --> 00:15:00,779
+je n'aurais que des cases vides.
+
+287
+00:15:00,779 --> 00:15:05,080
+A ce moment-là, il est intéressant de voir
+que tous les cas sont correctement traités
+
+288
+00:15:05,080 --> 00:15:07,751
+Je vais essayer de couvrir tous les cas 
+en remplissant ma grille
+
+289
+00:15:07,751 --> 00:15:12,308
+à certains endroits avec des jetons jaunes
+
+290
+00:15:12,308 --> 00:15:14,986
+et à d'autres avec des jetons rouges.
+
+291
+00:15:14,986 --> 00:15:19,716
+Ce que je fais ici par exemple 
+sur des cases arbitrairement choisies.
+
+292
+00:15:20,676 --> 00:15:24,727
+L'affichage auquel je m'attends, 
+suite à l'exécution de ce programme,
+
+293
+00:15:24,917 --> 00:15:27,233
+devrait ressembler à ceci.
+
+294
+00:15:27,853 --> 00:15:32,776
+Ici pour toutes les cases de la grille,
+
+295
+00:15:32,916 --> 00:15:34,906
+hormis celle que 
+j'aurais explicitement affectées,
+
+296
+00:15:34,906 --> 00:15:36,356
+j'aurais l'affichage d'un espace.
+
+297
+00:15:36,356 --> 00:15:39,433
+Ce que je représente ici 
+pour plus de clarté par ce symbole,
+
+298
+00:15:39,433 --> 00:15:43,218
+mais il faut noter qu'en réalité, rien ne 
+sera affiché, il n'y aura qu'un espace.
+
+299
+00:15:43,218 --> 00:15:45,802
+Et puis, pour les deux cases particulières 
+que j'ai remplies
+
+300
+00:15:45,802 --> 00:15:48,944
+avec les jetons jaunes et rouges, 
+j'aurai des affichages particuliers.
+
+301
+00:15:48,944 --> 00:15:56,627
+Ici la case de la grille à la ligne 2 et 
+à la colonne 3 doit être jaune,
+
+302
+00:15:56,627 --> 00:15:59,588
+ce qui correspond 
+à ma convention d'affichage X.
+
+303
+00:15:59,588 --> 00:16:05,222
+Ici j'ai bel et bien l'indice de ligne 
+zéro, un, deux...
+
+304
+00:16:05,222 --> 00:16:06,886
+Ce qui correspond à ce numéro de ligne.
+
+305
+00:16:06,886 --> 00:16:14,047
+L'indice de colonne 0, 1, 2, 3 
+ce qui correspond à ceci.
+
+306
+00:16:15,252 --> 00:16:19,228
+De façon analogue je dois donc avoir 
+la convention d'affichage
+
+307
+00:16:19,228 --> 00:16:24,310
+pour un jeton rouge 
+à la position ligne 2 colonne 4.
+
+308
+00:16:24,886 --> 00:16:28,520
+Concrètement dans mon jeu du puissance 4,
+ce jeu de test me permet
+
+309
+00:16:28,520 --> 00:16:32,525
+de créer une grille qui aurait 
+un jeton jaune ici et un jeton rouge là.
+
+310
+00:16:32,525 --> 00:16:36,391
+L'essentiel est maintenant mis en place 
+et on peut commencer
+
+311
+00:16:36,391 --> 00:16:38,673
+à s'intéresser à des aspects 
+un petit peu plus cosmétiques,
+
+312
+00:16:38,673 --> 00:16:40,048
+des aspects de peaufinage.
+
+313
+00:16:40,113 --> 00:16:42,945
+Ici l'affichage de notre grille 
+est relativement austère.
+
+314
+00:16:43,227 --> 00:16:45,616
+On ne peut pas bien distinguer 
+les différentes colonnes entre elles.
+
+315
+00:16:45,616 --> 00:16:49,071
+Et ce d'autant qu'on ne voit pas 
+très bien la séparation entre les espaces.
+
+316
+00:16:49,071 --> 00:16:51,845
+Il serait bien d'améliorer 
+un petit peu cet affichage
+
+317
+00:16:51,845 --> 00:16:54,904
+ce que l'on peut faire 
+en complétant le code existant,
+
+318
+00:16:54,904 --> 00:16:58,953
+en y greffant les ajouts suivants 
+que je vais maintenant commenter.
+
+319
+00:16:58,953 --> 00:17:02,534
+Ceci nous permettrait d'avoir 
+un affichage un petit peu plus explicite.
+
+320
+00:17:02,534 --> 00:17:07,488
+Notamment de séparer les différentes 
+colonnes par des barres verticales
+
+321
+00:17:07,488 --> 00:17:11,834
+et puis, de numéroter explicitement 
+les différentes colonnes
+
+322
+00:17:11,834 --> 00:17:14,846
+en-dessous de la grille
+afin de pouvoir visualiser plus clairement
+
+323
+00:17:14,846 --> 00:17:16,531
+le contenu de notre grille de jeu.
+
+324
+00:17:16,531 --> 00:17:21,120
+Quels ont été les ajouts nécessaires 
+pour parvenir à cette forme d'affichage ?
+
+325
+00:17:21,120 --> 00:17:26,381
+Et bien, je commence avant chaque ligne,
+
+326
+00:17:26,381 --> 00:17:29,695
+par afficher un espace 
+suivi d'une barre verticale.
+
+327
+00:17:29,695 --> 00:17:33,529
+Ce qui va permettre d'afficher chacun 
+de ces éléments pour chacune des lignes.
+
+328
+00:17:33,529 --> 00:17:39,599
+Ensuite, après l'affichage du contenu 
+de chaque case
+
+329
+00:17:39,599 --> 00:17:42,283
+qu'il soit vide, rouge ou jaune,
+
+330
+00:17:42,283 --> 00:17:47,180
+je suis l'affichage 
+par celui d'une barre verticale.
+
+331
+00:17:47,180 --> 00:17:50,172
+Ce qui me permet d'afficher 
+chacune de ces barres verticales ici.
+
+332
+00:17:50,172 --> 00:17:53,455
+Le reste des traitements 
+est exactement pareil.
+
+333
+00:17:53,455 --> 00:17:57,004
+Ensuite lorsque j'ai affiché 
+l'intégralité de la grille,
+
+334
+00:17:57,004 --> 00:18:01,754
+je vais m'intéresser à afficher 
+cette partie en dessous de la grille,
+
+335
+00:18:01,754 --> 00:18:05,196
+ce qui fait l'objet des lignes de codes 
+que vous avez ici sous les yeux
+
+336
+00:18:05,196 --> 00:18:06,667
+et que je vais commenter.
+
+337
+00:18:06,667 --> 00:18:09,226
+Je commence par faire afficher 
+un symbole égal qui est ce symbole,
+
+338
+00:18:11,785 --> 00:18:14,345
+qui est un cas particulier en fait,
+
+339
+00:18:14,345 --> 00:18:16,401
+qui ne correspond pas 
+au contenu d'une colonne.
+
+340
+00:18:16,401 --> 00:18:19,703
+Il correspond simplement à l'espace 
+précédant la première colonne.
+
+341
+00:18:20,173 --> 00:18:21,932
+Ensuite par une « boucle for »,
+
+342
+00:18:22,930 --> 00:18:26,861
+je vais itérer sur l'ensemble 
+des colonnes pour afficher le numéro.
+
+343
+00:18:28,216 --> 00:18:32,433
+Je précède l'affichage de chaque numéro
+par l'affichage du symbole égal.
+
+344
+00:18:33,223 --> 00:18:37,055
+En fait, la « boucle for » ici 
+va me permettre d'afficher
+
+345
+00:18:37,055 --> 00:18:42,643
+chaque numéro précédé du signe égal.
+
+346
+00:18:42,659 --> 00:18:44,715
+Donc ici, j'ai pris la précaution 
+de numéroter mes colonnes
+
+347
+00:18:44,715 --> 00:18:47,929
+à partir du nombre 1 
+afin que ce soit plus lisible.
+
+348
+00:18:47,929 --> 00:18:52,189
+Une fois que j'ai terminé cette « boucle for »,
+j'aurai affiché
+
+349
+00:18:52,189 --> 00:18:55,266
+le dernier numéro de colonne 
+précédé du symbole égal.
+
+350
+00:18:55,266 --> 00:18:58,086
+Si je veux clore mon affichage 
+de façon harmonieuse,
+
+351
+00:18:58,086 --> 00:19:01,022
+il ne me reste plus 
+qu'à afficher le double symbole égal
+
+352
+00:19:01,022 --> 00:19:03,213
+que vous avez ici sous les yeux.
+
+353
+00:19:03,822 --> 00:19:07,285
+Ceci est suivi d'autant de retours 
+de ligne qu'il me semble nécessaire.
+
+354
+00:19:07,285 --> 00:19:10,229
+A ce moment-là, 
+j'aurais peaufiné mon affichage
+
+355
+00:19:10,229 --> 00:19:11,931
+de sorte à le rendre plus lisible.
+
+356
+00:19:12,991 --> 00:19:15,132
+Notez ici que je ne suis pas 
+en train d'itérer
+
+357
+00:19:15,416 --> 00:19:17,909
+sur l'ensemble des valeurs de la grille.
+
+358
+00:19:18,202 --> 00:19:23,325
+Mais je suis en train d'itérer autant de 
+fois qu'il y a de colonnes dans la grille.
+
+359
+00:19:23,325 --> 00:19:26,546
+A ce moment-là, 
+j'utilise une itération for classique
+
+360
+00:19:26,546 --> 00:19:28,563
+et non pas une « itération 
+sur ensemble de valeurs ».
+
+361
+00:19:28,563 --> 00:19:34,193
+Mon « i » prend autant de valeurs qu'il y a
+d'éléments, de nombre de colonnes.
+
+362
+00:19:34,388 --> 00:19:38,124
+Le nombre de colonnes est 
+un élément de type « size »,
+
+363
+00:19:38,536 --> 00:19:43,433
+ce que je représente en C++ 
+au moyen du type « size_t ».
+
+364
+00:19:43,806 --> 00:19:45,836
+Il s'agit ici 
+d'une bonne pratique à observer
+
+365
+00:19:45,836 --> 00:19:47,910
+pour coder ce genre de traitement.
+
+366
+00:19:49,270 --> 00:19:50,850
+Nous voici arrivés 
+au terme de cette étape.
+
+367
+00:19:51,054 --> 00:19:53,772
+Nous savons désormais modéliser 
+une grille de jeu Puissance 4.
+
+368
+00:19:54,122 --> 00:19:56,249
+Nous savons également l'initialiser 
+et en afficher le contenu.
+
+369
+00:19:56,538 --> 00:19:59,057
+Nous pouvons maintenant 
+passer au vif du sujet
+
+370
+00:19:59,240 --> 00:20:01,474
+qui va être l'objet 
+des séquences suivantes.

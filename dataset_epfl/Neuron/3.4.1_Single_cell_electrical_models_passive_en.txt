@@ -1,0 +1,114 @@
+Hi.
+In this tutorial
+I will explain to you how to build single cell electrical models
+We will first give you an introduction to the simulator we use.
+This simulator is also called NEURON.
+We will first build a single compartmental model.
+We will add some current injections and record the voltage from this model and we will add some ion channels to the membrane.
+Let me first show how to load the neuron simulator into Python.
+This is simply done by importing NEURON.
+As you can see, there's a link here to the documentation of the NEURON simulator so that you can have a look at all the different functions that we are going to use later in this notebook.
+Historically, the NEURON Simulator was controlled using the HOC language.
+More and more scientists are switching to the Python interface of NEURON.
+In Python there's something called the HOCObject. which can be accessed by the
+'h' property of the neuron module which contains the HOC functionality of NEURON.
+For example, to load the
+'stdrun.hoc' file which contains some handy functionality one calls the HOC function load_file using this function call.
+We also want to make sure that we always start from a clean simulator.
+So with this comment here, the 'stdinit' we can reset the state of the stimulator.
+Also for this tutorial it's important to know that all the values used in NEURON have a certain unit.
+Here is a link to the different units which will be used and I have specified the most important ones below.
+What we will do in this tutorial is construct a neuron consisting of multiple compartments.
+Let's start with one compartment.
+I first want to introduce to you how
+NEURON looks at a neuron.
+We basically have a detailed morphology that was reconstructed by experimenters and NEURON will load this kind of morphology.
+It will then discretize this morphology in different segments or compartments which you can for example see here.
+So this is a zoomed-in version of a part of a dendrite.
+The different segments are these parts here and you see the diameter and length of every segment on this graph.
+We also have something called a section.
+A section is something between two branch points.
+So here you have one branch point.
+Here you have one branch point.
+A section is a piece of dendrite or any part of of the neuron between two branch points.
+After discretizing the space
+NEURON will run an electrical simulation of this morphology.
+We will see the details later but here you can already see an example of such an electrical circuit that's been simulated.
+Basically every segment is replaced by a tiny electrical circuit and all the segments are connected by wires with some resistance.
+In this tutorial we will build a ball and stick model.
+The ball is the soma of the cell and the stick is a dendrite.
+In light gray you see the morphology of the model that we are going to build.
+In dark black is the equivalent electrical circuit.
+We will go into the detail of all the components later but basically again we have one segment or compartment that represents the soma and we have different segments in the dendrite.
+So let's start with the soma of the cell.
+So let's start with the soma.
+Initially we'll create a section in NEURON that represents the soma and we wont add any channels to the membrane of the soma.
+It means that we will only have a capacitance that represents the membrane of our soma.
+Creating the soma is done by creating a section object in NEURON.
+This section object has a name and also has a variable that specifies a number of segments so basically a soma is one compartment.
+Every section in NEURON is basically represented as a cylinder which is the same with the soma here.
+Then you can see the length and the diameter of these sections.
+For example you can do this by setting the 'L' attribute to the soma to 40 which will be 40 microns and you can also set the diameter of the soma to 40 microns too which basically will represent a sphere instead of a cylinder.
+The area function can be used to calculate the surface area of the soma.
+And we can actually use the equation of the surface area of a cylinder to see if what NEURON says to us is correct.
+As you can see if you execute this block here you get exactly the same value for the area of the membrane of the soma.
+Maybe you find it a bit strange that everything in NEURON is a cylinder because basically the soma in most cells looks like a sphere but you can also see here that it actually doesn't matter too much because if we calculate the surface area of a sphere with the diameter and length of the cylinder to be specified we get exactly the same value.
+Now we have specified the shape of the single compartmental cell.
+Electrically, the only component that is present for now is the capacitance of the cell membrane.
+We can retrieve or set a specific membrane capacitance by accessing the 'cm' field as we can see here.
+The units of this field are microfarad per square centimeter
+(Î¼F/cm2).
+This specific capacitance that is stored in that variable is only a value per cmÂ² so per surface area of the soma.
+If you want to know the total capacitance of the soma, you have to multiply this by the total surface area of the soma and as you can see here we get this kind of value.
+You only have to be careful with the units because the surface area is in micrometer squared (Î¼mÂ²) while the capacitance is per cmÂ² so you need to have a correction factor for the units.
+Now we have this electrical circuit.
+What does this mean?
+We have the internals of the cell which is marked by this connector here and we have the outside of the cell which is grounded.
+What we will do in NEURON is calculate the voltage difference between the inside of the cell and the outside of the cell
+NEURON stores the voltage difference between inside and outside of the cell in a variable called 'v'.
+So for example even if you didn't do any simulation yet you can already ask an initial value of this value at the soma.
+I also want to point out this 0.5 value here so basically every section you can ask certain variables at different locations.
+The 0.5 here means that it's the middle of the soma.
+If you want to have one side of the soma, you take zero and the other side it's 1 so it's basically there is a range variable between zero and 1 that you can specify.
+As you can see, the voltage of the soma is -65 mV (millivolts).
+This is roughly the typical value of a neuron at rest.
+Then we also have the time variable of the simulator which will advance during our simulation but at the moment this is set to zero.
+Then we also have to set the variable called 'tstop' which will define how long our simulation will run.
+To record the time and voltage we create two neuron vector objects.
+These objects have a record method that when passed a reference to a variable will record the value of that variable in the vector during the simulation.
+For example, here we record the time and the voltage.
+Now, running the simulation is as easy as just calling the run method.
+The run method will basically advance the time from zero to the variable tstop we have defined.
+In this case
+100 ms.
+I've also created a little plot function to show the time and the voltage.
+As you can see, the voltage during our simulation has stayed the same.
+You can also see this from the equations, so basically NEURON is integrating an equation like the one you can see here, and if we put a zero current so we didn't inject any current in the model at the moment, we actually get a variable of dV which is a voltage difference of zero, which perfectly explains our plot here.
+To make this simulation a bit more interesting we'll inject a current.
+You basically do this by sticking a pipette into the soma and injecting a certain current.
+This is done by creating an 'iclamp' object in Neuron.
+The 'iclamp' object let's us specify the amount of current we are going to inject in nanoamps (nA) and also the delay and the duration of the stimulus.
+When we run our simulation we now get this kind of curve.
+Basically now we are integrating this equation here but unlike in the previous simulation, the I_m is not zero anymore but is equal to the value of the amplitude of the 'iclamp'.
+When we fill out all the variables is this equation we actually can calculate how much voltage difference we are going to see in the plot.
+So here we are actually comparing the voltage difference reported by the simulation and by our little calculation and it shows that these values are exactly the same.
+In a real neuron you don't just have a capacitance that forms the membrane but this membrane also contains ion channels.
+Let's start adding these to our model.
+The first one we'll add is the lead conductors.
+To insert such channels we have to insert certain mechanisms in NEURON.
+The mechanism represents which equations NEURON has to use to calculate the ion channel currents.
+One example is the 'hh' mechanism which represents the
+Hodgkin-Huxley model.
+When adding this 'hh' mechanism
+NEURON will integrate the following equation to get the membrane voltage over time.
+Like I said, at the moment we are mostly interested in the leak current so we are going to set the sodium and potassium currents to zero for the moment; so the final equation is this.
+Now we have introduced two new variables.
+We have the 'E_leak' and we have the 'G_leak'.
+The 'G_leak' is set by the
+'gl_hh' variable and we can set it to a certain value.
+Now we can also set the 'E_leak' and the 'E_leak' is basically the potential that the leakage channel will pull the cell to.
+Basically at the moment we are going to set it to exactly the reversal potential so that the cell will always naturally fall back to the reversal potential.
+When we now simulate this you see that our graph has changed.
+I have now a little question for you.
+Compare this graph to the previous one and if you look at the equations, do you understand why the voltage flattens out at the end of the stimulus here?
+Also as an exercise, when you assume that the time derivative between 40 and 60 milliseconds (ms) is zero, calculate the average voltage in that interval.

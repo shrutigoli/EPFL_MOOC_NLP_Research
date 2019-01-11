@@ -1,0 +1,1225 @@
+1
+00:00:04,360 --> 00:00:07,458
+In this lecture, 
+I'm going to cover locality.
+
+2
+00:00:07,458 --> 00:00:12,272
+Locality is the notion that 
+you would probably intuitively assume
+
+3
+00:00:12,272 --> 00:00:14,959
+is about things being 
+close to each other or not.
+
+4
+00:00:14,959 --> 00:00:18,486
+A little focus to some extent
+on date locality,
+
+5
+00:00:18,486 --> 00:00:20,262
+versus locality of computation.
+
+6
+00:00:20,262 --> 00:00:22,507
+Nowadays, in more and more
+scenarios in computer science,
+
+7
+00:00:22,507 --> 00:00:28,523
+we realize that data governs computation
+and if we remove computation
+
+8
+00:00:28,523 --> 00:00:30,674
+to better data rather than vice versa.
+
+9
+00:00:30,674 --> 00:00:32,594
+Of course, there will be concerns
+
+10
+00:00:32,594 --> 00:00:37,089
+about parallelization,
+concurrency and networking
+
+11
+00:00:37,089 --> 00:00:40,929
+but we have to worry about computations
+happening in different places
+
+12
+00:00:40,929 --> 00:00:44,059
+but usually, everything
+is centered around data.
+
+13
+00:00:44,297 --> 00:00:51,017
+Locality in a sense is the aspect
+of system that most closely relates
+
+14
+00:00:51,017 --> 00:00:52,627
+software systems with the physical world.
+
+15
+00:00:52,863 --> 00:00:56,556
+With the world of atoms and matter, etc.
+
+16
+00:00:56,742 --> 00:01:00,944
+We can fundamentally only pack
+so much memory and computing power
+
+17
+00:01:00,944 --> 00:01:02,273
+into a limited space.
+
+18
+00:01:02,273 --> 00:01:07,438
+If we build a CPU, there will be
+gates, transistors inside the CPU
+
+19
+00:01:07,438 --> 00:01:10,505
+and the amount of integration
+we can do will be limited
+
+20
+00:01:10,505 --> 00:01:12,531
+by physical concerns of the real world.
+
+21
+00:01:12,531 --> 00:01:18,597
+As data and computation needs grow,
+we'll get into locality problems.
+
+22
+00:01:18,709 --> 00:01:22,748
+Data, just like computation,
+takes space inside chips
+
+23
+00:01:22,748 --> 00:01:24,316
+or other devices.
+
+24
+00:01:24,316 --> 00:01:30,030
+In a sense we can reduce pretty much
+any concern about the performance
+
+25
+00:01:30,030 --> 00:01:32,615
+in the systems to locality considerations.
+
+26
+00:01:33,745 --> 00:01:37,155
+In computing, essentially all time
+and energy costs is due to moving
+
+27
+00:01:37,155 --> 00:01:38,326
+data over a distance.
+
+28
+00:01:38,326 --> 00:01:41,800
+That's relatively clear if you think about
+the data transfer, let's say from RAM
+
+29
+00:01:41,800 --> 00:01:42,897
+to a CPU cache.
+
+30
+00:01:42,897 --> 00:01:45,510
+Obviously the time this takes is governed
+by the speed of light
+
+31
+00:01:45,510 --> 00:01:48,123
+and the time it takes
+
+32
+00:01:48,123 --> 00:01:50,736
+to move to see the message 
+from the RAM to the CPU.
+
+33
+00:01:50,736 --> 00:01:55,736
+It is in the more abstract sense
+also truthful computing in general.
+
+34
+00:01:55,736 --> 00:02:00,353
+If you figure the gates
+and the connections in between them
+
+35
+00:02:00,353 --> 00:02:01,512
+inside the CPU,
+
+36
+00:02:01,512 --> 00:02:08,161
+we can think of a computation
+being governed by the way it travels
+
+37
+00:02:08,161 --> 00:02:11,655
+by some bits that is involved
+in the computation.
+
+38
+00:02:11,655 --> 00:02:15,953
+So even if you got a loop, that means that
+the bits flow in some sense
+
+39
+00:02:15,953 --> 00:02:19,837
+several ways in circles so to say
+from the same gates in general
+
+40
+00:02:19,837 --> 00:02:23,327
+we can still think of this as
+overall time travels governing
+
+41
+00:02:23,327 --> 00:02:25,988
+the time it takes to do the computation.
+
+42
+00:02:27,188 --> 00:02:28,982
+Now, there's fundamental limits
+
+43
+00:02:28,982 --> 00:02:32,254
+to shrinking the distances
+these electrons have to travel.
+
+44
+00:02:32,254 --> 00:02:34,656
+There is quantum effect to soon take over
+
+45
+00:02:34,656 --> 00:02:37,555
+as we integrate our chips further,
+make them smaller.
+
+46
+00:02:37,555 --> 00:02:41,234
+So automatically it will not be able
+to work with messages that are constituted
+
+47
+00:02:41,234 --> 00:02:42,690
+by less than one electron.
+
+48
+00:02:42,690 --> 00:02:45,491
+And there's of course, noise,
+on these very small scales
+
+49
+00:02:45,491 --> 00:02:48,301
+that will require to have
+more than one electron.
+
+50
+00:02:48,301 --> 00:02:51,184
+There is this fundamental
+failure of Dennard Scaling,
+
+51
+00:02:51,184 --> 00:02:54,096
+that we observe in computer
+architecture, which is in a sense,
+
+52
+00:02:54,096 --> 00:02:59,122
+more fundamental, less contested
+and more important than what we
+
+53
+00:02:59,122 --> 00:03:01,741
+sometimes consider the feel of, 
+the upcoming feel of Moore's law.
+
+54
+00:03:01,741 --> 00:03:06,471
+So, in Dennard scaling, Dennard's law,
+refers to the empirical effect over
+
+55
+00:03:06,471 --> 00:03:07,761
+many decades now.
+
+56
+00:03:07,842 --> 00:03:11,073
+We've been able to reduce
+the voltages needed
+
+57
+00:03:11,073 --> 00:03:15,783
+to run our computations
+with the size integrations
+
+58
+00:03:15,783 --> 00:03:20,346
+that means we double the number
+of gates, we half the size
+
+59
+00:03:20,346 --> 00:03:24,881
+of each gate needed so overall the space
+didn't grow and we also halved'
+
+60
+00:03:24,881 --> 00:03:26,454
+the voltages needed
+so we didn't need more energy.
+
+61
+00:03:26,454 --> 00:03:31,444
+Now this Dennard Law is now failing
+and it's really failing permanently.
+
+62
+00:03:31,444 --> 00:03:36,618
+Which means, we still might be able to 
+integrate and decrease sizes
+
+63
+00:03:36,618 --> 00:03:40,272
+for some more time, energies
+and energy densities increase
+
+64
+00:03:40,272 --> 00:03:44,028
+which means our chips get hotter,
+and it gets harder to keep them cool.
+
+65
+00:03:45,288 --> 00:03:49,607
+That also relates to the fact
+that only have two or if you like to see
+
+66
+00:03:49,607 --> 00:03:54,097
+at most three dimensions to pack stuff
+and that means gates in a CPU into space.
+
+67
+00:03:54,097 --> 00:03:56,556
+People right now are working
+on three dimensional chips
+
+68
+00:03:56,556 --> 00:04:00,805
+but already for two dimensional chips, 
+right now with this high integrations
+
+69
+00:04:00,805 --> 00:04:02,852
+cooling is very hard 
+and for three dimensional chips,
+
+70
+00:04:02,852 --> 00:04:04,096
+it gets even harder.
+
+71
+00:04:04,096 --> 00:04:06,798
+So cooling becomes
+a really important challenge
+
+72
+00:04:06,798 --> 00:04:09,220
+apart from the fact that if
+you are using a lot of energy,
+
+73
+00:04:09,220 --> 00:04:10,415
+that also has a cost.
+
+74
+00:04:11,775 --> 00:04:16,110
+Computation links need space.
+Buses and networks increasingly become
+
+75
+00:04:16,110 --> 00:04:18,749
+bottlenecks as we
+integrate and grow our data
+
+76
+00:04:18,749 --> 00:04:21,105
+and our computation capacities further.
+
+77
+00:04:21,105 --> 00:04:25,442
+That means, as we have computers
+with more and more data at the disposal
+
+78
+00:04:25,442 --> 00:04:31,046
+or storage capacities at their disposal,
+the relative bandwidths for transferring
+
+79
+00:04:31,046 --> 00:04:32,535
+this data decreases.
+
+80
+00:04:33,855 --> 00:04:38,410
+In many, if not in most 
+modern applications we care about.
+
+81
+00:04:38,410 --> 00:04:42,255
+Including big data analytics,
+video streaming, things like this.
+
+82
+00:04:42,835 --> 00:04:45,795
+CPUs are now mainly waiting
+for data to arrive,
+
+83
+00:04:45,795 --> 00:04:50,530
+and one could argue that this should
+inform and guide us in our design
+
+84
+00:04:50,530 --> 00:04:51,480
+of new hardware.
+
+85
+00:04:51,863 --> 00:04:53,641
+But this is not just for two
+or three dimensional
+
+86
+00:04:53,641 --> 00:04:55,171
+applications of course.
+
+87
+00:04:55,171 --> 00:04:59,524
+The solution to this, of course is cache
+hierarchies, prefetching, etc.
+
+88
+00:05:02,114 --> 00:05:05,685
+Now, there's an important notion
+of memory hierarchies and we should
+
+89
+00:05:05,685 --> 00:05:07,175
+talk about this a little.
+
+90
+00:05:08,505 --> 00:05:11,601
+If you think of a computer system,
+it will have multiple CPUs.
+
+91
+00:05:11,601 --> 00:05:14,097
+maybe with multiple cores.
+Here on this right side we have
+
+92
+00:05:14,097 --> 00:05:18,506
+an example picture where we've got
+single core CPUs and these CPUs
+
+93
+00:05:18,506 --> 00:05:20,101
+have caches.
+
+94
+00:05:20,821 --> 00:05:23,666
+Then there's the anagram that connects
+to these caches and connects
+
+95
+00:05:23,666 --> 00:05:25,549
+at the same time also
+to the storage devices.
+
+96
+00:05:25,549 --> 00:05:28,745
+They might be storage devices like
+hard drives, flash drives, etc.
+
+97
+00:05:28,745 --> 00:05:32,165
+And they themselves have (inaudible)
+several layers of (inaudible)
+
+98
+00:05:32,165 --> 00:05:36,290
+including the physical storage device
+and then a number of caches, potentially.
+
+99
+00:05:37,397 --> 00:05:40,879
+It is important to understand and remember
+that there's vastly different
+
+100
+00:05:40,879 --> 00:05:45,397
+transfer rates and speeds at which
+these different devices can be accessed
+
+101
+00:05:45,657 --> 00:05:46,887
+for read and write.
+
+102
+00:05:47,170 --> 00:05:50,224
+On this slide I've got
+a number of examples
+
+103
+00:05:50,224 --> 00:05:54,927
+for a specific model
+and chip and you can see that
+
+104
+00:05:54,927 --> 00:05:58,072
+in all the times it takes
+to do certain tasks even inside the CPU
+
+105
+00:05:58,072 --> 00:06:02,202
+for different caches really differs
+by two orders of magnitude basically.
+
+106
+00:06:03,842 --> 00:06:08,002
+So if I take the fastest cache
+and I hit something it means
+
+107
+00:06:08,002 --> 00:06:10,551
+it is in the cache and I don't
+have to go further to find
+
+108
+00:06:10,551 --> 00:06:12,866
+my data, it takes about
+four cycles on this chip
+
+109
+00:06:12,866 --> 00:06:17,391
+while having to access
+the level three cache
+
+110
+00:06:17,391 --> 00:06:20,451
+off that CPU and let's say
+even on a different CPU
+
+111
+00:06:20,451 --> 00:06:23,200
+on that same main board
+might take hundreds of cycles.
+
+112
+00:06:24,190 --> 00:06:27,164
+Now if we assume that this chip
+has a (inaudible) frequency of
+
+113
+00:06:27,164 --> 00:06:29,893
+three gHz, then accessing
+local TRAM which takes,
+
+114
+00:06:29,893 --> 00:06:32,809
+let's say six nanoseconds,
+takes 180 cycles.
+
+115
+00:06:32,809 --> 00:06:38,503
+Accessing or seeking on a hard drive
+10 milliseconds, takes about
+
+116
+00:06:38,503 --> 00:06:43,256
+40 million cycles, so we see
+a vast difference on the magnitude
+
+117
+00:06:43,256 --> 00:06:47,687
+and speed, about seven orders
+of magnitude between fast caches
+
+118
+00:06:47,687 --> 00:06:51,269
+and hard drives. Of course there's devices
+that are even slower.
+
+119
+00:06:54,439 --> 00:07:00,593
+So there are a number of basic principles
+to optimize locality that we are going
+
+120
+00:07:00,593 --> 00:07:02,947
+to talk about in this series of videos.
+
+121
+00:07:02,947 --> 00:07:05,983
+I have a group of three major ideas here.
+
+122
+00:07:05,983 --> 00:07:10,419
+The first is caching, which is about
+keeping some kind of work inside
+
+123
+00:07:10,419 --> 00:07:13,417
+of data that's frequently used
+close to where the computation happens.
+
+124
+00:07:13,417 --> 00:07:18,240
+Another one is to prefer sequential 
+over random access.
+
+125
+00:07:19,741 --> 00:07:23,696
+Physics governs that some data
+is better read or written sequential
+
+126
+00:07:23,878 --> 00:07:25,804
+than by random access, that's true
+for many kinds of devices.
+
+127
+00:07:25,804 --> 00:07:31,848
+It's very obvious for hard drives or tapes
+but it's also true for even an ananogram
+
+128
+00:07:31,848 --> 00:07:32,811
+for example.
+
+129
+00:07:32,811 --> 00:07:36,546
+In a sense, prefetching connects caching
+and this notion of sequential
+
+130
+00:07:36,546 --> 00:07:40,689
+over random access in a sense that
+when you do things like branch prediction.
+
+131
+00:07:40,689 --> 00:07:46,002
+If you try to predict what to prefetch
+into a cache, often enough you try to get
+
+132
+00:07:46,002 --> 00:07:48,658
+more of the same. We try to continue
+sequential that we have been reading.
+
+133
+00:07:48,658 --> 00:07:53,255
+And another, in a sense the final major
+class of things that you can do
+
+134
+00:07:53,255 --> 00:07:57,997
+for locality is partitioning 
+and dealing with data
+
+135
+00:07:57,997 --> 00:07:59,295
+in a data parallel way.
+
+136
+00:07:59,295 --> 00:08:02,556
+Not necessarily using parallelization
+but basically splitting up the parts
+
+137
+00:08:02,556 --> 00:08:04,356
+and doing divide and conquer.
+
+138
+00:08:04,713 --> 00:08:11,176
+We're going to talk in future videos
+about use cases
+
+139
+00:08:11,176 --> 00:08:13,018
+like out of core algorithms,
+things like joints and sorting.
+
+140
+00:08:13,734 --> 00:08:17,642
+Let's closer into these three strategies
+and start with caching.
+
+141
+00:08:17,642 --> 00:08:22,142
+Caching is really everywhere in systems
+there's many examples and just some
+
+142
+00:08:22,142 --> 00:08:24,602
+of them are of course, the CPU caches.
+
+143
+00:08:24,916 --> 00:08:29,416
+In address translation,memory management,
+as the translation look at side buffers.
+
+144
+00:08:29,416 --> 00:08:32,774
+In networks there's many examples,
+one is edge caches which are really
+
+145
+00:08:32,774 --> 00:08:35,755
+fundamental to be able to do for example
+streaming video on the internet
+
+146
+00:08:35,755 --> 00:08:37,506
+in reasonable times.
+
+147
+00:08:37,506 --> 00:08:42,284
+Another example are buffers
+in operating systems, data base management
+
+148
+00:08:42,284 --> 00:08:44,783
+systems, storage device controllers, etc.
+
+149
+00:08:44,890 --> 00:08:48,958
+Another example is materialized use
+in database systems.
+
+150
+00:08:48,958 --> 00:08:53,541
+There you can basically take a query and
+store the query result for future use.
+
+151
+00:08:53,541 --> 00:08:57,851
+Caching is actually frequently equated
+with localities so if you look
+
+152
+00:08:57,851 --> 00:09:01,732
+at our textbook, Salzer and Kaashoek,
+there's a performance chapter
+
+153
+00:09:01,732 --> 00:09:04,784
+and in there they talk about locality
+and for them it's just caching
+
+154
+00:09:04,784 --> 00:09:07,113
+and I think there's more to it.
+
+155
+00:09:07,113 --> 00:09:12,643
+We mentioned prefetching
+as one way to do speculative filling
+
+156
+00:09:12,643 --> 00:09:15,623
+of a cache, to have stuff in there
+that you might use next
+
+157
+00:09:15,636 --> 00:09:18,456
+so that you don't have to wait for it
+How can you do it?
+
+158
+00:09:18,456 --> 00:09:21,093
+There's of course different techniques
+and many of them are trade secrets
+
+159
+00:09:21,093 --> 00:09:22,703
+but often enough 
+there's nothing better
+
+160
+00:09:22,703 --> 00:09:24,339
+that you can do than to assume
+
+161
+00:09:24,339 --> 00:09:27,634
+that some loop is going to continue
+and you're going to eat more of the stuff
+
+162
+00:09:27,634 --> 00:09:31,030
+that you've been just reading on
+sequentially from wherever
+
+163
+00:09:31,030 --> 00:09:33,645
+on the next lower level no matter where
+or how the data is coming from.
+
+164
+00:09:33,645 --> 00:09:37,892
+That connects us to sequential access.
+
+165
+00:09:39,282 --> 00:09:42,354
+Sequential access is fast 
+than random access
+
+166
+00:09:42,354 --> 00:09:43,894
+in many different kinds
+of storage devices
+
+167
+00:09:43,894 --> 00:09:45,137
+in the memory technology.
+
+168
+00:09:45,137 --> 00:09:46,545
+What does this mean?
+
+169
+00:09:46,545 --> 00:09:49,403
+So there is some notion
+of locality of storage
+
+170
+00:09:49,403 --> 00:09:52,703
+for example in a hard drive,
+things can be stored sequentially
+
+171
+00:09:52,703 --> 00:09:57,013
+in tracks on disks, on RAM there are
+gates close to each other
+
+172
+00:09:57,175 --> 00:10:01,751
+that have addresses similar to each other
+and we're going to talk about
+
+173
+00:10:01,751 --> 00:10:04,276
+sequential access via reading
+things that are close to each other
+
+174
+00:10:04,276 --> 00:10:08,942
+in physical storage versus random access
+we have to jump around and go from one
+
+175
+00:10:08,942 --> 00:10:10,418
+(inaudible) to the other
+that are completely unrelated
+
+176
+00:10:10,418 --> 00:10:11,410
+to each other.
+
+177
+00:10:11,532 --> 00:10:15,831
+Now in hard drives, it's perfectly clear
+why sequential access is faster than
+
+178
+00:10:15,831 --> 00:10:16,915
+random access.
+
+179
+00:10:16,915 --> 00:10:20,351
+There, we've got a physical read/write head
+and we've got a rotating disk
+
+180
+00:10:20,351 --> 00:10:24,117
+so that the read/write test has to place
+itself on the right track on our disks
+
+181
+00:10:24,117 --> 00:10:26,682
+and the disks have to rotate to the right
+place to be able to start reading
+
+182
+00:10:26,682 --> 00:10:27,975
+a particular address.
+
+183
+00:10:27,975 --> 00:10:33,105
+That takes time because we've got
+mechanical pieces rotating, moving around
+
+184
+00:10:33,105 --> 00:10:36,654
+and that's of course, extremely slow
+on the time scales that they talk about
+
+185
+00:10:36,654 --> 00:10:38,114
+in the context of computing.
+
+186
+00:10:38,440 --> 00:10:43,721
+Now, your seek times in modern
+disks are on the level of let's say
+
+187
+00:10:43,721 --> 00:10:45,536
+ten milliseconds each time.
+
+188
+00:10:46,396 --> 00:10:49,006
+Once you're at the right place,
+transferring lots and lots
+
+189
+00:10:49,006 --> 00:10:52,477
+of pages of data, very quickly,
+that's kind of fast.
+
+190
+00:10:52,477 --> 00:10:57,776
+We might be reading tens of mega bytes
+per second, so if we have to randomly
+
+191
+00:10:57,776 --> 00:11:01,827
+jump around for each byte and incur
+ten milliseconds of sync time, every time,
+
+192
+00:11:01,827 --> 00:11:05,664
+we're going to have
+horrible access times.
+
+193
+00:11:05,664 --> 00:11:08,857
+While, if we get to go to a place
+and then sequential read basically
+
+194
+00:11:08,857 --> 00:11:10,720
+off the hard drive, that's going to be
+
+195
+00:11:10,720 --> 00:11:12,164
+quite good.
+
+196
+00:11:13,164 --> 00:11:16,643
+It is also true for devices
+that are not like this,
+
+197
+00:11:16,643 --> 00:11:19,143
+that are not physically a rotating
+disk for example.
+
+198
+00:11:19,143 --> 00:11:21,845
+Let's take for example
+flash and solid state devices.
+
+199
+00:11:21,845 --> 00:11:26,615
+They designed model solid state devices
+in a way that you can only write
+
+200
+00:11:26,615 --> 00:11:28,412
+certain sized blocks.
+
+201
+00:11:28,667 --> 00:11:33,651
+This is actually also true for hard drives
+but you can write only to places
+
+202
+00:11:33,651 --> 00:11:36,679
+that are empty in a sense,
+and if something is not empty
+
+203
+00:11:36,679 --> 00:11:37,823
+you have to erase it first.
+
+204
+00:11:37,823 --> 00:11:41,819
+While you cannot just write
+individual bytes, let's say,
+
+205
+00:11:41,819 --> 00:11:45,450
+or words to locations but you have to
+write in blocks.
+
+206
+00:11:45,450 --> 00:11:47,161
+Erasure applies to even larger blocks.
+
+207
+00:11:47,577 --> 00:11:52,777
+So, we mean if you've got a fragmented
+solid state drive you must first
+
+208
+00:11:52,777 --> 00:11:56,109
+defragment it, erasing large regions
+to be able to do this.
+
+209
+00:11:56,109 --> 00:11:58,586
+You might have to move useless stuff
+that you still need around
+
+210
+00:11:58,586 --> 00:12:02,937
+and solid state devices controls have
+garbage collectors and corresponding
+
+211
+00:12:02,937 --> 00:12:04,509
+caching strategies, etc.
+
+212
+00:12:05,179 --> 00:12:09,050
+Counterintuitively it's actually
+also true for dynamic RAM.
+
+213
+00:12:09,050 --> 00:12:12,856
+That means sequential access is preferred
+over random access
+
+214
+00:12:12,856 --> 00:12:14,773
+for random access memory.
+
+215
+00:12:14,773 --> 00:12:17,883
+That's counterintuitive but why
+is that true? Well, one is
+
+216
+00:12:18,131 --> 00:12:22,241
+if you want to address
+a consecutive block of memory
+
+217
+00:12:22,241 --> 00:12:25,857
+in random access memory,
+there are techniques for optimizing
+
+218
+00:12:25,857 --> 00:12:28,171
+this information transfer
+on the bus this requests
+
+219
+00:12:28,171 --> 00:12:31,442
+to actually use little space
+you might see "I want to read this range",
+
+220
+00:12:31,442 --> 00:12:34,603
+or "I want to transfer this entire block
+in random access memory".
+
+221
+00:12:34,603 --> 00:12:37,718
+That can be done more efficiently
+than having to address each individual
+
+222
+00:12:37,718 --> 00:12:39,503
+position.
+
+223
+00:12:39,503 --> 00:12:43,184
+Also, if you do random access to DRAM
+you will have lots of misses in the
+
+224
+00:12:43,184 --> 00:12:45,646
+translation local side buffer
+while you could do prefetching
+
+225
+00:12:45,646 --> 00:12:47,370
+properly to sequential access.
+
+226
+00:12:49,840 --> 00:12:53,132
+Finally, there's partitioning,
+so we've got a problem that consists
+
+227
+00:12:53,147 --> 00:12:55,431
+of larger pieces of data
+having to be processed
+
+228
+00:12:55,481 --> 00:12:59,481
+and we can decompose this data
+into pieces, process each of these
+
+229
+00:12:59,660 --> 00:13:03,789
+pieces independently, without having
+to look at the other pieces
+
+230
+00:13:03,789 --> 00:13:07,799
+having two local result and then combining
+these results, that's what they call
+
+231
+00:13:07,799 --> 00:13:09,387
+embarrassingly parallel.
+
+232
+00:13:10,917 --> 00:13:13,798
+This means, no communication
+needed between these pieces
+
+233
+00:13:13,798 --> 00:13:16,865
+of locally (inaudible) these different
+pieces and process them.
+
+234
+00:13:16,865 --> 00:13:21,272
+A more classic example is map/reduce
+which really relies on the ability
+
+235
+00:13:21,272 --> 00:13:25,422
+to assign map tasks to different pieces
+and combine their results.
+
+236
+00:13:26,562 --> 00:13:28,423
+Of course, that's not 
+applicable everywhere.
+
+237
+00:13:28,743 --> 00:13:32,567
+So it's actually a non phenomenon
+that frequently, when we look at the graph
+
+238
+00:13:32,567 --> 00:13:35,962
+the data gets processed in and by that
+I mean, not simply that our data
+
+239
+00:13:35,962 --> 00:13:39,860
+is graph shaped but there are 
+certain dependencies on aligning
+
+240
+00:13:39,860 --> 00:13:42,880
+our data, relationships between
+pieces of data that can be resent
+
+241
+00:13:42,880 --> 00:13:43,812
+in different ways.
+
+242
+00:13:43,812 --> 00:13:46,850
+For example, as relations, but also
+as graphs, for example.
+
+243
+00:13:46,850 --> 00:13:51,471
+The ace, in this graph is a relatively small
+diameter, so these are
+
+244
+00:13:51,471 --> 00:13:55,422
+the so called "small world phenomenon"
+"small world graphs" and these graphs
+
+245
+00:13:55,422 --> 00:13:58,066
+have no small cuts that means
+such problems, and they
+
+246
+00:13:58,066 --> 00:14:01,604
+are very ubiquitous and you'll see this
+in the next video, they cannot
+
+247
+00:14:01,604 --> 00:14:03,876
+be processed in an embarrassingly
+parallel fashion.
+
+248
+00:14:03,876 --> 00:14:05,638
+And that's very frequent actually.
+
+249
+00:14:06,838 --> 00:14:11,664
+To summarize, we've been talking
+about data locality, its fundamental
+
+250
+00:14:11,664 --> 00:14:16,936
+nature that connects the physical world
+with software systems, its impact
+
+251
+00:14:16,936 --> 00:14:21,193
+on performance, and arguably,
+its (inaudible) to care about
+
+252
+00:14:21,193 --> 00:14:23,984
+when you think about performance.
+You can always connect performance
+
+253
+00:14:23,984 --> 00:14:25,865
+with a data locality problem, 
+fundamentally.
+
+254
+00:14:25,865 --> 00:14:31,053
+We've talked about three broad strategies
+for dealing with locality
+
+255
+00:14:31,053 --> 00:14:32,351
+and making things more local.
+
+256
+00:14:32,351 --> 00:14:35,219
+These were caching, 
+sequential access preferred
+
+257
+00:14:35,219 --> 00:14:37,176
+and partitioning.

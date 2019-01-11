@@ -1,0 +1,1103 @@
+1
+00:00:00,000 --> 00:00:08,870
+Bonjour, nous continuons le cours
+"Comprendre les microcontrôleurs".
+
+2
+00:00:08,870 --> 00:00:12,928
+Nous avions commencé de parler de la
+gestion du temps, et
+
+3
+00:00:12,928 --> 00:00:16,920
+nous l'avions appliqué à des programmes
+qui n'utilisaient que les sorties.
+
+4
+00:00:16,920 --> 00:00:21,098
+Maintenant, nous allons aussi nous occuper
+des entrées, et
+
+5
+00:00:21,098 --> 00:00:25,390
+en particulier, regarder le problème de
+l'incertitude qui existe
+
+6
+00:00:25,390 --> 00:00:29,660
+sur les entrées, regarder comment on peut
+scruter les
+
+7
+00:00:29,660 --> 00:00:35,318
+entrées, de s'occuper de détecter des
+flancs, de considérer le
+
+8
+00:00:35,318 --> 00:00:40,342
+problème des rebonds de contact, de savoir
+aussi comment compter
+
+9
+00:00:40,342 --> 00:00:45,300
+les événements, et comment mesurer une
+durée, mesurer un temps.
+
+10
+00:00:45,300 --> 00:00:50,605
+Est-ce que vous vous souvenez du schéma
+correspondant à ce qui se trouve
+
+11
+00:00:50,605 --> 00:00:54,680
+derrière chaque patte de microcontrôleur,
+à l'intérieur du circuit?
+
+12
+00:00:54,680 --> 00:00:59,238
+Nous avions vu qu'il y avait
+fondamentalement une
+
+13
+00:00:59,238 --> 00:01:04,586
+bascule, associée à la sortie, et un
+
+14
+00:01:04,586 --> 00:01:10,030
+passeur, associé à l'entrée.
+
+15
+00:01:10,030 --> 00:01:15,776
+Lorsqu'une sortie est utilisée, ce passeur
+est utilisé, mais on voit bien
+
+16
+00:01:15,776 --> 00:01:18,778
+qu'il y a fondamentalement quelque chose
+de
+
+17
+00:01:18,778 --> 00:01:21,800
+différent entre les entrées et les
+sorties.
+
+18
+00:01:21,800 --> 00:01:26,840
+Pour une entrée, on regarde un court
+instant la valeur
+
+19
+00:01:26,840 --> 00:01:30,735
+qui se trouve sur la patte, par contre,
+pour une
+
+20
+00:01:30,735 --> 00:01:35,994
+sortie, on écrit dans une bascule, qui a
+la particularité,
+
+21
+00:01:35,994 --> 00:01:40,537
+de mémoriser cette valeur, et cette valeur
+ne va pas changer,
+
+22
+00:01:40,537 --> 00:01:43,480
+donc une nouvelle valeur ne va pas être
+écrite.
+
+23
+00:01:43,480 --> 00:01:48,855
+Donc, la bascule offre une certitude sur
+la valeur
+
+24
+00:01:48,855 --> 00:01:53,138
+de sortie, par contre, le passeur d'entrée
+ne donne
+
+25
+00:01:53,138 --> 00:01:57,240
+la valeur de l'entrée, qu'à l'instant de
+la lecture,
+
+26
+00:01:57,240 --> 00:02:02,080
+et laisse une incertitude pour tout le
+reste des instants.
+
+27
+00:02:02,080 --> 00:02:06,128
+Nous allons donc utiliser, pour lire les
+entrées,
+
+28
+00:02:06,128 --> 00:02:09,690
+un mécanisme qui s'appelle la scrutation.
+
+29
+00:02:09,690 --> 00:02:13,760
+Le terme anglais souvent utilisé est
+"polling".
+
+30
+00:02:13,760 --> 00:02:18,996
+D'après le dictionnaire, il s'agit d'un
+examen répété de l'état d'un ou de
+
+31
+00:02:18,996 --> 00:02:25,330
+plusieurs éléments d'un système, pour y
+détecter un changement éventuel.
+
+32
+00:02:25,330 --> 00:02:31,536
+Donc, on va lire, lire, lire et relire une
+entrée, en espérant y trouver
+
+33
+00:02:31,536 --> 00:02:36,070
+un événement qui va se produire, un
+changement en particulier.
+
+34
+00:02:36,070 --> 00:02:42,305
+Evidemment, les contraintes de temps,
+liées
+
+35
+00:02:42,305 --> 00:02:47,870
+à cette scrutation sont très différentes,
+selon la nature d'un problème.
+
+36
+00:02:47,870 --> 00:02:53,590
+Ici, vous voyez un tourniquet qui est
+utilisé,
+
+37
+00:02:53,590 --> 00:02:56,685
+par exemple, dans les métros pour compter
+les
+
+38
+00:02:56,685 --> 00:03:00,470
+personnes qui passent un couloir donné,
+par exemple.
+
+39
+00:03:00,470 --> 00:03:08,760
+Ici, vous avez un moteur de moto, qui peut
+tourner extrêmement rapidement.
+
+40
+00:03:08,760 --> 00:03:16,302
+Posons-nous la question, quel est le temps
+minimum entre deux scrutations, pour
+
+41
+00:03:16,302 --> 00:03:21,600
+prendre connaissance d'une manière fiable
+de la rotation de ces deux dispositifs?
+
+42
+00:03:21,600 --> 00:03:27,436
+Je précise que le tourniquet de métro
+reçoit une impulsion lors
+
+43
+00:03:27,436 --> 00:03:32,620
+du passage d'une personne, une personne
+qui marche, ou éventuellement, qui court.
+
+44
+00:03:32,620 --> 00:03:38,880
+Le moteur de moto, lui, reçoit 12
+impulsions par tour,
+
+45
+00:03:38,880 --> 00:03:44,700
+avec une vitesse maximum de 8000 tours par
+minute.
+
+46
+00:03:52,325 --> 00:03:58,075
+On va voir que cette réponse est
+acceptable, évidemment,
+
+47
+00:03:58,075 --> 00:04:03,078
+celle-là aussi, mais que seule celle-là,
+
+48
+00:04:03,078 --> 00:04:08,340
+est acceptable.
+Essayons de regarder pourquoi.
+
+49
+00:04:08,340 --> 00:04:11,380
+Le piéton va prendre environ une seconde
+pour
+
+50
+00:04:11,380 --> 00:04:15,640
+faire basculer le tourniquet, peut-être
+une demi seconde.
+
+51
+00:04:15,640 --> 00:04:17,551
+On imagine alors qu'une
+
+52
+00:04:17,551 --> 00:04:22,130
+scrutation chaque centième de seconde
+serait largement
+
+53
+00:04:22,130 --> 00:04:26,705
+suffisante.
+Par contre, le moteur tourne au maximum à
+
+54
+00:04:26,705 --> 00:04:31,871
+8000 tours par minute, soit un peu plus de
+133 tours par
+
+55
+00:04:31,871 --> 00:04:37,592
+seconde, ceci correspond à une période
+minimale d'environ 7,5
+
+56
+00:04:37,592 --> 00:04:43,095
+millisecondes.
+Si on a 12 impulsions, le temps minimum
+
+57
+00:04:43,095 --> 00:04:47,172
+entre deux changements, une demi impulsion
+en
+
+58
+00:04:47,172 --> 00:04:52,670
+quelques sortes, correspond donc à 312
+microsecondes.
+
+59
+00:04:52,670 --> 00:04:55,220
+Donc, dans ce cas-là, une scrutation
+
+60
+00:04:55,220 --> 00:04:59,100
+toutes les millisecondes serait largement
+insuffisante.
+
+61
+00:04:59,100 --> 00:05:04,490
+On a déjà appris à lire une entrée, donc,
+
+62
+00:05:04,490 --> 00:05:08,455
+apparemment, c'est très facile d'écrire un
+programme dont le cahier
+
+63
+00:05:08,455 --> 00:05:12,693
+des charges serait : "il faut allumer la
+LED rouge lorsqu'on presse
+
+64
+00:05:12,693 --> 00:05:16,513
+sur le bouton-poussoir".
+Voilà toutefois une erreur que les
+
+65
+00:05:16,513 --> 00:05:22,200
+débutants feraient facilement, la boucle
+principale, si on a
+
+66
+00:05:22,200 --> 00:05:28,174
+pressé sur le bouton-poussoir, alors, on
+allume la LED,
+
+67
+00:05:28,174 --> 00:05:33,767
+j'ai reproduit exactement le cahier des
+charges, tel que je l'ai lu.
+
+68
+00:05:33,767 --> 00:05:38,542
+C'est effectivement faux, on comprend bien
+que ce programme
+
+69
+00:05:38,542 --> 00:05:42,670
+allumerait une fois la lampe, et ne
+l'éteindrait jamais.
+
+70
+00:05:42,670 --> 00:05:47,875
+On aurait peut-être dû exprimer le cahier
+des charges en disant, on veut que la
+
+71
+00:05:47,875 --> 00:05:50,475
+lampe rouge s'allume lorsqu'on presse sur
+le
+
+72
+00:05:50,475 --> 00:05:54,380
+bouton-poussoir, et qu'elle s'éteigne le
+reste du temps.
+
+73
+00:05:54,380 --> 00:05:58,883
+Et alors le programme doit être complété
+par un else, si on ne presse
+
+74
+00:05:58,883 --> 00:06:03,580
+pas sur le bouton-poussoir, alors il faut
+éteindre la lampe.
+
+75
+00:06:03,580 --> 00:06:07,948
+Voilà une variante de ce programme, qui
+utilise à
+
+76
+00:06:07,948 --> 00:06:13,233
+l'intérieur de la boucle principale, une
+deuxième boucle, on
+
+77
+00:06:13,233 --> 00:06:16,610
+a donc une variable qui est bloquante,
+mais qui,
+
+78
+00:06:16,610 --> 00:06:20,460
+pour ce problème-là, va résoudre le
+problème tout aussi bien.
+
+79
+00:06:20,460 --> 00:06:24,135
+Le fait qu'une entrée soit active est une
+
+80
+00:06:24,135 --> 00:06:29,300
+chose, le fait de détecter le moment où
+elle s'active,
+
+81
+00:06:29,300 --> 00:06:33,800
+par exemple un flanc montant, en est une
+autre.
+
+82
+00:06:33,800 --> 00:06:39,220
+Voilà un programme qui va permettre de
+détecter un flanc montant.
+
+83
+00:06:39,220 --> 00:06:43,970
+Dans la boucle principale, nous allons
+d'abord attendre,
+
+84
+00:06:43,970 --> 00:06:49,157
+tant que l'entrée est à 0, quand elle
+n'est
+
+85
+00:06:49,157 --> 00:06:55,190
+plus à 0, elle est à 1, on va pouvoir
+exécuter l'action souhaitée.
+
+86
+00:06:55,190 --> 00:07:00,270
+Et ensuite, il va falloir attendre le
+flanc descendant,
+
+87
+00:07:00,270 --> 00:07:05,750
+avec, de nouveau, une boucle, mais avec
+cette fois la condition inverse.
+
+88
+00:07:05,750 --> 00:07:09,698
+De nouveau, le programme que nous venons
+d'écrire est
+
+89
+00:07:09,698 --> 00:07:14,460
+bloquant, puisqu'il contient deux boucles
+while, et il existe
+
+90
+00:07:14,460 --> 00:07:18,363
+une méthode, qui permet de ne pas utiliser
+de while
+
+91
+00:07:18,363 --> 00:07:23,810
+dans la boucle principale, seul, ici, un
+if, va être utilisé.
+
+92
+00:07:23,810 --> 00:07:27,692
+L'astuce est la suivante, on va utiliser
+deux
+
+93
+00:07:27,692 --> 00:07:32,364
+variables, une qui s'appelle valeur, qui
+va correspondre à
+
+94
+00:07:32,364 --> 00:07:34,938
+la dernière valeur de notre entrée qui a
+
+95
+00:07:34,938 --> 00:07:38,533
+été lue, et une, qui correspond à ancienne
+valeur.
+
+96
+00:07:38,533 --> 00:07:39,481
+Les étudiants
+
+97
+00:07:39,481 --> 00:07:42,650
+ont souvent un petit peu de peine à
+comprendre.
+
+98
+00:07:42,650 --> 00:07:48,230
+Alors, il faut commencer par
+l'initialiser, avec la valeur,
+
+99
+00:07:48,230 --> 00:07:54,190
+mais ensuite, elle prend, à la fin de la
+boucle, while,
+
+100
+00:07:54,190 --> 00:07:59,838
+de la boucle principale, elle prend la
+valeur qui était, dans la
+
+101
+00:07:59,838 --> 00:08:05,874
+variable valeur, donc qui a été lue au
+début de la boucle.
+
+102
+00:08:05,874 --> 00:08:10,378
+Ca signifie que pendant l'exécution de
+
+103
+00:08:10,378 --> 00:08:14,947
+la partie du milieu de la boucle, on
+dispose,
+
+104
+00:08:14,947 --> 00:08:19,620
+à la fois, de la dernière valeur lue, et
+de
+
+105
+00:08:19,620 --> 00:08:25,131
+l'avant-dernière valeur lue.
+Alors regardez
+
+106
+00:08:25,131 --> 00:08:31,062
+maintenant ce diagramme des temps, on voit
+bien que, on dispose
+
+107
+00:08:31,062 --> 00:08:36,580
+dans valeur, d'une sorte de copie de notre
+
+108
+00:08:36,580 --> 00:08:41,574
+entrée, avec un décalage lié au fait qu'on
+lit
+
+109
+00:08:41,574 --> 00:08:46,579
+les valeurs successivement, rappelez-vous
+ce qu'on a dit tout à l'heure,
+
+110
+00:08:46,579 --> 00:08:51,350
+on ne sait pas ce qui se passe entre les
+lectures, donc ici, il y a un petit
+
+111
+00:08:51,350 --> 00:08:56,788
+décalage entre ce flanc, et celui-là,
+entre ce flanc et celui-là,
+
+112
+00:08:56,788 --> 00:09:01,510
+et ce signal a quand même à peu près la
+même allure que celui-là.
+
+113
+00:09:01,510 --> 00:09:08,000
+Et on voit que cette ancienne valeur,
+c'est exactement la même chose que valeur,
+
+114
+00:09:08,000 --> 00:09:14,870
+mais décalée d'un coup de lecture du
+signal, toujours ce décalage.
+
+115
+00:09:14,870 --> 00:09:17,390
+Et ce qui est intéressant c'est que
+
+116
+00:09:17,390 --> 00:09:22,260
+en comparant, la valeur avec l'ancienne
+valeur,
+
+117
+00:09:22,260 --> 00:09:27,820
+il est possible, par exemple ici, de
+détecter les flancs montants,
+
+118
+00:09:27,820 --> 00:09:32,900
+avec la présence d'un 1 ici, d'un 0 là.
+
+119
+00:09:32,900 --> 00:09:37,589
+Il serait bien entendu aussi possible de
+détecter, un flanc
+
+120
+00:09:37,589 --> 00:09:42,700
+descendant, à cet endroit-là, ou encore,
+détecter
+
+121
+00:09:42,700 --> 00:09:47,530
+n'importe quel flanc en disant, il faut
+que l'ancienne
+
+122
+00:09:47,530 --> 00:09:51,410
+valeur soit différente, de la valeur
+actuelle.
+
+123
+00:09:51,410 --> 00:09:58,980
+On remarque bien, ici, que c'est
+différent, que c'est différent, et cetera.
+
+124
+00:09:58,980 --> 00:10:04,401
+De nouveau, cette technique de
+programmation est très intéressante
+
+125
+00:10:04,401 --> 00:10:09,370
+parce qu'elle permet d'exécuter plusieurs
+tâches dans notre boucle principale.
+
+126
+00:10:09,370 --> 00:10:12,982
+J'ai écrit ici en rouge ce qu'il fallait
+rajouter
+
+127
+00:10:12,982 --> 00:10:17,801
+pour gérer une deuxième entrée.
+Evidemment, les deux
+
+128
+00:10:17,801 --> 00:10:22,340
+variables, la lecture, en début de
+
+129
+00:10:22,340 --> 00:10:27,380
+boucle, la lecture, pardon, la copie, en
+fin de
+
+130
+00:10:27,380 --> 00:10:32,888
+boucle, et finalement le traitement
+spécifique pour détecter
+
+131
+00:10:32,888 --> 00:10:38,374
+le flanc sur la deuxième entrée.
+Le bouton-poussoir est très souvent
+
+132
+00:10:38,374 --> 00:10:40,990
+branché à une entrée d'un microcontrôleur.
+
+133
+00:10:40,990 --> 00:10:42,910
+On pourrait donc penser que, ce que
+
+134
+00:10:42,910 --> 00:10:46,310
+nous venons de voir, fonctionne avec un
+bouton-poussoir.
+
+135
+00:10:46,310 --> 00:10:48,312
+Et bien, ça n'est pas le cas.
+
+136
+00:10:48,312 --> 00:10:53,317
+En fait, dans un bouton-poussoir, il y a
+des éléments métalliques, qui
+
+137
+00:10:53,317 --> 00:10:58,810
+bougent, et on va avoir un effet de rebond
+de contact.
+
+138
+00:10:58,810 --> 00:11:03,512
+Ce phénomène se produit d'ailleurs quand
+on presse sur
+
+139
+00:11:03,512 --> 00:11:05,930
+le bouton, mais également quand on le
+lâche.
+
+140
+00:11:05,930 --> 00:11:11,420
+Regardons un peu un diagramme des temps
+qui met en évidence ces rebonds de
+
+141
+00:11:11,420 --> 00:11:16,880
+contact au moment où on presse, et au
+moment où on relâche.
+
+142
+00:11:16,880 --> 00:11:22,904
+Il existe une technique très simple, qui
+permet de s'affranchir de ces rebonds de
+
+143
+00:11:22,904 --> 00:11:29,583
+contact, c'est de ne lire la valeur
+d'entrée qu'à des intervalles
+
+144
+00:11:29,583 --> 00:11:37,400
+suffisamment longs, pour ne pas risquer
+d'inclure un rebond de contact.
+
+145
+00:11:37,400 --> 00:11:42,400
+Ici, on voit bien que le rebond de contact
+était complètement entre deux lectures,
+
+146
+00:11:42,400 --> 00:11:46,640
+il n'y a évidemment pas de problème, on a
+passé proprement du 0 au 1.
+
+147
+00:11:46,640 --> 00:11:51,194
+Ici, ça semble moins favorable, puisque
+c'est bien
+
+148
+00:11:51,194 --> 00:11:54,540
+au milieu du rebond qu'on a fait la
+lecture,
+
+149
+00:11:54,540 --> 00:11:58,763
+et malgré tout, on voit bien qu'on a ici
+lu un 1, ici, on
+
+150
+00:11:58,763 --> 00:12:02,590
+aurait pu lire un 1 ou un 0, ça va
+dépendre de peu de
+
+151
+00:12:02,590 --> 00:12:07,728
+choses, ensuite ici, un 0, et dans les
+deux cas que j'ai cité, on aurait eu
+
+152
+00:12:07,728 --> 00:12:13,160
+successivement des 1, puis des 0, donc les
+rebonds auraient été supprimés.
+
+153
+00:12:13,160 --> 00:12:15,860
+Le terme anglais utilisé pour la
+
+154
+00:12:15,860 --> 00:12:20,470
+suppression des rebonds de contacts est
+debouncing.
+
+155
+00:12:20,470 --> 00:12:25,790
+Nous avons ici, le programme qui permet de
+réaliser cette fonction de suppression
+
+156
+00:12:25,790 --> 00:12:30,803
+des rebonds de contact, avec à l'intérieur
+de la boucle principale,
+
+157
+00:12:30,803 --> 00:12:35,920
+un delay, qui fait que on ne lit, les
+entrées, que toutes les 20
+
+158
+00:12:35,920 --> 00:12:40,779
+millisecondes.
+Une variante, serait de lire en
+
+159
+00:12:40,779 --> 00:12:45,944
+permanence l'entrée, et lorsque le flanc
+montant
+
+160
+00:12:45,944 --> 00:12:50,920
+a été détecté, on fait une attente, qui
+masquerait le rebond.
+
+161
+00:12:50,920 --> 00:12:55,670
+Attention, ça ne va pas fonctionner de
+cette manière-là.
+
+162
+00:12:55,670 --> 00:13:00,942
+On serait dans une situation où on va
+lire, lire, lire, on
+
+163
+00:13:00,942 --> 00:13:06,568
+aurait le delay, lire, lire, lire, lire,
+lire, et là, on récupérerai
+
+164
+00:13:06,568 --> 00:13:11,625
+tous les rebonds de contact.
+Il est donc nécessaire
+
+165
+00:13:11,625 --> 00:13:16,478
+de, lorsqu'on a de nouveau lu une valeur
+qui correspond
+
+166
+00:13:16,478 --> 00:13:20,470
+au flanc descendant, d'attendre les 20
+millisecondes.
+
+167
+00:13:20,470 --> 00:13:25,720
+Voilà donc le programme, avec détection du
+flanc
+
+168
+00:13:25,720 --> 00:13:31,970
+montant, application du delay, détection
+du flanc
+
+169
+00:13:31,970 --> 00:13:37,240
+descendant, avec application du delay.
+Lorsqu'on fait la scrutation
+
+170
+00:13:37,240 --> 00:13:40,163
+régulière d'une entrée, elle se fait à
+
+171
+00:13:40,163 --> 00:13:45,490
+une certaine fréquence, qu'on appelle
+fréquence d'échantillonnage.
+
+172
+00:13:45,490 --> 00:13:49,460
+Et le choix de cette fréquence ne doit
+donc pas se faire au hasard.
+
+173
+00:13:49,460 --> 00:13:52,248
+La théorie du traitement de signal donne
+
+174
+00:13:52,248 --> 00:13:55,634
+des indications, en particulier le fait
+que,
+
+175
+00:13:55,634 --> 00:13:57,988
+si on a une fréquence maximum sur
+
+176
+00:13:57,988 --> 00:14:03,030
+l'entrée, il faut que la fréquence minimum
+d'échantillonnage,
+
+177
+00:14:03,030 --> 00:14:10,760
+soit, au moins, égale à 2 fois la
+fréquence maximale de l'entrée.
+
+178
+00:14:10,760 --> 00:14:13,548
+Là, de nouveau, nous n'allons pas entrer
+dans
+
+179
+00:14:13,548 --> 00:14:16,630
+ces théories qui dépasseraient le cadre de
+ce cours.
+
+180
+00:14:16,630 --> 00:14:21,320
+Essayons de programmer maintenant, le
+comptage
+
+181
+00:14:21,320 --> 00:14:24,428
+d'événements qui se produisent sur une
+entrée.
+
+182
+00:14:24,428 --> 00:14:28,720
+Voilà encore un programme qui correspond à
+une erreur de débutant.
+
+183
+00:14:28,720 --> 00:14:35,706
+Si le poussoir est actif, on incrémente le
+compteur.
+
+184
+00:14:35,706 --> 00:14:40,368
+Ca ne va pas correspondre au nombre de
+fois qu'on presse
+
+185
+00:14:40,368 --> 00:14:45,130
+sur le bouton, vous pourrez d'ailleurs le
+voir sur ce diagramme.
+
+186
+00:14:45,130 --> 00:14:49,427
+Lorsque je presse sur le bouton, je vais
+compter
+
+187
+00:14:49,427 --> 00:14:53,770
+plusieurs fois, ici je suis arrivé à 6,
+alors que
+
+188
+00:14:53,770 --> 00:14:58,000
+j'ai eu deux impulsions qui se sont
+produites.
+
+189
+00:14:58,000 --> 00:15:01,852
+Appliquons donc la technique de détection
+
+190
+00:15:01,852 --> 00:15:05,700
+des flancs, que nous connaissons
+maintenant.
+
+191
+00:15:05,700 --> 00:15:11,426
+De nouveau, l'acquisition de la valeur, la
+mémorisation de l'ancienne
+
+192
+00:15:11,426 --> 00:15:17,464
+valeur, et dans cette partie, la détection
+d'un flanc qui elle, va produire,
+
+193
+00:15:17,464 --> 00:15:21,594
+l'incrémentation du compteur.
+Un autre problème que nous
+
+194
+00:15:21,594 --> 00:15:26,150
+sommes capables de résoudre maintenant,
+c'est la mesure du temps.
+
+195
+00:15:26,150 --> 00:15:30,850
+Par exemple, mesurer la durée d'une
+impulsion.
+
+196
+00:15:30,850 --> 00:15:37,359
+J'ai illustré ici, un compteur, qui,
+chaque fois que la valeur
+
+197
+00:15:37,359 --> 00:15:43,440
+est active, va être incrémenté et qui sera
+repassé
+
+198
+00:15:43,440 --> 00:15:47,480
+à 0, lorsqu'on aura trouvé le flanc
+descendant.
+
+199
+00:15:47,480 --> 00:15:51,135
+Si on souhaite avoir un affichage en même
+temps, de
+
+200
+00:15:51,135 --> 00:15:55,366
+la valeur, c'est quand on a terminé
+l'impulsion, quand le
+
+201
+00:15:55,366 --> 00:15:59,920
+flanc descendant a été détecté, qu'il faut
+copier sur l'afficheur
+
+202
+00:15:59,920 --> 00:16:04,735
+et maintenir la valeur, jusqu'à la fin de
+la prochaine impulsion.
+
+203
+00:16:04,735 --> 00:16:09,080
+On a toujours, donc, la dernière impulsion
+qui s'est terminée,
+
+204
+00:16:09,080 --> 00:16:12,590
+dont la durée est affichée sur
+l'afficheur.
+
+205
+00:16:12,590 --> 00:16:19,520
+Voilà le programme correspondant, je
+rappelle qu'on utilise une boucle,
+
+206
+00:16:19,520 --> 00:16:25,966
+une boucle à durée fixe, il n'y a pas de
+boucle
+
+207
+00:16:25,966 --> 00:16:32,026
+à l'intérieur de la boucle principale, on
+trouve seulement des if.
+
+208
+00:16:32,026 --> 00:16:33,142
+On va ici,
+
+209
+00:16:33,142 --> 00:16:40,532
+compter, chaque fois que l'entrée est
+active, on totalise donc, la durée
+
+210
+00:16:40,532 --> 00:16:47,526
+de l'impulsion, par contre, au flanc
+descendant, on va, mettre le compteur
+
+211
+00:16:47,526 --> 00:16:52,126
+à 0 en vue du prochain comptage, mais
+auparavant on va afficher
+
+212
+00:16:52,126 --> 00:16:56,860
+la valeur, qui va rester jusqu'à la fin de
+la prochaine impulsion.
+
+213
+00:16:56,860 --> 00:16:58,199
+Et de nouveau,
+
+214
+00:16:58,199 --> 00:17:04,154
+pour que cette ligne puisse avoir un sens,
+c'est-à-dire qu'on ait à la fois,
+
+215
+00:17:04,154 --> 00:17:09,290
+connaissance de la valeur précédente, et
+de la valeur courante, il faut
+
+216
+00:17:09,290 --> 00:17:13,906
+ce mécanisme de copier la valeur dans
+l'ancienne valeur à la fin de
+
+217
+00:17:13,906 --> 00:17:18,909
+la boucle, alors que c'est en début de
+boucle que la valeur est lue.
+
+218
+00:17:18,909 --> 00:17:23,290
+Nous avons donc maintenant intégré les
+entrées à la
+
+219
+00:17:23,290 --> 00:17:27,914
+gestion du temps.
+Nous avons étudié l'incertitude des
+
+220
+00:17:27,914 --> 00:17:34,260
+entrées, nous avons regardé comment
+scruter les entrées, faire du "polling",
+
+221
+00:17:34,260 --> 00:17:40,000
+nous avons appris à détecter un flanc, à
+supprimer un rebond de contact, à compter
+
+222
+00:17:40,000 --> 00:17:45,690
+des événements, et à mesure du temps.
+
+223
+00:17:45,690 --> 00:17:48,870
+Dans la pratique, les applications que
+nous risquons de rencontrer,
+
+224
+00:17:48,870 --> 00:17:53,920
+seront certainement plus complexes.
+Nous pourrons en particulier réaliser des
+
+225
+00:17:53,920 --> 00:17:59,058
+machines d'état, dont nous avons appris
+tout au début de ce cours, à les décrire
+
+226
+00:17:59,058 --> 00:18:06,960
+avec des graphes d'état.
+Ce sera le sujet d'un prochain chapitre.

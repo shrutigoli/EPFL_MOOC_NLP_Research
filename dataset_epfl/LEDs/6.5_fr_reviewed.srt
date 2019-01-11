@@ -1,0 +1,1047 @@
+1
+00:00:00,025 --> 00:00:10,025
+[AUDIO_VIDE]
+
+2
+00:00:12,550 --> 00:00:17,900
+Bonjour, nous allons continuer le cours
+sur les enseignes et afficheurs à LED.
+
+3
+00:00:19,080 --> 00:00:24,290
+Aujourd'hui, nous allons aborder
+la commande d'une matrice à LED,
+
+4
+00:00:24,290 --> 00:00:26,470
+avec une carte FPGA.
+
+5
+00:00:26,470 --> 00:00:31,290
+Dans cette leçon, nous allons d'abord
+vous faire une petite présentation de la
+
+6
+00:00:31,290 --> 00:00:37,326
+matrice à LED, ensuite, un deuxième
+point présentera le principe du contrôle
+
+7
+00:00:37,326 --> 00:00:43,115
+de la matrice, nous allons ensuite
+présenter une mise en œuvre
+
+8
+00:00:43,115 --> 00:00:47,895
+sur une matrice RGB 32 fois 32,
+avec une carte FPGA,
+
+9
+00:00:49,285 --> 00:00:54,355
+et un dernier point présentera quelques
+simulations des signaux de contrôle.
+
+10
+00:00:54,355 --> 00:00:56,600
+Une matrice à LED est un panneau
+
+11
+00:00:58,110 --> 00:01:02,250
+où des LED sont arrangées en grille,
+lignes, colonnes.
+
+12
+00:01:03,700 --> 00:01:10,800
+Cette version de la matrice 32 fois 32
+présente une LED tous les six millimètres.
+
+13
+00:01:13,170 --> 00:01:20,095
+Elle compte 1024 LED RGB,
+c'est-à-dire une combinaison des couleurs,
+
+14
+00:01:20,095 --> 00:01:26,825
+rouge, bleu et vert, permet de
+contrôler la couleur de chaque pixel.
+
+15
+00:01:26,825 --> 00:01:29,065
+Voici les spécifications de la matrice.
+
+16
+00:01:29,065 --> 00:01:34,774
+Elle compte 1024 LED RGB,
+rangées sous forme de carré 32 fois 32,
+
+17
+00:01:35,960 --> 00:01:42,950
+les longueurs d'onde pour chaque couleur,
+rouge, vert et bleu, sont présentées ici,
+
+18
+00:01:44,040 --> 00:01:48,290
+elle est alimentée en cinq volts,
+et peut consommer jusqu'à quatre ampères,
+
+19
+00:01:49,600 --> 00:01:54,570
+nécessite 13 pins pour la commande,
+6 pour les données et 7 pour le contrôle.
+
+20
+00:01:56,050 --> 00:01:59,990
+La commande de cette
+matrice se fait par étapes,
+
+21
+00:01:59,990 --> 00:02:02,270
+on ne peut pas commander
+toutes les LED en même temps.
+
+22
+00:02:03,780 --> 00:02:08,560
+On contrôle uniquement une ligne
+à la fois, parmi plusieurs.
+
+23
+00:02:10,840 --> 00:02:13,780
+On joue donc sur la
+fréquence de scrutation
+
+24
+00:02:13,780 --> 00:02:16,100
+de l'affichage pour tromper l'oeil humain.
+
+25
+00:02:17,170 --> 00:02:19,660
+Ce principe est appelé le scanning.
+
+26
+00:02:21,130 --> 00:02:26,700
+Il représente le nombre de ligne que l'on
+peut rafraîchir pour présenter une image.
+
+27
+00:02:28,070 --> 00:02:31,140
+Cette version de la matrice est
+constituée de deux parties.
+
+28
+00:02:31,140 --> 00:02:36,580
+Une première partie constituée
+de 16 fois 32 pixels,
+
+29
+00:02:36,580 --> 00:02:39,770
+et une deuxième partie
+constituée de 16 fois 32 pixels.
+
+30
+00:02:41,430 --> 00:02:48,300
+On peut donc contrôler deux lignes
+à la fois pour la matrice globale.
+
+31
+00:02:49,660 --> 00:02:54,000
+En résumé, quand on contrôle une ligne, L,
+
+32
+00:02:55,180 --> 00:03:00,330
+de la matrice,
+on contrôle également la ligne L + 16.
+
+33
+00:03:00,330 --> 00:03:07,150
+Par exemple, ici, le contrôle de la ligne
+zéro contrôle en même temps la ligne 16,
+
+34
+00:03:07,150 --> 00:03:11,370
+qui correspond à la ligne
+zéro de la deuxième moitié.
+
+35
+00:03:13,310 --> 00:03:17,370
+Le chargement des données de
+la matrice se fait à travers
+
+36
+00:03:17,370 --> 00:03:19,940
+deux fois trois registres à décalages.
+
+37
+00:03:19,940 --> 00:03:26,820
+Nous avons ici trois registres à décalages
+32 bits, pour la première moitié,
+
+38
+00:03:26,820 --> 00:03:31,590
+et trois registres à décalages 32 bits,
+pour la deuxième moitié.
+
+39
+00:03:31,590 --> 00:03:36,590
+Ces deux registres sont contrôlés
+par le même signal, le clock.
+
+40
+00:03:38,750 --> 00:03:42,400
+Le chargement des données se
+fait donc sur fond du clock,
+
+41
+00:03:43,520 --> 00:03:46,230
+en séries de 32 bits par couleur.
+
+42
+00:03:48,450 --> 00:03:52,790
+Pour présenter le fonctionnement
+du chargement des trois couleurs,
+
+43
+00:03:52,790 --> 00:03:58,830
+nous avons ici un registre à
+décalages 32 bits, le chargement
+
+44
+00:03:58,830 --> 00:04:03,870
+des données des trois couleurs se fait
+à chaque front montant de l'horloge.
+
+45
+00:04:05,250 --> 00:04:08,975
+Lorsque le registre série est plein,
+
+46
+00:04:08,975 --> 00:04:15,290
+une activation du pin LAT permet de
+
+47
+00:04:15,290 --> 00:04:19,640
+transférer les données série en parallèle,
+sur un registre de mémorisation 32 bits.
+
+48
+00:04:19,640 --> 00:04:27,140
+Et une activation du OE, Output Enable,
+
+49
+00:04:27,140 --> 00:04:33,810
+permet de transférer les données
+sur le pixel de la matrice.
+
+50
+00:04:33,810 --> 00:04:38,010
+Il faut juste noter que le
+Enable Output est activé niveau bas.
+
+51
+00:04:39,790 --> 00:04:45,778
+Les deux moitiés de la
+matrice partagent les données
+
+52
+00:04:45,778 --> 00:04:50,320
+de sélection, le, clock,
+le Enable Output et le LAT.
+
+53
+00:04:51,900 --> 00:04:58,175
+La sélection des lignes se fait
+à travers les pins A, B, C et D.
+
+54
+00:04:59,465 --> 00:05:05,495
+Le tableau suivant donne les 16
+combinaisons sur A, B C et D,
+
+55
+00:05:05,495 --> 00:05:09,865
+permettant de sélectionner
+chacune des 16 lignes.
+
+56
+00:05:12,005 --> 00:05:17,107
+La sélection de la ligne, L, permet de
+sélectionner également la ligne, L + 16.
+
+57
+00:05:18,220 --> 00:05:25,756
+En résumé, le contrôle de la matrice se
+fait à travers six données de couleurs.
+
+58
+00:05:25,756 --> 00:05:30,430
+Nous avons les trois
+pour la première moitié,
+
+59
+00:05:30,430 --> 00:05:33,520
+et les trois pour la deuxième moitié.
+
+60
+00:05:35,750 --> 00:05:42,560
+Quatre lignes d'adresse, A, B,
+C et D, et trois sillons de contrôle,
+
+61
+00:05:42,560 --> 00:05:47,270
+le, clock, qui rythme le contrôle
+de chaque bit de données chargé,
+
+62
+00:05:47,270 --> 00:05:52,260
+le LAT qui permet de transférer les
+données à la fin de chaque chargement,
+
+63
+00:05:52,260 --> 00:05:56,850
+et le, Output Enable, qui permet
+d'activer ou de verrouiller l'affichage.
+
+64
+00:05:56,850 --> 00:06:01,670
+Pour contrôler la matrice
+avec une carte FPGA,
+
+65
+00:06:01,670 --> 00:06:07,290
+D E zéro nano d'ALTERA, nous avons
+choisi cette assignation des pins.
+
+66
+00:06:08,710 --> 00:06:13,780
+Ce tableau donne, sur la première colonne,
+les pins de la matrice,
+
+67
+00:06:13,780 --> 00:06:20,360
+sur la deuxième colonne, les pins que
+nous avons choisis sur la carte FPGA.
+
+68
+00:06:20,360 --> 00:06:26,040
+Pour vous permettre de vous repérer sur
+les pins, nous avons donné ici le schéma,
+
+69
+00:06:26,040 --> 00:06:31,120
+où nous avons, ici, en rouge, les pins
+GPI zéro, que nous avons utilisés,
+
+70
+00:06:32,160 --> 00:06:37,190
+et ici les noms des pins
+choisis et le brochage.
+
+71
+00:06:37,190 --> 00:06:42,995
+Le Top Level Matrix 32 fois 32 RGB,
+délivre les
+
+72
+00:06:42,995 --> 00:06:48,960
+signaux de commande qui vont
+être connectés à la matrice RGB.
+
+73
+00:06:48,960 --> 00:06:55,195
+Et ces signaux sont
+délivrés par un composant,
+
+74
+00:06:55,195 --> 00:07:00,980
+scan_matrice, qui est
+rythmé par une horloge.
+
+75
+00:07:02,260 --> 00:07:09,850
+L'entité, Matrix 32 fois 32 RGB,
+dispose de deux signaux d'entrée,
+
+76
+00:07:09,850 --> 00:07:15,443
+l'horloge interne de la carte FPGA,
+le reset,
+
+77
+00:07:15,443 --> 00:07:22,390
+et de 13 sorties, qui vont être
+connectées à la matrice à LED.
+
+78
+00:07:22,390 --> 00:07:27,690
+Nous avons ici les six
+données de couleurs, le,
+
+79
+00:07:27,690 --> 00:07:32,250
+clock série, qui permet de rythmer le
+chargement des données de couleurs, le,
+
+80
+00:07:32,250 --> 00:07:37,880
+clock parallèle, qui permet de faire le
+transfert lorsque le chargement est plein,
+
+81
+00:07:37,880 --> 00:07:45,820
+le, Enable Output, qui permet de,
+d'afficher ou de verrouiller l'affichage,
+
+82
+00:07:45,820 --> 00:07:51,150
+et ligne sel, qui permet
+d'adresser les différentes lignes.
+
+83
+00:07:51,150 --> 00:07:56,370
+L'architecture de, Matrix 32 fois 32 RGB,
+
+84
+00:07:56,370 --> 00:08:03,350
+permet de lancer en parallèle
+l'horloge et le, scan_matrice,
+
+85
+00:08:03,350 --> 00:08:07,250
+en leur fournissant également les
+différents signaux manipulés.
+
+86
+00:08:09,060 --> 00:08:14,548
+Nous avons ici au niveau de l'horloge,
+le reset, le, clock_in,
+
+87
+00:08:14,548 --> 00:08:19,750
+qui représente le clock de la carte FPGA,
+le,
+
+88
+00:08:19,750 --> 00:08:24,400
+horloge_bit, qui représente la sortie de
+l'horloge, et qui commande le composant,
+
+89
+00:08:24,400 --> 00:08:30,780
+scan_matrice, et nous avons ici les 13
+lignes permettant de contrôler la matrice.
+
+90
+00:08:32,270 --> 00:08:37,440
+L'entité, horloge,
+dispose de trois signaux, deux entrées,
+
+91
+00:08:37,440 --> 00:08:41,370
+le clock et le reset,
+et une sortie, le, clock_out.
+
+92
+00:08:41,370 --> 00:08:44,130
+Il s'agit en réalité d'un
+diviseur de fréquence,
+
+93
+00:08:44,130 --> 00:08:48,530
+qui nous permet de diviser la
+fréquence interne, de 50 mégahertz,
+
+94
+00:08:48,530 --> 00:08:53,410
+en une fréquence de 10 mégahertz, que nous
+avons choisie pour commander la matrice.
+
+95
+00:08:55,040 --> 00:08:58,750
+Au niveau de l'architecture de l'horloge,
+nous avons le, Process,
+
+96
+00:08:58,750 --> 00:09:00,720
+qui gère la division de fréquence.
+
+97
+00:09:00,720 --> 00:09:03,220
+Il est sensible aux signaux, clock_in,
+
+98
+00:09:03,220 --> 00:09:07,250
+qui représentent le clock interne
+de la carte FPGA et le reset.
+
+99
+00:09:08,270 --> 00:09:13,440
+Et au niveau de la sortie de
+notre horloge, nous avons un 1,
+
+100
+00:09:13,440 --> 00:09:18,740
+trois périodes sur cinq,
+et un zéro, deux périodes sur cinq.
+
+101
+00:09:20,190 --> 00:09:25,970
+Au niveau de l'entité, scan_matrice,
+nous avons deux ports d'entrée,
+
+102
+00:09:27,510 --> 00:09:32,520
+le clock et le reset,
+et 13 ports permettant
+
+103
+00:09:32,520 --> 00:09:37,350
+de commander le composant,
+Matrix 32 fois 32 RGB.
+
+104
+00:09:39,230 --> 00:09:44,140
+Ce shéma illustre les signaux
+de sortie de, scan_matrice,
+
+105
+00:09:44,140 --> 00:09:50,399
+qui vont commander les ports de,
+Matrix RGB 32 fois 32.
+
+106
+00:09:51,485 --> 00:09:55,835
+Et au niveau de l'architecture de,
+scan_matrice, nous avons le, clock série,
+
+107
+00:09:55,835 --> 00:10:01,095
+qui rythme le chargement des données, le,
+clock_parallel, le Enable Output, le,
+
+108
+00:10:01,095 --> 00:10:06,475
+Count, qui permet de gérer le
+chargement au niveau des lignes,
+
+109
+00:10:06,475 --> 00:10:09,410
+et le délai d'attente, aussi,
+au niveau de l'affichage,
+
+110
+00:10:09,410 --> 00:10:14,220
+et les lignes qui permettent
+d'adresser les différentes lignes.
+
+111
+00:10:14,220 --> 00:10:19,909
+Au niveau de ce process,
+chaque front montant de l'horloge,
+
+112
+00:10:19,909 --> 00:10:24,460
+ici, si le compteur
+atteint la valeur 1 023,
+
+113
+00:10:24,460 --> 00:10:29,030
+le compteur est réinitialisé,
+sinon, le compteur est incrémenté.
+
+114
+00:10:29,030 --> 00:10:34,285
+Et lorsque le compteur atteint la
+valeur 1 023, on scrute les lignes.
+
+115
+00:10:34,285 --> 00:10:37,205
+Si la ligne atteint la valeur 15,
+
+116
+00:10:37,205 --> 00:10:41,495
+la ligne est réinitialisée,
+sinon la ligne est incrémentée.
+
+117
+00:10:42,945 --> 00:10:49,705
+La dernière partie du process permet
+de gérer les signaux de contrôle.
+
+118
+00:10:49,705 --> 00:10:54,470
+Si le compteur est inférieur à 32,
+le clock série est mis à 1,
+
+119
+00:10:54,470 --> 00:10:57,450
+sinon le clock série est mis à zéro.
+
+120
+00:10:57,450 --> 00:10:59,760
+Si le compteur est égal à 32,
+
+121
+00:10:59,760 --> 00:11:04,620
+le clock parallèle est mis à 1,
+sinon le clock parallèle est à zéro.
+
+122
+00:11:04,620 --> 00:11:09,380
+Et si le compteur est supérieur à 32,
+le, output enable,
+
+123
+00:11:09,380 --> 00:11:12,190
+est mis à 1, sinon le,
+output enable, est mis à zéro.
+
+124
+00:11:12,190 --> 00:11:17,220
+Nous allons terminer ce projet
+par le chargement des données de
+
+125
+00:11:17,220 --> 00:11:22,730
+couleur et la génération des signaux de
+contrôle, dans un process pour afficher
+
+126
+00:11:22,730 --> 00:11:27,750
+des motifs fixes avec un opérateur,
+ET logique.
+
+127
+00:11:27,750 --> 00:11:32,865
+Pour la génération des signaux de
+contrôle, un, ET logique, avec le, clock
+
+128
+00:11:32,865 --> 00:11:38,275
+in, permet d'avoir d'avoir des fronts sur
+clock série et un, ET logique, avec le,
+
+129
+00:11:38,275 --> 00:11:42,355
+clock parallèle, permet d'avoir également
+des fronts sur le clock parallèle.
+
+130
+00:11:42,355 --> 00:11:48,175
+Il faut noter l'inversion de, output
+enable, puisqu'il est activé niveau bas.
+
+131
+00:11:49,315 --> 00:11:53,652
+Pour la gestion des chargements des
+données de couleur, nous avons voulu avoir
+
+132
+00:11:53,652 --> 00:11:59,680
+des motifs fixes,
+avec des damiers de tailles différentes,
+
+133
+00:11:59,680 --> 00:12:05,290
+en fonction des couleurs,
+et nous avons fait un, ET logique,
+
+134
+00:12:05,290 --> 00:12:11,030
+entre le bit zéro de, count,
+et de bit zéro de ligne ; le bit 1 de,
+
+135
+00:12:11,030 --> 00:12:16,360
+count, et le bit 1 de ligne, le bit 2 de,
+count, et le bit 2 de ligne.
+
+136
+00:12:16,360 --> 00:12:20,710
+La même chose est répétée sur la
+deuxième moitié de la matrice.
+
+137
+00:12:20,710 --> 00:12:24,570
+Ceci produira des motifs fixes,
+
+138
+00:12:24,570 --> 00:12:29,310
+de couleurs différentes,
+et de tailles différentes.
+
+139
+00:12:29,310 --> 00:12:34,150
+Nous avons simulé avec Modelsim le projet,
+
+140
+00:12:34,150 --> 00:12:40,380
+et voici les chronogrammes des signaux,
+qui montrent, ici, que toutes les
+
+141
+00:12:40,380 --> 00:12:45,390
+LED sont éteintes, les données de couleur
+sont toutes à zéro, sur la première ligne.
+
+142
+00:12:47,330 --> 00:12:50,240
+Nous avons au niveau de la ligne une,
+
+143
+00:12:50,240 --> 00:12:55,205
+la deuxième ligne, des chargements de
+la couleur rouge, une fois sur deux.
+
+144
+00:12:56,925 --> 00:12:58,545
+Au niveau de la ligne 2,
+
+145
+00:12:58,545 --> 00:13:03,665
+nous avons des chargements de la
+couleur verte, deux fois sur quatre.
+
+146
+00:13:04,965 --> 00:13:10,295
+Nous avons, ici,
+au niveau de la ligne 3, un mélange
+
+147
+00:13:10,295 --> 00:13:17,035
+de couleur rouge et de couleur verte,
+une fois sur deux, deux fois sur quatre.
+
+148
+00:13:17,035 --> 00:13:19,715
+Et au niveau de la ligne 4,
+
+149
+00:13:19,715 --> 00:13:25,115
+nous avons un chargement de la
+couleur bleue, quatre fois sur huit.
+
+150
+00:13:27,065 --> 00:13:33,379
+Un zoom sur le chargement de la ligne une,
+
+151
+00:13:33,379 --> 00:13:37,920
+et de la ligne 17 montre ici le, latch,
+
+152
+00:13:37,920 --> 00:13:43,390
+qui est activé lorsque le
+registre atteint la valeur 32,
+
+153
+00:13:43,390 --> 00:13:48,440
+c'est-à-dire que le registre est plein,
+et l'activation de, oe,
+
+154
+00:13:48,440 --> 00:13:53,510
+activé niveau bas, ici,
+pour afficher les données chargées.
+
+155
+00:13:55,000 --> 00:13:57,580
+Nous allons maintenant
+ajouter au projet une mémoire
+
+156
+00:13:57,580 --> 00:13:59,480
+pour les données à
+afficher sur chaque pixel.
+
+157
+00:14:00,700 --> 00:14:04,954
+Nous avons intégré au projet un composant,
+memoire_vive,
+
+158
+00:14:04,954 --> 00:14:08,946
+qui fournit au composant, scan_matrice,
+
+159
+00:14:08,946 --> 00:14:14,710
+les données de couleur et
+les données d'adresse.
+
+160
+00:14:15,840 --> 00:14:20,540
+Cela a nécessité quelques
+modifications de, scan_matrice,
+
+161
+00:14:20,540 --> 00:14:24,950
+et de, matrix RGB,
+que nous venons de présenter.
+
+162
+00:14:24,950 --> 00:14:28,685
+Au niveau des modifications
+sur le composant,
+
+163
+00:14:28,685 --> 00:14:34,035
+matrix RGB, nous avons ajouté,
+ici, une adresse et une donnée.
+
+164
+00:14:34,035 --> 00:14:37,025
+L'adresse est représentée, ici,
+
+165
+00:14:37,025 --> 00:14:42,845
+sur neuf bits, pour avoir les
+512 pixels de chaque moitié,
+
+166
+00:14:42,845 --> 00:14:46,705
+et les données sur six bits pour
+les six données de couleur.
+
+167
+00:14:48,665 --> 00:14:56,175
+Matrix RGB permet d'instancier les deux
+composants, memoire_vive, scan_matrice,
+
+168
+00:14:56,175 --> 00:14:59,265
+et l'horloge qui n'est pas représentée,
+ici, puisqu'elle n'est pas modifiée.
+
+169
+00:15:00,495 --> 00:15:05,385
+Au niveau de l'entité, scan_matrice,
+nous avons ajouté l'adresse,
+
+170
+00:15:05,385 --> 00:15:09,000
+représentée sur les neuf bits, et les
+données, représentées sur les six bits.
+
+171
+00:15:10,370 --> 00:15:14,320
+Des modifications ont été apportées
+au niveau du process qui gère
+
+172
+00:15:14,320 --> 00:15:17,190
+le chargement des données et la
+génération des signaux de contrôle.
+
+173
+00:15:18,680 --> 00:15:22,510
+Le chargement des données au niveau de,
+scan_matrice,
+
+174
+00:15:22,510 --> 00:15:24,550
+et des adresses provient de la mémoire.
+
+175
+00:15:25,550 --> 00:15:28,906
+Les cinq bits de poids faible de l'adresse
+
+176
+00:15:28,906 --> 00:15:33,415
+correspondent aux cinq bits
+de poids faible du compteur.
+
+177
+00:15:34,735 --> 00:15:39,930
+Et les quatre bits de
+poids fort de l'adresse
+
+178
+00:15:39,930 --> 00:15:44,225
+correspondent aux quatre
+bits des lignes d'adresse.
+
+179
+00:15:45,765 --> 00:15:50,330
+Le chargement des données de couleur
+se fait à travers le vecteur,
+
+180
+00:15:50,330 --> 00:15:52,820
+data, fourni par la mémoire.
+
+181
+00:15:53,920 --> 00:15:56,870
+Et la génération des signaux
+de contrôle n'a pas changé.
+
+182
+00:15:58,140 --> 00:16:03,242
+Au niveau de l'entité,
+mémoire, nous avons l'adresse,
+
+183
+00:16:03,242 --> 00:16:07,485
+ici, et le, output, en plus du,
+clock, et du reset.
+
+184
+00:16:09,775 --> 00:16:12,915
+L'adresse qui est représentée
+sur les neuf bits et le,
+
+185
+00:16:12,915 --> 00:16:17,525
+output, qui va fournir
+les données sur six bits.
+
+186
+00:16:17,525 --> 00:16:23,555
+L'architecture utilise ici une mémoire,
+MEM, qui est un tableau de
+
+187
+00:16:23,555 --> 00:16:30,210
+512 éléments et que chaque
+élément contient six bits.
+
+188
+00:16:30,210 --> 00:16:35,920
+Ce tableau permet d'adresser et de charger
+les données de chaque pixel de la matrice.
+
+189
+00:16:37,210 --> 00:16:42,290
+Il faut noter que le chargement des
+données peut se faire avec un processeur,
+
+190
+00:16:42,290 --> 00:16:47,670
+NIOS, interne de la carte FPGA ou
+bien fourni par un micro contrôleur.
+
+191
+00:16:49,050 --> 00:16:54,020
+Un deuxième processus permet de
+charger à chaque front descendant
+
+192
+00:16:54,020 --> 00:16:59,000
+de l'horloge les six données de couleur,
+pour chaque pixel.
+
+193
+00:17:00,360 --> 00:17:06,020
+Et enfin, nous pouvons, ici,
+faire le chargement des données
+
+194
+00:17:06,020 --> 00:17:10,440
+et modifier les données de la mémoire,
+au niveau de cette section.
+
+195
+00:17:12,190 --> 00:17:16,960
+Voici les résultats des tests que nous
+avons effectués sur la matrice 32 fois 32.
+
+196
+00:17:16,960 --> 00:17:19,710
+Comme vous pouvez le constater, sur la
+
+197
+00:17:19,710 --> 00:17:25,330
+première ligne que nous appellerons la
+ligne zéro, toutes les LED sont éteintes.
+
+198
+00:17:25,330 --> 00:17:28,880
+Sur la colonne zéro, également,
+toutes les LED sont éteintes.
+
+199
+00:17:30,290 --> 00:17:34,940
+Sur la ligne une, nous avons une LED
+sur deux qui est allumée en rouge.
+
+200
+00:17:36,560 --> 00:17:41,960
+Sur la ligne 2, nous avons deux LED
+sur quatre qui sont allumées en vert.
+
+201
+00:17:43,510 --> 00:17:51,310
+Sur la ligne 3, nous avons un
+mélange au niveau de ce pixel.
+
+202
+00:17:51,310 --> 00:17:59,250
+Sur la ligne 4, nous avons quatre LED
+bleues sur huit qui sont allumées.
+
+203
+00:17:59,250 --> 00:18:03,119
+Remarquez qu'une combinaison des trois
+couleurs donne la couleur blanche.
+
+204
+00:18:04,850 --> 00:18:08,860
+Il faut remarquer aussi que les
+mêmes motifs se reprennent,
+
+205
+00:18:08,860 --> 00:18:11,310
+au niveau des lignes et
+au niveau des colonnes.
+
+206
+00:18:13,210 --> 00:18:19,160
+Nous venons d'aborder la commande d'une
+matrice à LED, avec une carte FPGA.
+
+207
+00:18:20,500 --> 00:18:26,270
+Après une présentation de la matrice,
+nous vous avons proposé un projet
+
+208
+00:18:26,270 --> 00:18:33,450
+qui permet de contrôler une matrice RGB,
+avec une carte FPGA.
+
+209
+00:18:35,250 --> 00:18:40,410
+Nous avons par la suite intégré la gestion
+du chargement des données, à travers
+
+210
+00:18:40,410 --> 00:18:46,140
+une mémoire, qui peut être chargée
+par un composant externe, tel
+
+211
+00:18:46,140 --> 00:18:51,200
+qu'un micro contrôleur, ou un processeur
+interne de la carte, un processeur, NIOS.
+
+212
+00:18:53,690 --> 00:18:58,044
+On peut maintenant
+envisager une extension de
+
+213
+00:18:58,044 --> 00:19:02,910
+l'application, en chaînant
+plusieurs matrices,
+
+214
+00:19:02,910 --> 00:19:07,340
+ce qui nécessiterait une vitesse
+de contrôle plus élevée,
+
+215
+00:19:07,340 --> 00:19:13,790
+à l'image des grands murs de
+LED ou des grands afficheurs
+
+216
+00:19:14,820 --> 00:19:19,230
+qui sont, effectivement,
+commandés par des cartes FPGA.

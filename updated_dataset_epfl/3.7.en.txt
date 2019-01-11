@@ -1,0 +1,201 @@
+Welcome back, <i>Nature, In Code</i>.
+We're in Chapter 3, Lecture 7.
+We now have everything in place to start implementing Genetic Drift in JavaScript.
+Let's go ahead and do it.
+I'm going to start a new file here, a new html file.
+I'm going to do this from scratch.
+I'm going to use the doc type html here at the top.
+Whoops! h-t-m-l.
+Then I'm going to setup my <i>html</i> tag and I'm going to divide this here as always into <i>head</i> and a <i>body</i>.
+Then I'm going to indent this as always.
+Here in the <i>head</i>, 
+I'm going to define my script.
+Script and slash script.
+This is where I'm going to put my JavaScript.
+Let me just go ahead and save this right away.
+<i>File</i> &gt; <i>Save As...</i> in the code examples here, and I'm going to save this as <i>genetic_drift</i>.
+Alright, saved.
+Good.
+Syntax highlighting kicking in here.
+So, we're all set.
+Alright, so how are we now going to implement Genetic Drift?
+Well, let's see. Let's first think about which variables we have to define, values that we need to work with.
+Obviously we need to keep track of the allele frequencies.
+We have this variable <i>p</i>.
+I'm going to initialize this as 0.5 just as the example in the previous lecture.
+I'm actually not going to bother now to define <i>q</i> because <i>q</i> can always be calculated as <i>1 - p</i>, so we're fine with this <i>p</i>.
+The other variable that I obviously need is that of the population size.
+I'm going to use a capital <i>N</i> here. because that's the way we usually denote this.
+And let's say I'm goinf to define this as 1000 for example.
+So this is a finite population size, not quite as small as the one we used in the previous example but fairly small population here, a thousand individuals.
+So what I'd like to do now is basically from this population
+I would like to now understand what is the allele makeup in the next generation.
+Notice that we now stopped caring about how exactly those alleles are packaged into the three different genotypes.
+We're not really more interested in the evolution per se, which is as per our working definition, the change in allele frequencies over time so we're now simply going to keep track of the alleles, not of the genotypes anymore.
+And so now I have to calculate the next generation from this.
+As in the Hardy-Weinberg example,
+I'm going to define a function, 
+<i>next_generation</i>.
+Now, as you may recall the <i>next generation</i> function 
+Hardy-Weinberg was pretty simple.
+We actually kept track of the genotype frequencies, and we could just calculate them based on the <i>p</i> 's and <i>q</i> values that we have.
+Here, it's a little bit more complicated because we now have to simulate this random picking of alleles from the gamete pool.
+And we'll do this basically the same way that we flipped a coin.
+This is why we did all these coin flipping exercise in the first place.
+I'm going to draw basically 2N alleles from this infinite, or almost infinitely-sized gamete pool
+So I'm going to basically first find this variable draws in a number of draws that I'm going to make, which is of course <i>2 x N</i>, because that's the number of alleles that we need to draw.
+I'm going to keep track of the alleles here the ones that I draw.
+I need to keep track of how many I draw.
+Those two counters, 
+I'm just going to name <i>a1</i>, <i>a2</i>, and I'm obviously going to initialize those at zero whenever I start new generation.
+Now what I have to do is
+I have to implement this coin flipping.
+Let's go ahead and do this.
+We want to do this draws many times.
+However many times we have here in draws, we want to do this.
+This, of course, calls for a loop, so let's implement this loop.
+As always, we use the same construct, so I'm going to define here this initialization variable.
+Then I'm going to say as long as
+<i>i</i> is smaller than <i>draws</i>, and then of course I have to make sure
+I increment the <i>i</i> to avoid an infinite loop.
+Good.
+We're going to use our old friend here, <i>Math.random</i>.
+We're going to draw a random number-- this is our coin flipper now.
+And, as you may recall, in the coin flipping example we did something like this.
+<i>If Math.random is smaller or equal to 0.5</i> then we would do something, which is keep track of how often this happened.
+We could, in principle, do the same here because we know in fact that the probability of picking an <i>a1</i> is exactly 0.5.
+So it is like flipping a fair coin.
+What I'm going to do here is I'm simply going to say, okay, if that happens in half of the time on average, then I'm going to increase this <i>a1</i> counter here by 1.
+And if it doesn't happen, if the other side comes up, or if I pick the other allele, then obviously
+I have to increase this by 1, the <i>a2</i>.
+I'd increase the <i>a2</i> by 1.
+And that's basically it.
+So you can see, this is roughly identical to the coin flipping example.
+Then at the end, once I've done this-- so, my four loop ends here, and this is another reason why it's nice to indent things properly, so you can exactly see which curly bracket closes which one.
+Because, as you've noticed, as our code gets more complex, we have these levels of nesting.
+We have a function here that has this function body.
+And in the function body, we have a <i>for</i> loop.
+And in the <i>for</i> loop we have <i>if</i> and <i>else</i>, and this is why you now have this nesting here where you have three parenthesis here, three curly brackets, closing.
+And if you wouldn't do proper indentation, it would be very hard to see which one is which.
+And so here it's very easy to see, this one is this... so this one must be the next level, which is this, and this one must correspond to the function closing.
+I strongly advise you to use this indentation all the time.
+So, anyway, here after the <i>for</i> loop we have now picked our alleles so we can now calculate the new allele frequencies.
+So our new <i>p</i> here is essentially going to be, however many <i>a1</i> 's we picked, divided by the number of alleles, which is stored in this variable <i>draws;</i> it's <i>2N</i>.
+And that is pretty much it.
+So now, the only issue that we have here is something wrong with this code if we want to do this multiple times.
+This code will now work one time, because we have here a fair coin basically that we implemented with a 50% probability.
+But of course, as we've seen in the previous lecture, we expect the <i>p</i> value to change, in fact, over time.
+And so the probability that I will pick in <i>a1</i> will not remain 50% all of the time.
+It will change.
+So what I have to do here is I have to replace this 0.5 here that I hard coded here, this fair coin, by <i>p</i>.
+That's very important.
+Because basically it now means that I am picking an <i>a1</i> allele with the probability that equals this <i>p</i> value, this current frequency of the <i>a1</i> allele.
+And that's of course, correct.
+If <i>p</i>, for example, were 0.2, so 20% of the alleles were <i>a1</i>, then I would pick an <i>a1</i> allele from the gamete pool with a probability of 20%.
+And this condition here is true in exactly 20% of the time, if <i>Math.random</i> is smaller or equal to 0.2
+So whatever <i>p</i> is, this will be the correct statement here simply because we have to pick the <i>a1</i> allele according to its frequency.
+Good. So this is now a generic next generation function for genetic drift.
+Why don't we test this?
+Why don't we go ahead now and basically do this a couple of times?
+So let's say we want to call this function maybe a thousand times.
+We're going to build thousand generations, one after the other.
+Again, I'm going to do this many, many times, so this calls <i>for</i> loops.
+I'm going to have another loop here.
+Again, I'm setting up this variable for this particular loop and then I'm going to say,
+<i>i</i> smaller than 1000, then I have to obviously make sure that is-- again, I always increase this counter here, otherwise I create infinite loops.
+And then, I'm basically just going to call this function <i>next_generation</i>.
+This function now gets called a thousand times.
+Now I'm really curious how does this <i>p</i> change over time.
+Let's go ahead and basically output this every time we call, after we've called this next generation function.
+Let's take a look what this <i>p</i> value now, what value it has.
+So <i>console.log(p)</i> and in principle, of course,
+I could also do this a little nicer by saying, let's say, <i>generation</i>...
+Let's not only output the <i>p</i> but let's output first the generation that we're in which is <i>i</i>, then let's output <i>p</i>.
+And you know what, let's also output <i>q</i>, which is of course just <i>1 - p</i>.
+So we're outputting three values namely, what's the generation were at, what's the <i>p</i> value, and what's the corresponding <i>q</i> value.
+One more thing I want to do, just so that I can change this easily in the future.
+Here we have thousand now, hard coded.
+Why don't we store this variable-- this value in a variable so that we can later easily change it.
+I'm going to go ahead,
+I'm going to define a new variable up here,
+<i>var generations = 1000;</i>
+Then here, I'm going to replace this hard coded 1000 simply by the variable <i>generations</i>.
+Now I can easily change this value up here.
+Good. So let's save this and then let's go over to the browser and take a look at this code, how it performs.
+So I'm here in the browser.
+I'm going to open this file,
+<i>Open File</i>, here's my genetic drift, and I'm going to open this.
+Of course I need to open the JavaScript Console as well
+So, as always here in Chrome, it's <i>View</i> &gt; <i>Developer JavaScript Console</i>.
+Here you can see what's happening, in fact, a lot is happening.
+So let's scroll all the way to the top.
+We started at 0.5 and 0.5.
+As you can see, this changed relatively quickly, and our <i>p</i> seems to have gone down quite a bit over a few generations.
+But then after a while, it has actually come back up.
+So down here you can see that's it's again now above 0.5 and so on.
+You can now scroll through this and you can follow how this <i>p</i> changes over time.
+And then at the end, for example, you can see here after 1000 generations, we are at roughly 65%, 35%.
+So this is now genetic drift, implemented in JavaScript.
+You can see a lot of evolution going on here, according to our working definition of change of allele frequencies in a population over time.
+Because this was so much fun, let's just go ahead and reload this.
+Interesting. So what's happening here?
+We have a 1 and we have a 0.
+Let's scroll up a little bit.
+That wasn't always the case.
+We started at 0.5, so that all seems good.
+Then we scroll down...
+Hmmm... interesting.
+Look at this. Something seems to be happening here around generation 700.
+We somehow... very large <i>p</i> values and then <i>p</i> goes to 1 and <i>q</i> goes to 0.
+That is interesting.
+Well, let's reload this again and see what happens.
+Hmmm, same thing.
+Except now, it looks like <i>p</i> went to 0 and <i>q</i> went to 1.
+Let's reload this again.
+We didn't have this problem here.
+Reload it again.
+Not here either.
+Not here either.
+So this seems to happen occasionally when I reload these simulations.
+Not very often, but occasionally it happens.
+Here again, 1 and 0.
+And here it seems like this occurred actually quite early here.
+Oh yeah, that's actually very early.
+Look at this, around generation 340, it happened.
+So what is this?
+This is actually a key aspect of genetic drift, really a kind of almost the most important.
+What happens here is essentially that the <i>a1</i> allele goes to fixation.
+Or could differently in this case, the <i>a2</i> allele gets lost.
+We lose it in the population.
+This can happen because of genetic drift.
+Just like it can theoretically happen that when you flip a fair coin 10 times all the coins, all sides come up as heads or tails.
+And here of course, at this point, this one generation here before it happened, this is not a fair coin at all.
+This is an extremely biased coin, and so it is not surprising that this happens.
+But this is one of the key outcomes.
+You can actually lose alleles in a population because of genetic drift, and we've seen this happening here a couple of times, not always.
+And as we now investigate in future lectures, this process very much depends on the population size itself.
+One more thing. 
+I get this ugly rounding error here, so I don't like this.
+Why don't we use our old friend the <i>round number function</i> that we developed earlier, to get rid of these ugly rounding errors here.
+So I'm going to go back to the code, and I'm going to open the file where I defined this round number.
+So I'm going to open this file which was in first example, if I'm not completely mistaken.
+Open... yup, here it is, our friend round number.
+So I'm going to copy this and then going to go back to my other file, <i>genetic_drift</i> and I'm going to just put it up here for clarity, the round number.
+Then here, as I'm outputting <i>p</i> and <i>1 - p</i>,
+I don't want to output this straight away.
+I needed to pass through round number--
+<i>round_number(p)</i>.
+Then I'm going to say, 
+<i>four digits after the decimal point.</i>
+Same thing here. I'm just going to pass this <i>1 - p</i> to <i>round_number</i> first.
+So <i>1 - p</i>, 4 digits after the decimal point.
+I'm going to save this,
+I'm going to go back to Chrome.
+I'm going to reload this-- looks much nicer now.
+So we've now implemented genetic drift in JavaScript, which is pretty cool.
+The next lecture actually is going to be even better.
+Because now we will start visualizing these results.
+It's handy to be able to look through the values in a browser, in the JavaScript Console in the browser.
+But really, we'd like to visualize now what's going on.
+And int the next lecture we will start visualizing our results using JavaScript.
+So I'll see you there.

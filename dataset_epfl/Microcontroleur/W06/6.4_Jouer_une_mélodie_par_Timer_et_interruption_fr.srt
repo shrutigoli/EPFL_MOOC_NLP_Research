@@ -1,0 +1,1406 @@
+1
+00:00:00,000 --> 00:00:07,940
+Bonjour, nous allons faire un peu de
+musique aujourd'hui.
+
+2
+00:00:07,940 --> 00:00:11,216
+Nous allons le faire évidemment avec un
+microcontrôleur et il
+
+3
+00:00:11,216 --> 00:00:15,140
+n'y aura pas besoin d'être virtuose pour
+pouvoir suivre cette leçon.
+
+4
+00:00:15,140 --> 00:00:19,840
+C'est un exemple d'application que nous
+allons faire aujourd'hui.
+
+5
+00:00:19,840 --> 00:00:21,968
+Certes, nous parlerons un petit peu de
+notes
+
+6
+00:00:21,968 --> 00:00:25,148
+pour comprendre comment générer des notes
+correctes mais nous
+
+7
+00:00:25,148 --> 00:00:29,950
+verrons surtout comment le faire avec un
+timer et avec des interruptions.
+
+8
+00:00:29,950 --> 00:00:31,990
+C'est une jolie application de ces
+
+9
+00:00:31,990 --> 00:00:34,760
+techniques que nous avons appris à
+maîtriser.
+
+10
+00:00:34,760 --> 00:00:39,705
+Alors chacun sait qu'un son, c'est un
+phénomène
+
+11
+00:00:39,705 --> 00:00:45,041
+périodique qui se produit dans des
+fréquences de l'ordre de
+
+12
+00:00:45,041 --> 00:00:50,206
+50 Hertz à 20 kHz si on est très jeune.
+On a
+
+13
+00:00:50,206 --> 00:00:55,308
+donc une variation qui peut avoir
+différentes formes.
+
+14
+00:00:55,308 --> 00:01:00,298
+Ici nous allons utiliser la sortie d'un
+microcontrôleur pour
+
+15
+00:01:00,298 --> 00:01:05,773
+pouvoir mettre une valeur à 0 et à ce
+moment-là, le
+
+16
+00:01:05,773 --> 00:01:11,794
+haut-parleur ne sera pas activé, ou une
+valeur à 1 et la membrane sera collée.
+
+17
+00:01:11,794 --> 00:01:15,616
+Ici on a un montage plus astucieux où on
+va utiliser
+
+18
+00:01:15,616 --> 00:01:16,820
+deux sorties.
+
+19
+00:01:16,820 --> 00:01:21,788
+On va s'arranger de les utiliser en
+permanence en opposition, c'est-à-dire
+
+20
+00:01:21,788 --> 00:01:29,224
+lorsqu'on a un 0, on aura un 1 ici de
+telle manière que le haut-parleur soit
+
+21
+00:01:29,224 --> 00:01:35,014
+attiré dans un sens et tout au contraire,
+lorsqu'on aura un 0 ici et un
+
+22
+00:01:35,014 --> 00:01:40,630
+1, le haut-parleur sera collé dans l'autre
+sens donc on aura plus de
+
+23
+00:01:40,630 --> 00:01:42,970
+sonorité en utilisant ce schéma.
+
+24
+00:01:42,970 --> 00:01:48,076
+Vous n'êtes pas sans ignorer qu'en
+musique, on parle de notes, on parle d'une
+
+25
+00:01:48,076 --> 00:01:52,840
+gamme avec un certain nombre de notes, do,
+ré, mi, fa, sol, la, si.
+
+26
+00:01:52,840 --> 00:01:58,790
+Lorsqu'on retombe sur le do, on est à une
+octave de cette note-là
+
+27
+00:01:58,790 --> 00:02:04,730
+et l'octave correspond au, à la
+multiplication de la fréquence par deux.
+
+28
+00:02:04,730 --> 00:02:06,110
+Autre chose,
+
+29
+00:02:06,110 --> 00:02:12,870
+le la, c'est la référence, il est à 440 Hz
+et c'est ce qu'on
+
+30
+00:02:12,870 --> 00:02:20,430
+obtient avec un diapason, que vous avez
+peut-être vu utilisé chez des musiciens.
+
+31
+00:02:20,430 --> 00:02:23,670
+Pour être un tout petit peu plus précis,
+on
+
+32
+00:02:23,670 --> 00:02:27,720
+a des tons et des demis-tons qui séparent
+les notes.
+
+33
+00:02:27,720 --> 00:02:31,112
+Par exemple, entre le do et le ré, il y
+
+34
+00:02:31,112 --> 00:02:35,750
+a un ton par contre entre le mi et le fa,
+il y a un demi-ton.
+
+35
+00:02:35,750 --> 00:02:39,790
+Et en tout, on a 12 demis-tons par octave.
+
+36
+00:02:39,790 --> 00:02:44,174
+Or, c'est évidemment une progression
+géométrique et
+
+37
+00:02:44,174 --> 00:02:47,520
+non pas une progression arithmétique, une
+progression linéaire.
+
+38
+00:02:47,520 --> 00:02:52,580
+Donc chaque note doit être multipliée par
+un certain
+
+39
+00:02:52,580 --> 00:02:56,381
+facteur pour passer à la note suivante, ou
+plus exactement,
+
+40
+00:02:56,381 --> 00:03:00,102
+pour passer d'un demi-ton, on doit
+multiplier par un coefficient qui
+
+41
+00:03:00,102 --> 00:03:04,530
+est fixe et qui est égal à racine douzième
+de 2.
+
+42
+00:03:04,530 --> 00:03:10,690
+Pourquoi cette formule avec cette racine
+douzième de 2?
+
+43
+00:03:10,690 --> 00:03:14,600
+Et bien par le fait que nous avons des
+demis-tons.
+
+44
+00:03:14,600 --> 00:03:21,230
+Pour une octave, il y a 12 demis-tons.
+Or, une octave correspond à un facteur 2,
+
+45
+00:03:21,230 --> 00:03:23,050
+comme on l'a vu tout à l'heure.
+
+46
+00:03:23,050 --> 00:03:27,480
+Donc il faut bien utiliser un facteur qui
+est égal à racine douzième de 2.
+
+47
+00:03:27,480 --> 00:03:33,930
+Ce chiffre, d'ailleurs, est égal, à peu
+près, à 1,06.
+
+48
+00:03:33,930 --> 00:03:38,024
+Commençons la programmation de notre
+application qui
+
+49
+00:03:38,024 --> 00:03:41,060
+va nous permettre de jouer une mélodie.
+
+50
+00:03:41,060 --> 00:03:46,380
+Tout d'abord, j'ai énuméré des notes pour
+avoir des constantes
+
+51
+00:03:46,380 --> 00:03:48,850
+associées à toutes les notes.
+
+52
+00:03:48,850 --> 00:03:54,860
+Alors il y a do, ré, mi, fa, sol et cetera
+avec aussi les demis-tons jusqu'au si.
+
+53
+00:03:54,860 --> 00:03:58,548
+Et puis il y a une partie de la première
+octave, la
+
+54
+00:03:58,548 --> 00:04:01,515
+deuxième octave jusqu'ici, la troisième
+octave
+
+55
+00:04:01,515 --> 00:04:04,010
+jusqu'ici et une partie de la quatrième.
+
+56
+00:04:04,010 --> 00:04:07,552
+J'ai limité à 32 notes, vous verrez
+pourquoi tout à
+
+57
+00:04:07,552 --> 00:04:11,638
+l'heure, on va utiliser l'astuce que ces
+32 notes peuvent
+
+58
+00:04:11,638 --> 00:04:16,556
+se coder avec 5 bits de la puissance 5.
+Maintenant,
+
+59
+00:04:16,556 --> 00:04:22,189
+l'aspect essentiel, c'est de donner la
+période liée à chaque note.
+
+60
+00:04:22,189 --> 00:04:25,951
+Vous voyez ici un tableau qui a été fait
+avec un
+
+61
+00:04:25,951 --> 00:04:30,460
+tableur en mettant ce paramètre de la
+racine douzième de 2.
+
+62
+00:04:30,460 --> 00:04:36,290
+On est parti du la et on a culculé des
+différentes fréquences.
+
+63
+00:04:36,290 --> 00:04:36,698
+Puis on
+
+64
+00:04:36,698 --> 00:04:40,800
+est passé aux périodes, la période étant
+l'inverse de la fréquence.
+
+65
+00:04:40,800 --> 00:04:46,034
+Si vous regardez, si vous faites le
+calcul, 2272
+
+66
+00:04:46,034 --> 00:04:51,420
+microsecondes c'est égal
+
+67
+00:04:51,420 --> 00:04:56,435
+à 1 sur 440 Hz.
+C'est donc bien ici le la du
+
+68
+00:04:56,435 --> 00:05:01,710
+diapason qu'on trouve à cet endroit.
+C'est une chose de donner
+
+69
+00:05:01,710 --> 00:05:05,381
+une fréquence correcte mais nous
+souhaitons avoir
+
+70
+00:05:05,381 --> 00:05:08,470
+une mélodie avec des notes de durée
+régulière.
+
+71
+00:05:08,470 --> 00:05:17,994
+Or, en fonction de la fréquence le nombre
+de notes pour une durée donnée va varier.
+
+72
+00:05:17,994 --> 00:05:23,347
+Si la fréquence est plus basse, on aura
+moins de périodes.
+
+73
+00:05:23,347 --> 00:05:27,095
+Si la fréquence est plus élevée, on aura
+davantage
+
+74
+00:05:27,095 --> 00:05:28,080
+de périodes.
+
+75
+00:05:28,080 --> 00:05:33,615
+Certes on aurait pu le calculer, ici on a
+également utilisé
+
+76
+00:05:33,615 --> 00:05:38,385
+un tableau, un tableau de bytes, de
+caractères donc de mots de
+
+77
+00:05:38,385 --> 00:05:41,870
+8 bits, dans lequel on a mis ces valeurs
+qui ici
+
+78
+00:05:41,870 --> 00:05:47,000
+vont augmenter puisque tout à l'heure on
+avait des valeurs qui diminuaient.
+
+79
+00:05:47,000 --> 00:05:52,236
+Et c'est inversement proportionnel.
+En musique, les notes ont des durées qui
+
+80
+00:05:52,236 --> 00:05:56,468
+ont des noms.
+La durée la plus standard, c'est la noire.
+
+81
+00:05:56,468 --> 00:05:59,200
+La croche est deux fois plus courte.
+
+82
+00:05:59,200 --> 00:06:03,375
+La blanche est deux fois plus longue que
+la noire.
+
+83
+00:06:03,375 --> 00:06:07,550
+La ronde est quatre fois plus longue que
+la noire.
+
+84
+00:06:07,550 --> 00:06:12,682
+On a ajouté la possibilité de séparer les
+notes avec
+
+85
+00:06:12,682 --> 00:06:17,670
+un petit moment de silence et on va donner
+un paramètre qui est le pourcentage
+
+86
+00:06:17,670 --> 00:06:21,980
+du temps de la note pendant laquelle la
+note cessera d'être jouée.
+
+87
+00:06:21,980 --> 00:06:27,017
+C'est nettement plus agréable d'écouter
+une mélodie avec des notes un petit peu
+
+88
+00:06:27,017 --> 00:06:29,557
+séparées que d'avoir une mélodie tout en
+
+89
+00:06:29,557 --> 00:06:32,800
+continu, qui donne une impression très
+mécanique.
+
+90
+00:06:32,800 --> 00:06:37,970
+Alors nous pouvons maintenant coder les
+notes dans notre programme.
+
+91
+00:06:37,970 --> 00:06:42,818
+La croche vaut 1, la blanche vaut 2, 3, 4,
+on a même
+
+92
+00:06:42,818 --> 00:06:47,628
+prévu une noire pointée.
+Mais pourquoi ce décallé de 5?
+
+93
+00:06:47,628 --> 00:06:51,200
+C'est en fait une multiplication par 32.
+
+94
+00:06:51,200 --> 00:06:55,790
+Et bien, c'est pour libérer la place des 5
+premiers
+
+95
+00:06:55,790 --> 00:06:58,672
+bits qui seront utilisés pour le codage de
+la note
+
+96
+00:06:58,672 --> 00:07:02,145
+do, ré, mi, fa, sol alors que la durée
+croche,
+
+97
+00:07:02,145 --> 00:07:07,050
+blanche et cetera, sera codée sur les
+trois bits suivants.
+
+98
+00:07:07,050 --> 00:07:07,921
+Vous remarquez
+
+99
+00:07:07,921 --> 00:07:12,960
+qu'il n'y a pas de noire puisque la noire,
+c'est la valeur par défaut, c'est le 0.
+
+100
+00:07:12,960 --> 00:07:18,730
+Pour des raisons de lisibilité, j'ai
+également défini une version
+
+101
+00:07:18,730 --> 00:07:24,270
+résumée avec juste deux lettres de telle
+manière qu'on puisse, ici, noter
+
+102
+00:07:24,270 --> 00:07:28,846
+notre mélodie Frère Jacques, do, ré, mi,
+do, do, ré, mi
+
+103
+00:07:28,846 --> 00:07:32,932
+et cetera avec, ici, une blanche sur le
+sol, avec des
+
+104
+00:07:32,932 --> 00:07:39,125
+croches dans cette zone-là et finalement,
+une blanche qui termine le morceau
+
+105
+00:07:39,125 --> 00:07:43,130
+et puis, ici, le terminateur qui permettra
+de dire que la mélodie est terminée.
+
+106
+00:07:43,130 --> 00:07:46,070
+Alors vous pourriez me poser une question
+
+107
+00:07:46,070 --> 00:07:51,104
+: pourquoi ne pas avoir écrit constante
+devant
+
+108
+00:07:51,104 --> 00:07:55,970
+ce tableau comme devant tous les tableaux
+qu'on a vi, qu'on a vu jusqu'à maintenant?
+
+109
+00:07:55,970 --> 00:07:58,103
+Alors, c'est vrai, ce serait
+
+110
+00:07:58,103 --> 00:08:03,138
+mieux de le mettre mais malheureusement,
+le processeur que nous allons
+
+111
+00:08:03,138 --> 00:08:07,914
+utiliser dans ce cas-là, un AVR, un
+ATMega168 ou
+
+112
+00:08:07,914 --> 00:08:12,823
+328, n'est pas capable d'utiliser ce
+
+113
+00:08:12,823 --> 00:08:18,135
+terme, il n'est pas capable d'exploiter un
+tableau qui
+
+114
+00:08:18,135 --> 00:08:23,268
+se trouve en mémoire morte.
+En fait, c'est un processeur qui n'a pas
+
+115
+00:08:23,268 --> 00:08:26,184
+un bus unique d'adresse, il a deux bus, un
+
+116
+00:08:26,184 --> 00:08:29,401
+pour le programme et un pour les données,
+et, par
+
+117
+00:08:29,401 --> 00:08:33,791
+conséquent, il n'est pas possible
+simplement en ajoutant constante
+
+118
+00:08:33,791 --> 00:08:37,360
+devant un tableau de faire qu'il soit
+gravé en mémoire.
+
+119
+00:08:37,360 --> 00:08:39,472
+C'est le cas pour d'autres processeur,
+c'est le
+
+120
+00:08:39,472 --> 00:08:41,296
+cas pour le MSP430, qui est un processeur
+
+121
+00:08:41,296 --> 00:08:43,776
+dit de von Neumann, qui a un seul
+
+122
+00:08:43,776 --> 00:08:48,910
+espace d'adressage, mais pour l'AVR, ça
+n'est pas utile.
+
+123
+00:08:48,910 --> 00:08:51,838
+Dans ce cas-là, le compilateur ne pourra
+pas
+
+124
+00:08:51,838 --> 00:08:55,178
+exploiter ce terme constante et utilisera
+malheureusement de
+
+125
+00:08:55,178 --> 00:08:58,101
+la mémoire pour coder ces tables, qui
+quand
+
+126
+00:08:58,101 --> 00:09:01,470
+même ne vont pas changer, qui sont
+permanentes.
+
+127
+00:09:01,470 --> 00:09:03,750
+On arrive au programme principal,
+
+128
+00:09:03,750 --> 00:09:07,080
+on souhaiterait qu'il soit extrêmement
+simple.
+
+129
+00:09:07,080 --> 00:09:10,344
+Ici, simplement, demander de jouer la
+
+130
+00:09:10,344 --> 00:09:13,750
+mélodie Frère Jacques et ce qu'on
+souhaite,
+
+131
+00:09:13,750 --> 00:09:19,650
+c'est que, tout de suite, la main soit
+rendue pour que la suite du programme
+
+132
+00:09:19,650 --> 00:09:23,022
+puisse s'exécuter et on va voir que tout
+
+133
+00:09:23,022 --> 00:09:26,320
+le reste va être géré par des
+interruptions.
+
+134
+00:09:26,320 --> 00:09:29,687
+Ici j'ai une variable globale qui permet
+de
+
+135
+00:09:29,687 --> 00:09:32,902
+définir ce piqué, ce pourcentage de la
+note
+
+136
+00:09:32,902 --> 00:09:36,040
+pendant laquelle elle est inactive à la
+fin,
+
+137
+00:09:36,040 --> 00:09:38,846
+qui permet de donner une impression plus
+agréable de,
+
+138
+00:09:38,846 --> 00:09:39,630
+à l'écoute.
+
+139
+00:09:39,630 --> 00:09:43,635
+Alors regardons cette procédure
+JoueMelodie.
+
+140
+00:09:43,635 --> 00:09:48,900
+Il y a un certain nombre de variables
+qu'on va utiliser.
+
+141
+00:09:48,900 --> 00:09:53,170
+Et là, vous remarquez une syntaxe que nous
+n'avons encore jamais vue.
+
+142
+00:09:53,170 --> 00:09:54,810
+Il s'agit de pointeurs.
+
+143
+00:09:54,810 --> 00:09:59,334
+Alors, je ne veux pas vous faire une
+théorie sur les pointeurs
+
+144
+00:09:59,334 --> 00:10:04,164
+mais on voit ici que ce paramètre mélodie
+C'est en fait l'adresse
+
+145
+00:10:04,164 --> 00:10:07,130
+d'un tableau où va se trouver la mélodie.
+
+146
+00:10:07,130 --> 00:10:11,630
+Et on verra plus tard, dans la routine
+d'interruption, comment on va
+
+147
+00:10:11,630 --> 00:10:16,596
+chercher les informations à partir de ce
+pointeur, donc ici le début est
+
+148
+00:10:16,596 --> 00:10:20,698
+modifié, on a également ici un pointeur
+qui sera le pointeur courant qui
+
+149
+00:10:20,698 --> 00:10:24,630
+va suivre les différentes notes qui se
+jouent les unes après les autres.
+
+150
+00:10:24,630 --> 00:10:29,253
+J'initialise encore cette variable qui est
+le nombre de périodes restantes de
+
+151
+00:10:29,253 --> 00:10:31,861
+la note courante, comme il n'y a pas
+encore
+
+152
+00:10:31,861 --> 00:10:34,750
+de note qui est chargée, on initialise à
+zéro.
+
+153
+00:10:34,750 --> 00:10:38,778
+Et finalement j'ai séparé toute la partie
+matérielle, toute
+
+154
+00:10:38,778 --> 00:10:43,100
+la partie initialisation matérielle, de
+telle manière que, si
+
+155
+00:10:43,100 --> 00:10:47,065
+je veux réutiliser cette procédure sur un
+autre processeur,
+
+156
+00:10:47,065 --> 00:10:50,587
+je n'aie, en principe, que cette partie à
+modifier.
+
+157
+00:10:50,587 --> 00:10:54,589
+Et je signale qu'on revient tout de suite
+au programme
+
+158
+00:10:54,589 --> 00:10:57,910
+appelant sans attendre, toute la mélodie
+va
+
+159
+00:10:57,910 --> 00:11:02,120
+être jouée sous contrôle du mécanisme
+d'interruption.
+
+160
+00:11:02,120 --> 00:11:05,576
+Alors regardons quand même cette
+initialisation matérielle,
+
+161
+00:11:05,576 --> 00:11:08,160
+comme elle se présente pour un processeur
+AVR.
+
+162
+00:11:08,160 --> 00:11:14,801
+Donc InitMelodie, il faut enclencher le
+haut-parleur, donc le mettre en sortie,
+
+163
+00:11:14,801 --> 00:11:19,790
+ce sera un ddr qu'on devra activer.
+Il faut ensuite choisir
+
+164
+00:11:19,790 --> 00:11:24,561
+la fréquence du timer, on va évidemment
+utiliser un
+
+165
+00:11:24,561 --> 00:11:29,630
+timer, ici le timer c'est 16 bits, et vous
+voyez que dans ce registre de contrôle
+
+166
+00:11:29,630 --> 00:11:34,824
+de ce timer 16 bits, j'ai mis une valeur
+qui s'appelle
+
+167
+00:11:34,824 --> 00:11:39,646
+DivTimer8, et elle est décalée de
+
+168
+00:11:39,646 --> 00:11:44,840
+CS10, et ce qui vous semble peut-être
+encore plus bizarre, c'est que j'ai
+
+169
+00:11:44,840 --> 00:11:47,490
+déclaré cette valeur en binaire, et en
+plus avec
+
+170
+00:11:47,490 --> 00:11:51,520
+un zéro non significatif, j'ai mis trois
+valeurs binaires.
+
+171
+00:11:51,520 --> 00:11:54,556
+Alors vous allez comprendre pourquoi j'ai
+fait ces
+
+172
+00:11:54,556 --> 00:11:57,500
+choix qui peuvent paraître un petit peu
+obscurs.
+
+173
+00:11:57,500 --> 00:12:03,480
+Regardons ce que dit le fabricant de cette
+valeur qu'on doit mettre dans le registre.
+
+174
+00:12:03,480 --> 00:12:09,905
+Alors il le définit comme étant trois
+bits, qui s'appellent
+
+175
+00:12:09,905 --> 00:12:17,040
+CS02, 01, et 00, ou également 1 2, 1 1, 1
+
+176
+00:12:17,040 --> 00:12:24,200
+0, c'est celui qu'on a pris, c'est les
+mêmes pour le timer 0, le timer 1 et
+
+177
+00:12:24,200 --> 00:12:28,690
+le timer 2, et on voit bien ici que si on
+choisit une division
+
+178
+00:12:28,690 --> 00:12:33,596
+par 8, c'est ce qu'on a voulu prendre, on
+a la valeur 0, 1, 0.
+
+179
+00:12:33,596 --> 00:12:35,075
+C'est cette valeur
+
+180
+00:12:35,075 --> 00:12:40,164
+que vous retrouvez ici : 0, 1, 0.
+Et comme ces trois bits
+
+181
+00:12:40,164 --> 00:12:45,480
+se trouvent à la position CS00, qui est
+égale
+
+182
+00:12:45,480 --> 00:12:50,610
+à CS10 dans le registre TCCR1B,
+
+183
+00:12:50,610 --> 00:12:55,484
+et bien j'ai pris cette valeur binaire et
+je l'ai décalée du
+
+184
+00:12:55,484 --> 00:13:00,454
+rang de ce bit-là.
+Voilà une manière qui
+
+185
+00:13:00,454 --> 00:13:05,790
+est, on l'espère, lisible, de représenter
+ces informations.
+
+186
+00:13:05,790 --> 00:13:08,734
+De toute manière, il va falloir lire la
+documentation
+
+187
+00:13:08,734 --> 00:13:12,262
+si on veut comprendre en détail ce qui se
+passe.
+
+188
+00:13:12,262 --> 00:13:16,592
+Ici, on a enclenché un masque
+d'interruption, de
+
+189
+00:13:16,592 --> 00:13:19,480
+telle manière qu'on ait le output capture
+du
+
+190
+00:13:19,480 --> 00:13:22,846
+registre correspondant qui est activé,
+vous allez voir
+
+191
+00:13:22,846 --> 00:13:25,360
+tout à l'heure comment est-ce qu'on va
+l'utiliser.
+
+192
+00:13:25,360 --> 00:13:29,542
+Et bien sûr, il faut déclencher l'ensemble
+des
+
+193
+00:13:29,542 --> 00:13:33,710
+interruptions pour que notre interruption
+puisse alors fonctionner.
+
+194
+00:13:33,710 --> 00:13:37,598
+Je profite encore d'ajouter ces deux
+instructions dont on aura
+
+195
+00:13:37,598 --> 00:13:41,516
+besoin, celle qu'on a déjà utilisée, qui
+permet de mettre le
+
+196
+00:13:41,516 --> 00:13:45,882
+haut-parleur en sortie, c'est bien
+l'activation d'un bit sur un
+
+197
+00:13:45,882 --> 00:13:50,395
+registre ddr, et ce que j'ai appelé
+TicHautParleur, qui permet donc
+
+198
+00:13:50,395 --> 00:13:55,105
+de changer l'état du haut-parleur, donc
+générer un petit bruit.
+
+199
+00:13:55,105 --> 00:14:00,712
+Il va falloir travailler sur un port, et
+il va falloir faire le ou
+
+200
+00:14:00,712 --> 00:14:06,580
+exclusif, le toggle la version du bit,
+avec un des bits, ici on a choisi le PC5.
+
+201
+00:14:06,580 --> 00:14:10,301
+Alors essayons d'entrer dans cette routine
+d'interruption, c'est
+
+202
+00:14:10,301 --> 00:14:12,700
+la partie la plus compliquée de ce
+programme.
+
+203
+00:14:12,700 --> 00:14:15,490
+Voilà encore quelques variables que
+
+204
+00:14:15,490 --> 00:14:20,970
+nous allons utiliser.
+La période courante, ici la période
+
+205
+00:14:20,970 --> 00:14:26,730
+pendant laquelle le son ne doit pas être
+produit à la fin de la note.
+
+206
+00:14:26,730 --> 00:14:32,705
+Ici on a également la note courante, qui
+est mémorisée dans une variable, et ici
+
+207
+00:14:32,705 --> 00:14:36,001
+un int dans lequel la valeur du Timer,
+
+208
+00:14:36,001 --> 00:14:40,544
+au moment du début de l'interruption est
+mémorisée.
+
+209
+00:14:40,544 --> 00:14:42,780
+Alors voilà la syntaxe ici pour
+
+210
+00:14:42,780 --> 00:14:47,128
+l'interruption, interrupt sub routine, il
+s'agit de
+
+211
+00:14:47,128 --> 00:14:51,146
+l'interruption du timer 1 pour la
+comparaison
+
+212
+00:14:51,146 --> 00:14:54,286
+numéro 1, vect veut dire, donc, vecteur,
+
+213
+00:14:54,286 --> 00:14:59,021
+il s'agit d'un vecteur d'interruption, et
+la première chose qu'on fait pour ne
+
+214
+00:14:59,021 --> 00:15:01,472
+pas perdre une information temporelle,
+c'est de
+
+215
+00:15:01,472 --> 00:15:06,180
+mémoriser, dans cette variable, la valeur
+actuelle
+
+216
+00:15:06,180 --> 00:15:12,600
+du compteur, de ce compteur qui compte en
+permanence, donc du timer lui-même.
+
+217
+00:15:12,600 --> 00:15:15,570
+Ensuite, on va se poser la question :
+est-ce qu'il
+
+218
+00:15:15,570 --> 00:15:20,080
+reste des périodes dans la précédente note
+qu'on avait peut-être commencée?
+
+219
+00:15:20,080 --> 00:15:25,580
+Si ça n'est pas le cas, alors il faut
+aller chercher la note
+
+220
+00:15:25,580 --> 00:15:31,720
+courante en prenant la valeur qui se
+trouve à l'adresse du pointeur
+
+221
+00:15:31,720 --> 00:15:37,098
+de la mélodie, on va profiter
+d'incrémenter ce pointeur pour qu'il aille
+
+222
+00:15:37,098 --> 00:15:42,740
+ensuite chercher la prochaine note quand
+il s'agira de prendre la prochaine note.
+
+223
+00:15:42,740 --> 00:15:48,530
+Je reprends cette même ligne et je
+continue le code.
+
+224
+00:15:48,530 --> 00:15:51,114
+Est-ce que la note courante que je viens
+
+225
+00:15:51,114 --> 00:15:54,220
+de lire, c'est le terminateur de la
+mélodie?
+
+226
+00:15:54,220 --> 00:15:56,976
+Si oui, il va falloir terminer
+
+227
+00:15:56,976 --> 00:16:01,330
+la procédure, non sans avoir oublié
+d'arrêter,
+
+228
+00:16:01,330 --> 00:16:03,934
+de terminer de mettre à zéro le flag
+
+229
+00:16:03,934 --> 00:16:06,968
+des interruptions pour qu'il n'y ait plus
+
+230
+00:16:06,968 --> 00:16:10,450
+d'interruption qui vienne, puisque la
+mélodie est terminée.
+
+231
+00:16:10,450 --> 00:16:15,349
+On regarde aussi si la note courante a la
+valeur Reprise, qui est une constante qui
+
+232
+00:16:15,349 --> 00:16:20,750
+a été déclarée, et qui permet de faire la
+reprise de la mélodie au début.
+
+233
+00:16:20,750 --> 00:16:22,514
+On aura donc, a priori,
+
+234
+00:16:22,514 --> 00:16:25,356
+une mélodie qui se jouera sans fin, plus
+
+235
+00:16:25,356 --> 00:16:29,610
+exactement jusqu'au moment où on
+réinitialise une nouvelle mélodie.
+
+236
+00:16:29,610 --> 00:16:34,484
+Si c'est le cas, le pointeur de la mélodie
+reprend le début, on
+
+237
+00:16:34,484 --> 00:16:38,640
+va chercher la note courante, comme tout à
+l'heure, et on pourra continuer.
+
+238
+00:16:38,640 --> 00:16:43,736
+Maintenant s'il s'agit d'une note normale,
+et bien on
+
+239
+00:16:43,736 --> 00:16:48,190
+va à partir de cette note courante, en ne
+s'occupant
+
+240
+00:16:48,190 --> 00:16:54,010
+que de la partie note, donc en masquant
+les cinq premiers bits, on va
+
+241
+00:16:54,010 --> 00:17:00,350
+chercher dans le tableau notre période, la
+période de la note courante.
+
+242
+00:17:00,350 --> 00:17:06,480
+On va faire la même chose avec la durée,
+ça c'est le tableau de la durée,
+
+243
+00:17:06,480 --> 00:17:12,280
+on lui donne de nouveau comme index la
+note courante masquée de la même manière.
+
+244
+00:17:12,280 --> 00:17:13,302
+Petite astuce,
+
+245
+00:17:13,302 --> 00:17:18,482
+le programme avait été développé pour un
+processeur tournant à huit mégahertz, et
+
+246
+00:17:18,482 --> 00:17:24,076
+l'Arduino qu'on va utiliser aujourd'hui
+utilise un processeur à
+
+247
+00:17:24,076 --> 00:17:28,230
+16 mégahertz, c'est la raison pour
+laquelle j'ai multiplié par deux
+
+248
+00:17:28,230 --> 00:17:32,450
+cette durée, de telle manière que ma note
+dure un temps correct.
+
+249
+00:17:32,450 --> 00:17:34,690
+On doit encore s'occuper de la durée de la
+
+250
+00:17:34,690 --> 00:17:38,466
+note, est-ce qu'il s'agit d'une noire,
+est-ce qu'il s'agit
+
+251
+00:17:38,466 --> 00:17:42,529
+d'une blanche, et cetera.
+Donc on va masquer la note pour ne garder
+
+252
+00:17:42,529 --> 00:17:47,245
+que la partie qui nous intéresse dans la
+note courante, et puis on va regarder si
+
+253
+00:17:47,245 --> 00:17:51,890
+la valeur est nulle, une noire, ou bien si
+c'est une blanche, une ronde, et cetera.
+
+254
+00:17:51,890 --> 00:17:57,920
+On va également s'occuper de cette partie
+de la période, donc
+
+255
+00:17:57,920 --> 00:18:04,140
+de la durée de la note, où le son ne sera
+pas joué
+
+256
+00:18:04,140 --> 00:18:08,617
+pour donner une impression musicale plus
+agréable, en reprenant ce paramètre Pique,
+
+257
+00:18:08,617 --> 00:18:12,560
+vous vous souvenez peut-être qu'on avait
+initialisé à 20% dans le programme
+
+258
+00:18:12,560 --> 00:18:16,968
+principal, si on met une valeur plus
+grande, on aura une impression
+
+259
+00:18:16,968 --> 00:18:22,490
+de piqué plus importante, d'où le fait que
+j'ai appelé cette procédure Pique.
+
+260
+00:18:22,490 --> 00:18:30,008
+Finalement, il ne me reste qu'à donner au
+registre de capture
+
+261
+00:18:30,008 --> 00:18:35,015
+la nouvelle valeur de capture qui sera la
+valeur
+
+262
+00:18:35,015 --> 00:18:40,172
+qu'on a lue, tout à l'heure, du timer,
+auquel j'ajoute la
+
+263
+00:18:40,172 --> 00:18:45,480
+période courante, et il faudra évidemment
+faire un tic
+
+264
+00:18:45,480 --> 00:18:50,890
+sur le haut-parleur sauf si on est dans la
+période
+
+265
+00:18:50,890 --> 00:18:55,780
+où on ne doit pas donner de son.
+Donc le tic du haut-parleur
+
+266
+00:18:55,780 --> 00:18:59,651
+va faire bouger, soit faire coller soit
+faire décoller le
+
+267
+00:18:59,651 --> 00:19:04,920
+haut-parleur, et la succession de ces
+événements donnera un son.
+
+268
+00:19:04,920 --> 00:19:07,548
+Et finalement, pour la note courante, la
+
+269
+00:19:07,548 --> 00:19:10,780
+période restante, le nombre de périodes
+restantes
+
+270
+00:19:10,780 --> 00:19:13,354
+va diminuer, de telle manière que
+finalement
+
+271
+00:19:13,354 --> 00:19:15,334
+on aille jusqu'à la fin de la note.
+
+272
+00:19:15,334 --> 00:19:18,260
+Je reconnais que ce programme est un peu
+compliqué.
+
+273
+00:19:18,260 --> 00:19:20,852
+Il faudrait que vous puissiez l'avoir dans
+son ensemble
+
+274
+00:19:20,852 --> 00:19:22,350
+sous les yeux pour le regarder.
+
+275
+00:19:22,350 --> 00:19:24,915
+Mais de manière générale, lorsqu'on veut
+utiliser
+
+276
+00:19:24,915 --> 00:19:26,924
+des timers ou des interruptions, il faut
+
+277
+00:19:26,924 --> 00:19:29,815
+effectivement regarder la documentation du
+fabricant en
+
+278
+00:19:29,815 --> 00:19:33,072
+détail, ou éventuellement s'inspirer de
+programmes qu'on
+
+279
+00:19:33,072 --> 00:19:38,430
+a trouvés sur Internet, en particulier sur
+les sites des fabricants, ou dans d'autres
+
+280
+00:19:38,430 --> 00:19:43,190
+ressources qui sont fournies autour de ces
+microcontrôleurs, et il y en a beaucoup.
+
+281
+00:19:43,190 --> 00:19:46,193
+Est-ce que ce programme fonctionne?
+
+282
+00:19:46,193 --> 00:19:47,760
+Et bien, écoutez.
+
+283
+00:19:47,760 --> 00:19:52,949
+Je presse sur le petit bouton, il s'agit
+donc ici d'un Arduino, qui
+
+284
+00:19:52,949 --> 00:19:57,136
+est un modèle particulier, le Diduino, qui
+est très pratique puisqu'il a la
+
+285
+00:19:57,136 --> 00:19:59,456
+possibilité de placer des petits
+composants,
+
+286
+00:19:59,456 --> 00:20:01,254
+j'ai mis des petits fils pour mettre
+
+287
+00:20:01,254 --> 00:20:04,974
+la résistance, et le petit haut-parleur,
+le
+
+288
+00:20:04,974 --> 00:20:09,795
+petit buzzer, et maintenant écoutez le
+résultat.
+
+289
+00:20:17,450 --> 00:20:20,858
+Alors, si vous avez l'occasion de faire de
+
+290
+00:20:20,858 --> 00:20:24,890
+la musique avec un microcontrôleur, même
+des mélodies simples,
+
+291
+00:20:24,890 --> 00:20:27,965
+s'il vous plaît, essayez de faire des
+notes qui
+
+292
+00:20:27,965 --> 00:20:33,200
+soient justes, pensez aux gens qui ont
+l'oreille musicale.

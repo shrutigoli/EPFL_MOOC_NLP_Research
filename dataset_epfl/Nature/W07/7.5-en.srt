@@ -1,0 +1,969 @@
+1
+00:00:03,332 --> 00:00:04,094
+Welcome back.
+
+2
+00:00:04,333 --> 00:00:07,258
+Nature, In Code
+We’re in chapter seven, lecture five
+
+3
+00:00:07,473 --> 00:00:09,000
+and we just started an epidemic.
+
+4
+00:00:09,202 --> 00:00:11,839
+And you can tell that
+I’m extremely excited about this.
+
+5
+00:00:12,050 --> 00:00:14,362
+Now in the real world,
+I wouldn’t be excited at all.
+
+6
+00:00:14,568 --> 00:00:17,005
+But here in the computer,
+in our simulation
+
+7
+00:00:17,220 --> 00:00:19,307
+That's quite alright.
+It is very exciting.
+
+8
+00:00:19,509 --> 00:00:20,509
+But we've seen that
+
+9
+00:00:20,723 --> 00:00:22,529
+there's one crucial step missing
+
+10
+00:00:22,740 --> 00:00:24,159
+and that is that of recovery.
+
+11
+00:00:24,372 --> 00:00:26,621
+This is what we're going
+to implement right now.
+
+12
+00:00:26,833 --> 00:00:28,516
+So, here we're back in our code.
+
+13
+00:00:29,641 --> 00:00:31,291
+This seems to work all well.
+
+14
+00:00:31,509 --> 00:00:33,794
+So we have all these functions here.
+
+15
+00:00:34,009 --> 00:00:35,809
+And here is the core of it.
+
+16
+00:00:36,024 --> 00:00:37,475
+The "run time step" function
+
+17
+00:00:37,691 --> 00:00:39,581
+that sets up the "temp grid"
+
+18
+00:00:39,788 --> 00:00:42,327
+and then exposes the neighbours
+if they're infected
+
+19
+00:00:42,523 --> 00:00:45,061
+and, finally, moves
+the statuses over
+
+20
+00:00:45,267 --> 00:00:47,117
+from the "temp grid"
+into the "grid".
+
+21
+00:00:47,446 --> 00:00:51,758
+So, we do have
+the exposure function here.
+
+22
+00:00:51,989 --> 00:00:53,764
+But what we don’t have is
+
+23
+00:00:53,990 --> 00:00:58,666
+If there's an infected individual
+
+24
+00:00:58,904 --> 00:01:01,217
+we may expose the neighbours.
+
+25
+00:01:01,415 --> 00:01:05,840
+But there's also the chance
+that an individual recovers.
+
+26
+00:01:06,071 --> 00:01:07,821
+What’s missing here really
+
+27
+00:01:08,046 --> 00:01:10,071
+is that we need to
+give these individuals
+
+28
+00:01:10,281 --> 00:01:12,057
+a chance to recover.
+
+29
+00:01:12,278 --> 00:01:14,490
+So, I’m simply going to now
+call a function here
+
+30
+00:01:14,702 --> 00:01:16,127
+"try recovery"
+
+31
+00:01:16,330 --> 00:01:17,579
+as well, so "try recovery".
+
+32
+00:01:17,792 --> 00:01:19,792
+Again, we need to
+pass in the co-ordinates,
+
+33
+00:01:20,000 --> 00:01:22,250
+so that this function will know
+
+34
+00:01:22,459 --> 00:01:25,785
+which individual tries to recover.
+
+35
+00:01:26,649 --> 00:01:29,674
+And then I’m going to
+implement this function
+
+36
+00:01:29,888 --> 00:01:30,813
+ “try recovery"
+
+37
+00:01:31,006 --> 00:01:32,735
+I’m going to do this down here.
+
+38
+00:01:32,949 --> 00:01:34,437
+It doesn’t matter where we do it.
+
+39
+00:01:34,642 --> 00:01:37,292
+But I already have the
+"try infection" function here
+
+40
+00:01:37,507 --> 00:01:42,657
+So, I’m going to implement
+the “try recovery” function as well.
+
+41
+00:01:42,912 --> 00:01:45,619
+Now we don’t need to go through
+all the neighbours
+
+42
+00:01:45,839 --> 00:01:48,252
+because recovery is now
+
+43
+00:01:48,465 --> 00:01:51,952
+something that really affects
+only one individual.
+
+44
+00:01:52,196 --> 00:01:55,508
+So, we can basically
+use this exact same logic here
+
+45
+00:01:55,734 --> 00:01:58,972
+We can say,
+ok, if the individual
+
+46
+00:01:59,587 --> 00:02:03,863
+is indeed infected at the moment.
+
+47
+00:02:04,082 --> 00:02:07,531
+So, here we’re
+not testing for susceptibility
+
+48
+00:02:07,745 --> 00:02:11,582
+we’re actually
+testing for infectiousness.
+
+49
+00:02:11,873 --> 00:02:15,636
+So if this individual is infected
+
+50
+00:02:16,186 --> 00:02:20,592
+then with a certain probability
+it will recover.
+
+51
+00:02:20,843 --> 00:02:24,156
+So, if “Math random”
+
+52
+00:02:24,973 --> 00:02:27,548
+is now smaller than “gamma”
+
+53
+00:02:27,749 --> 00:02:30,837
+OK? not "beta",
+"gamma" is the recovery probability.
+
+54
+00:02:31,078 --> 00:02:35,979
+Then set the corresponding
+"temp grid" individual 
+
+55
+00:02:36,179 --> 00:02:41,193
+So "temp grid, i, ii" to "R".
+
+56
+00:02:41,730 --> 00:02:45,368
+So, this is virtually
+the same function.
+
+57
+00:02:45,572 --> 00:02:46,931
+It's just named differently.
+
+58
+00:02:47,141 --> 00:02:48,853
+And here it just
+checks for status "S",
+
+59
+00:02:49,066 --> 00:02:50,366
+here it checks
+for status "I",
+
+60
+00:02:50,574 --> 00:02:51,628
+the condition here.
+
+61
+00:02:51,834 --> 00:02:53,841
+The probability of
+something happening,
+
+62
+00:02:54,048 --> 00:02:54,635
+is "beta" here,
+
+63
+00:02:54,843 --> 00:02:55,556
+It's "gamma" here .
+
+64
+00:02:55,755 --> 00:02:56,702
+And what happens is
+
+65
+00:02:56,910 --> 00:02:59,498
+this individual moves
+from susceptible to infected.
+
+66
+00:02:59,703 --> 00:03:03,290
+Whereas this individual
+moves from infected to recovered.
+
+67
+00:03:03,511 --> 00:03:05,509
+And that's pretty much it.
+
+68
+00:03:05,860 --> 00:03:06,449
+So, by the way
+
+69
+00:03:06,670 --> 00:03:08,083
+I don't know if you noticed but
+
+70
+00:03:08,290 --> 00:03:09,187
+in principle we're
+
+71
+00:03:09,407 --> 00:03:10,437
+doing a double-check
+
+72
+00:03:10,649 --> 00:03:12,662
+right, we are testing here
+
+73
+00:03:12,871 --> 00:03:15,578
+that the individual is
+infected in the first place.
+
+74
+00:03:15,780 --> 00:03:17,618
+Otherwise, there can be no recovery.
+
+75
+00:03:17,831 --> 00:03:21,646
+But, in fact we're already
+testing this up here.
+
+76
+00:03:21,840 --> 00:03:23,585
+And that's fine.
+
+77
+00:03:23,830 --> 00:03:25,730
+I mean, in principle
+it is a double-check.
+
+78
+00:03:25,946 --> 00:03:29,521
+And one of them is,
+in principle, unnecessary.
+
+79
+00:03:29,733 --> 00:03:33,833
+But, I certainly would like
+to keep them here in any case.
+
+80
+00:03:34,192 --> 00:03:36,967
+But, certainly, also, here
+it seems like it's a good place
+
+81
+00:03:37,178 --> 00:03:38,443
+just to double-check,
+
+82
+00:03:38,652 --> 00:03:40,529
+and to make this method
+stand alone. 
+
+83
+00:03:40,755 --> 00:03:43,867
+Because this method cannot
+be 100% certain that
+
+84
+00:03:44,084 --> 00:03:46,796
+whoever calls this method
+has already checked
+
+85
+00:03:47,005 --> 00:03:50,155
+whether the corresponding
+individual is indeed infected.
+
+86
+00:03:50,362 --> 00:03:52,725
+So, this is an extra step
+
+87
+00:03:52,947 --> 00:03:54,890
+that, in principle,
+would be unnecessary,
+
+88
+00:03:55,097 --> 00:03:58,060
+but I still think it's good practice
+here in this case.
+
+89
+00:03:58,265 --> 00:03:59,633
+So with that out of the way.
+
+90
+00:03:59,867 --> 00:04:03,242
+Let's save this and
+let's go over to browser.
+
+91
+00:04:03,566 --> 00:04:08,237
+Where we have our poor
+fully infected population,
+
+92
+00:04:08,445 --> 00:04:09,889
+and let's reload this.
+
+93
+00:04:10,199 --> 00:04:13,573
+So, now what you see here
+is a real infection.
+
+94
+00:04:13,773 --> 00:04:15,324
+So, these individuals in red
+
+95
+00:04:15,533 --> 00:04:17,393
+are obviously infected
+
+96
+00:04:17,607 --> 00:04:20,620
+and they will expose
+the grey individuals nearby and
+
+97
+00:04:20,832 --> 00:04:23,594
+because of that,
+the epidemic keeps spreading
+
+98
+00:04:23,814 --> 00:04:27,089
+but everyone in the back
+eventually recovers.
+
+99
+00:04:27,305 --> 00:04:31,140
+And now this process
+will at some point stop
+
+100
+00:04:31,355 --> 00:04:35,003
+because essentially we are
+running out of susceptibles.
+
+101
+00:04:35,219 --> 00:04:36,131
+Now, it's happened.
+
+102
+00:04:36,347 --> 00:04:37,763
+Let me reload this again.
+
+103
+00:04:38,556 --> 00:04:41,942
+So here it's starting
+and it's slowly spreading out,
+
+104
+00:04:42,266 --> 00:04:45,266
+and it does so at the edges,
+
+105
+00:04:45,994 --> 00:04:48,519
+because that's where
+the susceptibles are.
+
+106
+00:04:48,756 --> 00:04:52,168
+It can't, obviously, the green
+individuals here have recovered,
+
+107
+00:04:52,393 --> 00:04:54,415
+they cannot be infected any more.
+
+108
+00:04:54,632 --> 00:04:56,832
+And here, again, eventually
+
+109
+00:04:57,106 --> 00:05:01,318
+the infection will
+run out of susceptibles.
+
+110
+00:05:01,542 --> 00:05:03,568
+So, that's a key observation here.
+
+111
+00:05:03,782 --> 00:05:07,616
+Another observation that you
+I'm sure have noticed,
+
+112
+00:05:07,841 --> 00:05:10,197
+is that we have these small islands
+
+113
+00:05:10,418 --> 00:05:13,080
+these small clusters of grey
+
+114
+00:05:13,295 --> 00:05:15,670
+meaning susceptible individuals.
+
+115
+00:05:15,867 --> 00:05:17,304
+Why is that the case?
+
+116
+00:05:17,516 --> 00:05:21,615
+Well, essentially these individuals
+probably just lucked out.
+
+117
+00:05:22,138 --> 00:05:27,213
+I mean, I'm sure some of them here,
+well, it's guaranteed in fact
+
+118
+00:05:27,433 --> 00:05:31,045
+that each inidvidual here
+that has green neighbours
+
+119
+00:05:31,257 --> 00:05:35,038
+has at somepoint
+been surrounded by red neighbours
+
+120
+00:05:35,250 --> 00:05:38,313
+because the green individuals,
+all of them, were red before.
+
+121
+00:05:38,515 --> 00:05:40,953
+It just so happened
+that they recovered
+
+122
+00:05:41,156 --> 00:05:46,118
+before they had a chance to infect
+the susceptible individuals.
+
+123
+00:05:46,334 --> 00:05:48,809
+So all of these individuals
+just got lucky.
+
+124
+00:05:49,026 --> 00:05:51,445
+There are some here in
+these larger clusters
+
+125
+00:05:51,674 --> 00:05:53,596
+that got very lucky
+in the sense that,
+
+126
+00:05:53,804 --> 00:05:56,906
+there, all their neighbours
+got lucky in the first place
+
+127
+00:05:57,130 --> 00:05:59,775
+by not being infected
+even though they were exposed.
+
+128
+00:05:59,988 --> 00:06:03,514
+And so there are few individuals
+that indeed were never ever exposed
+
+129
+00:06:03,716 --> 00:06:04,891
+but that's very very rare.
+
+130
+00:06:05,101 --> 00:06:08,177
+Most of them were exposed
+but just by chance
+
+131
+00:06:08,395 --> 00:06:09,745
+they didn't get infected.
+
+132
+00:06:10,147 --> 00:06:14,761
+Now, another observation is in fact
+that this recovery may die out.
+
+133
+00:06:15,585 --> 00:06:20,428
+It could be that these
+infected individuals all recover
+
+134
+00:06:20,640 --> 00:06:24,529
+before they have a chance
+to infect new individuals.
+
+135
+00:06:24,732 --> 00:06:26,095
+This is not happening here.
+
+136
+00:06:26,305 --> 00:06:27,955
+Let's see, maybe
+it's happening here
+
+137
+00:06:28,163 --> 00:06:29,264
+No, it's not happening.
+
+138
+00:06:29,477 --> 00:06:32,077
+Well, maybe we should just
+go back to the code and
+
+139
+00:06:32,289 --> 00:06:37,581
+increase our probability
+of recovery a little bit.
+
+140
+00:06:37,802 --> 00:06:39,496
+So let's go back to our code.
+
+141
+00:06:39,712 --> 00:06:42,712
+And go up here
+where we have the global variables.
+
+142
+00:06:42,964 --> 00:06:46,328
+And here we have "gamma".
+That's the probability of recovery.
+
+143
+00:06:46,540 --> 00:06:49,190
+Let's set this to "0.15"
+
+144
+00:06:49,419 --> 00:06:50,584
+instead of just "0.1".
+
+145
+00:06:50,794 --> 00:06:55,729
+So now there's much faster
+recovery and it may be that
+
+146
+00:06:55,966 --> 00:06:59,075
+now the infection
+will die out earlier. Let's see.
+
+147
+00:06:59,288 --> 00:07:00,700
+So, yep, here it just happened.
+
+148
+00:07:00,898 --> 00:07:04,429
+You saw this.
+You saw a few dots here in red,
+
+149
+00:07:04,655 --> 00:07:07,953
+but then they recovered too fast
+
+150
+00:07:08,167 --> 00:07:11,875
+before new individuals
+could be infected, and, of course, 
+
+151
+00:07:12,086 --> 00:07:16,430
+once the last
+infected individual recovers
+
+152
+00:07:16,645 --> 00:07:17,919
+there's no more infection.
+
+153
+00:07:18,128 --> 00:07:19,853
+Let me just reload this.
+
+154
+00:07:20,458 --> 00:07:22,821
+Here, no, it almost died out.
+
+155
+00:07:23,032 --> 00:07:25,532
+Let's see, it looks like 
+this could keep going
+
+156
+00:07:25,756 --> 00:07:27,067
+for quite a while.
+
+157
+00:07:28,480 --> 00:07:32,459
+Now it's a bit harder
+because it's now on two fronts.
+
+158
+00:07:32,672 --> 00:07:35,171
+One here, one here,
+one down here.
+
+159
+00:07:35,391 --> 00:07:37,328
+And this probably just keeps going.
+
+160
+00:07:37,545 --> 00:07:41,107
+But you can already see there are
+potentially very large clusters
+
+161
+00:07:41,322 --> 00:07:42,567
+now here of susceptibles,
+
+162
+00:07:42,764 --> 00:07:46,285
+because it locally died out before
+it could start an infection here.
+
+163
+00:07:46,499 --> 00:07:48,037
+Now let's see where this is going.
+
+164
+00:07:48,245 --> 00:07:49,594
+This is an
+interesting case.
+
+165
+00:07:49,806 --> 00:07:50,890
+So this one died out.
+
+166
+00:07:51,093 --> 00:07:52,625
+It looks like it's dying out here.
+
+167
+00:07:52,828 --> 00:07:55,253
+So you can see here
+the consequence of this now
+
+168
+00:07:55,470 --> 00:07:58,745
+is that the outbreak size
+for the number of individuals
+
+169
+00:07:58,958 --> 00:08:01,506
+that got infected in total
+is now smaller
+
+170
+00:08:01,722 --> 00:08:04,807
+It's probably, I don't know,
+I'd say around a third here
+
+171
+00:08:05,004 --> 00:08:06,379
+of the total population.
+
+172
+00:08:06,594 --> 00:08:08,443
+Let's do this one more time.
+
+173
+00:08:09,308 --> 00:08:11,578
+One more time where
+it doesn't die out.
+
+174
+00:08:11,789 --> 00:08:15,739
+So, here we have a cluster
+it's growing on three fronts.
+
+175
+00:08:15,953 --> 00:08:18,203
+And now it's only
+growing on two it seems.
+
+176
+00:08:18,423 --> 00:08:20,335
+One here to the left,
+one to the right.
+
+177
+00:08:20,554 --> 00:08:23,185
+The one here died out.
+The one here died out as well.
+
+178
+00:08:23,389 --> 00:08:28,389
+So, now you can see this
+is a farly "small" outbreak
+
+179
+00:08:28,637 --> 00:08:32,449
+that basically stopped itself
+so to speak.
+
+180
+00:08:32,929 --> 00:08:35,529
+So this is the consequences
+of a really fine balance
+
+181
+00:08:35,725 --> 00:08:38,250
+between this probability
+of infection
+
+182
+00:08:38,474 --> 00:08:40,319
+and the probability
+of recovery.
+
+183
+00:08:40,528 --> 00:08:44,366
+And if the recovery rate is very low
+compared to the infection rate
+
+184
+00:08:44,577 --> 00:08:46,751
+then pretty much everyone
+will get infected.
+
+185
+00:08:46,959 --> 00:08:50,431
+But if it's relatively high
+compared to the infection rate,
+
+186
+00:08:50,647 --> 00:08:56,849
+then there's probability these
+outbreaks will stop on their own
+
+187
+00:08:57,064 --> 00:09:01,307
+because the infected individuals
+will eventually recover
+
+188
+00:09:01,525 --> 00:09:04,067
+before they get a chance
+to infect new individuals
+
+189
+00:09:04,276 --> 00:09:07,296
+and this is exactly what
+happens here.
+
+190
+00:09:07,936 --> 00:09:12,436
+So, it's a constant race between
+recovery and infection.
+
+191
+00:09:12,636 --> 00:09:19,560
+So, this concludes our simulations
+of this standard situation.
+
+192
+00:09:19,775 --> 00:09:21,825
+What I want to do though
+is I want to take
+
+193
+00:09:22,036 --> 00:09:24,186
+one more shot at this
+
+194
+00:09:24,385 --> 00:09:27,085
+and modify something
+which can have
+
+195
+00:09:27,298 --> 00:09:29,960
+which is a small modification
+but it can actually have
+
+196
+00:09:30,155 --> 00:09:31,155
+huge consequences.
+
+197
+00:09:31,365 --> 00:09:36,365
+That modification is that we're
+going to modify the contact network.
+
+198
+00:09:36,584 --> 00:09:37,584
+So, at the moment
+
+199
+00:09:37,784 --> 00:09:42,785
+we asssume that each individual has
+exactly eight contacts or neighbours
+
+200
+00:09:42,990 --> 00:09:46,115
+The slight modification that
+we're going to make now is
+
+201
+00:09:46,322 --> 00:09:50,523
+occasionally, very rarely, a contact
+is being made between
+
+202
+00:09:50,735 --> 00:09:54,310
+two individuals that are
+potentially very far away.
+
+203
+00:09:54,527 --> 00:09:56,027
+So, "long distance" contact.
+
+204
+00:09:56,236 --> 00:10:00,348
+And you can think of this as
+someone gets on a plane,
+
+205
+00:10:00,580 --> 00:10:02,467
+travels to some other place
+
+206
+00:10:02,973 --> 00:10:04,911
+and then has contacts there.
+
+207
+00:10:06,048 --> 00:10:09,048
+This is, now, something
+we can implement very easily
+
+208
+00:10:09,260 --> 00:10:11,010
+with the code we have in place
+
+209
+00:10:11,223 --> 00:10:13,136
+and as we'll see in the next lecture
+
+210
+00:10:13,342 --> 00:10:15,967
+this will have rather
+dramatic consequences.
+
+211
+00:10:16,174 --> 00:10:17,961
+So, I'll see you
+in the next lecture.
+

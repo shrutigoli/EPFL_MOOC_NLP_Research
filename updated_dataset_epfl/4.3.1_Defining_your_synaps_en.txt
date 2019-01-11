@@ -1,0 +1,59 @@
+Hi, I'm Elif Muller, section manager for cells and circuits at the Blue Brain Project.
+Today I'm going to show you how to model your own synapses in the neuron simulator.
+In this tutorial, you've used the NEURON simulator to model neurons.
+We will use the NMODL language which is an extension of the NEURON simulator to allow you to define your own synapse models.
+We will walk you through this process and the NMODL syntax on the example of the model of the AMPA and NMDA glutamate receptors.
+You will learn how to make your own NMOD mod file model AMPA and NMDA glutamate receptors using the NMODL language, compile your MOD file insert it into a simple neuron and simulate it.
+First, let's look into how to edit MOD files get an overview of their syntax.
+The NMODL language is a domain specific language of the NEURON simulator to define extension such as ion channels, or synapse models.
+To use the NMODL, the user writes MOD files adhering to the NMODL language syntax.
+These are programs external to Python so it must be edited using an external editor.
+We will use the embedded editing capabilities of the Jupyter system.
+Going to the view of the files available to the Jupyter notebook on the home screen, we define a directory called "mechanisms" it can also be a directory of a different name where we will place our respected
+MOD files we would like to include in the NEURON simulation environment.
+I've prepared a simple
+AMPA and NMDA MOD file for the purposes of this tutorial.
+By selecting this file and clicking edit you can edit this file interactively in the Jupyter framework.
+Now let's look at the various sections of the NMODL MOD file.
+It begins with comments describing the contents of the MOD file a title, indicating the purpose of the MOD file and so on.
+The first block to define is the NEURON block.
+This is a definition of variables which maybe accessed by the user in the NEURON simulator environment.
+These in include the parameters you want to expose to the user and various variables that you would like to record.
+Also this point process statement defines the name of the mechanism as treated in the NEURON simulator.
+The next block is the parameter block which allows the user to define constance which maybe set in the NEURON simulator environment.
+For this example, we're using the dual exponential conductance profiles, for both the AMPA receptor and the NMDA receptor.
+Here we provide the rise and decay time constants for the AMPA conductance and also the NMDA conductance.
+Next, we define the reversal potential for AMPA and NMDA and the magnesium concentration which is required to  implement the voltage gate of the NMDA conductance.
+Gmax AMPA and the Gmax NMDA are the conductances of the AMPA and the NMDA receptors, respectively in units of micro Siemens.
+In the next block, the state block, we declare the state variables which make up this mechanism.
+Since we're implementing dual exponential rise kinetics and decay kinetics of the respective conductances we need to implement two state variables for both the AMPA and the NMDA conductances.
+The rise kinetics and decay kinetics.
+Next we have the assigned block this is the declaration of variables that are to be computed, for example in the break point block which we'll see in a second.
+The next block is the initial block, this is the definition of initial conditions of state variables, and is also where we should compute any calibrating factors.
+So first of all, here we declare some local variables that allows us to compute some specific calibrating factors.
+Next we zero the receptor rise and fall kinetics variables.
+Here we compute the constance needed to normalize the dual exponential receptor dynamics.
+First we have to compute the expression for the time to peak of the AMPA dual exponential conductance and the NMDA dual exponential conductance.
+Then we compute the normalizing factor such that the peak of the rise and decay mechanism is exactly equal to one.
+These factors implement this normalization.
+The next block is the break point block this is where we declare the method to propagate the state variables in time.
+This is the essential simulation block that defines how your model will be simulated.
+First you specify how to solve the system of equations which will be declared below the derivative block.
+The Cnx specifies integration method it is an implicit integration method that's stable even for stiff systems.
+Next we compute and assign quantities which depend on the state variables.
+First we compute the time varying AMPA receptor conductance as the difference of the rise and decay kinetic variables
+B AMPA and A AMPA.
+This gives us the exponential rise and decay.
+Similarly for NMDA we can compute the rise and decay kinetics of the NMDA conductance.
+Now we have an additional term to implement the magnesium block kinetics, due to Jarl and Stevens, 1990.
+Then the total conductance is the sum of the AMPA and the NMDA conductances.
+Next we can compute the specific currents of AMPA and NMDA.
+These are simply the conductance multiplied by the driving force which is the instantaneous membrane voltage minus the reversal potential.
+Finally we can compute the total current due to these combined receptors.
+The next block is the derivative block.
+This block declares the ODEs to be solved in the break point block.
+Here we see that the rise and decay kinetics of the AMPA and NMDA follows decaying exponentials with their respective time constants.
+The final block in the MOD file is the net receive block.
+This is the block to be executed when a presynaptic spike even arrives.
+In this case, when a spike even arrives each of the rise and decay kinetic variables is increased by a specific jump factor.
+This triggers the postsynaptic response kinetics.

@@ -1,0 +1,45 @@
+In this episode, we will continue our case study on watches,
+Swiss or not, by the way, and we will attack the polymorphic display of the different products in our hierarchy
+As a reminder, at the previous step, we made a draft of the hierarchy of products and we know want to make sure that these different products can be displayed in a polymorphic fashion.
+Basically, a product like a watch, a mechanism or an accessory will have its own way of being displayed and we want this display to be polymorphic, that is that, if we put an object of type
+Montre (TN: "watch")  in a variable of type Produit (TN: "Product") and we invoke the display method on that variable, then we want the output to automatically adapt to the actual type of the instance stored in the variable.
+So each product has its own way of being displayed and we are wondering how to proceed to make a polymorphic display.
+So, the idea would be for example that
+I declare a variable of type Produit,
+I assign to it the reference of an object of type Montre, which is a subclass of Produit, and that I then proceed to display this object "p". And I would like to have all the characteristics of the object, and I want them to be automatically adapted to the fact that the object is actually a watch, i.e that what I stored in the variable "p" is an object of type Montre.
+The most natural way is of course to use the toString method, which is automatically invoked by system.out.println, and if we want each product to be displayed in its own way, we simply need to override this toString method accordingly in each subclass where it seems useful to do so.
+Suppose that we wish to make sure that the default way to display a product is to display its price
+Remember that in the previous episode, we described a product as being characterized by an attribute of type double corresponding to its base value, and the class also contained a public method which calculated the price of the product and which, in the Produit class, simply returned the base value.
+In the Produit class, to make sure that the toString method displays a representation in the form of a character string of the price of the product, and we could thus be tempted to display the price by directly using the value of the attribute, since we reason that anyway, the price is just the base value of the product.
+This way of doing it, however, is not the correct one.
+Do you know why?
+We want the toString method as defined in the Produit class to determine the default behavior, that is, it must be capable of displaying the price, the correct price of the product, even if it isn't overridden in the subclasses.
+Yet the price of an object corresponds to its base value for a basic product, but this is not necessarily the calculation we would make for sub-types of products.
+For example, the price of a bracelet could correspond to a base value; however, the price of a watch could be calculated as being the sum of the price of all its components.
+And in that case, if we applied the toString method to an object of type Montre, we would want the price of the watch to be displayed correctly, and not some base value.
+The correct way to proceed here is thus to use, instead of valeur, the prix method, which can of course have a polymorphic behaviour itself.
+Finally, you will have noted that here, we had to convert the double returned by prix to a string using this syntax.
+Now, let's finalize our Produit class.
+One of the first things that come to mind naturally is that a product does not exist as such
+It is an abstract entity in our implementation.
+We can make this clear, at the design level, by labeling the Produit class as being abstract.
+Suppose that now, we wish to force the fact that the value of a product, once initialized, can not be changed during the lifetime of a product.
+So, the idea would be to give a first value to this attribute but not to allow it to be modified.
+This is possible by labeling the attribute as being final.
+If valeur had been an attribute of type object, so something else than a primitive data type, would the act of labeling it as final prevent any and all modification of this attribute?
+Suppose lastly that we wish to impose that a product should have, by default, a null base value: this can be done by adding to the Produit class a default constructor which would take care of initializing valeur to a null value.
+Overloading, and specifically here overloading constructors is a rather common way of giving default values to certain parameters in Java.
+So, this is what our Produit class looks like in the end.
+We have declared it as abstract because we do not want products to be instantiated as such, they do not exist in that form: a bracelet can be instantiated, and so can a watch, but not a product itself.
+An instance of Produit is defined by its base value.
+We have labeled this attribute as final, which means that once it has been initialized by one of the constructors, we will not be able to change its value.
+So a product has a constant base value during all its lifetime.
+A product can thus be initialized in two ways: either using a constructor that takes a base value as argument that will be given to the attribute, or using the default constructor, in which case the base value is set to zero.
+Since we have these constructors, would it be possible to write something like this: declaring a variable of type Produit, and initializing it like this, for example?
+The answer is of course no, since this class is abstract and thus cannot be instantiated.
+These constructors will only be used by constructors of subclasses of Produit that can actually be instantiated.
+The Produit class contains an override of the toString method inherited from Object, and the goal of this is to be able to use this toString method in a polymorphic way, that is, to be able to override it in subclasses of Produit.
+That said, it offers a default, basic definition which consists in displaying the price, converted to a character string.
+The price is calculated using another polymorphic method, that is, a method that we will be able to redefine in subclasses of Produit to adapt to the actual nature of the instance to which it belongs.
+That way, when we call the toString method on a Montre stored in a variable of type Produit, then the prix method of the Montre object will be called and the display of the price will be correct.
+This concludes our episode on the definition of products and their polymorphic display.

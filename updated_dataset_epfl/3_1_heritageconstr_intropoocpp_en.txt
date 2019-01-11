@@ -1,0 +1,80 @@
+In this episode, we will consider the effects of inheritance on constructors (initialization), and destructors.
+We saw in a previous episode on constructors that when a subclass is instantiated, attributes need to be initialized.
+This is what we do for example, when we declare an instance 'r' of a class Rectangle by giving its width and height.
+This is done with a constructor whose job it is to initialize the attributes.
+But if the class Rectangle inherits from a class FigureGeometrique, then the class Rectangle inherits a set of attributes from the class FigureGeometrique.
+So, the constructors of the class Rectangle are responsible for initializing the class Rectangle's attributes, which comprise those inherited from the superclass FigureGeometrique.
+However, it shouldn't be the programmer of this subclass who initializes the attributes from the superclass FigureGeometrique.
+He might even be incapable of doing this himself if the superclass had private data members, because he couldn't access them.
+So, how will the programmer of Rectangle accomplish this task?
+He will invoke in the constructor of Rectangle the constructor of the class
+FigureGeometrique.
+The initialization of the inherited data members has to be done by calling the constructors of the superclass in the constructor of the subclass.
+Let's see how this is written in C++, first from a general point of view and then with an example.
+Calling a constructor of the superclass from the constructor of a subclass is done in the section
+"initialization list".
+This section, which begins with a colon, is positioned between the header of the subclass and its definition.
+So, right after the header of the constructor of the child class, in the initialization list, you start by invoking the parent class in question so you add the arguments that you need, and naturally, the constructor of the superclass carries the same name as the superclass.
+Then with a comma, just like we initialize the different data members, you would have the rest of this initialization list that initializes the data members.
+Let's consider the example, with the class Rectangle, here, that is the child of the class FigureGeometrique.
+We defined a class FigureGeometrique that, let me remind you, has a data member 'position' that is protected and has a constructor that receives
+2 coordinates: x and y in order to initialize the field 'position'.
+So here, in the initialization list of the constructor FigureGeometrique we have the initialization of its field position.
+Now, look at the constructor of the subclass Rectangle, the constructor of Rectangle will take as usual
+2 parameters l and h to initialize its width and height, as before, without inheritance, but it will also take the 2 parameters x and y, we decided here to put them first but this is not necessary, to be able to initialize the position of the FigureGeometrique through the constructor of FigureGeometrique that takes 2 parameters.
+So, the constructor of Rectangle will have its 4 parameters then in the initialization list, we call the constructor of
+FigureGeometrique, here we chose to call 2 parameters, followed by a comma, then the initialization list of its own data members.
+Here we invoked the superclass constructor explicitly.
+Of course, if the class has a default constructor, this explicit invocation of the constructor is redundant.
+A default constructor,
+I recall, is a constructor that doesn't take any arguments, and doesn't need any arguments.
+And in this case, it is not at all necessary to explicitly call this constructor, because the compiler will automatically call the default constructor.
+But we will have in any case an invocation of the constructor.
+However, if the class does not have a default constructor, then of course an explicit call of one of these constructors needs to be made, without which, the compiler would not know what to do.
+So, calling a parent class constructor is mandatory.
+If the superclass doesn't have a default constructor, then a an explicit constructor needs to be used to make an explicit call in the initialization list of the subclass's constructor.
+Hence, the subclass has to have an explicit constructor, to make an explicit call to the superclass constructor.
+Now if our FigureGeometrique had a default constructor, it would not have been necessary to make this explicit call to a constructor, and we could have omitted it.
+Here is a different example, where the class FigureGeometrique has a defaulted default constructor.
+Let's see what happens in this case.
+Here we have the constructor of the subclass Rectangle that, in its initialization list, does not explicitly call its superclass
+FigureGeometrique's constructors, this is possible because the class
+FigureGeometrique has a default constructor.
+We suppose that we didn't write the constructor and therefore it has the default constructor provided by default by the compiler.
+So, we have here, in the beginning of the constructor of the subclass Rectangle, a call to the default constructor of the superclass FigureGeometrique.
+Note that here, a default constructor is called twice, because here, the class FigureGeometrique, has as data member, Position, and because we didn't explicitly call the constructor, it it the default constructor, that is provided by default, by the compiler, which will call the default constructors of each of the data members.
+So here, the defaulted default constructor calls the constructor by default of 'Position'.
+To summarize, the call of the constructor of Rectangle, for example, if I wrote something like this,
+'Rectangle r(3.0, 4.0); would call the constructor of Rectangle here by passing 3.0 and 4.0 as parameters, and would start by calling the default constructor provided by default, by the compiler of the class FigureGeometrique, which would the constructor by default of 'Position',
+(here I assume that Position is a class), and that therefore there is a defaulted default constructor, or a default constructor explicitly written.
+We would then first have a construction by default of the position that ends the default construction of FigureGeometrique, and would then allow the constructor of Rectangle to continue initializing its other data members.
+We will come back in an instant to the order constructors are called in a hierarchy.
+But first of all, I would like to insist on something.
+It is not necessary to have supplementary fields in the subclass.
+For example, if we have a square, which is a certain sort of rectangle, a square is a rectangle where the width is equal to its height, then we will not introduce into the subclass Carre (TN: = "square"), extra data members.
+But we could anyway, in the constructor of Carre, and we would have to do it here, in this constructor that doesn't add any fields, call the constructor of the superclass.
+Look at this example in detail.
+We say that a square is a rectangle, in the class Rectangle, we have as usual, data members for width and height, which we inherited from the class Carre and we would simply say a square is a rectangle whose width equals its height.
+And we would not add or change anything else in Carre.
+So, we would simply declare the class Carre as a subclass of Rectangle, and not add anything in particular.
+I will come back with a final remark in an instant.
+Simply, we will force the constructor here to take one unique dimension, the length of the side of a square, and to call the constructor of the superclass by asking the constructor of the superclass to have the same height and length, and we wouldn't add anything else to the body
+ of the subclass Carre.
+So, and it's simply these 3 lines here, and we don't need to add anything.
+They suffice to define a square that is a rectangle whose constructor is forced to give it sides of equal length.
+Then, when we say that there is nothing to add, of course, if in Rectangle, we had a method for example the method
+SetHauteur or the method SetLargeur, then these 2 methods inherited from Carre would have to be redefined so that the sides of the square would always be equal.
+So we could try to do something like this, in the class Carre, by specializing the method SetHauteur, which will shadow the method from Rectangle, and would, of course set the height to the value received, but would also --and this is new in Carre-- set the width to equal the new value too.
+Therefore this supplementary line will be added in the specialization of Carre, and we would do the same for setLargeur.
+To summarize, at this stage, each constructor of a subclass has to call a superclass constructor and this call comes first on the initialization list.
+What happens if we forget to explicitly call one of the constructors of the superclass?
+Then, a constructor of the subclass automatically calls the default constructor of the superclass and, as expected, if the superclass doesn't have a default constructor, an error occurs in the compiler.
+I will take advantage to remind you that the default constructor, that is to say, the constructor that doesn't take any arguments, is a bit particular if we do not write it out.
+We have then by default a version provided by the compiler of this default constructor.
+As soon as we write another constructor, this defaulted default constructor is not available anymore, and if we want a default constructor, then we have to rewrite it.
+So, to avoid problems with inheritance, first of all,
+I encourage you to always declare at least one constructor and to explicitly invoke a superclass constructor in the subclass.
+Even though you might want to call the default constructor,
+It is better to write it explicitly as it makes the code more clear.
+So this concludes this first part of the consequences of inheritance on constructors.
+In the 2nd part, we will come back to the order in which constructors are called in a class hierarchy, to finish with a few complements.

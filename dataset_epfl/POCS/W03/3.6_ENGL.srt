@@ -1,0 +1,383 @@
+1
+00:00:04,248 --> 00:00:06,636
+We're discussing Butler Lampson's 
+name service
+
+2
+00:00:06,979 --> 00:00:08,928
+and the final design goal 
+for this system
+
+3
+00:00:08,928 --> 00:00:10,621
+is well-defined behavior.
+
+4
+00:00:11,316 --> 00:00:14,044
+When two users of the system
+are trying to update
+
+5
+00:00:14,044 --> 00:00:18,994
+the same mapping at about the same time 
+the final outcome should be well-defined.
+
+6
+00:00:19,653 --> 00:00:21,003
+Let's see what that means.
+
+7
+00:00:22,383 --> 00:00:26,522
+First of all, an update always has 
+the form of a path like this.
+
+8
+00:00:27,525 --> 00:00:30,191
+Now let's see what happens 
+when a user submits
+
+9
+00:00:30,191 --> 00:00:31,668
+this update to the system.
+
+10
+00:00:32,321 --> 00:00:35,551
+First, the system identifies 
+in the current directory tree
+
+11
+00:00:35,551 --> 00:00:37,087
+a prefix of the update.
+
+12
+00:00:37,682 --> 00:00:40,696
+When I say a prefix I mean 
+a part of the directory tree
+
+13
+00:00:40,696 --> 00:00:44,427
+whose labels and time stamps 
+match exactly a part of the update.
+
+14
+00:00:45,305 --> 00:00:48,977
+In this particular example, 
+the entire directory on the left
+
+15
+00:00:48,977 --> 00:00:51,391
+is a prefix of the update on the right.
+
+16
+00:00:52,361 --> 00:00:55,065
+Second, the system discards 
+the part of the update
+
+17
+00:00:55,065 --> 00:00:58,143
+that matches the prefix 
+and attaches the rest of the update
+
+18
+00:00:58,143 --> 00:00:59,460
+to the directory tree.
+
+19
+00:01:02,092 --> 00:01:05,638
+Suppose a user now submits 
+this update and I am marking it
+
+20
+00:01:05,638 --> 00:01:08,171
+with green to differentiate it 
+from the previous one.
+
+21
+00:01:08,645 --> 00:01:12,442
+First, as before the system identifies 
+in the current directory tree
+
+22
+00:01:12,442 --> 00:01:13,951
+a prefix of the update.
+
+23
+00:01:14,929 --> 00:01:20,218
+Second, the system examines what 
+happens right below the identified prefix.
+
+24
+00:01:21,502 --> 00:01:24,866
+In the directory tree on the left 
+we have a password label
+
+25
+00:01:24,866 --> 00:01:26,085
+with time stamp two.
+
+26
+00:01:26,964 --> 00:01:30,447
+In the update on the right 
+we also have a password label
+
+27
+00:01:30,447 --> 00:01:32,091
+but with time stamp three.
+
+28
+00:01:33,053 --> 00:01:36,785
+The bigger time stamp wins, 
+so the system detaches
+
+29
+00:01:36,785 --> 00:01:40,206
+from the directory tree 
+and throws away the subtree
+
+30
+00:01:40,206 --> 00:01:42,367
+that starts with a password label.
+
+31
+00:01:43,468 --> 00:01:46,540
+Finally, the system discards 
+the part of the update
+
+32
+00:01:46,540 --> 00:01:50,176
+that matches the prefix and attaches 
+the rest to the directory tree.
+
+33
+00:01:55,173 --> 00:01:57,596
+Now suppose we swap the order 
+of these two updates.
+
+34
+00:01:58,221 --> 00:02:00,744
+So a user first submits the green update.
+
+35
+00:02:01,870 --> 00:02:05,642
+First, the system identifies in 
+the directory tree a prefix of the update.
+
+36
+00:02:06,527 --> 00:02:08,908
+Second, the system discards 
+the part of the update
+
+37
+00:02:08,908 --> 00:02:12,162
+that matches the prefix and attaches 
+the rest of the directory tree.
+
+38
+00:02:14,394 --> 00:02:17,122
+Then a user submits the blue update.
+
+39
+00:02:17,963 --> 00:02:21,517
+First, the system identifies in 
+the directory tree a prefix of the update.
+
+40
+00:02:22,300 --> 00:02:26,165
+Second, the system examines what happens 
+right below the identified prefix.
+
+41
+00:02:26,748 --> 00:02:29,618
+In the directory tree on the left, 
+there is a password label
+
+42
+00:02:29,618 --> 00:02:30,962
+with time stamp three.
+
+43
+00:02:31,402 --> 00:02:35,607
+In the update on the right there's also 
+a password label but with time stamp two.
+
+44
+00:02:36,234 --> 00:02:41,126
+The bigger time stamp wins so the 
+system simply discards the entire update.
+
+45
+00:02:43,636 --> 00:02:48,598
+So, the update semantics of the system 
+are such that whether we first submit
+
+46
+00:02:48,598 --> 00:02:52,834
+the blue or the green update 
+the final outcome is the same.
+
+47
+00:02:55,248 --> 00:02:57,851
+This property of a system 
+is called "commutativity".
+
+48
+00:02:58,296 --> 00:03:01,645
+We say that updates are commutative 
+when the order in which
+
+49
+00:03:01,645 --> 00:03:05,000
+they are applied does not 
+effect the final outcome.
+
+50
+00:03:07,293 --> 00:03:09,648
+Let us look at a couple more 
+examples of updates.
+
+51
+00:03:10,237 --> 00:03:12,967
+Suppose a user submits this update.
+
+52
+00:03:14,189 --> 00:03:17,512
+The system as before identifies 
+a prefix of the update
+
+53
+00:03:17,512 --> 00:03:20,555
+and attaches the right part of the update 
+to the directory tree.
+
+54
+00:03:23,033 --> 00:03:25,197
+Then a user submits this update.
+
+55
+00:03:25,854 --> 00:03:28,770
+Again, the system identifies 
+a prefix of the update
+
+56
+00:03:28,770 --> 00:03:32,913
+and attaches the right part of 
+the update to the directory tree.
+
+57
+00:03:35,673 --> 00:03:40,438
+Now suppose a user resubmits
+the last update, the green one.
+
+58
+00:03:41,566 --> 00:03:44,668
+The system acts exactly as in 
+the previous examples.
+
+59
+00:03:44,828 --> 00:03:47,305
+First, it identifies 
+in the directory tree,
+
+60
+00:03:47,305 --> 00:03:49,212
+a prefix of the update
+
+61
+00:03:49,482 --> 00:03:52,259
+but in this case the prefix 
+comprises the entire update.
+
+62
+00:03:53,201 --> 00:03:55,962
+Second, the system discards 
+the part of the update
+
+63
+00:03:55,962 --> 00:03:59,634
+that matches the prefix, 
+that is it discards the entire update.
+
+64
+00:04:02,268 --> 00:04:05,999
+So, the update semantics of the system 
+are such that no matter
+
+65
+00:04:05,999 --> 00:04:10,462
+how many times we reapply an update 
+the final outcome is the same.
+
+66
+00:04:12,189 --> 00:04:14,790
+This property of a system 
+is called "idempotency".
+
+67
+00:04:15,165 --> 00:04:18,804
+We say that updates are idempotent 
+when reapplying an update
+
+68
+00:04:18,804 --> 00:04:21,250
+does not effect the final outcome.
+
+69
+00:04:23,164 --> 00:04:26,739
+So, the behavior of the system 
+is well-defined in the sense that
+
+70
+00:04:26,739 --> 00:04:29,371
+updates are commutative and idempotent.
+
+71
+00:04:29,812 --> 00:04:32,979
+This means that reapplying 
+or reordering the updates
+
+72
+00:04:32,979 --> 00:04:35,392
+does not change the final outcome.
+
+73
+00:04:36,081 --> 00:04:37,869
+Which enables concurrency control.
+
+74
+00:04:38,278 --> 00:04:42,163
+When multiple users try to update 
+the same name at about the same time
+
+75
+00:04:42,414 --> 00:04:44,578
+the user with the higher time stamp wins.
+
+76
+00:04:45,641 --> 00:04:48,875
+To summarize: we have seen 
+the design of a name service
+
+77
+00:04:48,875 --> 00:04:51,605
+that achieves scalability 
+through hierarchy,
+
+78
+00:04:51,605 --> 00:04:54,900
+reliability through redundancy, 
+performance through caching
+
+79
+00:04:54,900 --> 00:04:58,892
+and well-defined behavior in the form 
+of commutativity and idempotency.
+
+80
+00:04:59,332 --> 00:05:03,124
+As we will see in the rest of the course, 
+these are fundamental design patterns
+
+81
+00:05:03,124 --> 00:05:06,700
+that underly the operation of 
+many successful systems.

@@ -1,0 +1,1273 @@
+1
+00:00:04,263 --> 00:00:06,839
+Terminons toute cette étude de cas
+
+2
+00:00:06,839 --> 00:00:09,219
+par le problème de la copie de montres,
+
+3
+00:00:09,219 --> 00:00:11,570
+comme nous savons 
+que notre montre a des pointeurs
+
+4
+00:00:11,570 --> 00:00:13,606
+vers ses différents composants,
+
+5
+00:00:13,606 --> 00:00:16,105
+son mécanisme et puis ses accessoires,
+
+6
+00:00:16,105 --> 00:00:18,356
+comment faire pour copier une montre ?
+
+7
+00:00:18,356 --> 00:00:20,199
+Jusque là nous avions interdit cette copie
+
+8
+00:00:20,199 --> 00:00:22,343
+et interdit l'affectation, 
+l'opérateur égal
+
+9
+00:00:22,343 --> 00:00:24,567
+mais maintenant nous allons 
+nous intéresser
+
+10
+00:00:24,567 --> 00:00:26,819
+à effectivement comment copier une montre
+
+11
+00:00:26,819 --> 00:00:29,212
+ce qui va nous amener 
+à une nouvelle problématique
+
+12
+00:00:29,212 --> 00:00:31,255
+qui est la copie polymorphique.
+
+13
+00:00:31,635 --> 00:00:34,316
+Commençons par le problème 
+de copie de montres
+
+14
+00:00:34,316 --> 00:00:37,627
+et supposons que l'on ait, par exemple,
+deux montres <i>m1</i> et <i>m2</i>
+
+15
+00:00:38,287 --> 00:00:41,612
+telles que <i>m2</i> soit une copie de <i>m1</i>.
+
+16
+00:00:42,832 --> 00:00:45,730
+Nous avons donc en mémoire 
+le schéma suivant :
+
+17
+00:00:48,371 --> 00:00:50,813
+le cœur qui est un pointeur
+
+18
+00:00:50,813 --> 00:00:53,635
+sur un mécanisme quelque part en mémoire
+
+19
+00:00:53,635 --> 00:00:57,089
+et les accessoires qui sont donc,
+
+20
+00:00:57,089 --> 00:01:01,283
+un tableau dynamique de pointeurs
+
+21
+00:01:02,163 --> 00:01:06,499
+vers différents accessoires en mémoire.
+
+22
+00:01:08,179 --> 00:01:12,126
+Si l'on fait une copie de surface 
+de <i>m1</i> dans <i>m2</i>,
+
+23
+00:01:12,126 --> 00:01:16,008
+copie de surface, c'est à dire 
+que l'on va simplement recopier
+
+24
+00:01:17,108 --> 00:01:21,093
+les différentes valeurs de <i>m1</i>,
+valeurs de pointeurs,
+
+25
+00:01:21,093 --> 00:01:26,010
+donc ici, on recopiera le pointeur 
+vers cet élément et cetera,
+
+26
+00:01:27,750 --> 00:01:30,192
+alors à ce moment là, 
+si ceci était possible,
+
+27
+00:01:30,192 --> 00:01:32,446
+je vais revenir dans un instant 
+sur ce point là,
+
+28
+00:01:32,446 --> 00:01:34,833
+on aurait, de toute façon 
+déjà un problème
+
+29
+00:01:34,833 --> 00:01:39,476
+puisque la montre <i>m2</i> et la montre <i>m1</i>
+partagent les mêmes accessoires
+
+30
+00:01:39,476 --> 00:01:41,911
+et partagent le même mécanisme
+
+31
+00:01:41,911 --> 00:01:44,369
+ce qui fait que si,
+au travers de <i>m1</i> on remet,
+
+32
+00:01:44,369 --> 00:01:46,107
+par exemple, 
+sa montre à l'heure,
+
+33
+00:01:46,107 --> 00:01:48,426
+automatiquement, la montre de votre ami, 
+qui est la montre <i>m2</i>,
+
+34
+00:01:48,426 --> 00:01:49,683
+elle aura le même heure.
+
+35
+00:01:49,683 --> 00:01:52,689
+Si vous décidez de changer 
+le bracelet de la montre <i>m1</i>
+
+36
+00:01:52,689 --> 00:01:55,372
+pour avoir un bracelet en cuir, 
+automatiquement,
+
+37
+00:01:55,372 --> 00:01:59,204
+la montre <i>m2</i> aura aussi 
+un bracelet en cuir.
+
+38
+00:01:59,204 --> 00:02:01,370
+Qui plus est, avec l'architecture
+
+39
+00:02:01,370 --> 00:02:05,296
+que l'on a défini actuellement, 
+c'est à dire, avec des <i>unique_ptr</i>,
+
+40
+00:02:05,296 --> 00:02:08,342
+on ne peut pas 
+de toute façon faire ces copies
+
+41
+00:02:08,342 --> 00:02:12,867
+puisque les <i>unique_ptr</i>
+doivent pointer de façon unique
+
+42
+00:02:12,867 --> 00:02:14,668
+vers les zones mémoires,
+
+43
+00:02:14,668 --> 00:02:17,859
+on ne peut pas avoir de copie 
+de <i>unique_ptr</i>.
+
+44
+00:02:17,859 --> 00:02:20,592
+De toute façon, on ne pourrait pas faire 
+ce schéma en mémoire
+
+45
+00:02:20,592 --> 00:02:23,974
+et si on avait ici décidé 
+d'avoir des pointeurs à la 'c'
+
+46
+00:02:23,974 --> 00:02:26,581
+alors on aurait le problème 
+que j'ai évoqué précédemment,
+
+47
+00:02:26,581 --> 00:02:31,043
+d'avoir des composant qui seraient 
+partagés par différentes montres.
+
+48
+00:02:31,223 --> 00:02:32,891
+Donc la conclusion de tout ceci
+
+49
+00:02:32,891 --> 00:02:36,095
+c'est qu'il faut faire une copie profonde,
+
+50
+00:02:36,095 --> 00:02:39,282
+copie profonde qui signifie 
+qu'au lieu de simplement copier
+
+51
+00:02:39,282 --> 00:02:41,554
+les valeurs de pointeurs, 
+copier les adresses
+
+52
+00:02:41,554 --> 00:02:44,810
+on copie les objets pointés eux mêmes
+
+53
+00:02:44,810 --> 00:02:48,737
+et donc à chaque composant 
+on effectue effectivement
+
+54
+00:02:48,737 --> 00:02:52,090
+une copie de l'objet en question
+
+55
+00:02:52,090 --> 00:02:55,974
+et on stock dans l'objet copié
+
+56
+00:02:57,754 --> 00:03:00,543
+au plus haut niveau, les pointeurs
+
+57
+00:03:00,543 --> 00:03:04,472
+vers les copies des composants.
+
+58
+00:03:04,472 --> 00:03:09,321
+On a fait la copie, non pas au niveau 
+superficiel en surface
+
+59
+00:03:09,321 --> 00:03:12,129
+mais on a fait la copie en profondeur.
+
+60
+00:03:12,129 --> 00:03:15,210
+Et on en a donc ici, non pas des copies 
+des valeurs de pointeurs
+
+61
+00:03:15,210 --> 00:03:20,332
+mais on a des pointeurs 
+vers des copies des objets pointés.
+
+62
+00:03:20,332 --> 00:03:23,042
+Voila ce dont il s'agit 
+quand on parle de copie profonde
+
+63
+00:03:23,042 --> 00:03:24,856
+par opposition à une copie de surface
+
+64
+00:03:24,856 --> 00:03:27,572
+et donc ici ce qu'il nous faut 
+c'est bien une copie profonde,
+
+65
+00:03:27,572 --> 00:03:29,916
+une copie de chaque constituant.
+
+66
+00:03:29,916 --> 00:03:31,914
+Dans ces cas là il est d'ailleurs usuel
+
+67
+00:03:31,914 --> 00:03:34,374
+d'également redéfinir 
+l'opérateur d'affectation,
+
+68
+00:03:34,374 --> 00:03:36,259
+ce que nous allons faire aussi 
+dans un second temps.
+
+69
+00:03:36,259 --> 00:03:39,898
+Commençons donc 
+par le constructeur de copie
+
+70
+00:03:39,898 --> 00:03:41,455
+c'est donc le constructeur de Montre
+
+71
+00:03:41,455 --> 00:03:43,205
+qui fait une construction de copie
+
+72
+00:03:43,205 --> 00:03:45,231
+donc le paramètre reçu 
+par le constructeur de copie
+
+73
+00:03:45,231 --> 00:03:47,399
+c'est bien sûr une autre montre,
+
+74
+00:03:47,399 --> 00:03:50,231
+l'écriture de ce constructeur 
+de copie doit commencer,
+
+75
+00:03:50,231 --> 00:03:52,212
+il ne faut surtout pas 
+oublier cet aspect là
+
+76
+00:03:52,212 --> 00:03:55,217
+par appeler les constructeurs 
+de copie des super-classes,
+
+77
+00:03:55,217 --> 00:03:57,405
+ici on a une seule super-classe, 
+la classe <i>Produit</i>.
+
+78
+00:03:57,405 --> 00:04:00,235
+Et donc ici il faut appeler 
+le constructeur de copie
+
+79
+00:04:00,235 --> 00:04:02,843
+de la classe <i>Produit</i>, sinon...
+
+80
+00:04:04,203 --> 00:04:07,351
+sinon en effet c'est un appel 
+au constructeur par défaut
+
+81
+00:04:07,351 --> 00:04:10,539
+qui aurait lieu ici 
+si on avait pas écrit cette ligne là
+
+82
+00:04:10,539 --> 00:04:13,626
+donc on aurait à ce moment là 
+une construction par défaut
+
+83
+00:04:13,626 --> 00:04:15,530
+de la partie <i>Produit</i> d'une montre,
+
+84
+00:04:15,530 --> 00:04:17,781
+c'est à dire, mise à zéro 
+par exemple de son prix
+
+85
+00:04:17,781 --> 00:04:19,786
+ce qui n'est pas forcément
+toujours souhaitable.
+
+86
+00:04:19,786 --> 00:04:23,125
+Donc il faut absolument 
+toujours commencer par un appel
+
+87
+00:04:23,125 --> 00:04:25,532
+au constructeur de copie 
+des super-classes.
+
+88
+00:04:25,532 --> 00:04:28,071
+Ensuite la question c'est,
+comment continuer,
+
+89
+00:04:28,071 --> 00:04:31,418
+quand écrire la copie 
+des différents composants ?
+
+90
+00:04:31,418 --> 00:04:33,803
+Si l'on écrit simplement comme ceci
+
+91
+00:04:33,803 --> 00:04:36,878
+et de façon similaire 
+pour les accessoires
+
+92
+00:04:36,878 --> 00:04:40,786
+alors à ce moment là on va avoir 
+une copie de surface,
+
+93
+00:04:40,786 --> 00:04:44,002
+on aura copié la valeur 
+du pointeur (autre.cœur)
+
+94
+00:04:44,002 --> 00:04:47,173
+dans le pointeur "cœur" de l'instance 
+qu'on est en train de créer
+
+95
+00:04:47,173 --> 00:04:50,442
+c'est donc justement exactement 
+ce que l'on ne veut pas
+
+96
+00:04:50,442 --> 00:04:52,458
+donc ce n'est pas la bonne façon de faire.
+
+97
+00:04:52,458 --> 00:04:56,600
+Ce que l'on peut alors imaginer,
+c'est effectivement copier l'objet pointé
+
+98
+00:04:57,400 --> 00:04:59,794
+par le cœur de l'autre,
+
+99
+00:04:59,794 --> 00:05:04,567
+donc faire une copie de *(autre.cœur),
+
+100
+00:05:05,477 --> 00:05:11,531
+en effet l'accès au contenu 
+pointé par le coeur de l'autre
+
+101
+00:05:11,531 --> 00:05:14,496
+c'est bien le contenu de cette cellule ici
+
+102
+00:05:14,496 --> 00:05:17,058
+c'est bien ça que l'on voulait copier.
+
+103
+00:05:17,058 --> 00:05:21,140
+Copier dans le cœur 
+de l'instance courante
+
+104
+00:05:21,840 --> 00:05:25,920
+et pour ceci donc, allouer 
+une nouvelle zone mémoire
+
+105
+00:05:26,500 --> 00:05:29,222
+dont on récupérait l'adresse
+
+106
+00:05:29,222 --> 00:05:34,696
+et cette nouvelle zone là étant la copie 
+du contenu de (autre.cœur).
+
+107
+00:05:34,696 --> 00:05:37,139
+Donc ça s'écrirait comme ceci :
+
+108
+00:05:37,139 --> 00:05:42,017
+coeur( new ??? ( *(autre.cœur)) - 
+mais "new" quoi ?
+
+109
+00:05:42,017 --> 00:05:47,255
+quel objet devrait être copié en tant que
+cœur de l'autre ?
+
+110
+00:05:48,515 --> 00:05:50,902
+Puisque je vous rappelle qu'un cœur
+
+111
+00:05:50,902 --> 00:05:54,689
+c'est un pointeur sur un mécanisme
+
+112
+00:05:55,789 --> 00:06:01,458
+et donc ici, il faudrait bien sûr 
+convertir notre pointeur à la C
+
+113
+00:06:01,458 --> 00:06:04,574
+on met <i>unique_ptr<Mecanisme></i>
+
+114
+00:06:04,574 --> 00:06:06,736
+mais on ne sait toujours pas 
+en tant que quoi
+
+115
+00:06:06,736 --> 00:06:08,936
+il faut copier cet autre cœur
+
+116
+00:06:08,936 --> 00:06:11,130
+parce que cet autre cœur 
+pourrait très bien être
+
+117
+00:06:11,130 --> 00:06:13,792
+un mécanisme analogique 
+ou un mécanisme digital
+
+118
+00:06:13,792 --> 00:06:15,974
+ou un mécanisme double
+
+119
+00:06:15,974 --> 00:06:19,956
+et donc, en tant que quoi 
+copier cet autre cœur ?
+
+120
+00:06:19,956 --> 00:06:22,641
+Ce que l'on pourrait imaginer
+
+121
+00:06:22,641 --> 00:06:26,329
+c'est de le copier en tant que Mecanisme
+
+122
+00:06:27,289 --> 00:06:30,214
+mais à ce moment là 
+ça veut dire que l'on recopie
+
+123
+00:06:30,214 --> 00:06:34,020
+que la partie <i>Mecanisme</i> du cœur de l'autre
+
+124
+00:06:34,020 --> 00:06:36,875
+et l'on risque de perdre 
+toutes les spécificités
+
+125
+00:06:36,875 --> 00:06:40,972
+de l'instance réellement pointée
+donc les spécificités analogiques,
+
+126
+00:06:40,972 --> 00:06:43,353
+si c'est un cœur qui est 
+un mécanisme analogique
+
+127
+00:06:43,353 --> 00:06:45,435
+les spécificités digitales et cetera,
+
+128
+00:06:45,435 --> 00:06:47,697
+on perdrait donc, les spécificités.
+
+129
+00:06:47,697 --> 00:06:51,355
+Donc ici, on ne peut pas faire 
+une copie comme cela
+
+130
+00:06:51,355 --> 00:06:53,953
+en tant que Mecanisme.
+
+131
+00:06:53,953 --> 00:06:56,361
+La question de fond, c'est :
+
+132
+00:06:56,361 --> 00:06:59,503
+comment copier chaque élément 
+en tant que tel ?
+
+133
+00:06:59,503 --> 00:07:02,510
+C'est à dire ne pas les copier 
+en tant qu'instance uniquement
+
+134
+00:07:02,510 --> 00:07:04,805
+de super-classes de <i>Mecanisme</i>
+mais de les copier
+
+135
+00:07:04,805 --> 00:07:07,681
+en tant que sous-classes 
+pour ceux qu'elles sont elles-mêmes.
+
+136
+00:07:07,681 --> 00:07:09,570
+Et la question se pose 
+de la même façon bien sûr
+
+137
+00:07:09,570 --> 00:07:13,346
+pour tous les accessoires, 
+comment copier chacun des accessoires ?
+
+138
+00:07:13,346 --> 00:07:16,178
+Le bracelet en tant que bracelet,
+les fermoirs en tant que fermoirs,
+
+139
+00:07:16,178 --> 00:07:18,106
+les boîtiers en tant 
+que boîtiers et cetera.
+
+140
+00:07:18,106 --> 00:07:20,030
+La question est donc, 
+comment fait on une copie
+
+141
+00:07:20,030 --> 00:07:22,892
+qui garde la nature propre des instances ?
+
+142
+00:07:22,892 --> 00:07:25,854
+c'est à dire, comment fait on 
+une copie polymorphique ?
+
+143
+00:07:26,594 --> 00:07:28,980
+La solution consiste, comme à chaque fois
+
+144
+00:07:28,980 --> 00:07:30,877
+qu'on a une tâche particulière a faire
+
+145
+00:07:30,877 --> 00:07:33,337
+à définir une méthode qui fait cette tâche
+
+146
+00:07:33,337 --> 00:07:36,566
+et donc ici, à définir une méthode <i>copie</i>
+
+147
+00:07:36,566 --> 00:07:39,223
+qui est capable de faire 
+une copie polymorphique,
+
+148
+00:07:39,223 --> 00:07:43,140
+ici une copie polymorphique de Mecanisme
+
+149
+00:07:43,140 --> 00:07:46,961
+et ici une copie 
+polymorphique d'accessoires.
+
+150
+00:07:46,961 --> 00:07:50,019
+Il faudra alors pour le coup, 
+copier évidemment chaque accessoire
+
+151
+00:07:50,019 --> 00:07:54,757
+en tant que tel et donc parcourir 
+les accessoires de l'autre montre
+
+152
+00:07:54,757 --> 00:07:59,544
+un par un pour pouvoir chacun, 
+le copier de façon polymorphique.
+
+153
+00:08:00,404 --> 00:08:03,254
+Voyons donc comment s'écrit 
+une telle copie polymorphique
+
+154
+00:08:03,254 --> 00:08:05,623
+et prenons pour cela 
+l'exemple des accessoires.
+
+155
+00:08:05,623 --> 00:08:10,154
+Nous avons donc, un tableau dynamique 
+de pointeurs sur des accessoires
+
+156
+00:08:10,154 --> 00:08:12,454
+dont on veut copier chacun des éléments
+
+157
+00:08:12,454 --> 00:08:15,197
+et typiquement donc 
+on le copierait comme ceci
+
+158
+00:08:15,197 --> 00:08:18,410
+en faisant un appel 
+à une copie polymorphique
+
+159
+00:08:18,410 --> 00:08:21,099
+d'un pointeur donc sur des accessoires.
+
+160
+00:08:21,099 --> 00:08:23,945
+Donc la copie polymorphique 
+va être défini
+
+161
+00:08:23,945 --> 00:08:25,945
+au niveau de la classe la plus générale
+
+162
+00:08:25,945 --> 00:08:28,974
+pour laquelle on veut faire 
+une telle copie polymorphique
+
+163
+00:08:28,974 --> 00:08:32,554
+à ce niveau là on va dire 
+qu'il existe une méthode <i>copie</i>,
+
+164
+00:08:32,554 --> 00:08:36,485
+la méthode <i>copie</i> en tant que telle, 
+ne modifie pas les instances
+
+165
+00:08:36,485 --> 00:08:37,889
+elle les copie ailleurs
+
+166
+00:08:37,889 --> 00:08:40,927
+et on ne sait pas la définir 
+à un niveau aussi général
+
+167
+00:08:40,927 --> 00:08:43,050
+typiquement pour une classe abstraite 
+donc ici on va dire
+
+168
+00:08:43,050 --> 00:08:44,977
+que c'est une méthode virtuelle pure.
+
+169
+00:08:44,977 --> 00:08:46,818
+La valeur de retour d'une telle méthode
+
+170
+00:08:46,818 --> 00:08:50,833
+c'est ce que l'on doit mettre ici 
+dans cette collection
+
+171
+00:08:50,833 --> 00:08:53,743
+et donc ça sera 
+un <i>unique_ptr</i><accessoire>
+
+172
+00:08:53,743 --> 00:08:57,653
+donc ici on va dire que c'est 
+un *unique_ptr<Accessoire>.
+
+173
+00:08:57,653 --> 00:08:59,523
+Et donc dans les sous-classes
+
+174
+00:08:59,523 --> 00:09:01,380
+par exemple ici 
+dans la sous-classe <i>Bracelet</i>
+
+175
+00:09:01,380 --> 00:09:04,240
+ce que l'on va faire 
+c'est que l'on va redéfinir
+
+176
+00:09:04,240 --> 00:09:08,709
+la copie qui retourne 
+un <i>unique_ptr<Accessoire></i>
+
+177
+00:09:08,709 --> 00:09:13,018
+en disant que l'on va retourner 
+en tant que <i>unique_ptr</i>
+
+178
+00:09:13,018 --> 00:09:16,577
+sur un accessoire, donc ça, 
+ça reste un pointeur sur un accessoire
+
+179
+00:09:16,577 --> 00:09:20,047
+mais ce pointeur
+est spécifiquement un pointeur
+
+180
+00:09:20,047 --> 00:09:24,759
+sur un nouveau bracelet en mémoire
+qui est une copie de l'instance courante.
+
+181
+00:09:25,011 --> 00:09:28,478
+Alors, je sais que cette syntaxe 
+est extrêmement difficile à comprendre
+
+182
+00:09:28,478 --> 00:09:30,041
+la première fois qu'on la rencontre,
+
+183
+00:09:30,041 --> 00:09:31,864
+détaillons la donc un petit peu.
+
+184
+00:09:31,864 --> 00:09:34,872
+Ce que l'on veut faire 
+avec une telle méthode <i>copie</i>
+
+185
+00:09:34,872 --> 00:09:38,422
+c'est se copier en tant que tel
+
+186
+00:09:39,282 --> 00:09:43,933
+donc se copier en tant que <i>Bracelet</i>
+si l'on est un Bracelet,
+
+187
+00:09:43,933 --> 00:09:48,771
+pour ceci on va appeler le constructeur 
+de copie de la classe <i>bracelet</i>
+
+188
+00:09:48,771 --> 00:09:51,135
+pour copier l'instance courante,
+
+189
+00:09:51,135 --> 00:09:53,996
+l'instance courante c'est bien
+
+190
+00:09:55,096 --> 00:09:58,640
+le contenu du pointeur <i>this</i>
+
+191
+00:09:58,640 --> 00:10:01,900
+donc (*this) c'est l'instance courante
+
+192
+00:10:01,900 --> 00:10:06,047
+c'est le contenu de ce 
+qui est pointé par <i>this</i>
+
+193
+00:10:06,047 --> 00:10:10,025
+<i>this</i> pointant l'instance courante
+ceci est donc bien l'instance courante
+
+194
+00:10:10,025 --> 00:10:12,689
+que l'on copie dans un nouveau <i>Bracelet</i>.
+
+195
+00:10:12,689 --> 00:10:15,512
+Donc ça nous donne 
+cette partie là de cette ligne
+
+196
+00:10:16,192 --> 00:10:21,630
+et puis on va faire ceci en créant
+une nouvelle zone mémoire
+
+197
+00:10:21,630 --> 00:10:25,377
+et récupérer un pointeur
+
+198
+00:10:25,917 --> 00:10:30,569
+sur cette zone mémoire
+ce qui est fait par le <i>new</i>,
+
+199
+00:10:30,569 --> 00:10:34,764
+donc ici <i>new Bracelet</i>
+ça va nous créer un nouveau bracelet
+
+200
+00:10:34,764 --> 00:10:36,549
+dont on récupère l'adresse
+
+201
+00:10:36,549 --> 00:10:39,210
+et ce nouveau bracelet, c'est une copie
+
+202
+00:10:39,210 --> 00:10:41,783
+de l'instance courante.
+
+203
+00:10:41,783 --> 00:10:45,107
+Et enfin, ce pointeur à la 'c'
+
+204
+00:10:45,107 --> 00:10:49,620
+résultat du <i>new</i> de ce Bracelet
+qui copie l'instance courante,
+
+205
+00:10:49,620 --> 00:10:53,916
+on va le transformer en un
+unique_ptr<Accessoire>
+
+206
+00:10:53,916 --> 00:10:55,922
+on va le voir, on va regarder ce pointeur
+
+207
+00:10:55,922 --> 00:10:59,398
+comme un <i>unique_ptr</i> sur un accessoire.
+
+208
+00:10:59,398 --> 00:11:02,092
+Voila donc la formulation 
+utilisée très souvent
+
+209
+00:11:02,092 --> 00:11:04,151
+pour faire des copies polymorphique
+
+210
+00:11:04,151 --> 00:11:07,931
+on <i>return</i> un pointeur 
+sur la classe abstraite,
+
+211
+00:11:07,931 --> 00:11:10,781
+la super-classe au niveau 
+de laquelle on veut faire la copie
+
+212
+00:11:10,781 --> 00:11:13,951
+d'une nouvelle copie ici, 
+cette fois-ci attention,
+
+213
+00:11:13,951 --> 00:11:17,861
+spécifique de la classe courante,
+
+214
+00:11:17,861 --> 00:11:20,441
+donc, ceci c'est bien dans la classe 
+<i>Bracelet</i> on met bracelet,
+
+215
+00:11:20,441 --> 00:11:22,953
+dans la classe <i>Fermoir</i> on mettra fermoir
+
+216
+00:11:22,953 --> 00:11:25,741
+copie de l'instance courante.
+
+217
+00:11:27,441 --> 00:11:29,580
+Voila donc pour la copie des montres.
+
+218
+00:11:29,580 --> 00:11:32,419
+Quand est-il si on veut aussi faire 
+l'opérateur d'affectation ?
+
+219
+00:11:32,419 --> 00:11:35,095
+C'est à dire par exemple, 
+faire <i>m2</i> égal <i>m1</i>.
+
+220
+00:11:35,095 --> 00:11:38,856
+Pour ceci nous allons surcharger 
+l’opérateur d'affectation
+
+221
+00:11:38,856 --> 00:11:41,604
+l'opérateur égal, de la façon suivante,
+
+222
+00:11:41,604 --> 00:11:44,678
+dans la classe <i>Montre</i>, 
+suit le schéma que l'on a présenté
+
+223
+00:11:44,678 --> 00:11:47,832
+dans les vidéos sur 
+la surcharge des opérateurs
+
+224
+00:11:47,832 --> 00:11:52,247
+et donc, on a ici le prototype typique 
+de l'opérateur égal
+
+225
+00:11:52,247 --> 00:11:55,737
+où l'on utilise ici, un passage par valeur
+
+226
+00:11:55,737 --> 00:12:00,880
+ce qui fait qu’effectivement 
+lorsqu'on va écrire <i>m2=m1</i>
+
+227
+00:12:01,880 --> 00:12:05,836
+c'est à dire, <i>m2.opérateur=(m1)</i>
+
+228
+00:12:06,896 --> 00:12:12,223
+on aura ici copie de <i>m1</i>
+dans cette nouvelle source.
+
+229
+00:12:12,223 --> 00:12:16,632
+Donc, on utilise ici 
+le constructeur de copie
+
+230
+00:12:17,772 --> 00:12:21,054
+et c'est ce constructeur de copie 
+que l'on vient justement de définir
+
+231
+00:12:21,054 --> 00:12:23,153
+qui va faire tout le travail 
+de la copie profonde
+
+232
+00:12:23,153 --> 00:12:26,373
+ensuite on a plus qu'a échanger 
+l'instance nouvellement copiée
+
+233
+00:12:26,373 --> 00:12:30,278
+ex <i>m1</i> devenu <i>source</i>
+dans l'instance courante
+
+234
+00:12:30,278 --> 00:12:34,256
+et pour ceci, donc par exemple on peut, 
+en utilisant la méthode <i>swap</i>
+
+235
+00:12:34,256 --> 00:12:36,677
+fourni dans la bibliothèque 
+standard <i>utility</i>,
+
+236
+00:12:36,677 --> 00:12:40,852
+échanger le cœur de <i>m2</i>
+de l'instance courante
+
+237
+00:12:40,852 --> 00:12:44,387
+avec le cœur de la source 
+nouvellement créé par copie
+
+238
+00:12:44,387 --> 00:12:48,732
+et donc échanger le tableau
+des pointeurs de l'instance courante
+
+239
+00:12:48,732 --> 00:12:52,981
+avec le tableau des pointeurs 
+vers des nouvelles composantes
+
+240
+00:12:52,981 --> 00:12:55,864
+créée par copie profonde de cette source
+
+241
+00:12:55,864 --> 00:12:57,933
+donc justement, nouvellement créée
+
+242
+00:12:57,933 --> 00:12:59,966
+et on termine avec le schéma classique
+
+243
+00:12:59,966 --> 00:13:02,247
+qui retourne une référence 
+sur l'instance courante
+
+244
+00:13:02,247 --> 00:13:04,536
+pour être conforme à ce prototype
+
+245
+00:13:04,536 --> 00:13:09,623
+qui permet des écritures 
+du genres <i>m3=m2=m1</i>.
+
+246
+00:13:10,403 --> 00:13:12,857
+Voila donc pour 
+l'opérateur d'affectation
+
+247
+00:13:13,477 --> 00:13:15,761
+et bien sûr tout ceci doit être testé,
+
+248
+00:13:15,761 --> 00:13:18,703
+ce que nous ferions typiquement 
+complétant notre ancien <i>main</i>
+
+249
+00:13:18,703 --> 00:13:20,642
+dans lequel nous avions défini une montre
+
+250
+00:13:20,642 --> 00:13:24,021
+par un appel ici au constructeur de copie
+
+251
+00:13:24,021 --> 00:13:27,247
+qui copie <i>m</i> dans <i>m2</i>, 
+puis l'on vérifie que la copie
+
+252
+00:13:27,247 --> 00:13:30,102
+s'est faite correctement 
+en affichant ici <i>m2</i>
+
+253
+00:13:30,102 --> 00:13:33,257
+et puis on testerait l'opérateur égal.
+
+254
+00:13:33,257 --> 00:13:35,660
+d'abord on crée ici une nouvelle montre <i>m3</i>
+
+255
+00:13:35,660 --> 00:13:38,911
+avec peu importe ce qu'il y a dedans 
+et puis on l'affiche,
+
+256
+00:13:38,911 --> 00:13:42,351
+on fait ensuite une affectation de <i>m2</i> à <i>m3</i>
+
+257
+00:13:42,351 --> 00:13:44,526
+et on vérifie que'effectivement 
+cette affectation
+
+258
+00:13:44,526 --> 00:13:46,601
+a fonctionné correctement.
+
+259
+00:13:46,601 --> 00:13:48,796
+Pour vérifier en plus que 
+nous avions bien fait
+
+260
+00:13:48,796 --> 00:13:51,105
+une copie profonde dans cette copie ici,
+
+261
+00:13:51,105 --> 00:13:54,375
+alors on ajouterait une méthode
+que nous n'avons pas détaillée
+
+262
+00:13:54,375 --> 00:13:56,536
+dans cette vidéo mais 
+qui ne présente aucune difficulté
+
+263
+00:13:56,536 --> 00:14:00,470
+une méthode <i>mettre à l'heure</i>
+qui mettrait la montre <i>m2</i> à l'heure
+
+264
+00:14:00,470 --> 00:14:02,718
+qui modifierait l'heure 
+de la même montre : <i>m2</i>
+
+265
+00:14:02,718 --> 00:14:05,285
+et on vérifierait donc 
+que dans cette affectation
+
+266
+00:14:05,285 --> 00:14:08,359
+c'est bien <i>m3</i> qui avait 
+l'ancienne heure de <i>m2</i>
+
+267
+00:14:08,359 --> 00:14:12,538
+et qui n'est pas affectée 
+par cette mise à l'heure de <i>m2</i>
+
+268
+00:14:12,538 --> 00:14:14,436
+si on avait qu'une copie de surface
+
+269
+00:14:14,436 --> 00:14:18,695
+alors ici <i>m2.mettre_a_l_heure</i>
+remettrait aussi à l'heure <i>m3</i>.
+
+270
+00:14:18,952 --> 00:14:20,806
+Donc cette ligne ici 
+nous permet effectivement
+
+271
+00:14:20,806 --> 00:14:23,056
+de vérifier que nous avons 
+une copie profonde
+
+272
+00:14:23,056 --> 00:14:25,554
+et non pas une copie de surface 
+de <i>m2</i> dans <i>m3</i>.
+
+273
+00:14:25,554 --> 00:14:27,786
+Tout ce code, tout le code complet
+
+274
+00:14:27,786 --> 00:14:30,438
+est à nouveau fourni sur le site du cours.
+
+275
+00:14:30,438 --> 00:14:32,972
+Voila donc tout ceci conclut 
+cette étude de cas
+
+276
+00:14:32,972 --> 00:14:35,804
+et donc termine tout ce cours.

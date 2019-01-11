@@ -1,0 +1,46 @@
+We are discussing 
+Butler Lampson's name service and the third design goal for the system is performance.
+When a user looks up a name they should get a response within say, a few hundreds of milliseconds even if the system happens to be storing millions of name mappings.
+Let's see how this is achieved.
+To discuss the performance of the system, we first need to look at its operation in a bit more detail.
+In an earlier slide, we said that given the directory tree on the left, this name maps to this value.
+Let's see now what happens when a user needs to obtain this name to value mapping.
+The first component of the name is the directory identifier of the root directory.
+The assumption is that every machine knows how to reach the root directory.
+More specifically, every machine knows how to reach at least one server that stores a copy of the root directory.
+The second component is DEC.
+This is a local directory name that only the root directory knows about.
+So we need to ask the root directory about it.
+The root directory stores information about the DEC directory in this form.
+"DR" stands for directory reference.
+311 is the directory identifier for DEC and "delta" and "omega" are identifiers for the servers that store copies of the DEC directory.
+So, from the point of view of the root directory
+DEC is an entity, DR is a property of DEC and the information about DEC is the value of the DR property.
+Which means that to learn how to reach the DEC directory we need to look up this name in the root directory and get back its value.
+So now we know how to reach the DEC directory and we need to learn how to reach the SRC directory.
+This is again a local directory name that only the DEC directory knows about.
+So we need to ask the DEC directory about it.
+The rest is as you would expect.
+The DEC directory stores information about the SRC directory in this form.
+So to learn how to reach the SRC directory we need to look up this name in the DEC directory and get back its value.
+Let me make a parentheses here.
+This is one of the most elegant aspects of the design of this system.
+All the metadata that are needed by the system are stored within the system itself as entities, properties, and values.
+That is the name service is using itself as a name service.
+At this point we know how to reach the SRC directory so we can ask it about Lampson.
+We already know that the SRC directory stores information about Lampson in this form so we need to look up this name in the SRC directory and get back its value.
+So three names had to be looked up in order for a user to obtain the value of Lampson.
+This means that in an application that needs to obtain this value may incur significant latency.
+Because it has to wait for many look ups to complete.
+How can we reduce this latency? 
+Through caching.
+A user of the system that completes a successful look up can cache the result for some period of time.
+However, there is a price to pay for caching.
+If a user is allowed to cache a mapping for say an hour, this means that this mapping should not change for an hour.
+Otherwise the user will end up with a stale mapping.
+To ensure that no user ends up with a stale mapping each entry is assigned an expiration time and changing it before that time is forbidden.
+So, what the system does is limit the rate at which the value of a name can change in order to decrease the latency experienced when looking up this name.
+So, performance is achieved through caching.
+Each user of the system can cache their most recent name lookups.
+This, however, restricts the rate at which we can change the content of the directory.
+Each entry is assigned an expiration time and it is guaranteed not to change before that time.

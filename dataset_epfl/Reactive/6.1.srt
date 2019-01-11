@@ -1,0 +1,1428 @@
+1
+00:00:00,690 --> 00:00:05,770
+This week, we will turn our view to the
+last crucial missing piece.
+
+2
+00:00:05,770 --> 00:00:09,030
+And that is how to handle failure in actor
+systems.
+
+3
+00:00:10,100 --> 00:00:13,310
+This model was inspired by Erlang, and
+
+4
+00:00:13,310 --> 00:00:16,320
+it is centered around the concept of
+supervision.
+
+5
+00:00:16,320 --> 00:00:19,280
+So when you have a failure, it is
+contained and
+
+6
+00:00:19,280 --> 00:00:22,279
+delegated to a supervisor who is then
+supposed to handle it.
+
+7
+00:00:23,530 --> 00:00:25,960
+This gives rise to the question of how
+
+8
+00:00:25,960 --> 00:00:28,760
+an actor's state is supposed to be
+handled,
+
+9
+00:00:28,760 --> 00:00:31,890
+which will lead us to the error kernel
+pattern,
+
+10
+00:00:31,890 --> 00:00:34,570
+and we'll also talk about how to persist
+
+11
+00:00:34,570 --> 00:00:37,929
+and actor such that its state survives a
+failure.
+
+12
+00:00:39,080 --> 00:00:41,140
+So far we have looked at actors which
+
+13
+00:00:41,140 --> 00:00:44,210
+do exactly as they are told, and nothing
+unforeseen
+
+14
+00:00:44,210 --> 00:00:48,815
+happens, but we need to concern ourselves
+also with
+
+15
+00:00:48,815 --> 00:00:51,850
+handling the cases which we did not
+foresee, and
+
+16
+00:00:51,850 --> 00:00:53,490
+that is what we will do in the following.
+
+17
+00:00:54,820 --> 00:00:58,360
+In an asynchronous system which is
+completely based on asynchronous
+
+18
+00:00:58,360 --> 00:01:02,400
+message passing, there is the problem
+where failure should go.
+
+19
+00:01:02,400 --> 00:01:05,500
+Normally, when you call a method, an
+exception is thrown, and the
+
+20
+00:01:05,500 --> 00:01:09,240
+caller gets this exception and then also
+is obliged to handle it.
+
+21
+00:01:10,570 --> 00:01:13,190
+When you send a message to an actor, that
+actor
+
+22
+00:01:13,190 --> 00:01:17,270
+processes the message long after the call
+in context is gone.
+
+23
+00:01:17,270 --> 00:01:21,160
+The sender has gone onto something else.
+So where should failure go?
+
+24
+00:01:22,580 --> 00:01:26,200
+In the actor model, there's just one way
+to communicate, and that is by
+
+25
+00:01:26,200 --> 00:01:31,780
+way of messages which means that failure
+also needs to be sent as a message.
+
+26
+00:01:31,780 --> 00:01:34,710
+We take the exception which was thrown
+inside the actor.
+
+27
+00:01:34,710 --> 00:01:39,650
+We reify it as a message.
+And we send it, well, to whom?
+
+28
+00:01:39,650 --> 00:01:42,940
+One possibility would be to send it back
+to that actor
+
+29
+00:01:42,940 --> 00:01:46,490
+which had sent the message during whose
+processing we just failed.
+
+30
+00:01:47,510 --> 00:01:51,400
+Let's step back a bit and try to visualize
+what that means.
+
+31
+00:01:51,400 --> 00:01:54,260
+Let's say you're standing in front of a
+vending machine
+
+32
+00:01:54,260 --> 00:01:57,540
+and you put in the coins and you select
+your product.
+
+33
+00:01:58,820 --> 00:02:02,320
+Which means you make a request to the
+machine.
+
+34
+00:02:02,320 --> 00:02:04,570
+And then something goes wrong, the ma, the
+machine is not
+
+35
+00:02:04,570 --> 00:02:07,940
+in a state where it can sell you things,
+and then you
+
+36
+00:02:07,940 --> 00:02:10,090
+get to handle the exception.
+
+37
+00:02:10,090 --> 00:02:12,410
+That basically means that the customer of
+the
+
+38
+00:02:12,410 --> 00:02:15,900
+vending machine, you, is responsible for
+fixing it.
+
+39
+00:02:17,130 --> 00:02:19,210
+With actors we can do much better than
+this.
+
+40
+00:02:20,530 --> 00:02:26,680
+The inspiration for how actors collaborate
+is taken from how we humans work together.
+
+41
+00:02:26,680 --> 00:02:31,220
+Just like we form teams, actors work in
+systems.
+
+42
+00:02:31,220 --> 00:02:33,570
+And the failure of an individual
+
+43
+00:02:33,570 --> 00:02:38,810
+is handled by the team leader or, in that
+case, by another actor.
+
+44
+00:02:38,810 --> 00:02:42,980
+In our society, we apply this pattern in a
+hierarchical fashion.
+
+45
+00:02:42,980 --> 00:02:46,880
+Let's look at, for example, a big
+corporation.
+
+46
+00:02:47,920 --> 00:02:48,470
+This
+
+47
+00:02:52,100 --> 00:02:55,994
+big corporation might be divided into
+different divisions.
+
+48
+00:02:55,994 --> 00:03:03,810
+For example, marketing, sales,
+
+49
+00:03:03,810 --> 00:03:11,200
+and engineering.
+And engineering, for example,
+
+50
+00:03:11,200 --> 00:03:13,000
+might have different product teams.
+And
+
+51
+00:03:18,680 --> 00:03:24,510
+within the storage group, for example, we
+might have the file systems and
+
+52
+00:03:28,370 --> 00:03:28,880
+the database.
+
+53
+00:03:29,960 --> 00:03:35,590
+All of these teams on all levels have
+multiple members and one leader.
+
+54
+00:03:35,590 --> 00:03:38,470
+The leader of the whole corporation is for
+example the CEO.
+
+55
+00:03:38,470 --> 00:03:42,420
+And in the database team it might be the
+project leader for the database.
+
+56
+00:03:43,470 --> 00:03:47,100
+Let's say that in this team someone falls
+sick.
+
+57
+00:03:47,100 --> 00:03:50,120
+Now the leader has to either redistribute
+the work
+
+58
+00:03:50,120 --> 00:03:53,520
+among the remaining members of the team or
+ask
+
+59
+00:03:53,520 --> 00:03:56,850
+for help and as additional resources.
+
+60
+00:03:56,850 --> 00:03:59,520
+If he cannot fix the problem himself he
+
+61
+00:03:59,520 --> 00:04:02,550
+will therefore have to escalate it to his
+boss.
+
+62
+00:04:02,550 --> 00:04:05,230
+The boss of the storage coop might then
+
+63
+00:04:05,230 --> 00:04:09,100
+decide either to pull in resources from
+file systems
+
+64
+00:04:09,100 --> 00:04:12,550
+or if they're underwater as well She might
+just
+
+65
+00:04:12,550 --> 00:04:16,990
+escalate it to the leader of the
+engineering department.
+
+66
+00:04:16,990 --> 00:04:18,340
+And this goes on,
+
+67
+00:04:18,340 --> 00:04:23,090
+onto the top, making sure that every
+failure is eventually handled.
+
+68
+00:04:23,090 --> 00:04:25,659
+This is precisely how actor systems do it
+as well.
+
+69
+00:04:27,990 --> 00:04:31,940
+Resilience means recovering from a
+deformation.
+
+70
+00:04:31,940 --> 00:04:35,800
+So to get back to the proper shape and
+form
+
+71
+00:04:35,800 --> 00:04:39,380
+and function that it used to have before
+something went wrong.
+
+72
+00:04:40,650 --> 00:04:43,390
+In order to achieve this we need two
+things.
+
+73
+00:04:43,390 --> 00:04:47,110
+First of all containment which means that
+a failure is
+
+74
+00:04:47,110 --> 00:04:50,860
+isolated such that it does, cannot spread
+to other components.
+
+75
+00:04:52,720 --> 00:04:53,070
+The actor
+
+76
+00:04:53,070 --> 00:04:55,910
+model naturally takes care of this because
+we
+
+77
+00:04:55,910 --> 00:04:59,840
+have seen that actors are fully
+encapsulated objects.
+
+78
+00:04:59,840 --> 00:05:04,780
+The second is, that failure cannot be
+handled by the failed component, because
+
+79
+00:05:04,780 --> 00:05:08,050
+it is presumably compromised, so the
+handling
+
+80
+00:05:08,050 --> 00:05:10,660
+of failure must be delegated to another.
+
+81
+00:05:12,010 --> 00:05:15,070
+For actors, this means that one other
+actor needs
+
+82
+00:05:15,070 --> 00:05:18,250
+to decide what to do with a failed actor,
+
+83
+00:05:18,250 --> 00:05:20,550
+whether it shall be terminated or
+restarted.
+
+84
+00:05:21,860 --> 00:05:25,200
+Of course, it would be confusing if this
+decision would somehow be
+
+85
+00:05:25,200 --> 00:05:29,410
+taken by more than one actor, because they
+would have to collaborate.
+
+86
+00:05:29,410 --> 00:05:32,810
+So in practice, it needs to be done by
+exactly one.
+
+87
+00:05:32,810 --> 00:05:38,080
+And this means that if you look at
+supervision, there is a hierarchy which is
+
+88
+00:05:38,080 --> 00:05:43,400
+formed.
+So if you have one actor here, let's call
+
+89
+00:05:43,400 --> 00:05:47,520
+it top, which supervises three other
+actors,
+
+90
+00:05:50,420 --> 00:05:52,020
+A, B and C.
+
+91
+00:05:52,020 --> 00:05:57,680
+It will handle all their failures, and in
+order to do that it must also be able to
+
+92
+00:05:57,680 --> 00:06:01,690
+restart them, or when it terminates them
+to recreate
+
+93
+00:06:01,690 --> 00:06:04,070
+them to get the service up and running
+again.
+
+94
+00:06:05,190 --> 00:06:08,480
+This means that top is not only the
+supervisor
+
+95
+00:06:08,480 --> 00:06:11,240
+of A B and C but also its parent.
+
+96
+00:06:12,630 --> 00:06:16,380
+The two hierarchies which are formed, the
+supervision hierarchy and
+
+97
+00:06:16,380 --> 00:06:19,380
+the creation hierarchy are the same.
+
+98
+00:06:19,380 --> 00:06:22,580
+In Akka, we call this mandatory parental
+supervision.
+
+99
+00:06:23,620 --> 00:06:27,640
+How does this supervision hierarchy
+reflect in code?
+
+100
+00:06:27,640 --> 00:06:29,740
+Let us look at one example.
+
+101
+00:06:29,740 --> 00:06:34,710
+This class called manager is an actor
+which supervises two children.
+
+102
+00:06:34,710 --> 00:06:40,800
+It creates a DBActor and it creates and
+ImportantServiceActor.
+
+103
+00:06:40,800 --> 00:06:41,400
+Let's call them
+
+104
+00:06:41,400 --> 00:06:42,590
+db and service.
+
+105
+00:06:44,300 --> 00:06:47,990
+This miniature much declare what shall
+happen in case of failure.
+
+106
+00:06:47,990 --> 00:06:53,005
+We say override val supervisorStrategy to
+override the default
+
+107
+00:06:53,005 --> 00:06:57,260
+.The default would restart all children
+when they fail.
+
+108
+00:06:58,320 --> 00:07:03,770
+We want to do something else here.
+So we say we have a OneForOneStrategy.
+
+109
+00:07:03,770 --> 00:07:05,640
+I'll cover variance in a second.
+
+110
+00:07:06,820 --> 00:07:09,500
+And then we give it what we call a
+decider.
+
+111
+00:07:09,500 --> 00:07:13,210
+This is a partial function here with three
+cases.
+
+112
+00:07:13,210 --> 00:07:17,900
+In case, we have a DBException from the
+DBActor.
+
+113
+00:07:19,270 --> 00:07:24,480
+Then we restart it.
+This will probably tell the DBActor to
+
+114
+00:07:24,480 --> 00:07:30,180
+reestablish the connection to the database
+in hope that the failure was transient.
+
+115
+00:07:30,180 --> 00:07:31,990
+And will be fixed by reconnecting.
+
+116
+00:07:33,010 --> 00:07:35,080
+The second case describes what shall
+happen
+
+117
+00:07:35,080 --> 00:07:37,980
+when the actor receives a kill message.
+
+118
+00:07:37,980 --> 00:07:46,590
+You can write, actor, bang, kill, which is
+a case object.
+
+119
+00:07:46,590 --> 00:07:50,290
+And this is handled automatically by the
+actor context.
+
+120
+00:07:50,290 --> 00:07:52,905
+And, which will make the actor
+
+121
+00:07:52,905 --> 00:07:56,550
+throw an exception, namely this
+ActorKilledException.
+
+122
+00:07:56,550 --> 00:07:58,280
+And then the supervisor gets to decide
+
+123
+00:07:58,280 --> 00:08:01,080
+what to do, and usually the intention was
+to
+
+124
+00:08:01,080 --> 00:08:03,650
+stop the actor, so that's what we do here.
+
+125
+00:08:05,030 --> 00:08:07,920
+But what if this very important service
+actor fails?
+
+126
+00:08:09,060 --> 00:08:10,970
+This manager depends on it.
+
+127
+00:08:10,970 --> 00:08:17,590
+It cannot function without it.
+So it cannot fix the problem itself,
+
+128
+00:08:17,590 --> 00:08:22,150
+hence it escalates this exception to its
+own supervisor.
+
+129
+00:08:24,160 --> 00:08:29,110
+We have started from the premise that
+failure is communicated as a message, just
+
+130
+00:08:29,110 --> 00:08:34,410
+as anything else between actors, hence it
+also acts like a message.
+
+131
+00:08:34,410 --> 00:08:37,560
+It is sent and processed like a message.
+
+132
+00:08:37,560 --> 00:08:42,770
+This means that the supervisor strategy
+declared inside the actor has full
+
+133
+00:08:42,770 --> 00:08:47,820
+access to the actor's state, just as any
+message processing would have.
+
+134
+00:08:47,820 --> 00:08:49,830
+Processing failure messages
+
+135
+00:08:49,830 --> 00:08:54,660
+is sequentially serialized with all other
+messages as well.
+
+136
+00:08:54,660 --> 00:08:56,420
+They go through the same mailbox.
+
+137
+00:08:57,450 --> 00:09:00,420
+Which means that no normal message can be
+
+138
+00:09:00,420 --> 00:09:03,490
+processed while a failure is currently
+being handled.
+
+139
+00:09:05,060 --> 00:09:11,200
+In this example, we use this power to
+implement a bit more refined scheme.
+
+140
+00:09:11,200 --> 00:09:15,670
+First we create a map restarts from
+ActorRef to integers.
+
+141
+00:09:16,750 --> 00:09:23,030
+Which defaults to zero for the values.
+Then when we get a DBException,
+
+142
+00:09:23,030 --> 00:09:29,260
+we actually look in the restarts map for
+the sender of this failure.
+
+143
+00:09:29,260 --> 00:09:32,130
+And check, if it has failed too many
+times,
+
+144
+00:09:34,180 --> 00:09:38,290
+then we remove this actor from the map and
+stop it.
+
+145
+00:09:39,500 --> 00:09:43,680
+Otherwise, we update the map, increasing
+the failure
+
+146
+00:09:43,680 --> 00:09:46,460
+count for this actor and issue a restart.
+
+147
+00:09:48,140 --> 00:09:52,520
+This is just a very simple example to make
+it fit on one slide.
+
+148
+00:09:52,520 --> 00:09:55,990
+You can do any kind of processing you
+would like.
+
+149
+00:09:55,990 --> 00:10:00,450
+It is important to note that this should
+be a value and
+
+150
+00:10:00,450 --> 00:10:02,400
+not a death.
+
+151
+00:10:02,400 --> 00:10:05,530
+It would also work if you write overwrite
+death but then
+
+152
+00:10:05,530 --> 00:10:11,030
+this strategy would be re-instantiated
+during the handling of each failure.
+
+153
+00:10:11,030 --> 00:10:14,840
+And that is usually not what you want and
+it is not particularly efficient.
+
+154
+00:10:16,880 --> 00:10:20,140
+There are variations on what you can
+apply.
+
+155
+00:10:20,140 --> 00:10:22,740
+For example, the one for one strategy
+
+156
+00:10:22,740 --> 00:10:26,830
+always deals with each child actor in
+isolation.
+
+157
+00:10:26,830 --> 00:10:30,150
+If a decision shall apply to all children,
+
+158
+00:10:30,150 --> 00:10:33,350
+then there is also the all for one
+strategy.
+
+159
+00:10:33,350 --> 00:10:37,070
+Which means that the supervisor is
+supervising a group
+
+160
+00:10:37,070 --> 00:10:40,670
+of actors which need to live and die
+together.
+
+161
+00:10:41,920 --> 00:10:46,450
+Let me show you an example of this.
+We have a supervisor here,
+
+162
+00:10:51,330 --> 00:10:56,706
+who's just super.
+With three
+
+163
+00:10:56,706 --> 00:11:01,776
+children,
+
+164
+00:11:01,776 --> 00:11:08,160
+A, B and C.
+Now if A fails.
+
+165
+00:11:09,780 --> 00:11:16,150
+So I go, send the failure.
+The supervisor gets to decide what to do.
+
+166
+00:11:16,150 --> 00:11:16,390
+And if
+
+167
+00:11:16,390 --> 00:11:20,530
+it will restart A, then all of them will
+restart.
+
+168
+00:11:29,420 --> 00:11:33,880
+If A would have been stopped, all three
+would have been stopped together.
+
+169
+00:11:35,330 --> 00:11:37,920
+Both the one for one strategy and the all
+for
+
+170
+00:11:37,920 --> 00:11:42,820
+one strategy can be configured to include
+a simple rate trigger.
+
+171
+00:11:42,820 --> 00:11:46,780
+This means you can tell it to only allow a
+finite number of restarts.
+
+172
+00:11:47,810 --> 00:11:50,440
+Here's an example, one for one
+
+173
+00:11:50,440 --> 00:11:54,870
+strategy allows the specification of more
+arguments.
+
+174
+00:11:54,870 --> 00:11:58,100
+This max number of restarts, ten, means
+that after
+
+175
+00:11:58,100 --> 00:12:02,740
+ten restarts a restart would turn into a
+stop.
+
+176
+00:12:02,740 --> 00:12:05,440
+The other feature which is demonstrated
+here as well
+
+177
+00:12:05,440 --> 00:12:09,000
+is that this can be applied within a time
+window.
+
+178
+00:12:09,000 --> 00:12:12,900
+So if there come ten restarts within one
+minute it's still fine.
+
+179
+00:12:12,900 --> 00:12:16,620
+The eleventh in the same minute will be
+turned into a stop.
+
+180
+00:12:19,300 --> 00:12:23,610
+An actor is restarted in order to recover
+from failure.
+
+181
+00:12:23,610 --> 00:12:26,400
+The benefit of this is that other actors
+can
+
+182
+00:12:26,400 --> 00:12:32,100
+continue communicating with the service
+provided by this actor.
+
+183
+00:12:32,100 --> 00:12:37,200
+Before and after the restart without
+having to fix the problem.
+
+184
+00:12:37,200 --> 00:12:38,500
+That was the initial goal.
+
+185
+00:12:39,680 --> 00:12:44,580
+But this requires that the identifier by
+which other actors
+
+186
+00:12:44,580 --> 00:12:48,170
+refer to this actor must be stable across
+a restart.
+
+187
+00:12:49,780 --> 00:12:53,839
+In Akka, the ActorRef stays valid during a
+restart.
+
+188
+00:12:55,060 --> 00:12:57,720
+It is just the actor object behind it
+which is
+
+189
+00:12:57,720 --> 00:13:00,330
+swapped out during the restart as we will
+soon see.
+
+190
+00:13:01,560 --> 00:13:03,500
+There are other ways to implement that.
+
+191
+00:13:03,500 --> 00:13:09,530
+For example, in Erlang, actors which fail
+always terminate.
+
+192
+00:13:09,530 --> 00:13:11,040
+And they are replaced by new ones.
+
+193
+00:13:12,250 --> 00:13:14,790
+In order to give them a stable identity,
+there is
+
+194
+00:13:14,790 --> 00:13:18,900
+a name registry into which the so called
+PID is registered.
+
+195
+00:13:20,150 --> 00:13:25,370
+One issue with this approach is that
+clients of this registry must be
+
+196
+00:13:25,370 --> 00:13:30,980
+able to cope with the fact that a name
+might be registered at one time.
+
+197
+00:13:30,980 --> 00:13:34,620
+Then when the actor fails there is no name
+registered.
+
+198
+00:13:34,620 --> 00:13:38,640
+And then once it is restarted the name
+refers to a different actor.
+
+199
+00:13:39,650 --> 00:13:43,940
+An actor in Akka has a richer life cycle
+than a
+
+200
+00:13:43,940 --> 00:13:48,750
+PID in Erlang, which is a trade-off
+between this additional
+
+201
+00:13:48,750 --> 00:13:53,020
+complexity and avoiding the race
+conditions during restart.
+
+202
+00:13:54,770 --> 00:13:59,940
+So far we have talked about restarts in an
+abstract vision, saying that it fixes
+
+203
+00:13:59,940 --> 00:14:02,850
+the problem.
+But what does that really mean?
+
+204
+00:14:02,850 --> 00:14:07,310
+Expected error conditions within an actor
+are typically handled explicitly.
+
+205
+00:14:08,340 --> 00:14:13,940
+The sender will get a failure response as
+we have seen in the bank account example.
+
+206
+00:14:13,940 --> 00:14:16,200
+It is the unexpected errors which we
+
+207
+00:14:16,200 --> 00:14:20,350
+are concerned with here and anything
+unexpected.
+
+208
+00:14:20,350 --> 00:14:24,490
+So an exception which is thrown which we
+did not foresee, for example,
+
+209
+00:14:24,490 --> 00:14:28,370
+indicates that some part of the actor
+state has become invalid.
+
+210
+00:14:29,610 --> 00:14:34,390
+The decision whether a possible failure is
+treated as an expected or
+
+211
+00:14:34,390 --> 00:14:39,870
+an unexpected error Is one which needs to
+be taken on a case-by-case basis.
+
+212
+00:14:39,870 --> 00:14:44,680
+But the goal of the actor model is to keep
+each actor as clean
+
+213
+00:14:44,680 --> 00:14:49,600
+as possible, concerned only with its own
+business, and have the
+
+214
+00:14:49,600 --> 00:14:54,920
+supervisor handle the rest.
+As a consequence, the supervisor's
+
+215
+00:14:54,920 --> 00:15:00,740
+action will be course-grained.
+It can only stop, restart or escalate.
+
+216
+00:15:00,740 --> 00:15:06,150
+In this sense the only safe action a
+supervisor can take upon a restart is
+
+217
+00:15:06,150 --> 00:15:12,010
+to cause the actor to install its initial
+behavior to return to the initial state.
+
+218
+00:15:12,010 --> 00:15:15,290
+Because that supposedly is a valid one.
+
+219
+00:15:17,070 --> 00:15:19,960
+Now how does an actor's lifecycle look
+like?
+
+220
+00:15:22,940 --> 00:15:25,280
+At first, it will be started.
+
+221
+00:15:30,110 --> 00:15:36,650
+This happens when the parent calls context
+dot actor of and giving it the props.
+
+222
+00:15:36,650 --> 00:15:41,640
+When the call return this start action
+will be scheduled to run asynchronously.
+
+223
+00:15:46,470 --> 00:15:47,700
+The first thing which happens
+
+224
+00:15:50,600 --> 00:15:58,530
+is that the actor context, the actual
+machinery, creates a new actor instance.
+
+225
+00:16:04,800 --> 00:16:07,941
+This will run the constructor of the actor
+clause.
+
+226
+00:16:09,400 --> 00:16:19,220
+The second is to run a method, a call back
+called preStart.
+
+227
+00:16:19,220 --> 00:16:22,810
+This is executed before the first message
+is processed.
+
+228
+00:16:23,840 --> 00:16:26,180
+Until this point, messages may have
+
+229
+00:16:26,180 --> 00:16:28,490
+already been buffered in the actor's
+mailbox.
+
+230
+00:16:29,680 --> 00:16:30,100
+The actor
+
+231
+00:16:30,100 --> 00:16:35,060
+then begins processing messages and maybe
+it
+
+232
+00:16:35,060 --> 00:16:39,415
+fails here.
+The failure reaches the
+
+233
+00:16:39,415 --> 00:16:44,728
+machinery, the actor context, which
+
+234
+00:16:44,728 --> 00:16:50,202
+will then consult the supervisor what to
+
+235
+00:16:50,202 --> 00:16:55,720
+do.
+Once the verdict comes back, let us say
+
+236
+00:16:55,720 --> 00:16:57,370
+it was a restart.
+
+237
+00:17:01,410 --> 00:17:03,380
+What then happens is
+
+238
+00:17:05,590 --> 00:17:12,850
+that, on this actor instance, another hook
+is called, namely
+
+239
+00:17:16,320 --> 00:17:23,710
+preRestart.
+Then this instance is terminated.
+
+240
+00:17:23,710 --> 00:17:25,940
+The object is not referenced any longer.
+
+241
+00:17:25,940 --> 00:17:30,200
+It will collect it by the virtual
+machine's garbage collector.
+
+242
+00:17:33,450 --> 00:17:38,380
+The next is that a new instance of the
+actor will be created.
+
+243
+00:17:41,580 --> 00:17:49,010
+Again, a hook is run, this time
+postRestart.
+
+244
+00:17:52,500 --> 00:17:57,640
+No messages will be processed between the
+failure and here.
+
+245
+00:17:59,580 --> 00:18:03,580
+The message which caused the failure will
+not be processed again,
+
+246
+00:18:03,580 --> 00:18:07,260
+because presumably it could also have been
+the cause of the failure.
+
+247
+00:18:09,410 --> 00:18:13,890
+Then after postRestart, the actor resumes
+its actions.
+
+248
+00:18:15,630 --> 00:18:21,150
+After a while, let us say the actor wants
+to stop.
+
+249
+00:18:22,410 --> 00:18:27,380
+It signals this to the actor context,
+which will initiate
+
+250
+00:18:29,810 --> 00:18:31,160
+the stop procedure.
+
+251
+00:18:35,480 --> 00:18:36,300
+As part of this,
+
+252
+00:18:40,530 --> 00:18:41,720
+the last hook will be run
+
+253
+00:18:45,600 --> 00:18:46,710
+called postStop.
+
+254
+00:18:46,710 --> 00:18:51,160
+And then, the actor instance will be
+terminated.
+
+255
+00:18:54,030 --> 00:19:04,380
+Restarts, so all of this, can happen zero,
+one or any number of times.
+
+256
+00:19:04,380 --> 00:19:09,052
+But an actor will always have one start
+event and one stop.
+
+257
+00:19:09,052 --> 00:19:11,170
+And after the stop, it is
+
+258
+00:19:11,170 --> 00:19:14,480
+completely terminated and cannot be
+restarted anymore.
+
+259
+00:19:17,360 --> 00:19:20,070
+And it should be noted that at this place,
+
+260
+00:19:22,480 --> 00:19:25,680
+this is where the actor's state is cleared
+out, because
+
+261
+00:19:26,710 --> 00:19:30,090
+it was supposedly invalid and replaced by
+a new one.
+
+262
+00:19:31,150 --> 00:19:34,160
+No internal actor state can cross this red
+line.
+
+263
+00:19:35,580 --> 00:19:40,430
+The actor lifecycle is reflected in source
+code by the actor lifestyle hooks.
+
+264
+00:19:41,970 --> 00:19:47,085
+Here we have the preStart method, which
+does not get an argument.
+
+265
+00:19:47,085 --> 00:19:51,260
+preRestart, we know the reasons by which
+the
+
+266
+00:19:51,260 --> 00:19:56,140
+restart was caused, and we may know the
+message.
+
+267
+00:19:57,150 --> 00:19:59,340
+Which was processed while the actor
+failed.
+
+268
+00:20:01,700 --> 00:20:06,880
+The default behavior is to stop all
+children at this point.
+
+269
+00:20:08,620 --> 00:20:11,860
+Because child actors are considered part
+of an actor's state.
+
+270
+00:20:13,010 --> 00:20:15,940
+Then by default the postStop hook is
+invoked.
+
+271
+00:20:18,100 --> 00:20:23,300
+After a restart, postRestart again is
+invoked with the reason.
+
+272
+00:20:23,300 --> 00:20:27,760
+And this defaults to preStart.
+
+273
+00:20:29,940 --> 00:20:33,360
+And the postStop hook is the one which
+will
+
+274
+00:20:33,360 --> 00:20:36,280
+be called after the instance is no longer
+running anymore.
+
+275
+00:20:38,070 --> 00:20:43,580
+Let me illustrate two different ways to
+use these hooks on to examples.
+
+276
+00:20:43,580 --> 00:20:47,070
+The first one is an actor representing a
+database connection.
+
+277
+00:20:48,462 --> 00:20:53,270
+This DBActor, in its constructor calls
+DB.openConnection
+
+278
+00:20:53,270 --> 00:20:54,980
+to return a handle to a database.
+
+279
+00:20:57,960 --> 00:21:01,060
+When the actor is stopped, it needs to
+close this connection.
+
+280
+00:21:02,460 --> 00:21:08,040
+By default, during a restart of course the
+constructor will rerun, after
+
+281
+00:21:08,040 --> 00:21:13,160
+the restart and before the restart the
+handle will have been closed.
+
+282
+00:21:13,160 --> 00:21:17,570
+This means that the actor is fully
+reinitialized during a restart.
+
+283
+00:21:18,820 --> 00:21:22,140
+Another possibility is an actor which has
+external state.
+
+284
+00:21:23,990 --> 00:21:27,786
+This listener will register with a source
+to receive events.
+
+285
+00:21:27,786 --> 00:21:33,942
+In preStart it sends to the source a
+message, RegisterListener
+
+286
+00:21:33,942 --> 00:21:39,642
+self, which means it registers its
+ActorRef to receive the
+
+287
+00:21:39,642 --> 00:21:45,355
+notifications which it desires.
+As we have seen the
+
+288
+00:21:45,355 --> 00:21:51,040
+ActorRef stays valid over restart, so
+preRestart,
+
+289
+00:21:51,040 --> 00:21:51,712
+we do nothing.
+
+290
+00:21:51,712 --> 00:21:54,960
+And postRestart, there is no reason
+
+291
+00:21:54,960 --> 00:21:58,460
+to re-register, because we did not
+unregister.
+
+292
+00:21:58,460 --> 00:22:03,320
+Only in postStop do we send to the source
+the unregistration command.
+
+293
+00:22:05,650 --> 00:22:10,530
+It is important to note that actor-local
+state cannot be kept across the restarts.
+
+294
+00:22:10,530 --> 00:22:12,110
+Remember the red line.
+
+295
+00:22:12,110 --> 00:22:17,070
+Only external state like this registration
+can be managed in this fashion.
+
+296
+00:22:18,320 --> 00:22:22,010
+You will also have noticed that by
+overriding preRestart to do
+
+297
+00:22:22,010 --> 00:22:26,598
+nothing, we also do not stop child actors
+upon a restart.
+
+298
+00:22:27,980 --> 00:22:31,260
+In this case, the actor context will
+
+299
+00:22:31,260 --> 00:22:36,560
+recursively restart the child actors,
+which were not stopped.
+

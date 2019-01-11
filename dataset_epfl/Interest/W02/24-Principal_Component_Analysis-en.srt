@@ -1,0 +1,753 @@
+1
+00:00:05,559 --> 00:00:08,559
+A major problem in estimating
+the term structure
+
+2
+00:00:08,759 --> 00:00:11,584
+is the high dimensionality 
+of the discount curve.
+
+3
+00:00:12,983 --> 00:00:18,921
+In this part we aim at finding
+the basis shapes of the yield curve
+
+4
+00:00:19,121 --> 00:00:22,333
+by looking at time series 
+of yield curves.
+
+5
+00:00:23,776 --> 00:00:27,488
+The technique we'll use is
+Principal Component Analysis(PCA).
+
+6
+00:00:28,809 --> 00:00:32,046
+This is one of the most important
+ dimension reduction techniques
+
+7
+00:00:32,246 --> 00:00:34,921
+in multivariate data analysis.
+
+8
+00:00:35,326 --> 00:00:39,476
+The key mathematical principle
+underlying PCA
+
+9
+00:00:39,676 --> 00:00:43,001
+is the spectral theorem
+from linear algebra.
+
+10
+00:00:43,959 --> 00:00:48,097
+It states that any real symmetric
+end by end matrix Q
+
+11
+00:00:49,836 --> 00:00:52,836
+can be decomposed as shown here
+
+12
+00:00:53,663 --> 00:00:56,288
+into the product of A
+
+13
+00:00:56,488 --> 00:00:59,488
+which is an orthogonal matrix
+whose columns
+
+14
+00:00:59,939 --> 00:01:02,876
+are the normalized Eigen vectors
+of Q.
+
+15
+00:01:03,990 --> 00:01:07,290
+They from an orthonormal basis 
+of R-n.
+
+16
+00:01:09,085 --> 00:01:15,310
+And L which is the diagonal matrix
+containing the Eigen values of Q
+
+17
+00:01:15,718 --> 00:01:19,143
+we'll always assume without
+loss of generality
+
+18
+00:01:19,343 --> 00:01:24,030
+that these eigen values are ordered
+in this decreasing sense
+
+19
+00:01:25,156 --> 00:01:28,668
+and times A-transpose.
+
+20
+00:01:30,369 --> 00:01:34,056
+Now let X be an n-dimensional 
+random vector
+
+21
+00:01:34,565 --> 00:01:40,128
+with mean denoted by μ
+and co variance matrix denoted by Q.
+
+22
+00:01:40,950 --> 00:01:47,187
+Note that the co variance is a symmetric 
+and positive semi definite matrix.
+
+23
+00:01:47,673 --> 00:01:51,323
+We can think of X as being 
+high dimensional
+
+24
+00:01:52,262 --> 00:01:55,850
+and is large, it could be a model
+
+25
+00:01:56,050 --> 00:01:59,050
+for the shape of the yield curve.
+
+26
+00:02:00,000 --> 00:02:04,313
+In this figure I illustrate
+the case where the dimension is 2.
+
+27
+00:02:05,816 --> 00:02:08,141
+We see the mean vector μ
+
+28
+00:02:10,216 --> 00:02:14,041
+and this ellipse indicates
+
+29
+00:02:14,927 --> 00:02:18,689
+that the support of the vector X 
+
+30
+00:02:19,408 --> 00:02:23,908
+is somewhat scattered 
+with the shape.
+
+31
+00:02:25,383 --> 00:02:28,083
+Formally speaking, this ellipse
+
+32
+00:02:28,283 --> 00:02:33,421
+is a level set of the co variance 
+matrix acting as a quadratic form
+
+33
+00:02:33,923 --> 00:02:35,511
+on R-2.
+
+34
+00:02:35,952 --> 00:02:39,090
+The spectral theorem applied 
+to the co variance matrix Q
+
+35
+00:02:39,941 --> 00:02:41,003
+gives us
+
+36
+00:02:41,683 --> 00:02:43,933
+the matrices A and L.
+
+37
+00:02:44,366 --> 00:02:48,066
+L is diagonal with the eigen values
+
+38
+00:02:48,266 --> 00:02:50,928
+which are non negative on
+the diagonal,
+
+39
+00:02:51,128 --> 00:02:55,828
+and A stacks the eigen vectors
+of Q
+
+40
+00:02:56,028 --> 00:03:01,216
+as normalized column vectors
+a-1 up to a-n.
+
+41
+00:03:02,951 --> 00:03:06,113
+a-1 corresponding to the 
+largest eigen value
+
+42
+00:03:07,164 --> 00:03:11,014
+is giving us the largest 
+variability of X.
+
+43
+00:03:12,955 --> 00:03:16,117
+The principal component transform
+of X 
+
+44
+00:03:16,317 --> 00:03:19,455
+is given by projecting X
+
+45
+00:03:20,080 --> 00:03:22,943
+onto these eigen vectors.
+
+46
+00:03:24,003 --> 00:03:26,528
+In other words, we get
+
+47
+00:03:27,984 --> 00:03:31,647
+the component Y-i by projecting
+
+48
+00:03:31,847 --> 00:03:34,509
+the de-centred μ
+
+49
+00:03:35,715 --> 00:03:39,502
+onto the eigen vector a-i.
+
+50
+00:03:40,549 --> 00:03:43,924
+We call Y-i the ith principal 
+component of X
+
+51
+00:03:44,725 --> 00:03:48,887
+and we call a-i the ith vector
+of loadings of X.
+
+52
+00:03:50,157 --> 00:03:53,370
+In matrix notation, these rates
+are shown here.
+
+53
+00:03:54,677 --> 00:03:59,252
+We can re express X in terms
+of its principle components
+
+54
+00:03:59,773 --> 00:04:02,086
+and that reads like this here.
+
+55
+00:04:03,562 --> 00:04:07,012
+As we see in this figure here
+Y-1 is now capturing
+
+56
+00:04:07,724 --> 00:04:11,111
+the major variability of X and Y-2
+
+57
+00:04:12,015 --> 00:04:14,065
+is what remains.
+
+58
+00:04:15,781 --> 00:04:19,081
+Indeed this is confirmed
+on the following page
+
+59
+00:04:20,020 --> 00:04:23,882
+one can formally show,
+and that is an elementary exercise,
+
+60
+00:04:24,070 --> 00:04:29,007
+that the principal components have
+mean 0
+
+61
+00:04:30,758 --> 00:04:34,070
+and they have a co variance matrix
+which is diagonal.
+
+62
+00:04:34,999 --> 00:04:37,086
+It is actually equal to L.
+
+63
+00:04:37,522 --> 00:04:38,684
+That means
+
+64
+00:04:39,524 --> 00:04:43,062
+The principal components 
+are uncorrelated
+
+65
+00:04:43,262 --> 00:04:46,087
+and have variances given by 
+
+66
+00:04:46,907 --> 00:04:48,057
+'λ-i's.
+
+67
+00:04:48,501 --> 00:04:50,626
+Because the 'λ-i's are ordered
+
+68
+00:04:50,988 --> 00:04:54,363
+it follows that Y-1 has
+maximal variance
+
+69
+00:04:54,981 --> 00:04:59,018
+among all standardized linear
+combinations of X
+
+70
+00:04:59,920 --> 00:05:02,020
+as shown here.
+
+71
+00:05:03,595 --> 00:05:04,695
+Going on
+
+72
+00:05:04,992 --> 00:05:09,155
+Y-2 has maximal variance among
+all such linear combinations
+
+73
+00:05:09,421 --> 00:05:13,933
+which are orthogonal to A-1, 
+the first eigen vector.
+
+74
+00:05:14,454 --> 00:05:18,390
+And generally speaking 
+Y-i has maximal variance 
+
+75
+00:05:18,590 --> 00:05:21,003
+among all such linear combinations
+
+76
+00:05:21,405 --> 00:05:25,955
+which are orthogonal to the first
+i-1 linear combinations.
+
+77
+00:05:27,482 --> 00:05:30,845
+Observe that the sum of all
+variances
+
+78
+00:05:31,775 --> 00:05:33,912
+of all the components X-i
+
+79
+00:05:34,312 --> 00:05:37,650
+is preserved under the principal
+component transformed.
+
+80
+00:05:39,194 --> 00:05:42,869
+If we thus choose a number K which
+is smaller than N,
+
+81
+00:05:43,280 --> 00:05:47,605
+and sum up the first 'λ-i's
+from 1 to K,
+
+82
+00:05:48,349 --> 00:05:52,187
+and hold this against the sum of
+all the eigen values,
+
+83
+00:05:53,550 --> 00:05:54,925
+we thus obtain
+
+84
+00:05:55,125 --> 00:05:57,788
+the amount of variability
+in X
+
+85
+00:05:57,988 --> 00:06:01,488
+explained by the first K principle
+components.
+
+86
+00:06:04,415 --> 00:06:08,877
+As such, we could think of X being
+an N-dimensional model
+
+87
+00:06:09,077 --> 00:06:12,927
+for the yield curve, or the daily
+changes of the yield curve.
+
+88
+00:06:13,704 --> 00:06:16,954
+If then the first K principle 
+components
+
+89
+00:06:17,154 --> 00:06:20,979
+explain a significant amount of
+variability in X,
+
+90
+00:06:21,754 --> 00:06:24,179
+it is appropriate to approximate X
+
+91
+00:06:24,969 --> 00:06:29,957
+by the first K principle components
+as shown here.
+
+92
+00:06:30,610 --> 00:06:33,072
+This is now a lower dimensional 
+model
+
+93
+00:06:33,960 --> 00:06:36,085
+which however captures
+
+94
+00:06:36,447 --> 00:06:41,297
+the variability of the original
+model quite well.
+
+95
+00:06:42,268 --> 00:06:44,943
+The loadings a-1to a-k
+
+96
+00:06:45,143 --> 00:06:49,956
+are in turn, the main components of 
+the stochastic yield curve movements.
+
+97
+00:06:51,040 --> 00:06:53,002
+Before we look into an example,
+
+98
+00:06:53,674 --> 00:06:55,873
+Let us recall the sample analog 
+
+99
+00:06:56,073 --> 00:06:59,624
+of what we just did 
+for the random variable X.
+
+100
+00:07:00,643 --> 00:07:03,943
+Assume we have a time series
+of observations
+
+101
+00:07:04,143 --> 00:07:07,143
+that we stack into the matrix X
+
+102
+00:07:08,582 --> 00:07:10,932
+whose T-th column
+
+103
+00:07:12,197 --> 00:07:18,721
+is a sample realization
+of a random vector X(t).
+
+104
+00:07:16,159 --> 00:07:19,159
+
+
+105
+00:07:19,992 --> 00:07:22,529
+We assume that this random vector 
+X(t)
+
+106
+00:07:22,729 --> 00:07:25,729
+is distributed as X
+
+107
+00:07:25,929 --> 00:07:29,491
+with mean μ and co variance
+matrix Q.
+
+108
+00:07:30,447 --> 00:07:34,072
+We then estimate the mean vector
+of X
+
+109
+00:07:34,272 --> 00:07:37,272
+by the empirical mean
+of the data
+
+110
+00:07:38,226 --> 00:07:43,963
+and the co variance matrix Q by the 
+empirical n x n co variance matrix
+
+111
+00:07:44,953 --> 00:07:47,278
+as shown here.
+
+112
+00:07:48,459 --> 00:07:52,096
+Applying the spectral theorem
+to the empirical co variance matrix
+
+113
+00:07:52,509 --> 00:07:55,422
+gives us the empirical counter parts
+
+114
+00:07:56,623 --> 00:08:01,498
+eigen values λ and 
+eigen vectors â. 
+
+115
+00:08:02,000 --> 00:08:04,562
+indicated now with hats.
+
+116
+00:08:06,615 --> 00:08:09,928
+The sample principal component
+decomposition of X
+
+117
+00:08:10,128 --> 00:08:12,765
+is then given as shown here
+
+118
+00:08:12,965 --> 00:08:17,065
+with the empirical principal
+components y
+
+119
+00:08:17,757 --> 00:08:22,094
+and the loadings â-i.
+
+120
+00:08:22,644 --> 00:08:29,569
+These empirical principal components
+are uncorrelated again by construction.
+
+121
+00:08:32,191 --> 00:08:35,491
+The empirical mean and 
+co variance matrix
+
+122
+00:08:36,214 --> 00:08:41,127
+μ̂ and Q̂ are standard estimates
+for the true parameters μ and Q
+
+123
+00:08:41,694 --> 00:08:45,931
+if the observations of X(t) are
+serially uncorrelated
+
+124
+00:08:47,986 --> 00:08:49,386
+as shown here.
+
+125
+00:08:51,222 --> 00:08:55,660
+If this kind of stationarity of 
+the time series X(t) is in doubt
+
+126
+00:08:56,000 --> 00:09:00,625
+the standard practice is to differentiate 
+and to consider the increments.
+
+127
+00:09:03,467 --> 00:09:05,304
+We are now ready for the example
+
+128
+00:09:06,002 --> 00:09:09,365
+and consider monthly changes 
+of the yield curve
+
+129
+00:09:10,002 --> 00:09:11,989
+of the Swiss government bonds
+
+130
+00:09:12,754 --> 00:09:15,954
+over the ten years from August 2005
+
+131
+00:09:16,154 --> 00:09:18,742
+until July 2015.
+
+132
+00:09:19,704 --> 00:09:23,592
+For 8 times to maturities τ-i
+
+133
+00:09:24,041 --> 00:09:27,478
+ranging from 2 years up to 30 years,
+
+134
+00:09:29,191 --> 00:09:31,841
+running the PCA on this time series
+
+135
+00:09:32,041 --> 00:09:36,841
+gives us the following first
+3 yield curve loadings.
+
+136
+00:09:37,992 --> 00:09:41,942
+Remember each loading is a
+vector with 8 components
+
+137
+00:09:43,737 --> 00:09:47,999
+and we'll represent the vector 
+as a function
+
+138
+00:09:48,969 --> 00:09:53,057
+with values given by its components..
+
+139
+00:09:54,016 --> 00:09:57,079
+So the first loading
+is this black line.
+
+140
+00:09:58,771 --> 00:10:02,096
+The second loading is the 
+blue line,
+
+141
+00:10:03,222 --> 00:10:06,110
+and the third loading 
+is the red line.
+
+142
+00:10:07,625 --> 00:10:10,187
+If we look at their shapes, 
+we see that the first loading
+
+143
+00:10:10,387 --> 00:10:12,137
+is roughly flat.
+
+144
+00:10:13,053 --> 00:10:16,040
+It affects the parallel shifts
+
+145
+00:10:16,240 --> 00:10:18,803
+and can thus be dubbed the level.
+
+146
+00:10:19,655 --> 00:10:22,405
+The second loading is upward
+sloping
+
+147
+00:10:23,898 --> 00:10:26,110
+It affects the tilting of the
+yield curve
+
+148
+00:10:27,003 --> 00:10:32,016
+and the third is hump-shaped, it 
+affects the flexing of the yield curve.
+
+149
+00:10:33,021 --> 00:10:36,021
+It has become common to speak
+of these shapes
+
+150
+00:10:36,221 --> 00:10:40,933
+as level, slope, and curvature
+of the yield curve.
+
+151
+00:10:41,750 --> 00:10:46,000
+The explained variance of these 
+first 3 principle components 
+
+152
+00:10:46,200 --> 00:10:47,974
+is as shown here.
+
+153
+00:10:48,838 --> 00:10:51,100
+The first principle component 
+explains
+
+154
+00:10:52,687 --> 00:10:55,812
+roughly 77% of the variance,
+
+155
+00:10:56,766 --> 00:11:01,066
+the second explains 18%,
+the third explains 3%.
+
+156
+00:11:02,454 --> 00:11:05,591
+In sum, the first three principle
+components
+
+157
+00:11:05,791 --> 00:11:11,004
+explain more than 98% of the
+variance of the yield curve.
+
+158
+00:11:11,779 --> 00:11:13,017
+As a consequence
+
+159
+00:11:13,776 --> 00:11:17,701
+the yield curve (movements)
+can be approximated
+
+160
+00:11:18,651 --> 00:11:21,876
+by a linear combination of the
+first three loadings
+
+161
+00:11:22,396 --> 00:11:26,559
+level, slope, curvature,
+with small relative error.
+
+162
+00:11:26,759 --> 00:11:30,021
+In other words, 
+a 2 or 3 factor model
+
+163
+00:11:30,221 --> 00:11:34,921
+will do a very good job in fitting
+the time series of the yield curve.
+

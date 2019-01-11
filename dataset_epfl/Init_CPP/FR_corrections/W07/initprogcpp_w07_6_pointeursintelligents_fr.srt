@@ -1,0 +1,1000 @@
+1
+00:00:02,912 --> 00:00:05,872
+Les pointeurs dont nous venons de
+détailler l'usage jusqu'ici sont les bons
+
+2
+00:00:05,872 --> 00:00:08,602
+vieux pointeurs « à la C », qui sont sans
+doute les plus polyvalents,
+
+3
+00:00:08,602 --> 00:00:10,592
+les plus puissants, mais aussi
+les plus dangereux.
+
+4
+00:00:10,592 --> 00:00:13,820
+En effet, nous avons vu que leur
+utilisation nécessite une grande rigueur.
+
+5
+00:00:13,820 --> 00:00:16,550
+Tout ce qui est alloué par le programmeur
+comme mémoire pointée par
+
+6
+00:00:16,550 --> 00:00:20,030
+ces pointeurs doit être systématiquement
+désalloué par le programmeur.
+
+7
+00:00:20,030 --> 00:00:22,320
+Et cette grande rigueur est parfois
+difficile à respecter
+
+8
+00:00:22,320 --> 00:00:23,870
+de façon systématique.
+
+9
+00:00:24,312 --> 00:00:26,902
+Si l'on veut allouer de la mémoire
+dynamiquement, on peut depuis
+
+10
+00:00:26,902 --> 00:00:30,902
+C++11 avoir recours à des types de
+pointeurs un petit peu plus confortables
+
+11
+00:00:30,902 --> 00:00:34,482
+d'utilisation, qui nécessitent moins de
+précautions de la part du programmeur,
+
+12
+00:00:34,482 --> 00:00:37,512
+il s'agit des pointeurs intelligents
+que je vais brièvement vous
+
+13
+00:00:37,512 --> 00:00:38,802
+présenter maintenant.
+
+14
+00:00:40,345 --> 00:00:43,175
+Les pointeurs intelligents que vous
+pourrez trouver dans la littérature
+
+15
+00:00:43,175 --> 00:00:46,715
+anglophone sous le vocab de
+<i>smart pointers</i>, sont utilisables en
+
+16
+00:00:46,715 --> 00:00:48,515
+incluant la bibliothèque memory.
+
+17
+00:00:48,515 --> 00:00:52,515
+Ils ont la spécificité de faire leur
+propre delete au moment opportun.
+
+18
+00:00:52,515 --> 00:00:56,215
+Ça veut dire qu'ils gèrent la restitution
+de la mémoire associée par leur propres
+
+19
+00:00:56,215 --> 00:00:57,885
+moyens.
+Le programmeur
+
+20
+00:00:57,885 --> 00:01:01,365
+n'a plus à se préoccuper de la restitution
+de la mémoire, et donc on va
+
+21
+00:01:01,365 --> 00:01:05,365
+éviter par ce biais-là l'oubli de <i>delete</i> qui
+cause de nombreux soucis avec
+
+22
+00:01:05,365 --> 00:01:06,865
+les pointeurs « à la C ».
+
+23
+00:01:08,184 --> 00:01:11,784
+La gestion de la mémoire par les pointeurs
+intelligents fait appel à des
+
+24
+00:01:11,784 --> 00:01:15,784
+techniques dites des ramasse miettes
+ou de <i>garbage collecting</i>.
+
+25
+00:01:16,844 --> 00:01:19,794
+Il existe en C++11 trois formes
+de pointeurs intelligents.
+
+26
+00:01:19,794 --> 00:01:23,044
+Les <i>unique_ptr</i>, <i>shared_ptr</i> et <i>weak_ptr</i>.
+
+27
+00:01:23,121 --> 00:01:26,741
+La distinction entre l'une ou l'autre de
+ces formes est essentiellement
+
+28
+00:01:26,741 --> 00:01:30,541
+relative au nombre de pointeurs d'un
+même type pouvant référencer
+
+29
+00:01:30,541 --> 00:01:31,851
+une même zone mémoire.
+
+30
+00:01:31,851 --> 00:01:36,031
+Par exemple, dans le cas de <i>unique_ptr</i>,
+il ne peut y avoir qu'un seul
+
+31
+00:01:36,031 --> 00:01:39,541
+<i>unique_ptr</i> pointant une zone mémoire
+dynamiquement allouée
+
+32
+00:01:39,541 --> 00:01:40,581
+comme celle-ci.
+
+33
+00:01:40,632 --> 00:01:44,512
+La situation où on aurait un deuxième
+<i>unique_ptr</i> pointant sur la même zone
+
+34
+00:01:44,512 --> 00:01:47,452
+mémoire dynamiquement allouée
+n'est pas possible.
+
+35
+00:01:48,343 --> 00:01:52,343
+A contrario, les <i>shared_ptr</i> et <i>weak_ptr</i>
+peuvent être plusieurs
+
+36
+00:01:53,522 --> 00:01:57,522
+à pointer simultanément sur la même
+zone mémoire dynamiquement allouée.
+
+37
+00:01:57,522 --> 00:02:02,082
+La distinction entre <i>shared</i> et <i>weak_ptr</i>
+sera esquissée brièvement dans
+
+38
+00:02:02,082 --> 00:02:02,872
+ce qui suit.
+
+39
+00:02:03,698 --> 00:02:06,508
+Les pointeurs à la C » permettent de
+tout faire, ils permettent
+
+40
+00:02:06,508 --> 00:02:10,628
+notamment, dans certaines situations,
+de faire en sorte que deux pointeurs
+
+41
+00:02:10,628 --> 00:02:14,038
+différents référencent, pointent vers
+la même zone mémoire.
+
+42
+00:02:14,038 --> 00:02:16,728
+Cela implique une grande rigueur, de
+grandes précautions de la part
+
+43
+00:02:16,728 --> 00:02:17,588
+du programmeur.
+
+44
+00:02:17,588 --> 00:02:21,588
+Imaginez par exemple, que dans une
+partie du programme, je fasse <i>delete p2</i>.
+
+45
+00:02:22,596 --> 00:02:26,936
+Ceci va avoir pour incidence que la zone
+mémoire pointée par p2 est désallouée,
+
+46
+00:02:26,936 --> 00:02:29,696
+et par la même, celle
+pointée par p1 aussi.
+
+47
+00:02:29,696 --> 00:02:32,796
+Donc c'est au programmeur à être
+suffisamment précautionneux pour
+
+48
+00:02:32,796 --> 00:02:36,796
+garantir que les restitutions de mémoire
+qu'il opère n'ont pas d'incidence
+
+49
+00:02:36,796 --> 00:02:39,346
+fâcheuse sur une autre
+partie du programme.
+
+50
+00:02:40,689 --> 00:02:44,689
+Si l'on veut éviter ce genre de tracas
+et si l'on sait qu'a priori il n'y a pas
+
+51
+00:02:44,689 --> 00:02:48,279
+de nécessité à ce que plusieurs pointeurs
+référencent, soient propriétaires
+
+52
+00:02:48,279 --> 00:02:52,849
+d'une même zone mémoire, alors en
+C++11 on aura plutôt recours à la notion
+
+53
+00:02:52,849 --> 00:02:54,009
+de unique_ptr.
+
+54
+00:02:54,009 --> 00:02:57,579
+Donc nous avons vu que ces pointeurs sont
+tels que il peut y avoir qu'un
+
+55
+00:02:57,579 --> 00:03:01,579
+seul et unique unique_ptr référençant
+une zone mémoire dynamiquement allouée.
+
+56
+00:03:01,579 --> 00:03:05,839
+Donc, la situation où on aurait deux
+unique_ptr référençant la même zone
+
+57
+00:03:05,839 --> 00:03:08,889
+n'est pas possible, donc la situation que
+nous avions tout à l'heure n'est
+
+58
+00:03:08,889 --> 00:03:10,059
+désormais plus possible.
+
+59
+00:03:10,059 --> 00:03:13,299
+Cela va éviter les confusions justement
+que nous avons décrites.
+
+60
+00:03:13,299 --> 00:03:17,109
+Et il en découle une conséquence assez
+logique, vu qu'il ne peut y avoir qu'un
+
+61
+00:03:17,109 --> 00:03:21,109
+seul et unique unique_ptr pointant sur
+la zone mémoire, et bien les
+
+62
+00:03:21,109 --> 00:03:24,309
+unique_ptr ne peuvent pas être copiés.
+
+63
+00:03:25,188 --> 00:03:29,188
+Concrètement, en C++11, si je veux
+déclarer, initialiser un unique_ptr,
+
+64
+00:03:29,188 --> 00:03:31,698
+et bien, je vais avoir recours
+à la syntaxe suivante.
+
+65
+00:03:31,698 --> 00:03:35,858
+Donc, unique_ptr. Je dois indiquer sur
+quel type de zone mémoire est capable
+
+66
+00:03:35,858 --> 00:03:37,458
+de pointer le unique_ptr.
+
+67
+00:03:37,458 --> 00:03:41,458
+Donc ici je déclare un new unique_ptr
+capable de pointer sur un entier, et
+
+68
+00:03:41,458 --> 00:03:43,068
+évidemment je lui donne un nom.
+
+69
+00:03:43,068 --> 00:03:46,508
+Pour l'initialiser, et bien, c'est un
+pointeur donc c'est une adresse et donc
+
+70
+00:03:46,508 --> 00:03:50,508
+je peux l'initialiser grâce à l'adresse
+d'un objet dynamiquement alloué.
+
+71
+00:03:50,991 --> 00:03:55,311
+Ce que je sais faire pour un entier par
+exemple, par le biais de
+
+72
+00:03:55,311 --> 00:03:56,681
+ce genre de tournure.
+
+73
+00:03:57,212 --> 00:03:58,292
+Maintenant si j'essaie
+
+74
+00:04:00,529 --> 00:04:01,889
+de créer une copie
+
+75
+00:04:04,031 --> 00:04:08,031
+de ce unique_ptr, donc en déclarant un
+pointeur p1 et en lui copiant la valeur
+
+76
+00:04:08,031 --> 00:04:11,371
+de p2, et bien ceci en C++11
+n'est pas licite.
+
+77
+00:04:11,371 --> 00:04:15,101
+Ceci pour garantir qu'il n'y ait pas
+justement deux pointeurs de type
+
+78
+00:04:15,101 --> 00:04:18,891
+unique_ptr pointant sur la même zone
+mémoire dynamiquement allouée.
+
+79
+00:04:20,364 --> 00:04:23,994
+Les unique_ptr ne peuvent donc pas
+être copiés, mais en revanche ils
+
+80
+00:04:23,994 --> 00:04:27,204
+peuvent être déplacés, c'est-à-dire
+transmis plus loin.
+
+81
+00:04:27,204 --> 00:04:31,204
+Le C++11 met en effet en oeuvre ce que
+l'on appelle la move semantic,
+
+82
+00:04:31,204 --> 00:04:34,804
+qui est une notion qui dépasse un peu
+le cadre de ce cours, mais que je vais
+
+83
+00:04:34,804 --> 00:04:36,794
+brièvement esquisser par la suite.
+
+84
+00:04:37,397 --> 00:04:40,587
+Donc par rapport à la syntaxe, pour bien
+établir la syntaxe, un petit exemple de
+
+85
+00:04:40,587 --> 00:04:42,977
+déclaration initialisation
+d'un unique_ptr.
+
+86
+00:04:42,977 --> 00:04:46,977
+Donc ici, je déclare un unique_ptr px,
+qui est capable de pointer sur un entier.
+
+87
+00:04:47,250 --> 00:04:51,170
+Un unique_ptr est un pointeur comme un
+autre dans le sens où il va contenir
+
+88
+00:04:51,170 --> 00:04:55,060
+une adresse, et ici il contient l'adresse
+d'une zone dynamiquement allouée
+
+89
+00:04:55,060 --> 00:04:56,760
+d'un entier dynamiquement alloué.
+
+90
+00:04:57,409 --> 00:05:01,409
+Pour le reste, et bien, les unique_ptr
+vont s'employer comme les autres pointeurs
+
+91
+00:05:01,409 --> 00:05:02,619
+qu'on a vu jusqu'ici.
+
+92
+00:05:02,619 --> 00:05:05,999
+Par exemple, on peut accéder au contenu
+pointé par le unique_ptr
+
+93
+00:05:05,999 --> 00:05:09,249
+au moyen de l'étoile comme nous avions
+l'habitude de le faire avec
+
+94
+00:05:09,249 --> 00:05:11,009
+les pointeurs « à la C ».
+
+95
+00:05:11,758 --> 00:05:15,478
+On peut bien sûr parfaitement déclarer
+un vecteur, un tableau dynamique
+
+96
+00:05:15,478 --> 00:05:16,628
+de unique_ptr.
+
+97
+00:05:16,628 --> 00:05:20,098
+Ici, vous avez l'exemple d'un tableau
+dynamique qui s'appelle noms
+
+98
+00:05:20,098 --> 00:05:24,938
+et dont les cases sont des unique_ptr
+capables de pointer sur des zones
+
+99
+00:05:24,938 --> 00:05:27,128
+mémoires de type chaîne de caractères.
+
+100
+00:05:27,128 --> 00:05:30,678
+Au moment de l'initialisation de ce
+vecteur, nous avons recours à de
+
+101
+00:05:30,678 --> 00:05:33,838
+l'allocation dynamique pour aboutir
+à la situation suivante.
+
+102
+00:05:33,838 --> 00:05:38,148
+Donc, notre tableau noms contient deux
+cases, deux cellules, dont chacune
+
+103
+00:05:38,148 --> 00:05:39,718
+contient l'adresse
+
+104
+00:05:41,417 --> 00:05:43,537
+d'un objet dynamiquement alloué.
+
+105
+00:05:45,154 --> 00:05:50,714
+Donc, la première case contient l'adresse
+d'une zone dynamiquement allouée
+
+106
+00:05:50,714 --> 00:05:55,274
+contenant la chaîne de caractères Pierre,
+et la deuxième case du tableau
+
+107
+00:05:55,274 --> 00:05:59,274
+contient l'adresse d'une zone
+dynamiquement allouée contenant la chaîne
+
+108
+00:05:59,274 --> 00:06:00,414
+de caractères Paul.
+
+109
+00:06:02,731 --> 00:06:04,821
+Donc ici, chaque case du tableau
+
+110
+00:06:06,142 --> 00:06:11,642
+va pointer de façon unique vers une chaîne
+de caractères grâce à la notion
+
+111
+00:06:11,642 --> 00:06:12,782
+de unique_ptr.
+
+112
+00:06:14,022 --> 00:06:16,862
+Dernier exemple pour illustrer notamment
+la notion de déplacement
+
+113
+00:06:16,862 --> 00:06:18,532
+par rapport à celui de copie.
+
+114
+00:06:18,729 --> 00:06:22,729
+Donc ici, on imagine que dans un programme
+on dispose d'un type Personne
+
+115
+00:06:22,729 --> 00:06:26,359
+qui est par exemple une structure
+représentant la notion de personne et dont
+
+116
+00:06:26,359 --> 00:06:28,849
+l'un des champs serait par exemple
+le nom de la personne
+
+117
+00:06:28,849 --> 00:06:30,519
+de type chaîne de caractères.
+
+118
+00:06:30,519 --> 00:06:34,519
+Donc, on veut au travers de la fonction
+naissance créer un nouvel objet
+
+119
+00:06:34,519 --> 00:06:38,519
+de type Personne et retourner l'adresse
+de cet objet stocké dans
+
+120
+00:06:38,519 --> 00:06:39,559
+un unique_ptr.
+
+121
+00:06:39,838 --> 00:06:44,478
+Donc la ligne de code qui est en charge
+de créer ce nouvel objet est la suivante.
+
+122
+00:06:44,478 --> 00:06:47,758
+Et la création de l'objet se fait par
+une allocation dynamique.
+
+123
+00:06:47,758 --> 00:06:50,542
+On crée dynamiquement un
+objet de type Personne.
+
+124
+00:06:50,758 --> 00:06:55,388
+L'adresse de cet objet est stockée dans
+la variable bb qui est de type unique_ptr
+
+125
+00:06:55,388 --> 00:06:56,748
+sur une personne.
+
+126
+00:06:56,748 --> 00:07:01,338
+Donc, on imagine ici que par la suite on
+fasse les initialisations nécessaires sur
+
+127
+00:07:01,338 --> 00:07:06,258
+la variable bb, notamment en mettant
+le nom de la structure de données
+
+128
+00:07:06,961 --> 00:07:10,961
+avec le nom transmis à la fonction et
+puis on transmet au monde extérieur
+
+129
+00:07:11,850 --> 00:07:15,320
+l'adresse de l'objet en question que
+nous venons de créer.
+
+130
+00:07:15,320 --> 00:07:18,270
+Donc, nous nous trouvons
+dans cette situation finale.
+
+131
+00:07:18,270 --> 00:07:24,290
+Nous avons une variable bb qui contient
+l'adresse d'un objet dynamiquement alloué
+
+132
+00:07:24,290 --> 00:07:30,880
+qui serait de type Personne, donc ici le
+type stocké est le type Personne.
+
+133
+00:07:32,121 --> 00:07:36,121
+Plaçons-nous maintenant dans le contexte
+de l'utilisation de la fonction naissance.
+
+134
+00:07:36,121 --> 00:07:40,621
+Donc ici, je déclare une variable
+adresse_quidam qui est de type
+
+135
+00:07:40,621 --> 00:07:44,911
+unique_ptr sur Personne et
+je l'initialise au moyen du
+
+136
+00:07:44,911 --> 00:07:49,871
+unique_ptr retourné par l'appel
+à la fonction naissance.
+
+137
+00:07:50,899 --> 00:07:54,899
+Donc, on pourrait imaginer ici que l'on
+soit dans cette situation, donc
+
+138
+00:07:54,899 --> 00:07:56,269
+la variable bb
+
+139
+00:07:58,765 --> 00:08:04,785
+contient l'adresse d'une personne, de la
+personne dont le nom est Pierre,
+
+140
+00:08:04,785 --> 00:08:08,285
+et ici, on pourrait imaginer que en
+réalité ce qu'on a fait ici c'est une
+
+141
+00:08:08,285 --> 00:08:10,945
+copie de la valeur de bb
+
+142
+00:08:13,418 --> 00:08:18,088
+dans une autre variable de type
+unique_ptr qui s'appellerai
+
+143
+00:08:18,088 --> 00:08:19,248
+adresse_quidam.
+
+144
+00:08:20,685 --> 00:08:24,375
+Donc ceci peut être parfaitement pris pour
+une copie, mais en réalité ce qui
+
+145
+00:08:24,375 --> 00:08:28,375
+se passe c'est un déplacement,
+c'est-à-dire que ici la valeur qui était
+
+146
+00:08:28,375 --> 00:08:34,475
+dans bb est déplacée vers la nouvelle
+variable, adresse_quidam,
+
+147
+00:08:35,631 --> 00:08:38,791
+et donc la variable bb n'est plus
+utilisable en soi telle qu'elle est,
+
+148
+00:08:38,791 --> 00:08:42,791
+ce qui veut dire que l'on a toujours
+qu'un seul objet pointant
+
+149
+00:08:44,076 --> 00:08:50,106
+vers l'objet personne, et donc on n'a
+pas cassé le fait qu'un unique_ptr
+
+150
+00:08:50,106 --> 00:08:51,896
+pointe vers un objet unique.
+
+151
+00:08:51,896 --> 00:08:57,056
+Donc ici, on a implicitement utilisé ce
+qu'on appelle en C++11 la move semantic.
+
+152
+00:08:57,056 --> 00:09:00,616
+Ce qui se passe dans ce contexte précis
+n'est pas une copie, mais c'est
+
+153
+00:09:00,616 --> 00:09:01,656
+un déplacement.
+
+154
+00:09:04,084 --> 00:09:08,084
+C++11 sait en effet que à ce stade-là
+nous utilisons un déplacement
+
+155
+00:09:08,084 --> 00:09:13,154
+et non pas une copie de par le fait que ce
+que nous affectons à l'objet de type
+
+156
+00:09:13,154 --> 00:09:18,864
+unique_ptr est en réalité une donnée
+transitoire issue d'un appel de fonction.
+
+157
+00:09:18,864 --> 00:09:22,864
+C'est cette donnée transitoire issue de
+cet appel de fonction qui est affectée
+
+158
+00:09:22,864 --> 00:09:27,614
+au unique_ptr, et dans ce cas-ci, et bien,
+on sait que il y a un déplacement
+
+159
+00:09:27,614 --> 00:09:29,964
+qui a été mis en oeuvre et
+non pas une copie.
+
+160
+00:09:32,512 --> 00:09:35,712
+Donc, les unique_ptr sont des pointeurs
+intelligents, ce qui veut dire que la
+
+161
+00:09:35,712 --> 00:09:39,362
+mémoire qui y est associée est restituée
+automatiquement, on n'a pas besoin
+
+162
+00:09:39,362 --> 00:09:40,632
+de s'en préoccuper.
+
+163
+00:09:40,632 --> 00:09:44,632
+Si par contre, on voulait libérer cette
+mémoire de façon explicite,
+
+164
+00:09:44,632 --> 00:09:47,972
+c'est aussi possible de le faire, et donc
+de faire le delete nous-même,
+
+165
+00:09:47,972 --> 00:09:52,472
+et donc à ce moment-là, on utilise une
+fonctionnalité spécifique à ces pointeurs,
+
+166
+00:09:52,472 --> 00:09:54,182
+la fonctionnalité reset.
+
+167
+00:09:54,182 --> 00:09:57,862
+Et donc à ce moment-là, nous faisons
+l'appel ptr.reset() qui aura
+
+168
+00:09:57,862 --> 00:10:02,072
+pour conséquence de libérer la mémoire
+associée à ce pointeur et
+
+169
+00:10:02,072 --> 00:10:06,072
+d'affecter la valeur nullptr au
+pointeur intelligent ptr.
+
+170
+00:10:06,659 --> 00:10:10,489
+Les unique_ptr sont très sécurisés, nous
+venons de voir qu'ils garantissent que
+
+171
+00:10:10,489 --> 00:10:14,659
+chaque pointeur pointe de façon unique sur
+une zone mémoire et donc, ça
+
+172
+00:10:14,659 --> 00:10:17,779
+implique une utilisation très sûre et
+donc, leur usage est recommandé dans
+
+173
+00:10:17,779 --> 00:10:19,789
+toutes les situations où on peut le faire.
+
+174
+00:10:19,789 --> 00:10:22,749
+Mais par contre, il est clair qu'ils ne
+vont pas couvrir tous les besoins,
+
+175
+00:10:22,749 --> 00:10:26,649
+et dans certains cas, il est absolument
+inévitable de garantir que deux
+
+176
+00:10:26,649 --> 00:10:30,649
+portions de code différentes pointent,
+utilisent la même zone mémoire.
+
+177
+00:10:30,649 --> 00:10:34,359
+Et donc à ce moment-là, il faudra avoir
+recours à d'autres types de pointeurs
+
+178
+00:10:34,359 --> 00:10:36,499
+intelligents, comme les shared_ptr
+par exemple.
+
+179
+00:10:36,499 --> 00:10:44,429
+Donc un shared_ptr est tel que il peut
+être utilisé pour pointer sur la même
+
+180
+00:10:44,429 --> 00:10:45,509
+zone mémoire.
+
+181
+00:10:45,509 --> 00:10:48,679
+Donc ici on peut avoir, on peut
+imaginer la situation où on a
+
+182
+00:10:49,789 --> 00:10:53,169
+une portion de code code1  et une portion
+de code code2 et toutes les deux
+
+183
+00:10:53,169 --> 00:10:56,819
+en fait pointent par le biais d'un
+pointeur de type shared_ptr sur la même
+
+184
+00:10:56,819 --> 00:10:59,259
+zone dynamiquement allouée,
+qui sera celle-ci.
+
+185
+00:11:00,913 --> 00:11:04,913
+Techniquement, pour qu'il puisse y
+avoir restitution automatique d'une zone
+
+186
+00:11:04,913 --> 00:11:08,913
+mémoire référencée par des shared_ptr,
+il faut donc qu'il y est une comptabilité
+
+187
+00:11:08,913 --> 00:11:13,553
+des différentes zones, portions de code,
+qui référencent cet emplacement mémoire.
+
+188
+00:11:13,553 --> 00:11:16,413
+Donc, on ne peut désallouer
+automatiquement cet emplacement que
+
+189
+00:11:16,413 --> 00:11:18,203
+lorsque plus personne ne l'utilise.
+
+190
+00:11:18,203 --> 00:11:21,743
+Et il peut y avoir des situations de
+dépendance cyclique qui fait que l'on
+
+191
+00:11:21,743 --> 00:11:26,343
+n'arrive plus à restituer proprement la
+mémoire en utilisant des shared_ptr.
+
+192
+00:11:26,343 --> 00:11:30,343
+À ce moment-là, en combinaison, il va
+falloir utiliser des weak_ptr qui vont
+
+193
+00:11:30,343 --> 00:11:34,343
+permettre de casser les cycles
+éventuellement induits par les shared_ptr.
+
+194
+00:11:35,448 --> 00:11:39,848
+Donc ceci est évidemment très avancé
+par rapport au contenu du cours.
+
+195
+00:11:40,094 --> 00:11:43,874
+Le message essentiel et que je souhaitais
+faire passer est l'existence de ce genre
+
+196
+00:11:43,874 --> 00:11:46,924
+d'outils sans entrer en profondeur
+dans leur utilisation.
+
+197
+00:11:46,924 --> 00:11:50,924
+Ce qu'il faut retenir essentiellement,
+c'est que si l'on veut utiliser, dans
+
+198
+00:11:50,924 --> 00:11:54,924
+un cadre simple, des pointeurs et que
+l'on n'a pas besoin de faire en sorte
+
+199
+00:11:54,924 --> 00:11:58,454
+que plusieurs pointeurs référencent le
+même emplacement mémoire,
+
+200
+00:11:58,454 --> 00:12:03,944
+la solution à privilégier absolument est
+celle des unique_ptr, qui est sécurisée,
+
+201
+00:12:03,944 --> 00:12:06,964
+qui ne pose pas de complications
+induites par les autres types
+
+202
+00:12:06,964 --> 00:12:08,354
+de pointeurs intelligents.
+
+203
+00:12:09,961 --> 00:12:13,171
+Les pointeurs sont un vaste sujet, il y
+aurait encore beaucoup de choses à dire,
+
+204
+00:12:13,171 --> 00:12:15,011
+en particulier sur les
+pointeurs intelligents.
+
+205
+00:12:15,011 --> 00:12:17,821
+Nous n'avons fait que les présenter
+brièvement pour que vous sachiez
+
+206
+00:12:17,821 --> 00:12:18,851
+que ça existe.
+
+207
+00:12:18,851 --> 00:12:21,661
+Pour l'essentiel, nous nous sommes
+attardés à bien comprendre
+
+208
+00:12:21,661 --> 00:12:24,471
+ce qu'était un pointeur classique
+« à la C », que vous aurez l'occasion
+
+209
+00:12:24,471 --> 00:12:27,341
+de très souvent rencontrer
+encore dans la littérature.

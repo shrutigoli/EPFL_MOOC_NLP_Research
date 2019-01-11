@@ -1,0 +1,132 @@
+Hello!
+We continue the course
+"Understanding Micro-Controllers".
+And today, we'll talk of drawing resistances.
+What is that odd word?
+Maybe you already know them under the name
+Pull up resistor.
+We will recall the principle and the usefulness of these pulling resistors.
+We will then speak in more detail pull up resistors which are integrated in a large number of microcontrollers.
+Then, we will look in more details how it is implemented on the AVR and on the MSP430.
+Once is not a custom, we will begin this lesson with a quiz.
+You have this diagram.
+It is very simple.
+It seems to you perhaps a little odd since this leg is connected to nothing at all.
+It's in the air.
+Here, we simply have an LED as we're used to using them.
+The program therefore corresponds in its set-up part but the red LED in output, we are accustomed to this syntax.
+In the main loop, we have a variable which is the value which is read on the digitalRead on the entry and underlined 3 and this same value val is copied with a digital Read on the light emitting diode.
+So we have a program that constantly copies the input to the output.
+So my question: with this setup and this program, what will we see on the LED?
+Do you think it will remain off ?
+Do you think it will, for example, be turned on?
+Do you think it will rather be flashing or that it's condition will fluctuate?
+And if for once we let the material answer us?
+Watch this short video.
+So you notice the small wire that is connected on the input P1.3.
+You notice that to a certain number of things, the light diode changes.
+We feel there are movements.
+These movements are seen to be made by one hand.
+See here my finger.
+It approaches but does not touch this small wire and you see that the output changes at a certain time.
+Let's try to understand what happened.
+We're using microcontrollers which use C-MOS technology.
+And the C-MOS have high-impedance inputs.
+And therefore, an unconnected input captures all kinds of parasites, any kind of electromagnetic influences, any kind of static charges, even very small ones
+Which will make it change state in a way that seems a bit random.
+It is therefore not possible to leave an unconnected input.
+It is essential to avoid these entries in the air.
+What solution can be proposed to solve this problem?
+What we are seeking is to diminish the impedance of the system and a resistor which must be linked to one of the power supplies will ensure a known potential at the moment when the entrance is in the air.
+Then, 2 diagrams are possible since there are 2 feeds.
+The solution with the pull-up in English pull-up and it can be seen that the resistor is connected to the positive power supply.
+And the solution with the pull down, pull-down in English.
+It can be seen that the resistor is connected towards the 0 volt towards the ground.
+In both cases, between a supply point and the entrance of our system, we have a resistance which avoids this problem of high input impedance of our micro-controllers.
+In fact, this technique is well known to electronics technicians. and it remains for us to ask ourselves the question is there between these 2 pull-up and pull-down solutions one that is preferable to the other?
+So, right away, I will tell you that the one that is most used and by far, is the pull-up.
+How can I justify the fact that we should use a pull-up rather than a pull-down?
+Consider the simple case of an end-of-travel switch which is going to be at a certain physical distance of the electronic board containing the micro-controller.
+We thus have: a push button and this push-button must be connected to our electronic card with in this case a connection to the input and an earth connection.
+In the other case, we always have our push button.
+We always have a connection towards the entrance.
+And this time, the second connection must be towards the most.
+Admitting that this cable or that this cable are relatively long cables and that they move along the frame of our machine, which solution will we prefer?
+Transfer the signal and the positive voltage or on the contrary transfer the signal and the negative voltage, that is, the earth.
+And we prefer this solution since generally the earth is actually connected to the machine frame and electronic technicians have the habit of using this pattern.
+Moreover, a number of microcontrollers offer built-in pull-up resistors whereas they are more rare those that offer both a pull-up resistor or a pull-down resistance.
+Indeed, many manufacturers incorporate draft resistances directly in micro-controllers.
+The value of this resistance is generally about 50 kOhm.
+So we see here on this diagram that the resistance is not placed here on the outside but is placed inside.
+Of course, it must not be permanently connected and it will be necessary to find a mechanism to engage or trigger this pull resistance.
+Unfortunately, there is not a single method to engage these pull resistors.
+Each manufacturer proposes a technique.
+I will take the example for AVR processors of the company Atmail.
+I think you remember this table.
+We talked about it when we talked about inputs and outputs.
+You recall that
+In the Dir register for each leg, the respective bit is used either to have an entry when it is at 0, either to have an output when it is at 1.
+In this case, it is the OUT register which allows the output to be set to 0 and set the output to 1.
+On the other hand, it should be noted that these two lines are the same and whether the OUT is 0 or 1, when the Dir is 0 does not really matter.
+And some manufacturers have just had the idea to distinguish these two cases by saying in the case where DDR is at 0, if PORT is at 0, then this is a normal input with high impedance.
+On the other hand, if PORT is 1, always with DDR which is at 0, then, we move to an entry with pull-up.
+To make it extremely easy to trigger the input, it will suffice to activate the corresponding bit of the port as long as we have the DDR (INAUDIBLE) at  0.
+I remind you that on the Atmail, the direction PORT is called DDR and the output PORT is simply called PORT so we would have for example
+D-D-R B if it is PORT B and then PORT B correspondent
+I could have shown you the internal diagram of the AVRs.
+It is very complicated but we still recognize it here this pull resistance.
+It is seen that it is operated by a transistor and connected at most.
+So we have a pull-up resistance which can be interlocked.
+Here, we have an inverter that matches to the inversion of this transistor.
+Here, then, we have a logical function, a door (INAUDIBLE).
+To get a 1 here and therefore the transistor conducts and the resistor is active, we must have here the value 1 since there is no small circle.
+We must have here the value 0 where there must be a small circle.
+This value 1 here corresponds to PORT.
+This value 0 here corresponds to the DDR.
+So we are well in the logic I have just explained.
+When DDR the corresponding bit is 0 and that the PORT bit corresponding is at 1, these two conditions, we have  (INAUDIBLE)triggers the intrlocking of our resistance of pull-up.
+Another micro-controller, a different way to manage the resistors.
+The MSP430, offers pull-up and pull-down on each leg.
+It's new.
+It is interesting in some cases.
+It is true that we use much more often the pull-up as the pull-down but there are certainly applications interesting for the pull-down.
+In this case, an additional register, a special register was used.
+It has the particular name of REN which means
+Resistor Enable.
+So, interlocking of the resistance.
+And when we decided to interlock the resistor, we choose if it is a pull-up or a pull-down with the value of OUT.
+So I remind you in this table, when Dir is at 0,
+We always have an entrance.
+When Dir is at 1, we always have an output.
+When it is an output, it can be at 0 or at 1 according to the OUT, nothing has changed.
+However, the input is at high impedance and in the normal state when the OUT is 0 and that the REN is also at 0, on the other hand, one or the other of the resistors with the REN to 1.
+This will be a pull-up with the 1, a pull-down with the 0.
+I would caution you if values â€‹â€‹that are different of those cited in this sort of truth table that I have just drawn.
+Let's take an example .
+I did not mention the case where we would have a 1 on the Resistor Enable and a 1 on the Dir.
+And what will happen,
+I can not give you the answer.
+The answer can be found in the manufacturer's documentation.
+It will vary from one manufacturer to another of course
+But be extremely careful
+To use the modes that are provided by the manufacturer.
+Obviously, all this is described in the documents that the manufacturers give us and which describe with great precision but in a very large number of pages the exact operation of all parts of micro-controllers.
+Let's take an example .
+In fact, we have already seen this program but there were 2 lines which had not been very clearly explained.
+Let us first read the second.
+Here in the register REN,
+I will activate the bit 2 and bit 3.
+So I will interlock the resistors
+Now I decide by acting with a 7 bits also on bit 2 and on bit 3 to select pull-up type resistors.
+Can't the Arduino not solve our problem?
+In a certain sense yes since the primitive that the pinMode function we know does not only allow a leg in the OUTPUT
+Or a leg on the input.
+But I tell you today, it is also possible to set it to the mode
+INPUT_PULLUP, that is, an input with a return resistor upwards.
+Unfortunately, they did not anticipate the pull-down resistance.
+So, this line will work perfectly well on an AVR of Atmail, on an MSP430 with the environment (INAUDIBLE) but we can not use the pull-down which is yet physically available on an MSP430.
+And it's still interesting.
+This allows you to have a syntax that works on all micro-controllers which have resistors of recall at the top of the pull-up resistance.
+In summary we have just seen that the pull resistances are essential whenever a leg is likely to be in the air.
+We have also seen that many micro-controllers integrates these draw resistors within the integrated circuit.
+And we also noted that each manufacturer proposes its own implementation for these pull-up mechanisms and possibly pull-down.

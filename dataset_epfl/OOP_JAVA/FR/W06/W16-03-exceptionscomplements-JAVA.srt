@@ -1,0 +1,1644 @@
+1
+00:00:04,076 --> 00:00:06,382
+Nous abordons dans cette séquence
+plusieurs compléments
+
+2
+00:00:06,382 --> 00:00:07,868
+sur la gestion des exceptions.
+
+3
+00:00:07,868 --> 00:00:10,067
+Nous allons commencer par
+la notion de relancement,
+
+4
+00:00:10,067 --> 00:00:11,870
+comment traiter partiellement 
+une exception,
+
+5
+00:00:11,870 --> 00:00:13,207
+et la relancer plus loin,
+
+6
+00:00:13,207 --> 00:00:16,450
+nous allons également parler d'une
+règle particulière à respecter en Java,
+
+7
+00:00:16,450 --> 00:00:18,485
+la règle déclarée ou traitée,
+
+8
+00:00:18,485 --> 00:00:20,331
+et nous allons aussi voir 
+comment il est possible
+
+9
+00:00:20,331 --> 00:00:23,329
+de déclarer ses 
+propres classes d'exception.
+
+10
+00:00:23,329 --> 00:00:24,819
+Commençons par le relancement.
+
+11
+00:00:24,819 --> 00:00:27,379
+Vous vous rappelez sans doute 
+de notre petit exemple d'introduction,
+
+12
+00:00:27,379 --> 00:00:29,765
+dans cet exemple, nous avions la méthode
+
+13
+00:00:29,765 --> 00:00:32,730
+de plus bas niveau inverse
+qui lançait l'exception.
+
+14
+00:00:32,730 --> 00:00:36,181
+Cette exception lancée n'était pas 
+rattrapée par le niveau intermédiaire
+
+15
+00:00:36,181 --> 00:00:41,216
+qui consistait à afficher graphiquement 
+l'inverse des températures,
+
+16
+00:00:41,216 --> 00:00:44,337
+par contre on suggérait d'intercepter
+
+17
+00:00:44,337 --> 00:00:46,668
+l'exception lancée 
+dans le programme principal,
+
+18
+00:00:46,668 --> 00:00:48,777
+afin de la gérer à cet endroit là.
+
+19
+00:00:49,087 --> 00:00:51,822
+Si on décide de gérer l'exception
+à ce niveau du programme,
+
+20
+00:00:51,822 --> 00:00:53,966
+on saura si une exception est lancée,
+
+21
+00:00:53,966 --> 00:00:57,966
+que quelque chose d'anormal s'est produit
+lorsqu'on exécute graphique inverse.
+
+22
+00:00:57,966 --> 00:01:00,966
+On aura cependant peu d'informations
+sur les conditions exactes
+
+23
+00:01:00,966 --> 00:01:03,173
+d'occurrence de cette situation anormale.
+
+24
+00:01:03,173 --> 00:01:05,566
+Par exemple, on pourrait aimer savoir
+
+25
+00:01:05,566 --> 00:01:08,533
+quelle est la position du tableau 
+contenant une valeur
+
+26
+00:01:08,533 --> 00:01:10,948
+qui a conduit à cette situation là.
+
+27
+00:01:10,948 --> 00:01:14,301
+La partie du programme qui sait 
+à quel endroit du tableau
+
+28
+00:01:14,301 --> 00:01:17,009
+a été déclenchée l'exception 
+est en fait cette partie.
+
+29
+00:01:17,009 --> 00:01:19,946
+Il pourrait être intéressant 
+de faire en sorte que cette partie
+
+30
+00:01:19,946 --> 00:01:22,638
+indique au reste du programme 
+qu'il y a eu un problème
+
+31
+00:01:22,638 --> 00:01:24,531
+à telle position du tableau.
+
+32
+00:01:25,026 --> 00:01:29,252
+Cette méthode pourrait donc intercepter 
+l'exception lancée pour la traiter ici
+
+33
+00:01:29,252 --> 00:01:30,979
+en indiquant au reste du programme
+
+34
+00:01:30,979 --> 00:01:32,690
+à quel indice s'est produit le problème.
+
+35
+00:01:32,690 --> 00:01:41,896
+Par exemple, on pourrait imaginer 
+d'essayer d'intercepter l'exception ici,
+
+36
+00:01:47,598 --> 00:01:49,653
+cette méthode ne connait pas
+exactement le contexte
+
+37
+00:01:49,653 --> 00:01:50,969
+dans lequel elle est invoquée.
+
+38
+00:01:50,969 --> 00:01:54,248
+Elle ne peut donc pas prendre 
+de décisions par rapport au tableau,
+
+39
+00:01:54,248 --> 00:01:55,780
+elle ne peut pas faire des traitements,
+
+40
+00:01:55,780 --> 00:01:58,044
+tels qu'ils se font 
+dans le programme principal,
+
+41
+00:01:58,044 --> 00:02:01,197
+où on pourrait décider d'acquérir 
+à nouveau toutes les températures,
+
+42
+00:02:01,197 --> 00:02:03,476
+parce que les premières 
+étaient erronées par exemple.
+
+43
+00:02:04,756 --> 00:02:06,331
+La seule chose que 
+peut faire cette méthode
+
+44
+00:02:06,331 --> 00:02:08,182
+est en fait d'informer 
+le reste du programme
+
+45
+00:02:08,182 --> 00:02:10,570
+de l'indice auquel 
+s'est produit le problème,
+
+46
+00:02:10,570 --> 00:02:13,460
+et de relancer l'exception 
+à un niveau plus élevé,
+
+47
+00:02:13,460 --> 00:02:17,284
+plus informé de comment résoudre
+exactement cette situation anormale.
+
+48
+00:02:17,284 --> 00:02:20,226
+La méthode graphique inverse 
+pourrait donc à son tour
+
+49
+00:02:20,226 --> 00:02:26,823
+lancer une exception, 
+pour indiquer au reste du programme
+
+50
+00:02:29,059 --> 00:02:31,394
+à quel indice s'est produit le problème,
+
+51
+00:02:32,943 --> 00:02:34,241
+par exemple comme ceci,
+
+52
+00:02:34,241 --> 00:02:36,689
+je déborde un peu de mon cadre
+mais ce n'est pas trop grave,
+
+53
+00:02:37,324 --> 00:02:40,578
+et il faut pour ceci bien sûr 
+que l'indice soit géré,
+
+54
+00:02:44,472 --> 00:02:47,482
+ce qu'on peut imaginer 
+de faire comme ceci par exemple.
+
+55
+00:02:50,050 --> 00:02:54,140
+Désormais si une exception est lancée
+lors de l'exécution de cette boucle,
+
+56
+00:02:54,140 --> 00:02:58,164
+le programme principal va l'intercepter
+en recevant un message
+
+57
+00:02:58,164 --> 00:03:00,838
+qui peut potentiellement 
+l'informer de l'indice
+
+58
+00:03:00,838 --> 00:03:03,221
+auquel s'est produit le problème.
+
+59
+00:03:03,737 --> 00:03:06,463
+Une partie intermédiaire 
+du programme a donc ici choisi
+
+60
+00:03:06,463 --> 00:03:10,184
+de relancer une exception, 
+un peu plus informée que la précédente,
+
+61
+00:03:10,184 --> 00:03:12,776
+pour que une partie 
+plus informée du programme
+
+62
+00:03:12,776 --> 00:03:14,399
+puisse en faire bon usage
+
+63
+00:03:15,035 --> 00:03:18,819
+On a donc traité ici l'exception d'origine
+de façon partielle.
+
+64
+00:03:19,821 --> 00:03:21,891
+Comme nous venons donc 
+de le voir sur cet exemple,
+
+65
+00:03:21,891 --> 00:03:24,305
+une exception peut être 
+partiellement traitée
+
+66
+00:03:24,305 --> 00:03:27,507
+à un niveau intermédiaire du programme,
+par un bloc catch dédié
+
+67
+00:03:27,507 --> 00:03:29,746
+et attendre un traitement 
+plus complet ultérieur,
+
+68
+00:03:29,746 --> 00:03:33,043
+pour cela il faut au niveau intermédiaire
+relancer l'exception,
+
+69
+00:03:33,043 --> 00:03:34,949
+la même ou une nouvelle plus informée,
+
+70
+00:03:34,949 --> 00:03:37,865
+il faut bien sûr pour cela 
+que le niveau supérieur
+
+71
+00:03:37,865 --> 00:03:40,627
+soit équipé de bloc 
+<i>try</i> et <i>catch</i> correspondant,
+
+72
+00:03:40,627 --> 00:03:44,876
+capable d'intercepter et de traiter 
+proprement l'exception relancée.
+
+73
+00:03:45,652 --> 00:03:48,622
+L'idée est donc qu'à un niveau
+intermédiaire du programme,
+
+74
+00:03:48,622 --> 00:03:51,547
+on intercepte l'exception lancée 
+d'un niveau plus bas,
+
+75
+00:03:51,547 --> 00:03:53,965
+on peut la traiter partiellement, 
+et puis se dire
+
+76
+00:03:53,965 --> 00:03:56,897
+qu'on n'est pas suffisamment informé
+pour la traiter complètement,
+
+77
+00:03:56,897 --> 00:04:00,019
+donc relancer l'exception,
+soit la même qu'on a reçue,
+
+78
+00:04:00,019 --> 00:04:03,430
+soit une nouvelle avec un autre message
+ou un autre contenu.
+
+79
+00:04:03,908 --> 00:04:06,545
+Vous savez maintenant 
+qu'une exception peut être interceptée
+
+80
+00:04:06,545 --> 00:04:09,586
+à un niveau intermédiaire du programme
+pour être traitée partiellement,
+
+81
+00:04:09,586 --> 00:04:11,389
+puis relancée à un niveau supérieur,
+
+82
+00:04:11,389 --> 00:04:13,930
+mieux informé du contexte de l'erreur.
+
+83
+00:04:13,930 --> 00:04:15,980
+Nous allons maintenant 
+aborder un autre sujet,
+
+84
+00:04:15,980 --> 00:04:19,024
+la règle déclarée ou traitée,
+qui est spécifique à Java.
+
+85
+00:04:19,531 --> 00:04:22,494
+Lorsqu'une méthode lance une exception
+et qu'elle en délègue la gestion
+
+86
+00:04:22,494 --> 00:04:24,103
+à un niveau supérieur du programme,
+
+87
+00:04:24,103 --> 00:04:26,005
+c'est-à-dire qu'elle
+ne la traite pas localement,
+
+88
+00:04:26,005 --> 00:04:30,212
+elle doit en général informer qu'elle
+lance une exception potentiellement.
+
+89
+00:04:30,817 --> 00:04:33,192
+Ainsi, celui qui utilise cette méthode
+à un niveau supérieur,
+
+90
+00:04:33,192 --> 00:04:34,723
+sait qu'elle peut lancer l'exception,
+
+91
+00:04:34,723 --> 00:04:38,271
+et donc s'apprête lui-même
+à pouvoir gérer cette exception,
+
+92
+00:04:38,271 --> 00:04:40,331
+ou la relancer à un niveau supérieur.
+
+93
+00:04:40,851 --> 00:04:43,616
+Pour qu'une méthode déclare 
+qu'elle peut lancer potentiellement
+
+94
+00:04:43,616 --> 00:04:45,205
+une ou plusieurs exceptions,
+
+95
+00:04:45,205 --> 00:04:48,943
+on doit utiliser une syntaxe particulière,
+après l'entête de la méthode,
+
+96
+00:04:48,943 --> 00:04:51,289
+indiqué par le mot réservé <i>throws</i>,
+
+97
+00:04:51,289 --> 00:04:54,528
+la liste des exceptions qui peuvent 
+être lancées par la méthode,
+
+98
+00:04:54,528 --> 00:04:56,129
+séparées par des virgules.
+
+99
+00:04:56,784 --> 00:05:00,231
+Par exemple ici, la méthode inverse 
+lance une exception,
+
+100
+00:05:00,231 --> 00:05:02,003
+lorsqu'il y a une division par 0,
+
+101
+00:05:02,003 --> 00:05:04,477
+elle ne traite pas
+cette exception localement,
+
+102
+00:05:04,477 --> 00:05:06,084
+il n'y a pas de bloc <i>try</i> et <i>catch</i>
+
+103
+00:05:06,084 --> 00:05:09,294
+à l'intérieur de la méthode inverse 
+qui capterait cette exception là,
+
+104
+00:05:09,294 --> 00:05:13,649
+elle doit donc signaler 
+au reste du programme,
+
+105
+00:05:13,649 --> 00:05:16,124
+à qui elle délègue 
+la gestion de cette exception
+
+106
+00:05:16,124 --> 00:05:17,947
+qu'elle lance ce type d'exception.
+
+107
+00:05:18,327 --> 00:05:20,583
+Ceci se fait au moyen
+du mot réservé <i>throws</i>
+
+108
+00:05:20,583 --> 00:05:24,186
+suivi de la liste des exceptions
+lancées par la méthode.
+
+109
+00:05:24,699 --> 00:05:27,122
+En Java, il faut appliquer 
+une règle particulière,
+
+110
+00:05:27,122 --> 00:05:31,473
+toute exception qui n'est pas
+<i>RunTimeEcxeption</i> ni une <i>Error</i>,
+
+111
+00:05:31,473 --> 00:05:35,730
+doit impérativement respecter 
+la règle "déclarer ou traiter".
+
+112
+00:05:35,730 --> 00:05:38,998
+Ce qui veut dire concrètement 
+que ces expressions doivent
+
+113
+00:05:38,998 --> 00:05:42,802
+soit être directement interceptées 
+dans la méthode où elles sont lancées,
+
+114
+00:05:42,802 --> 00:05:44,829
+ce qui est possible 
+dans certaines situations,
+
+115
+00:05:44,829 --> 00:05:46,942
+soit être déclarées par la méthode,
+
+116
+00:05:46,942 --> 00:05:49,198
+pour indiquer au reste du monde 
+que la méthode délègue
+
+117
+00:05:49,198 --> 00:05:51,947
+la gestion de cette exception 
+au reste du programme.
+
+118
+00:05:52,590 --> 00:05:54,881
+En java donc, si une exception n'est pas
+
+119
+00:05:54,881 --> 00:05:57,202
+de type <i>RunTimeException</i> ou <i>Error</i>,
+
+120
+00:05:57,202 --> 00:06:00,635
+alors si elle n'est pas interceptée
+dans la méthode où elle est lancée,
+
+121
+00:06:00,635 --> 00:06:02,512
+et si elle n'est pas déclarée
+par la méthode,
+
+122
+00:06:02,512 --> 00:06:05,067
+le compilateur va émettre 
+un message d'erreur.
+
+123
+00:06:06,017 --> 00:06:08,826
+On parle dans ce cas 
+de <i>Checked exceptions</i>,
+
+124
+00:06:08,826 --> 00:06:11,396
+les exceptions contrôlées 
+par le compilateur,
+
+125
+00:06:11,396 --> 00:06:13,806
+par opposition aux <i>Unchecked</i>,
+
+126
+00:06:18,655 --> 00:06:22,506
+pour lequel le compilateur ne va pas 
+imposer qu'il y ait forcément
+
+127
+00:06:22,506 --> 00:06:26,078
+un traitement ou une indication 
+qu'une telle exception est lancée.
+
+128
+00:06:26,862 --> 00:06:29,724
+Ces contrôles faits par le compilateur
+ont pour objectif
+
+129
+00:06:29,724 --> 00:06:31,644
+de forcer la gestion des exceptions.
+
+130
+00:06:31,644 --> 00:06:34,256
+Le compilateur ne veut
+cependant pas vous forcer
+
+131
+00:06:34,256 --> 00:06:37,685
+à gérer les exceptions de type
+<i>RunTime</i> ou <i>Error</i>,
+
+132
+00:06:37,685 --> 00:06:40,224
+<i>Error</i> correspond en effet à des situations
+
+133
+00:06:40,224 --> 00:06:42,811
+que le programmeur n'est pas 
+en mesure de gérer lui-même,
+
+134
+00:06:42,811 --> 00:06:45,712
+par exemple, plus suffisamment, 
+de mémoire sur la machine
+
+135
+00:06:45,712 --> 00:06:47,840
+sur laquelle s'exécute le programme,
+
+136
+00:06:47,840 --> 00:06:50,054
+il n'y aurait donc pas de sens 
+à ce que le compilateur
+
+137
+00:06:50,054 --> 00:06:52,920
+force le programmeur à traiter
+ce genre d'exceptions.
+
+138
+00:06:52,920 --> 00:06:56,056
+De leur côté, les <i>RunTimeExceptions</i>
+correspondent très souvent
+
+139
+00:06:56,056 --> 00:06:58,513
+à des situations qui pourraient 
+être résolues plus proprement
+
+140
+00:06:58,513 --> 00:07:00,170
+par une meilleur programmation.
+
+141
+00:07:00,170 --> 00:07:03,240
+Par exemple, lorsque l'on sort 
+des indices possibles pour un tableau,
+
+142
+00:07:03,240 --> 00:07:05,030
+ou lorsqu'on fait une division par 0,
+
+143
+00:07:05,030 --> 00:07:07,621
+alors ça peut être des situations
+qui peuvent être résolues
+
+144
+00:07:07,621 --> 00:07:09,023
+par une meilleure programmation,
+
+145
+00:07:09,023 --> 00:07:10,633
+mais ça peut aussi être des situations
+
+146
+00:07:10,633 --> 00:07:13,672
+que l'on veut pouvoir gérer
+par le biais des exceptions.
+
+147
+00:07:13,672 --> 00:07:17,379
+Les problèmes qui pourraient être résolus
+par une meilleure programmation
+
+148
+00:07:17,379 --> 00:07:19,194
+devraient l'être par ce biais là,
+
+149
+00:07:19,194 --> 00:07:21,014
+et non par par le biais 
+de gestion d'exception,
+
+150
+00:07:21,014 --> 00:07:23,375
+et c'est pourquoi le compilateur
+ne vous force pas
+
+151
+00:07:23,375 --> 00:07:26,530
+à déclarer ou traiter 
+des <i>RunTimeExceptions</i> non plus.
+
+152
+00:07:27,050 --> 00:07:30,184
+Java offre une très large palette 
+de type d'exceptions possibles,
+
+153
+00:07:30,184 --> 00:07:33,268
+qu'il est recommandé d'utiliser
+en étant le plus informatif possible,
+
+154
+00:07:33,268 --> 00:07:36,704
+en utilisant le type d'exception qui cible
+au mieux le type de problème
+
+155
+00:07:36,704 --> 00:07:39,320
+que vous voulez cerner ou gérer 
+par le biais des exceptions.
+
+156
+00:07:39,320 --> 00:07:41,706
+Néanmoins, dans certaines situations,
+il est peut être utile
+
+157
+00:07:41,706 --> 00:07:44,058
+de définir soi-même 
+ses propres classes d'exceptions,
+
+158
+00:07:44,058 --> 00:07:46,821
+et c'est une possibilité qui est 
+offerte par le langage.
+
+159
+00:07:47,159 --> 00:07:49,017
+Pour définir ses propres 
+classes d'exception,
+
+160
+00:07:49,017 --> 00:07:51,780
+il suffit de les faire hériter
+soit de la classe exception,
+
+161
+00:07:51,780 --> 00:07:53,550
+ou de l'une de ces sous-classes.
+
+162
+00:07:53,550 --> 00:07:56,450
+Comme vous avez eu l'occasion de le voir 
+dans une séquence précédente,
+
+163
+00:07:56,450 --> 00:07:59,479
+la classe exception offre 
+une méthode getMessage,
+
+164
+00:07:59,479 --> 00:08:02,143
+qu'il est utile d'invoquer
+pour donner des informations
+
+165
+00:08:02,143 --> 00:08:03,799
+sur la nature de l'exception.
+
+166
+00:08:03,799 --> 00:08:05,728
+Le message retourné par getMessage
+
+167
+00:08:05,728 --> 00:08:09,424
+est initialisé par les constructeurs
+de la classe exception.
+
+168
+00:08:09,424 --> 00:08:12,516
+Pour que le message associé 
+à vos propres classes d'exception,
+
+169
+00:08:12,516 --> 00:08:16,002
+soit correctement initialisé, 
+il est donc recommandé qu'une
+
+170
+00:08:16,002 --> 00:08:18,780
+une classe d'exception personnalisée
+qui n'ait pas d'autre contenu,
+
+171
+00:08:18,780 --> 00:08:21,850
+contienne au minimum 
+les deux constructeurs suivants,
+
+172
+00:08:22,610 --> 00:08:26,857
+l'un par défaut qui initialisera
+le message avec une valeur par défaut,
+
+173
+00:08:26,857 --> 00:08:31,508
+et un autre qui prendra une chaîne 
+avec laquelle initialiser ce message.
+
+174
+00:08:32,338 --> 00:08:34,244
+Et ceci permettra donc de préserver
+
+175
+00:08:34,244 --> 00:08:36,606
+le comportement attendu de getMessage.
+
+176
+00:08:37,577 --> 00:08:39,333
+Alors bien évidemment, assez souvent,
+si l'on définit
+
+177
+00:08:39,333 --> 00:08:41,099
+des classes d'exception personnalisées,
+
+178
+00:08:41,099 --> 00:08:43,150
+c'est pour mettre davantage 
+de contenu à l'intérieur,
+
+179
+00:08:43,150 --> 00:08:44,777
+et on est tout à fait libre à ce niveau
+
+180
+00:08:44,777 --> 00:08:49,047
+d'ajouter autant de méthodes, d'attributs,
+qu'il semble souhaitable de le faire.
+
+181
+00:08:49,047 --> 00:08:52,497
+Par exemple, il pourrait être utile 
+de mettre à l'intérieur de la classe
+
+182
+00:08:52,497 --> 00:08:54,729
+des attributs qui indiquent 
+des codes d'erreurs,
+
+183
+00:08:54,729 --> 00:08:58,321
+ou bien certaines informations sur
+le contenu de détection de l'exception,
+
+184
+00:08:58,321 --> 00:08:59,423
+et ainsi de suite.
+
+185
+00:08:59,423 --> 00:09:01,200
+Voyons ceci sur un exemple concret.
+
+186
+00:09:01,200 --> 00:09:03,429
+Par exemple, imaginons
+que l'on souhaite créer
+
+187
+00:09:03,429 --> 00:09:05,852
+une classe d'exceptions 
+qui est capable de traiter
+
+188
+00:09:05,852 --> 00:09:08,415
+des situations anormales
+par rapport à des températures,
+
+189
+00:09:08,415 --> 00:09:10,347
+donc cette classe d'exceptions
+contiendrait une information
+
+190
+00:09:10,347 --> 00:09:13,522
+indiquant quelle température anormale
+a été relevée,
+
+191
+00:09:13,522 --> 00:09:16,498
+et donnerait des consignes 
+par rapport à cette température,
+
+192
+00:09:16,498 --> 00:09:18,257
+qu'est-ce qu'il faut faire concrètement
+
+193
+00:09:18,257 --> 00:09:20,810
+dans le cas de telle ou telle
+température anormale.
+
+194
+00:09:20,810 --> 00:09:22,920
+Vous noterez au passage 
+qu'il est de bon temps en Java
+
+195
+00:09:22,920 --> 00:09:25,127
+d'appeler ses propres 
+classes d'exceptions
+
+196
+00:09:25,127 --> 00:09:27,513
+en terminant leur nom
+par le terme <i>exceptions</i>.
+
+197
+00:09:27,513 --> 00:09:29,373
+Nous atteignons ici
+les limites de l'esthétique
+
+198
+00:09:29,373 --> 00:09:32,195
+quant au mélange anglais et français,
+mais nous allons vivre avec ça.
+
+199
+00:09:32,195 --> 00:09:35,037
+La classe peut alors comporter 
+tout contenu semblant utile
+
+200
+00:09:35,037 --> 00:09:38,036
+pour gérer ce type d'exceptions,
+et typiquement ici,
+
+201
+00:09:38,036 --> 00:09:41,534
+un constructeur capable d'initialiser
+la température relevée
+
+202
+00:09:41,534 --> 00:09:44,305
+et la consigne qui y est associée.
+
+203
+00:09:44,305 --> 00:09:46,514
+Ce constructeur devra bien évidemment
+
+204
+00:09:46,514 --> 00:09:48,643
+invoquer aussi le constructeur 
+de la super classe
+
+205
+00:09:48,643 --> 00:09:51,009
+pour initialiser le message associé.
+
+206
+00:09:51,009 --> 00:09:53,885
+Lequel pourrait tout à fait 
+aussi être un paramètre,
+
+207
+00:09:53,885 --> 00:09:57,311
+ici nous avons fait le choix de 
+lui attribuer une valeur par défaut.
+
+208
+00:09:57,311 --> 00:09:59,726
+Et l'on peut ajouter toute 
+autre méthode semblant utile,
+
+209
+00:09:59,726 --> 00:10:02,099
+ici, nous avons simplement fait le choix
+d'ajouter un guetteur
+
+210
+00:10:02,172 --> 00:10:04,296
+pour chacun des attributs,
+
+211
+00:10:04,296 --> 00:10:06,701
+donc un pour la température 
+et un pour la consigne.
+
+212
+00:10:07,316 --> 00:10:09,210
+Et ici, un exemple d'utilisation,
+
+213
+00:10:09,210 --> 00:10:11,666
+si par exemple, la température 
+atteint un seuil critique,
+
+214
+00:10:11,666 --> 00:10:13,965
+on peut imaginer de lancer une exception
+
+215
+00:10:13,965 --> 00:10:15,950
+du nouveau type qu'on a défini,
+
+216
+00:10:15,950 --> 00:10:19,391
+en l'initialisant avec la température 
+anormale relevée,
+
+217
+00:10:19,391 --> 00:10:21,874
+et une consigne particulière à adopter
+
+218
+00:10:21,874 --> 00:10:24,570
+lorsque cette température 
+a été rencontrée.
+
+219
+00:10:24,900 --> 00:10:27,347
+Donc le bloc qui va intercepter 
+cette exception
+
+220
+00:10:27,347 --> 00:10:30,806
+va pouvoir fournir un certain nombre 
+d'informations intéressantes
+
+221
+00:10:30,806 --> 00:10:32,626
+sur la nature de l'exception,
+
+222
+00:10:32,626 --> 00:10:36,329
+il va pouvoir indiquer la température 
+anormale qui a été relevée,
+
+223
+00:10:36,329 --> 00:10:38,564
+et il va pouvoir par exemple ici, 
+donner des consignes
+
+224
+00:10:38,564 --> 00:10:41,875
+sur ce qu'il faut faire par rapport
+à cette température là.
+
+225
+00:10:41,875 --> 00:10:44,410
+On peut ainsi imaginer donner 
+des messages plus informatifs,
+
+226
+00:10:44,410 --> 00:10:46,553
+comme par exemple ici, 
+nous avons relevé une température
+
+227
+00:10:46,553 --> 00:10:48,715
+trop importante de 150 degrés,
+
+228
+00:10:48,715 --> 00:10:52,100
+et la consigne dans ce cas, est d'aller 
+vérifier votre appareil de mesure.
+
+229
+00:10:52,100 --> 00:10:54,440
+Voilà, nous en avons terminé 
+avec les compléments
+
+230
+00:10:54,440 --> 00:10:57,603
+que nous souhaitions apporter 
+sur la gestion des exceptions en java.
+
+231
+00:10:57,603 --> 00:11:00,314
+Pour conclure sur ce volet, 
+nous allons simplement vous présenter
+
+232
+00:11:00,314 --> 00:11:03,624
+le petit exemple d'introduction, 
+mais cette fois, codé en java.
+
+233
+00:11:03,624 --> 00:11:06,381
+Alors il s'agit de notre programme 
+qui avait pour but
+
+234
+00:11:06,381 --> 00:11:09,515
+d'afficher l'inverse d'un certain nombre
+de températures mesurées,
+
+235
+00:11:09,515 --> 00:11:12,010
+commençons par l'écriture 
+du programme principal
+
+236
+00:11:12,010 --> 00:11:14,827
+tel qu'on pourrait l'imaginer en java.
+
+237
+00:11:14,827 --> 00:11:18,243
+Le programme principal va stocker
+un certain nombre de mesures
+
+238
+00:11:18,243 --> 00:11:20,376
+dans un tableau dynamique de doubles.
+
+239
+00:11:20,376 --> 00:11:24,071
+Ses températures sont acquises 
+aux travers d'une méthode,
+
+240
+00:11:24,071 --> 00:11:26,295
+qui va permettre
+le remplissage du tableau,
+
+241
+00:11:26,295 --> 00:11:29,481
+et nous voulons donc afficher
+l'inverse des températures
+
+242
+00:11:29,481 --> 00:11:31,470
+ainsi stockées dans le tableau.
+
+243
+00:11:31,759 --> 00:11:33,943
+Si le tableau de mesures
+contient des valeurs nulles,
+
+244
+00:11:33,943 --> 00:11:37,313
+l'affichage des températures inverses 
+va produire une erreur.
+
+245
+00:11:37,313 --> 00:11:39,245
+Nous souhaitons cependant 
+donner plusieurs chances
+
+246
+00:11:39,245 --> 00:11:40,931
+à l'utilisateur de ce programme,
+
+247
+00:11:40,931 --> 00:11:43,828
+et lui permettre de saisir 
+à nouveau son tableau de mesures
+
+248
+00:11:43,828 --> 00:11:47,285
+au cas où une situation anormale
+se serait présentée.
+
+249
+00:11:47,285 --> 00:11:50,261
+Nous lui accordons dans cet exemple
+deux essais au maximum,
+
+250
+00:11:50,261 --> 00:11:55,071
+pour tenter de saisir un tableau de mesure
+qui ne contient aucune valeur nulle.
+
+251
+00:11:55,071 --> 00:11:56,707
+L'idée est donc la suivante :
+
+252
+00:11:56,707 --> 00:11:59,688
+sachant que l'appel de 
+cette méthode peut résulter
+
+253
+00:11:59,688 --> 00:12:01,545
+dans le déclenchement d'une exception,
+
+254
+00:12:01,545 --> 00:12:05,423
+nous allons indiquer que cette instruction
+est un bloc réceptif aux erreurs,
+
+255
+00:12:05,423 --> 00:12:08,311
+donc l'encadrer par un bloc <i>try</i>,
+
+256
+00:12:08,311 --> 00:12:10,746
+si le tableau de mesures 
+contient une mesure nulle,
+
+257
+00:12:10,746 --> 00:12:14,344
+l'exécution de cette méthode 
+va lancer une exception,
+
+258
+00:12:14,344 --> 00:12:18,123
+on suppose ici que c'est une exception 
+de type <i>ArithmeticException</i>,
+
+259
+00:12:18,123 --> 00:12:21,068
+laquelle sera rattrapée 
+par un bloc catch correspondant.
+
+260
+00:12:21,390 --> 00:12:23,866
+Si nous n'avons pas encore atteint
+le nombre d'essai maximal,
+
+261
+00:12:23,866 --> 00:12:26,961
+on va simplement signifier à l'utilisateur
+qu'il doit ressaisir des valeurs,
+
+262
+00:12:26,961 --> 00:12:28,782
+sinon, par un autre message,
+
+263
+00:12:28,782 --> 00:12:31,324
+nous lui indiquons qu'il y a eu 
+suffisamment d'essais
+
+264
+00:12:31,324 --> 00:12:34,003
+et qu'il y a donc abandon 
+de l'acquisition des mesures.
+
+265
+00:12:34,323 --> 00:12:37,518
+Lorsque nous terminons 
+l'exécution de ce bloc catch,
+
+266
+00:12:37,518 --> 00:12:39,655
+l'exécution se poursuit en séquence,
+
+267
+00:12:39,655 --> 00:12:43,045
+l'exécution va tomber sur l'évaluation
+
+268
+00:12:43,045 --> 00:12:45,267
+de la condition de continuation du <i>while</i>.
+
+269
+00:12:45,267 --> 00:12:47,152
+Le <i>while</i> continuera à s'exécuter
+
+270
+00:12:47,152 --> 00:12:49,533
+si le nombre d'essais 
+n'est pas encore atteint.
+
+271
+00:12:49,533 --> 00:12:52,185
+Ceci va donc permettre de ressaisir
+le tableau de mesures,
+
+272
+00:12:52,185 --> 00:12:55,703
+tant que le nombre maximal d'essais
+n'est pas atteint.
+
+273
+00:12:55,703 --> 00:12:58,680
+La méthode en charge d'afficher
+les inverses de températures
+
+274
+00:12:58,680 --> 00:13:01,762
+va donc prendre un tableau
+de température en paramètres,
+
+275
+00:13:01,762 --> 00:13:05,045
+elle va itérer sur chacune
+des entrées de ce tableau,
+
+276
+00:13:05,045 --> 00:13:07,430
+et afficher pour chaque entrée i,
+
+277
+00:13:07,430 --> 00:13:11,190
+l'inverse de la température 
+stockée à la position i.
+
+278
+00:13:11,190 --> 00:13:13,722
+Comme le calcul de l'inverse 
+peut lancer une exception,
+
+279
+00:13:13,722 --> 00:13:16,116
+que nous supposons ici, 
+de type <i>ArithmecticException</i>,
+
+280
+00:13:16,116 --> 00:13:18,256
+nous prenons le soin d'indiquer 
+que cette instruction
+
+281
+00:13:18,256 --> 00:13:22,646
+est un bloc réceptif aux erreurs, 
+donc entouré par un bloc <i>try</i>.
+
+282
+00:13:23,126 --> 00:13:25,366
+Ceci permettra de signaler que le problème
+
+283
+00:13:25,366 --> 00:13:28,044
+s'est produit au niveau de l'indice i.
+
+284
+00:13:28,044 --> 00:13:29,935
+Comme nous ne savons pas 
+complètement résoudre
+
+285
+00:13:29,935 --> 00:13:32,832
+le problème à ce niveau là, 
+nous relançons l'exception,
+
+286
+00:13:32,832 --> 00:13:36,935
+et ici, nous relançons exactement
+l'exception déjà reçue.
+
+287
+00:13:36,935 --> 00:13:39,092
+On aurait pu en créer une autre.
+
+288
+00:13:39,366 --> 00:13:41,328
+Vous aurez peut-être remarqué au passage
+
+289
+00:13:41,328 --> 00:13:45,388
+que nous avons déclaré l'exception
+potentiellement lancée
+
+290
+00:13:45,388 --> 00:13:47,620
+dans <i>plotTempInverse</i>,
+
+291
+00:13:47,620 --> 00:13:49,256
+était-ce nécessaire ici ?
+
+292
+00:13:49,256 --> 00:13:53,324
+Alors en effet, il n'est pas nécessaire 
+de déclarer l'exception lancée ici.
+
+293
+00:13:53,324 --> 00:13:55,246
+Pourquoi ? 
+Parce que <i>ArithmeticException</i>
+
+294
+00:13:55,246 --> 00:13:57,330
+est de type <i>RunTimeException</i>,
+
+295
+00:13:57,330 --> 00:14:00,929
+et qu'elle n'est donc pas soumise
+à la règle déclarée ou traitée.
+
+296
+00:14:00,929 --> 00:14:04,791
+Simplement ici, le fait de la déclarer 
+donne un petit plus d'informations,
+
+297
+00:14:04,791 --> 00:14:07,729
+quelqu'un qui lirait 
+l'entête de cette méthode
+
+298
+00:14:07,729 --> 00:14:10,449
+verrait qu'elle peut lancer 
+une <i>ArithmeticException</i>,
+
+299
+00:14:10,449 --> 00:14:12,840
+et donc prendre ses dispositions
+en conséquence.
+
+300
+00:14:12,840 --> 00:14:14,782
+Enfin, pour aller
+jusqu'au bout de l'exemple,
+
+301
+00:14:14,782 --> 00:14:17,480
+on supposera bien sûr qu'il existe
+une méthode de dessin,
+
+302
+00:14:17,480 --> 00:14:20,126
+à proprement parler, qui est capable
+de dessiner un point,
+
+303
+00:14:20,126 --> 00:14:22,164
+donc on imagine qu'il existe 
+une méthode graphique
+
+304
+00:14:22,164 --> 00:14:23,670
+capable de faire ce traitement,
+
+305
+00:14:23,670 --> 00:14:26,434
+puis bien sûr notre fameuse 
+méthode de calcul d'inverses,
+
+306
+00:14:26,434 --> 00:14:28,202
+qui calcule l'inverse d'un nombre,
+
+307
+00:14:28,202 --> 00:14:32,976
+nous avons choisi ici aussi, de déclarer 
+qu'elle lançait une <i>ArithmeticException</i>,
+
+308
+00:14:32,976 --> 00:14:36,750
+à nouveau ça n'est pas nécessaire
+puisqu'il s'agit d'une <i>RunTimeException</i>,
+
+309
+00:14:36,750 --> 00:14:40,358
+donc dans le cas où
+le nombre donné est nul,
+
+310
+00:14:40,358 --> 00:14:44,184
+cette méthode va lancer une exception 
+de type <i>ArithmeticException</i>
+
+311
+00:14:44,184 --> 00:14:45,930
+avec un message approprié.
+
+312
+00:14:45,930 --> 00:14:47,964
+Le flot d'exécution sera le suivant,
+
+313
+00:14:47,964 --> 00:14:50,909
+imaginez que dans le tableau de mesures,
+il existe une mesure nulle,
+
+314
+00:14:50,909 --> 00:14:53,828
+nous allons donc appeler <i>plotTempInverse</i>,
+
+315
+00:14:54,608 --> 00:14:58,596
+laquelle va appeler la méthode
+qui calcule l'inverse d'un nombre,
+
+316
+00:14:58,596 --> 00:15:03,769
+et qui si ce nombre est nul, 
+va donc lancer une exception
+
+317
+00:15:03,769 --> 00:15:05,717
+de type <i>ArithmeticException</i>,
+
+318
+00:15:05,717 --> 00:15:08,714
+cette exception va donc être capturée 
+au niveau supérieur,
+
+319
+00:15:08,714 --> 00:15:10,704
+donc dans <i>plotTempInverse</i>,
+
+320
+00:15:10,704 --> 00:15:15,481
+et donc à ce moment là, le message
+"Problème à l'indice i" va s'afficher,
+
+321
+00:15:15,737 --> 00:15:18,125
+puis l'exception est relancée,
+
+322
+00:15:18,125 --> 00:15:21,002
+pour être cette fois capturée 
+au niveau supérieur,
+
+323
+00:15:21,002 --> 00:15:23,453
+c'est <i>plotTempInverse</i>,
+qui cette fois a envoyé,
+
+324
+00:15:23,453 --> 00:15:28,505
+a lancé l'exception, du coup, 
+on va brancher sur le bloc <i>catch</i>
+
+325
+00:15:28,505 --> 00:15:30,591
+correspondant dans le programme principal,
+
+326
+00:15:30,591 --> 00:15:33,097
+et à ce moment là on commence 
+à comptabiliser
+
+327
+00:15:33,097 --> 00:15:35,126
+les essais de notre utilisateur.
+
+328
+00:15:35,407 --> 00:15:38,119
+Donc voici comment se déroulerait
+l'exécution d'un tel programme
+
+329
+00:15:38,119 --> 00:15:40,481
+lorsque des lancements 
+d'exceptions ont lieu.
+
+330
+00:15:41,064 --> 00:15:43,238
+Voilà, pour clore sur
+le chapitre des exceptions,
+
+331
+00:15:43,238 --> 00:15:45,239
+il faut savoir que la gestion 
+des exceptions
+
+332
+00:15:45,239 --> 00:15:47,113
+est un moyen extrêmement 
+souple et pratique
+
+333
+00:15:47,113 --> 00:15:48,935
+pour gérer les situations anormales,
+
+334
+00:15:48,935 --> 00:15:50,955
+mais qu'il est néanmoins
+beaucoup plus coûteux
+
+335
+00:15:50,955 --> 00:15:52,709
+qu'un simple <i>if..then..else</i>.
+
+336
+00:15:52,709 --> 00:15:55,825
+La consigne est donc que si
+nous avons le moyen de traiter l'erreur
+
+337
+00:15:55,825 --> 00:15:57,667
+à l'endroit où nous la découvrons,
+
+338
+00:15:57,667 --> 00:16:01,039
+alors il faut le faire, sans passer
+par la gestion des exceptions.
+
+339
+00:16:01,039 --> 00:16:03,344
+Imaginez par exemple que dans un programme
+
+340
+00:16:03,344 --> 00:16:06,889
+on demande à l'utilisateur de saisir 
+des valeurs entre 0 et 100,
+
+341
+00:16:06,889 --> 00:16:09,938
+et que l'utilisateur introduise
+une valeur supérieure à 100,
+
+342
+00:16:09,938 --> 00:16:12,524
+alors nous savons gérer 
+localement cette erreur,
+
+343
+00:16:12,524 --> 00:16:15,574
+en signifiant à l'utilisateur qu'il doit
+réintroduire des valeurs,
+
+344
+00:16:15,574 --> 00:16:18,543
+nous n'avons pas besoin d'utiliser
+le mécanisme des exceptions,
+
+345
+00:16:18,543 --> 00:16:19,986
+dans ce cas là.
+
+346
+00:16:19,986 --> 00:16:23,041
+Enfin, lorsque l'on a le choix de lancer 
+plusieurs types d'exceptions,
+
+347
+00:16:23,041 --> 00:16:25,088
+choisir des exceptions plus spécifiques
+
+348
+00:16:25,088 --> 00:16:28,368
+sera généralement
+plus informatif et plus utile.
+
+349
+00:16:28,368 --> 00:16:30,787
+Et ceci termine cette séquence
+sur les exceptions.

@@ -1,0 +1,1424 @@
+1
+00:00:00,880 --> 00:00:07,550
+In the last lesson, we introduced Futures
+as the effect for computations
+
+2
+00:00:07,550 --> 00:00:12,144
+that have latency and may fail.
+Remember that?
+
+3
+00:00:12,144 --> 00:00:12,940
+Okay.
+
+4
+00:00:12,940 --> 00:00:15,110
+Now, what we're going to do in this
+lesson.
+
+5
+00:00:15,110 --> 00:00:16,660
+We're going to look at the various
+
+6
+00:00:16,660 --> 00:00:19,429
+combinators that can be defined on
+Futures.
+
+7
+00:00:20,520 --> 00:00:23,380
+And in particular, we want to know whether
+futures are
+
+8
+00:00:23,380 --> 00:00:26,360
+really a monad, which means that we have
+to check if
+
+9
+00:00:26,360 --> 00:00:27,200
+it has a flatMap.
+
+10
+00:00:29,450 --> 00:00:32,790
+Let's look at the standard library of
+
+11
+00:00:32,790 --> 00:00:37,760
+Scala and, you know, grab the trait
+definitions.
+
+12
+00:00:37,760 --> 00:00:39,510
+And guess what.
+
+13
+00:00:39,510 --> 00:00:42,140
+There is our friend flatMap.
+
+14
+00:00:42,140 --> 00:00:47,840
+So we are happy, we now know that futures
+are monads because there is a flat map.
+
+15
+00:00:47,840 --> 00:00:50,580
+And there's some other operators here, we
+will look
+
+16
+00:00:50,580 --> 00:00:54,460
+at them in a minute and then there's
+another
+
+17
+00:00:54,460 --> 00:00:59,180
+super type here.
+So future of t actually extends Awaitable.
+
+18
+00:00:59,180 --> 00:01:04,320
+We will talk about a way to also later and
+just to remind
+
+19
+00:01:04,320 --> 00:01:09,220
+you again, this is the companion object
+for Futures that would take a
+
+20
+00:01:09,220 --> 00:01:14,310
+block and return a Future and remember
+from the previous
+
+21
+00:01:14,310 --> 00:01:19,460
+lesson that all this takes an implicit
+execution context because we want
+
+22
+00:01:19,460 --> 00:01:24,240
+to run the Future here in its own separate
+thread.
+
+23
+00:01:24,240 --> 00:01:26,420
+Such that it doesn't block the main
+threat.
+
+24
+00:01:27,700 --> 00:01:29,820
+What we're going to do next is we're going
+to
+
+25
+00:01:29,820 --> 00:01:32,920
+look in a little bit more detail at the
+various operators.
+
+26
+00:01:34,520 --> 00:01:39,410
+This is the code that we were left with
+when we introduced futures.
+
+27
+00:01:39,410 --> 00:01:44,570
+Remember the mess that we arrived at.
+Because we were using,
+
+28
+00:01:44,570 --> 00:01:47,426
+we were trying to use onComplete to chain
+
+29
+00:01:47,426 --> 00:01:53,190
+together the readFromMemory method call
+with the sendToEurope call.
+
+30
+00:01:53,190 --> 00:01:57,318
+So readFromMemory returned a future of a
+byte array
+
+31
+00:01:57,318 --> 00:02:02,559
+and then we register the onComplete
+callback with that future.
+
+32
+00:02:02,559 --> 00:02:08,890
+If that was successful, we can grab the
+packet here.
+
+33
+00:02:08,890 --> 00:02:10,530
+Send it to Europe, and
+
+34
+00:02:10,530 --> 00:02:15,600
+then we have the future of byte array for
+the confirmation.
+
+35
+00:02:15,600 --> 00:02:21,380
+But we were stuck inside the success case
+here.
+
+36
+00:02:21,380 --> 00:02:24,660
+And we would end up with our spaghetti
+code.
+
+37
+00:02:24,660 --> 00:02:27,479
+Yep, you remember the mess, I'm pretty
+sure about that.
+
+38
+00:02:28,860 --> 00:02:35,210
+Now, just like with Try of t, flatMap will
+lead us through the happy part.
+
+39
+00:02:35,210 --> 00:02:35,350
+So,
+
+40
+00:02:35,350 --> 00:02:41,980
+let's rewrite this code using flatMap and
+look how beautiful
+
+41
+00:02:41,980 --> 00:02:47,850
+we get our packets from memory, returns a
+future of t and then
+
+42
+00:02:47,850 --> 00:02:53,200
+we can just flatMap that which gives us
+the packet and send it to Europe.
+
+43
+00:02:53,200 --> 00:02:56,170
+This is of type a future of array of
+
+44
+00:02:56,170 --> 00:03:00,270
+bytes which exactly is the right type for
+flatMap,
+
+45
+00:03:00,270 --> 00:03:04,620
+so now we get our confirmation which is a
+future of array of bytes.
+
+46
+00:03:05,850 --> 00:03:12,830
+Okay, so here you see again, flatMap is
+really the hero of every monad.
+
+47
+00:03:12,830 --> 00:03:18,772
+flatMap allows us to chain together
+computations inside the monad, and it
+
+48
+00:03:18,772 --> 00:03:24,920
+will allow us to focus on the happy path
+flatMap will take care of all the noise.
+
+49
+00:03:24,920 --> 00:03:28,320
+flatMap is the Dolby for programmers.
+
+50
+00:03:31,140 --> 00:03:35,010
+Let's drill down into a possible
+implementation
+
+51
+00:03:35,010 --> 00:03:38,790
+of send packet to Europe and back.
+
+52
+00:03:38,790 --> 00:03:42,890
+Assume that we have an imaginary HTTP
+library.
+
+53
+00:03:42,890 --> 00:03:46,100
+you can pick your owned favorite HTTP
+library.
+
+54
+00:03:46,100 --> 00:03:49,170
+There's many HTTP libraries for Scala
+available and
+
+55
+00:03:49,170 --> 00:03:53,390
+for Java but that's not relevant for this
+lesson.
+
+56
+00:03:53,390 --> 00:03:56,890
+The only thing that we want from our HTTP
+library
+
+57
+00:03:56,890 --> 00:04:01,430
+is that there is a factory method that
+takes a URL, that takes a
+
+58
+00:04:03,050 --> 00:04:07,930
+request, and then asynchronously runs this
+HTTP request,
+
+59
+00:04:07,930 --> 00:04:12,960
+sends it over the network and at some
+point gives us back a response.
+
+60
+00:04:12,960 --> 00:04:16,310
+So we want an asynchronous computation
+that given
+
+61
+00:04:16,310 --> 00:04:20,380
+a request delivers us a response at some
+time.
+
+62
+00:04:22,010 --> 00:04:25,080
+Of course this might fail because we all
+
+63
+00:04:25,080 --> 00:04:28,860
+know that a network is unreliable and may
+fail.
+
+64
+00:04:28,860 --> 00:04:34,530
+Here's the code that uses this eh, trait
+here, this object.
+
+65
+00:04:34,530 --> 00:04:40,460
+It sends packet to Europe, it returns a
+future of array of bytes.
+
+66
+00:04:40,460 --> 00:04:44,570
+And let's say we send it to a mail server
+in Europe with our packet.
+
+67
+00:04:44,570 --> 00:04:47,160
+We wrap that into a request.
+
+68
+00:04:47,160 --> 00:04:51,510
+Then we only want to see the requests that
+are okay.
+
+69
+00:04:51,510 --> 00:04:57,460
+And then since we get back a response,
+here, but we needed a byte array
+
+70
+00:04:57,460 --> 00:05:02,410
+we assume that we have some way to turn
+the response into a byte array.
+
+71
+00:05:04,170 --> 00:05:08,700
+Now this code is still not completely
+correct
+
+72
+00:05:08,700 --> 00:05:11,440
+because Too many things can still go
+wrong.
+
+73
+00:05:11,440 --> 00:05:12,190
+This code can
+
+74
+00:05:12,190 --> 00:05:14,010
+still throw and what we want to do is we
+
+75
+00:05:14,010 --> 00:05:19,130
+want to turn this code into a robust mail
+send program.
+
+76
+00:05:19,130 --> 00:05:24,970
+So we want to send mail to Europe but we
+make sure that it happens.
+
+77
+00:05:24,970 --> 00:05:27,680
+Let's look at a few possibilities how we
+can do that.
+
+78
+00:05:30,140 --> 00:05:34,370
+Here was our code.
+That was not very reliable.
+
+79
+00:05:34,370 --> 00:05:37,370
+So let's try this attempt here.
+
+80
+00:05:37,370 --> 00:05:40,030
+What we're going to do, is we're going to
+send
+
+81
+00:05:40,030 --> 00:05:44,550
+our mail both to Europe and to the USA,
+okay?
+
+82
+00:05:44,550 --> 00:05:46,080
+So that's what we want to do.
+
+83
+00:05:46,080 --> 00:05:51,360
+And that also shows a weakness of our
+original implementation because we hard
+
+84
+00:05:51,360 --> 00:05:56,300
+wired the mail.server in Europe in our
+method.
+
+85
+00:05:56,300 --> 00:05:58,850
+So, in this case here we have abstracted
+that out.
+
+86
+00:05:58,850 --> 00:06:05,560
+So we are now taking the the URL as a
+parameter such that we can send mail to
+
+87
+00:06:05,560 --> 00:06:09,319
+two different mail servers using the same
+call without having to repeat the code.
+
+88
+00:06:10,710 --> 00:06:12,130
+Well you can think, this is great.
+
+89
+00:06:12,130 --> 00:06:15,570
+I'm sending it to Europe, I'm sending it
+to USA.
+
+90
+00:06:15,570 --> 00:06:19,220
+And then, I zip them together.
+
+91
+00:06:19,220 --> 00:06:21,370
+And remember the type of zip.
+
+92
+00:06:21,370 --> 00:06:26,490
+Zip takes two futures and returns a future
+of pairs.
+
+93
+00:06:26,490 --> 00:06:27,550
+So that's what you see here.
+
+94
+00:06:27,550 --> 00:06:29,630
+Now, we get two confirmations.
+
+95
+00:06:29,630 --> 00:06:33,290
+We get a future.
+That hopefully contains two confirmations.
+
+96
+00:06:34,910 --> 00:06:38,700
+Is that really safe.
+Is this really robust.
+
+97
+00:06:38,700 --> 00:06:40,950
+Well, unfortunately not.
+
+98
+00:06:40,950 --> 00:06:46,590
+Because if either one of them fails, the
+future here will fail.
+
+99
+00:06:46,590 --> 00:06:52,290
+So, we have absolutely no guarantee that
+sending both
+
+100
+00:06:52,290 --> 00:06:58,090
+to Europe, and sending to the US will give
+us the success that we're after.
+
+101
+00:06:58,090 --> 00:07:01,292
+Because if either one fails, then the
+whole Future will fail.
+
+102
+00:07:01,292 --> 00:07:05,750
+So actually, this is a worse
+implementation, because now
+
+103
+00:07:05,750 --> 00:07:08,910
+the chance that something goes wrong is
+here doubled.
+
+104
+00:07:08,910 --> 00:07:12,300
+So yeah, I, I, I wouldn't recommend doing
+this one.
+
+105
+00:07:15,200 --> 00:07:18,410
+Fortunately, the Scala designers have
+already kind
+
+106
+00:07:18,410 --> 00:07:20,440
+of, you know, thought about this problem.
+
+107
+00:07:20,440 --> 00:07:24,600
+And in the library for Futures there are
+these two functions here.
+
+108
+00:07:24,600 --> 00:07:28,740
+Very helpful functions.
+The first one is called recover.
+
+109
+00:07:28,740 --> 00:07:31,250
+And what it takes, it takes a partial
+function.
+
+110
+00:07:31,250 --> 00:07:34,080
+It takes a throwable and returns a t.
+
+111
+00:07:34,080 --> 00:07:38,175
+And that's one you can use in case your
+future has failed.
+
+112
+00:07:38,175 --> 00:07:40,670
+Yeah, you, you can check the throwable and
+
+113
+00:07:40,670 --> 00:07:48,170
+then you can deliver a value that is
+returned when the computation failed.
+
+114
+00:07:48,170 --> 00:07:50,930
+And so the result type here is future of
+t.
+
+115
+00:07:50,930 --> 00:07:53,380
+So, recover takes a future of t if
+
+116
+00:07:53,380 --> 00:07:57,050
+that future failed, you call the partial
+function, you
+
+117
+00:07:57,050 --> 00:08:00,070
+check the exception and then you return
+the
+
+118
+00:08:00,070 --> 00:08:02,870
+value that you want to return as a
+recovery.
+
+119
+00:08:04,350 --> 00:08:06,440
+And the other one, recover with,
+
+120
+00:08:06,440 --> 00:08:10,210
+is very similar, except, instead of a
+future instead
+
+121
+00:08:10,210 --> 00:08:13,450
+of a t, it returns a future of t.
+
+122
+00:08:13,450 --> 00:08:15,070
+So what that means is that you can do
+
+123
+00:08:15,070 --> 00:08:19,150
+another asynchronous computation in case
+the first one failed.
+
+124
+00:08:19,150 --> 00:08:22,320
+You can try another thing that takes a
+long
+
+125
+00:08:22,320 --> 00:08:24,840
+time and then you, both of them return a
+future.
+
+126
+00:08:25,900 --> 00:08:30,720
+We will not look at the definition of
+these functions in this lecture.
+
+127
+00:08:30,720 --> 00:08:31,770
+But you can go and
+
+128
+00:08:31,770 --> 00:08:36,160
+look at the standard library and their
+implementations are fairly simple.
+
+129
+00:08:36,160 --> 00:08:41,840
+Basically they just use the on complete
+and in the error case.
+
+130
+00:08:41,840 --> 00:08:46,450
+They call the PartialFunction here, okay?
+
+131
+00:08:46,450 --> 00:08:51,970
+There's our function sent to a URL, and
+now let's look at
+
+132
+00:08:51,970 --> 00:08:57,530
+the first attempt to make this safe.
+So, sendToSafe takes a packet and
+
+133
+00:08:57,530 --> 00:09:01,380
+returns a future of array of bytes, just
+like here.
+
+134
+00:09:01,380 --> 00:09:03,750
+And what we're going to do, is we're first
+
+135
+00:09:03,750 --> 00:09:06,550
+going to try to send the packets to
+Europe.
+
+136
+00:09:07,700 --> 00:09:15,640
+And if that fails, we use recoverWith to
+send the mail to the US.
+
+137
+00:09:15,640 --> 00:09:19,150
+And again, we use recoverWith because this
+one was
+
+138
+00:09:19,150 --> 00:09:22,170
+future of t and this one is future of t.
+
+139
+00:09:22,170 --> 00:09:26,390
+So, we have to use recoverWith and not
+recover.
+
+140
+00:09:26,390 --> 00:09:29,960
+But if sending the mail to the US fails.
+
+141
+00:09:29,960 --> 00:09:34,160
+Well we run out of possibilities and then
+we just use the error
+
+142
+00:09:34,160 --> 00:09:38,910
+message that we got when we failed to send
+the message to the USA.
+
+143
+00:09:40,230 --> 00:09:44,160
+Unfortunately, this method here does not
+really do what
+
+144
+00:09:44,160 --> 00:09:47,270
+we want because our goal was to send the
+package
+
+145
+00:09:47,270 --> 00:09:51,650
+to Europe and really sending it to the US
+was a backup strategy.
+
+146
+00:09:51,650 --> 00:09:56,270
+But what this thing returns, when both
+sending to Europe
+
+147
+00:09:56,270 --> 00:10:00,440
+fails and to the USA fails, is the error
+message
+
+148
+00:10:00,440 --> 00:10:03,140
+that we got from sending the pack, trying
+to send
+
+149
+00:10:03,140 --> 00:10:07,150
+a packet to the USA, which is not what we
+want.
+
+150
+00:10:07,150 --> 00:10:11,720
+What we really want is the error message
+when we send it to Europe.
+
+151
+00:10:11,720 --> 00:10:12,400
+So let's see
+
+152
+00:10:12,400 --> 00:10:18,040
+if we can make this code even better.
+What
+
+153
+00:10:18,040 --> 00:10:24,130
+we're going to try to do, is we're going
+to make this code better in multiple ways.
+
+154
+00:10:24,130 --> 00:10:28,960
+So, first of all, what we want to do is we
+want to get the right error message
+
+155
+00:10:28,960 --> 00:10:31,110
+so we don't want the message for the USA
+
+156
+00:10:31,110 --> 00:10:34,490
+error but we want a message from the
+Europe error.
+
+157
+00:10:34,490 --> 00:10:37,570
+But the other thing is that this code also
+looks
+
+158
+00:10:37,570 --> 00:10:38,890
+kind of ugly.
+
+159
+00:10:38,890 --> 00:10:42,520
+I'm not a big fan of all this case
+matching and so on.
+
+160
+00:10:42,520 --> 00:10:43,370
+I don't like that.
+
+161
+00:10:43,370 --> 00:10:46,460
+So, I want to write code that looks
+
+162
+00:10:46,460 --> 00:10:51,060
+better and does better recovery and does
+less matching.
+
+163
+00:10:51,060 --> 00:10:56,330
+We're going to define a new method
+fallback on future of t.
+
+164
+00:10:56,330 --> 00:11:00,110
+That takes a, a call by name other future,
+
+165
+00:11:00,110 --> 00:11:03,340
+so we don't want to evaluate this thing
+eagerly.
+
+166
+00:11:03,340 --> 00:11:09,350
+We only want to evaluate this thing if our
+first future fails and
+
+167
+00:11:09,350 --> 00:11:14,800
+and if that's that future succeeds, we
+want to have its result
+
+168
+00:11:14,800 --> 00:11:20,500
+but if that future fails, we want to have
+the failure of our original future, okay?
+
+169
+00:11:20,500 --> 00:11:23,439
+Because we were looking here for the
+message for Europe.
+
+170
+00:11:25,210 --> 00:11:27,920
+Now assume that we have this fallback
+function.
+
+171
+00:11:27,920 --> 00:11:28,540
+How would
+
+172
+00:11:28,540 --> 00:11:30,700
+send to safe look like.
+
+173
+00:11:30,700 --> 00:11:33,010
+This how it would looks like, and you see
+there's
+
+174
+00:11:33,010 --> 00:11:36,930
+one less case match there, so that's
+already an improvement.
+
+175
+00:11:36,930 --> 00:11:40,600
+So what we're going to do, is we're going
+to send the mail to Europe.
+
+176
+00:11:41,840 --> 00:11:45,780
+If that fails we're going to send that to
+the US.
+
+177
+00:11:47,330 --> 00:11:53,280
+If this fails and that failed, well we get
+the error message,
+
+178
+00:11:53,280 --> 00:11:59,260
+the error for send to Europe.
+So then we just use the normal recovery.
+
+179
+00:11:59,260 --> 00:12:01,965
+But in this case we get the Europe error,
+not the
+
+180
+00:12:01,965 --> 00:12:05,260
+U.S. error, and then we convert that to
+the byte array.
+
+181
+00:12:05,260 --> 00:12:07,950
+So this goes, this exactly what we want
+to.
+
+182
+00:12:10,140 --> 00:12:16,260
+Of course, we're still cheating because we
+have not yet defined fallbackTo.
+
+183
+00:12:16,260 --> 00:12:17,959
+So that will be our next exercise.
+
+184
+00:12:19,010 --> 00:12:24,620
+Here's the definition of fallbackTo.
+It looks beautifully concise.
+
+185
+00:12:24,620 --> 00:12:30,150
+So let's drill down how it works.
+Remember, fallbackTo
+
+186
+00:12:30,150 --> 00:12:35,580
+was defined on future of t.
+And it takes a second future
+
+187
+00:12:35,580 --> 00:12:40,340
+here, a.
+Call by name future called that.
+
+188
+00:12:40,340 --> 00:12:43,480
+And what we wanted to return is a new
+future
+
+189
+00:12:43,480 --> 00:12:48,820
+but we want to only call that when this
+would fail.
+
+190
+00:12:48,820 --> 00:12:53,450
+Well, we already have part of that because
+we have recover with.
+
+191
+00:12:53,450 --> 00:12:59,570
+So, if this succeeds, recoverWith will do
+nothing.
+
+192
+00:12:59,570 --> 00:13:00,710
+So that's good, so that's
+
+193
+00:13:00,710 --> 00:13:02,280
+exactly what we want.
+
+194
+00:13:02,280 --> 00:13:08,480
+Now if this returns failure, in that case,
+we
+
+195
+00:13:10,820 --> 00:13:11,920
+run that.
+
+196
+00:13:11,920 --> 00:13:16,010
+So only at this point, we will execute
+this Future.
+
+197
+00:13:16,010 --> 00:13:22,190
+And if that fails, well we still, we want
+it to return this.
+
+198
+00:13:22,190 --> 00:13:25,260
+Which was failed, so we get exactly what
+we want.
+
+199
+00:13:25,260 --> 00:13:28,190
+And look it's, it's like a little bit like
+poetry, right.
+
+200
+00:13:28,190 --> 00:13:33,010
+This recover with, that recover with this.
+
+201
+00:13:33,010 --> 00:13:36,340
+I think this is super beautiful.
+You agree?
+
+202
+00:13:38,510 --> 00:13:41,640
+One of the constructor functions that's
+sorely missing
+
+203
+00:13:41,640 --> 00:13:45,330
+from the Scala standard library is the
+following.
+
+204
+00:13:45,330 --> 00:13:48,290
+What we want to do with Try, is we want it
+to
+
+205
+00:13:48,290 --> 00:13:52,650
+take a block that returned a t, into a Try
+of t.
+
+206
+00:13:52,650 --> 00:13:55,450
+That was a regular definition of Try.
+
+207
+00:13:55,450 --> 00:13:59,190
+But now that we have Futures, we want to
+have something very similar.
+
+208
+00:13:59,190 --> 00:14:03,580
+What we want to do is we want to take a
+Future of T and materialize
+
+209
+00:14:03,580 --> 00:14:08,240
+all the exceptions that can happen when we
+execute the Future of T.
+
+210
+00:14:08,240 --> 00:14:11,970
+And we want to return a Future of Try of
+T.
+
+211
+00:14:13,320 --> 00:14:19,010
+In this quiz, we're going to look at the
+implementation of this factory method.
+
+212
+00:14:19,010 --> 00:14:23,780
+And here are four possibilities and I'll
+give you a few
+
+213
+00:14:23,780 --> 00:14:28,180
+seconds to look at all of them and pick
+the right one.
+
+214
+00:14:31,660 --> 00:14:36,090
+Let's look at all the possible answers
+one-by-one.
+
+215
+00:14:36,090 --> 00:14:41,660
+Let's look at the first one here.
+The first one is starts out quite clever.
+
+216
+00:14:41,660 --> 00:14:46,590
+It says, let's do f and then register a
+callback that
+
+217
+00:14:46,590 --> 00:14:50,690
+will be called when f completes.
+And since the callback takes of, an
+
+218
+00:14:50,690 --> 00:14:56,910
+argument of try of t.
+Now that's what we want to have here as
+
+219
+00:14:56,910 --> 00:15:00,390
+well why don't we just return the x
+immediately?
+
+220
+00:15:01,660 --> 00:15:06,992
+Unfortunately this was exactly the same
+thing that brought us this mess in
+
+221
+00:15:06,992 --> 00:15:13,460
+the beginning, why we needed flatMap is
+because onComplete returns unit.
+
+222
+00:15:13,460 --> 00:15:14,250
+Okay?
+
+223
+00:15:14,250 --> 00:15:17,820
+So, returning the Try of t here doesn't
+help
+
+224
+00:15:17,820 --> 00:15:21,060
+us at all because onComplete will just
+return unit.
+
+225
+00:15:21,060 --> 00:15:22,030
+And not Try of
+
+226
+00:15:22,030 --> 00:15:26,740
+t as we want.
+Now let's look at the second case.
+
+227
+00:15:26,740 --> 00:15:30,720
+Second case says let's do a recover with
+where in this
+
+228
+00:15:30,720 --> 00:15:35,850
+case, we return a Try of t here when it
+failed.
+
+229
+00:15:36,930 --> 00:15:41,700
+Unfortunately, when f succeeded, it won't
+return a Try of t.
+
+230
+00:15:41,700 --> 00:15:45,390
+Because it will just return the normal
+Future of t.
+
+231
+00:15:45,390 --> 00:15:46,990
+So this one is also wrong.
+
+232
+00:15:48,900 --> 00:15:54,790
+Option c, we map f, with, by wrapping x
+into Try of t.
+
+233
+00:15:54,790 --> 00:15:58,990
+Well this one doesn't work for exactly the
+opposite reason.
+
+234
+00:15:58,990 --> 00:16:03,770
+If f succeeds we happily wrap it into a
+Try of t, which is great.
+
+235
+00:16:03,770 --> 00:16:07,820
+But if it fails we don't wrap it into a
+failed.
+
+236
+00:16:07,820 --> 00:16:12,360
+And therefore, we need to have the last
+one, d is the correct answer.
+
+237
+00:16:12,360 --> 00:16:14,240
+Let me kind of make
+
+238
+00:16:14,240 --> 00:16:17,070
+sure that we don't see all the wrong
+answers.
+
+239
+00:16:18,120 --> 00:16:22,760
+Here d, what we do, is when f succeeds,
+you
+
+240
+00:16:22,760 --> 00:16:26,060
+know that it's succeeded, so we wrap it
+into Success.
+
+241
+00:16:26,060 --> 00:16:32,150
+And when it fails, we recover by returning
+a failed Future.
+
+242
+00:16:32,150 --> 00:16:33,690
+And this is the right answer.
+
+243
+00:16:35,710 --> 00:16:40,920
+We're going to end this lesson by looking
+at this mysterious trait here
+
+244
+00:16:40,920 --> 00:16:45,780
+that was the super type of future of t and
+this trait
+
+245
+00:16:45,780 --> 00:16:50,600
+awaitable has two methods, ready and
+result that
+
+246
+00:16:50,600 --> 00:16:55,360
+take a duration.
+Now, this trait here,
+
+247
+00:16:56,590 --> 00:17:00,870
+should be used very carefully because this
+trait here.
+
+248
+00:17:00,870 --> 00:17:06,580
+The awaitable trait allows you to block on
+the result of a future.
+
+249
+00:17:06,580 --> 00:17:11,570
+So, instead of calling complete or you
+know, using the methods
+
+250
+00:17:11,570 --> 00:17:16,010
+on future.
+Sometimes, you want to go from future of t
+
+251
+00:17:16,010 --> 00:17:21,010
+to t.
+And this is what awaitable allows
+
+252
+00:17:21,010 --> 00:17:25,910
+you to do.
+So, in particular, result here goes from a
+
+253
+00:17:25,910 --> 00:17:31,800
+future of t via its super type Awaitable
+into a t.
+
+254
+00:17:31,800 --> 00:17:35,130
+So it allows you to go out of the monad.
+
+255
+00:17:35,130 --> 00:17:38,950
+And going out of a monad is always
+dangerous.
+
+256
+00:17:38,950 --> 00:17:44,080
+Because if you look at monads there's a
+way to go into monads with flat map and
+
+257
+00:17:44,080 --> 00:17:46,210
+all the operators you see that they always
+
+258
+00:17:46,210 --> 00:17:51,280
+return the, the, the monad value but
+there's usually
+
+259
+00:17:51,280 --> 00:17:56,190
+no way to go out and if you go out you're
+doing something dangerous.
+
+260
+00:17:56,190 --> 00:17:59,719
+And that's exactly what this trait
+Awaitable gives us.
+
+261
+00:18:00,980 --> 00:18:03,120
+Now some things, sometimes we wan't to be
+
+262
+00:18:03,120 --> 00:18:06,210
+dangerous, we want to be asynchronous
+where possible.
+
+263
+00:18:06,210 --> 00:18:11,310
+But sometimes we just need to block and so
+it's great to have the possibility to
+
+264
+00:18:11,310 --> 00:18:16,480
+do so if we really need to.
+But I really want to emphasize, you should
+
+265
+00:18:16,480 --> 00:18:21,440
+really never block if it's not necessary.
+So use this one with care.
+
+266
+00:18:22,920 --> 00:18:26,150
+and, you know, maybe this should have had
+like a
+
+267
+00:18:26,150 --> 00:18:31,060
+better name, but it's really dangerous to
+call the result here.
+
+268
+00:18:31,060 --> 00:18:33,060
+But, you know, that's something that you
+should
+
+269
+00:18:33,060 --> 00:18:36,300
+then, whenever you see result, think in
+your mind.
+
+270
+00:18:37,930 --> 00:18:41,620
+Let's see how we can use result to block
+on
+
+271
+00:18:41,620 --> 00:18:42,130
+a Future.
+
+272
+00:18:43,190 --> 00:18:47,890
+Say that we have read our packet from
+memory.
+
+273
+00:18:47,890 --> 00:18:53,220
+Send it, safely, to Europe and back and
+we've gotten the confirmation.
+
+274
+00:18:53,220 --> 00:19:00,500
+And now we want to print the text of the
+confirmation on the standard output.
+
+275
+00:19:00,500 --> 00:19:06,200
+But, we have to wait until the Future has
+terminated.
+
+276
+00:19:06,200 --> 00:19:06,720
+But we don't
+
+277
+00:19:06,720 --> 00:19:10,400
+know how to print a Future.
+Do you know how to print a string?
+
+278
+00:19:10,400 --> 00:19:14,770
+So in that case, what we can do is we can
+call Await result.
+
+279
+00:19:16,840 --> 00:19:21,850
+But in order to not block forever.
+There's a timeout here,
+
+280
+00:19:21,850 --> 00:19:26,920
+so what this will do is it will wait for
+at most two seconds.
+
+281
+00:19:26,920 --> 00:19:33,080
+If the future has not terminated within
+two seconds, this will throw.
+
+282
+00:19:33,080 --> 00:19:37,910
+If it terminates within two seconds, it
+will give you the value here.
+
+283
+00:19:37,910 --> 00:19:41,390
+Instead of a future of byte array, it will
+be a byte array.
+
+284
+00:19:41,390 --> 00:19:41,860
+Then we can
+
+285
+00:19:41,860 --> 00:19:44,640
+turn that to text, and print it on the
+standard output.
+
+286
+00:19:46,300 --> 00:19:53,670
+Now one thing that you may have noticed is
+that we've write here two seconds.
+
+287
+00:19:53,670 --> 00:19:56,370
+Which is quite elegant.
+
+288
+00:19:56,370 --> 00:20:00,950
+And what is the magic that allows you to
+do that.
+
+289
+00:20:00,950 --> 00:20:03,240
+Well, let's briefly look into that.
+
+290
+00:20:05,820 --> 00:20:10,960
+If you import scala.language.postfixOps
+
+291
+00:20:10,960 --> 00:20:15,670
+and you have the duration object in scope.
+The duration
+
+292
+00:20:15,670 --> 00:20:20,990
+object has a constructor method that takes
+a length and
+
+293
+00:20:20,990 --> 00:20:26,350
+a time unit and thanks to the post fix
+operators.
+
+294
+00:20:26,350 --> 00:20:31,340
+You are able to write the constructor
+function here
+
+295
+00:20:31,340 --> 00:20:33,130
+in post fix notation.
+
+296
+00:20:33,130 --> 00:20:36,050
+So, you can just write you know, if you
+
+297
+00:20:36,050 --> 00:20:40,240
+want to define five years which is 1826
+minutes.
+
+298
+00:20:40,240 --> 00:20:45,650
+You can write this beautifully here using
+postfix notation.
+

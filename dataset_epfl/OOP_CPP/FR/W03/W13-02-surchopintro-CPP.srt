@@ -1,0 +1,862 @@
+1
+00:00:04,522 --> 00:00:06,201
+Dans cette séquence vidéo 
+et dans les suivantes,
+
+2
+00:00:06,201 --> 00:00:09,240
+nous allons nous intéresser 
+à la surcharge des opérateurs.
+
+3
+00:00:09,659 --> 00:00:11,044
+C’est un sujet assez technique
+
+4
+00:00:11,044 --> 00:00:13,870
+qui va nous permettre de définir 
+nos propres opérateurs.
+
+5
+00:00:14,885 --> 00:00:17,858
+Commençons par un exemple.
+Voyons à quoi cela peut bien servir.
+
+6
+00:00:18,433 --> 00:00:22,193
+Imaginons que, par exemple,
+vous ayez défini une classe Complexe
+
+7
+00:00:22,193 --> 00:00:24,164
+pour additionner des nombres complexes.
+
+8
+00:00:24,164 --> 00:00:26,222
+Peu importe ici 
+ce dont il s'agit précisément.
+
+9
+00:00:26,535 --> 00:00:28,955
+Ce qui compte de savoir,
+c'est qu'on peut additionner
+
+10
+00:00:28,957 --> 00:00:30,537
+des nombres complexes.
+
+11
+00:00:30,537 --> 00:00:33,457
+Supposons donc que vous ayez
+défini quelques nombres complexes :
+
+12
+00:00:33,457 --> 00:00:34,896
+z1, z2, etc.
+
+13
+00:00:34,988 --> 00:00:38,280
+Comment feriez-vous pour additionner
+ces nombres complexes ?
+
+14
+00:00:39,138 --> 00:00:43,119
+Par exemple, pour mettre dans z3
+le résultat de z1 + z2.
+
+15
+00:00:43,744 --> 00:00:45,959
+Naturellement je pense qu'on écrirait
+quelque chose comme :
+
+16
+00:00:46,217 --> 00:00:49,261
+z3 = z1 + z2
+
+17
+00:00:50,785 --> 00:00:52,474
+Si vous faites ceci 
+avec vos classes habituelles,
+
+18
+00:00:52,474 --> 00:00:54,484
+vous allez avoir une erreur de compilation
+
+19
+00:00:54,484 --> 00:00:57,611
+parce que justement le +
+n'est pas défini pour z1, z2,
+
+20
+00:00:57,611 --> 00:00:59,657
+n'est pas défini
+pour les nombres complexes.
+
+21
+00:01:00,197 --> 00:01:02,452
+Donc jusqu'à maintenant
+ce que vous auriez fait
+
+22
+00:01:02,504 --> 00:01:04,910
+c'est plutôt d'avoir une fonction
+qui fait l'addition,
+
+23
+00:01:05,009 --> 00:01:07,398
+par exemple :
+une fonction qui s'appelle « add »
+
+24
+00:01:07,468 --> 00:01:08,873
+et on ferait comme ceci :
+
+25
+00:01:08,953 --> 00:01:13,511
+add (z1, z2)
+et z3 = add (z1, z2)
+
+26
+00:01:14,193 --> 00:01:17,780
+pour mettre le résultat de l'addition
+de z1 et z2 dans z3.
+
+27
+00:01:19,107 --> 00:01:23,550
+Et si on voulait faire par exemple
+z4 qui est le résultat de l'addition
+
+28
+00:01:23,550 --> 00:01:27,532
+de z1, z2, z3
+on serait obligé d'écrire
+
+29
+00:01:27,532 --> 00:01:32,660
+comme premier argument
+ici on additionne z1 à z2
+
+30
+00:01:34,637 --> 00:01:40,642
+et puis ensuite comme deuxième argument
+un deuxième appel de la fonction add
+
+31
+00:01:41,199 --> 00:01:44,454
+on ajouterait ici z3.
+
+32
+00:01:45,842 --> 00:01:48,309
+Avouez que donc cette façon d'écrire
+est assez peu naturelle
+
+33
+00:01:48,309 --> 00:01:54,342
+et qu'il serait quand même plus naturel
+de pouvoir écrire z4 = z1 + z2 + z3
+
+34
+00:01:54,342 --> 00:01:58,522
+c'est plus clair que quelque chose
+comme ceci avec une fonction addition.
+
+35
+00:01:59,050 --> 00:02:02,089
+Et bien justement, le but
+de la surcharge des opérateurs
+
+36
+00:02:02,089 --> 00:02:05,858
+c'est de permettre d'écrire comme ceci
+d'utiliser le symbole, l'opérateur +
+
+37
+00:02:05,858 --> 00:02:10,151
+avec une classe qui nous appartient,
+une classe que nous avons définie
+
+38
+00:02:10,151 --> 00:02:12,200
+qui s'appelle la classe Complexe.
+
+39
+00:02:12,968 --> 00:02:15,502
+De même on peut continuer
+à imaginer qu'on voudrait afficher
+
+40
+00:02:15,502 --> 00:02:18,631
+des nombres complexes de façon homogène,
+comme ceci,
+
+41
+00:02:18,631 --> 00:02:22,478
+dire par exemple :
+affiche le message "z3 ="
+
+42
+00:02:22,478 --> 00:02:25,808
+suivi de la valeur du nombre complexe z3
+pour afficher z3.
+
+43
+00:02:25,913 --> 00:02:28,515
+Eh bien cette écriture ici
+n'est pas possible
+
+44
+00:02:28,515 --> 00:02:31,991
+si l'on ne surcharge pas
+l'opérateur d'affichage.
+
+45
+00:02:32,479 --> 00:02:37,638
+Je pense que c'est bien préférable
+d'écrire ceci que d'avoir à découper ici
+
+46
+00:02:37,638 --> 00:02:42,579
+un affichage du message "z3 ="
+puis d'appeler une fonction "affiche"
+
+47
+00:02:42,579 --> 00:02:45,858
+qu'on aurait définie 
+pour la classe complexe
+
+48
+00:02:45,858 --> 00:02:48,104
+puis ensuite d'afficher 
+comme ça le retour à la ligne.
+
+49
+00:02:48,384 --> 00:02:50,401
+Voilà donc à quoi sert 
+la surcharge des opérateurs.
+
+50
+00:02:50,578 --> 00:02:53,339
+Cela nous permet d'étendre
+l'utilisation des opérateurs usuels,
+
+51
+00:02:53,339 --> 00:02:54,883
+ceux que l'on trouve les plus utiles,
+
+52
+00:02:54,883 --> 00:02:57,886
+aux classes auxquelles on trouve
+qu'il faut rajouter
+
+53
+00:02:57,886 --> 00:03:01,029
+ces différents opérateurs :
+addition, affichage, multiplication...
+
+54
+00:03:01,029 --> 00:03:03,029
+en fonction de nos besoins.
+
+55
+00:03:03,783 --> 00:03:07,510
+Ceci dit, la surcharge des opérateurs
+est un sujet quand même assez technique,
+
+56
+00:03:07,510 --> 00:03:09,893
+assez difficile, car on est vraiment
+au cœur du langage
+
+57
+00:03:09,893 --> 00:03:12,358
+puisqu'on va redéfinir 
+des opérations élémentaires :
+
+58
+00:03:12,358 --> 00:03:13,494
+les opérateurs.
+
+59
+00:03:13,494 --> 00:03:15,596
+Donc, en fonction de votre niveau
+
+60
+00:03:15,596 --> 00:03:18,635
+ou en fonction des contraintes
+dans lesquelles vous développez,
+
+61
+00:03:18,640 --> 00:03:22,661
+vous pouvez avoir plusieurs approches
+par rapport à la surcharge des opérateurs.
+
+62
+00:03:22,720 --> 00:03:25,777
+Vous pouvez décider de ne pas du tout
+en faire et continuer
+
+63
+00:03:25,777 --> 00:03:28,640
+à utiliser des fonctions
+comme vous le faisiez jusqu'à maintenant.
+
+64
+00:03:29,506 --> 00:03:32,190
+Ou alors vous pouvez donc décider
+d'introduire des opérateurs
+
+65
+00:03:32,190 --> 00:03:35,682
+relativement simples :
+des additions, des multiplications,
+
+66
+00:03:36,186 --> 00:03:39,026
+sans vous préoccuper de la version
+qu'on appelle auto-affectation
+
+67
+00:03:39,026 --> 00:03:41,987
+c'est-à-dire sans les +=, -=, x=
+
+68
+00:03:42,045 --> 00:03:46,893
+Vous pouvez aussi à ce même niveau décider
+de surcharger l'opérateur d'affichage
+
+69
+00:03:46,893 --> 00:03:48,876
+si vous trouvez cela utile.
+
+70
+00:03:49,638 --> 00:03:51,694
+A un niveau supérieur,
+vous pouvez commencer à attaquer
+
+71
+00:03:51,745 --> 00:03:56,102
+la surcharge des opérateurs 
+d'auto-affectation : +=, -=...
+
+72
+00:03:56,102 --> 00:03:58,805
+mais dans une version 
+un peu plus simplifiée
+
+73
+00:03:58,805 --> 00:04:00,365
+avec un type de retour "void".
+
+74
+00:04:00,424 --> 00:04:03,710
+Nous reviendrons sur tout ceci en détails
+dans les différentes vidéos qui suivront.
+
+75
+00:04:04,205 --> 00:04:07,380
+Je donne juste ici le plan des vidéos
+que nous allons vous proposer.
+
+76
+00:04:08,144 --> 00:04:11,502
+Et enfin à un dernier niveau
+vous pouvez redéfinir aussi
+
+77
+00:04:11,502 --> 00:04:15,694
+ces opérateurs suivant le standard,
+à un niveau donc bien plus avancé.
+
+78
+00:04:16,484 --> 00:04:18,792
+Le niveau visé par ce cours 
+sera le niveau 2,
+
+79
+00:04:18,792 --> 00:04:22,069
+c'est-à-dire de faire une surcharge
+des opérateurs relativement simple.
+
+80
+00:04:22,069 --> 00:04:25,499
+Néanmoins, dans les vidéos qui vont suivre
+nous vous présenterons
+
+81
+00:04:25,499 --> 00:04:30,570
+le niveau 3 et le niveau 4
+afin que vous sachiez que ça existe,
+
+82
+00:04:31,238 --> 00:04:34,674
+et si cela vous intéresse
+de pouvoir approfondir ce sujet.
+
+83
+00:04:36,278 --> 00:04:38,445
+Entrons donc maintenant 
+dans le vif du sujet
+
+84
+00:04:38,445 --> 00:04:40,150
+de cette fameuse surcharge des opérateurs.
+
+85
+00:04:40,150 --> 00:04:43,147
+D'abord qu'est-ce qu'un opérateur ?
+Je vous rappelle qu'un opérateur
+
+86
+00:04:43,147 --> 00:04:47,219
+c'est les signes que l'on utilise
+pour représenter les opérations,
+
+87
+00:04:47,219 --> 00:04:49,790
+comme par exemple 
+les opérateurs arithmétiques :
+
+88
+00:04:49,790 --> 00:04:53,453
+quand vous écrivez par exemple
+z = a + b
+
+89
+00:04:56,629 --> 00:04:58,215
+vous avez l'opérateur de l'addition.
+
+90
+00:04:58,278 --> 00:05:02,120
+Vous avez les opérateurs logiques,
+par exemple si on écrit :
+
+91
+00:05:09,976 --> 00:05:12,317
+(a = = b) and (x == y)
+ça c'est un opérateur : and
+
+92
+00:05:13,211 --> 00:05:19,085
+Vous avez les opérateurs de comparaison
+par exemple, lorsque vous écrivez : x <= y
+
+93
+00:05:22,024 --> 00:05:24,331
+vous avez encore un opérateur.
+
+94
+00:05:25,386 --> 00:05:28,997
+Vous avez les opérateurs d'auto-incrément,
+par exemple quand on écrit : ++i
+
+95
+00:05:30,001 --> 00:05:31,346
+dans les boucles forts.
+
+96
+00:05:32,206 --> 00:05:34,999
+Et vous avez aussi l'opérateur d'affection
+dont je n'ai pas encore parlé
+
+97
+00:05:34,999 --> 00:05:37,771
+mais qui est écrit ici.
+Quand vous avez z = quelque chose
+
+98
+00:05:37,771 --> 00:05:41,142
+c'est bien un opérateur,
+cet opérateur aussi est surchargeable,
+
+99
+00:05:41,142 --> 00:05:43,813
+on en parlera tout à la fin 
+de la dernière vidéo.
+
+100
+00:05:44,544 --> 00:05:48,531
+Il faut savoir que quand vous écrivez
+une expression qui contient un opérateur,
+
+101
+00:05:48,531 --> 00:05:51,549
+l'opérateur == ici, l'opérateur and, etc.,
+
+102
+00:05:52,053 --> 00:05:55,129
+en fait cela correspond 
+à l'appel d'une fonction
+
+103
+00:05:55,129 --> 00:05:56,794
+ou l'appel d'une méthode.
+
+104
+00:05:57,596 --> 00:05:59,407
+Chaque fois que vous écrivez
+a <i>Op</i> b
+
+105
+00:06:00,090 --> 00:06:03,700
+c'est soit que vous avez la fonction
+operator<i>Op</i>(a, b)
+
+106
+00:06:03,700 --> 00:06:06,065
+par exemple quand j'écris 
+a + b
+
+107
+00:06:07,769 --> 00:06:13,000
+c'est que j'ai soit la fonction 
+Operator+(a,b) qui a été appelée
+
+108
+00:06:15,509 --> 00:06:18,786
+soit, et on verra les distinctions 
+plus tard, la méthode de la classe
+
+109
+00:06:18,786 --> 00:06:22,515
+dont a est une instance
+a.operator+(b),
+
+110
+00:06:24,583 --> 00:06:29,656
+donc la méthode operator+
+ici avec l'argument b.
+
+111
+00:06:30,987 --> 00:06:33,903
+De la même façon, 
+si vous avez des opérateurs unaires
+
+112
+00:06:33,903 --> 00:06:36,461
+c'est-à-dire des opérateurs
+qu'utilise un seul opérand
+
+113
+00:06:36,897 --> 00:06:41,311
+par exemple quand vous écrivez -a
+pour prendre l'opposé de a
+
+114
+00:06:41,633 --> 00:06:44,700
+ou quand vous écrivez ++a
+pour incrémenter a
+
+115
+00:06:45,538 --> 00:06:49,080
+c'est soit un appel d'une fonction,
+par exemple dans le cas de -a
+
+116
+00:06:49,969 --> 00:06:53,413
+ce sera la fonction operator-
+avec ici un argument a,
+
+117
+00:06:54,658 --> 00:07:01,657
+ou dans le cas d'une méthode d'une 
+instance de classe ce sera a.operator-
+
+118
+00:07:03,316 --> 00:07:04,992
+et ici sans argument.
+
+119
+00:07:05,957 --> 00:07:10,101
+De même le ++a va soit 
+appeler une fonction,
+
+120
+00:07:10,101 --> 00:07:16,234
+en fonction de ce qui aura été défini,
+soit une fonction operator++(a)
+
+121
+00:07:17,891 --> 00:07:21,309
+soit la méthode operator++
+de la classe dont a est une instance.
+
+122
+00:07:24,695 --> 00:07:29,148
+Pour donner encore d'autres exemples
+quand vous écrivez cout << a
+
+123
+00:07:30,837 --> 00:07:34,821
+c'est soit la fonction operator <<
+qui prend comme argument cout et a
+
+124
+00:07:37,689 --> 00:07:42,228
+soit parce qu'il faut savoir que cout
+c'est une instance d'une classe
+
+125
+00:07:42,228 --> 00:07:48,347
+qui s'appelle la classe iostream,
+donc soit la méthode operator <<
+
+126
+00:07:50,467 --> 00:07:53,094
+de la classe dont cout est une instance
+c'est-à-dire la classe ostream
+
+127
+00:07:54,514 --> 00:07:56,143
+avec comme paramètre a.
+
+128
+00:07:57,067 --> 00:07:59,254
+Enfin pour finir, il faut savoir 
+que quand vous appelez a = b
+
+129
+00:07:59,414 --> 00:08:01,615
+alors on est effectivement dans ce cas-là
+
+130
+00:08:03,251 --> 00:08:08,026
+mais ici vous n'avez pas de fonction =
+avec deux arguments.
+
+131
+00:08:08,083 --> 00:08:13,353
+Là c'est forcément que 
+c'est la méthode operator =
+
+132
+00:08:14,659 --> 00:08:17,086
+de la classe dont a est une instance
+qui est appelée
+
+133
+00:08:17,086 --> 00:08:18,758
+avec comme paramètre b.
+
+134
+00:08:20,671 --> 00:08:22,575
+Voilà donc pour quelques exemples.
+
+135
+00:08:22,575 --> 00:08:24,798
+L'ensemble des opérateurs 
+que vous pouvez surcharger
+
+136
+00:08:24,798 --> 00:08:28,041
+est donné en complément
+sous format d'un fichier pdf
+
+137
+00:08:28,041 --> 00:08:30,081
+sur le site du cours.
+
+138
+00:08:30,644 --> 00:08:32,911
+Voilà pour les opérateurs.
+Qu'en est-il de la surcharge ?
+
+139
+00:08:33,680 --> 00:08:36,208
+La surcharge c'est quand une fonction
+ou une méthode
+
+140
+00:08:36,208 --> 00:08:40,616
+a le même nom qu'une autre fonction
+mais elle est différenciée par ses arguments.
+
+141
+00:08:41,321 --> 00:08:46,326
+Exemple, on peut imaginer une fonction max
+qui prend deux entiers comme paramètres
+
+142
+00:08:46,881 --> 00:08:51,664
+et une autre fonction max qui prend
+deux doubles comme paramètres.
+
+143
+00:08:52,280 --> 00:08:54,634
+On va dire à ce moment-là
+que les fonctions max sont surchargées.
+
+144
+00:08:55,203 --> 00:08:59,034
+Il existe plusieurs fonctions 
+qui ont le même nom max
+
+145
+00:08:59,034 --> 00:09:01,820
+mais qui sont différenciées
+par les types de leurs paramètres.
+
+146
+00:09:02,709 --> 00:09:05,111
+Pour les opérateurs, 
+c'est ce que nous allons faire aussi :
+
+147
+00:09:05,111 --> 00:09:06,758
+nous allons surcharger les opérateurs.
+
+148
+00:09:07,321 --> 00:09:11,159
+Par exemple surcharger l'opérateur +
+pour la classe Complexe,
+
+149
+00:09:11,159 --> 00:09:14,351
+qui prend ici deux complexes
+et l'addition de deux complexes
+
+150
+00:09:14,351 --> 00:09:18,090
+retourne ici un complexe.
+On pourra surcharger aussi par exemple
+
+151
+00:09:18,090 --> 00:09:20,858
+si on imagine qu'on a des matrices
+que l'on peut additionner,
+
+152
+00:09:20,858 --> 00:09:25,300
+surcharger opérateur + pour prendre
+deux matrices ici.
+
+153
+00:09:26,332 --> 00:09:27,947
+Voilà ce qu'est la surcharge 
+des opérateurs :
+
+154
+00:09:27,947 --> 00:09:31,665
+c'est la capacité de redéfinir 
+des opérateurs qui ont le même nom :
+
+155
+00:09:31,665 --> 00:09:34,798
+"operator quelque chose"
+pour différentes classes.
+
+156
+00:09:36,375 --> 00:09:39,207
+En C++, presque tous les opérateurs
+sont surchargeables.
+
+157
+00:09:39,207 --> 00:09:42,482
+Encore une fois la liste exhaustive
+est donnée sur le site du cours.
+
+158
+00:09:43,155 --> 00:09:45,854
+Vous pouvez donc surcharger ainsi 
+librement les opérateurs usuels
+
+159
+00:09:45,854 --> 00:09:49,401
+pour vos classes.
+On l'a vu, il y a deux façons
+
+160
+00:09:49,401 --> 00:09:51,882
+d'interpréter un opérateur :
+soit sous forme de fonction,
+
+161
+00:09:51,882 --> 00:09:53,293
+soit sous forme de méthode,
+
+162
+00:09:53,892 --> 00:09:56,380
+parce qu'il y a en fait deux types
+de surcharge :
+
+163
+00:09:56,380 --> 00:09:59,960
+la surcharge qu'on appelle interne,
+et la surcharge externe.
+
+164
+00:10:00,934 --> 00:10:03,782
+La surcharge externe est celle qui
+utilise une fonction,
+
+165
+00:10:03,782 --> 00:10:07,804
+comme par exemple :
+operator+ qui prend deux complexes
+
+166
+00:10:07,804 --> 00:10:17,442
+pour faire par exemple z3 = z1 + z2
+qui ici appellera operator+
+
+167
+00:10:18,352 --> 00:10:22,485
+z3 = operator+(z1, z2)
+
+168
+00:10:23,752 --> 00:10:27,160
+C'est une surcharge à l'extérieur
+de la classe, c'est ce qu'on appelle
+
+169
+00:10:27,160 --> 00:10:30,591
+une surcharge externe,
+par opposition à une surcharge interne
+
+170
+00:10:30,667 --> 00:10:35,669
+qui se fait dans la classe.
+C'était l'autre forme, alternative.
+
+171
+00:10:36,336 --> 00:10:40,843
+Cette fois-ci on aurait :
+z3 = z1.appel de méthode
+
+172
+00:10:41,741 --> 00:10:44,011
+donc ici operator+ de z2.
+
+173
+00:10:44,878 --> 00:10:48,584
+Donc dans une surcharge interne
+nous avons l'opérateur qui correspond
+
+174
+00:10:48,584 --> 00:10:52,784
+à une méthode, alors que
+dans la surcharge externe
+
+175
+00:10:52,784 --> 00:10:56,286
+les opérateurs correspondent
+à des fonctions.
+
+176
+00:10:57,268 --> 00:10:59,590
+Nous allons commencer par vous présenter
+la surcharge externe,
+
+177
+00:10:59,590 --> 00:11:03,327
+puis dans la séquence vidéo suivante
+nous présenterons la surcharge interne
+
+178
+00:11:03,327 --> 00:11:05,739
+et nous discuterons 
+quand il est plus approprié
+
+179
+00:11:05,739 --> 00:11:07,765
+de choisir l'une ou l'autre
+de ces surcharges.

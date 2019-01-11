@@ -1,0 +1,1107 @@
+1
+00:00:00,770 --> 00:00:04,050
+In the previous part of this lecture, we
+have extended the
+
+2
+00:00:04,050 --> 00:00:07,308
+link check example to run on a cluster of
+nodes, and we
+
+3
+00:00:07,308 --> 00:00:11,290
+have seen that cluster start up and shut
+down, but how
+
+4
+00:00:11,290 --> 00:00:14,800
+did that actually work, what were these
+states that we have seen?
+
+5
+00:00:16,770 --> 00:00:25,070
+When a cluster node wants to join, it
+enters the joining state.
+
+6
+00:00:28,200 --> 00:00:29,630
+That was the first one we have seen.
+
+7
+00:00:32,810 --> 00:00:38,070
+We've also seen that in the example,
+nothing happened until the second node
+
+8
+00:00:38,070 --> 00:00:44,000
+joined, because we had defined that the
+cluster needs at least size two to work.
+
+9
+00:00:44,000 --> 00:00:50,849
+But what happened then is that the node
+became up.
+
+10
+00:00:50,849 --> 00:00:57,986
+This transition was made by the leader,
+when the leader determined that
+
+11
+00:00:57,986 --> 00:01:03,756
+all members of the cluster had seen all
+new nodes joining.
+
+12
+00:01:03,756 --> 00:01:08,740
+When the program was done, the cluster
+main shut itself down, and
+
+13
+00:01:08,740 --> 00:01:13,091
+it did so by declaring that it wants to
+leave the cluster.
+
+14
+00:01:13,091 --> 00:01:19,040
+This intention is expressed by going to
+the leaving state.
+
+15
+00:01:21,820 --> 00:01:25,770
+This transition can be done by any node,
+
+16
+00:01:25,770 --> 00:01:27,780
+without the leader having anything to do
+with it.
+
+17
+00:01:29,250 --> 00:01:32,990
+The information that the node wants to
+leave needs to be disseminated to
+
+18
+00:01:32,990 --> 00:01:38,000
+all others, so that they are prepared to
+remove it from the membership list.
+
+19
+00:01:38,000 --> 00:01:40,800
+Because otherwise, not all would have the
+same
+
+20
+00:01:40,800 --> 00:01:42,440
+picture, and it would not be a cluster.
+
+21
+00:01:44,450 --> 00:01:49,114
+In order to do that in an orderly fashion,
+the leader
+
+22
+00:01:49,114 --> 00:01:54,354
+determines when all have seen.
+And moves
+
+23
+00:01:54,354 --> 00:01:59,883
+the node to the exiting
+
+24
+00:01:59,883 --> 00:02:04,278
+state.
+And this is the
+
+25
+00:02:04,278 --> 00:02:09,543
+signal for all the other nodes to
+
+26
+00:02:09,543 --> 00:02:16,173
+remove this entry from their membership
+
+27
+00:02:16,173 --> 00:02:22,056
+list, at their next convenience.
+
+28
+00:02:22,056 --> 00:02:26,840
+This was the sequence of states which the
+cluster main went through.
+
+29
+00:02:26,840 --> 00:02:31,140
+From joining to up, then performing what
+it was
+
+30
+00:02:31,140 --> 00:02:34,880
+supposed to do, and then leaving via this
+path,
+
+31
+00:02:34,880 --> 00:02:39,850
+until it shut itself down.
+The ClusterWorker lift the
+
+32
+00:02:39,850 --> 00:02:45,650
+cluster afterwards by is, a little bit
+different route which was
+
+33
+00:02:45,650 --> 00:02:51,350
+via a state called unreachable.
+And, we'll talk about that next.
+
+34
+00:02:54,580 --> 00:02:58,020
+In order to form a cluster, everyone
+within it
+
+35
+00:02:58,020 --> 00:03:01,490
+needs to be in consensus about who is in
+it.
+
+36
+00:03:01,490 --> 00:03:02,850
+That was the definition of it.
+
+37
+00:03:04,630 --> 00:03:07,920
+Therefore, only if the members of the
+cluster
+
+38
+00:03:07,920 --> 00:03:11,190
+can communicate with each other, can the
+cluster function.
+
+39
+00:03:12,400 --> 00:03:15,980
+This means that the reachability of all
+cluster members
+
+40
+00:03:15,980 --> 00:03:20,330
+must be closely monitored, and once one
+becomes unreachable,
+
+41
+00:03:20,330 --> 00:03:21,890
+special action needs to be taken.
+
+42
+00:03:23,620 --> 00:03:27,970
+In order to check the ability to
+communicate, every node in
+
+43
+00:03:27,970 --> 00:03:32,890
+a cluster is monitored by several others
+using so called heartbeats.
+
+44
+00:03:32,890 --> 00:03:35,620
+That means that periodic messages are
+sent.
+
+45
+00:03:35,620 --> 00:03:40,162
+And once they are not received anymore
+there is presumably a problem.
+
+46
+00:03:41,570 --> 00:03:45,610
+Now if you have a very large cluster it is
+impractical to have everybody
+
+47
+00:03:45,610 --> 00:03:48,600
+monitor everybody else, because then the
+number
+
+48
+00:03:48,600 --> 00:03:51,650
+of connections needed for that, the number
+
+49
+00:03:51,650 --> 00:03:58,000
+of communication pairs, would be roughly
+one half n squared which can be a lot.
+
+50
+00:03:58,000 --> 00:04:05,460
+Therefore, we apply a technique of that
+the neighbors monitor each other.
+
+51
+00:04:05,460 --> 00:04:06,980
+How do we define neighbors?
+
+52
+00:04:06,980 --> 00:04:10,760
+Let's say we have a cluster with seven
+nodes.
+
+53
+00:04:10,760 --> 00:04:16,027
+One, two, three, four,
+
+54
+00:04:16,027 --> 00:04:20,862
+five, six, and seven.
+
+55
+00:04:20,862 --> 00:04:26,142
+Since these nodes all agree that they are
+the seven which are in the
+
+56
+00:04:26,142 --> 00:04:31,230
+cluster and you can apply a sort order on
+their addresses,
+
+57
+00:04:31,230 --> 00:04:36,030
+every of these seven nodes can draw the
+same kind of ring with
+
+58
+00:04:36,030 --> 00:04:41,075
+the same order of the nodes in it.
+And then we could
+
+59
+00:04:41,075 --> 00:04:46,515
+say that one monitors two and three, two
+
+60
+00:04:46,515 --> 00:04:51,500
+monitors three and four, and so on.
+
+61
+00:04:51,500 --> 00:04:55,808
+This would be a picture if every node
+would monitor two others.
+
+62
+00:04:55,808 --> 00:05:01,280
+For a more tight mesh, we could also make
+it
+
+63
+00:05:01,280 --> 00:05:06,448
+three, for example, then it would look
+
+64
+00:05:06,448 --> 00:05:11,577
+like this.
+Let us say that node five
+
+65
+00:05:11,577 --> 00:05:16,427
+fails.
+It was monitored by
+
+66
+00:05:16,427 --> 00:05:22,247
+two, three, and four.
+Eventually,
+
+67
+00:05:22,247 --> 00:05:27,499
+these three nodes will not receive a
+heartbeats from five anymore.
+
+68
+00:05:27,499 --> 00:05:32,080
+But, heartbeats cannot be sent at a one
+millisecond interval.
+
+69
+00:05:32,080 --> 00:05:34,040
+That would just be too much.
+
+70
+00:05:34,040 --> 00:05:38,180
+So, let's say you send a heartbeat every
+five seconds.
+
+71
+00:05:38,180 --> 00:05:41,740
+Then, within five seconds, the three will
+notice
+
+72
+00:05:43,770 --> 00:05:49,040
+that the first heartbeat was not received.
+But, that might just have been a fluke.
+
+73
+00:05:49,040 --> 00:05:50,850
+The next one might still arrive.
+
+74
+00:05:50,850 --> 00:05:56,150
+So triggering when one is absent is
+usually too finicky.
+
+75
+00:05:57,890 --> 00:06:00,202
+So what you need to wait for is that two
+
+76
+00:06:00,202 --> 00:06:03,380
+or three fail and then it takes maybe 15
+seconds.
+
+77
+00:06:04,500 --> 00:06:08,960
+And the more monitors you have, the higher
+the chance is that you get
+
+78
+00:06:08,960 --> 00:06:10,600
+the signal a bit earlier.
+
+79
+00:06:10,600 --> 00:06:17,140
+So let us say, node 4 was the first to
+detect that 5 is down.
+
+80
+00:06:17,140 --> 00:06:22,350
+Then this information will be included in
+the gossip messages.
+
+81
+00:06:22,350 --> 00:06:26,620
+And four talks randomly to all the other
+
+82
+00:06:26,620 --> 00:06:29,870
+nodes in the ring and spreads the
+information.
+
+83
+00:06:29,870 --> 00:06:34,180
+So, it might be communicated to six, and
+then
+
+84
+00:06:34,180 --> 00:06:39,720
+to two, but six also keeps talking to one,
+and so on.
+
+85
+00:06:39,720 --> 00:06:46,760
+And eventually, all of them will know that
+
+86
+00:06:46,760 --> 00:06:48,950
+node number four has seen that five is
+down.
+
+87
+00:06:50,120 --> 00:06:52,860
+For a cluster to be hampered in its
+function, it
+
+88
+00:06:52,860 --> 00:06:56,179
+is enough that one of the communication
+links does not work.
+
+89
+00:06:57,190 --> 00:06:59,430
+Unless messages can be routed
+
+90
+00:06:59,430 --> 00:07:03,560
+by other nodes.
+So if 4 and 5 cannot talk anymore,
+
+91
+00:07:05,260 --> 00:07:10,150
+and if, for example, the routing protocol
+does not messages to
+
+92
+00:07:10,150 --> 00:07:14,960
+go via one, for example, then the cluster
+cannot function.
+
+93
+00:07:14,960 --> 00:07:20,430
+And that is the case in Akka that supports
+only direct messages at this point.
+
+94
+00:07:21,510 --> 00:07:24,590
+This means that as soon as one node sees
+another
+
+95
+00:07:24,590 --> 00:07:27,550
+node as unreachable, that node has to
+
+96
+00:07:27,550 --> 00:07:30,930
+be considered unreachable for the whole
+cluster.
+
+97
+00:07:30,930 --> 00:07:36,300
+And that means that the cluster currently
+is inconsistent.
+
+98
+00:07:36,300 --> 00:07:42,640
+Because these six nodes think, that that
+one is not part of the cluster.
+
+99
+00:07:42,640 --> 00:07:45,810
+But this node, well it might not have
+crashed.
+
+100
+00:07:45,810 --> 00:07:49,690
+Someone might have pulled the, the network
+cable out from it, so it
+
+101
+00:07:49,690 --> 00:07:51,700
+cannot communicate anymore.
+
+102
+00:07:51,700 --> 00:07:55,790
+And the last state that it has is that
+everybody is part of the cluster.
+
+103
+00:07:56,920 --> 00:08:02,360
+But as this node is also monitoring other
+nodes - namely six,
+
+104
+00:08:02,360 --> 00:08:08,090
+seven, and one - it will conclude after
+some period of time that they are down.
+
+105
+00:08:08,090 --> 00:08:12,490
+It will start monitoring these instead to
+see if they are still up.
+
+106
+00:08:12,490 --> 00:08:16,380
+So in the end, the clusters will split.
+
+107
+00:08:16,380 --> 00:08:19,010
+Five would be in a cluster on its own,
+
+108
+00:08:23,830 --> 00:08:27,990
+and these nodes would also be in a cluster
+on its own.
+
+109
+00:08:27,990 --> 00:08:33,780
+But in order to form these clusters, nodes
+need to be removed properly,
+
+110
+00:08:33,780 --> 00:08:37,810
+so that these six nodes can declare that
+five is no longer in it.
+
+111
+00:08:39,940 --> 00:08:46,410
+Going to back to this state diagram,
+unreachability is not really a state.
+
+112
+00:08:46,410 --> 00:08:51,860
+It is a flag, because I know it can become
+reachable after a period of time.
+
+113
+00:08:51,860 --> 00:08:54,580
+For example, someone plugs in that network
+
+114
+00:08:54,580 --> 00:08:57,640
+cable again, and everything happily starts
+over.
+
+115
+00:08:58,720 --> 00:09:03,670
+But unreachability is important enough to
+be part of this diagram.
+
+116
+00:09:06,312 --> 00:09:10,706
+And nodes can become unreachable at all
+times, at any time.
+
+117
+00:09:10,706 --> 00:09:20,010
+And if the did not really crash as I said,
+they can become reachable again.
+
+118
+00:09:20,010 --> 00:09:25,170
+In order to form a new cluster, without
+the unreachable node, that node needs to
+
+119
+00:09:25,170 --> 00:09:31,480
+be communicated that it is leaving.
+But it is not the same kind of leaving
+
+120
+00:09:31,480 --> 00:09:36,530
+as we've seen over here.
+Because, the node went down.
+
+121
+00:09:37,990 --> 00:09:41,980
+This transition here is a policy decision,
+
+122
+00:09:41,980 --> 00:09:45,670
+because you cannot in all cases say
+whether
+
+123
+00:09:45,670 --> 00:09:47,980
+the node is really down or whether it
+
+124
+00:09:47,980 --> 00:09:52,700
+is transiently unreachable, whether it
+will come back.
+
+125
+00:09:52,700 --> 00:09:56,670
+So in the end, there will be some either a
+program or
+
+126
+00:09:56,670 --> 00:10:00,490
+an operator monitoring the system, and
+deciding after which
+
+127
+00:10:00,490 --> 00:10:04,340
+an unreachability period to move a node to
+down.
+
+128
+00:10:04,340 --> 00:10:08,260
+Once that has happened, and once that has
+properly been disseminated
+
+129
+00:10:08,260 --> 00:10:13,870
+among all of the remaining cluster nodes,
+the leader removes the node.
+
+130
+00:10:14,970 --> 00:10:22,390
+Now we can recapitulate the whole history
+as seen by the ClusterWorker.
+
+131
+00:10:22,390 --> 00:10:28,560
+It's, it was joining it saw the main
+joining and then up, and once the
+
+132
+00:10:28,560 --> 00:10:33,920
+main program stopped, the ClusterWorker
+detected it as being unreachable.
+
+133
+00:10:35,410 --> 00:10:41,720
+Then I have shown you that I set an option
+called autodown in the worker.
+
+134
+00:10:41,720 --> 00:10:43,290
+Which means that as soon as a
+
+135
+00:10:43,290 --> 00:10:47,960
+node becomes unreachable, this transition
+happens automatically.
+
+136
+00:10:47,960 --> 00:10:52,378
+So as soon as that failure detector
+flagged that the
+
+137
+00:10:52,378 --> 00:10:57,430
+main is unreachable, it went from up via
+unreachable to down.
+
+138
+00:10:57,430 --> 00:11:03,430
+And that means that there was just one
+node in that cluster left.
+
+139
+00:11:03,430 --> 00:11:08,030
+The cluster worker was the only node, and
+therefore also its leader,
+
+140
+00:11:08,030 --> 00:11:13,240
+and it removed the main, and that
+triggered the ClusterWorker's main actor
+
+141
+00:11:13,240 --> 00:11:19,110
+to shut down the program.
+In the program code, we registered
+
+142
+00:11:19,110 --> 00:11:24,480
+for certain events to be received.
+The first one was MemberUp.
+
+143
+00:11:24,480 --> 00:11:28,900
+And that is published exactly with this
+transition here.
+
+144
+00:11:29,970 --> 00:11:33,210
+And in response to it, we started the
+program running.
+
+145
+00:11:33,210 --> 00:11:38,810
+The cluster main reacted to this MemberUp
+event in order to start the calculation.
+
+146
+00:11:40,050 --> 00:11:44,060
+The cluster worker was more interested in
+when the main exited.
+
+147
+00:11:46,780 --> 00:11:54,030
+And that is published as MemberRmoved upon
+this transition here, as well as this one.
+
+148
+00:11:56,940 --> 00:12:00,218
+There are other transitions which you can
+listen to, for example
+
+149
+00:12:00,218 --> 00:12:06,370
+MemberLeaving, and MemberUnreachable,
+which were not shown in code so far.
+
+150
+00:12:07,860 --> 00:12:14,020
+Whenever a node is removed from the
+cluster, all the actors which are on it
+
+151
+00:12:14,020 --> 00:12:16,760
+might still be alive, if it's just
+
+152
+00:12:16,760 --> 00:12:19,190
+a network partition, but that does not
+matter.
+
+153
+00:12:19,190 --> 00:12:22,120
+As far as the cluster is concerned, this
+node is
+
+154
+00:12:22,120 --> 00:12:24,740
+removed and does not exist anymore.
+
+155
+00:12:24,740 --> 00:12:29,290
+That also means that all actor refs which
+are still held within
+
+156
+00:12:29,290 --> 00:12:35,570
+the cluster to actors on that removed node
+need to be considered terminated.
+
+157
+00:12:35,570 --> 00:12:39,490
+If, for example, DeathWatch was registered
+on these
+
+158
+00:12:39,490 --> 00:12:44,180
+actor refs, then the terminated messages
+must be delivered.
+
+159
+00:12:44,180 --> 00:12:47,480
+Even though the actors possibly have not
+really stopped
+
+160
+00:12:47,480 --> 00:12:52,100
+yet, but they are considered to be dead
+after the node has been removed.
+
+161
+00:12:53,280 --> 00:12:58,348
+This is important to allow consistent
+cleanup of resources.
+
+162
+00:12:58,348 --> 00:13:03,700
+One actor, monitoring the lifecycle of
+another was interested in when that other
+
+163
+00:13:03,700 --> 00:13:08,300
+actor cannot perform its duties anymore,
+and that is clearly the case here.
+
+164
+00:13:08,300 --> 00:13:13,130
+Another reason why this needs to be done
+consistently is
+
+165
+00:13:13,130 --> 00:13:18,470
+that for remote-deployed actors, for
+example, if a child actor was
+
+166
+00:13:18,470 --> 00:13:23,670
+on the remove node, the parent needs to be
+told that child is no longer there.
+
+167
+00:13:23,670 --> 00:13:26,570
+The name is free again, for example.
+
+168
+00:13:26,570 --> 00:13:30,320
+Or, if that node had remote deployed
+children
+
+169
+00:13:30,320 --> 00:13:32,970
+to nodes which are still on the cluster.
+
+170
+00:13:32,970 --> 00:13:35,590
+Then these are currently without a parent.
+
+171
+00:13:35,590 --> 00:13:38,300
+And that cannot be because then there is
+no one who will handle
+
+172
+00:13:38,300 --> 00:13:39,018
+their failures.
+
+173
+00:13:39,018 --> 00:13:43,210
+This means that they also need to be
+stopped.
+
+174
+00:13:45,130 --> 00:13:50,150
+The most important part of the semantics
+of DeathWatch are, that once the
+
+175
+00:13:50,150 --> 00:13:53,110
+terminated message has been delivered, no
+further
+
+176
+00:13:53,110 --> 00:13:56,430
+communication will be received from that
+actor.
+
+177
+00:13:56,430 --> 00:13:59,150
+This has consequences on the cluster as
+well.
+
+178
+00:13:59,150 --> 00:14:03,750
+Once a node has been removed, and
+DeathWatch has fired on all the actors
+
+179
+00:14:03,750 --> 00:14:08,140
+within it, this node cannot join the
+cluster again.
+
+180
+00:14:08,140 --> 00:14:12,720
+It cannot come back, because that would
+mean that the actors could also
+
+181
+00:14:12,720 --> 00:14:15,050
+start sending messages again, and that
+would
+
+182
+00:14:15,050 --> 00:14:18,039
+violate the contract of the terminated
+message.
+
+183
+00:14:19,300 --> 00:14:23,220
+Therefore, a node which was removed from
+the cluster needs to be
+
+184
+00:14:23,220 --> 00:14:29,120
+restarted completely before it can join
+again, and there cannot be any
+
+185
+00:14:29,120 --> 00:14:30,850
+of the old actors still on it.
+
+186
+00:14:32,550 --> 00:14:37,180
+If you have paid close attention, you will
+have noticed a small inconsistency here.
+
+187
+00:14:37,180 --> 00:14:40,860
+In Akka message delivery is not
+guaranteed, but
+
+188
+00:14:40,860 --> 00:14:44,440
+still we do guarantee that the terminated
+message arrives.
+
+189
+00:14:45,640 --> 00:14:49,990
+The need for this guarantee should have
+become clear, and
+
+190
+00:14:49,990 --> 00:14:54,440
+the reason why we can afford to implement
+this guarantee is
+
+191
+00:14:54,440 --> 00:14:57,800
+that terminated can just be synthesized.
+
+192
+00:14:57,800 --> 00:15:00,080
+It can be put together even though the
+
+193
+00:15:00,080 --> 00:15:02,380
+sender is currently not able to do that
+anymore.
+
+194
+00:15:03,490 --> 00:15:07,360
+Therefore the terminated message enjoys
+this special status.
+
+195
+00:15:08,860 --> 00:15:13,616
+To try this out, we will modify the
+ClusterWorker, not to rely on the
+
+196
+00:15:13,616 --> 00:15:19,684
+MemberRemoved event, but instead to use
+DeathWatch so that it terminates once the
+
+197
+00:15:19,684 --> 00:15:24,000
+cluster main stops.
+First of all the worker needs to subscribe
+
+198
+00:15:24,000 --> 00:15:30,090
+to the MemberUp event.
+And after joining the main, it waits
+
+199
+00:15:30,090 --> 00:15:35,810
+for this event to arrive, signaling that
+the cluster main has been started.
+
+200
+00:15:37,860 --> 00:15:41,786
+Then we need an actor to which we can
+apply DeathWatch,
+
+201
+00:15:41,786 --> 00:15:45,582
+we know one which will exist, that is the
+receptionist.
+
+202
+00:15:45,582 --> 00:15:51,100
+We can construct the receptionist's actor
+path because we have the
+
+203
+00:15:51,100 --> 00:15:56,590
+main address, and we can form a root actor
+path from it.
+
+204
+00:15:57,950 --> 00:16:04,380
+And then these paths have a little DSL
+built in where you can separate
+
+205
+00:16:04,380 --> 00:16:08,800
+by slashes, the path components.
+So, this is the
+
+206
+00:16:08,800 --> 00:16:13,192
+address of the cluster main / user / app /
+
+207
+00:16:13,192 --> 00:16:17,900
+receptionist.
+We can resolve this actor path using
+
+208
+00:16:17,900 --> 00:16:24,340
+actorSelection and sending it an Identify
+message with some random tag here,
+
+209
+00:16:24,340 --> 00:16:29,450
+and If we cannot find, if we cannot
+
+210
+00:16:29,450 --> 00:16:33,130
+resolve the receptionist, something must
+be wrong.
+
+211
+00:16:33,130 --> 00:16:34,560
+We stop the program.
+
+212
+00:16:34,560 --> 00:16:36,580
+Otherwise, this is normal case.
+
+213
+00:16:36,580 --> 00:16:39,340
+We just watch the receptionist, and once
+
+214
+00:16:39,340 --> 00:16:41,960
+we get the terminated, we stop the
+program.
+
+215
+00:16:44,140 --> 00:16:47,900
+YOu can see here this modified
+ClusterWorker.
+
+216
+00:16:47,900 --> 00:16:51,790
+I've inserted one log line, when we
+successfully
+
+217
+00:16:51,790 --> 00:16:55,810
+watched the receptionist, to print out who
+that was.
+
+218
+00:16:56,860 --> 00:16:58,260
+Now running the program.
+
+219
+00:17:07,640 --> 00:17:10,980
+We see that the main program performs its
+duty.
+
+220
+00:17:10,980 --> 00:17:14,010
+It did the retrevials and then it shut
+down.
+
+221
+00:17:15,670 --> 00:17:18,786
+But we're more interested in the worker.
+
+222
+00:17:27,320 --> 00:17:33,015
+We see here that the worker was welcomed
+into the cluster by the cluster main.
+
+223
+00:17:33,015 --> 00:17:38,710
+And then we resolved the receptionist to
+be this actor ref here, with the UID.
+
+224
+00:17:41,600 --> 00:17:46,160
+This was at 11:09:21, and then eight
+seconds later when the work
+
+225
+00:17:46,160 --> 00:17:48,930
+was done, the application was shutting
+
+226
+00:17:48,930 --> 00:17:51,190
+down because it received the terminated
+message.
+
+227
+00:17:53,870 --> 00:17:58,250
+As you have seen, using the cluster is
+really not complicated,
+
+228
+00:17:58,250 --> 00:18:03,240
+it just means subscribing to some events
+and then reacting to MemberUp.
+
+229
+00:18:03,240 --> 00:18:07,150
+And for example, using DeathWatch just as
+normal.
+
+230
+00:18:07,150 --> 00:18:10,190
+I invite you to play around with this
+program a little bit, maybe
+
+231
+00:18:10,190 --> 00:18:14,440
+add more cluster nodes and see how you can
+make this program scale.
+

@@ -1,0 +1,131 @@
+In the previous episodes, we have seen that the attributes defined within the class represent informations specific to each  instance of the class.
+Let us go back to our little example of the rectangle.
+Each instance of rectangle, each
+Rectangle-type object will have its own width, its own height.
+Those are specific informations characterizing each rectangle.
+Now, what does happen if several instances of a same class need to access a same information, a common information?
+This is the object of today's episode.
+In order to illustrate the problem we are interested in, let us go back to our example of counting instances.
+We have already had the chance to study it in the episodes regarding the construction/destruction of an object.
+Our goal is to account for all the instances existing at a given time in a program.
+For that, we need to have a memory area accessible by every instance.
+It will be incremented whenever an instance is created and decremented every time an instance is destroyed.
+When we had discussed this problem for the first time, the only way we had to define this memory area, acessible by every instance in order to be incremented and decremented was to use a global variable.
+Formerly, we were not plainly satisfied with this declaration of a global variable.
+Indeed, using global variables tends to be nefarious in a program; it is a very poor solution.
+A global variable, such as this one, is not attached to any entity in the program.
+Therefore, violates the principle of encapsulation and is a sign of a poor modularization.
+Moreover, this can induce harmful side effects.
+Indeed, such a variable can be accessed pretty much everywhere in the program, without any control.
+Therefore, we should avoid this at all cost.
+Alternatively, defining the counter as an attribute of the rectangle class is clearly not a good solution either since it would mean that each instance of rectangle has its own counter. This is clearly not what we wish.
+We wish to have a common area accessible by every instance.
+Therefore, this solution is not good either.
+The solution to this problem is to define the information we wish to be common to all instances of the class as a class attribute.
+Unlike the attributes relative to instances
+(the ones we were used to define up until now) a class attribute is an attribute defined inside the class, but matched with the reserved keyword "static".
+Typically, let us us imagine a program where severall Rectangle instances coexist.
+To make things easier, there will be two.
+The situation in the memory is the following.
+The "r1" object has its own specific values for its instance attributes : the height and the width.
+The same goes for the "r2" object, having its own values for the height and the width.
+On the other hand, the class attribute "compteur" is a unique memory area accessible by all the instances.
+However, it only exists once in the memory.
+By the way, please note that the visibility rules for a "static" attribute are the sames as the non "static" attributes.
+This means that this memory area is accessible even if no instance has been created, simply through the name of the class.
+Very concretely, let us have a program where we declare a "Rectangle" class, like this, with a class attribute.
+We can access this class attribute without having previously created any instance of Rectangle.
+This can be done through the following notation, this one :
+We are accessing the variable of the "Rectangle" class called "compteur". We are doing this through the scope resolution operator.
+To sum up, in order to define a class attribute, we define an attribute and precede its declaration with the reserved keyword "static".
+We have seen that a class attribute is shared by all the instances.
+It is a unique memory area shared by all the instances.
+This memory area exists even when we have not created any instance of this class.
+We have seen we can access it through this notation.
+Also, a class attribute can, like an instance attribute, be either private or public.
+The instance attributes are typically initialized upon the objects' initialization.
+However, we have seen that a class attribute may exist independently from any object's construction.
+In that case, how should we proceed to initialize a class attribute?
+To that end, we must resort to a particular syntax.
+Outside the class, we place an initialization line with this syntax.
+It means : the "compteur" variable, of the "Rectangle" class, of the integer type, will be initialized to 0.
+Such a line of code will appear outside the "Rectangle" class.
+For example, like this.
+We will take this line outside the declaration of the "Rectangle" class.
+We resort to a particular syntax since a class attribute exists even if we have not declared any instance of this class.
+This means we cannot have, for example, a constructor be in charge of the required initialization.
+Resorting to a class variable in order to account for all the instances of a class is naturally a relatively atypical example.
+Of course, there are many other situations where it is useful to share informations between several instances.
+However, most of the time, it will be a constant.
+Let us take an example.
+This time, we will move away from our rectangle example and imagine a situation where we need to reperesent the employees of a company.
+This is more of an administrative example.
+Let us say that an employee is characterized by an age, the in-service date.
+Also, let us say that there is an information common to all employees. This would be the official pensionable age.
+Where should we place this information on the pensionable age
+(for example 65 years) ?
+This pensionable age of 65 years is the same for all employees.
+Let us imagine we start by declaring it like an instance attribute, like this.
+This means that, every time we create an employee, this employee will have an age (30 years old) an in-service date, and an official pensionable age (65 years).
+Same thing for the second employee, still with 65 years.
+And this as many times as there are employees, with the value 65 repeated every time.
+This information is thus uselessly repeated for each employee.
+There is thus code duplication; this could induce maintenance troubles.
+For example, let us imagine that, through a change of law, the pensionable age is changed to 67 years.
+We would thus need to dive into each instance and modify this value everywhere.
+Obviously, this may beget severe maintenance problems.
+The solution is obviously to define this information as a class variable thanks to the reserved "keyword" static.
+Typically, here, "age_retraite" would be a memory area commonly accessible by all the instances.
+However, it will not be duplicated in each of the instances.
+Typically, this will disapear.
+The same goes for each instance.
+To sum up, we have seen, through the previous examples that the class attributes are typically very practical and useful when different objects need to access a common information
+(such as the official pensionable age).
+We have seen it lets us avoid information duplication and permits for a better maintenance of this information.
+Also, please remember the case we had studied before, regarding instance counting.
+Here, the class variable was defined as a non-constance since we need to decrement/increment this value every time an object is created is destroyed.
+Why, this situation is rather atypical.
+Practically, most of the class variables you will encounter will be used to represent constants useful for all the instances of a given class.
+Now, you know what a class attribute is, a "static" attribute.
+Is it possible to do the same thing with methods?
+The answer is yes, and we will present it for the sake of completeness, even though  "static" methods are not used very frequently.
+Also, it is not recommanded to use them in object-oriented programming.
+A "static" method is simply a method defined inside a class.
+This declaration is preceded with the reserved keyword "static".
+In order to call an instance method, that is, the the methods we were used to work with until now, we forced to have previously created an object.
+Only then could we call the method on this object.
+For example, in order to calculate the surface of a rectangle, we first need to create a Rectangle-type object.
+Only then can we call the calculation of this rectangle's surface.
+On the other hand, a class method may very well be called if not object of the class has been previously declared.
+For example, let " A " be a class with a static method called "methode1". We may call this method thanks to the scope resolution operator without having previously declared any A-type object.
+Here, we simply say that we are calling "method1" of the class "A".
+Of course, such an instruction is not valid for non-static methods.
+For example, here, in the class "A", we have a second method : "methode2".
+It has not been declared as "static".
+If we try to call it only through the name of the class, without passing by the creation of an instance, we will get an error.
+In order to call the non-static "methode2", we need an previously declared
+A-type object on which to call "methode2".
+This is what we are doing here to calculate the surface of a given rectangle "r".
+By the way, please note that a "static" method method may be called either through the name of the class
+(independently of the any instance's creation, as we have done here) or it can be called through an instance
+(if such an instance exists).
+Therefore, such an instruction is valid albeit not frequent or recommanded.
+Finally, this kind of instruction, accessing a "static" member through an instance is also possible for the attributes (if this attribute is accessible, of course).
+The fact that a class method may be called independently of the creation of any instance begets a few restrictions regarding what we may do within such a method.
+Indeed, since a class method cannot presuppose the existence of the current object on which it is applied, it cannot itself use a method or attribute presupposing the existence of an object.
+It will not be able to use an instance method or attribute.
+In other words, this means that a class method can only access otehr class methods and attributes.
+A "static" method can itself only use "static" members.
+We may see class methods as simple usual functions that have been placed inside a class.
+In languages such as C++, where there is a non-object layer where we can use usual functions without passing by the creation of classes, the use of class methods is warranted only in very particular situations.
+We can imagine, as an example, the need to create a class method in order to print a few values of class attributes.
+We can imagine the need to define a class method in order to manipulate class attributes,
+"static" attributes who are non constant and private.
+In this case, it is necessary to define such methods.
+In general, it is almost always preferable to use usual functions in C++ rather than class methods.
+Above, we should absolutely avoid to have "statics" grow rampant in a program.
+Whyso?
+Indeed, since a "static" member can be called independently of the creation of any object, it weakens our oriented-object approach.
+VoilÃ , this concludes our presentation on "static" members in a class; methods and attributes both.
+We have seen that, practically, most of the "static" attributes we will encounter will be constants.
+Also, we should remain careful not to overuse "statics".

@@ -1,0 +1,103 @@
+Let's conclude this case study with the problem of copying watches.
+Since we know that our watch has pointers to its different components, its mechanism and its accessories, how do we copy a watch?
+Up til now, we have forbidden copying and forbidden assignment, the equals operator but now, we will look into how to actually copy a watch.
+This will lead us to a new problematic which is polymorphic copying.
+Let's start with the problem of copying watches and suppose, for example, that we have two watches <i>m1</i> and <i>m2</i> such that <i>m2</i> is a copy of <i>m1</i>.
+So, we have the following situation in memory: the core, which is a pointer to a mechanism somewhere in memory and the accessories which are a dynamic array of pointers to different accessories in memory.
+If we make a shallow copy of <i>m1</i> into <i>m2</i>,
+-- a shallow copy means that we will simply copy the different values of <i>m1</i>, the values of the pointers -- so here, we will copy the pointer to this element etc., and at this moment, if this were possible
+-- I will come back to this point in a moment -- we would already have a problem in any case since the watches <i>m2</i> and <i>m1</i> share the same accessories and share the same mechanism which means that if, through
+<i>m1</i>, we change for example, the time of the watch, then your friend's watch, watch <i>m2</i>, will automatically have the same time
+If you decide to change the bracelet of your watch, <i>m1</i>, to have a leather bracelet, then automatically the watch <i>m2</i> will also have a leather bracelet.
+What's more, with the architecture that we defined currently, that is, with the <i>unique_ptr</i>s, we can in any case not make copies since <i>unique_ptr</i>s must be unique in pointing to their memory area.
+We cannot copy unique pointers.
+So in any case, we could not have this situation in memory and if we had decided to use C-style pointers, then we would run into the problem I have just mentioned, of having components that would be shared by different watches.
+So the conclusion for all of this is that we must make deep copies.
+A deep copy means that instead of simply copying the values of the pointers, instead of copying the addresses, we copy the pointed-to objects themselves and so for each component, we actually copy the current object and we store in the copied object, at the highest level, the pointers to the copies of the components.
+We will have copied, not just at the surface, but deep down.
+And so here, we do not have copies of the values of the pointers but pointers to copies of the pointed-to objects.
+This is what we mean when we speak of a deep copy versus a shallow copy.
+And so what we need is indeed a deep copy a copy of each component.
+In those cases, it is also customary to override the assignment operator, which is what we will do later on.
+Let's start with the copy constructor, that is, the constructor of Montre that makes a copy construction.
+So the parameter taken by the copy constructor is of course another watch.
+The copy constructor should begin with
+-- one must never forget this aspect -- a call to the copy constructors of the superclasses.
+Here, we only have one superclass, the Produit class, and so here we must call the copy constructor of the Produit class. Otherwise.. otherwise, we will call the default constructor at this point, if we had not written this line.
+So we would have a default construction of the Produit aspect of a watch.
+Meaning that its price, for example, would be set to zero which is not always desirable.
+So we must always start with a call to the copy constructor of the superclass.
+Then the question is how to continue, when should we copy the different components?
+If we simply write this and in a similar way for the accessories, then we will just have a shallow copy, we will have copied the value of the pointer, "autre.coeur", into the pointer "coeur" of the instance that we are creating.
+This is exactly what we want to avoid so it is not the correct way to do this.
+What we could imagine, then, is to copy the object pointed to by the core of the other watch, that is, to copy *(autre.coeur).
+Indeed, the access to the contents of the other's core is the contents of this cell here.
+This is what we wanted to copy.
+Copy this into the core of the current instance and to do so, allocate a new memory area whose address we would retrieve and this new area will contain the copy of the contents of (autre.coeur).
+So this would be written like this: coeur( new ??? (*(autre.coeur))
+-- but new what?
+Which object should be copied as the core of the other?
+Since I remind you that a core is a pointer to a mechanism and here, we would of course have to convert our C-style pointer into a unique_ptr to a Mecanisme.
+But we still don't know what this core that we are copying should be.
+Because this other core could easily be an analog mechanism or a digital mechanism or a double mechanism.
+And so, what should we copy this other core as?
+What we could imagine would be to copy it as a Mecanisme but this means that we would copy only the Mecanisme part of the other's core and we would risk losing all the specifics of the instance that is actually pointed to, such as the specifics of the analog mechanism if the core is an analog mechanism, the digital specifics, etc.
+So we would lose the specifics.
+So here, we cannot make a copy like this as a Mecanisme
+The question, basically, is: how do we copy each element as it is?
+That is, to copy them not just as instances of the Mecanisme superclass but to copy them as the subclasses to which they belong.
+And the question can of course be posed for all the accessories -- how do we copy each of the accessories?
+The bracelet as a bracelet, the clasp as a clasp, the body as a body etc.
+The question is thus, how do we make a copy that respects the proper nature of the instances?
+That is, how do we make a polymorphic copy?
+The solution consists, as usual when we have a particular task to do, in defining a method that carries out this task and so, to define a copy method here that is capable of making a polymorphic copy.
+A polymorphic copy of a Mecanisme here and a polymorphic copy of an accessory here.
+And so of course, we will have to copy each accessory as they are, and so iterate over the accessories of the other watch one by one to be able to make a polymorphic copy of them.
+Let's see how we can write such a polymorphic copy taking the accessories as an example.
+So we have a dynamic array of pointers to accessories of which we want to copy each element.
+Typically, we would copy them like this by making a call to a polymorphic copy of a pointer to an accessory.
+So the polymorphic copy will be defined at the level of the most general class for which we want to make a polymorphic copy. at this level, we will define a <i>copie</i> method.
+The <i>copie</i> method, as such, will not modify the instances
+-- it just copies them -- and we don't know how to define it at such a general level.
+So as we are in an abstract class, we will say that it is a pure virtual method.
+The return value of such a method is what we will put in this container and so it will be a unique pointer to an accessory so here we will say that it is a
+"unique_ptr<Accessoire>"
+And so in the subclasses for example here in the Bracelet subclass, what we will do is to override the copy that returns a unique_ptr to an accessory and say that we will return a unique_ptr to an accessory, so this here remains a pointer to an accessory, but this pointer, specifically, is a pointer to a new bracelet in memory which is a copy of the current instance.
+So I know that this syntax is very difficult to understand the first time one comes across it, so let's explain it a little.
+What we want to do with a copy method such as this one is to copy oneself as one is, meaning, to copy oneself as a Bracelet if one is a Bracelet.
+To do so, we will call the copy constructor of the Bracelet class to copy the current instance.
+The current instance is indeed the contents of the <i>this</i> pointer, so "*this" is the current instance.
+It is the contents of what is pointed to by <i>this</i> and since <i>this</i> points to the current instance, it is indeed the current instance that we are copying into a new
+Bracelet
+So that gives us this part of this line and then we will do this by creating a new memory area and retrieve a pointer to this memory area -- this is done by the <i>new</i>.
+So here, <i>new Bracelet</i> will create a new bracelet of which we retrieve the address and this new bracelet is a copy of the current instance.
+Finally, we will convert this C-style pointer which is the result of the <i>new Bracelet</i> copying the current instance, we will convert it into a unique_ptr-to-Accessoire.
+We will see it, we will see this pointer as a unique_ptr to an accessory.
+So this is the syntax that is very often used to make polymorphic copies.
+We return a pointer to the abstract class, the superclass at whose level we want to make the copy, of a new copy, and be careful here, specific to the current class.
+So here, we are indeed in the Bracelet class, we write "Bracelet"
+-- in the Fermoir class, we will write "Fermoir".
+This is a copy of the current instance.
+That's it for copying watches.
+What if we also want to take care of the assigmnent operator?
+That is, for example, do 
+<i> m1 = m2 </i>.
+To do so, we will overload the assignment operator the equals operator, in the following way.
+In the Montre class, we follow the model we presented in the episode on operator overloading and so here, we have the typical prototype for the equals operator where we pass by value here which means that when we write
+<i>m2 = m1</i>, that is, <i>m2.operator=(m1)</i> we will copy <i>m1</i> into this new source.
+So here, we use the copy constructor and it is this copy constructor, which we have just defined, that will do all the work of making the deep copy, then we just have to exchange the newly copied instance ex-<i>m1</i>, which is now <i>source</i>, into the current instance and to do so, we can for example use the <i>swap</i> method provided by the standard library
+<i>utility</i> to swap the core of <i>m2</i>, of the current instance with the core of the newly-created source, created by copy
+And so we will swap the array of pointers of the current instance with the array of pointers to new components created by the deep copy of this source that was just created.
+And we end with the standard syntax which returns a reference to the current instance to conform to this prototype which allows us to write things like <i>m3 = m2 = m1</i>.
+That's it for the assignment operator and of course, all of this must be tested, which we will do by completing our old <i>main</i> in which we had defined a watch with a call to the copy constructor that copies <i>m</i> into <i>m2</i>.
+Then we check that the copy was made correctly by displaying <i>m2</i> here.
+Then we would test the equals operator.
+First, we create a new watch, <i>m3</i> with whatever in it, then we display it, then we assign <i>m2</i> to <i>m3</i>.
+And we check that this assigment worked correctly.
+On top of this, to check that we have made a deep copy with this copy here, then we would add a method that we haven't explained in this video but that doesn't present any difficulty: a "mettre Ã  l'heure" method (TN: means "set time") which would set the time of watch <i>m2</i> which would modify the time of the watch <i>m2</i>
+And so we would check that in this assignment
+<i>m3</i> has <i>m2</i>'s old time, and is not affected by this change of time in <i>m2</i>.
+If we only had a shallow copy, then <i>m2.mettre_a_l_heure</i> would also modify <i>m3</i>'s time.
+So this line here effectively allows us to check that we have made a deep copy and not a shallow copy of <i>m2</i> into <i>m3</i>.
+All this code, the complete code is again provided on the course website
+This concludes this case study and the whole course.

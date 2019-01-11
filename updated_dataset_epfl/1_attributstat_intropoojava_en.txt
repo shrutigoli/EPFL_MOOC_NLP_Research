@@ -1,0 +1,107 @@
+In the previous episodes, we saw that the attributes defined inside a class represent information that is specific too each instance of the class.
+If we take our favorite example with the rectangle again, each instance of "Rectangle", each Rectangle-type object will have its own width, its own height, information that is specific to it and which caracterizes it.
+However, what happens if many instances of a same class need to access the same information, a common information?
+That's the topic of this episode.
+Until now, we have used different types of variables in our programs.
+We've used instance variables, which are commonly called "attributes".
+We've used local variables, which are variables declared inside a method's body.
+We've also used parameters, which we can assimilate to local variables in the methods, and which are used to provide data to methods so that they can work with.
+In this episode, you'll discover the notion of "static variables", which are also called "class variables", as opposed to instance variables.
+They are in fact particular attributes, the declaration of which is preceded by the reserved word "static".
+They look like the standard attributes, the instance variables.
+They are declared the same way, except for the "static" modifier that is added before.
+They are declared as instance attributes, as instance variables, outside of the methods.
+As the instance variables, they are visible everywhere in the class, and are inherited by the subclasses.
+In this episode, we'll mainly focus on static variables, but it must be noted that there also exist static methods, which will see later on.
+In Java, the static modifier is used for both variables and methods.
+In the two cases, a static member can be used without having constructed the object beforehand.
+Note that in Java, the static modifier doesn't apply to local variables, that is, to variables declared inside a method's body.
+But what does it actually mean that a static member can be accessed without constructing any object?
+If we take the example of the rectangle again, what we've used until now were attributes declared inside classes, a.k.a. instance variables.
+And we have methods, and in this context it is strictly impossible to use a member of the rectangle class without constructing an instance of rectangle beforehand.
+So here for example, if I want to use the surface method,
+I have to construct an object of rectangle type.
+And through this object, I can call the method that computes the surface.
+A static member, whether it's a variable or a method, is invokable without having created an instance beforehand, by using only the class name according to terms that we'll examine later.
+One of the facets is that we can use a static member without constructing any objects.
+The other facet, relatively to static variables, is that they are shared between each instance of the class.
+Until now you've learnt that each instance has its own memory area for each of its attributes.
+Each instantiated rectangle in a program will have its own memory areas for the width and the height.
+So here for example, for the rectangle 'r1', we'll have memory areas storing the value of its own width and height.
+For another rectangle, there'll be other memory areas that will store the width and the height of that second rectangle.
+That's why we say "instance variables": because each instance owns its own variables.
+On the other hand, a static variable would be an unique memory area associated with the class rather than the instances, but accessible from each instance.
+To sum up, for instance variables, the attributes, we reserve a memory area for each object that we instantiate, that we create with "new".
+So each object has its own memory area, its own value for the corresponding instance variable.
+For a class variable, that is, a class-attribute, declared as static, there's a single allocation of an unique memory area.
+This reservation is done as soon as we load the class, that is, to simplify, as soon as the class is mentioned in the program,
+No memory area will be allocated for that attribute when we create a new instance with "new".
+However, that attribute remains accessible like instance attributes used up to now, via all the objects of the class, which will refer to the same memory area, the unique memory area allocated for that static attribute.
+Let's see this with a concrete example.
+We have the case of a class A that contains an instance variable, an attribute as we have always used them until now, and a class variable, that is, an attribute whose declaration is preceded of the reserved word 'static'.
+The class A also contains a modified method, which can access all the attributes of the class, whether they're static or not.
+Now let's examine step by step what happens when we execute the following code.
+In fact, before the execution, as soon as the class A is used in a program, as it contains a static variable "c", there'll be an allocation of a memory space for this static variable "c", which will be initialized with the value 10 because of this line.
+If we examine this first line of code, the first thing that we see is that the class variable is accessible independently of the creation of any instance.
+We can access the 'c' attribute through the name of the class only, without creating any instance.
+When we execute this line of code, we increment the class variable 'c', which is a class variable of the class A, which has already been initialized.
+We'll have this situation, the value of 'c' will go from 10 to 11.
+The two following lines declare an instance of A, and initialize it using the default constructor.
+Each instance of A has its own instance variables, here, in this case, the variable instance 'b', which means that when this instruction line's execution has finished, the memory situation will be the following: we'll have a variable "v1" containing a reference to an object of type A which has an attribute 'b', initialized to 1 with the help of this line.
+The modified method is then called on the instance "v1".
+This method increments the value of the instance variable 'b', we'll therefore be in this situation at the end of the instruction line's execution.
+The modified method then increments the class variable 'c'.
+You'll note by the way that the methods of the class A can access the static attributes in the same way they access the non-static attributes, the instance variables.
+The execution of the second line of this modified method will therefore result in an additional incrementation of the class variable 'c', which will be 12.
+So we were able to modify the value of the class variable of the static attribute both by passing by the name of the class uniquely, and by using an instance.
+So here through the "v1" instance, we were able to modify the class-variable 'c'.
+The modified variable, whether its through the name of the class, or through an instance, is an unique memory area.
+With this example we saw that when we modify an instance variable, the value changes only for the current object.
+But when we modify a class variable, the value changes for all the objects of the class.
+Indeed, the class variable is unique and accessible to all the objects.
+As we have just seen in the previous example, a static variable can be used through the name of the class without passing by the creation of any object.
+We can therefore use static members and do completely without objects, which goes against the
+"object-oriented" approach.
+Using static members to avoid the "object-oriented" approach is of course a bad reason to use static variables.
+A good reason is to represent a value common to all the objects of a class.
+Let's have a look at this with a concrete example.
+Let's imagine that in a program, we have an
+"Employe" (= employee) class.
+We want to represent the fact that 65 years old is the official retirement age for all the employees.
+Let's consider two possible versions to implement this.
+So a version where we use an instance variable to represent the retirement age, and another version where we use a class variable, a static variable.
+First version, an "Employe" class that represents the retirement age as an instance variable.
+The constructor of the class
+"Employe1" would be in charge of initializing each attribute with values passed as parameters.
+Now let's suppose that an
+"Entreprise" class uses this "Employe1" type, in particular to create an array containing a number of employees.
+Each element of the array would be filled by creating an instance of Employe.
+As the official retirement age is represented with an instance variable, each Employe will store a memory area that contains this official age, which happens to be the same for everybody.
+Therefore, we reserve a memory area for each Employe, to contain the exact same information.
+So if we have thousands of employees, we'll end up with thousands of times the value 65 stored, which of course is an unncessary duplication.
+Moreover, this duplication causes major maintenance problems.
+Let's suppose for example that the law changes, and that the official retirement age is now 67 years old.
+We would have to iterate over all the possible instances to modify this age in a proper way.
+If the instances were stored in an array, it's still feasible, but imagine if the instance were created independently.
+This would create a major update issue.
+In the second version, where we now use a static variable for the official retirement age, so where we precede the declaration of the attribute with the reserved word "static", we don't have this problem anymore.
+Indeed, there would be an unique memory area accessible by each instance, which would contain the official retirement age, which is the same for everybody.
+This retirement age can be accessed from each instance, or from the class name.
+There isn't information duplication anymore, and it's easy to do modifications.
+Here we don't have to look for each instance of every employee anymore, just to modify the retirement age and change it to 67 years old.
+VoilÃ ! I hope that this small example will have convinced you of the benefits of using static variable well.
+Also note that for constants that are common to every instance of a class, it is unnecessary to store the value for each object of the class.
+You must in fact declare them as "final static".
+For example, for a "Planete"
+(= Planet) class, we need to use G, the gravitational constant.
+This constant is the same for each planet, and in this case, it is better to declare the constant in question as
+"final static", whether than only "final", to avoid duplicating this constant for each instance of Planete.
+To conclude on this chapter of static variables, let's come back to an often-used instruction line.
+We are now in position to understand what this instruction line does, which we had used up till now as a magical incantation.
+What can we use directly through a class name, well that's nothing else than a static variable.
+So 'out' is a static variable, it must therefore most likely contain a reference to an object, as we apply a method on this 'out' variable, obviously the 'println' method.
+'out' is indeed a static variable of the
+'System' class, a variable of type 'PrintStream', so it's an instance of the
+'PrintStream' class, and this 'PrintStream' class contains a 'println' method, which is invoked like this.
+This concludes our episode on static variables.
+In a following episode, you'll have the opportunity of learning about static methods.

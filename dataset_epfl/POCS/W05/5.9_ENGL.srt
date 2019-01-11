@@ -1,0 +1,646 @@
+1
+00:00:04,080 --> 00:00:06,513
+Let's look a bit more
+into eventual consistency.
+
+2
+00:00:07,033 --> 00:00:10,594
+Specifically, in this lecture
+I will talk about causal consistency,
+
+3
+00:00:10,594 --> 00:00:13,113
+and their realization using vector clocks.
+
+4
+00:00:13,113 --> 00:00:16,227
+So there is an important system
+that you should know about,
+
+5
+00:00:16,227 --> 00:00:20,030
+called Dynamo, which was
+implemented by Amazon,
+
+6
+00:00:20,030 --> 00:00:22,217
+which is also the foundation
+and the driving force
+
+7
+00:00:22,217 --> 00:00:24,050
+behind this shopping cart example
+
+8
+00:00:24,050 --> 00:00:26,022
+that I talked about
+in the previous lecture.
+
+9
+00:00:26,288 --> 00:00:28,766
+Conceptually, causal consistency
+is the following:
+
+10
+00:00:28,766 --> 00:00:30,758
+A system provides causal consistency
+
+11
+00:00:30,758 --> 00:00:33,511
+if the memory operations
+that potentially are causally related
+
+12
+00:00:33,511 --> 00:00:35,824
+are seen by every node
+of the system in the same order.
+
+13
+00:00:35,824 --> 00:00:39,402
+So that means if I've got
+a process A that makes a change,
+
+14
+00:00:39,402 --> 00:00:42,087
+and communicates with a process B,
+
+15
+00:00:42,087 --> 00:00:44,671
+then process B has to start from there,
+
+16
+00:00:44,671 --> 00:00:48,301
+and basically start from the values
+written by this previous process.
+
+17
+00:00:48,660 --> 00:00:51,393
+And this propagates,
+transitively, so to say.
+
+18
+00:00:51,758 --> 00:00:54,551
+And you can implement causality,
+causal consistency,
+
+19
+00:00:54,551 --> 00:00:55,742
+using vector clocks.
+
+20
+00:00:55,742 --> 00:00:58,613
+Let me say that this is not enough
+to ensure eventual consistency,
+
+21
+00:00:58,613 --> 00:01:01,195
+because all that it ensures
+is that certain things
+
+22
+00:01:01,195 --> 00:01:03,968
+are not really inconsistent,
+but it doesn't guarantee that ultimately
+
+23
+00:01:03,968 --> 00:01:05,413
+everything is propagated everywhere,
+
+24
+00:01:05,413 --> 00:01:07,516
+but that's only a small step
+from causal consistency.
+
+25
+00:01:07,516 --> 00:01:12,292
+Also, in general, causal consistency,
+mechanisms using vector clocks,
+
+26
+00:01:12,292 --> 00:01:14,629
+might lead to conflicts
+that then have to be resolved
+
+27
+00:01:14,629 --> 00:01:16,781
+using application-specific semantics.
+
+28
+00:01:16,781 --> 00:01:18,916
+For example, the shopping cart example,
+
+29
+00:01:18,916 --> 00:01:21,201
+these vector clocks will tell us
+that there is a conflict,
+
+30
+00:01:21,201 --> 00:01:24,815
+but then we have to decide, and
+that's going to be application-specific,
+
+31
+00:01:24,815 --> 00:01:26,276
+how to resolve them,
+
+32
+00:01:26,276 --> 00:01:29,296
+and that's separate from
+the vector clocks themselves.
+
+33
+00:01:29,624 --> 00:01:31,810
+So how do vector clocks work, in general?
+
+34
+00:01:32,400 --> 00:01:36,428
+In general, we will have
+a vector of, basically, pairs,
+
+35
+00:01:36,724 --> 00:01:41,612
+and each pair has the information of,
+identity of a server,
+
+36
+00:01:41,959 --> 00:01:44,475
+and a logical timestamp.
+
+37
+00:01:45,109 --> 00:01:47,923
+So a vector consists
+of several such pairs,
+
+38
+00:01:48,743 --> 00:01:52,697
+and such a vector is basically
+associated with a data value,
+
+39
+00:01:53,135 --> 00:01:55,149
+but it's not global to a data value,
+
+40
+00:01:55,149 --> 00:01:58,663
+so if we've got multiple replicas
+of that data value, at different machines,
+
+41
+00:01:58,663 --> 00:02:01,337
+then at any point in time
+there might be different vectors
+
+42
+00:02:01,337 --> 00:02:03,559
+associated with each of those.
+
+43
+00:02:03,559 --> 00:02:06,380
+So now let's assume
+that we are at timepoint zero,
+
+44
+00:02:06,380 --> 00:02:07,893
+nothing interesting has happened yet,
+
+45
+00:02:07,893 --> 00:02:09,939
+of course our data values
+have some value,
+
+46
+00:02:09,939 --> 00:02:15,260
+and now data value D1
+is actually written to by server X.
+
+47
+00:02:15,820 --> 00:02:18,144
+So, initially,
+this is the first timestamp,
+
+48
+00:02:18,144 --> 00:02:20,420
+the entry to this ,
+so to say, entry vector,
+
+49
+00:02:20,420 --> 00:02:21,956
+this pair Sx,
+
+50
+00:02:21,956 --> 00:02:24,973
+and logical complement
+we want is the initial value.
+
+51
+00:02:24,973 --> 00:02:27,228
+So this means Sx has written.
+
+52
+00:02:27,629 --> 00:02:30,890
+Now let's assume that
+Sx makes a second write,
+
+53
+00:02:30,890 --> 00:02:32,569
+still in the same process,
+
+54
+00:02:32,569 --> 00:02:37,507
+to D1 and it changes this value,
+copies this value to D2,
+
+55
+00:02:37,507 --> 00:02:39,296
+in general writes to D2.
+
+56
+00:02:39,296 --> 00:02:43,078
+Now, we will create
+this vector clock and tree for D2,
+
+57
+00:02:43,078 --> 00:02:46,538
+which is Sx, so the x is written,
+and the increment--
+
+58
+00:02:46,538 --> 00:02:47,953
+whenever we make a local write
+
+59
+00:02:47,953 --> 00:02:50,430
+the local server's vector clock by one,
+
+60
+00:02:50,430 --> 00:02:52,358
+so we now have the timestamp 2.
+
+61
+00:02:52,924 --> 00:02:56,209
+Now assume that we're now
+communicating this value
+
+62
+00:02:56,209 --> 00:03:01,796
+to server Y, and server Y
+is going to, itself, write the value.
+
+63
+00:03:02,213 --> 00:03:05,656
+So we're going to extend
+this vector clock for this value,
+
+64
+00:03:05,656 --> 00:03:07,473
+let's say we write to D3,
+
+65
+00:03:07,473 --> 00:03:10,965
+by adding for Sy a logical timestamp 1.
+
+66
+00:03:10,965 --> 00:03:12,747
+So we'll now have the vector
+
+67
+00:03:12,747 --> 00:03:16,269
+Sx with timestamp 2,
+and Sy with timestamp 1.
+
+68
+00:03:16,269 --> 00:03:18,183
+These could be the same value D2,
+
+69
+00:03:18,183 --> 00:03:20,152
+but that server is different,
+that doesn't matter,
+
+70
+00:03:20,152 --> 00:03:22,905
+but D2 has communicated
+some information to D3,
+
+71
+00:03:22,905 --> 00:03:24,491
+potentially the value of D2.
+
+72
+00:03:24,491 --> 00:03:28,004
+Based on this, the decision
+was made to write particularity D3,
+
+73
+00:03:28,004 --> 00:03:33,626
+so we have to basically infect
+the vector of D3 with the information
+
+74
+00:03:33,626 --> 00:03:39,154
+that what happens here happens
+after logical timestamp 2 at server X.
+
+75
+00:03:39,154 --> 00:03:44,360
+So we have to record that the relevant
+last-seen timestamp of server X was 2,
+
+76
+00:03:44,360 --> 00:03:48,428
+and the last-seen timestamp
+of server Y is 1.
+
+77
+00:03:48,428 --> 00:03:52,231
+Now let's assume that independently,
+after Sx has written
+
+78
+00:03:52,231 --> 00:03:54,284
+its second logical timestamp to D2,
+
+79
+00:03:54,284 --> 00:03:58,137
+some data is communicated
+to a new server, Sz,
+
+80
+00:03:58,137 --> 00:04:00,817
+and a value is written to D4,
+
+81
+00:04:00,817 --> 00:04:04,335
+then we also have to expand
+the logical vector clock for D4 there,
+
+82
+00:04:04,335 --> 00:04:10,153
+and we get Sx 2 and Sz 1, assuming
+that's the first logical timestamp for Sz.
+
+83
+00:04:11,418 --> 00:04:14,211
+Now, let's assume now we want
+to reconcile this information,
+
+84
+00:04:14,211 --> 00:04:17,692
+that means we send
+to some server two values,
+
+85
+00:04:17,692 --> 00:04:22,404
+or we communicate from both Sy
+and from Sz to a single server.
+
+86
+00:04:22,404 --> 00:04:24,947
+Let's assume that server is Sx again.
+
+87
+00:04:25,330 --> 00:04:28,046
+Some information sent from both,
+the vector clocks have communicated,
+
+88
+00:04:28,046 --> 00:04:30,285
+and they're basically now
+aggregate these vector clocks,
+
+89
+00:04:30,285 --> 00:04:31,715
+we have to combine them.
+
+90
+00:04:31,715 --> 00:04:33,941
+So Sx writes a new value.
+
+91
+00:04:33,941 --> 00:04:39,332
+It sees Xx 2 and Sx 2 from the different
+vector clocks of Sy and Sz,
+
+92
+00:04:39,332 --> 00:04:42,686
+and itself, it's going to increment it
+to the next vector clock time,
+
+93
+00:04:42,686 --> 00:04:43,915
+which is free.
+
+94
+00:04:43,915 --> 00:04:46,978
+And it has to combine Sy 1 and Sz 1.
+
+95
+00:04:47,818 --> 00:04:49,166
+This is a conflict,
+
+96
+00:04:49,166 --> 00:04:51,475
+because it cannot order,
+relative to each other,
+
+97
+00:04:51,475 --> 00:04:54,397
+the changes made by Sy and Sz,
+
+98
+00:04:54,397 --> 00:04:56,585
+they are independent
+from each other, so to say.
+
+99
+00:04:56,585 --> 00:04:59,507
+So we need to invoke
+a conflict resolution mechanism
+
+100
+00:04:59,868 --> 00:05:01,949
+that decides what to do
+with this value now.
+
+101
+00:05:02,316 --> 00:05:05,407
+Now, what does conflict resolution mean
+in the context of this example
+
+102
+00:05:05,407 --> 00:05:08,600
+that we discussed before,
+of the shopping cart at Amazon?
+
+103
+00:05:08,600 --> 00:05:11,049
+We could think of, and model this
+as the shopping cart,
+
+104
+00:05:11,049 --> 00:05:12,517
+consisting of a number of products,
+
+105
+00:05:12,517 --> 00:05:13,955
+these are the different objects,
+
+106
+00:05:13,955 --> 00:05:16,974
+and values being either serial 1-bits
+
+107
+00:05:16,974 --> 00:05:18,944
+that say whether it's
+in the shopping cart or not.
+
+108
+00:05:18,944 --> 00:05:20,111
+Let's assume that for now.
+
+109
+00:05:20,111 --> 00:05:23,490
+Well, then, an inconsistency could arise
+if a particular product
+
+110
+00:05:23,490 --> 00:05:26,798
+is in the shopping cart in one browser
+but is not in the other,
+
+111
+00:05:26,798 --> 00:05:30,362
+so we have, for example,
+in Sy, set the bit to 1,
+
+112
+00:05:30,362 --> 00:05:32,670
+and in Sz we have set the bit to 0.
+
+113
+00:05:32,670 --> 00:05:34,827
+And then we would need
+a conflict resolution mechanism
+
+114
+00:05:34,827 --> 00:05:36,044
+to make a decision about this,
+
+115
+00:05:36,044 --> 00:05:38,441
+and in the case of shopping carts,
+it may be not so critical.
+
+116
+00:05:38,441 --> 00:05:40,866
+We could either ask the user,
+or we could, for example,
+
+117
+00:05:40,866 --> 00:05:44,450
+use a physical timestamp,
+an actual timestamp,
+
+118
+00:05:44,450 --> 00:05:46,118
+to decide what is newer,
+
+119
+00:05:46,118 --> 00:05:48,247
+that might be acceptable,
+but not in practice,
+
+120
+00:05:48,247 --> 00:05:50,015
+given that users are very slow,
+
+121
+00:05:50,015 --> 00:05:52,823
+and might not be able to click
+at the same point in time,
+
+122
+00:05:52,823 --> 00:05:54,365
+into two different browsers.
+
+123
+00:05:55,361 --> 00:05:57,968
+But overall things are quite clear.
+
+124
+00:05:57,968 --> 00:06:02,220
+On the other hand, it might also be
+that both Sy and Sz
+
+125
+00:06:02,220 --> 00:06:04,686
+have both set to speak to the same value.
+
+126
+00:06:04,686 --> 00:06:07,012
+It's still a conflict in the viewpoint
+of the vector clock,
+
+127
+00:06:07,012 --> 00:06:08,906
+because the vector clock doesn't know.
+
+128
+00:06:08,906 --> 00:06:12,154
+But a conflict resolution mechanism,
+given the application semantics,
+
+129
+00:06:12,154 --> 00:06:15,088
+might easily be able to tell
+no, that's not a problem,
+
+130
+00:06:15,088 --> 00:06:17,600
+there's no conflict,
+resolution's very easy,
+
+131
+00:06:17,600 --> 00:06:20,180
+the biggest one in both cases
+the new bit is 1.
+
+132
+00:06:21,765 --> 00:06:23,890
+Now, how do we achieve
+eventual consistency,
+
+133
+00:06:23,890 --> 00:06:25,631
+given this protocol?
+
+134
+00:06:25,631 --> 00:06:27,025
+Well all that is left to be done
+
+135
+00:06:27,025 --> 00:06:30,585
+is that servers that hold replicas
+of the same object
+
+136
+00:06:30,585 --> 00:06:32,883
+talk to each other from time to time,
+
+137
+00:06:32,883 --> 00:06:35,164
+so that their vector clocks are merged
+
+138
+00:06:35,164 --> 00:06:37,565
+and, if there's a conflict,
+it gets resolved.
+
+139
+00:06:37,565 --> 00:06:38,978
+So, ultimately, after some time,
+
+140
+00:06:38,978 --> 00:06:42,207
+all machines will have
+the same values for each object.

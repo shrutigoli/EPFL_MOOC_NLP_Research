@@ -1,0 +1,1175 @@
+1
+00:00:04,695 --> 00:00:06,809
+In this episode, we will
+discuss how
+
+2
+00:00:06,809 --> 00:00:10,026
+polymorphism can be a very good
+complement to abstraction,
+
+3
+00:00:10,026 --> 00:00:12,698
+allowing us to better
+specify classes
+
+4
+00:00:12,698 --> 00:00:14,808
+at the most abstract level.
+
+5
+00:00:14,808 --> 00:00:18,303
+We will introduce the notion
+of "abstract classes"
+
+6
+00:00:18,303 --> 00:00:20,962
+and "pure virtual methods".
+
+7
+00:00:20,962 --> 00:00:22,994
+But let's start by presenting
+the problem
+
+8
+00:00:22,994 --> 00:00:25,507
+that these pure virtual methods
+address.
+
+9
+00:00:25,867 --> 00:00:28,384
+At the highest level in a hierarchy,
+
+10
+00:00:28,384 --> 00:00:31,258
+we don't necessarily know
+how to define a method,
+
+11
+00:00:31,258 --> 00:00:35,614
+even though we know it will exist
+in all the subclasses.
+
+12
+00:00:35,614 --> 00:00:39,078
+For example, if I imagine a very
+general class
+
+13
+00:00:39,078 --> 00:00:43,493
+representing any closed
+geometric shape,
+
+14
+00:00:43,493 --> 00:00:45,691
+then at that point, in this class,
+
+15
+00:00:45,691 --> 00:00:49,944
+it will be quite hard to define how
+to calculate the surface area
+
+16
+00:00:49,944 --> 00:00:52,737
+of a closed, nondescript geometric shape.
+
+17
+00:00:52,737 --> 00:00:55,549
+This is certainly something that
+is hard to define,
+
+18
+00:00:55,549 --> 00:00:57,167
+we wouldn't really know how
+to do it.
+
+19
+00:00:57,167 --> 00:00:59,428
+However, we know that
+for all closed figures,
+
+20
+00:00:59,428 --> 00:01:02,879
+for example circles, which
+are closed figures,
+
+21
+00:01:04,896 --> 00:01:07,828
+we know that for each specific
+closed figure
+
+22
+00:01:07,828 --> 00:01:11,352
+we should be able to define a 
+"surface area" method.
+
+23
+00:01:11,352 --> 00:01:14,086
+So, we can imagine that
+all closed figures
+
+24
+00:01:14,086 --> 00:01:15,938
+will have a surface method,
+
+25
+00:01:15,938 --> 00:01:19,223
+even if we don't know how to define it
+at the most abstract level.
+
+26
+00:01:19,223 --> 00:01:22,255
+Yet, to push it further,
+
+27
+00:01:22,255 --> 00:01:24,976
+we can even imagine that
+this surface method
+
+28
+00:01:24,976 --> 00:01:27,683
+will be used at the highest level,
+
+29
+00:01:27,683 --> 00:01:33,117
+for example to calculate the volume
+occupied over a certain height
+
+30
+00:01:34,193 --> 00:01:36,021
+by this surface
+
+31
+00:01:36,021 --> 00:01:40,336
+In this case, the volume occupied
+by this geometric figure,
+
+32
+00:01:40,336 --> 00:01:42,045
+-- depending on this height --
+
+33
+00:01:42,045 --> 00:01:46,437
+would be defined as the product
+of the height multiplied by
+
+34
+00:01:46,437 --> 00:01:49,630
+the surface area of the closed figure
+
+35
+00:01:49,630 --> 00:01:52,002
+So we could even call this method
+
+36
+00:01:52,002 --> 00:01:54,960
+even if we don't quite know
+how to define it.
+
+37
+00:01:54,960 --> 00:01:57,122
+At the highest level, it would be defined
+
+38
+00:01:57,122 --> 00:02:00,369
+for all the actual examples of
+closed figures.
+
+39
+00:02:00,369 --> 00:02:02,438
+The correct way to do this,
+
+40
+00:02:02,438 --> 00:02:05,045
+to introduce a method that
+we know must exist,
+
+41
+00:02:05,045 --> 00:02:08,065
+but that we don't necessarily
+know how to define
+
+42
+00:02:08,065 --> 00:02:09,904
+at the level of a superclass,
+
+43
+00:02:09,904 --> 00:02:12,588
+is to introduce the method as
+
+44
+00:02:12,588 --> 00:02:15,472
+a "pure virtual method".
+
+45
+00:02:16,571 --> 00:02:19,278
+Let's illustrate this concept of
+pure virtual methods
+
+46
+00:02:19,278 --> 00:02:22,735
+with another example and return
+to our game
+
+47
+00:02:22,735 --> 00:02:24,779
+with characters,
+
+48
+00:02:24,779 --> 00:02:27,950
+where we had warriors, who are
+characters,
+
+49
+00:02:27,950 --> 00:02:31,573
+magicians, who are characters,
+robbers,...
+
+50
+00:02:33,198 --> 00:02:37,281
+The class "Jeu" (TN: means "Game") would
+of course contain several characters:
+
+51
+00:02:37,281 --> 00:02:39,186
+we decided to put them here
+
+52
+00:02:39,186 --> 00:02:41,229
+in a vector of characters.
+
+53
+00:02:41,229 --> 00:02:42,814
+And to have polymorphism,
+
+54
+00:02:42,814 --> 00:02:45,391
+we have an vector of pointers-to-characters
+(TN: "Personnage" means "Character"),
+
+55
+00:02:45,391 --> 00:02:48,688
+this specific aspect of arrays
+of pointers to a class
+
+56
+00:02:48,688 --> 00:02:52,046
+will be detailed in a future episode
+
+57
+00:02:52,046 --> 00:02:54,564
+on heterogeneous collections.
+
+58
+00:02:54,564 --> 00:02:57,004
+Here, we simply have our
+vector of characters,
+
+59
+00:02:57,004 --> 00:02:59,935
+and imagine that in the game,
+we wish to display
+
+60
+00:02:59,935 --> 00:03:02,150
+the whole set of characters.
+
+61
+00:03:02,150 --> 00:03:06,733
+So we would write a loop which iterates
+over the set of characters,
+
+62
+00:03:06,733 --> 00:03:09,435
+which iterates over this "persos" vector,
+
+63
+00:03:09,435 --> 00:03:14,903
+and for each of these characters,
+we would display that character.
+
+64
+00:03:14,903 --> 00:03:17,138
+In this syntax here, "un_perso"
+(TN: means "a_character")
+
+65
+00:03:17,138 --> 00:03:20,662
+is the variable that iterates
+over our vector of characters,
+
+66
+00:03:20,662 --> 00:03:22,698
+so it a pointer-to-Personnage.
+
+67
+00:03:22,698 --> 00:03:26,213
+And since we have a pointer, we
+use this syntax here
+
+68
+00:03:26,213 --> 00:03:31,265
+to call the afficher method of
+the object pointed to by un_perso.
+
+69
+00:03:31,265 --> 00:03:34,221
+So here, we would indeed
+display each of the characters,
+
+70
+00:03:34,221 --> 00:03:38,073
+one character in the set of
+stored characters,
+
+71
+00:03:38,073 --> 00:03:41,646
+here in the "persos" data-member
+of the game.
+
+72
+00:03:42,298 --> 00:03:47,163
+The problem is how to display
+a generic character.
+
+73
+00:03:47,163 --> 00:03:49,696
+We don't know how to display
+a generic character.
+
+74
+00:03:49,696 --> 00:03:55,800
+We certainly know how to display a warrior,
+a magician or a thief,
+
+75
+00:03:55,800 --> 00:04:00,066
+so each of the specific subclasses knows
+how to be displayed;
+
+76
+00:04:00,066 --> 00:04:02,388
+however, at the general level of
+a character,
+
+77
+00:04:02,388 --> 00:04:04,342
+we don't necessarily know how to
+display it.
+
+78
+00:04:04,342 --> 00:04:08,032
+But we know that we need to do so,
+here at the very general level of the game,
+
+79
+00:04:08,032 --> 00:04:11,088
+we know we will have to display
+the characters.
+
+80
+00:04:11,088 --> 00:04:12,334
+So, how do we do so?
+
+81
+00:04:12,334 --> 00:04:15,206
+Of course, if we do nothing
+in the "Personnage" class,
+
+82
+00:04:15,206 --> 00:04:17,598
+if we do not define any "afficher"
+method in "Personnage",
+
+83
+00:04:17,598 --> 00:04:21,172
+then the "afficher" method in Jeu
+would not compile
+
+84
+00:04:21,172 --> 00:04:24,360
+since here, we call the "afficher"
+method of a character
+
+85
+00:04:24,360 --> 00:04:26,462
+and the compiler would not
+know what to do,
+
+86
+00:04:26,462 --> 00:04:28,357
+it would give us an error.
+
+87
+00:04:28,357 --> 00:04:31,810
+So we should be able to write this
+at the global level of the game,
+
+88
+00:04:31,810 --> 00:04:35,781
+we must introduce an "afficher" method
+in the "Personnage" class.
+
+89
+00:04:35,781 --> 00:04:38,498
+Moreover, we would like to impose
+to each of the subclasses,
+
+90
+00:04:38,498 --> 00:04:42,343
+warriors, magicians, to be displayed with
+their own "afficher" method,
+
+91
+00:04:42,343 --> 00:04:45,690
+to have a specific method, and that it is
+this specific method
+
+92
+00:04:45,690 --> 00:04:50,237
+which should be called in the general call
+here at the level of the game.
+
+93
+00:04:50,237 --> 00:04:54,035
+Essentially, we want to force
+the presence of a specific
+
+94
+00:04:54,035 --> 00:04:56,663
+method at the class level, and we want
+this method to be polymorphic.
+
+95
+00:04:56,663 --> 00:04:59,581
+So this method has to be "virtual"
+
+96
+00:04:59,581 --> 00:05:02,142
+and exist at the character level.
+
+97
+00:05:02,142 --> 00:05:03,842
+But how do we do this if we don't know
+
+98
+00:05:03,842 --> 00:05:07,874
+-- suppose that we don't know how
+to display a generic character.
+
+99
+00:05:08,174 --> 00:05:11,345
+What's more, how do we force
+subclasses to override this
+
+100
+00:05:11,345 --> 00:05:16,651
+"afficher" method?
+
+101
+00:05:16,651 --> 00:05:19,475
+First solution for the first problem:
+
+102
+00:05:19,475 --> 00:05:22,844
+how to define the display for a
+generic character.
+
+103
+00:05:22,844 --> 00:05:26,662
+We could have some arbitrarily-defined
+method,
+
+104
+00:05:26,662 --> 00:05:28,801
+for example, suppose that here,
+we arbitrarily define
+
+105
+00:05:28,801 --> 00:05:31,758
+that the display for a generic character
+
+106
+00:05:31,758 --> 00:05:34,463
+is no display at all.
+
+107
+00:05:34,463 --> 00:05:37,562
+This solution is a very bad idea,
+
+108
+00:05:37,562 --> 00:05:40,387
+because, first, it is a bad model
+of reality
+
+109
+00:05:40,387 --> 00:05:43,611
+as characters do not appear as nothing,
+
+110
+00:05:43,611 --> 00:05:47,908
+so it doesn't correspond to anything,
+the display is incorrect.
+
+111
+00:05:47,908 --> 00:05:49,933
+And what's more, the display would
+be incorrect
+
+112
+00:05:49,933 --> 00:05:54,150
+if a subclass forgot to override
+this method;
+
+113
+00:05:54,150 --> 00:05:55,829
+in that case, we would have characters
+that would not be displayed,
+
+114
+00:05:55,829 --> 00:05:59,049
+phantom characters, which could be
+a problem for the game.
+
+115
+00:05:59,049 --> 00:06:02,365
+Moreover, this solution does not address
+the second problem,
+
+116
+00:06:02,365 --> 00:06:08,437
+it does not force the subclasses to
+define their own "afficher" method.
+
+117
+00:06:08,437 --> 00:06:12,957
+The only good solution is to indicate
+that the "afficher" method
+
+118
+00:06:12,957 --> 00:06:16,663
+must exist and must be defined
+in each of the subclasses.
+
+119
+00:06:16,663 --> 00:06:20,400
+This is known as a "pure virtual method".
+
+120
+00:06:20,400 --> 00:06:23,987
+I hope this second example has
+allowed you to understand
+
+121
+00:06:23,987 --> 00:06:26,301
+the need for these pure virtual
+methods
+
+122
+00:06:26,301 --> 00:06:30,837
+in defining general, abstract superclasses.
+
+123
+00:06:31,157 --> 00:06:35,154
+Now, let's see how all of this is
+actually written in C++.
+
+124
+00:06:35,154 --> 00:06:39,068
+A pure virtual method, also known as
+an "abstract method",
+
+125
+00:06:39,068 --> 00:06:41,833
+is used to force subclasses
+
+126
+00:06:41,833 --> 00:06:46,134
+to override the inherited
+virtual method.
+
+127
+00:06:46,134 --> 00:06:49,600
+To define a pure virtual method,
+an abstract method,
+
+128
+00:06:49,600 --> 00:06:54,090
+we simply add "= 0" at the end
+of its prototype.
+
+129
+00:06:54,090 --> 00:06:57,142
+For example, if in the "Personnage" class
+
+130
+00:06:57,142 --> 00:07:00,101
+we had written the virtual method
+"afficher"
+
+131
+00:07:00,101 --> 00:07:02,832
+-- the "afficher" method does not
+modify a character --
+
+132
+00:07:02,832 --> 00:07:04,196
+and at the end of its prototype,
+
+133
+00:07:04,196 --> 00:07:07,612
+instead of just having a semicolon,
+we also added "= 0".
+
+134
+00:07:07,612 --> 00:07:12,806
+Then this would define a pure virtual
+method, an abstract method.
+
+135
+00:07:12,806 --> 00:07:16,590
+Generally, a pure virtual method
+is only partly specified,
+
+136
+00:07:16,590 --> 00:07:19,111
+meaning that there is usually
+no definition
+
+137
+00:07:19,111 --> 00:07:22,327
+but only a prototype in the class
+in which it was introduced.
+
+138
+00:07:22,327 --> 00:07:25,393
+This is not a strict requirement, but
+it is often the case.
+
+139
+00:07:25,393 --> 00:07:28,429
+Here for example, we would not
+define the "afficher" method
+
+140
+00:07:28,429 --> 00:07:30,008
+for a generic character;
+
+141
+00:07:30,008 --> 00:07:34,355
+we expect that each subclass will
+define its own "afficher" method
+
+142
+00:07:34,355 --> 00:07:38,087
+specific to warriors, magicians,
+thieves,...
+
+143
+00:07:38,387 --> 00:07:42,227
+If I go back to the other example,
+the one with the closed figures,
+
+144
+00:07:42,227 --> 00:07:47,435
+we would have a "surface" method,
+which would be a pure virtual method,
+
+145
+00:07:47,435 --> 00:07:51,282
+so here we would add "= 0"
+to the end of its prototype,
+
+146
+00:07:51,282 --> 00:07:53,186
+that we could still use,
+
+147
+00:07:53,186 --> 00:07:55,524
+We are allowed to call
+pure virtual methods.
+
+148
+00:07:55,524 --> 00:07:59,333
+we can for instace define
+a "volume" method
+
+149
+00:07:59,333 --> 00:08:01,120
+which we have not defined as virtual
+
+150
+00:08:01,120 --> 00:08:05,490
+as there is no reason for a subclass to
+override this volume method,
+
+151
+00:08:05,490 --> 00:08:08,966
+which takes a height and
+calculates the volume occupied
+
+152
+00:08:08,966 --> 00:08:12,476
+as the product of the height and
+the result of the call to the surface method,
+
+153
+00:08:12,476 --> 00:08:17,693
+where the surface method will be the
+one belonging to the instance on which it is called.
+
+154
+00:08:17,693 --> 00:08:19,579
+Because as we will see,
+
+155
+00:08:19,579 --> 00:08:21,506
+a class containing a pure virtual
+method,
+
+156
+00:08:21,506 --> 00:08:23,711
+such as FigureFermee,
+cannot be instantiated
+
+157
+00:08:23,711 --> 00:08:26,663
+and so we will never call the
+surface method
+
+158
+00:08:26,663 --> 00:08:28,734
+directly on a FigureFermee object.
+
+159
+00:08:28,734 --> 00:08:31,508
+However we can imagine subclasses
+such as rectangles or circles
+
+160
+00:08:31,508 --> 00:08:33,742
+who know how to calculate
+their surface area.
+
+161
+00:08:33,742 --> 00:08:36,370
+So we will call the circle's method
+if it is a circle,
+
+162
+00:08:36,370 --> 00:08:39,628
+or the rectangle's method if it is
+a rectangle --
+
+163
+00:08:39,628 --> 00:08:41,591
+that is the polymorphic aspect,
+
+164
+00:08:41,591 --> 00:08:44,080
+enabled by this "virtual" keyword.
+
+165
+00:08:44,080 --> 00:08:47,500
+Here, we call the surface method
+through a pointer,
+
+166
+00:08:47,500 --> 00:08:51,035
+indeed, remember that this is
+exactly the same as writing
+
+167
+00:08:51,035 --> 00:08:56,774
+"this -> surface", as we
+might easily forget,
+
+168
+00:08:56,774 --> 00:09:01,302
+and so here, polymorphism is used
+
+169
+00:09:01,302 --> 00:09:04,586
+since we make the call through
+a pointer,
+
+170
+00:09:04,586 --> 00:09:08,146
+even if it is not explicitly written, and
+the method is virtual.
+
+171
+00:09:08,566 --> 00:09:11,220
+Another pure virtual method that
+we could define
+
+172
+00:09:11,220 --> 00:09:14,914
+at the level of the FigureFermee class
+is the concept of the perimeter.
+
+173
+00:09:14,914 --> 00:09:20,340
+The method would return the
+perimeter of a closed figure,
+
+174
+00:09:20,340 --> 00:09:24,478
+and we don't necessarily know how to
+define this generally either
+
+175
+00:09:24,478 --> 00:09:28,261
+at the level of the very generic, abstract
+class describing closed figures.
+
+176
+00:09:28,261 --> 00:09:32,329
+But we could imagine being able to define
+this properly in subclasses.
+
+177
+00:09:32,329 --> 00:09:35,222
+We will return to this example shortly.
+
+178
+00:09:35,711 --> 00:09:39,660
+A class containing a pure virtual
+method such as this one
+
+179
+00:09:39,660 --> 00:09:42,590
+is known as an abstract class.
+
+180
+00:09:42,590 --> 00:09:44,615
+It is indeed an abstract class because
+
+181
+00:09:44,615 --> 00:09:48,667
+if a class contains a pure
+virtual method,
+
+182
+00:09:48,667 --> 00:09:51,601
+then it cannot be instantiated.
+
+183
+00:09:51,601 --> 00:09:54,026
+We cannot create instances
+of this class.
+
+184
+00:09:54,026 --> 00:09:59,422
+For example, we cannot declare a
+variable of type "Personne",
+
+185
+00:09:59,422 --> 00:10:03,632
+and of course any subclass that inherits
+from an abstract superclass
+
+186
+00:10:03,632 --> 00:10:08,224
+remains abstract as long as it
+doesn't provide definitions
+
+187
+00:10:08,224 --> 00:10:11,897
+for the pure virtual functions
+they inherited.
+
+188
+00:10:11,897 --> 00:10:15,348
+In other words, as long as they
+haven't removed the "= 0"
+
+189
+00:10:15,348 --> 00:10:20,820
+from the prototypes of their override
+of the pure virtual method
+
+190
+00:10:20,820 --> 00:10:22,822
+inherited from the superclass.
+
+191
+00:10:22,822 --> 00:10:25,170
+Let's take a look at this through
+an example,
+
+192
+00:10:25,170 --> 00:10:28,003
+our example of a game with characters,
+
+193
+00:10:28,003 --> 00:10:30,439
+where a warrior is a character,
+
+194
+00:10:30,439 --> 00:10:34,333
+and has inherited a pure virtual method,
+
+195
+00:10:37,033 --> 00:10:41,726
+an "afficher" method defined as
+pure virtual in the "Personnage" class.
+
+196
+00:10:41,726 --> 00:10:47,037
+If we do not redefine this "afficher" method
+in the "Guerrier" class,
+
+197
+00:10:47,037 --> 00:10:49,258
+then this "Guerrier" subclass
+
+198
+00:10:49,258 --> 00:10:51,545
+is thus also an abstract class
+
+199
+00:10:51,545 --> 00:10:53,972
+since it has inherited a pure
+virtual method
+
+200
+00:10:53,972 --> 00:10:56,865
+that it did not override, and that
+hence remains pure virtual.
+
+201
+00:10:56,865 --> 00:11:00,627
+So if we try to add a warrior like this,
+
+202
+00:11:00,627 --> 00:11:03,750
+to add an instance of the Guerrier class
+to the game
+
+203
+00:11:03,750 --> 00:11:06,026
+the we will get a compilation error
+
+204
+00:11:06,026 --> 00:11:08,585
+saying that I cannot create objects,
+
+205
+00:11:08,585 --> 00:11:12,631
+instances of the abstract class Guerrier,
+
+206
+00:11:12,631 --> 00:11:16,609
+since the virtual method "afficher"
+
+207
+00:11:16,609 --> 00:11:22,442
+in "Guerrier" is a pure
+virtual method.
+
+208
+00:11:23,757 --> 00:11:27,601
+Let's complete our second example on
+geometric shapes.
+
+209
+00:11:27,601 --> 00:11:30,016
+We have these closed figures
+
+210
+00:11:30,016 --> 00:11:32,627
+which have two pure virtual methods:
+
+211
+00:11:32,627 --> 00:11:36,806
+one for the perimeter and
+one for the surface.
+
+212
+00:11:36,806 --> 00:11:39,257
+Let's imagine that we have
+a Cercle class
+
+213
+00:11:39,257 --> 00:11:43,725
+which inherits from FigureFermee
+as well as a Polygone subclass
+
+214
+00:11:43,725 --> 00:11:46,420
+which also inherits from FigureFermee.
+
+215
+00:11:46,420 --> 00:11:50,562
+In the Cercle subclass, we override
+the surface method.
+
+216
+00:11:50,562 --> 00:11:53,969
+The surface of a circle is pi times
+the radius squared.
+
+217
+00:11:53,969 --> 00:11:56,728
+The Cercle class would have a
+member variable for the radius.
+
+218
+00:11:56,728 --> 00:12:03,664
+And we also override the perimeter, defining
+it as 2 times pi times the radius.
+
+219
+00:12:03,664 --> 00:12:07,532
+So the Cercle class defines the surface and
+perimeter properly.
+
+220
+00:12:07,532 --> 00:12:11,718
+The Cercle class has thus overridden both
+pure virtual methods
+
+221
+00:12:11,718 --> 00:12:16,542
+without keeping them pure virtual, without
+adding the "= 0" here,
+
+222
+00:12:16,542 --> 00:12:19,584
+so the Cercle class no longer has
+any abstract methods
+
+223
+00:12:19,584 --> 00:12:22,738
+and we can now create instances
+of this class.
+
+224
+00:12:22,738 --> 00:12:27,723
+There is no problem in defining
+an instance of "Cercle".
+
+225
+00:12:28,300 --> 00:12:31,399
+On the other hand, we have the
+Polygone class. Let's say that
+
+226
+00:12:31,399 --> 00:12:34,431
+a polygon is defined as a vector of sides.
+
+227
+00:12:34,861 --> 00:12:40,135
+This polygon class would override
+the perimeter method,
+
+228
+00:12:40,135 --> 00:12:41,754
+without making it abstract,
+
+229
+00:12:41,754 --> 00:12:45,150
+removing the abstract aspect of
+perimetre.
+
+230
+00:12:45,150 --> 00:12:47,503
+It overrides this perimetre method,
+
+231
+00:12:47,503 --> 00:12:52,151
+but the Polygone class does not
+override the surface method.
+
+232
+00:12:52,151 --> 00:12:55,107
+We think it is too complicated
+to have a formula here
+
+233
+00:12:55,107 --> 00:12:58,039
+to define the surface area of a polygon
+in a general way
+
+234
+00:12:58,039 --> 00:13:01,008
+and so we do not define the surface
+method in the Polygone class.
+
+235
+00:13:01,008 --> 00:13:05,204
+So Polygone remains an
+abstract class:
+
+236
+00:13:05,204 --> 00:13:08,609
+we cannot declare instances
+of Polygone.
+
+237
+00:13:09,269 --> 00:13:12,502
+It is impossible because in the
+Polygone class,
+
+238
+00:13:12,502 --> 00:13:15,299
+there is a pure virtual method left
+
+239
+00:13:15,299 --> 00:13:18,512
+which is the surface method
+inherited from FigureFermee
+
+240
+00:13:18,512 --> 00:13:22,925
+And since the Polygone class still
+has a pure virtual method,
+
+241
+00:13:22,925 --> 00:13:26,844
+it is an abstract class and we cannot
+create instances of it.
+
+242
+00:13:27,284 --> 00:13:29,803
+There, this example concludes this episode
+
+243
+00:13:29,803 --> 00:13:33,215
+on pure virtual methods and
+abstract classes.
+
+244
+00:13:33,215 --> 00:13:36,468
+The next episode will focus
+
+245
+00:13:36,468 --> 00:13:39,037
+on heterogeneous containers,
+
+246
+00:13:39,037 --> 00:13:41,377
+vectors in which we put
+
+247
+00:13:41,377 --> 00:13:44,153
+the pointers to characters for example,
+in our game.
+
+248
+00:13:44,153 --> 00:13:46,244
+We will go over all of this in detail
+
+249
+00:13:46,244 --> 00:13:48,204
+in the next episode.
+
+250
+00:13:48,204 --> 00:13:50,652
+And then we will discuss
+additional aspects related to that topic
+
+251
+00:13:50,652 --> 00:13:53,924
+in a final, optional episode.

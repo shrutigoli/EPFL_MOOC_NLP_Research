@@ -1,0 +1,132 @@
+Welcome back, Nature in Code.
+We are in Chapter 2, Lecture 9.
+In this video, I want to clean up a few things with the rounding error and introduce an important concept, namely that of returning values from functions.
+So if you take a look here at our console, we have this rounding error.
+It's pretty ugly and it's irrelevant for our purpose here.
+So, why don't we just output a rounded number?
+Something that's rounded down to maybe 2 digits after the decimal point.
+Something like that.
+So how would we do this?
+Well, it turns out that JavaScript in the browser, comes with a pretty handy function called <i>Math.round</i>.
+So again this capital "M", <i>Math.round</i>.
+This method actually takes one argument, namely a number.
+Let's for example put 1.23456.
+If we hit enter, what we see here is the value 1. so this has been rounded down and that's what <i>Math.round</i> does.
+It takes a number and rounds it down or up to the next integer, the next whole number.
+So if we would instead say 
+"<i>Math.round</i> 1.6", for example, this would be round up because 1.6 is closer to 2 then it is to 1.
+Now, unfortunately,
+<i>Math.round</i> does only that.
+It doesn't come with the ability to round two specific, desired number of digits after the decimal point.
+So we somehow have to do this ourselves. but we can use the functionality of <i>Math.round</i>. so how would we do this?
+How would we say, you know, rounded down to two points after the decimal point here.
+Two digits after the decimal point.
+There's actually a neat little trick.
+What we need to do is, we simply need to first shift the decimal here over by 2, then we need to use the <i>Math.round</i> functionality to get rid of everything after those two digits and then we need to shift the decimal point back. so concretely what this would look like is, if you take for example 1.23456, we multiply this by hundreds, what do we get?
+Well, we get the whole thing shifted, the decimal point shifted by two points over here and here is our new or old friend, the rounding error again.
+But we're not gonna care about this, because what will do now is we will essentially take this number and we pass it to <i>Math.round</i>.
+So what we will do is we would take <i>Math.round</i> and now pass in (1.23456 times 100).
+I was missing the closing parenthesis.
+All right.
+So now we've gotten rid of everything after the 3, which is exactly what we wanted because we multiplied by 100 thereby shifting the decimal point two places to the right and then rounding it.
+And now we simply need to go back to the correct order of magnitude. we multiplied it by 100, so now we simply need to divide it by 100 again.
+All right, so basically what this would be, then, it would be "<i>Math.round</i>(1.23456 x 100)" and now the whole thing here, we simply divide it by 100 -- and that is 1.23 and that is exactly how this number should be rounded if we wanted to round it to two digits after the decimal point.
+So that's a neat little trick.
+Let's implement this into a generic function, so let's go back to our code and let's maybe add a function here.
+Okay, so I'm gonna call this function
+<i>round_number</i>.
+That seems like a good name, because as we said in the beginning, we should name our functions according to what they do and this function is supposed to round the number.
+So that's fine.
+And then this function now, with the parentheses as always, should now take an argument, so I have to define a parameter here and I am going to call it <i>value</i> because that's a pretty generic term and that is essentially what I expect to be passed in when this function is called.
+So, the function body here should contain this code
+"math dot random", sorry, "round", not random. we take the number that was passed to us, so <i>value</i> we multiply it by 100 as we have seen then we round this product down to the next integer and now we divide it back by 100, so they were in the correct magnitude. and a semicolon to end the expression.
+All right.
+So now, this is a function that takes one argument, one parameter we can call this function and we can pass in an argument so anything, any number that we want to and it will be rounded down correctly to two points after the decimal, two digits after the decimal point.
+The only problem here is that that calculation, the result of the calculation would actually be lost it would just be calculated and then "boom",
+It would be gone.
+What we need is, we need a way to actually return this value to the point where the function was called in the first place and this is an very important concept when it comes to functions and doing this, this returning.
+We actually use a very meaningful keyword which is called <i>return</i>.
+Okay, and you can see here by the automatic color coding that it recognizes this as a key word.
+So we are here calculating this expression and then we are returning that value to whomever called this function in the first place.
+So where would we like to call this function?
+Well, here in this particular code, we would like to call it in six places, namely, here, here and here.
+And then down here, here and here.
+So, let's go ahead and do this.
+So rather than passing here "a1a1", to console lock, we actually first want to filter this value by passing it through the <i>round_number</i> function, so I'm simply gonna say
+"round_number(a1a1)"
+Okay.
+Instead of just "a1a1".
+So what happens here is we'll take this value, we will pass it to this function, something is being calculated, hopefully correctly,
+If we did this right.
+And then this value is returned to where we actually called this function in the first place.
+Essentially put here.
+And so we can do this with the with the other six, the other five examples, as well.
+So here we would simply put a
+"round _number(a1a2)~, and here we would simply put
+"round_number(a2a2)" and the same thing down here so "round_number(a1a1)",
+"round_number(a1a2)", and "round_number(a2a2)"
+All right, so let's save this and go back to the browser and see if this worked
+Okay, so I am here in this document,
+I am reloading and boom-- it worked beautifully.
+So as you can see the numbers here are now rounded correctly down to two digits after the decimal point.
+So this worked great. now, maybe one other question.
+So this is great that we now have this tool that rounds a number, but it rounds it to two digits after the decimal point.
+And this is hard-coded. is there a way for us to make this function even more generic, so that we can let a user, not only pass in the number that is to be rounded, but also the precision?
+How many digits after the decimal point?
+Well, absolutely we can do this.
+So, why don't we go ahead and simply define a second parameter for this function, which I'm now gonna call <i>decimals</i>.
+Okay, so what this would be for example in this concrete case where we would like it to be two digits after the decimal point
+This value should be 2, because we want it shifted by 2 and so this value here, as we know, is correct, we need to, therefore, multiply the value by 100 and then divide it again by 100.
+So if this value, for example, were 3, this <i>decimals</i>, which means that we would like the number to be rounded to three digits after the decimal point,
+Then, we would have to multiply this by 1,000 and divide it by 1,000
+If it were 4, we would have to that multiplied by 10,000 and then divided by 10,000 and so on, so the trick here is that this number should be hard-coded but it should actually be dependent on the <i>decimals</i> here.
+And we can do this, so it's should simply be 10 to the power of whatever we have in <i>decimals</i> and there's a really nice function actually that helps us do this and it's called <i>math.pow</i>, it takes two arguments, namely the base and the exponent, so, in our cases it would be
+"10 exponent decimals". so if <i>decimals</i> is 2, then this would be
+10 to the power of 2, if it were 3, it would be
+10 to the power of 3 and so on.
+Now we're gonna store this here in a variable that I'm gonna call <i>shifter</i>.
+"Shifter", because it is shifting.
+It is shifting the decimal point.
+And then we shouldn't forget to end this line here with a semicolon, and now instead of this hard-coded 100 here
+I am simply gonna replaced this 100 with the <i>shifter</i>, whatever value we have in the <i>shifter</i>.
+So--
+Now, the only thing that we need to do is we need-- wherever we are calling this function, we are now expected to pass in two arguments, not just one.
+So let's do that here, Okay?
+Let's put in a 2 here, so comma 2, as the decimal, so we're passing the value, and that the decimals, and same down here, 0.2 and 0.2 and sorry, "comma" 2.
+Okay, <i>save</i>, and now, let's move over to the browser and see if this works.
+So we're going to reload this document and nothing changed, so the output here is still the same, which is correct, but actually behind the scenes we made-- we made a much more generic round number function.
+Indeed, if we were to go back and replace these 2s with, for example, 1 we should see all those numbers rounded to one digit after the decimal point.
+Let me save this, go back to the browser reload.
+And indeed this is happening, but you can see that this is not a good idea here because things are individually, correctly rounded, but these are independent calculations from each other.
+And so what happens is that actually these numbers would add up to something that is greater than 1.
+And that's obviously not desired.
+So we're gonna leave this as-- with a 2 here.
+We could write a function that takes all three values into account and correctly rounds, so that the sum will still be 1. but here it's just a simple function that just takes any value, doesn't care about any other values in the code and then rounds it down to a specific number of digits after the decimal point.
+So this essentially solves our problem, let me save this again and just go back and see if everything works as planned, yes indeed, so if you now look at this code.
+We've done a couple of things here.
+First of all we got rid of the rounding problem in the context of outputting the number.
+So that's nice, but we also learned how to write a function that takes one or two or in fact the multiple parameters, which gives us a really powerful tool to write very generic functions.
+If you take this function down here, for example, that is not a generic function.
+It doesn't take any values. 
+You simply calculate something and that's fine here in the context of this example, but it's not a very generic function.
+This function here is much more generic, you can now pass in any value that you want to, and any number of decimals for your precision that you want and it will return to correct value.
+This is a very powerful concept. and the other thing that is really important here is this return. you can explicitly return things from a function
+And that's actually a very common way to go about.
+So here, for example, we will return the calculation.
+The result this calculation here, but as you can see below here, we don't specifically, explicitly need to return anything.
+Functions work without the return key word. if you don't return anything, actually behind the scenes, undefined is returned.
+And that's why sometimes it shows up in the console.
+But it's really not important for us here.
+You can return something if you want to, you don't have to.
+Many times you actually want to return something.
+And finally, the other thing
+I'd like to mention here is that, once you return from the function, then the function is terminated.
+Okay? Because you basically return control over to the place where to function has been called.
+So for example, anything down here, you know, "var bla = 5;" that would actually never be executed, because you would always return the function here and that would be it.
+So let me get rid of this.
+Okay, so a couple of powerful ideas here implemented in JavaScript.
+So this concludes this video.
+We have learned about returned values and about generating powerful, generic functions.
+In the next and final video of Chapter 2,
+I'd like to explain something else that we have looked over so far, which is the concept of a scope.
+So, I'll see you in the next video.

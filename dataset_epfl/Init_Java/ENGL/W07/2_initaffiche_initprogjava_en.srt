@@ -1,0 +1,1643 @@
+1
+00:00:05,157 --> 00:00:06,965
+Coding of an application,
+whatever its nature may be,
+
+2
+00:00:06,975 --> 00:00:10,220
+requires thinking both about
+the involved data and their types,
+
+3
+00:00:10,220 --> 00:00:11,908
+and about the fundamental
+functionalities
+
+4
+00:00:11,908 --> 00:00:14,076
+allowing the implementation
+of the desired processes.
+
+5
+00:00:14,306 --> 00:00:17,105
+We started this work during the
+previous episode
+
+6
+00:00:17,105 --> 00:00:19,448
+for the implementation of
+the Connect Four game.
+
+7
+00:00:19,648 --> 00:00:21,823
+Today, we will push this further
+
+8
+00:00:21,873 --> 00:00:24,771
+and start to focus on the first
+functionalities
+
+9
+00:00:24,801 --> 00:00:26,739
+needed for the implementation of
+this game.
+
+10
+00:00:27,689 --> 00:00:29,421
+As a reminder, during the
+previous episode,
+
+11
+00:00:29,421 --> 00:00:32,717
+we had started by working on the
+representation of the game's grid.
+
+12
+00:00:33,305 --> 00:00:36,078
+Our choice was, naturally,
+to represent it
+
+13
+00:00:36,078 --> 00:00:38,045
+in the form of a two-dimensional
+array.
+
+14
+00:00:38,045 --> 00:00:40,895
+We had also worked on the
+representation of the
+
+15
+00:00:40,895 --> 00:00:43,621
+content of each of the cells
+of this grid.
+
+16
+00:00:44,051 --> 00:00:46,314
+There are of course many different
+possible choices
+
+17
+00:00:46,314 --> 00:00:48,137
+to represent this content.
+
+18
+00:00:48,347 --> 00:00:50,630
+We kept one for its simplicity:
+
+19
+00:00:50,790 --> 00:00:53,601
+representing the type of each cell
+as an integer
+
+20
+00:00:53,601 --> 00:00:56,363
+with a certain convention which
+consists in saying
+
+21
+00:00:56,363 --> 00:01:01,983
+that 0 represents an empty cell, 1 a yellow
+cell and 2 a red cell.
+
+22
+00:01:02,323 --> 00:01:04,753
+To be able to manipulate the
+contents of these cells
+
+23
+00:01:04,753 --> 00:01:06,877
+explicitly and clearly in the
+program,
+
+24
+00:01:06,997 --> 00:01:09,228
+we had defined constants
+
+25
+00:01:10,378 --> 00:01:14,269
+to represent these different values and
+to manipulate them explicitly.
+
+26
+00:01:15,049 --> 00:01:17,360
+Let's now focus on the first
+functionalities
+
+27
+00:01:17,360 --> 00:01:19,728
+useful for the implementation
+of a Connect Four game.
+
+28
+00:01:20,298 --> 00:01:24,745
+When, in my program, I will
+have declared the grid
+
+29
+00:01:24,745 --> 00:01:26,372
+in the form of a two-dimensional
+array,
+
+30
+00:01:26,662 --> 00:01:29,204
+it is likely that the first thing
+I will think about is
+
+31
+00:01:29,204 --> 00:01:31,206
+to initialize this grid correctly.
+
+32
+00:01:31,426 --> 00:01:33,110
+Indeed, at the beginning of the game
+for example,
+
+33
+00:01:33,110 --> 00:01:36,700
+it would be best for
+each of these cells to be empty.
+
+34
+00:01:37,019 --> 00:01:39,178
+And so, we must carry
+out this initialization.
+
+35
+00:01:40,308 --> 00:01:44,368
+Another natural function to
+anticipate is the display of the grid.
+
+36
+00:01:44,568 --> 00:01:47,136
+Indeed, for the player to be
+able to know
+
+37
+00:01:47,136 --> 00:01:48,925
+the evolution of the game with time,
+
+38
+00:01:48,925 --> 00:01:53,496
+it must be possible to display the
+different cell colors in the game's grid,
+
+39
+00:01:53,496 --> 00:01:56,629
+and at that moment, a display function
+becomes absolutely necessary.
+
+40
+00:01:56,899 --> 00:01:58,483
+In this episode,
+
+41
+00:01:58,483 --> 00:02:00,481
+we will focus on the actual
+implementation
+
+42
+00:02:00,481 --> 00:02:02,189
+of these two basic functionalities.
+
+43
+00:02:03,019 --> 00:02:05,319
+Let's start by the initialization
+function
+
+44
+00:02:05,319 --> 00:02:06,765
+which we will implement here
+
+45
+00:02:06,765 --> 00:02:09,801
+via a method called "initialise".
+
+46
+00:02:10,581 --> 00:02:13,439
+One of the first things to do
+when we start to think about
+
+47
+00:02:13,439 --> 00:02:15,305
+implementing a method
+
+48
+00:02:15,305 --> 00:02:18,545
+is to try to imagine how we will
+actually use it.
+
+49
+00:02:18,775 --> 00:02:23,115
+So here, if I have first declared my
+grid in this form,
+
+50
+00:02:23,165 --> 00:02:27,965
+it is natural to imagine the
+initialization of this grid
+
+51
+00:02:27,965 --> 00:02:31,620
+through a call to an "initialise" method
+which would take the grid as a parameter,
+
+52
+00:02:31,620 --> 00:02:32,485
+like so.
+
+53
+00:02:32,975 --> 00:02:36,171
+Such a call to the "initialise" method
+would result
+
+54
+00:02:37,041 --> 00:02:42,298
+in the initialization of each of the cells of
+my game grid with
+
+55
+00:02:42,948 --> 00:02:46,138
+the value "VIDE" [TN: means "EMPTY"].
+Let's now think about the header for
+
+56
+00:02:46,352 --> 00:02:48,232
+the "initialise" method. We have learned
+that, at this stage of the course,
+
+57
+00:02:48,682 --> 00:02:52,102
+the "static" keyword is associated
+to every method
+
+58
+00:02:52,102 --> 00:02:53,982
+for reasons which will be
+explained
+
+59
+00:02:53,982 --> 00:02:56,422
+in the other course on object-oriented
+Java.
+
+60
+00:02:57,042 --> 00:03:00,881
+How about the rest of the elements of hte
+header of the "initialise" method?
+
+61
+00:03:00,881 --> 00:03:03,791
+So, to define this header precisely,
+
+62
+00:03:03,791 --> 00:03:08,071
+we have to specify the name of the
+method -- we chose it here --
+
+63
+00:03:08,471 --> 00:03:10,934
+the set of arguments that the
+method will have to receive
+
+64
+00:03:10,934 --> 00:03:12,177
+for it to work,
+
+65
+00:03:12,177 --> 00:03:14,460
+and what we call the return type
+of the method.
+
+66
+00:03:14,460 --> 00:03:16,709
+How do we choose the return type here?
+
+67
+00:03:17,073 --> 00:03:20,951
+Here, I called my initialization
+method
+
+68
+00:03:21,901 --> 00:03:24,609
+by passing it the grid as parameter
+
+69
+00:03:24,799 --> 00:03:27,958
+and I do not expect anything in return
+from this call. 
+
+70
+00:03:28,268 --> 00:03:31,815
+I do not expect to make this call
+in such a way that,
+
+71
+00:03:31,815 --> 00:03:34,875
+after my grid is initialized, I would
+receive a value
+
+72
+00:03:34,875 --> 00:03:36,079
+in return.
+
+73
+00:03:36,219 --> 00:03:38,349
+The "initialise" method
+returns nothing,
+
+74
+00:03:38,349 --> 00:03:41,189
+so it is natural to give it a "void"
+return type.
+
+75
+00:03:42,568 --> 00:03:46,644
+It is quite easy to describe the
+other elements of the header.
+
+76
+00:03:46,644 --> 00:03:48,961
+So, we have started writing the code
+"initialise"
+
+77
+00:03:48,961 --> 00:03:52,378
+and the set of arguments is a two-
+dimensional array
+
+78
+00:03:53,208 --> 00:03:54,276
+which represents the grid.
+
+79
+00:03:54,666 --> 00:03:56,580
+So at this stage, I will have
+completely defined
+
+80
+00:03:56,580 --> 00:03:59,254
+what we refer to as the header of the method.
+
+81
+00:03:59,254 --> 00:04:01,579
+It is now time to think about
+its body,
+
+82
+00:04:02,049 --> 00:04:03,947
+that is, the set of instructions
+
+83
+00:04:03,947 --> 00:04:05,745
+which will carry out the
+desired behavior,
+
+84
+00:04:05,745 --> 00:04:09,063
+which is to fill the grid
+with the "VIDE" (empty) value.
+
+85
+00:04:09,653 --> 00:04:11,368
+Small aside before continuing,
+
+86
+00:04:11,368 --> 00:04:14,769
+you should note that this specific
+way of designing the "initialise" method
+
+87
+00:04:14,769 --> 00:04:16,550
+is of course not the only one possible.
+
+88
+00:04:16,850 --> 00:04:20,075
+We could easily have imagined
+alternative designs,
+
+89
+00:04:20,075 --> 00:04:23,356
+for example the one that consists
+in making the "initialise"
+
+90
+00:04:23,356 --> 00:04:26,080
+method return a grid,
+
+91
+00:04:26,080 --> 00:04:29,174
+without taking the grid to fill
+in as an argument,
+
+92
+00:04:29,754 --> 00:04:32,680
+and so to replace these two lines
+by something
+
+93
+00:04:32,680 --> 00:04:34,736
+like this.
+
+94
+00:04:35,726 --> 00:04:39,264
+And in this case, the initialise method
+would not take any arguments,
+
+95
+00:04:39,538 --> 00:04:42,311
+as it would completely build and
+initialize a grid
+
+96
+00:04:42,311 --> 00:04:43,094
+and then return it.
+
+97
+00:04:43,594 --> 00:04:46,687
+Its return type would not be
+"void" anymore,
+
+98
+00:04:46,687 --> 00:04:49,957
+but a grid, so a two-dimensional
+array.
+
+99
+00:04:50,379 --> 00:04:53,746
+In the version that we chose, this works
+thanks to the fact
+
+100
+00:04:53,746 --> 00:04:56,313
+that arrays are manipulated via
+references
+
+101
+00:04:56,313 --> 00:04:59,222
+and that we can modify a
+referenced object
+
+102
+00:04:59,222 --> 00:05:00,818
+through the reference passed as argument.
+
+103
+00:05:01,018 --> 00:05:05,991
+This means that the grid that we
+passed to the "initialise" method
+
+104
+00:05:05,991 --> 00:05:07,953
+will indeed be modified
+
+105
+00:05:07,953 --> 00:05:10,671
+once the method is done executing.
+
+106
+00:05:11,861 --> 00:05:16,366
+The algorithm for the initialization
+of the grid is easy to imagine here.
+
+107
+00:05:16,666 --> 00:05:19,074
+For each of the lines of the grid,
+
+108
+00:05:19,284 --> 00:05:23,932
+we will go through each cell,
+each column,
+
+109
+00:05:24,432 --> 00:05:27,990
+to fill these cells with
+the empty value, "VIDE".
+
+110
+00:05:28,510 --> 00:05:30,271
+Let's start by writing the
+lines of code
+
+111
+00:05:30,271 --> 00:05:34,011
+that will allow us to initialize a single
+line of our grid;
+
+112
+00:05:34,011 --> 00:05:36,311
+for example, the first line.
+
+113
+00:05:36,681 --> 00:05:41,623
+So here, we need to iterate over all
+the cells of this line,
+
+114
+00:05:41,913 --> 00:05:45,763
+which can be done naturally with an
+iteration, a  for-loop,
+
+115
+00:05:46,513 --> 00:05:48,480
+that we can write like this.
+
+116
+00:05:48,710 --> 00:05:53,802
+So, for each column of the first line,
+
+117
+00:05:53,802 --> 00:05:56,450
+which we can write in the form
+"grille[0]",
+
+118
+00:05:57,200 --> 00:06:01,146
+we will put the  "VIDE" value into the
+current column.
+
+119
+00:06:01,666 --> 00:06:02,843
+We know that in Java,
+
+120
+00:06:02,843 --> 00:06:05,334
+a two-dimensional array is simply
+an array of arrays,
+
+121
+00:06:05,504 --> 00:06:08,405
+so here our grid would have the
+following form,
+
+122
+00:06:08,865 --> 00:06:12,457
+and the first line of the grid is
+what is accessible
+
+123
+00:06:12,457 --> 00:06:14,589
+under the name "grille[0]".
+
+124
+00:06:15,579 --> 00:06:19,751
+So here, simply, for each of the
+columns of the first line,
+
+125
+00:06:19,751 --> 00:06:21,910
+we populate their content using
+the value "VIDE".
+
+126
+00:06:22,790 --> 00:06:24,472
+"grille[0].length", by the way,
+
+127
+00:06:25,642 --> 00:06:28,720
+gives us the number of cells
+in the first line of my grid,
+
+128
+00:06:28,720 --> 00:06:30,408
+in this case, 7.
+
+129
+00:06:31,318 --> 00:06:33,807
+We know that, in a Java array,
+
+130
+00:06:34,017 --> 00:06:37,955
+the elements are indexed from
+0 to size-1
+
+131
+00:06:38,455 --> 00:06:42,203
+which explains why we stop strictly
+before the value 7
+
+132
+00:06:43,193 --> 00:06:46,083
+and why we start iterating from 0.
+
+133
+00:06:47,093 --> 00:06:48,939
+Since the code that
+we have written here
+
+134
+00:06:48,939 --> 00:06:52,639
+only allows us to initialize one
+line of our grid,
+
+135
+00:06:52,639 --> 00:06:56,369
+we have to repeat it for each of the
+other lines.
+
+136
+00:06:56,619 --> 00:07:01,134
+So, this routine must be repeated
+for each line
+
+137
+00:07:01,134 --> 00:07:04,533
+and so it is natural to nest this
+in another for-loop
+
+138
+00:07:04,533 --> 00:07:06,516
+which will iterate over the number of lines.
+
+139
+00:07:06,926 --> 00:07:08,844
+This can be written like so:
+
+140
+00:07:08,844 --> 00:07:14,012
+for each line numbered from 0 to "grille.length",
+
+141
+00:07:14,012 --> 00:07:16,071
+we repeat the instructions
+
+142
+00:07:16,071 --> 00:07:17,952
+that we wrote for the first line.
+
+143
+00:07:18,312 --> 00:07:21,773
+So here, a few modifications
+should be made,
+
+144
+00:07:22,413 --> 00:07:24,865
+such as replacing 0 by the i-th line
+
+145
+00:07:24,865 --> 00:07:27,697
+since we are repeating this for each line,
+
+146
+00:07:28,457 --> 00:07:29,641
+and there we have it.
+
+147
+00:07:32,091 --> 00:07:34,523
+There, once a game has
+been declared in a program,
+
+148
+00:07:34,523 --> 00:07:36,351
+in the form of a two-dimensional
+integer array,
+
+149
+00:07:36,351 --> 00:07:39,236
+we now know how to initialize it
+using the "initialise" method.
+
+150
+00:07:39,486 --> 00:07:42,038
+Let's now focus on the second
+base functionality,
+
+151
+00:07:42,038 --> 00:07:44,542
+which is a method allowing us to
+display the grid,
+
+152
+00:07:44,542 --> 00:07:45,766
+the "affiche" method. 
+(TN: "affiche" means "display")
+
+153
+00:07:46,226 --> 00:07:48,132
+As we did earlier for the 
+"initialise" method,
+
+154
+00:07:48,132 --> 00:07:48,936
+let's try to imagine
+
+155
+00:07:48,936 --> 00:07:51,120
+how we would naturally call the "affiche"
+method.
+
+156
+00:07:51,120 --> 00:07:52,215
+So, we can imagine that,
+
+157
+00:07:52,215 --> 00:07:54,890
+after having made a certain number
+of operations on the grid,
+
+158
+00:07:54,890 --> 00:07:56,875
+we wish to display its content.
+
+159
+00:07:56,875 --> 00:08:00,787
+It's quite natural to anticipate
+this call being of this form.
+
+160
+00:08:00,787 --> 00:08:04,188
+So, we pass as a parameter to
+the "affiche" method
+
+161
+00:08:04,188 --> 00:08:05,599
+the grid to display
+
+162
+00:08:05,599 --> 00:08:07,540
+and we do not expect
+any return value.
+
+163
+00:08:07,660 --> 00:08:09,593
+So, just like for the "initialise" method,
+
+164
+00:08:10,003 --> 00:08:12,288
+we obtain a method header
+
+165
+00:08:12,288 --> 00:08:14,673
+quite analogous to that of the
+"initialise" method,
+
+166
+00:08:14,673 --> 00:08:19,256
+in the sense that we do not expect the
+"affiche" method to return any value,
+
+167
+00:08:19,256 --> 00:08:21,764
+so we define its return type
+as "void".
+
+168
+00:08:21,984 --> 00:08:24,992
+As always at this stage of the course, we
+use the "static" keyword.
+
+169
+00:08:25,192 --> 00:08:27,601
+As parameters for the "affiche" method,
+
+170
+00:08:27,971 --> 00:08:30,827
+we will pass the grid to display.
+
+171
+00:08:31,467 --> 00:08:34,025
+Let's now proceed to the coding of the body
+of the "affiche" method.
+
+172
+00:08:34,125 --> 00:08:35,402
+The algorithm is very close
+
+173
+00:08:35,402 --> 00:08:38,319
+to the one we wrote for the "initialise" method,
+
+174
+00:08:38,319 --> 00:08:42,887
+since we have to iterate over
+each line of the grid
+
+175
+00:08:42,887 --> 00:08:46,222
+and for each of these lines,
+iterate on each column
+
+176
+00:08:46,412 --> 00:08:49,077
+to display their content in a
+particular format.
+
+177
+00:08:49,307 --> 00:08:52,672
+Here, of course, we will not make
+any graphical display,
+
+178
+00:08:52,672 --> 00:08:54,984
+but we will make a textual printing in the
+terminal
+
+179
+00:08:54,984 --> 00:08:57,563
+by adopting a certain number
+of display conventions.
+
+180
+00:08:57,563 --> 00:09:01,376
+For example, we will display an empty
+cell with a space
+
+181
+00:09:01,576 --> 00:09:05,409
+and red or yellow cells using arbitrary
+characters
+
+182
+00:09:05,409 --> 00:09:07,363
+such as 'X' or 'O'.
+
+183
+00:09:08,103 --> 00:09:11,032
+So we would have a display that would
+look like this
+
+184
+00:09:11,332 --> 00:09:13,520
+for each line of our grid.
+
+185
+00:09:14,180 --> 00:09:16,485
+In Java, these instructions
+can be written like this:
+
+186
+00:09:17,135 --> 00:09:20,037
+so here I am iterating again
+
+187
+00:09:20,037 --> 00:09:21,315
+but I will switch it up a little 
+
+188
+00:09:21,315 --> 00:09:23,043
+compared to my earlier
+solution
+
+189
+00:09:23,043 --> 00:09:25,161
+by iterating over the whole set of values.
+
+190
+00:09:25,343 --> 00:09:29,123
+Here, for each line of my grid,
+which is written like this,
+
+191
+00:09:30,773 --> 00:09:36,134
+for each cell of this line, I will
+display its content
+
+192
+00:09:36,134 --> 00:09:39,184
+and for this I will have to stick
+to my conventions
+
+193
+00:09:39,184 --> 00:09:40,844
+and so write a certain number of tests.
+
+194
+00:09:40,844 --> 00:09:44,226
+If the cell is empty, I will display
+it using a space,
+
+195
+00:09:44,746 --> 00:09:46,142
+which is written like this.
+
+196
+00:09:46,452 --> 00:09:49,168
+So here, I don't jump any line,
+I just want to display the space.
+
+197
+00:09:49,578 --> 00:09:52,516
+Then I continue with another test, "else if".
+
+198
+00:09:53,296 --> 00:09:57,443
+If my cell's value is the red
+constant,
+
+199
+00:09:57,443 --> 00:10:00,610
+then I display it according to another
+convention, like so,
+
+200
+00:10:00,610 --> 00:10:03,838
+and finally, I know that I am
+
+201
+00:10:03,838 --> 00:10:05,824
+in the situation where my cell is yellow
+
+202
+00:10:06,224 --> 00:10:10,395
+and so I can display it using
+another character, 'X' here.
+
+203
+00:10:10,995 --> 00:10:11,546
+And here we are!
+
+204
+00:10:11,636 --> 00:10:15,009
+Here, for each of the
+lines of the grid
+
+205
+00:10:15,429 --> 00:10:16,992
+to be displayed separately from the
+others,
+
+206
+00:10:17,382 --> 00:10:21,177
+I must insert a line break after displaying
+each line.
+
+207
+00:10:23,820 --> 00:10:26,143
+An alternative way of coding this
+
+208
+00:10:26,143 --> 00:10:28,714
+would have been to replace the 
+iterations over the whole set of values
+
+209
+00:10:28,714 --> 00:10:31,345
+by conventional "for" iterations,
+
+210
+00:10:31,605 --> 00:10:33,317
+which could be written like so.
+
+211
+00:10:33,797 --> 00:10:35,911
+So here, we have chosen
+
+212
+00:10:35,911 --> 00:10:37,719
+to iterate over a set of values
+
+213
+00:10:37,719 --> 00:10:39,727
+which is a little more
+elegant and explicit.
+
+214
+00:10:39,847 --> 00:10:42,745
+So why did we not use this
+option earlier
+
+215
+00:10:42,745 --> 00:10:44,978
+when we coded the "initialise" method?
+
+216
+00:10:44,978 --> 00:10:47,946
+Why did we choose to use
+"conventional" "for" iterations?
+
+217
+00:10:47,946 --> 00:10:50,246
+Would you know how to
+answer this question?
+
+218
+00:10:50,566 --> 00:10:52,216
+The answer is simply that in Java,
+
+219
+00:10:52,216 --> 00:10:53,976
+an iteration on a set of values
+
+220
+00:10:53,976 --> 00:10:56,886
+cannot modify the set of values
+that it iterates over.
+
+221
+00:10:57,130 --> 00:10:59,924
+Whereas for the "initialise" method,
+this is an absolute must,
+
+222
+00:10:59,924 --> 00:11:04,236
+the "initialise" method has to
+modify the set of cells of the grid.
+
+223
+00:11:05,306 --> 00:11:08,871
+There, now our display method
+is essentially written
+
+224
+00:11:08,881 --> 00:11:12,588
+and we will, as good programmers,
+comment this method
+
+225
+00:11:12,848 --> 00:11:15,038
+Here, the comment is
+particularly important
+
+226
+00:11:15,038 --> 00:11:17,955
+because the display conventions
+that we chose
+
+227
+00:11:17,955 --> 00:11:19,202
+are completely arbitrary,
+
+228
+00:11:19,352 --> 00:11:23,058
+and anyone who reads our code
+should be able to know these conventions
+
+229
+00:11:23,064 --> 00:11:26,120
+without having to read through and 
+understand the whole of the method's body.
+
+230
+00:11:26,310 --> 00:11:28,734
+This is why here, we must
+absolutely comment our choices
+
+231
+00:11:28,734 --> 00:11:32,809
+and indicate that, for us, a big 'O'
+indicates a red cell
+
+232
+00:11:32,809 --> 00:11:35,099
+and a big 'X' a yellow one.
+
+233
+00:11:36,572 --> 00:11:39,404
+Systematic testing of the different
+features of an application
+
+234
+00:11:39,404 --> 00:11:41,576
+during coding
+
+235
+00:11:41,576 --> 00:11:45,381
+is absolutely essential to produce
+robust, high-quality code. 
+
+236
+00:11:45,501 --> 00:11:47,187
+This is a recommendation that
+we made
+
+237
+00:11:47,187 --> 00:11:49,870
+right at the beginning of our case
+study on the Connect Four game.
+
+238
+00:11:49,930 --> 00:11:51,897
+We will now stick to these
+principles
+
+239
+00:11:51,897 --> 00:11:54,374
+and start to test our
+first features,
+
+240
+00:11:54,374 --> 00:11:57,984
+that is, initialization and
+display of the grid.
+
+241
+00:11:58,801 --> 00:12:00,702
+To test the "initialise" and
+"affiche" methods,
+
+242
+00:12:00,702 --> 00:12:03,497
+we will have to write a small
+program which calls them,
+
+243
+00:12:03,497 --> 00:12:04,542
+so a "main" method.
+
+244
+00:12:04,762 --> 00:12:06,386
+So this "main" method here
+
+245
+00:12:06,886 --> 00:12:08,730
+will of course declare a grid 
+
+246
+00:12:08,730 --> 00:12:11,514
+in the form of a two-dimensional
+integer array
+
+247
+00:12:11,714 --> 00:12:14,565
+and construct it as a matrix of 6 lines
+and 7 columns.
+
+248
+00:12:14,565 --> 00:12:16,455
+Here, we suppose that before this,
+
+249
+00:12:16,455 --> 00:12:19,781
+we have declared the constants for empty ("VIDE"),
+yellow ("JAUNE") and red ("ROUGE"),
+
+250
+00:12:20,451 --> 00:12:22,417
+and we will thus proceed to
+the different calls
+
+251
+00:12:22,417 --> 00:12:24,183
+which will allow us to
+test the methods,
+
+252
+00:12:24,183 --> 00:12:26,743
+in other words the initialization of
+the grid and its display.
+
+253
+00:12:27,433 --> 00:12:32,213
+So, if we displayed the grid
+immediately after its initialization,
+
+254
+00:12:32,313 --> 00:12:34,467
+we would not be able to test all
+the cases
+
+255
+00:12:34,467 --> 00:12:36,685
+since the grid would be
+completely empty;
+
+256
+00:12:36,685 --> 00:12:37,968
+and we could not know
+
+257
+00:12:37,968 --> 00:12:40,721
+if yellow and red cells are
+displayed correctly.
+
+258
+00:12:41,101 --> 00:12:43,330
+For this reason, it
+is advisable to modify
+
+259
+00:12:43,330 --> 00:12:45,979
+the contents of some
+cells of the grid,
+
+260
+00:12:45,979 --> 00:12:49,379
+in order to be able to see how
+the program behaves
+
+261
+00:12:49,379 --> 00:12:53,499
+when it has a yellow cell or a red
+cell at a given place.
+
+262
+00:12:54,779 --> 00:12:57,417
+If our initialization and
+display methods
+
+263
+00:12:57,417 --> 00:12:58,615
+were correctly written
+
+264
+00:12:58,615 --> 00:13:01,345
+we should obtain an output which
+looks like this:
+
+265
+00:13:01,745 --> 00:13:05,081
+this will allow us to verify that
+all the cells of the grid
+
+266
+00:13:05,081 --> 00:13:09,108
+which were not explicitly modified
+are indeed empty cells,
+
+267
+00:13:09,108 --> 00:13:12,596
+following our convention that we
+display a space for these
+
+268
+00:13:12,966 --> 00:13:15,068
+and that those that were
+explicitly modified
+
+269
+00:13:15,068 --> 00:13:17,428
+are displayed according to the
+conventions that we defined.
+
+270
+00:13:17,787 --> 00:13:21,558
+So, basically, here,
+we should be able to verify
+
+271
+00:13:21,688 --> 00:13:23,946
+that the cell which is at line 2
+
+272
+00:13:23,946 --> 00:13:26,584
+(remember that we start numbering from 0)
+
+273
+00:13:26,754 --> 00:13:30,954
+and column 3 does indeed correspond
+to a yellow cell,
+
+274
+00:13:30,954 --> 00:13:34,245
+which we chose to represent
+with a big 'X'.
+
+275
+00:13:34,395 --> 00:13:37,728
+The same goes for the second
+explicitly modified cell,
+
+276
+00:13:38,168 --> 00:13:43,465
+which corresponds here to the cell
+on line 2
+
+277
+00:13:43,855 --> 00:13:46,052
+and column 4, this time
+
+278
+00:13:46,282 --> 00:13:48,254
+So, the output of the program
+will allow us to verify
+
+279
+00:13:48,254 --> 00:13:51,057
+most of the functions that we
+implemented
+
+280
+00:13:51,057 --> 00:13:52,910
+through "initialise" and "affiche".
+
+281
+00:13:53,710 --> 00:13:56,510
+The "initialise" and "affiche" methods,
+as we have coded them,
+
+282
+00:13:56,510 --> 00:13:59,575
+carry out most of the functions
+that these two methods must implement.
+
+283
+00:13:59,705 --> 00:14:01,505
+It is now time to wonder about
+
+284
+00:14:01,505 --> 00:14:03,764
+more cosmetic aspects, about finishing.
+
+285
+00:14:03,764 --> 00:14:05,373
+Let's go back to the "affiche" method
+
+286
+00:14:05,373 --> 00:14:07,712
+to see how we could improve
+its code.
+
+287
+00:14:08,442 --> 00:14:10,907
+The "affiche" method, as we
+have coded it,
+
+288
+00:14:10,907 --> 00:14:13,244
+would allow, for a game grid
+looking like this,
+
+289
+00:14:14,224 --> 00:14:18,700
+to produce a text display such as
+the one you see here.
+
+290
+00:14:18,700 --> 00:14:21,677
+As you can see, this display is
+rather basic,
+
+291
+00:14:21,677 --> 00:14:23,366
+and makes it quite hard
+
+292
+00:14:23,366 --> 00:14:25,895
+to distinguish between
+different columns.
+
+293
+00:14:26,575 --> 00:14:29,545
+And so we could imagine
+improving the display
+
+294
+00:14:30,225 --> 00:14:32,557
+by having something that
+would look like this.
+
+295
+00:14:32,787 --> 00:14:36,001
+So, by explicitly separating the different
+columns
+
+296
+00:14:36,001 --> 00:14:38,429
+and by numbering these columns
+
+297
+00:14:38,429 --> 00:14:41,479
+to have a much clearer view
+of the contents of the grid.
+
+298
+00:14:42,339 --> 00:14:46,534
+The modifications we must
+make to obtain this sort of output
+
+299
+00:14:46,534 --> 00:14:48,904
+are visible here and I will
+now comment on them.
+
+300
+00:14:49,456 --> 00:14:53,096
+So here, first modification: we 
+took the precaution,
+
+301
+00:14:53,766 --> 00:14:56,344
+before displaying each line,
+
+302
+00:14:56,494 --> 00:15:01,944
+to display a space and a bar, which
+corresponds to this output here,
+
+303
+00:15:02,124 --> 00:15:03,546
+for each of the lines.
+
+304
+00:15:03,996 --> 00:15:08,915
+Then, once we have displayed
+all of the cells,
+
+305
+00:15:08,915 --> 00:15:11,910
+we should close the cell with
+a bar,
+
+306
+00:15:11,980 --> 00:15:13,385
+like so.
+
+307
+00:15:13,835 --> 00:15:17,051
+When we have finished
+displaying the grid,
+
+308
+00:15:17,051 --> 00:15:18,553
+we want to add this line,
+
+309
+00:15:18,553 --> 00:15:20,665
+which will allow us to number
+the different columns.
+
+310
+00:15:20,935 --> 00:15:24,449
+We start by displaying a first '=' symbol
+
+311
+00:15:24,799 --> 00:15:27,447
+below the space preceding the first
+column,
+
+312
+00:15:28,097 --> 00:15:30,305
+then a for-loop will repeat
+
+313
+00:15:30,565 --> 00:15:34,285
+as many times as the number of
+columns we have in the grid
+
+314
+00:15:34,465 --> 00:15:36,823
+to display the number of
+each column
+
+315
+00:15:37,173 --> 00:15:40,833
+So, at each iteration here, for each
+possible column number,
+
+316
+00:15:41,083 --> 00:15:46,063
+given that we are numbering, to be more
+clear, from 1 to "grille.length",
+
+317
+00:15:46,353 --> 00:15:49,284
+we will display, for each of the possible
+columns,
+
+318
+00:15:49,284 --> 00:15:52,000
+an '=' symbol followed by the column
+number.
+
+319
+00:15:52,260 --> 00:15:57,629
+So, this for-loop will allow us to display
+these different elements:
+
+320
+00:15:57,729 --> 00:16:00,751
+"=1", "=2", "=3", "=4", ...
+and so on.
+
+321
+00:16:01,501 --> 00:16:04,353
+When we are done with this for-loop,
+
+322
+00:16:04,863 --> 00:16:07,598
+we find ourselves in the situation
+where we have displayed
+
+323
+00:16:07,598 --> 00:16:09,919
+'=' followed by the last column
+number possible.
+
+324
+00:16:10,079 --> 00:16:12,564
+What remains is to display
+these two '=' symbols
+
+325
+00:16:12,594 --> 00:16:15,029
+for a little more harmony
+in the display.
+
+326
+00:16:15,109 --> 00:16:17,576
+This is what we are doing here.
+
+327
+00:16:18,466 --> 00:16:21,051
+This illustrates an essential
+point in coding practices:
+
+328
+00:16:21,051 --> 00:16:23,331
+one should always start by working o
+
+329
+00:16:23,331 --> 00:16:25,331
+essential and fundamental
+functionalities
+
+330
+00:16:25,331 --> 00:16:26,681
+before dealing with
+
+331
+00:16:26,681 --> 00:16:30,481
+little things, before adding cosmetic or finishing
+touches to our application
+
+332
+00:16:30,481 --> 00:16:33,081
+as we have just done here in this
+example.
+
+333
+00:16:33,391 --> 00:16:34,952
+So we can see that at this stage,
+
+334
+00:16:34,952 --> 00:16:37,546
+our "affiche" method is starting
+to get big,
+
+335
+00:16:37,546 --> 00:16:39,594
+so we can legitimately ask
+ourselves the question:
+
+336
+00:16:39,594 --> 00:16:41,613
+should we modularize more?
+
+337
+00:16:41,613 --> 00:16:43,922
+And here, this is absolutely feasible.
+
+338
+00:16:44,082 --> 00:16:46,528
+We can imagine introducing
+two new methods
+
+339
+00:16:46,818 --> 00:16:49,609
+which would help the "affiche"
+method in its job
+
+340
+00:16:49,609 --> 00:16:52,101
+and render it somewhat
+more concise.
+
+341
+00:16:52,101 --> 00:16:54,833
+We could for example have a method
+"afficheLigne" (TN: means "displayRow")
+
+342
+00:16:54,833 --> 00:16:58,375
+whose job would be to display
+one entire row of this grid
+
+343
+00:16:58,375 --> 00:17:02,025
+and another method, for example "afficheBas"
+(TN: means "displayFooter")
+
+344
+00:17:02,028 --> 00:17:05,498
+which would display the bottom
+of our grid.
+
+345
+00:17:06,102 --> 00:17:08,298
+We are now at the end of
+this step.
+
+346
+00:17:08,298 --> 00:17:11,360
+You now know how to model a
+Connect Four grid.
+
+347
+00:17:11,360 --> 00:17:14,349
+You also know how to initialize it and
+display its contents.
+
+348
+00:17:14,349 --> 00:17:16,680
+We can now move on to the
+heart of the matter,
+
+349
+00:17:16,680 --> 00:17:19,590
+coding the functionalities which will
+allow us to play,
+
+350
+00:17:19,590 --> 00:17:21,649
+as we will see in the following
+episodes.

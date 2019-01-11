@@ -1,0 +1,1797 @@
+1
+00:00:04,662 --> 00:00:09,129
+Transaction and abstraction for dealing
+with concurrency and systems.
+
+2
+00:00:09,129 --> 00:00:12,933
+They're actually very simple and elegant
+and intuitive abstraction
+
+3
+00:00:12,933 --> 00:00:17,036
+because they correspond to the notion
+of transactions as we're used to
+
+4
+00:00:17,036 --> 00:00:20,003
+from the real world,
+from business transactions.
+
+5
+00:00:20,003 --> 00:00:23,898
+So, if you go to a bookstore
+to buy a book, you will think
+
+6
+00:00:23,898 --> 00:00:30,459
+of a transaction as: to choose your books,
+take the book and give money to the store.
+
+7
+00:00:30,459 --> 00:00:34,504
+It means that there are at least
+two actions that happen:
+
+8
+00:00:34,504 --> 00:00:39,719
+the moving of the book
+into your ownership, into your possession,
+
+9
+00:00:39,719 --> 00:00:42,944
+and the movement of money 
+into the possession of the store.
+
+10
+00:00:43,315 --> 00:00:47,887
+And you want to handle 
+these two actions atomically.
+
+11
+00:00:47,887 --> 00:00:51,510
+That means, you would like to have
+both of them or none of them.
+
+12
+00:00:51,510 --> 00:00:54,948
+Of course, as the buyer,
+if you give money; you want the book.
+
+13
+00:00:54,948 --> 00:00:59,496
+And as a store, you want to get
+the money if you give the book.
+
+14
+00:01:00,056 --> 00:01:01,626
+And not just one of the two.
+
+15
+00:01:01,752 --> 00:01:07,074
+Also, if at the same time maybe, 
+in the bookstore, there's another buyer
+
+16
+00:01:07,074 --> 00:01:11,659
+who also wants to buy a book,
+maybe at a different checkout,
+
+17
+00:01:11,659 --> 00:01:14,352
+I would think of that 
+as a different transaction.
+
+18
+00:01:14,352 --> 00:01:16,248
+We wouldn't want 
+to have to confuse the two.
+
+19
+00:01:16,248 --> 00:01:18,998
+We don't want to put them together;
+we can treat them separately,
+
+20
+00:01:18,998 --> 00:01:21,777
+from the viewpoint of the buyers
+and to some extent,
+
+21
+00:01:21,777 --> 00:01:23,316
+from the viewpoint of the book store.
+
+22
+00:01:24,028 --> 00:01:28,256
+<i>Transactions are actually a notion
+that came out of database research,</i>
+
+23
+00:01:28,256 --> 00:01:31,211
+<i>and they play a very important
+role in delivery systems.</i>
+
+24
+00:01:31,211 --> 00:01:35,024
+<i>But they also play an important role
+in other context of systems,</i>
+
+25
+00:01:35,024 --> 00:01:39,403
+<i>application service transaction
+ processing systems of all kinds,</i>
+
+26
+00:01:39,403 --> 00:01:42,111
+<i>and also in the context 
+of transaction memory.</i>
+
+27
+00:01:42,111 --> 00:01:44,997
+<i>Which is an important notion
+in the context of programming languages</i>
+
+28
+00:01:44,997 --> 00:01:46,753
+<i>and computer architecture.</i>
+
+29
+00:01:48,112 --> 00:01:52,938
+<i>Transactions allow us to support
+the concurrent execution of user programs</i>
+
+30
+00:01:52,938 --> 00:01:56,624
+<i>and they are essential 
+for good database performance.</i>
+
+31
+00:01:56,624 --> 00:01:57,716
+<i>Why is that the case?</i>
+
+32
+00:01:57,907 --> 00:02:01,007
+<i>Well, one thing is that transactions
+might be quite long-running.</i>
+
+33
+00:02:01,007 --> 00:02:03,141
+<i>For example there might 
+be humans involved</i>
+
+34
+00:02:03,141 --> 00:02:07,270
+<i>and the two steps of the transaction
+ that I talked about in the bookstore;</i>
+
+35
+00:02:07,270 --> 00:02:10,631
+<i>they might take some time to happen
+because humans take their time</i>
+
+36
+00:02:10,631 --> 00:02:12,760
+<i>and they are much slower
+than computers, right?</i>
+
+37
+00:02:12,760 --> 00:02:16,740
+<i>So if such transaction takes a minute 
+for example, you don't want to enter</i>
+
+38
+00:02:16,740 --> 00:02:19,965
+<i>the system to be locked down, 
+and only be able to deal</i>
+
+39
+00:02:19,965 --> 00:02:23,737
+<i>with this one transaction, and not be able
+to serve any other transactions</i>
+
+40
+00:02:23,737 --> 00:02:24,807
+<i>at the same time.</i>
+
+41
+00:02:25,107 --> 00:02:28,911
+<i>Our computers are very fast,
+and we want to use that performance.</i>
+
+42
+00:02:30,121 --> 00:02:34,000
+<i>So as I said, transactions 
+are an abstraction....</i>
+
+43
+00:02:34,440 --> 00:02:37,809
+<i>and they allow us to separate</i>
+
+44
+00:02:37,809 --> 00:02:43,289
+<i>things that are relevant to the database 
+system, for executing the transaction.</i>
+
+45
+00:02:43,289 --> 00:02:48,110
+<i>For making this set of concurrent changes
+possible, while keeping other things</i>
+
+46
+00:02:48,110 --> 00:02:51,964
+<i>separate that are not important.
+For example, an application program</i>
+
+47
+00:02:51,964 --> 00:02:58,416
+<i>a frontant, a browser frontant for example,
+for a webstore, will be worrying about</i>
+
+48
+00:02:58,416 --> 00:03:01,532
+<i>displaying things in all kinds of colors 
+and putting text in all kinds of places,</i>
+
+49
+00:03:01,532 --> 00:03:04,883
+<i>and that might not be important 
+for getting the transaction right.</i>
+
+50
+00:03:05,063 --> 00:03:08,651
+<i>But the delivery system has to know which
+book I want to buy, and how much money</i>
+
+51
+00:03:08,651 --> 00:03:12,352
+<i>I am going to give for it, from which
+account, what my identity is etc.</i>
+
+52
+00:03:15,942 --> 00:03:19,500
+<i>So, users submit transactions and can
+think of each transaction</i>
+
+53
+00:03:19,500 --> 00:03:22,296
+<i>executing by itself,
+independent of any others.</i>
+
+54
+00:03:22,296 --> 00:03:24,144
+<i>We don't have to know 
+about other transactions.</i>
+
+55
+00:03:24,144 --> 00:03:28,564
+<i>We can think of as a user,
+for the purpose of abstraction,</i>
+
+56
+00:03:28,564 --> 00:03:32,022
+<i>that there is nothing else happening
+in the system at this point in time.</i>
+
+57
+00:03:32,808 --> 00:03:36,572
+<i>We call this thing Isolation.</i>
+
+58
+00:03:37,602 --> 00:03:40,852
+<i>Concurrency is then achieved 
+by the database system,</i>
+
+59
+00:03:40,852 --> 00:03:45,687
+<i>which has to interleave these actions,</i>
+<i>has to worry about how to make things work</i>
+
+60
+00:03:45,687 --> 00:03:49,417
+<i>how to make this transaction 
+become... get executed.</i>
+
+61
+00:03:49,417 --> 00:03:54,459
+<i>And how to put as much work into
+ as little time as possible, ideally.</i>
+
+62
+00:03:54,459 --> 00:03:59,677
+<i>Each transaction 
+must be completed</i>
+
+63
+00:03:59,677 --> 00:04:03,135
+<i>and leaves the database
+in a consistent state.</i>
+
+64
+00:04:04,155 --> 00:04:09,454
+<i>Which means that if there
+was a notion of consistency,</i>
+
+65
+00:04:09,454 --> 00:04:12,768
+<i>at the beginning of the transaction, 
+before the transaction started,</i>
+
+66
+00:04:12,768 --> 00:04:15,328
+<i>the database was in a state where
+were everything was correct</i>
+
+67
+00:04:15,328 --> 00:04:19,382
+<i>nothing is wrong; nothing that
+I expect violates it.</i>
+
+68
+00:04:19,382 --> 00:04:24,247
+<i>Then I want this property of everything 
+being consistent and fine also to hold</i>
+
+69
+00:04:24,247 --> 00:04:27,354
+<i>after the transaction has finished.</i>
+
+70
+00:04:27,354 --> 00:04:29,435
+<i>In the consistent database system, 
+we talk in particular</i>
+
+71
+00:04:29,435 --> 00:04:31,301
+<i>about integrity constraints here.</i>
+
+72
+00:04:31,542 --> 00:04:37,354
+<i>That means, constraints like--
+there mustn't be two users</i>
+
+73
+00:04:37,354 --> 00:04:39,125
+<i>with the same social security number.</i>
+
+74
+00:04:39,125 --> 00:04:40,103
+<i>Things like that, right?</i>
+
+75
+00:04:40,103 --> 00:04:42,884
+<i>These integrity constraints;
+they must at all points in time,</i>
+
+76
+00:04:42,884 --> 00:04:44,275
+<i>conceptually hold true.</i>
+
+77
+00:04:44,275 --> 00:04:48,701
+<i>Sometimes, there might be dependencies
+between different items that we change,</i>
+
+78
+00:04:48,701 --> 00:04:52,617
+<i>so they have to change together
+to achieve consistency.</i>
+
+79
+00:04:52,617 --> 00:04:56,338
+<i>For example, it might be that I have</i>
+<i>two different records in a delivery system</i>
+
+80
+00:04:56,338 --> 00:05:02,115
+<i>that belong together and it's only
+possible if the other one exists as well.</i>
+
+81
+00:05:02,115 --> 00:05:07,294
+<i>For example, I could create a new user
+only if there's at least one business</i>
+
+82
+00:05:07,294 --> 00:05:10,582
+<i>[inaudible] that just bought something
+in my bookstore and at the same time,</i>
+
+83
+00:05:10,582 --> 00:05:13,240
+<i>a business transaction is not possible
+without the user record.</i>
+
+84
+00:05:13,518 --> 00:05:16,850
+<i>That means at a point in time when
+the user for the first time buys a book,</i>
+
+85
+00:05:17,870 --> 00:05:21,645
+<i>we have to enter two records
+and the integrity constraints</i>
+
+86
+00:05:21,645 --> 00:05:27,048
+<i>and the mutual dependency between
+the two records right--</i>
+
+87
+00:05:27,048 --> 00:05:30,909
+<i>If one is there, the other one is almost
+always there and visa versa.</i>
+
+88
+00:05:30,909 --> 00:05:36,426
+<i>It cannot be guaranteed 
+at all points in time</i>
+
+89
+00:05:36,426 --> 00:05:38,352
+<i>if you really enter record by record.</i>
+
+90
+00:05:38,705 --> 00:05:43,470
+<i>But if I create a transaction that
+atomically creates both records together,</i>
+
+91
+00:05:43,470 --> 00:05:46,075
+<i>then all I have to require
+is that the integrity constraints</i>
+
+92
+00:05:46,075 --> 00:05:49,429
+<i>holds before the transaction starts
+and after it finishes.</i>
+
+93
+00:05:49,429 --> 00:05:54,081
+<i>You know the constraint, 
+well that always disappears off records.</i>
+
+94
+00:05:54,081 --> 00:05:58,312
+<i>So this notion of satisfying 
+all integrity constraints,</i>
+
+95
+00:05:58,312 --> 00:06:00,203
+<i>posted on the system,
+formalized in the system</i>
+
+96
+00:06:00,203 --> 00:06:04,573
+<i>corresponds to some of the consistency
+in database systems.</i>
+
+97
+00:06:04,573 --> 00:06:10,597
+<i>In more generally more challenging module,</i>
+<i>we will think of consistency</i>
+
+98
+00:06:10,597 --> 00:06:11,819
+<i>as a broader notion.</i>
+
+99
+00:06:11,819 --> 00:06:16,412
+<i>But for the purpose 
+of this transaction video today,</i>
+
+100
+00:06:16,412 --> 00:06:21,498
+<i>we will restrict consistency
+to satisfying the integrity constraints.</i>
+
+101
+00:06:22,928 --> 00:06:27,386
+<i>But beyond satisfying the integrity
+constraints post by some programmer</i>
+
+102
+00:06:27,386 --> 00:06:29,538
+<i>to the database system,
+the database system doesn't have</i>
+
+103
+00:06:29,538 --> 00:06:33,436
+<i>to understand the semantics
+of the data; it cannot really.</i>
+
+104
+00:06:33,436 --> 00:06:38,750
+<i>And consistency doesn't concern itself
+with intuitive notions of what is right,</i>
+
+105
+00:06:38,750 --> 00:06:41,145
+<i>that are not specified to the system.</i>
+
+106
+00:06:42,599 --> 00:06:45,948
+<i>I've already mentioned the notion
+of atomicity in transactions.</i>
+
+107
+00:06:45,948 --> 00:06:50,949
+<i>So, a transaction consists of a bag
+or actually a sequence of actions,</i>
+
+108
+00:06:50,949 --> 00:06:53,509
+<i>operations that may change 
+the state of the database.</i>
+
+109
+00:06:53,819 --> 00:07:00,546
+<i>And in the end, I would like to execute
+all of the transactions or none of it.</i>
+
+110
+00:07:00,546 --> 00:07:04,069
+<i>If it's for some reason, not possible
+to complete the transaction,</i>
+
+111
+00:07:04,069 --> 00:07:07,622
+<i>or if a user chooses
+to cancel the transaction,</i>
+
+112
+00:07:07,622 --> 00:07:09,425
+<i>there is this notion 
+of aborting a transaction,</i>
+
+113
+00:07:09,425 --> 00:07:15,417
+<i>and then the database has to get back
+into the state it was in at the beginning</i>
+
+114
+00:07:15,417 --> 00:07:18,586
+<i>of the transaction, before any changes
+were made by this transaction.</i>
+
+115
+00:07:18,586 --> 00:07:22,095
+<i>In general, you can imagine 
+that this is not super easy to achieve,</i>
+
+116
+00:07:22,095 --> 00:07:25,831
+<i>if there are many transactions working
+concurrently that might depend</i>
+
+117
+00:07:25,831 --> 00:07:28,110
+<i>in some way, on each 
+other, conceptually.</i>
+
+118
+00:07:28,110 --> 00:07:33,335
+<i>So the notion of atomicity connects 
+to the notion of committing</i>
+
+119
+00:07:33,335 --> 00:07:34,599
+<i>or aborting a transaction.</i>
+
+120
+00:07:34,599 --> 00:07:38,449
+<i>Committing means, 
+in the end of all my actions</i>
+
+121
+00:07:38,571 --> 00:07:44,513
+<i>I say, "Now indeed, I would like to make
+all of these changes persistent</i>
+
+122
+00:07:44,513 --> 00:07:46,593
+<i>and I would like to enter
+the transaction that way."</i>
+
+123
+00:07:46,593 --> 00:07:50,683
+<i>The alternative is to abort it
+and then all has to be undone.</i>
+
+124
+00:07:51,306 --> 00:07:56,069
+<i>This notion of aborting 
+can be implemented in different ways.</i>
+
+125
+00:07:56,069 --> 00:07:59,829
+<i>One way is to have a, kind of, log
+that records all the actions</i>
+
+126
+00:07:59,829 --> 00:08:02,083
+<i>so that we can undo them in someway.</i>
+
+127
+00:08:02,083 --> 00:08:05,321
+<i>Maybe the pre and after
+images of the database.</i>
+
+128
+00:08:05,321 --> 00:08:09,042
+<i>Another notion would be to work
+with a snapshot that copies the database;</i>
+
+129
+00:08:09,042 --> 00:08:12,807
+<i>that can be thrown away if you choose
+not to commit to transaction.</i>
+
+130
+00:08:14,970 --> 00:08:20,418
+A very famous notion 
+is that of ACID transactions.
+
+131
+00:08:20,988 --> 00:08:24,310
+You may have heard this already,
+it's actually very important
+
+132
+00:08:24,310 --> 00:08:25,996
+in computer science.
+
+133
+00:08:26,511 --> 00:08:30,737
+And ACID is an acronym standing for: 
+atomicity, consistency, isolation
+
+134
+00:08:30,737 --> 00:08:31,535
+and durability.
+
+135
+00:08:32,785 --> 00:08:36,257
+So we have just discussed atomicity 
+and we've discussed consistency;
+
+136
+00:08:36,257 --> 00:08:38,642
+that was the notion of satisfying
+all the integrity constraints
+
+137
+00:08:38,642 --> 00:08:39,932
+posed to the system.
+
+138
+00:08:40,532 --> 00:08:43,879
+Isolation refers to, and I think 
+I mentioned this before as well...
+
+139
+00:08:45,309 --> 00:08:48,763
+The idea that transactions
+were completely independent;
+
+140
+00:08:48,763 --> 00:08:50,162
+they don't interfere with each other.
+
+141
+00:08:50,162 --> 00:08:54,496
+Each transaction can be executed
+using a conception model--
+
+142
+00:08:54,496 --> 00:08:57,570
+that nothing else happens 
+at the same time in the system.
+
+143
+00:08:57,570 --> 00:09:00,787
+And finally, durability refers 
+to the notion that things
+
+144
+00:09:00,787 --> 00:09:05,033
+that we commit become
+durable and don't get lost.
+
+145
+00:09:05,033 --> 00:09:08,081
+That means conceptually,
+if I commit a transaction,
+
+146
+00:09:08,081 --> 00:09:10,367
+and I say "Finish it; store it."
+
+147
+00:09:10,367 --> 00:09:14,083
+Then it mustn't go away;
+the data must remain stored.
+
+148
+00:09:14,083 --> 00:09:18,110
+It mustn't, for example, crash
+suddenly and then the data is lost.
+
+149
+00:09:18,110 --> 00:09:21,811
+Something that is committed, must be
+recorded so it'll stay for eternity.
+
+150
+00:09:23,221 --> 00:09:25,780
+Keep in mind though,
+that another transaction
+
+151
+00:09:25,780 --> 00:09:30,200
+may intentionally change
+things back to an old state.
+
+152
+00:09:30,200 --> 00:09:33,142
+If it's a different transaction,
+then that's OK.
+
+153
+00:09:33,142 --> 00:09:34,901
+This doesn't conflict with durability.
+
+154
+00:09:34,901 --> 00:09:38,205
+If I've got a first transaction
+that increases my bank account
+
+155
+00:09:38,205 --> 00:09:43,008
+by 100 Swiss Francs and the second
+that decreases it by 100 Swiss Francs,
+
+156
+00:09:43,008 --> 00:09:45,902
+this is not in violation of durability.
+
+157
+00:09:45,902 --> 00:09:49,589
+It would be a violation of durability,
+if after the first transaction
+
+158
+00:09:49,589 --> 00:09:54,115
+which increased my bank
+account by 100, something bad happens
+
+159
+00:09:54,115 --> 00:09:57,697
+and this change is lost and goes away.
+
+160
+00:09:57,946 --> 00:10:01,523
+But if you intentionally change it
+in a separate transaction
+
+161
+00:10:01,523 --> 00:10:04,018
+then that's not
+in violation of durability.
+
+162
+00:10:07,243 --> 00:10:12,003
+<i>Here's an example of a transaction
+or actually a sketch of two transactions.</i>
+
+163
+00:10:12,003 --> 00:10:18,390
+<i>So, we will use the notion of sketch rule
+or history to refer to a recording</i>
+
+164
+00:10:18,390 --> 00:10:21,585
+<i>of multiple transactions possible
+that occur over a time frame.</i>
+
+165
+00:10:21,585 --> 00:10:24,096
+<i>And usually, we'll write
+these transactions</i>
+
+166
+00:10:24,096 --> 00:10:27,214
+<i>along a timeline from left to right.</i>
+
+167
+00:10:27,214 --> 00:10:30,797
+<i>Transaction begins and then there might 
+be sequence of actions that happen</i>
+
+168
+00:10:30,797 --> 00:10:31,699
+<i>one after the other.</i>
+
+169
+00:10:31,915 --> 00:10:33,624
+<i>And in the end, they end.</i>
+
+170
+00:10:33,927 --> 00:10:36,483
+<i>In example that you see actually,
+I just say 'BEGIN and END'.</i>
+
+171
+00:10:36,483 --> 00:10:41,508
+<i>If I don't say anything else, I assume
+by end that the transaction is committed.</i>
+
+172
+00:10:41,508 --> 00:10:43,479
+[Inauduable]
+
+173
+00:10:43,479 --> 00:10:46,086
+<i>Sometimes, it will say
+explicitly: commit or abort.</i>
+
+174
+00:10:46,086 --> 00:10:50,842
+<i>So, here we see two transactions,
+the first one says well,</i>
+
+175
+00:10:51,872 --> 00:10:55,282
+<i>take two bank balances
+for example, two account balances,</i>
+
+176
+00:10:55,282 --> 00:11:01,089
+<i>and I increase and commence one, 
+the first bank balance A by 100</i>
+
+177
+00:11:01,089 --> 00:11:03,694
+<i>and I decrease the second B by 100.</i>
+
+178
+00:11:03,694 --> 00:11:05,442
+<i>So the idea is, I actually
+make a bank transaction</i>
+
+179
+00:11:05,442 --> 00:11:10,604
+<i>moving 100 of a currency from B to A.</i>
+
+180
+00:11:11,499 --> 00:11:17,668
+<i>I've got a separate transaction
+that actually increases all the balances,</i>
+
+181
+00:11:17,668 --> 00:11:20,910
+<i>that means, both A and B's balance by 6%.</i>
+
+182
+00:11:20,910 --> 00:11:24,989
+<i>That means we multiply 
+the current balance by 1.06,</i>
+
+183
+00:11:24,989 --> 00:11:29,318
+<i>and assign that new value
+to the bank balances.</i>
+
+184
+00:11:29,318 --> 00:11:35,298
+<i>So I can imagine this as two transactions
+ in a bank, in a banking system.</i>
+
+185
+00:11:35,298 --> 00:11:39,755
+<i>The first one is a wire transfer,
+the second one is and interest payment</i>
+
+186
+00:11:39,755 --> 00:11:41,806
+<i>on all the accounts.</i>
+
+187
+00:11:41,806 --> 00:11:45,775
+<i>So, what could I mean by this?</i>
+
+188
+00:11:46,564 --> 00:11:48,622
+<i>In a sense, these things
+ happen concurrently.</i>
+
+189
+00:11:48,622 --> 00:11:54,165
+<i>If transaction T1 happens completely
+before T2, everything is probably clear.</i>
+
+190
+00:11:54,555 --> 00:11:59,104
+<i>And if T2 happens completely
+before T1, everything is clear.</i>
+
+191
+00:11:59,104 --> 00:12:01,138
+<i>Actually, it makes a difference though.</i>
+
+192
+00:12:01,138 --> 00:12:08,351
+<i>Because if the bank balance
+of A initially is zero</i>
+
+193
+00:12:08,841 --> 00:12:15,931
+<i>and we first increase by 100 
+and then pay interest, A will own 106.</i>
+
+194
+00:12:17,551 --> 00:12:22,002
+<i>While, if we first pay interest
+and then get our increase,</i>
+
+195
+00:12:22,002 --> 00:12:24,624
+<i>A will own 100 only.</i>
+
+196
+00:12:24,624 --> 00:12:28,001
+<i>So the order of the transactions matters.</i>
+
+197
+00:12:28,001 --> 00:12:33,588
+<i>And that order is going to be determined
+by the order in which transactions</i>
+
+198
+00:12:33,588 --> 00:12:35,940
+<i>physically arrive in some sense.</i>
+
+199
+00:12:35,940 --> 00:12:40,977
+<i>We're going to only require the semantics
+to be such that, we can think</i>
+
+200
+00:12:40,977 --> 00:12:44,844
+<i>of transactions that have 
+happened in some order</i>
+
+201
+00:12:44,844 --> 00:12:46,574
+<i>not in the living.</i>
+
+202
+00:12:46,574 --> 00:12:49,448
+<i>That's consistent with this notion
+of isolation and expectations</i>
+
+203
+00:12:49,448 --> 00:12:52,504
+<i>that we have about 
+transactions discussed so far.</i>
+
+204
+00:12:55,002 --> 00:12:58,027
+<i>Let's consider some possible
+interleavings of these two</i>
+
+205
+00:12:58,027 --> 00:12:59,633
+<i>transactions we've just seen.</i>
+
+206
+00:12:59,633 --> 00:13:02,102
+<i>At the top of the slide,
+you see an interleaving</i>
+
+207
+00:13:02,102 --> 00:13:05,669
+<i>were the first action of the first
+transaction, is followed</i>
+
+208
+00:13:05,669 --> 00:13:09,053
+<i>by the first operation of second
+transaction, followed by the second</i>
+
+209
+00:13:09,053 --> 00:13:12,253
+<i>operation to the first transaction
+and finally, the second operation</i>
+
+210
+00:13:12,253 --> 00:13:13,482
+<i>of the second transaction.</i>
+
+211
+00:13:14,014 --> 00:13:16,681
+<i>If you look at the first two
+actions in this schedule;</i>
+
+212
+00:13:16,681 --> 00:13:23,035
+<i>they're both on object A
+on the first user's bank balance.</i>
+
+213
+00:13:23,035 --> 00:13:29,164
+<i>And then the third and the fourth
+actions are only involving B.</i>
+
+214
+00:13:29,747 --> 00:13:38,375
+<i>So in a sense, the first two actions
+don't interleave with this second set;</i>
+
+215
+00:13:39,215 --> 00:13:40,896
+<i>the actions 3 and 4.</i>
+
+216
+00:13:41,186 --> 00:13:47,380
+<i>And conceptually, I could reorder
+the second and the third actions</i>
+
+217
+00:13:47,380 --> 00:13:52,606
+<i>in this schedule, to get
+a completely serial schedule,</i>
+
+218
+00:13:52,606 --> 00:13:54,244
+<i>namely T1 completed before T2.</i>
+
+219
+00:13:54,244 --> 00:14:01,190
+<i>That means, I could move the B=B-100
+before the A=1.06 x A and it would have</i>
+
+220
+00:14:01,190 --> 00:14:05,204
+<i>exactly the same meaning, 
+the same semantics to the schedule.</i>
+
+221
+00:14:05,204 --> 00:14:11,297
+<i>So this schedule is actually equivalent
+to a serial execution of T1 before T2.</i>
+
+222
+00:14:11,785 --> 00:14:16,117
+<i>And that is what we think
+of as an acceptable execution</i>
+
+223
+00:14:16,117 --> 00:14:18,857
+<i>of these set of transactions.</i>
+
+224
+00:14:18,857 --> 00:14:22,579
+<i>And if you look at the second schedule
+ that you see on this slide,</i>
+
+225
+00:14:22,579 --> 00:14:27,780
+<i>were we first have A=A+100, A=1.06 x A</i>
+
+226
+00:14:27,780 --> 00:14:32,401
+<i>and then B=1.06 x B and then B=B-100.</i>
+
+227
+00:14:33,661 --> 00:14:39,202
+<i>The interleaving of T2 nested into T1,
+is such that there is actually</i>
+
+228
+00:14:39,202 --> 00:14:42,959
+<i>no execution that is
+serial and equivalent.</i>
+
+229
+00:14:42,959 --> 00:14:46,197
+<i>So if you execute a T1 
+completely before T2,</i>
+
+230
+00:14:46,197 --> 00:14:51,338
+<i>we would have a different semantics
+because then B would have had its money</i>
+
+231
+00:14:51,338 --> 00:14:53,960
+<i>deducted before the interest
+was paid, which is different</i>
+
+232
+00:14:53,960 --> 00:14:57,804
+<i>from what we see right now, were interest
+is paid before money is entirely deducted.</i>
+
+233
+00:14:57,804 --> 00:15:00,733
+<i>So current schedule, as you see it here,</i>
+
+234
+00:15:00,733 --> 00:15:06,252
+<i>is advantageous to be compared to one</i>
+
+235
+00:15:06,252 --> 00:15:09,532
+<i>were T1 is executed before T2.</i>
+
+236
+00:15:09,532 --> 00:15:10,459
+<i>And visa versa.</i>
+
+237
+00:15:10,459 --> 00:15:13,693
+<i>If you would execute T2
+entirely before T1,</i>
+
+238
+00:15:13,693 --> 00:15:18,718
+<i>it would be unfair, so to say,
+in the other sense,</i>
+
+239
+00:15:18,718 --> 00:15:20,572
+<i>compared to the schedule.</i>
+
+240
+00:15:20,572 --> 00:15:23,802
+<i>So what we're saying is that,
+this schedule, the second schedule</i>
+
+241
+00:15:23,802 --> 00:15:27,442
+<i>actually does not correspond
+to any serial execution of--</i>
+
+242
+00:15:27,442 --> 00:15:31,055
+<i>It's not equivalent to any serial
+execution of these two transactions</i>
+
+243
+00:15:31,055 --> 00:15:33,636
+<i>and we want to exclude
+such an interleaving.</i>
+
+244
+00:15:33,636 --> 00:15:37,051
+<i>Because it doesn't correspond
+to our notion of isolation.</i>
+
+245
+00:15:37,051 --> 00:15:39,825
+<i>This does not make sense
+if we think of this system</i>
+
+246
+00:15:39,825 --> 00:15:41,924
+<i>executing everything
+one after the other,</i>
+
+247
+00:15:41,924 --> 00:15:44,928
+<i>elimination the need for us
+to understand concurrency.</i>
+
+248
+00:15:46,529 --> 00:15:50,326
+<i>Just for completeness right now,
+from the viewpoint of the database</i>
+
+249
+00:15:50,326 --> 00:15:55,677
+<i>system, analyzing such schedules,
+we can actually extract away</i>
+
+250
+00:15:55,677 --> 00:15:58,480
+<i>from the application code that
+[inaudiable] does certain things with A,</i>
+
+251
+00:15:58,480 --> 00:16:01,324
+<i>and changes A in certain ways
+and changes B in certain ways,</i>
+
+252
+00:16:01,324 --> 00:16:03,599
+<i>reading off values of B, etc.</i>
+
+253
+00:16:03,599 --> 00:16:05,500
+<i>And we could only talk 
+with reads and writes.</i>
+
+254
+00:16:05,500 --> 00:16:11,156
+<i>So, we could say that this very first
+action: A=A+100 is actually a read of A</i>
+
+255
+00:16:11,156 --> 00:16:12,467
+<i>followed by a write of A.</i>
+
+256
+00:16:12,467 --> 00:16:14,929
+<i>What is written depends
+on the reading of A,</i>
+
+257
+00:16:14,929 --> 00:16:16,537
+<i>so we cannot ignore
+what has been read.</i>
+
+258
+00:16:16,537 --> 00:16:19,958
+<i>But how exactly it's written;
+that effect is that we actually</i>
+
+259
+00:16:19,958 --> 00:16:21,710
+<i>increment it by 100.</i>
+
+260
+00:16:21,710 --> 00:16:26,756
+<i>We don't need to know or worry
+about these ordering constraints.</i>
+
+261
+00:16:26,756 --> 00:16:32,394
+<i>So in fact now, each of these four
+operations is or corresponds</i>
+
+262
+00:16:32,394 --> 00:16:37,149
+<i>to a read of the old value 
+and a write of the new value.</i>
+
+263
+00:16:37,149 --> 00:16:40,246
+<i>And you can think of this schedule
+on the level of abstraction</i>
+
+264
+00:16:40,246 --> 00:16:45,098
+<i>that we will really have to study later;
+its just a sequence of reads and writes</i>
+
+265
+00:16:45,098 --> 00:16:46,680
+<i>in each transaction.</i>
+
+266
+00:16:49,746 --> 00:16:53,336
+<i>So I've already kind of said 
+this in this example,</i>
+
+267
+00:16:53,336 --> 00:16:56,913
+<i>so we think of a serial schedule
+ as a schedule that doesn't have</i>
+
+268
+00:16:56,913 --> 00:16:58,000
+<i>any interleavings.</i>
+
+269
+00:16:58,000 --> 00:17:01,191
+<i>Each transaction is executed--
+the transactions are executed</i>
+
+270
+00:17:01,191 --> 00:17:02,297
+<i>one after the other.</i>
+
+271
+00:17:03,296 --> 00:17:07,198
+<i>For example, T1 completely before T2
+or T2 completely before T1.</i>
+
+272
+00:17:07,198 --> 00:17:08,306
+<i>That's serial.</i>
+
+273
+00:17:08,306 --> 00:17:12,391
+<i>Any interleaving were things</i>
+<i>are overlapping, is not a serial schedule.</i>
+
+274
+00:17:12,391 --> 00:17:18,031
+<i>And if you go for two schedules
+as equivalent, if they lead to the same</i>
+
+275
+00:17:18,031 --> 00:17:20,481
+<i>result no matter what
+the initial database state is,</i>
+
+276
+00:17:20,481 --> 00:17:23,682
+<i>that means no matter what, 
+they are all [inaudible] A and B,</i>
+
+277
+00:17:23,682 --> 00:17:27,808
+<i>the result must be the same, 
+and then the schedules are equivalent.</i>
+
+278
+00:17:27,808 --> 00:17:31,881
+<i>And a serializable schedule 
+is a schedule that is equivalent</i>
+
+279
+00:17:31,881 --> 00:17:34,679
+<i>to a serial execution
+of the transactions.</i>
+
+280
+00:17:34,679 --> 00:17:37,315
+<i>That means, it's equivalent
+to a serial schedule.</i>
+
+281
+00:17:37,315 --> 00:17:39,014
+<i>It's a serializable schedule.</i>
+
+282
+00:17:39,014 --> 00:17:42,579
+<i>And this is a very important notion
+because that is what we think of</i>
+
+283
+00:17:42,579 --> 00:17:48,022
+<i>as an acceptable execution
+of transactions in concurrent systems.</i>
+
+284
+00:17:48,022 --> 00:17:53,514
+<i>That means serializability allowing
+only serializable schedules</i>
+
+285
+00:17:53,514 --> 00:17:57,652
+<i>is exactly what we want to, kind of,
+guarantee this notion of consistency</i>
+
+286
+00:17:57,652 --> 00:18:00,704
+<i>of actually ACID's 
+in a consistent databases.</i>
+
+287
+00:18:00,704 --> 00:18:04,144
+<i>What can go wrong 
+in non-serializable schedules?</i>
+
+288
+00:18:04,144 --> 00:18:09,539
+<i>There's actually three major notions
+ of things going wrong;</i>
+
+289
+00:18:09,539 --> 00:18:11,616
+<i>anomalies, that we should talk about.</i>
+
+290
+00:18:11,616 --> 00:18:16,272
+<i>The first is what you call: Reading
+ Uncommitted Data or 'dirty reads'.</i>
+
+291
+00:18:16,272 --> 00:18:19,245
+<i>We can also call them, 
+Write-Read Conflicts.</i>
+
+292
+00:18:19,245 --> 00:18:21,576
+<i>So look at this example schedule here.</i>
+
+293
+00:18:21,576 --> 00:18:27,007
+<i>We've got T1 writing A,
+followed by T2 reading A.</i>
+
+294
+00:18:27,007 --> 00:18:32,750
+<i>Then T2 is committing and finally,
+T1, let's say, is aborting.</i>
+
+295
+00:18:32,750 --> 00:18:36,474
+<i>That means that T1 made 
+a change to the database,</i>
+
+296
+00:18:36,474 --> 00:18:39,704
+<i>a temporary change 
+to the database that it later undid.</i>
+
+297
+00:18:39,704 --> 00:18:45,273
+<i>And T2 read this change and made
+decisions based on that change,</i>
+
+298
+00:18:45,273 --> 00:18:47,880
+<i>wrote to the database
+state and committed this.</i>
+
+299
+00:18:47,880 --> 00:18:53,352
+<i>That means, this commit depends
+on data that actually was not final,</i>
+
+300
+00:18:53,352 --> 00:18:59,034
+<i>and thus, this read of A
+in T2 is a 'dirty read'.</i>
+
+301
+00:18:59,034 --> 00:19:02,518
+<i>It's a read that shouldn't have happened
+in this way and thus the database</i>
+
+302
+00:19:02,518 --> 00:19:05,687
+<i>is not in a consistent form 
+anymore and it's corrupted.</i>
+
+303
+00:19:05,687 --> 00:19:07,489
+<i>So this must not happen.</i>
+
+304
+00:19:08,109 --> 00:19:12,974
+<i>The second form Read-Writes conflicts,
+unrepeatable reads.</i>
+
+305
+00:19:12,974 --> 00:19:21,049
+<i>So, look at this example, so we have T1
+reading A, T2 reading A then writing it</i>
+
+306
+00:19:21,049 --> 00:19:21,834
+<i>then committing.</i>
+
+307
+00:19:21,834 --> 00:19:24,318
+<i>And then we have T1 reading A again.</i>
+
+308
+00:19:24,318 --> 00:19:30,425
+<i>So, T1 reads A twice, and it will 
+in general read two different values,</i>
+
+309
+00:19:30,425 --> 00:19:34,400
+<i>because in the meantime, between
+the first and the second read of T1,</i>
+
+310
+00:19:34,400 --> 00:19:36,690
+<i>T2 has changed the value of A.</i>
+
+311
+00:19:36,690 --> 00:19:41,653
+<i>And isolation basically governs
+that this must not happen.</i>
+
+312
+00:19:42,227 --> 00:19:46,336
+<i>We should think of T1 happening
+ in complete isolation.</i>
+
+313
+00:19:46,336 --> 00:19:51,506
+<i>We don't need to store the value 
+of A locally for consistency.</i>
+
+314
+00:19:51,506 --> 00:19:53,520
+<i>We can rely on 
+the database to store it for us.</i>
+
+315
+00:19:53,520 --> 00:20:00,940
+<i>And the semantics of A's transactions,
+requires that this is safe to do,</i>
+
+316
+00:20:00,940 --> 00:20:04,870
+<i>that reading two values twice,
+if I have not written them in between</i>
+
+317
+00:20:04,870 --> 00:20:08,597
+<i>in my transaction, 
+has to lead to the same value.</i>
+
+318
+00:20:08,597 --> 00:20:11,238
+<i>So these unrepeatable reads
+are of course bad</i>
+
+319
+00:20:11,238 --> 00:20:15,192
+<i>and they won't be possible
+in serializable transactions.</i>
+
+320
+00:20:17,012 --> 00:20:22,707
+<i>The third case is: Write-Write Conflicts,
+where we overwrite uncommitted data.</i>
+
+321
+00:20:22,707 --> 00:20:28,852
+<i>So for example here, T1 writes A,</i>
+<i>then T2 write A and then writes B, commits</i>
+
+322
+00:20:28,852 --> 00:20:32,219
+<i>and then T1 writes B and commits.</i>
+
+323
+00:20:32,570 --> 00:20:39,665
+<i>So, in a sense, what T2 has done
+specifically, what it has done to B</i>
+
+324
+00:20:39,665 --> 00:20:42,917
+<i>has been lost, it has been overwritten
+and durability in a sense,</i>
+
+325
+00:20:42,917 --> 00:20:44,925
+<i>has been violated.</i>
+
+326
+00:20:45,676 --> 00:20:48,964
+<i>At the same time, I cannot 
+just say, "Well, this is OK,"</i>
+
+327
+00:20:48,964 --> 00:20:52,399
+<i>because I could have executed T2
+completely before T1</i>
+
+328
+00:20:52,399 --> 00:20:56,978
+<i>leading to a serializable schedule
+because I'm actually writing</i>
+
+329
+00:20:56,978 --> 00:20:59,926
+<i>A and T2 after I am writing A and T1.</i>
+
+330
+00:20:59,926 --> 00:21:05,680
+<i>So this interleaving, nesting T2 intoT1,
+leads to a Write-Write Conflict</i>
+
+331
+00:21:05,680 --> 00:21:06,898
+<i>and that's again, bad.</i>
+
+332
+00:21:06,898 --> 00:21:10,227
+<i>And it would not happen
+in a serializable schedule.</i>
+
+333
+00:21:12,866 --> 00:21:17,502
+<i>So finally, let's think again about
+what it means to abort a transaction.</i>
+
+334
+00:21:17,502 --> 00:21:19,755
+<i>There's a few issues here.</i>
+
+335
+00:21:19,755 --> 00:21:23,772
+<i>First of all, again if a transaction
+is aborted then all its actions</i>
+
+336
+00:21:23,772 --> 00:21:24,616
+<i>have to be undone.</i>
+
+337
+00:21:24,616 --> 00:21:26,911
+<i>That's required by atomicity.</i>
+
+338
+00:21:26,911 --> 00:21:29,255
+<i>But not only that.</i>
+
+339
+00:21:29,255 --> 00:21:33,368
+<i>If some other transaction reads
+what a transaction has written,</i>
+
+340
+00:21:33,368 --> 00:21:34,962
+<i>then this transaction is getting aborted.</i>
+
+341
+00:21:34,962 --> 00:21:38,583
+<i>That means, a transaction 
+depends on values that are now</i>
+
+342
+00:21:38,583 --> 00:21:40,735
+<i>getting undone by the abort.</i>
+
+343
+00:21:40,735 --> 00:21:44,253
+<i>Then this other transaction that depends
+on those values, has to also be aborted.</i>
+
+344
+00:21:44,253 --> 00:21:46,390
+<i>So this can lead to a cascade of aborts.</i>
+
+345
+00:21:46,390 --> 00:21:50,404
+<i>A single abort can force other
+transactions to be aborted as well.</i>
+
+346
+00:21:50,404 --> 00:21:54,756
+<i>And we have to be careful because</i>
+<i>we mustn't allow these other transactions</i>
+
+347
+00:21:54,756 --> 00:21:58,865
+<i>get committed before the first
+transaction gets committed.</i>
+
+348
+00:21:58,865 --> 00:22:01,837
+<i>Because if the first transaction
+gets aborted then you've got</i>
+
+349
+00:22:01,837 --> 00:22:04,737
+<i>this dependencies which
+cannot be recovered from.</i>
+
+350
+00:22:04,737 --> 00:22:08,894
+<i>And the database is permanently,
+so to say, corrupted.</i>
+
+351
+00:22:08,894 --> 00:22:10,017
+<i>That mustn't happen.</i>
+
+352
+00:22:10,017 --> 00:22:12,809
+<i>So we have to actually worry about
+in our concurrency control</i>
+
+353
+00:22:12,809 --> 00:22:16,097
+<i>algorithms and protocols,
+not just about serializability</i>
+
+354
+00:22:16,097 --> 00:22:21,277
+<i>but also about correctly
+ dealing with aborts.</i>
+
+355
+00:22:22,005 --> 00:22:26,663
+In summary, transactions 
+are a very nice and clean abstraction
+
+356
+00:22:26,663 --> 00:22:28,207
+for dealing with concurrency.
+
+357
+00:22:28,207 --> 00:22:31,062
+We've talked about the ACID 
+properties of transactions:
+
+358
+00:22:31,062 --> 00:22:35,617
+atomicity, consistency,
+isolation and durability.
+
+359
+00:22:35,617 --> 00:22:38,697
+All of those, are important 
+and there's good reason for them.
+
+360
+00:22:38,697 --> 00:22:41,589
+Atomicity really makes
+the transaction work.
+
+361
+00:22:41,589 --> 00:22:44,571
+It's not a single individual update
+but a sequence of things
+
+362
+00:22:44,571 --> 00:22:46,701
+that belong together.
+
+363
+00:22:46,701 --> 00:22:52,437
+Consistency means that you can have
+constraints on the validity of the data,
+
+364
+00:22:52,437 --> 00:22:58,255
+integrity constraints, and they must be
+satisfied before and after transactions.
+
+365
+00:22:58,255 --> 00:23:03,360
+Isolation means, you can really think
+of, as a program of database application
+
+366
+00:23:03,360 --> 00:23:06,474
+for example, that there's nothing else
+happening, you don't have
+
+367
+00:23:06,474 --> 00:23:07,342
+to worry about consistency.
+
+368
+00:23:07,342 --> 00:23:10,232
+So you don't really have to be
+an expert systems engineer, for example,
+
+369
+00:23:10,232 --> 00:23:12,967
+to be able to deal
+with a database system.
+
+370
+00:23:12,967 --> 00:23:16,895
+You can program your application
+programs as if nothing else happens.
+
+371
+00:23:16,895 --> 00:23:20,607
+And the database system is entirely
+responsible for ensuring
+
+372
+00:23:21,647 --> 00:23:24,213
+that concurrency is dealt with properly.
+
+373
+00:23:24,213 --> 00:23:28,331
+And transactions 
+are the vehicle for doing this.
+
+374
+00:23:28,331 --> 00:23:31,430
+And finally, durability is the,
+kind of, obvious thing that,
+
+375
+00:23:31,430 --> 00:23:34,314
+things that you store and mean to store
+and say, "I really mean to store this,
+
+376
+00:23:34,314 --> 00:23:35,847
+I commit," they mustn't get lost.

@@ -1,0 +1,952 @@
+1
+00:00:22,869 --> 00:00:26,788
+Bienvenue à cette leçon qui va porter
+sur le géoréférencement des images.
+
+2
+00:00:27,450 --> 00:00:30,667
+Les images et les rasters
+doivent en effet être positionnés
+
+3
+00:00:30,867 --> 00:00:33,441
+au bon endroit dans
+un système d'information géographique
+
+4
+00:00:33,641 --> 00:00:35,388
+pour pouvoir être utilisés correctement.
+
+5
+00:00:36,775 --> 00:00:39,758
+L'objectif de cette leçon
+est de vous familiariser
+
+6
+00:00:39,958 --> 00:00:44,077
+avec les principes et la pratique
+du géoréférencement d'images
+
+7
+00:00:44,277 --> 00:00:47,277
+si bien qu'à son terme,
+vous soyez capable
+
+8
+00:00:47,477 --> 00:00:50,477
+de géoréférencer une image
+ou de manipuler
+
+9
+00:00:50,677 --> 00:00:53,340
+les paramètres de géoréférencement
+de ces images.
+
+10
+00:00:54,190 --> 00:00:56,991
+<i>Durant la leçon,
+nous allons aborder successivement</i>
+
+11
+00:00:57,191 --> 00:00:59,641
+<i>la problématique
+du géoréférencement,</i>
+
+12
+00:01:00,203 --> 00:01:02,778
+<i>une brève description
+de cette problématique,</i>
+
+13
+00:01:03,016 --> 00:01:07,159
+<i>la méthodologie utilisée
+pour géoréférencer une image,</i>
+
+14
+00:01:07,359 --> 00:01:10,617
+<i>un exemple d'application,
+comment est-ce que l'on fait</i>
+
+15
+00:01:10,817 --> 00:01:14,342
+<i>un géoréférencement
+avec le logiciel QGIS</i>
+
+16
+00:01:14,580 --> 00:01:18,230
+<i>et finalement, comment stocker,
+comment enregistrer</i>
+
+17
+00:01:18,430 --> 00:01:22,912
+<i>les paramètres caractéristiques
+d'un géoréférencement.</i>
+
+18
+00:01:28,350 --> 00:01:30,551
+<i>Commençons par la problématique</i>
+
+19
+00:01:30,751 --> 00:01:34,751
+<i>qui est celle d'une image
+héritée de source externe</i>
+
+20
+00:01:34,951 --> 00:01:36,621
+<i>par exemple une ancienne
+carte scannée</i>
+
+21
+00:01:36,821 --> 00:01:41,737
+<i>ou une photographie aérienne dont
+on a perdu les coordonnées de référence,</i>
+
+22
+00:01:41,937 --> 00:01:44,937
+<i>donc une image quelconque
+dépourvue de référence spatiale</i>
+
+23
+00:01:45,137 --> 00:01:49,068
+<i>que l'on souhaite intégrer
+à un système d'information géographique.</i>
+
+24
+00:01:49,268 --> 00:01:51,545
+<i>Pour cela, il faut pouvoir
+la placer au bon endroit</i>
+
+25
+00:01:51,745 --> 00:01:57,317
+<i>donc reconstituer le système
+de références spatiales correspondant.</i>
+
+26
+00:02:07,006 --> 00:02:09,508
+<i>L'opération s'effectue
+en deux étapes.</i>
+
+27
+00:02:09,708 --> 00:02:12,467
+<i>Dans un premier temps,
+on va identifier une série de points</i>
+
+28
+00:02:12,667 --> 00:02:15,667
+<i>communs à l'image
+et à une carte de référence</i>
+
+29
+00:02:15,867 --> 00:02:19,211
+<i>sur laquelle cette image
+doit venir s'intégrer.</i>
+
+30
+00:02:19,411 --> 00:02:23,534
+<i>Et dans un deuxième temps,
+on va modifier, transformer l'image</i>
+
+31
+00:02:23,734 --> 00:02:26,160
+<i>la déplacer, la tourner,
+changer son échelle</i>
+
+32
+00:02:26,360 --> 00:02:29,697
+<i>pour l'ajuster en fait
+à la carte de référence.</i>
+
+33
+00:02:31,210 --> 00:02:33,079
+<i>Il faut au moins
+trois points de contrôle,</i>
+
+34
+00:02:33,279 --> 00:02:34,078
+<i>si possible plus,</i>
+
+35
+00:02:34,278 --> 00:02:36,431
+<i>des points qui soient
+faciles à identifier</i>
+
+36
+00:02:36,631 --> 00:02:39,949
+<i>aussi bien sur la carte
+que dans l'image de départ.</i>
+
+37
+00:02:40,149 --> 00:02:43,149
+<i>Et ces points doivent être
+si possible bien répartis</i>
+
+38
+00:02:43,349 --> 00:02:45,908
+<i>sur l'ensemble de la zone
+à géoréférencer</i>
+
+39
+00:02:46,108 --> 00:02:51,109
+<i>de sorte que la déformation
+de l'image soit à peu près...</i>
+
+40
+00:02:51,359 --> 00:02:53,021
+<i>soit bien répartie disons</i>
+
+41
+00:02:53,221 --> 00:02:56,790
+<i>et qu'il n'y ait pas
+de singularité.</i>
+
+42
+00:02:57,540 --> 00:03:00,796
+<i>Cette transformation géométrique
+est composée d'une translation</i>
+
+43
+00:03:00,996 --> 00:03:03,343
+<i>d'une mise à l'échelle
+et d'une rotation,</i>
+
+44
+00:03:03,543 --> 00:03:07,693
+<i>l'ensemble de ces opérations caractérisant
+une transformation de Helmert</i>
+
+45
+00:03:07,893 --> 00:03:09,392
+<i>ou une transformation affine.</i>
+
+46
+00:03:09,592 --> 00:03:12,592
+<i>Il existe d'autres types
+de transformations possibles,</i>
+
+47
+00:03:12,792 --> 00:03:15,152
+<i>en particulier
+des transformations polynomiales</i>
+
+48
+00:03:15,352 --> 00:03:17,290
+<i>de premier, second
+ou troisième ordre,</i>
+
+49
+00:03:17,490 --> 00:03:20,897
+<i>l'utilisation de spleens
+ou de projections.</i>
+
+50
+00:03:21,097 --> 00:03:24,097
+<i>Toutes ces approches sont
+un peu moins fréquentes.</i>
+
+51
+00:03:24,297 --> 00:03:30,294
+<i>Elle sont surtout utiles lorsque
+la carte de départ n'est pas très régulière</i>
+
+52
+00:03:30,494 --> 00:03:33,494
+<i>et que la déformation
+doit pouvoir tenir compte</i>
+
+53
+00:03:33,694 --> 00:03:36,156
+<i>de certaines particularités locales</i>
+
+54
+00:03:36,356 --> 00:03:39,312
+<i>pour permettre des ajustements
+très très spécifiques.</i>
+
+55
+00:03:39,512 --> 00:03:44,322
+<i>La plupart du temps toutefois,
+on va utiliser une transformation de Helmert.</i>
+
+56
+00:03:45,510 --> 00:03:51,331
+<i>Qui dit changement d'échelle
+et rotation dit également nouvelle grille</i>
+
+57
+00:03:51,594 --> 00:03:55,846
+<i>pour laquelle il faut évaluer
+la valeur de chaque pixel,</i>
+
+58
+00:03:56,046 --> 00:03:59,971
+<i>donc ré-échantillonner en fait
+la grille de départ.</i>
+
+59
+00:04:00,171 --> 00:04:04,711
+<i>Ce ré-échantillonnage peut utiliser
+l'approche du plus proche voisin</i>
+
+60
+00:04:04,911 --> 00:04:08,595
+<i>où on prend simplement
+la valeur de la cellule</i>
+
+61
+00:04:08,789 --> 00:04:10,649
+<i>de la carte originale
+la plus proche.</i>
+
+62
+00:04:11,174 --> 00:04:14,776
+<i>Le ré-échantillonnage par la méthode
+du plus proche voisin</i>
+
+63
+00:04:14,976 --> 00:04:18,309
+<i>est celle qui respecte le mieux
+l'image d'origine</i>
+
+64
+00:04:18,509 --> 00:04:22,467
+donc qui va le moins
+atténuer les contrastes
+
+65
+00:04:22,667 --> 00:04:24,199
+<i>de l'image d'origine.</i>
+
+66
+00:04:25,312 --> 00:04:28,503
+<i>L'approche bi-linéaire
+bi-cubique est parfois utile</i>
+
+67
+00:04:28,703 --> 00:04:31,703
+<i>si le déplacement,
+le changement d'échelle</i>
+
+68
+00:04:31,903 --> 00:04:34,074
+<i>ou la rotation sont importants</i>
+
+69
+00:04:34,274 --> 00:04:38,297
+<i>et que l'image serait en fait...
+deviendrait peu lisible</i>
+
+70
+00:04:38,497 --> 00:04:40,109
+<i>à cause de la transformation.</i>
+
+71
+00:04:49,510 --> 00:04:51,532
+<i>Voyons maintenant
+un exemple concret</i>
+
+72
+00:04:51,732 --> 00:04:54,126
+<i>de comment se pratique
+un géoréférencement</i>
+
+73
+00:04:54,326 --> 00:04:55,803
+<i>avec le logiciel QGIS.</i>
+
+74
+00:04:56,003 --> 00:04:57,768
+<i>Alors dans QGIS,</i>
+
+75
+00:04:57,968 --> 00:05:00,968
+<i>on va ouvrir l'outil
+de géoréférencement</i>
+
+76
+00:05:01,168 --> 00:05:05,847
+<i>et dans cet outil,
+importer l'image à géoréférencer</i>
+
+77
+00:05:06,047 --> 00:05:09,047
+<i>en l'occurrence,
+une vieille carte de Mahé.</i>
+
+78
+00:05:09,247 --> 00:05:12,247
+<i>On nous demande de préciser
+le système de références</i>
+
+79
+00:05:12,447 --> 00:05:14,207
+<i>le système de projections
+de références</i>
+
+80
+00:05:14,407 --> 00:05:17,491
+<i>qui doit être le même que
+le système de projection de la carte.</i>
+
+81
+00:05:18,728 --> 00:05:21,887
+<i>Et ensuite, on va ajouter
+les points de contrôle,</i>
+
+82
+00:05:22,087 --> 00:05:25,337
+<i>un premier point
+sur la Pointe Matoopa</i>
+
+83
+00:05:26,512 --> 00:05:30,668
+<i>à l'ouest de Mahé
+puis un second point</i>
+
+84
+00:05:30,868 --> 00:05:34,368
+<i>au nord-est
+sur la Pointe Machabée,</i>
+
+85
+00:05:42,156 --> 00:05:47,028
+<i>un troisième point
+à proximité de l'aéroport,</i>
+
+86
+00:05:53,544 --> 00:05:57,028
+<i>un quatrième point
+tout au sud de l'île</i>
+
+87
+00:06:04,053 --> 00:06:08,015
+<i>et un dernier point au sud-ouest
+à la Pointe Lazare.</i>
+
+88
+00:06:13,290 --> 00:06:16,067
+<i>Lorsque l'on lance l'opération
+de géoréférencement,</i>
+
+89
+00:06:16,267 --> 00:06:20,546
+<i>le système nous demande de préciser
+les paramètres de cette transformation.</i>
+
+90
+00:06:20,758 --> 00:06:23,908
+<i>On choisit en l'occurence
+parmi les types de transformation</i>
+
+91
+00:06:24,108 --> 00:06:25,703
+<i>la transformation de Helmert,</i>
+
+92
+00:06:25,903 --> 00:06:29,852
+<i>un ré-échantillonnage
+par les plus proches voisins</i>
+
+93
+00:06:30,052 --> 00:06:33,641
+<i>et puis on précise
+le fichier de sortie</i>
+
+94
+00:06:33,866 --> 00:06:37,057
+<i>donc un fichier image tif</i>
+
+95
+00:06:37,257 --> 00:06:41,974
+<i>qui aura simplement
+le nom de fichier de départ</i>
+
+96
+00:06:42,174 --> 00:06:43,920
+<i>plus le mot qui est Georef.</i>
+
+97
+00:06:44,120 --> 00:06:49,101
+<i>Il faut préciser aussi
+le système de projection sorti</i>
+
+98
+00:06:49,301 --> 00:06:51,820
+<i>donc en l'occurence,
+on a travaillé avec du web Mercator</i>
+
+99
+00:06:52,020 --> 00:06:54,971
+<i>aussi bien pour la carte de départ</i>
+
+100
+00:06:55,171 --> 00:06:58,171
+<i>que pour la carte importée
+et la carte résultante.</i>
+
+101
+00:06:58,371 --> 00:07:03,199
+<i>On lance l'opération
+et avant de fermer,</i>
+
+102
+00:07:03,399 --> 00:07:06,399
+<i>on nous demande encore
+de sauver les points d'ajustement,</i>
+
+103
+00:07:06,599 --> 00:07:08,406
+<i>les points de contrôle
+qui ont été définis.</i>
+
+104
+00:07:09,018 --> 00:07:12,772
+<i>Et on voit que cette carte,
+elle a été ajoutée en fait</i>
+
+105
+00:07:12,972 --> 00:07:15,255
+au système d'information géographique.
+
+106
+00:07:15,455 --> 00:07:18,455
+<i>On peut modifier dans les propriétés
+sa transparence</i>
+
+107
+00:07:18,655 --> 00:07:20,334
+<i>pour constater qu'effectivement,</i>
+
+108
+00:07:20,534 --> 00:07:24,514
+<i>cette carte-image est maintenant placée
+au bon endroit.</i>
+
+109
+00:07:24,714 --> 00:07:28,152
+<i>Et en passant en revue
+les différents points de contrôle,</i>
+
+110
+00:07:28,352 --> 00:07:33,736
+<i>on peut voir que l'ajustement
+n'est pas de si mauvaise qualité.</i>
+
+111
+00:07:33,936 --> 00:07:41,117
+<i>Un petit peu d'approximation
+ici du côté de Baie Lazare...</i>
+
+112
+00:07:41,960 --> 00:07:47,700
+<i> Mais dans l’ensemble, 
+l’ajustement est assez précis.</i>
+
+113
+00:07:57,412 --> 00:08:01,015
+<i>Voyons maintenant encore
+les paramètres qui définissent</i>
+
+114
+00:08:01,215 --> 00:08:03,462
+<i>la transformation et la manière
+de les stocker.</i>
+
+115
+00:08:03,662 --> 00:08:06,662
+<i>Comme je l'ai dit tout à l'heure,
+une transformation de Helmert</i>
+
+116
+00:08:06,862 --> 00:08:08,399
+<i>est une transformation affine,</i>
+
+117
+00:08:08,599 --> 00:08:11,566
+<i>c'est-à-dire une transformation
+qui peut être décrite</i>
+
+118
+00:08:11,766 --> 00:08:16,752
+<i>par une combinaison linéaire
+des coordonnées x y</i>
+
+119
+00:08:16,952 --> 00:08:18,624
+<i>du système de départ.
+Donc chaque coordonnée</i>
+
+120
+00:08:18,824 --> 00:08:21,733
+<i>du système d'arrivée,
+x' y' ici,</i>
+
+121
+00:08:21,933 --> 00:08:24,180
+<i>s'exprime comme
+une combinaison linéaire</i>
+
+122
+00:08:24,380 --> 00:08:31,517
+<i>des coordonnées de départ x et y
+et puis d'un terme constant.</i>
+
+123
+00:08:31,717 --> 00:08:34,394
+<i>Ce système en fait
+comprend 6 paramètres</i>
+
+124
+00:08:34,594 --> 00:08:37,267
+<i>qui sont regroupés dans ce qu'on appelle
+un World File</i>
+
+125
+00:08:37,482 --> 00:08:40,794
+<i>décrivant en fait
+le géoréférencement d'une image.</i>
+
+126
+00:08:40,994 --> 00:08:43,574
+<i>Et dans ce World File,
+ces paramètres se présentent</i>
+
+127
+00:08:43,774 --> 00:08:48,163
+<i>dans l'ordre qui est décrit ci-dessous
+avec tout d'abord la taille du pixel</i>
+
+128
+00:08:48,363 --> 00:08:50,335
+<i>selon l'axe x,</i>
+
+129
+00:08:50,535 --> 00:08:54,600
+<i>puis les 2 paramètres de rotation
+autour de l'axe y et de l'axe x,</i>
+
+130
+00:08:54,800 --> 00:08:57,380
+<i>la taille du pixel selon y,</i>
+
+131
+00:08:57,580 --> 00:09:00,580
+<i>et puis finalement les coordonnées,
+les termes constants, </i>
+
+132
+00:09:00,780 --> 00:09:05,780
+<i>les coordonnées x y du centre du pixel
+situé en haut à gauche de l'image.</i>
+
+133
+00:09:05,992 --> 00:09:11,988
+<i>Donc on voit bien que
+si on définit la position</i>
+
+134
+00:09:12,188 --> 00:09:14,238
+<i>du point en haut à gauche
+de l'image,</i>
+
+135
+00:09:14,438 --> 00:09:18,147
+<i>la taille des cellules
+de la grille</i>
+
+136
+00:09:18,347 --> 00:09:20,890
+<i>et puis les éléments de rotation,</i>
+
+137
+00:09:21,090 --> 00:09:24,845
+<i>on peut positionner en fait
+une image précisément</i>
+
+138
+00:09:25,045 --> 00:09:26,895
+<i>dans un système
+d'information géographique.</i>
+
+139
+00:09:28,020 --> 00:09:29,988
+<i>Dans l'exemple qui est ici à droite,</i>
+
+140
+00:09:30,188 --> 00:09:32,559
+<i>lorsqu'on a des pixels carrés et
+pas de rotation,</i>
+
+141
+00:09:32,759 --> 00:09:34,636
+<i>les termes angulaires
+sont nuls.</i>
+
+142
+00:09:34,836 --> 00:09:39,668
+<i>Et finalement, le calcul
+des coordonnées de chaque point</i>
+
+143
+00:09:39,868 --> 00:09:43,280
+<i>au centre de chaque pixel
+est assez simple. </i>
+
+144
+00:09:43,768 --> 00:09:48,017
+<i>Dans le cas où la transformation
+comprend une composante de rotation,</i>
+
+145
+00:09:48,217 --> 00:09:52,030
+<i>on voit qu'en fait
+les paramètres D et B </i>
+
+146
+00:09:52,230 --> 00:09:54,365
+<i>ne sont pas en fait
+des angles de rotation</i>
+
+147
+00:09:54,565 --> 00:09:57,560
+<i>mais représentent les composantes
+selon x et y </i>
+
+148
+00:09:57,760 --> 00:09:59,827
+<i>de la largeur et de la hauteur
+du pixel.</i>
+
+149
+00:10:00,027 --> 00:10:03,661
+<i>Et il est du coup plus juste
+de parler de composantes</i>
+
+150
+00:10:03,861 --> 00:10:09,877
+<i>selon x et selon y, de projections
+plutôt que de termes angulaires.</i>
+
+151
+00:10:10,077 --> 00:10:14,255
+<i>Après, les calculs se compliquent
+encore si le pixel n'est pas carré</i>
+
+152
+00:10:14,455 --> 00:10:18,229
+<i>mais qu'il a des dimensions différentes
+selon y et selon x.</i>
+
+153
+00:10:18,842 --> 00:10:21,429
+<i>Ces différents paramètres
+peuvent être stockés</i>
+
+154
+00:10:21,629 --> 00:10:24,629
+<i>dans un fichier d'accompagnement,
+le World File précisément,</i>
+
+155
+00:10:24,829 --> 00:10:30,392
+<i>avec pour règle que le fichier
+d'accompagnement a le même nom</i>
+
+156
+00:10:30,592 --> 00:10:33,592
+<i>que le fichier de base
+et une extension qui dépend</i>
+
+157
+00:10:33,792 --> 00:10:36,392
+<i>du format d'image,
+tfw pour le tif </i>
+
+158
+00:10:36,617 --> 00:10:39,992
+<i>et jgw pour le jpeg,
+pgw pour le png</i>
+
+159
+00:10:40,192 --> 00:10:41,815
+<i>gfw pour le gif.</i>
+
+160
+00:10:42,227 --> 00:10:45,015
+<i>Ou alors, deuxième possibilité,</i>
+
+161
+00:10:45,215 --> 00:10:48,777
+<i>stocker ces informations dans l'entête
+d'un fichier image au format .tif</i>
+
+162
+00:10:49,040 --> 00:10:50,998
+<i>Et on parle alors
+de format GEOTIFF</i>
+
+163
+00:10:51,198 --> 00:10:52,980
+<i>puisqu'il s'agit d'un seul fichier</i>
+
+164
+00:10:53,180 --> 00:10:55,380
+<i>qui contient
+l'information de géoréférencement,</i>
+
+165
+00:10:55,580 --> 00:10:57,073
+<i>donc une image qui contient</i>
+
+166
+00:10:57,314 --> 00:10:59,627
+<i>intrinsèquement
+l'information de géoréférencement.</i>
+
+167
+00:10:59,899 --> 00:11:03,894
+<i>L'utilitaire GeotiffExamine
+qui est libre d'accès</i>
+
+168
+00:11:04,094 --> 00:11:07,914
+<i>permet facilement de vérifier
+si un fichier TIFF possède</i>
+
+169
+00:11:08,114 --> 00:11:10,163
+<i>les informations de géoréférencement</i>
+
+170
+00:11:10,363 --> 00:11:13,216
+<i>et le cas échéant, de générer
+un World File</i>
+
+171
+00:11:13,416 --> 00:11:15,360
+<i>ou inversement lorsqu'on a
+le World File,</i>
+
+172
+00:11:15,560 --> 00:11:18,284
+<i>de renseigner l'entête
+du fichier TIFF</i>
+
+173
+00:11:18,484 --> 00:11:20,364
+<i>pour transformer un TIFF
+en Geotiff.</i>
+
+174
+00:11:20,564 --> 00:11:25,077
+<i>On voit par exemple que
+si l'on va chercher le fichier géoréférencé</i>
+
+175
+00:11:25,277 --> 00:11:28,277
+<i>que l'on vient de fabriquer
+et qu'on ouvre ce fichier</i>
+
+176
+00:11:28,477 --> 00:11:30,676
+<i>avec cette utilitaire,</i>
+
+177
+00:11:30,876 --> 00:11:35,876
+<i>on voit que les paramètres
+de géoréférencement</i>
+
+178
+00:11:36,076 --> 00:11:38,959
+<i>sont stockés avec
+le fichier lui-même</i>
+
+179
+00:11:39,159 --> 00:11:41,712
+<i>et on peut fabriquer
+le World File correspondant.</i>
+
+180
+00:11:42,350 --> 00:11:46,541
+<i>Comme dit tout à l'heure,
+ce World File a l'extension tfw</i>
+
+181
+00:11:46,741 --> 00:11:50,343
+<i>et si on l'ouvre
+avec un logiciel texte tout simple,</i>
+
+182
+00:11:50,543 --> 00:11:54,622
+<i>on retrouve les 6 paramètres
+qui caractérisent</i>
+
+183
+00:11:54,822 --> 00:11:59,607
+<i>la transformation géométrique
+et le positionnement de l'image.</i>
+
+184
+00:12:00,082 --> 00:12:03,418
+<i>L'extension de ce fichier,
+de ce World File</i>
+
+185
+00:12:03,640 --> 00:12:07,653
+<i>peut être changé en jgw</i>
+
+186
+00:12:07,853 --> 00:12:12,543
+<i>et le nom transformé
+en enlevant le suffixe Georef</i>
+
+187
+00:12:12,743 --> 00:12:15,480
+<i>de sorte que l'on peut constater,
+que l'on peut importer désormais</i>
+
+188
+00:12:15,680 --> 00:12:18,527
+<i>le fichier jpeg original
+en utilisant</i>
+
+189
+00:12:18,727 --> 00:12:21,302
+<i>l'information de géoréférencement</i>
+
+190
+00:12:21,510 --> 00:12:24,460
+<i>qui a été générée par la suite.</i>
+
+191
+00:12:26,897 --> 00:12:28,760
+<i>Voilà, c'est tout simple.</i>
+
+192
+00:12:52,532 --> 00:12:54,128
+Voilà, nous arrivons au terme
+de cette leçon
+
+193
+00:12:54,328 --> 00:12:57,328
+qui nous aura permis
+de passer en revue les principes
+
+194
+00:12:57,528 --> 00:12:59,683
+et la pratique
+du géoréférencement d'images
+
+195
+00:12:59,883 --> 00:13:04,857
+et de voir comment on peut manipuler,
+en fait, enregistrer et manipuler
+
+196
+00:13:05,157 --> 00:13:09,275
+les paramètres de référencement
+dans des fichiers image
+
+197
+00:13:09,475 --> 00:13:11,205
+ou dans des fichiers d'accompagnement.
+

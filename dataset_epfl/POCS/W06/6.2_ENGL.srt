@@ -1,0 +1,1629 @@
+1
+00:00:04,259 --> 00:00:05,839
+So now that we've talked about redundancy,
+
+2
+00:00:06,299 --> 00:00:08,300
+let's talk about one of
+the most important applications
+
+3
+00:00:08,300 --> 00:00:10,073
+of the redundancy principle,
+
+4
+00:00:10,073 --> 00:00:12,787
+and that is the ability to create
+fault-tolerant systems.
+
+5
+00:00:13,065 --> 00:00:15,659
+And first, let's get
+one thing off the table.
+
+6
+00:00:16,207 --> 00:00:18,370
+The alternative to fault tolerance,
+
+7
+00:00:18,370 --> 00:00:20,326
+which would be
+the ability to avoid faults,
+
+8
+00:00:20,326 --> 00:00:22,435
+is simply a symptom of denial.
+
+9
+00:00:22,688 --> 00:00:25,196
+It might be one thing
+to reason about your own code,
+
+10
+00:00:25,196 --> 00:00:28,250
+and to convince yourself
+that there are no bugs,
+
+11
+00:00:28,250 --> 00:00:31,357
+and with the appropriate level
+of verification and checks,
+
+12
+00:00:31,357 --> 00:00:33,596
+convince yourself
+that this is actually running
+
+13
+00:00:33,596 --> 00:00:35,461
+free of any particular bug,
+
+14
+00:00:35,461 --> 00:00:37,783
+but this code depends on other code.
+
+15
+00:00:38,151 --> 00:00:40,905
+That code actually runs
+on top of an operating system.
+
+16
+00:00:40,905 --> 00:00:43,011
+The operating system runs
+on top of hardware,
+
+17
+00:00:43,011 --> 00:00:44,964
+which consists of multiple
+independent components,
+
+18
+00:00:44,964 --> 00:00:46,394
+which may all fail.
+
+19
+00:00:46,734 --> 00:00:50,175
+And then the system itself
+depends on environmental assumptions--
+
+20
+00:00:50,175 --> 00:00:52,374
+that there is enough power, for example,
+
+21
+00:00:52,374 --> 00:00:55,580
+or that you have an Internet connection,
+in order to properly behave.
+
+22
+00:00:55,780 --> 00:00:59,838
+So it's impossible to think about
+any computer systems
+
+23
+00:00:59,838 --> 00:01:03,448
+without thinking about the possible faults
+that the system may encounter.
+
+24
+00:01:03,668 --> 00:01:05,727
+And in order to reason about this
+it's first important
+
+25
+00:01:05,727 --> 00:01:08,590
+to get a couple definitions off the table.
+
+26
+00:01:08,896 --> 00:01:12,546
+And these two definitions
+are important to use consistently.
+
+27
+00:01:12,546 --> 00:01:16,019
+They're the definitions of faults,
+and the definition of failure.
+
+28
+00:01:16,210 --> 00:01:18,726
+So fault is an underlying defect.
+
+29
+00:01:18,726 --> 00:01:21,047
+Now, because denial is not a strategy,
+
+30
+00:01:21,047 --> 00:01:24,206
+we have to assume that we have
+potential faults, everywhere.
+
+31
+00:01:24,498 --> 00:01:28,487
+The most obvious types of faults
+include bugs in our own code,
+
+32
+00:01:28,487 --> 00:01:31,676
+bugs in somebody else's code,
+hardware components that go bad,
+
+33
+00:01:31,676 --> 00:01:33,204
+memory that gets corrupted,
+
+34
+00:01:33,204 --> 00:01:36,145
+mechanical parts that fail,
+power supplies that fail.
+
+35
+00:01:36,511 --> 00:01:37,887
+When you look at this globally,
+
+36
+00:01:37,887 --> 00:01:40,441
+there are other critically
+important types of faults--
+
+37
+00:01:40,441 --> 00:01:43,401
+a design fault, for example,
+or a sizing limitation.
+
+38
+00:01:43,608 --> 00:01:46,491
+An operational fault,
+a canonical user error
+
+39
+00:01:46,491 --> 00:01:49,297
+is also a fault, for the purpose
+of this conversation.
+
+40
+00:01:49,553 --> 00:01:52,254
+Information-critical application,
+the scope of faults,
+
+41
+00:01:52,254 --> 00:01:55,230
+extends well beyond the IT space,
+
+42
+00:01:55,230 --> 00:01:59,140
+into considerations such as
+the failure of the power grids.
+
+43
+00:01:59,834 --> 00:02:01,746
+Okay, so that's for the fault itself,
+
+44
+00:02:01,746 --> 00:02:04,847
+now the fault does not mean
+the failure of the system.
+
+45
+00:02:05,075 --> 00:02:07,401
+First, some faults
+may actually be latent--
+
+46
+00:02:07,401 --> 00:02:09,456
+in that they have no visible side effects,
+
+47
+00:02:09,456 --> 00:02:10,993
+and other faults may be active.
+
+48
+00:02:10,993 --> 00:02:14,233
+But beyond that, the ability
+to contain the impact of faults
+
+49
+00:02:14,233 --> 00:02:16,456
+is the whole point of this conversation.
+
+50
+00:02:17,063 --> 00:02:19,622
+So let's define a failure as when
+
+51
+00:02:19,622 --> 00:02:22,508
+a module's not producing
+the desired result.
+
+52
+00:02:23,033 --> 00:02:25,945
+A failure occurs only when
+an underlying fault
+
+53
+00:02:25,945 --> 00:02:29,531
+is neither detected
+nor masked by the module.
+
+54
+00:02:30,022 --> 00:02:31,419
+And this leads up to the concept
+
+55
+00:02:31,419 --> 00:02:34,186
+of fault tolerance
+and fault-tolerance design.
+
+56
+00:02:34,420 --> 00:02:36,338
+Fault tolerance is the systematic approach
+
+57
+00:02:36,338 --> 00:02:38,785
+that allows us to build reliable systems
+
+58
+00:02:38,785 --> 00:02:41,089
+out of unreliable components.
+
+59
+00:02:41,776 --> 00:02:45,260
+This goal is achieved by applying
+two fundamental principles:
+
+60
+00:02:45,260 --> 00:02:47,562
+redundancy, and modularity.
+
+61
+00:02:47,728 --> 00:02:51,759
+Now here we apply the modularity
+principle in a precise way,
+
+62
+00:02:51,759 --> 00:02:54,394
+so that errors can be handled internally,
+within a module,
+
+63
+00:02:54,394 --> 00:02:57,833
+and without propagating
+to any other part of the system.
+
+64
+00:02:58,083 --> 00:03:00,624
+So at its core,
+the fault-tolerance process
+
+65
+00:03:00,624 --> 00:03:04,445
+is pretty much always about
+applying a three-step process,
+
+66
+00:03:04,445 --> 00:03:06,105
+within each module.
+
+67
+00:03:06,349 --> 00:03:11,635
+In the first step, you need to provide
+a mechanism to detect errors and faults.
+
+68
+00:03:11,635 --> 00:03:14,850
+How we detect errors
+is a function of the module itself,
+
+69
+00:03:15,070 --> 00:03:18,709
+but in general this assumes
+some redundancy within the module.
+
+70
+00:03:19,016 --> 00:03:20,979
+If there is some memory module,
+for example,
+
+71
+00:03:20,979 --> 00:03:23,088
+redundancy or coding can detect errors.
+
+72
+00:03:23,598 --> 00:03:24,889
+If this is a hardware component,
+
+73
+00:03:24,889 --> 00:03:27,614
+the component must have
+enough instrumentation capabilities
+
+74
+00:03:27,964 --> 00:03:30,967
+to determine whether
+it is operating correctly, or not.
+
+75
+00:03:31,311 --> 00:03:34,144
+In the second step,
+you have to design the system
+
+76
+00:03:34,144 --> 00:03:37,792
+to ensure that any error
+is contained within the module.
+
+77
+00:03:38,324 --> 00:03:40,958
+Again, ideally the modularity
+principle applies
+
+78
+00:03:40,958 --> 00:03:43,685
+not only during the normal
+operation of the module,
+
+79
+00:03:43,985 --> 00:03:46,127
+but also during error conditions.
+
+80
+00:03:46,787 --> 00:03:51,005
+Take for example, the example of a library
+that has a corrupted data structure.
+
+81
+00:03:51,005 --> 00:03:54,829
+Ideally, the effects of that corruption
+would be contained to that library.
+
+82
+00:03:55,253 --> 00:03:57,995
+Client server designs,
+that rely on isolated processes
+
+83
+00:03:57,995 --> 00:04:01,943
+ensure this guarantee,
+but single-address based designs do not.
+
+84
+00:04:01,943 --> 00:04:06,895
+So discretionary modularity,
+which is what a library provides
+
+85
+00:04:06,895 --> 00:04:08,616
+in its relationship with applications,
+
+86
+00:04:08,616 --> 00:04:11,610
+is not sufficient
+to fault-containment purposes.
+
+87
+00:04:11,955 --> 00:04:14,944
+Instead, we need to have a way
+to enforce the modularity
+
+88
+00:04:14,944 --> 00:04:16,611
+at the boundaries of each module,
+
+89
+00:04:16,611 --> 00:04:19,459
+during normal and abnormal operation.
+
+90
+00:04:20,001 --> 00:04:22,955
+And third, and critically,
+the fault-tolerance design process
+
+91
+00:04:22,955 --> 00:04:25,846
+is about having a remedy to errors,
+
+92
+00:04:25,846 --> 00:04:28,663
+so that the overall system
+can continue to operate
+
+93
+00:04:29,073 --> 00:04:30,743
+after the error itself,
+
+94
+00:04:31,022 --> 00:04:34,020
+and this is done by masking
+the error and correcting it.
+
+95
+00:04:34,020 --> 00:04:36,000
+And here again we rely on redundancy
+
+96
+00:04:36,000 --> 00:04:38,419
+to ensure that we can mask the problem.
+
+97
+00:04:40,603 --> 00:04:43,217
+So redundancy applies not only to data,
+
+98
+00:04:43,217 --> 00:04:46,086
+it actually applies to all aspects
+of computer systems.
+
+99
+00:04:46,337 --> 00:04:48,366
+The incarnation takes a different form.
+
+100
+00:04:48,924 --> 00:04:51,592
+At a system level,
+in particular in digital design,
+
+101
+00:04:51,592 --> 00:04:53,266
+you can apply redundancy to logic,
+
+102
+00:04:53,736 --> 00:04:57,131
+and what is known as
+the <i>N-WAY modular redundancy system</i>.
+
+103
+00:04:57,131 --> 00:05:01,281
+And in this picture, again, you have
+the three-way modular redundant circuit.
+
+104
+00:05:01,871 --> 00:05:03,847
+Each circuit is totally independent,
+
+105
+00:05:04,087 --> 00:05:06,125
+but its output feeds into a gate,
+
+106
+00:05:06,125 --> 00:05:08,300
+and the gates themselves
+feed into a voter,
+
+107
+00:05:08,300 --> 00:05:10,953
+which is also known as the <i>majority gate</i>.
+
+108
+00:05:11,162 --> 00:05:14,080
+And in an NMR system, 
+the majority rules.
+
+109
+00:05:14,080 --> 00:05:16,763
+So if this if this a boolean circuit,
+there's always a majority,
+
+110
+00:05:16,763 --> 00:05:19,779
+since each gate can
+only have one of two states.
+
+111
+00:05:20,019 --> 00:05:22,461
+Now with a bit of luck,
+the vote is unanimous,
+
+112
+00:05:22,838 --> 00:05:25,262
+but there could be 
+a distending opinion,
+
+113
+00:05:25,262 --> 00:05:26,982
+which is the minority report.
+
+114
+00:05:27,522 --> 00:05:30,925
+By definition, this indicates
+a fault of the component.
+
+115
+00:05:30,925 --> 00:05:33,636
+That fault must be signaled
+to an outside entity,
+
+116
+00:05:33,636 --> 00:05:36,032
+for example to signal a repair.
+
+117
+00:05:36,032 --> 00:05:38,105
+And in those systems,
+as the majority rules,
+
+118
+00:05:38,105 --> 00:05:40,919
+the fault is presumed to be
+in the minority gate,
+
+119
+00:05:40,919 --> 00:05:43,182
+and it's masked for further operation
+
+120
+00:05:43,182 --> 00:05:46,341
+until the failed component
+can be replaced.
+
+121
+00:05:49,372 --> 00:05:52,073
+Now the approach applies
+not only to digital design,
+
+122
+00:05:52,073 --> 00:05:53,897
+but also to commercial systems.
+
+123
+00:05:53,897 --> 00:05:57,109
+For example, the same algorithm
+of N-WAY modular redundancy
+
+124
+00:05:57,879 --> 00:06:00,757
+could be performed by
+N totally independent modules
+
+125
+00:06:00,757 --> 00:06:02,996
+on different machines who run N software
+
+126
+00:06:03,428 --> 00:06:05,722
+which then vote on the winning result.
+
+127
+00:06:05,944 --> 00:06:07,799
+This is used in avionics, for example,
+
+128
+00:06:07,799 --> 00:06:10,819
+where by design, different
+approaches and algorithms are used
+
+129
+00:06:10,819 --> 00:06:13,860
+to ensure the overall
+resiliency of the process.
+
+130
+00:06:14,434 --> 00:06:16,934
+Now if the implementation
+of the modules is different,
+
+131
+00:06:16,934 --> 00:06:19,160
+i.e., the software running
+on them is different,
+
+132
+00:06:19,160 --> 00:06:22,095
+this approach is called <i>N-WAY programming</i>.
+
+133
+00:06:22,387 --> 00:06:24,810
+And this makes sense
+for safety-critical applications,
+
+134
+00:06:24,810 --> 00:06:26,637
+for example to fly airplanes,
+
+135
+00:06:26,637 --> 00:06:29,893
+but these examples are rare
+and few and far between.
+
+136
+00:06:30,137 --> 00:06:31,837
+And instead the field of computer systems
+
+137
+00:06:31,837 --> 00:06:33,861
+has developed some systematic approaches
+
+138
+00:06:33,861 --> 00:06:36,179
+that can build fault-tolerance
+into systems
+
+139
+00:06:36,179 --> 00:06:38,508
+without going through
+the extremes of implementing
+
+140
+00:06:38,956 --> 00:06:41,642
+N-WAY module redundancy
+or N-WAY programming.
+
+141
+00:06:41,874 --> 00:06:45,396
+And the general principle is always
+around finding a way to respond
+
+142
+00:06:45,396 --> 00:06:48,270
+to active fault within
+the systems, to contain them,
+
+143
+00:06:48,270 --> 00:06:50,291
+and then to repair the system itself.
+
+144
+00:06:51,004 --> 00:06:53,067
+So let's first talk
+about error containment.
+
+145
+00:06:53,067 --> 00:06:56,406
+It is a key benefit
+of the enforced modularity principle.
+
+146
+00:06:56,948 --> 00:07:00,969
+In a system, for example a layered system
+as shown on screen right now,
+
+147
+00:07:00,969 --> 00:07:03,343
+the enforced modularity
+of each of the layers
+
+148
+00:07:03,343 --> 00:07:05,717
+ensures the fault can be contained.
+
+149
+00:07:06,199 --> 00:07:08,093
+Let me rephrase that sentence.
+
+150
+00:07:08,093 --> 00:07:11,348
+Containment is possible
+because of enforced modularity,
+
+151
+00:07:11,830 --> 00:07:15,917
+but although necessary,
+this is not a sufficient condition.
+
+152
+00:07:16,292 --> 00:07:18,505
+As a matter of fact,
+we have different design options,
+
+153
+00:07:18,505 --> 00:07:21,102
+and let's think a little bit about
+what the various design options
+
+154
+00:07:21,102 --> 00:07:24,878
+in our system might be
+in the presence of a fault.
+
+155
+00:07:25,658 --> 00:07:28,542
+Well first, if there's enough
+redundancy in the system,
+
+156
+00:07:28,542 --> 00:07:31,109
+within the layer you can
+repair it transparently,
+
+157
+00:07:31,109 --> 00:07:33,732
+mask the error, and keep operation.
+
+158
+00:07:33,937 --> 00:07:36,069
+That's how ECC operates, 
+for example,
+
+159
+00:07:36,069 --> 00:07:38,333
+when it automatically
+repairs its own faults.
+
+160
+00:07:39,652 --> 00:07:41,269
+Now if that's not possible,
+
+161
+00:07:41,269 --> 00:07:44,880
+another solution is to explicitly
+report the error to the layer above.
+
+162
+00:07:44,880 --> 00:07:46,633
+This is called <i>fail-fast</i>,
+
+163
+00:07:46,633 --> 00:07:50,343
+and this is a case of the
+end-to-end principle being applied.
+
+164
+00:07:50,343 --> 00:07:53,396
+Assume that the layer above
+will know best how to recover
+
+165
+00:07:53,396 --> 00:07:55,711
+from the failure of the underlying module.
+
+166
+00:07:56,366 --> 00:07:59,574
+Well alternatively, you can operate
+in <i>fail-safe</i> mode,
+
+167
+00:07:59,954 --> 00:08:02,377
+that is ensure that the module
+will keep operating,
+
+168
+00:08:02,377 --> 00:08:04,183
+and produce acceptable values.
+
+169
+00:08:04,390 --> 00:08:06,360
+By acceptable, we mean
+values that are consistent
+
+170
+00:08:06,360 --> 00:08:09,021
+with the theory of operation
+of the module itself.
+
+171
+00:08:10,431 --> 00:08:13,307
+Now <i>fail-stop</i> might seem pretty harsh,
+
+172
+00:08:14,007 --> 00:08:15,565
+but it's actually a pretty good choice.
+
+173
+00:08:15,565 --> 00:08:18,337
+By fail-stop we just
+stop operating the module
+
+174
+00:08:18,337 --> 00:08:20,690
+as soon as we detect a fault.
+
+175
+00:08:21,101 --> 00:08:23,707
+Kernel panic is an example
+of fail-stop operation
+
+176
+00:08:23,707 --> 00:08:27,203
+if some invariant
+in the operating system fails.
+
+177
+00:08:29,066 --> 00:08:31,863
+Also you can operate
+with degraded specification,
+
+178
+00:08:31,863 --> 00:08:33,901
+also known as <i>fail-soft</i>.
+
+179
+00:08:34,804 --> 00:08:38,136
+And in some situations the fault has
+a performance implication
+
+180
+00:08:38,136 --> 00:08:42,131
+without impacting the function,
+and thus is the case of fail-soft.
+
+181
+00:08:42,323 --> 00:08:45,057
+RAID is actually
+an example of fail-soft,
+
+182
+00:08:45,057 --> 00:08:47,644
+and particularly when
+the fault is permanent,
+
+183
+00:08:47,644 --> 00:08:50,922
+that is you've lost a sector
+on a permanent basis,
+
+184
+00:08:50,922 --> 00:08:53,206
+or a disk on a permanent basis.
+
+185
+00:08:53,377 --> 00:08:56,712
+Until a replacement disk
+has been brought up online,
+
+186
+00:08:56,712 --> 00:08:59,602
+and the RAID-5 parity
+has been fully reconstructed,
+
+187
+00:08:59,602 --> 00:09:02,561
+the layer is operating
+with degraded specification,
+
+188
+00:09:02,561 --> 00:09:05,231
+and possibly with degraded performance.
+
+189
+00:09:06,430 --> 00:09:08,202
+That's because
+the RAID control in practice
+
+190
+00:09:08,202 --> 00:09:10,941
+is competing for bandwidth
+with the application.
+
+191
+00:09:10,941 --> 00:09:13,489
+And so in a fail-soft mode
+you're operating
+
+192
+00:09:14,012 --> 00:09:18,930
+with degraded specification
+while the error is present.
+
+193
+00:09:19,554 --> 00:09:23,317
+And then of course there's everyone's
+design favorite: do nothing,
+
+194
+00:09:23,317 --> 00:09:27,157
+let the upper layer deal with
+a completely arbitrary specification
+
+195
+00:09:27,157 --> 00:09:29,603
+that has not been determined.
+
+196
+00:09:30,299 --> 00:09:33,185
+Now this classification
+may seem a little abstract,
+
+197
+00:09:33,185 --> 00:09:36,716
+but it all boils down
+to how you respond to faults.
+
+198
+00:09:37,083 --> 00:09:40,546
+And so let's walk through an example,
+and see what that means.
+
+199
+00:09:42,041 --> 00:09:44,225
+So specifically let's look
+at what that means
+
+200
+00:09:44,225 --> 00:09:46,211
+when there's an active fault
+in the system.
+
+201
+00:09:46,608 --> 00:09:49,144
+Now this flowchart,
+which comes from the textbook,
+
+202
+00:09:49,144 --> 00:09:52,765
+discusses the process to classify
+faults into two categories--
+
+203
+00:09:52,765 --> 00:09:56,048
+the ones that you can tolerate,
+and the ones that you cannot.
+
+204
+00:09:56,558 --> 00:09:58,599
+Now the bad news here seems to be
+
+205
+00:09:58,599 --> 00:10:02,750
+that most paths lead
+to the untolerated error and state.
+
+206
+00:10:02,750 --> 00:10:05,538
+In reality, they're actually
+at different end states, as we will see.
+
+207
+00:10:05,934 --> 00:10:08,484
+This flowchart is a useful guide.
+
+208
+00:10:08,723 --> 00:10:11,342
+So let's actually walk through
+our concrete examples
+
+209
+00:10:11,342 --> 00:10:12,903
+with memory errors.
+
+210
+00:10:12,903 --> 00:10:15,800
+In this diagram there are only
+two layers that are shown,
+
+211
+00:10:15,800 --> 00:10:20,187
+the memory subsystem and the operating
+system controlling applications
+
+212
+00:10:20,187 --> 00:10:23,605
+as the second layer,
+and you'll see why in a second.
+
+213
+00:10:23,985 --> 00:10:26,548
+Now by now, hopefully,
+you know about ECC's.
+
+214
+00:10:26,989 --> 00:10:29,215
+Let's first study single-bit errors.
+
+215
+00:10:29,215 --> 00:10:32,274
+As we all know these faults
+are both detected and masked
+
+216
+00:10:32,274 --> 00:10:34,229
+within the DIMM itself,
+
+217
+00:10:34,229 --> 00:10:36,749
+and therefore these are tolerated errors,
+
+218
+00:10:36,749 --> 00:10:39,404
+as far as this flowchart is concerned.
+
+219
+00:10:40,084 --> 00:10:42,842
+But let's now study double-bit errors.
+
+220
+00:10:43,314 --> 00:10:47,285
+They can be detected,
+but they cannot be masked.
+
+221
+00:10:47,530 --> 00:10:50,516
+So the flowchart goes
+from the detected error
+
+222
+00:10:50,516 --> 00:10:52,882
+to the unmaskable error state.
+
+223
+00:10:53,408 --> 00:10:55,040
+So that's the bad news.
+
+224
+00:10:55,165 --> 00:10:58,001
+Now the good news is that
+modern computer systems
+
+225
+00:10:58,001 --> 00:11:00,154
+have a <i>fail-fast</i> mechanism,
+
+226
+00:11:00,743 --> 00:11:05,511
+and that fail-fast mechanism is called
+a <i>Machine Check Exception</i>, or an <i>MCE</i>.
+
+227
+00:11:05,511 --> 00:11:10,171
+Think of an MCE as a signal raised
+by the DIMM that interrupts the CPU.
+
+228
+00:11:10,171 --> 00:11:12,849
+As a matter of fact,
+that is pretty much what it does.
+
+229
+00:11:14,001 --> 00:11:17,091
+And this brings up
+the second layer of this system,
+
+230
+00:11:17,091 --> 00:11:19,337
+which is the operating system itself.
+
+231
+00:11:20,275 --> 00:11:23,880
+Now because of MCE
+the OS has a way to detect faults.
+
+232
+00:11:23,880 --> 00:11:26,897
+These are memory faults,
+where the memory has gone bad
+
+233
+00:11:26,897 --> 00:11:28,938
+because of a double-bit error.
+
+234
+00:11:29,205 --> 00:11:30,926
+Now the first thing that the OS does
+
+235
+00:11:30,926 --> 00:11:35,251
+is to determine who uses
+that particular faulty page in memory.
+
+236
+00:11:35,702 --> 00:11:39,104
+If the page is unused,
+either because it's free
+
+237
+00:11:39,104 --> 00:11:41,978
+or because it's part
+of the file-system buffer cache,
+
+238
+00:11:41,978 --> 00:11:44,557
+then it's actually sufficient
+for the operating system
+
+239
+00:11:44,557 --> 00:11:47,117
+to mark it as invalid,
+never reuse it again,
+
+240
+00:11:47,117 --> 00:11:49,136
+and keep operation.
+
+241
+00:11:49,513 --> 00:11:52,117
+But if the page is used
+by one application,
+
+242
+00:11:52,117 --> 00:11:55,078
+then the appropriate
+behavior is actually
+
+243
+00:11:55,078 --> 00:11:58,284
+to propagate the fault-tolerance
+design one level up,
+
+244
+00:11:58,284 --> 00:12:00,113
+and kill the application.
+
+245
+00:12:00,113 --> 00:12:03,780
+And this provides the application
+fail-stop semantics
+
+246
+00:12:04,166 --> 00:12:06,744
+in the case of double-bit errors.
+
+247
+00:12:07,034 --> 00:12:09,206
+If the page is used
+by the operating system itself
+
+248
+00:12:09,206 --> 00:12:12,192
+then obviously it's harder to resolve,
+
+249
+00:12:12,192 --> 00:12:15,964
+and typically the operating system
+will actually issue a kernel panic,
+
+250
+00:12:15,964 --> 00:12:21,834
+and trigger a fail-stop operation
+for the entire computer system itself.
+
+251
+00:12:22,380 --> 00:12:25,486
+Now so far we've talked about trying
+to reduce the impact of failures,
+
+252
+00:12:26,386 --> 00:12:29,612
+but this is actually
+not an acceptable situation
+
+253
+00:12:29,612 --> 00:12:33,825
+for many applications that require
+a higher degree of availability.
+
+254
+00:12:34,402 --> 00:12:37,440
+And for that people have developed
+and engineering discipline
+
+255
+00:12:37,440 --> 00:12:42,260
+that eliminates systematically
+all possible single points of failure,
+
+256
+00:12:42,260 --> 00:12:45,579
+either in hardware or in software
+in the system.
+
+257
+00:12:45,915 --> 00:12:49,261
+And we're actually going to study
+one very classic example of such systems
+
+258
+00:12:49,261 --> 00:12:52,682
+that has systematically eliminated
+all single points of failures,
+
+259
+00:12:52,682 --> 00:12:56,824
+and that is the Tandem NonStop
+operating system and hardware platform
+
+260
+00:12:56,824 --> 00:12:59,177
+that was developed during the 1980's.
+
+261
+00:12:59,556 --> 00:13:02,100
+Now the computer scientists
+at Tandem get credit
+
+262
+00:13:02,100 --> 00:13:05,844
+for having written the most
+seminal papers in this field,
+
+263
+00:13:06,195 --> 00:13:08,670
+and I've found this
+technical report on the web
+
+264
+00:13:08,670 --> 00:13:10,726
+that dates back to 1986,
+
+265
+00:13:10,726 --> 00:13:14,352
+and actually very succinctly describes,
+on a single page,
+
+266
+00:13:14,352 --> 00:13:17,404
+the design principles
+of fault-tolerant systems.
+
+267
+00:13:17,404 --> 00:13:20,895
+And you'll notice that the second author
+for this technical report is Jim Gray,
+
+268
+00:13:20,895 --> 00:13:25,374
+and Jim Gray has arguably been
+one of the most influential persons
+
+269
+00:13:25,374 --> 00:13:29,739
+in the combined field of computer
+systems and databases.
+
+270
+00:13:30,477 --> 00:13:34,551
+And this paper lists the key
+design principles on a single page.
+
+271
+00:13:35,109 --> 00:13:37,972
+Now we've talked about modularity
+many times already,
+
+272
+00:13:37,972 --> 00:13:40,014
+the first design principle.
+
+273
+00:13:40,014 --> 00:13:43,821
+We've talked about fail-fast
+as a design option.
+
+274
+00:13:43,821 --> 00:13:47,600
+Now in this context this is defined
+through the combination of self-checking,
+
+275
+00:13:47,600 --> 00:13:51,564
+in other words redundancy,
+and fail-stop operations.
+
+276
+00:13:52,583 --> 00:13:56,541
+The paper then defines
+single-fault tolerance, as follows:
+
+277
+00:13:57,068 --> 00:13:59,489
+"When a hardware or software faults,
+
+278
+00:13:59,489 --> 00:14:02,887
+its function is immediately taken over
+by another module--
+
+279
+00:14:02,887 --> 00:14:07,135
+given a mean time to repair
+measured in milliseconds.
+
+280
+00:14:07,135 --> 00:14:10,126
+For processors or processes this means
+
+281
+00:14:10,126 --> 00:14:13,588
+a second processor or process exists.
+
+282
+00:14:13,994 --> 00:14:19,286
+For storage, it means the storage
+and paths to the storage are duplexed."
+
+283
+00:14:19,573 --> 00:14:22,762
+In other words, there are
+no single points of failure.
+
+284
+00:14:23,251 --> 00:14:25,826
+A definition does not
+get better than this.
+
+285
+00:14:26,082 --> 00:14:29,068
+It then discusses the need
+for online maintenance.
+
+286
+00:14:29,382 --> 00:14:32,780
+And this is actually part and parcel
+of the single-fault tolerance model,
+
+287
+00:14:33,123 --> 00:14:38,410
+because after failure it is okay
+to operate in a degraded state for awhile,
+
+288
+00:14:38,410 --> 00:14:42,560
+but you actually need to be able
+to go back to the fully protected state
+
+289
+00:14:42,560 --> 00:14:45,403
+without requiring a service interruption,
+
+290
+00:14:45,403 --> 00:14:48,161
+therefore the need
+to do online maintenance
+
+291
+00:14:48,161 --> 00:14:52,261
+and perform online maintenance
+and repair of a running system.
+
+292
+00:14:52,547 --> 00:14:54,306
+And then it actually talks about the need,
+
+293
+00:14:54,306 --> 00:14:56,497
+even going back to the 1980's,
+
+294
+00:14:56,497 --> 00:14:59,941
+for having a simple user interface
+that guides these operations,
+
+295
+00:14:59,941 --> 00:15:02,849
+make it accessible to people
+who are responsible,
+
+296
+00:15:02,849 --> 00:15:06,255
+in particular for the repair
+of these operations.
+
+297
+00:15:06,606 --> 00:15:10,231
+So think about it--this is a technical
+report from nearly 30 years ago
+
+298
+00:15:10,231 --> 00:15:13,533
+that describes the principles
+of fault-tolerant systems.
+
+299
+00:15:14,730 --> 00:15:18,290
+So let's actually see what that means,
+and how those systems were built.
+
+300
+00:15:18,779 --> 00:15:21,103
+Well, first it means redundant hardware
+
+301
+00:15:21,103 --> 00:15:23,352
+with no single point of failure.
+
+302
+00:15:23,591 --> 00:15:25,394
+This means redundant CPU's,
+
+303
+00:15:25,987 --> 00:15:27,188
+redundant storage,
+
+304
+00:15:27,614 --> 00:15:30,444
+redundant connections
+between the CPU and storage,
+
+305
+00:15:30,914 --> 00:15:33,735
+and some redundant connection
+between the two CPU's
+
+306
+00:15:33,735 --> 00:15:36,084
+so that they can know about
+each other's health.
+
+307
+00:15:36,738 --> 00:15:39,927
+But this is actually not sufficient
+to achieve low recur time,
+
+308
+00:15:39,927 --> 00:15:41,505
+in the presence of failures.
+
+309
+00:15:41,647 --> 00:15:44,753
+For that you actually
+need to create a process pair,
+
+310
+00:15:45,353 --> 00:15:49,838
+and in this model each process
+has a backup process,
+
+311
+00:15:49,838 --> 00:15:51,924
+on the other processor,
+
+312
+00:15:51,924 --> 00:15:55,307
+and the pair stays in sync
+through a special API
+
+313
+00:15:55,307 --> 00:15:57,057
+that they need to follow.
+
+314
+00:15:57,462 --> 00:16:01,815
+And that API ensures that the state
+is appropriately synchronized at all times
+
+315
+00:16:01,815 --> 00:16:04,141
+between these two processes.
+
+316
+00:16:05,699 --> 00:16:08,499
+So first the system calls
+themselves are mirrored,
+
+317
+00:16:09,398 --> 00:16:13,316
+but the application level state
+is also mirrored as well through this API.
+
+318
+00:16:13,993 --> 00:16:16,157
+So that if the primary fails,
+
+319
+00:16:16,157 --> 00:16:19,854
+the secondary processor,
+or the operating system,
+
+320
+00:16:19,854 --> 00:16:24,024
+can detect the failure,
+and it immediately signals the process
+
+321
+00:16:24,024 --> 00:16:26,856
+to take over without losing transactions,
+
+322
+00:16:26,856 --> 00:16:30,561
+and without having to repair
+the state of the transaction system
+
+323
+00:16:30,561 --> 00:16:32,921
+from stable storage of the database,
+
+324
+00:16:32,921 --> 00:16:35,756
+and that is because the two processes
+and their address space
+
+325
+00:16:36,276 --> 00:16:38,410
+are kept logically in sync.
+
+326
+00:16:38,965 --> 00:16:40,911
+Now think about this for a minute
+
+327
+00:16:40,911 --> 00:16:43,464
+from a layering and
+a fault-tolerance perspective.
+
+328
+00:16:43,464 --> 00:16:47,402
+Of course the hardware layers
+are self-checking, fail-fast,
+
+329
+00:16:47,402 --> 00:16:49,588
+and redundantly deployed,
+
+330
+00:16:49,588 --> 00:16:52,692
+but the process pair itself
+is also a distinct layer
+
+331
+00:16:52,692 --> 00:16:56,990
+that is also self-checking,
+and can repair its own errors.
+
+332
+00:16:57,625 --> 00:16:59,901
+So I actually find this pretty neat.
+
+333
+00:16:59,901 --> 00:17:01,955
+With the mean time to repair
+measured in milliseconds
+
+334
+00:17:01,955 --> 00:17:03,573
+for errors that could be masked,
+
+335
+00:17:03,733 --> 00:17:06,797
+and an actual mean time
+between total system failures
+
+336
+00:17:06,797 --> 00:17:09,923
+that was measured in years, at the time.
+
+337
+00:17:10,163 --> 00:17:12,988
+And this is extremely impressive
+given that the individual components
+
+338
+00:17:12,988 --> 00:17:15,294
+used to fail much more frequently.
+
+339
+00:17:16,158 --> 00:17:18,485
+So let's just summarize this module.
+
+340
+00:17:18,755 --> 00:17:21,714
+We saw redundancy and enforced modularity
+
+341
+00:17:21,714 --> 00:17:25,218
+as the two foundations for
+the fault-tolerant design process.
+
+342
+00:17:25,218 --> 00:17:28,290
+We saw that there is
+a systematic design process
+
+343
+00:17:28,290 --> 00:17:31,667
+that helps you reason about errors,
+classify errors,
+
+344
+00:17:32,147 --> 00:17:35,131
+and associate a particular
+failure semantic
+
+345
+00:17:35,131 --> 00:17:37,938
+to any particular module in the system.
+
+346
+00:17:38,498 --> 00:17:41,522
+Then we saw a glimpse about how
+to achieve fault tolerance in hardware,
+
+347
+00:17:41,522 --> 00:17:45,287
+and the need to have redundant paths
+and duplicated resources,
+
+348
+00:17:45,287 --> 00:17:48,310
+and we also saw a way of achieving
+the same goal in software
+
+349
+00:17:48,310 --> 00:17:52,120
+through process pairs
+that depend on a special API.

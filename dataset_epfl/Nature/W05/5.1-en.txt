@@ -1,0 +1,75 @@
+Welcome back. Nature in Code.
+We are now on Chapter 5.
+Chapter 5  is all about spacial models. This is Lecture 1.
+Chapter 5 is going to be a fun chapter. I mean I do hope that you find all chapters interesting but this one, I think, experience has shown that it's quite rewarding to learners because a) we're actually going to code a lot and so we're really going to use those skills that you gained in the past few chapters.
+Then second, at the end you get this visual simulation, spacial simulation that runs in your browser and that is really intriguing to look at and I've also chosen it as the cover of the book for that reason.
+Let's get started.
+What are spacial models and why do they matter?
+Well, so far we've made the following assumptions: we have our individuals; diploid individuals so they have 2 copies.
+For example here we have an A1 and 
+A2 individual
+Individuals then produce many, many gametes. For example 
+A1 gametes and A2 gametes, depending on their genotype of course and so they create many, many gametes and we eventually get this practically infinitely sized gamete pool. 
+From this pool we're now drawing alleles to essentially create new individuals. So far we've made 2 crucial assumptions namely that drawing from this gamete pool was essentially a random process. 
+That was the first assumption and then the second assumption, at least in Chapter 2 that we made was that population size was infinite so we would in fact draw infinitely many times. 
+Then later we relaxed this assumption and we said no, it's actually finite so we don't draw infinitely many times.
+We draw a certain number and that introduces interesting random sampling effects that cause genetic drift but still in all of those models, the assumption was that we draw randomly from this pool.
+Now, in a spacial model, that is potentially going to change because we're going to assume that the mating between individuals will not be completely random so we're not just picking random gametes here;
+random alleles but we're actually considering where they are in space.
+Here's one way to think about this:
+Imagine you have an individual here and now this individual will be mating with another individual and thereby producing offspring so which are these other mating individuals going to be?
+Well, it's much more likely that this is going to be an individual that's close by rather than individuals that are extremely far away.
+This may not be fully true.
+Of course for modern humans.
+We have long distance travel etc. but I mean consider any other species or humans in fact, hundreds or thousands of years ago.
+Think about a mouse for example somewhere in your backyard. Who is this mouse going to mate with?
+Well, probably with mice that are in the neighborhood. Not with mice that are a thousand miles away and this is sort of the spacial consideration.
+How can we model this notion that you can only travel so far?
+We can setup a world like this and say, this is our space.
+You could also draw it like this and here you will have individuals living in the space but here we just take a birdseye view and now we're going to put individuals here for example, randomly on this map.
+Now we start with the observation that this individual here for example, is much more likely to mate with this individual here that's close by compared to this individual here which is rather far away.
+That's really sort of the major change that we're now going to implement compared to all the other models that we've implemented so far.
+In fact, this is not exactly the way we're going to do this because here, as you saw, I just put these individuals randomly here.
+Each of these individuals would have some form of X and Y co-ordinates in the 2 dimensional space and I would have to calculate for each pair the distance and how this maps the probability of mating and so on.
+That's a bit too complicated.
+We can actually simplify this even more and the way people usually do this is by assuming that the world is essentially a grid.
+What does this look like?
+This is a grid. These are the cells of the grid and we can now make the assumption that each cell contains 1 individual.
+That has a number of simplifying
+properties such as well, number 1, it's very easy to calculate now, the number of individuals that live on this grid because we can just calculate the number of cells here because each cell contains 
+1 individual.
+Then we can also come up with rules about the movement that is allowed from cell to cell or the mating probabilities among these different cells.
+Now, we're going to simplify things quite a bit in this chapter and we're going to assume there's no movement so perhaps a bit like plants or trees; sessile individuals but you could in principle, add movement to your simulation if you wanted to.
+The key point here is that of limited mating distance.
+For example, let's zoom in on this cell here and say okay, we have an individual here ... We have an individual in each cell but we're just going to focus on this one now so who could this individual mate with? So far, we have basically assumed that it could mate with any other randomly chosen individual in this world.
+We didn't explicitly model space but we did make that assumption that each individual can mate with each other individual.
+In fact, we didn't even bother to consider individuals. We just picked alleles from the gamete pool but in effect, this would have the same consequence; just random individuals mating with each other. Now that we have a spacial grid, we can limit this.
+In the simplest case we could for example say well, there is a maximum distance for each individual that it can choose a mating partner from.
+For example, we could set this distance to 1 and then we'd get something like this. Here again, this is our individual and we could say okay, we have this maximum mating distance of 1 and now this individual can mate with any of these individuals here that live in the surrounding cells but not with any of the others.
+We could expand this and we could say no, you know what? 
+We're going to assume a mating distance of 2. This would look like this. Here we have our individual living here and the mating distance is now 2.
+That means this individual can now randomly choose any individual to mate with that lives in this blue zone here but not outside of the blue zone.
+Then we could take this even further. We could essentially set 
+'d' to very large values so that the zone gets larger and larger and eventually becomes so large that it spans the entire world.
+Then we would effectively be back at
+non-spacial dynamics. We would still have a spacial world because we would still the grid but the parameter will be chosen in such a way that the dynamics will be exactly identical to the non-spacial models because mating would essentially be random.
+That's now quite intriguing because if we built a model like this, we can now simply tweak this parameter and very quickly compare an entire range of models, those that are very strictly spacial and those that are in a sense, non-spacial because random mating will still occur.
+This is another nice side property of doing it like this.
+What about the borders? 
+Are there any kinds of meaningful borders here? No, there are actually not so let's think about how this should work. Let's assume you have an individual that is somewhere around here perhaps and for some reason you say you have movement; this individual wants to move over here. 
+You look at this grid and you would say well, but it cant because here there's this border. Well but you can simply assume that any individual who moves
+out of here would immediately re-enter the world here and vice-versa; the same is true for every border. An individual for example who would move out here would immediately re-enter the world over here.
+Effectively you don't have any borders any more.
+This has interesting consequences but the most important aspect is that you don't have these side-effects of actually having walls in a world where individuals cannot move any further. From a practical perspective that means we have to think a little bit about those mating songs so to speak.
+Say you have an individual here.
+Now let's also say that we have a mating distance of 1 so as we've seen before, the mating area now the cells to choose a mating partner from would be like this but here the world ends in our visualization. What are we going to do? Well, as we said, if you move out of here, you re-enter the world here so effectively this is the other part of this square. You have the 6 cells or rather, the 5 cells because you're not going to mate with yourself but you have these 5 cells here and then the 3 cells over here as the range of individuals to choose from. In the extreme case, you're going to look at this individual here in the corner but there is no corner. 
+This corner is just a visual illusion because effectively the mating neighborhood here would be ... Whoops. Let me use red; would be this and then of course it would continue here, right?
+These 2 cells would be in fact the one over here. These 2 cells down here would be those and the one here would simply be this one. 
+This is how you would define the mating neighborhood of a cell here
+You can see here; no borders so let's implement such a world. 
+Now, again, a fair bit of warning.
+We're going to write a lot of code here but of course that's why we're here in the first place.
+There are 3 factors that make it a little easier. First of all, of course, I'll do it with you so you can just follow me but the second is also that you already have all the tools in place.
+As you can see, this will obviously be stored as a 2 dimensional array. We'll have a lot of itterations, functions, control flow and so on and you already know all of this.
+The 3rd aspect, as I said, at the end you'll have a very rewarding visual experience. Alright so we have our work cut out for us.
+Let's do it. Let's get started in the next lecture.

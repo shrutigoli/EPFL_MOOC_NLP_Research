@@ -1,0 +1,99 @@
+In this episode, we will present the notion of multiple inheritance in C++.
+Before we dive into this matter, we will start by reviewing all the knowledge aquired up to now.
+Now, you are familiar with the three central concepts of the object oriented programming: encapsulation/abstraction, inheritance and polymorphism.
+You know that encapsulating and abstracting means to regrouping data and processing into one same entity.
+It also revolves around separating the user interface from the implementation details.
+Also, you know that the inheritance lets us set up a "is a" relationship between different classes of a program.
+You also know that this tool lets us use polymorphic solutions in the sense of "inclusion polymorphism".
+Finally, you have learnt that the polymorphisms is a very powerful tool making it possible for the execution of a same code to automatically adapt to the different types of data.
+In C++, you know that we are able to set up a polymorphic solution using two mandatory ingredients: we must use virtual methods through references or pointers.
+To conclude this brief review of your knowledge, let us mention the notions of "abstract classes* and "pure virtual methods".
+These let us improve the object-ortiented models dramatically.
+Let us move on to the thema of this episode: "multiple inheritance*.
+It actually follows an already mastered thema, the simple inheritance.
+Until now, the inheritance relationships we have studied were simple inheritance relationships.
+This means that each sub-class only had one direct parent.
+Multiple inheritance simply revolves around one sub-class having several direct parent classes.
+Multiple inheritance is allowed in C++.
+In other words, we may have one sub class inherit directly from several parent classes.
+However, this notion is not provided by all object-oritented programming languages.
+Basic notions regarding multiple inheritance are mostly the same as the ones regarding simple inheritance.
+Consequently, one sub-class will inherit from these base classes, all their attributes and methods (except constructors and destructor), as well as their type.
+Let us dive into a concrete example; we shall see how multiple inheritance will deem useful.
+For old time's sake, let us choose a game-related example.
+Now, several entities will play a part in the game. For example, a ball, rackets, a net, a player.
+On each entity, we will bestow a method called "evolue" (TN: means "evolve") making it possible to track the position of the entity during the game.
+In our first draft conception, we could imagine a super-class "Entite" (TN: means "Entity") whose main method will be called "evolue". This method will probably be polymorphic and redefined in the sub-classes. However, this is not our point here. Then, we will have sub-classes representing the different concrete entities in the game such as the classes "Balle", "Raquette", "Filet" and "Joueur"
+Now, after further analysis, we might realise that, due to game requirements, all these entities do not, in fact, behave exactly the same. They might not have the same needs.
+For example, we may need to print or draw certain entities.
+The ball, the net or the racket may require a graphical representation aswell.
+Others may not require it. For example, we may not need to see the player in the game.
+Moreover, certain entities may need to be interactive, that is, controllable with mouse and keyboard (maybe the ball and the racket).
+Others may not need to be controllable : for example, maybe we need not control the player nor the net.
+We are now wondering how to set up all this.
+The class hierarchy (which you can now see) answers precisely to the just-now-mentioned needs.
+Here, we have introduced a super-class "Interactive", thanks to which we will take care of the different entities requiring to be interactive, such as the ball and the racket.
+This super-class will provide the methods regarding this very interaction.
+Similarly, the super-class "Graphique" lets us define all entities we wish to see drawable in the game
+(that is, the racket, ball and the net). this super-class will provide the necessary material to the graphical representation of these entities.
+These two super-classes let us see some entities
+- albeit not all - as interactive objects and/or as graphical objects.
+Please note that it would not have been correct to place the drawing and interaction methods in the super-class "Entity".
+Why, do you think, is it the case?
+Indeed, placing these methods in the super-class "Entity" would force certain classes to have a drawing method while we want them to be undrawable.
+It would also force certain classes to be interactive while we do not wish it.
+Thanks to multiple inheritance, we now have a better model of what we wish to realise.
+C++ grants us this option.
+We can imagine many another situation requiring the use of multiple inheritance.
+Here comes a zoological example.
+Assume that you are tasked to model the animals in a zoo.
+As it happens, some animals are ovoviviparous and this inherit from the oviparous and from the viviparous.
+Multiple inheritance lets us model clearly the different lodgers of the zoo.
+Oviparous animals lay eggs and the egg "develops" the embryo until birth. Viviparous animals give birth to live babies.
+Ovoviviparous animals (such as the seahorse) indeed inherit the characteristics of oviparous and viviparous both: their embryo is "developed" by the egg
+(just like oviaprous), but they are born live (just like viviparous).
+Finally, a more informatic example.
+You may not know that the different
+C++ classes regarding inputs and outputs,
+(these ones should ring a bell), are organized thanks to multiple inheritance.
+This organisation in particular, presents the famous,
+"diamond architecture" on which we will expand later on.
+Let us now move on to the concrete use of multiple inheritance in C++.
+In C++, if we wish to declare that a sub-class inherits from several parent classes, we simply need, during the class declaration, to indicate all the super-classes, separated by commas.
+Thus, here, for each super-class from which the sub-class inherits we will indicate
+"public nameOfTheSuperClass", and separate the different parent classes with commas.
+Concretely, this here means that the class "Ovovivipare" inherits from the super-class "Ovipare", and the super-class "Vivipare".
+Then, the class's content is not very different from what we have seen in the classes written or read until now.
+Finally, please note that, the order of the declaration of the inheritance links is relevant. Indeed, it impacts how we will build and destroy an instance created through multiplte inheritance.
+This is the next point we will focus on.
+How do construction and destruction work in the frame of multiple inheritance.
+Let us discuss what mutiple inheritance implies on constructors.
+There is in fact not much new; although there is one point you must pay attention to.
+So, like with simple inheritance, the initialization of the attributes  inherited from the super-classes is done through the initialization list of the sub-class constructor by calling all the constructors of the parent classes we inherit from.
+Thus, the general syntax is the same as for simple inheritance.
+In the "initialization list" section of the sub-class constructor, we call, like this, the different constructors of the super-classes we inherit from, separated by commas.
+And, obviously, if one of the super-classes has a default constructor, it is not necessary to explicitly call it.
+As always, while you are still unfamiliar with the constructor concepts, we recommand you explicitly call the default constructors aswell so that you do not forget that there is a call to the default constructor, even though this is not necessary.
+However, be careful: there is a little peculiarity with multiple inheritance.
+The call order of the constructors is not the order of the written constructors in the initialization list of the sub-class constructors. The constructors are called following the order of the inheritance declaration.
+As always, the destructors are called in the order reverse to that of the constructors.
+Let us illustrate all this with a concrete example.
+We will go back to the example regarding ovoviviparous who inherit from both oviparous and viviparous.
+Let us assume that oviparous' constructor typically require a number of eggs, and that the viviparous' constructor requires a gestation period.
+For ovoviviparous, we will add an attribute here: it is a boolean indicating if the species is rare or not.
+Thus, we pass here as the third parameter an argument "raretÃ©" (TN: means "rarity").
+This lets us initialize wether the species is rare or not.
+Therefore, the prototype of the ovoviviparous' constructor will typically have one parameter for the oviparous' constructor, one parameter for the viviparous' constructor, and one parameter to initialize its own attribute.
+To this parameter, we give a default value, which is "false".
+The constructor for ovoviviparous is thus tasked with calling the constructors of the classes it inherits from.
+First of all, it will call, in its initialization list, the constructors of the classes it inhertis from. For example, it will called the viviparous' constructor by passing the expected parameter.
+It will also call the oviparous' constructor by passing the corresponding parameter.
+These calls are, as usual, separated by commas. Then, we will initialize its own attribute with the parameter received here as argument.
+Pay attention though, here, even if we may think that, as it is, the constructor of ovoviviparous will first call the viviparous' constructor, then the oviparous' constructor, actually, this is not the case.
+The first called constructor will actually be the one of oviparous.
+What matters regarding the call order of the super-classes in case of multiple inhertiance is indeed the inheritance declaration and not the order of declaration in the constuctor's initialization list in the sub-class.
+This means that here, whatever we write, the oviparous' constructor will always be called first.
+Then, the viviparous' constructor will be called.
+To make things easier, most modern compilers will now indicate with a warning if the call order of the constructors does not match the one you think you have written here.
+VoilÃ , this was all we had to say on multiple inheritance and the order of the constructors' call.
+We remind you that the destructors are always called in the reverse order of the constructors'.

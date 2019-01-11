@@ -1,0 +1,1075 @@
+1
+00:00:04,290 --> 00:00:04,938
+Bonjour.
+
+2
+00:00:04,938 --> 00:00:08,580
+Nous continuons le cours Comprendre les
+microcontrôleurs
+
+3
+00:00:08,580 --> 00:00:11,310
+et en particulier, ces exemples que nous
+
+4
+00:00:11,310 --> 00:00:14,985
+voulons vous présenter pour pouvoir
+expérimenter ce
+
+5
+00:00:14,985 --> 00:00:17,820
+que nous avons appris au début du cours.
+
+6
+00:00:17,820 --> 00:00:22,084
+Aujourd'hui, nous parlerons de
+programmation de machines
+
+7
+00:00:22,084 --> 00:00:25,281
+d'état, les machines d'état, c'est un
+vieux souvenir.
+
+8
+00:00:25,281 --> 00:00:27,447
+Vous vous souvenez certainement que
+lorsque
+
+9
+00:00:27,447 --> 00:00:29,790
+nous avons présenté les systèmes
+séquentiels,
+
+10
+00:00:29,790 --> 00:00:33,870
+nous avions pris un exemple avec une
+perceuse qui monte et qui descend.
+
+11
+00:00:33,870 --> 00:00:36,530
+Un exemple très simple, mais qui nous a
+permis
+
+12
+00:00:36,530 --> 00:00:39,830
+de trouver les méthodes pour résoudre ce
+type de problème.
+
+13
+00:00:39,830 --> 00:00:44,736
+Nous allons reprendre ce problème, parce
+que nous ne l'avions pas très bien résolu.
+
+14
+00:00:44,736 --> 00:00:47,864
+La solution avec les circuits logiques
+était lourde et
+
+15
+00:00:47,864 --> 00:00:52,190
+fastidieuse, et, on ne connaissait encore
+rien des microcontrôleurs.
+
+16
+00:00:52,190 --> 00:00:54,920
+Nous allons donc essayer de trouver
+
+17
+00:00:54,920 --> 00:00:59,533
+un algorithme pour résoudre ce problème,
+et ensuite nous allons
+
+18
+00:00:59,533 --> 00:01:04,330
+chercher une autre solution en exploitant
+particulièrement la variable d'état.
+
+19
+00:01:04,330 --> 00:01:06,032
+Alors, vous vous souvenez certainement du
+
+20
+00:01:06,032 --> 00:01:07,918
+problème auquel nous avions tenté de
+répondre.
+
+21
+00:01:07,918 --> 00:01:14,009
+Donc une perceuse, avec le moteur qui
+actionne la mèche, des
+
+22
+00:01:14,009 --> 00:01:20,024
+pièces ici, à percer, et finalement un
+moteur ici, qui entraîne
+
+23
+00:01:20,024 --> 00:01:23,962
+un axe et qui va faire bouger dans un sens
+et dans l'autre cette perceuse.
+
+24
+00:01:23,962 --> 00:01:26,638
+Vous vous souvenez qu'on avait placé
+également des
+
+25
+00:01:26,638 --> 00:01:29,774
+interrupteurs de fin de course en bas, et
+en
+
+26
+00:01:29,774 --> 00:01:32,216
+haut, et qu'il y avait également un bouton
+
+27
+00:01:32,216 --> 00:01:35,470
+start qui permettait à l'ouvrier de
+démarrer le cycle.
+
+28
+00:01:35,470 --> 00:01:40,590
+Nous avions donc un système avec trois
+entrées, start, bas
+
+29
+00:01:40,590 --> 00:01:44,951
+et haut, avec les deux sorties qui
+commandent le moteur,
+
+30
+00:01:44,951 --> 00:01:49,550
+avance" et recule et ici vous trouvez le
+graphe d'état avec
+
+31
+00:01:49,550 --> 00:01:54,380
+ces trois états qui décrivent le
+fonctionnement de cette machine d'état.
+
+32
+00:01:54,380 --> 00:01:59,410
+Je rappelle juste que nous avions trouvé
+une solution un peu compliquée,
+
+33
+00:01:59,410 --> 00:02:04,244
+avec deux bascules qui mémorisaient
+l'état, avec un
+
+34
+00:02:04,244 --> 00:02:09,488
+système combinatoire qui, à partir de
+l'état présent, et des entrées,
+
+35
+00:02:09,488 --> 00:02:13,965
+calculait les nouveaux états, et une
+horloge qui permettait
+
+36
+00:02:13,965 --> 00:02:17,522
+d'avoir ce calcul en permanence, et nous
+avions tenté d'écrire
+
+37
+00:02:17,522 --> 00:02:19,862
+un programme, je pense que vous n'aviez
+pas compris
+
+38
+00:02:19,862 --> 00:02:22,760
+grand chose puisque nous n'avions pas
+encore appris tout cela.
+
+39
+00:02:22,760 --> 00:02:25,876
+Ce programme, maintenant vous êtes
+capables de
+
+40
+00:02:25,876 --> 00:02:28,090
+le lire, il a été écrit d'une manière
+
+41
+00:02:28,090 --> 00:02:30,410
+un petit peu brute, ici la lecture
+
+42
+00:02:30,410 --> 00:02:35,030
+des valeurs, ici le calcul du système
+combinatoire,
+
+43
+00:02:35,030 --> 00:02:39,770
+ici la mémorisation des valeurs, et
+finalement les sorties.
+
+44
+00:02:39,770 --> 00:02:44,537
+C'est un programme qui en plus, n'est pas
+bien écrit, donc on va rapidement passer à
+
+45
+00:02:44,537 --> 00:02:46,054
+la suite et essayer de trouver quelque
+chose
+
+46
+00:02:46,054 --> 00:02:47,910
+de beaucoup plus lisible, de beaucoup plus
+clair.
+
+47
+00:02:47,910 --> 00:02:54,242
+Les instructions du langage C peuvent être
+décrites par des organigrammes et souvent
+
+48
+00:02:54,242 --> 00:02:58,970
+lorsqu'on a envie de programmer, on
+commence par réfléchir à l'organigramme.
+
+49
+00:02:58,970 --> 00:02:59,630
+Donc,
+
+50
+00:02:59,630 --> 00:03:04,878
+comment passer de notre graphe d'état à un
+organigramme.
+
+51
+00:03:04,878 --> 00:03:09,300
+Alors, voilà ici une solution qui résout
+le problème.
+
+52
+00:03:09,300 --> 00:03:14,066
+On voit bien qu'on doit mettre les valeurs
+0 0
+
+53
+00:03:14,066 --> 00:03:18,110
+lorsqu'on est à l'arrêt, c'est ce qu'on a
+fait ici.
+
+54
+00:03:18,110 --> 00:03:22,440
+Et on doit ensuite attendre de franchir
+cette transition.
+
+55
+00:03:22,440 --> 00:03:24,636
+Pour attendre, il va falloir utiliser une
+
+56
+00:03:24,636 --> 00:03:29,649
+structure de ce type-là, si la condition
+start n'est pas réalisée,
+
+57
+00:03:29,649 --> 00:03:34,250
+on revient sur le test, si la condition
+est réalisée, on
+
+58
+00:03:34,250 --> 00:03:38,855
+passe à la suite.
+On voit bien qu'ici ça correspond à l'état
+
+59
+00:03:38,855 --> 00:03:44,030
+descente avec ses 2 valeurs, de la même
+manière, on attend
+
+60
+00:03:44,030 --> 00:03:49,816
+qu'on soit arrivé en bas et puis, on
+arrive à la montée, et on
+
+61
+00:03:49,816 --> 00:03:53,050
+attend qu'on soit arrivé en haut.
+
+62
+00:03:53,050 --> 00:03:58,886
+Il y a bien évidemment une boucle ici qui
+permet de revenir
+
+63
+00:03:58,886 --> 00:04:04,050
+au début de l'opération et qui permet à
+l'ouvrier de fabriquer une seconde pièce.
+
+64
+00:04:04,050 --> 00:04:09,620
+Vous remarquez que nous avons quatre
+boucles
+
+65
+00:04:09,620 --> 00:04:15,300
+dans ce système, oui j'ai bien dit quatre,
+c'est vrai qu'on voit bien la première,
+
+66
+00:04:15,300 --> 00:04:18,810
+la deuxième, et la troisième, mais il ne
+faut
+
+67
+00:04:18,810 --> 00:04:23,316
+pas oublier cette quatrième, qui est
+également une boucle.
+
+68
+00:04:23,316 --> 00:04:29,194
+Dailleurs vous pouvez compter les flèches
+montantes : 1, 2, 3 et 4, les flèches
+
+69
+00:04:29,194 --> 00:04:34,010
+montantes montrent systématiquement qu'il
+s'agit d'une boucle.
+
+70
+00:04:34,010 --> 00:04:37,506
+Nous avons un organigramme, nous n'avons
+pas encore
+
+71
+00:04:37,506 --> 00:04:40,430
+un programme en C, je rappelle qu'en C
+nous
+
+72
+00:04:40,430 --> 00:04:45,704
+avons un certain nombrre de structures,
+des structures du type boucle, avec
+
+73
+00:04:45,704 --> 00:04:51,004
+le while et le do while, qui se
+ressemblent, simplement le
+
+74
+00:04:51,004 --> 00:04:54,486
+test se trouve une fois au début et une
+fois à la
+
+75
+00:04:54,486 --> 00:04:58,700
+fin, et on a une structure de test qui
+s'appelle le if.
+
+76
+00:04:58,700 --> 00:05:01,980
+Il est nécessaire de trouver une analogie
+entre
+
+77
+00:05:01,980 --> 00:05:06,755
+l'organigramme que nous avons écrit et les
+instructions
+
+78
+00:05:06,755 --> 00:05:12,273
+que nous allons exécuter.
+Prenons, par exemple, cette boucle.
+
+79
+00:05:12,273 --> 00:05:14,680
+On connaît les while et les do while.
+
+80
+00:05:14,680 --> 00:05:17,696
+Avec les while et les do while, on a
+
+81
+00:05:17,696 --> 00:05:22,241
+le test d'une condition, et on a une
+instruction.
+
+82
+00:05:22,241 --> 00:05:26,390
+Dans ce cas-là l'instruction n'existe pas.
+
+83
+00:05:26,390 --> 00:05:29,870
+C'est pas grave, il suffira de mettre une
+instruction vide.
+
+84
+00:05:29,870 --> 00:05:32,110
+Donc, on va effectivement ici,
+
+85
+00:05:32,110 --> 00:05:36,930
+pour cette partie là, écrire quelque chose
+du type while,
+
+86
+00:05:36,930 --> 00:05:42,080
+mettre la condition start, et
+
+87
+00:05:42,080 --> 00:05:46,810
+ne rien exécuter.
+
+88
+00:05:46,810 --> 00:05:52,105
+C'est vraiment juste, ce que j'ai fait?
+Non,
+
+89
+00:05:52,105 --> 00:05:57,636
+c'est faux, parce que, ici, la condition
+
+90
+00:05:57,636 --> 00:06:02,333
+start doit ne pas être vérifiée, pour
+boucler,
+
+91
+00:06:02,333 --> 00:06:07,266
+c'est donc indispensable ici de dire, tant
+que on
+
+92
+00:06:07,266 --> 00:06:12,396
+n'a pas de start, alors, on doit
+
+93
+00:06:12,396 --> 00:06:17,367
+reprendre, continuer la boucle.
+La suite du
+
+94
+00:06:17,367 --> 00:06:22,980
+programme est similaire, et il faudra
+évidemment ne pas oublier de mettre
+
+95
+00:06:22,980 --> 00:06:25,265
+un while 1 pour cette boucle qui elle n'a
+pas
+
+96
+00:06:25,265 --> 00:06:28,340
+de condition, n'a pas de test, c'est une
+boucle permanente.
+
+97
+00:06:28,340 --> 00:06:30,144
+Voilà donc un programme.
+
+98
+00:06:30,144 --> 00:06:34,736
+On y voit les trois boucles qui
+correspondent à l'attente pour les
+
+99
+00:06:34,736 --> 00:06:37,702
+transitions et puis évidemment la boucle
+
+100
+00:06:37,702 --> 00:06:41,200
+principale ici, while 1, boucle
+permanente.
+
+101
+00:06:41,200 --> 00:06:43,972
+Ce que j'ai écrit ici en rose n'est pas
+
+102
+00:06:43,972 --> 00:06:47,440
+tout à fait du C, dépêchons-nous de
+corriger ça.
+
+103
+00:06:47,440 --> 00:06:47,992
+Avec ce
+
+104
+00:06:47,992 --> 00:06:54,315
+qu'on vient d'apprendre, on voit qu'on
+peut écrire d'une manière très semblable.
+
+105
+00:06:54,315 --> 00:06:57,705
+Alors voilà une solution qui maintenant
+est du C, j'ai
+
+106
+00:06:57,705 --> 00:07:03,099
+remplacé cette écriture qui n'était pas
+acceptable, par cette syntaxe
+
+107
+00:07:03,099 --> 00:07:07,975
+là, donc il va falloir créer des
+procédures avance et recule
+
+108
+00:07:07,975 --> 00:07:13,252
+auxquelles on passe des paramètres et
+également une procédure
+
+109
+00:07:13,252 --> 00:07:17,412
+qui s'appelle start, et la même chose pour
+bas
+
+110
+00:07:17,412 --> 00:07:20,365
+et haut qui sont les procédures qui vont
+nous
+
+111
+00:07:20,365 --> 00:07:23,920
+rendre une valeur qui va permettre de
+connaître l'état
+
+112
+00:07:23,920 --> 00:07:27,660
+du bouton "start" et des interrupteurs de
+fin de course.
+
+113
+00:07:27,660 --> 00:07:31,650
+Alors, étant donné les choix que j'ai
+faits pour
+
+114
+00:07:31,650 --> 00:07:37,390
+cette syntaxe, avance", "recule", start,
+haut et bas, et cetera.
+
+115
+00:07:37,390 --> 00:07:38,650
+eh bien il a fallu
+
+116
+00:07:38,650 --> 00:07:41,790
+auparavant donner un certain nombre de
+définitions,
+
+117
+00:07:41,790 --> 00:07:45,150
+ici la procédure avance, je lui passe
+
+118
+00:07:45,150 --> 00:07:48,864
+un paramètre du type entier, j'exécute un
+
+119
+00:07:48,864 --> 00:07:52,866
+digitalWrite avec le numéro de la patte
+correspondant
+
+120
+00:07:52,866 --> 00:07:58,562
+à avant, qui a été défini ici, mais on a
+décidé d'utiliser la patte P1 souligné
+
+121
+00:07:58,562 --> 00:08:03,885
+0 la même chose, évidemment pour recule,
+et puis maintenant pour les entrées j'ai
+
+122
+00:08:03,885 --> 00:08:05,994
+pris l'exemple de start, il s'agit aussi
+
+123
+00:08:05,994 --> 00:08:08,274
+d'une procédure, mais cette fois qui rend
+une
+
+124
+00:08:08,274 --> 00:08:12,610
+valeur, pour qu'elle puisse être utilisée
+à l'intérieur
+
+125
+00:08:12,610 --> 00:08:15,540
+de la condition de la boucle, et cette
+
+126
+00:08:15,540 --> 00:08:22,048
+procédure rend, c'est donc le paramètre de
+sortie, une valeur qui est la lecture de
+
+127
+00:08:22,048 --> 00:08:24,868
+la patte start, la patte start a été
+
+128
+00:08:24,868 --> 00:08:28,968
+définie ici, c'est P1 souligné 3, vous
+remarquez
+
+129
+00:08:28,968 --> 00:08:32,160
+ici le point d'exclamation qui met en
+évidence le
+
+130
+00:08:32,160 --> 00:08:35,990
+fait que le start est actif à 0, puisque
+
+131
+00:08:35,990 --> 00:08:40,978
+l'interrupteur est câblé contre la masse,
+c'est ce qu'on
+
+132
+00:08:40,978 --> 00:08:42,273
+fait généralement lorsqu'on utilise un
+
+133
+00:08:42,273 --> 00:08:43,960
+interrupteur comme entrée d'un
+microcontrôleur.
+
+134
+00:08:43,960 --> 00:08:47,700
+Voilà ici l'ensemble de ce programme.
+
+135
+00:08:47,700 --> 00:08:54,016
+L'essentiel se trouve ici, on peut se
+concentrer sur
+
+136
+00:08:54,016 --> 00:08:58,548
+la lecture de ce programme et comprendre
+comme il fonctionne, tout le reste,
+
+137
+00:08:58,548 --> 00:09:00,570
+ce sont des définitions, et des
+
+138
+00:09:00,570 --> 00:09:04,038
+initialisations, il faut bien évidemment
+qu'elles aient
+
+139
+00:09:04,038 --> 00:09:08,544
+été faites correctement pour que le
+programme marche, mais du point de vue
+
+140
+00:09:08,544 --> 00:09:13,120
+de la logique, on peut se concentrer sur
+cette partie-là du programme principal.
+
+141
+00:09:13,120 --> 00:09:15,280
+Dans le cas que nous venons de
+
+142
+00:09:15,280 --> 00:09:20,026
+voir, c'était relativement facile de faire
+l'organigramme
+
+143
+00:09:20,026 --> 00:09:23,422
+qui correspondait à notre graphe d'état,
+mais
+
+144
+00:09:23,422 --> 00:09:27,090
+dans beaucoup de cas, c'est extrêmement
+compliqué.
+
+145
+00:09:27,090 --> 00:09:33,190
+Imaginez un graphe d'état avec 50 états,
+avec des transitions dans tous les sens,
+
+146
+00:09:33,190 --> 00:09:37,220
+trouver l'organigramme correspondant,
+c'est extrêmement compliqué.
+
+147
+00:09:37,220 --> 00:09:38,732
+Et pire que ça, quand vous croyez
+
+148
+00:09:38,732 --> 00:09:41,780
+l'avoir trouvé, êtes-vous vraiment sûr
+qu'il est correct?
+
+149
+00:09:41,780 --> 00:09:45,115
+On va donc chercher une toute autre
+méthode, qui va
+
+150
+00:09:45,115 --> 00:09:47,392
+nous permettre de réaliser une machine
+
+151
+00:09:47,392 --> 00:09:50,230
+d'état, je dirais presque, les yeux
+fermés.
+
+152
+00:09:50,230 --> 00:09:55,155
+Alors, je reprends mon graphe d'état, et
+cette fois
+
+153
+00:09:55,155 --> 00:09:59,430
+je vais tenter de passer directement à un
+programme.
+
+154
+00:09:59,430 --> 00:10:02,190
+Alors qu'est-ce que je vais faire?
+
+155
+00:10:02,190 --> 00:10:06,589
+Je vais essayer de faire une boucle, dans
+laquelle je me pose la
+
+156
+00:10:06,589 --> 00:10:10,327
+question : est-ce que je suis dans l'état
+arrêt, est-ce que je dans l'état
+
+157
+00:10:10,327 --> 00:10:14,145
+descente, est-ce que je suis dans l'état
+montée, et, selon que je
+
+158
+00:10:14,145 --> 00:10:18,314
+suis dans l'un ou l'autre de ces états, je
+vais alors faire
+
+159
+00:10:18,314 --> 00:10:21,720
+ce qui doit être fait au niveau des
+sorties, et tester ce
+
+160
+00:10:21,720 --> 00:10:25,840
+qui doit être testé au niveau des entrées
+pour effectuer les transitions.
+
+161
+00:10:25,840 --> 00:10:30,432
+Première chose, je n'ai pas du tout envie
+d'appeler les états,
+
+162
+00:10:30,432 --> 00:10:35,396
+l'état 0, l'état 1, l'état 2, je préfère
+utiliser la symbolique qui
+
+163
+00:10:35,396 --> 00:10:38,390
+nous est proposée par le C, avec la
+fonction enum.
+
+164
+00:10:38,390 --> 00:10:43,664
+Je vous rappelle que une constante a été
+déclarée, une deuxième constante, une
+
+165
+00:10:43,664 --> 00:10:47,575
+troisième constante, qui s'appellent
+arrêt, descente,
+
+166
+00:10:47,575 --> 00:10:50,121
+et montée, elles vont prendre des valeurs,
+
+167
+00:10:50,121 --> 00:10:55,260
+probablement la valeur 0, la valeur 1, et
+la valeur 2, mais ça n'a aucune importance
+
+168
+00:10:55,260 --> 00:11:00,921
+pour celui qui programme, et alors ici,
+j'ai une variable
+
+169
+00:11:00,921 --> 00:11:06,374
+d'état, cette variable d'état, elle va
+être initialisée à
+
+170
+00:11:06,374 --> 00:11:11,870
+arrêt, au début, le système doit être
+arrêté au démarrage.
+
+171
+00:11:11,870 --> 00:11:16,840
+Je trouve ensuite cette boucle infinie,
+notez
+
+172
+00:11:16,840 --> 00:11:19,720
+qu'elle est totalement différente de la
+boucle infinie
+
+173
+00:11:19,720 --> 00:11:22,134
+que nous avions tout à l'heure, parce que
+
+174
+00:11:22,134 --> 00:11:25,830
+cette boucle va s'exécuter à très grande
+vitesse,
+
+175
+00:11:25,830 --> 00:11:30,560
+puisque, il n'y a que quelques if, il n'y
+a pas d'attente, il
+
+176
+00:11:30,560 --> 00:11:35,500
+n'y a pas de while dans ce programme, dans
+cette boucle while 1.
+
+177
+00:11:35,500 --> 00:11:39,208
+Alors, je vais ensuite donc regarder si je
+
+178
+00:11:39,208 --> 00:11:42,498
+suis à l'arrêt, il faudra faire un certain
+nombre
+
+179
+00:11:42,498 --> 00:11:44,816
+de choses, à la descente, il faudra faire
+un
+
+180
+00:11:44,816 --> 00:11:48,180
+certain nombre de choses, ou encore, à la
+montée.
+
+181
+00:11:48,180 --> 00:11:51,296
+Entrons maintenant un peu plus dans le
+détail
+
+182
+00:11:51,296 --> 00:11:56,224
+de ce qui se passe, par exemple, pour
+l'état descente, je dois,
+
+183
+00:11:56,224 --> 00:12:01,408
+évidemment, m'occuper des sorties qui
+prennent les valeurs qui
+
+184
+00:12:01,408 --> 00:12:05,166
+sont notées ici, et la deuxième chose qui
+sera à faire,
+
+185
+00:12:05,166 --> 00:12:09,600
+ce sera de s'occuper de la transition qui
+quitte la descente.
+
+186
+00:12:09,600 --> 00:12:12,984
+Les autres transitions ne nous concernent
+pas, mais,
+
+187
+00:12:12,984 --> 00:12:16,485
+cette transition-là, comme elle a sa
+source dans
+
+188
+00:12:16,485 --> 00:12:21,398
+la descente, elle part de descente, eh
+bien je dois m'en occuper, et
+
+189
+00:12:21,398 --> 00:12:25,315
+ici il s'agit d'un test, si on est arrivé
+en bas, alors on
+
+190
+00:12:25,315 --> 00:12:30,950
+va changer d'état et j'assigne état à la
+nouvelle valeur
+
+191
+00:12:30,950 --> 00:12:36,130
+montée, qui donc est une constante qui a
+été déclarée par l'enum qui se trouve ici.
+
+192
+00:12:36,130 --> 00:12:41,526
+Voilà maintenant l'ensemble de notre
+programme, remarquez que j'ai utilisé une
+
+193
+00:12:41,526 --> 00:12:46,651
+autre syntaxe que cette succession de if
+qui était un petit peu lourde, c'était une
+
+194
+00:12:46,651 --> 00:12:51,770
+excellente occasion d'essayer le switch
+case, avec
+
+195
+00:12:51,770 --> 00:12:56,540
+ici les trois états possibles, Vous
+
+196
+00:12:56,540 --> 00:13:01,696
+remarquez que je n'ai pas utilisé le
+default, je sais
+
+197
+00:13:01,696 --> 00:13:06,701
+en effet que la variable état ne prendra
+jamais d'autres valeurs
+
+198
+00:13:06,701 --> 00:13:11,778
+que arrêt, descente et montée, puisqu'elle
+est complètement contrôlée
+
+199
+00:13:11,778 --> 00:13:16,990
+par notre programme, elle est initialisée
+à l'arrêt au départ, elle prend,
+
+200
+00:13:16,990 --> 00:13:20,660
+la valeur descente, la valeur montée, ou
+la valeur arrêt
+
+201
+00:13:20,660 --> 00:13:24,730
+dans le cours du programme, donc le
+default n'est pas nécessaire.
+
+202
+00:13:24,730 --> 00:13:27,489
+Par contre, je mets bien en évidence
+
+203
+00:13:27,489 --> 00:13:32,580
+la nécessité d'utiliser les break, sinon,
+si j'oubliais
+
+204
+00:13:32,580 --> 00:13:39,197
+ce break, alors j'exécuterais toutes ces
+instructions, même
+
+205
+00:13:39,197 --> 00:13:42,174
+dans le cas où je me trouve à l'arrêt.
+
+206
+00:13:42,174 --> 00:13:47,720
+C'est une curiosité de cette structure
+switch, et on l'utilise presque toujours
+
+207
+00:13:47,720 --> 00:13:53,110
+avec les break, qui permettent de sortir
+de la structure switch.
+
+208
+00:13:53,110 --> 00:13:57,863
+Voilà ici le programme complet, qui donc
+fonctionne avec
+
+209
+00:13:57,863 --> 00:14:04,359
+un Arduino, ici je l'ai programmé pour
+l'Energia, donc avec le MSP430
+
+210
+00:14:04,359 --> 00:14:10,330
+étant donné que j'ai fait le choix
+d'utiliser le main et de faire moi-même le
+
+211
+00:14:10,330 --> 00:14:14,200
+while 1, je dois rajouter cette
+instruction
+
+212
+00:14:14,200 --> 00:14:17,180
+mystérieuse dont nous avons déjà parlé, et
+
+213
+00:14:17,180 --> 00:14:20,330
+dont, simplement, il faut se souvenir
+qu'elle
+
+214
+00:14:20,330 --> 00:14:23,682
+est indispensable dans la plupart des
+programmes.
+
+215
+00:14:23,682 --> 00:14:27,730
+Nous sommes donc parvenus à programmer
+notre machine d'état,
+
+216
+00:14:27,730 --> 00:14:31,260
+avec une technique qui, cette fois, est
+beaucoup plus simple.
+
+217
+00:14:31,260 --> 00:14:34,500
+Tout l'effort doit être fait pour dessiner
+le graphe
+
+218
+00:14:34,500 --> 00:14:39,168
+d'état, par contre, ensuite, partir du
+graphe d'état pour écrire
+
+219
+00:14:39,168 --> 00:14:44,070
+le programme, c'est tout à fait simple, il
+faut énumérer
+
+220
+00:14:44,070 --> 00:14:49,125
+les états, il faut faire une structure
+dans la boucle
+
+221
+00:14:49,125 --> 00:14:53,606
+principale, du type switch qui permet de
+choisir chacun
+
+222
+00:14:53,606 --> 00:14:57,500
+des états, il faut ensuite actionner les
+sorties pour
+
+223
+00:14:57,500 --> 00:15:00,004
+chacun des états, et il faut ensuite
+programmer les
+
+224
+00:15:00,004 --> 00:15:08,080
+transitions pour chacune des transitions
+qui concernent chaque état.

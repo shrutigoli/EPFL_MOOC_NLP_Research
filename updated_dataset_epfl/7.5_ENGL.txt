@@ -1,0 +1,131 @@
+Welcome back.
+This is final module for this week on virtualization.
+This is actually an optional module so feel free to skip if you're short on time.
+And this is a case study on the original
+VMware Workstation product, which is a system
+I worked on in '98 and '99.
+Now, at the time we were not interested in publishing papers.
+We were building a product for a commercial company.
+And so, the paper was written in 2012, so I had the chance to write this with a little bit of the benefit of hindsight.
+This paper is not on the mandatory reading list for this week.
+But back in 1999, we had a number of challenges.
+And the first challenge that we identified was that the x86 architecture was actually not virtualizable.
+So we learned in the previous modules of the importance of Popek/Goldberg theorem.
+And I also gave you a little bit of a sense that people had forgotten about that theorem.
+Indeed, when it came to the x86 architecture, the 32-bit architecture at the time, it was clearly not virtualizable.
+There were 17 instructions that grossly violated the Popek and Goldberg criteria.
+And this was a problem.
+This was not just a theoretical problem, this was an actual pragmatic, practical problem because our goal was to run on modified operating systems, and in particular, our first goal was to run
+Windows in virtual machines.
+Now the second challenge that we identified was that the x86 architecture is of daunting complexity and for any one of you who's actually dealt with x86 at the assembly level you probably have a sense of what I'm talking about.
+If you think about this from a systems perspective, the reality gets even worse.
+There is an unbounded combination of protections, segmentation, paging, execution mode mechanism, that overlap with very bizarre semantics.
+The list is actually not something that I can enumerate in my head.
+And none of the modes, except one minor 16-bit backward compatibility mode called Virtual 8086 were virtualizable according to the Popek and Goldberg criteria.
+But beyond that, there were additional challenges that we identified.
+We were trying to start a small company and we were trying to introduce the notion of running virtual machines on x86 systems and we realized very quickly that the diversity of peripherals was going to be a very significant issue because it's one thing to virtualize the x86 CPU.
+It's one thing to use
+Shadow page tables to virtualize memory which are the two multiplexing techniques I've talked about.
+But when you actually build the real products you realize that you also need to do I/O and you need to do I/O in a very broad sort of platform so this can very quickly be challenging.
+And finally we also recognized early on that we needed to have a very simple user experience so that people could actually test out the product without actually having to reinstall their systems.
+And all of these challenges, these four main higher-order challenges, all fed into critical design points of the emerald workstation.
+And of those points,
+I'm going to focus on two of these contributions.
+The first one is the contribution on how to create a type II
+Virtual Machine Monitor that can run on top of an operating system like Linux or Windows.
+The type I vs. type II classification was originally designed at a time when operating systems were running... where the protection, the notion of protection was actually different than it is today.
+Now by building a type II system, and by going after a type II system, we actually, off the bat, can address the issue of device diversity and the user experience simply because the host operating system is in charge of device diversity and the host operating system can present the experience of, a simple experience of running a virtual machine monitor as an application.
+And then the second challenge that we faced obviously was how to virtualize x86 in the context of these sets of instructions that failed the Popek and Goldberg criteria.
+So let's talk about these two contributions.
+The first contribution is really aimed at providing a simple user experience.
+So we run as a type II hypervisor.
+So, logically speaking, and from a learning perspective the host operating system is in full control of virtualization layer, which is the VMR software, runs as an application on top of the host operating system.
+And it is in full control of the virtual machines so the guest operating system in the applications run inside the virtual machine.
+And then obviously, the application runs under the control of the guest operating system.
+So you have very nice
+Russian doll-type diagram here that illustrates the layered relationship between the different entities in the system.
+Of course, the challenge is how do you actually build that and how do you build that in a way that is fast.
+So our solution to that challenge was actually to break the VMware software into different components.
+If you look at the picture right now, what you see is the CPU, the host operating system, and any arbitrary application running on top of the host operating system making system calls to that host operating system.
+While VMware rather than being one piece of software is actually broken up into multiple components the user perceives the application to be exclusively running as an application on top of that same host operating system, making system calls like any other application would.
+But in reality that application is really just a proxy for the Virtual Machine Monitor.
+And the Virtual Machine Monitor runs in an environment in which the host operating system is actually no longer present in memory.
+So we have an environment where we have two context: the host context and the VMM context.
+And we have the ability to switch between these two context.
+We actually call that switch,
+"the world switch," because it's much more than a process switch.
+It is a complete switch of the address spaces.
+To the point that when you're running in the VMM context, the host context is no longer present in the address space of the CPU and vice versa.
+If you're running in the host context, then the VMM is no longer [inaudible] into the address space of the CPU.
+Now, surprisingly, that implementation can actually be extremely efficient.
+You can switch between these context with something that costs just a little bit more than a normal context switch between two processes.
+And by running into the VMM context and effectively by throwing the host operating system out of the system at least for some amount of time, then the VMM has the full flexibility to reconfigure the hardware and meet exactly the requirements that it needs in order to efficiently run a virtual machine.
+And so the system goes back and forth between these two.
+If you're interested there are details in the paper as to when we actually go back and forth between these two.
+We do it whenever the VMM needs to make a request on behalf of the virtual machine that has access to a system resource, like sending a network package or doing Disk I/O in which case, that is done by the application, the VMX application.
+And also whenever there is an I/O interrupt, we restore context from the VMM back to the host, so that the operating system can handle all device interrupts, as if it was always in full control over the system.
+And the magic trick to make that happen is to have a little Kernel driver that runs within the operating system that does this.
+So this was the first challenge.
+The second challenge is the virtualization of the x86 architecture.
+Now, because we now understand the Popek and Goldberg theorem, we know that we cannot use the classic technique, and the classic technique was simply to use "trap-and-emulate," and we know that this is not possible.
+So, at the same time we also know that we need to support binary compatibility.
+So, the critical observation behind the second contribution of VMware is that most of these x86 sensitive instructions are only sensitive when executing system software.
+So, the instruction can be sensitive, based on the level that it is expected to run at, or it cannot be sensitive, in certain cases.
+It turns out that most of these instructions are sensitive when they're running in a kernel, but they're not sensitive when they're running in the application.
+And when I say "kernel" and "the application" and when I say "system software," we're using extremely loose definitions of these terms up until now.
+And so our high-level solution is to use a combination of two techniques.
+The first one is the well-known trap-and-emulate technique, but we only use that whenever that is possible and we specifically only use that when these sensitive instructions are not sensitive.
+For the current point in time.
+And when that's not the case, then we must rely on another technique, which is the big hammer of computer systems, which is the emulation layer.
+So we use an emulation technique known as binary translation to convert the original instruction stream, which is an x86 instruction stream, into a converted x86 instruction stream, in which faithfully emulate the semantics of all instructions including the sensitive one.
+So I mentioned the term binary translation.
+Let me just give you one slide on what I mean by that.
+This is a technique in which a dynamic compiler running as part of the VMM converts a basic block of virtual machine instructions, so this is an x86 instruction sequence, and it converts it into another instruction sequence that can be executed directly in the CPU in a way that is safe and that faithfully emulates the semantics of the architecture.
+Now, compilation is expensive.
+Translation is expensive, so you want to minimize how often this is done.
+So there's a large data structure called a translation cache, which is a buffer that holds these translations, and then there's a main, a high-level dispatch function, which basically allows you to jump into the translation cache and start executing instructions directly.
+And then there are a large number of optimizations that make it efficient in particularly the ability to go directly from one basic block to another basic block within the translation cache.
+Now, the challenge in a binary translation system, and these are systems that have been prominently used for simulation purposes, is they have something like a 5x to a 10x slowdown.
+If you're familiar with the QEMU binary translator, those are the type of performance numbers that you should expect.
+And obviously a 5x to 10x slowdown is completely incompatible with a virtual machine monitor.
+And so our solution to building an efficient binary translator was to actually specifically configure the hardware and use the hardware to avoid many of the software overheads and in particular the result we were able to achieve is one in which most of the instructions are translated one-to-one.
+So, in this example,
+I have a basic block with three instructions.
+The first two instructions, which are representative of innocuous instructions that simply manipulate memory, had to be converted on a one-to-one basis.
+And that is actually not the traditional output of a binary translator that is running a full system simulation because it needs to do bounce checks and indirections and other things.
+Now, the reason we don't need to do bounce checks is because we've configured the hardware to do the bounce checks on our behalf.
+Now there's a third instruction that actually does require an expansion.
+In this case, I took sort of a complicated example.
+This is a registered indirect call that expands into a stub, followed by a jump to another function that actually will do the work.
+Now, what you actually see in this stub is a couple of instructions that use a specific register and that register is called "gs," and it's a segment register.
+And that segment register was reserved by the binary translator only to be used on behalf of the VMM.
+So, the virtual machine cannot directly access that register and that register gives you access to sort of memory that is not otherwise available.
+And that is the basic trick that allows us to operate without any form of software fault isolation.
+Now, sandboxing is when the virtual machine uses normal segments, these segments are truncated so that they never overlap with the VMM portion.
+And if there's any attempt that we actually need to emulate that attempt.
+Conversely, the binary translator has, using this gs register, the ability to access locations and memory that are not otherwise available to regulate instruction.
+So again, we use hardware in order to make the binary translator efficient.
+Now, having a trap-and-emulate system and having a binary translator itself, is actually not sufficient to the technical result.
+The key technical result is actually a decision algorithm which determines when direct execution is possible and conversely when binary translation is necessary.
+And that decision algorithm, one of its interesting characteristics is that it can execute in constant time.
+It does not require any inspection of the instruction stream.
+It's not a function of the architecturally-defined registers.
+It's only a function of the system-defined register state as well as the segment state of the system.
+So for example, if the virtual machine is in a state where it runs in kernel mode, or it it's in a state where it can disable interrupts, then direct execution is not possible because you could get to the point where you could actually take over the entire system.
+However, if you're running an application space and if you're running in a mode in which you cannot disable interrupts in application states, which is true of 99.99% of applications running on top of an operating system, then you can actually use direct execution.
+But that's only one of the many criteria.
+There are other criteria.
+For example, you have to be running in protected mode, or have to be running in virtual 8086 mode, there's some legacy modes in the systems which were commonly used at the time that are not virtualizable, and whenever you're in one of those legacy modes then you need to use binary translation at all times.
+And in final, there's a final technical complication which has to do with the reversibility of segments which I will not go into.
+So, if you put those together, you actually end up with a decision algorithm, a set of constraint problems, and if all the constraints are met, then direct execution is possible.
+If any of the constraints are not met then binary translation must be used.
+And so the definition of system software is actually, at least in our current terminology at the time, the definition of system software was software that actually required binary translation, and conversely, application software was application that actually could take advantage of the direct execution techniques and the trap-and-emulate techniques.
+There are many details for that in the paper.
+The good news is that those definitions of system software versus application software largely overlap with what we commonly understand as applications and operating systems today
+Now, the good news is that that level complexity is no longer required today and that is because in 2005
+AMD and Intel both introduced hardware support for virtualization
+So basically an extension of the architecture that actually finally met the Popek and Goldberg criteria.
+And the way this was done is by deduplicating the four protection rings available in protection mode of the architecture so that you could actually run virtual machines running the full 64-bit, x86 extended instructions and architecture in virtual machine, on top of a virtual machine monitor that only used trap-and-emulate technique and did not require extensive forms of binary translation.
+And with that, this is the wrap for both this module and this week on virtualization.
+I look forward to discussion section.
+Thank you.

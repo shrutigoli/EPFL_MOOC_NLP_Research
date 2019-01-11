@@ -1,0 +1,225 @@
+Welcome back Nature, in Code.
+We're in Chapter 3, Lecture 10.
+In the previous lectures, we implemented genetic drift simulations in javascript and then plotted the results and everything works beautifully so far.
+So what we like to do now is to extend this a little bit and actually plot multiple simulations in one figure.
+So how are we going to do this?
+Well, we need two-dimensional arrays and we briefly touched upon them in the previous lecture.
+In this video, we'll extend our genetic drift simulation to multiple simulations using two-dimensional arrays
+So let's get going.
+What we have at the moment is this data array.
+This data array contains many values like 0.49, 0.48,
+0.485, and so on-- many, many values. in fact, it contains exactly a thousand values.
+Okay, so there's going to be
+1000 data points, and this corresponds to one simulation.
+And then we're essentially plotting those 1000 data points.
+This is what we're doing already.
+Now we'd like to extend this, and we'd like to gave ten simulations for example, or 20 or hundreds, but let's focus on the assumption that we'll have ten simulations.
+So ten simulations, and each of those simulations will have 1000 data points.
+So how do we store this?
+Well, we could just store 10,000 data points into a one-dimensional array but that's not a good way to structure this.
+The better way to structure this is to say, "Well, our data array will contain itself ten arrays."
+So ten arrays-- we're not going to draw ten here but we'll have ten elements here... okay, ten arrays... that will be contained in this array.
+And then each of those arrays, alright, each of those will now have the values... 0.49, 0.48,
+0.47... whatever.
+1000 data points, just as we had before,
+1000 data points, which corresponds to one simulation.
+But all of this is now stored in one single array here, and this data array contains ten of those arrays.
+So we're have a 10 times 
+1000 elements array.
+The dimension of this data array will be 10 times 1000, then we can just simple pass this data array now to the plotting function.
+The plotting function is already programmed in such a way that it knows how to deal with this.
+Let's implement this in javascript.
+Here's our genetic drift simulation as it is at the moment.
+It simply has this array, values get pushed into this array, the P values, and then we're going to hand this data over to the Draw a Line Chart function and the data gets plotted.
+Now, we need to extend this code so that the data array will contain multiple arrays, that each contain simulation results.
+I'm going to go ahead and do this
+Let's say I like to have the code do ten simulations.
+So, this is currently a simulation, right?
+Because for however many times
+I have stored in generations, at the moment it's 1000,
+I'm going to call this 
+<i>Next Generation Function</i> and then that's it, that's one simulation.
+What I'm going to do is
+I'm going to wrap this loop here into a function, and I'm going to call this function, 
+"simulation" because it's essentially a single simulation.
+So, <i>simulation</i>... okay.
+And then I'm going to wrap this here, with curly brackets.
+Now, I'm going to cut this for loop and we're going to paste it back here using the correct indentation.
+It's the same loop that we had before, but now it's within a function.
+Now I can simply call this function ten times, and that of course I can do using, again, a loop.
+So I'm going to set up another loop here that says, <i>for var i = 0</i> so as usual,.
+And then let's say, let's do this ten times, and then increase the counter, obviously to avoid endless loops.
+Now, I'm simply going to call, simulation.
+Okay, so here now, 
+I'm calling this function, simulation ten times, and this simulations is essentially just a convenience function that calls "next generation," however many times we want it.
+So that's a good start, but now we need to adapt this function here, "next generation" to be able to deal with the fact that we can't just now mindlessly push p values into a data array.
+Otherwise, we would have this long array of ten thousand numbers.
+What we instead want, is we want ten arrays, one for each simulation, and then those ten arrays will get stored in the data array.
+So how do we do this?
+Well, first of all, the next generation function should not really have to deal with this.
+So what I'm going to do here is,
+I'm actually just going to correct-- hand the correct sub-array of the current simulation to this "next generation" function, and it will then push it there, and we have to sort out somewhere else where we deal with this.
+Basically, I'm asking "next generation" to take one value and I'm going to call this <i>simulation data</i>... simulation data...
+So one parameter here.
+And basically now, when I call this function
+I have to pass the correct data array for this current simulation.
+And then rather than pushing the p values here into data,
+I'm going to push it now into this simulation data.
+Let me copy this and then here,
+I'm just going to say, 
+"simulation data push p".
+So now, "next generation" is completely agnostic about this.
+It just will receive a data array here, and then when it's called as an argument, then it will push the p value that it calculates into this array.
+Now we have to simply deal with the fact that we should have ten of these arrays and they should be stored correctly in the data array.
+What we can do is, we have now here ten iterations, so we iterate ten times.
+So <i>i</i> here is really the counter for our simulations and therefore also, for our arrays.
+What I'm going to do is every time before I actually run a simulation,
+I'm going to push and new array into an empty array, into this data array.
+Okay, so like this.
+So now, every time before I run this simulation function, before I execute it,
+I'm pushing another empty array into the data array.
+That's great because at the end we want to have ten arrays in data, and each of those arrays, each of them being one simulation data array in the data array.
+Now, the only thing I have to take care of is I have to somehow make sure that when I call this
+"next generation" function, it passes on the correct simulation data array, the correct sub-array within data.
+Here in "next generation," 
+I need to pass now this array.
+It's going to be some array that is within data.
+So data will contain ten arrays, and so I can access this sub-array by simply accessing its element.
+How am I going to do this?
+Well, I'm simply going to say here things like, "data 0".
+That will now be the first element, which itself is an array, or I'm going to say "data 1" which is another array, or "data 2," and so on.
+What is the correct index here?
+Well, I need a way to figure out which simulation we're currently in.
+How do we know this?
+Well, of course know it down here, right?
+When <i>i</i> is 0, we're in the first simulation, and so the correct index would be zero.
+When <i>i</i> is 1, we're in the second simulation
+And so the correct index will be 1, and so on.
+What I'm going to do is,
+I'm going to pass this information, this <i>i</i> up to simulation.
+I'm going to pass <i>i</i> to simulation, in other words, I need to receive it here, so I'm going to find a parameter here, and I'm going to call this, 
+"parameter simulation counter" because that's what it is.
+And this simulation counter-- so first time it's going to be 0, the second time it's going to be 1, the third time it's going to be 2, and so on, that is going to be my index for the data array.
+I hope you understand how this works but I'll just briefly walk you through this, again.
+What's happening here is we're iterating ten times.
+Each iteration, the first thing I do is I push another empty array into the data array, and this is the one that should now contain all the values for this particular simulation.
+Then I'm going to call simulation, and I'm going to pass it the <i>i</i> value, just so that it knows, that simulation knows which iteration we're currently in.
+Okay, so in the beginning it's going to be zero.
+So this function gets called, this value will be passed on to "simulation counter," and now I'm going to call 
+"next generation" and I'm going to pass it the correct simulation array which is "data index simulation counter."
+So it's going to be 0 for the first simulation,
+1 for the second simulation, and so on, and 9 for the last simulation.
+And here, the "next generation" doesn't really care.
+Each just gets some array and it pushes the values into this.
+So, let's save this and see if everything works fine.
+Okay, I'm going to save it... and now we are going over to the browser.
+We're going to reload things here.
+And something works, but it looks a little weird.
+What do we have here?
+Let's reload this a couple of times.
+Oh, that looks interesting.
+So, we've made a mistake, and I've made it on purpose just to demonstrate.
+Look at what happens here, so we start, 0.5 and then quickly go to in order value.
+And then here, this simulation... the A1 allele doesn't go to fixation, neither does the A2, so we're here somewhere around 0.75.
+Then the next simulation seems to start at this value, eventually goes to fixation, and then the next simulation starts at 1.
+And of course, once you lost all genetic variation, there's no way to get it back at the moment because we don't have any other process, and we don't have mutation or anything like that.
+So there's something wrong here.
+If I reload this again a couple of times, you can see the same phenomenon.
+So the first simulation here in blue stops somewhere here, and then the next simulation mistakenly continues at this value.
+Let me reload this again,
+This is an interesting case, and none of the simulations actually goes to fixation.
+The fourth one goes and then it's over.
+Here's also a good example.
+The first simulation almost loses the A1 allele, ends here at around 0.1 after 1000 generation.
+Then the next simulation mistakenly starts at 0.1 and then quickly get the A1 quickly gets lost.
+How do we fix this?
+Let's go back to the code.
+The problem is we just keep pushing <i>p</i> into these arrays, so that seems to work, but we're actually never resetting <i>p</i> to 0.5.
+And of course, we have to do this, otherwise the next-- once the simulation is done, the next simulation will start at whichever value <i>p</i> is currently at.
+So here, what I'm going to do here in this simulation, when the function simulation gets executed, the first thing we do before we call next generation a thousand times, is we're going to set <i>p</i> back to 0.5.
+So we're going to reset <i>p</i>.
+Notice that I'm not using <i>var p</i>, and I hope you know now why because what I would like to do now here is I'm talking about the global-- the variable and the global scope, the one that we defined up here.
+That needs to get reset.
+If I would say <i>var p</i>, that wouldn't work because it would simply be a local variable that no one cares about.
+So, be careful to say here "p" because we're talking about this global "p" here.
+<i>P</i>, we're not defining a variable, we're simply overriding this p variable here, resetting it to 0.5
+Okay, by the way, something else we could do since we're resetting it here, we may also essentially get rid of this initialization because we're resetting it every time simulation gets called anyways, which is also the case in the first time we called the simulation function.
+Let's save this. Let's go over to the browser and let reload this.
+This looks much better now.
+You can see all of the simulations here start at 0.5,
+And all of these simulations now are independent of each other, correctly.
+And you can now really observe very interesting dynamics here.
+Here in this particular case, you can see that basically two of the simulations, you have a situation where one of the alleles goes to fixation and the other one gets lost in the population.
+Well, maybe it's three, it's not quite clear here, whatever this gray line goes to fixation, but let's reload this, let's take a look at another case.
+So here actually, quite a few go to fixations.
+1, 2, 3... 4 of the simulations go to fixation.
+It seems like the purple one here also goes to fixation or the A1 gets lost, but correspondingly, 2 goes to fixation, and there are only a few,
+1, 2, 3, 4, 5 correspondingly left where the genetic variance hasn't been lost yet.
+And so this is quite nice, you can reload this a couple of times and you can see the different dynamics.
+Most of the time, sort of about half of the time it seems genetic variation remains in about half of the simulations, one of the alleles goes to fixation and you lose all genetic variation.
+So that's really interesting.
+Now we have this system in place, these randomly stochastic simulations of genetic drift
+So now we could go and play with those values.
+Let's go back to the code, for example, and let's set the population size to 200, and also the generations now here, we're going to make this a little shorter to 200 time steps, okay, 200 generations.
+So let's save this, and go back and reload this.
+Here's what we can see.
+This is now a bit higher resolution because it's only 200 generations.
+Some of the simulations go to fixation, and some, they don't.
+That's interesting.
+Now we could say, "Well, you know what, let's reduce the population size to just 20 individuals."
+So we set <i>n</i> to 20, we go back to the browser.
+And look at this. In all ten simulations, the genetic variation is completely lost.
+The A1 allele will either get lost and A2 will go to fixation or the A1 allele goes to fixation.
+This happens at different speeds here.
+All of them went very fast.
+Here's actually one where it doesn't get lost by generation 200.
+I think that's quite rare, but of course it can occasionally happen.
+Here's another one.
+But you can see, typically, very quickly such a small population size within typically less than 100 generation, all genetic diversity is lost from this population.
+So when you have small population sizes, the effects of genetic drift are very, very strong.
+In fact, let's now go the other way and increase the population size, not back to 200, but in fact, in another order of magnitude, to 2000.
+Let's save this, let's go back.
+So this is now the opposite.
+You still have the drifting here, and you can reload this a couple of times.
+It will always look roughly the same.
+And you know, eventually some of those would actually go to fixation.
+But after 200 generations, you still have most of the genetic diversity.
+You can clearly see the effect of drift and how would becomes stronger over time, just because these effects started accumulating, but clearly the effect here is much, much weaker when we have a population size that's 100 times larger.
+So I just claimed-- well eventually, also in this case with this large population size of 2000, it will go to fixation.
+Is that really true? 
+Well, we can actually test it.
+Let's just up the generation number here to 2000.
+So this might take a little longer because it's now ten times more calculations but let's reload it... yup, here we go.
+So you can see the diversity here is already much larger.
+I haven't seen anything go to fixation.
+Actually here this one goes to fixation around generation 1,000.
+None here, although this is very close.
+Here and around generation 2000, the A2 allele went to fixation the A1 allele got lost.
+And in fact, let's just increment this to 20,000 generations.
+So, if we reload this, this now going to take a while, because it has to calculate quite a bit, but it will eventually do this, I hope.
+And here it is.
+So you can see now over 20,000 generations, all of these 10 simulations actually go to fixation.
+I'm going to reload this again.
+So this is essentially now the same effect as before, when we had 20 population size 20, and only 200 generations here as well.
+All of them go to fixation by here around generation 10,000.
+But you can see now in these simulations. the major effects of drift.
+So what happens with drift is that you will ultimately lose genetic variation because alleles will go to fixation, which means others will get lost.
+That's the ultimate consequence of genetic drift.
+When that happens, at which speed?
+Decidedly depends on the population size.
+If the population is very small, this will happen much faster.
+If it's a very large, this will happen much slower.
+That is how the population size relates to genetic drift.
+And intuitively, this makes sense I hope.
+It's just like a coin flipping example.
+If we only flip a few coins, then the effect can be quite traumatic.
+You very quickly get cases where we have nine heads one tail or even ten heads, 0 tails.
+But if you have 1,000 coins data is virtually never going to happen.
+And so because these effects accumulate if you have large population sizes these effects will take time but they will eventually accumulate to such an extent that it will lose one or the other allele and eventually, even if you had multiple alleles, not only two, all of them would would get lost except one that will go to fixation.
+Congratulations for implementing this.
+This is quite a feed.
+You're now implementing multiple simulation, multiple stochastic simulations of genetic drift in javascript, using the plotting library D3, and we're not even in Chapter 4, so quite the feat, well done.
+Now we implemented this using two-dimensional array.
+I hope you had some time to wrap your head around this.
+And in the next few chapters, we'll take a look at some special cases, interesting phenomenon in the context of genetic drift, and we'll also get a little bit more mathematical handle on genetic drift.
+So, I'll see you in the next lecture.

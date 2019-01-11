@@ -1,0 +1,1551 @@
+1
+00:00:00,000 --> 00:00:05,434
+Hello. For this last
+
+2
+00:00:05,434 --> 00:00:11,810
+lesson, we will analyze a
+simple robotic application.
+
+3
+00:00:11,810 --> 00:00:18,490
+Raphael programmed his robot,
+Zébulon, to pass between two bricks.
+
+4
+00:00:18,490 --> 00:00:25,270
+On the rim, an ultrasonic sensor
+is used to measure the distance.
+
+5
+00:00:25,270 --> 00:00:30,700
+So the algorithm, of course,
+is to scan the space to
+
+6
+00:00:30,700 --> 00:00:35,980
+measure the distances, and then
+move on in the right direction.
+
+7
+00:00:35,980 --> 00:00:41,534
+Since the robot is not perfectly
+straight, the prudent solution
+
+8
+00:00:41,534 --> 00:00:47,050
+is to recalibrate, after having
+traveled a certain distance.
+
+9
+00:00:47,050 --> 00:00:50,750
+So Raphael is very disappointed,
+
+10
+00:00:50,750 --> 00:00:54,746
+It worked well for him, but there,
+
+11
+00:00:54,746 --> 00:00:57,920
+disaster, it did not take
+the right direction.
+
+12
+00:00:57,920 --> 00:01:00,440
+We'll understand why.
+
+13
+00:01:04,945 --> 00:01:10,451
+We are going to study this
+ultrasonic sensor a little, see how
+
+14
+00:01:10,451 --> 00:01:15,560
+this simple program was written,
+why it was not tested enough
+
+15
+00:01:15,560 --> 00:01:19,196
+and what it took to troubleshoot it,
+and think a
+
+16
+00:01:19,196 --> 00:01:21,180
+little bit for more
+
+17
+00:01:21,180 --> 00:01:24,900
+complex programs, by interruption,
+using other sensors.
+
+18
+00:01:24,900 --> 00:01:29,960
+The ultrasonic sensor is well known,
+it has already been presented
+
+19
+00:01:29,960 --> 00:01:35,300
+in a previous lesson. It is
+very simple to use, since it
+
+20
+00:01:35,300 --> 00:01:40,200
+is sufficient to send a start pulse,
+
+21
+00:01:40,200 --> 00:01:45,250
+and then measure the duration of the echo.
+
+22
+00:01:45,250 --> 00:01:50,398
+On the oscilloscope, well we
+see that we have perfectly and
+
+23
+00:01:50,398 --> 00:01:55,990
+usable signals. And the
+program is as simple to write.
+
+24
+00:01:55,990 --> 00:02:01,593
+It is naturally necessary to define
+the units, to give the right directions.
+
+25
+00:02:01,593 --> 00:02:04,491
+And at the level of the measurement
+loop, that we will,
+
+26
+00:02:04,491 --> 00:02:10,120
+naturally, start by testing, in the
+simplest program possible, we
+
+27
+00:02:10,120 --> 00:02:15,920
+activates the output Trig, we make a small
+delay, more than 10 microseconds,
+
+28
+00:02:15,920 --> 00:02:21,204
+we deactivate, and then we have
+an Arduino facility, which awaits
+
+29
+00:02:21,204 --> 00:02:24,809
+the pulse and measures its duration.
+
+30
+00:02:24,809 --> 00:02:30,024
+So, it is enough to print the measured
+
+31
+00:02:30,024 --> 00:02:35,316
+value which has been measured,
+and then start again every second,
+
+32
+00:02:35,316 --> 00:02:40,404
+for example, to avoid filling the screen
+too fast while moving the sensor.
+
+33
+00:02:40,404 --> 00:02:43,060
+So there are two problems
+with this routine.
+
+34
+00:02:43,060 --> 00:02:46,510
+It is here it is waitting for
+
+35
+00:02:46,510 --> 00:02:49,771
+the Echo, so it's an instruction that
+
+36
+00:02:49,771 --> 00:02:52,524
+is blocking, during all the reading, the
+
+37
+00:02:52,524 --> 00:02:56,113
+processor will do nothing else, and the
+
+38
+00:02:56,113 --> 00:02:59,636
+two other problems that
+can be ambarrassing
+
+39
+00:02:59,636 --> 00:03:05,549
+quite often, it is when the sensor
+does not give a signal, and
+
+40
+00:03:05,549 --> 00:03:11,582
+the routine will remain blocked on hold,
+and if the sensor gives a signal
+
+41
+00:03:11,582 --> 00:03:17,040
+too long, because, for example,
+there was no return of
+
+42
+00:03:17,040 --> 00:03:23,562
+sound information, good the program
+will also wait, this time, on the state in one.
+
+43
+00:03:23,562 --> 00:03:28,983
+So the duration of the Echo
+that we hope to have for a meter
+
+44
+00:03:28,983 --> 00:03:34,600
+fifty, typically 10ms, you just have
+to calculate the speed of the sound.
+
+45
+00:03:34,600 --> 00:03:36,760
+With the sensor that
+
+46
+00:03:36,760 --> 00:03:42,184
+has four pines, we can have
+up to 200ms during which
+
+47
+00:03:42,184 --> 00:03:46,858
+the circuit, seeing that there
+is no Echo, is still waiting.
+
+48
+00:03:46,858 --> 00:03:52,069
+While the SR05 with five legs,
+a maximum of 20 ms and
+
+49
+00:03:52,069 --> 00:03:57,462
+you can repeat, every 40ms,
+to make a reading.
+
+50
+00:03:57,462 --> 00:04:02,050
+So, 200 ms, obviously, it can be
+quite annoying pusic your
+
+51
+00:04:02,050 --> 00:04:05,365
+board, if it moves during this time,
+everything will
+
+52
+00:04:05,365 --> 00:04:10,150
+be blocked to make decisions
+about this sensor.
+
+53
+00:04:10,150 --> 00:04:15,190
+So, the problems we have with these
+sound sensors, and I was not aware
+
+54
+00:04:15,190 --> 00:04:22,630
+that there were as many as that, you have
+possibilities of reflection of the ground.
+
+55
+00:04:22,630 --> 00:04:28,160
+If it's carpet, well, you're going
+to have a non-negligible reflection,
+
+56
+00:04:28,160 --> 00:04:33,385
+which may distort distances.
+You pose the smallest
+
+57
+00:04:33,385 --> 00:04:38,352
+object on the stage, a pencil,
+well, right away it will make
+
+58
+00:04:38,352 --> 00:04:43,685
+reflections. A problem that
+is easy to understand,
+
+59
+00:04:43,685 --> 00:04:48,415
+is that if the surface, whose
+distance is to be measured
+
+60
+00:04:48,415 --> 00:04:53,245
+is inclined with respect to an
+emited sound path
+
+61
+00:04:53,245 --> 00:04:58,634
+, you are going to have a reflection,
+reflection in the sense of a
+
+62
+00:04:58,634 --> 00:05:03,069
+mirror, and no sound wave
+will return to the sensor, so
+
+63
+00:05:03,069 --> 00:05:06,645
+if the object is near, and well
+it will be seen as being at
+
+64
+00:05:06,645 --> 00:05:12,615
+infinity, and you will have that expectation,
+which can be abusive in some cases.
+
+65
+00:05:12,615 --> 00:05:18,730
+Therefore, a smooth material reflects,
+a porous material absorbs completely.
+
+66
+00:05:18,730 --> 00:05:23,005
+So if you put the foam very close
+to the robot,
+
+67
+00:05:23,005 --> 00:05:28,255
+well you will again feel that
+the obstacle is to infinity.
+
+68
+00:05:28,255 --> 00:05:30,660
+Another experiment is that
+corrugated
+
+69
+00:05:30,660 --> 00:05:33,790
+board is relatively favorable,
+although its wavelength
+
+70
+00:05:33,790 --> 00:05:35,870
+seems a little bit short
+
+71
+00:05:35,870 --> 00:05:38,880
+compared to the wavelength
+of the light waves.
+
+72
+00:05:38,880 --> 00:05:43,976
+So the problem is that there
+is a cone of emission, which is
+
+73
+00:05:43,976 --> 00:05:49,360
+documented as being 15 degrees.
+Our experience is that this cone is
+
+74
+00:05:49,360 --> 00:05:54,730
+actually much broader, and obviously
+you guess that as soon as
+
+75
+00:05:54,730 --> 00:06:00,013
+that cone touches the edge
+of the obstacle, good,
+
+76
+00:06:00,013 --> 00:06:05,254
+there will be reflection, and then you
+will no longer have infinite distance at all.
+
+77
+00:06:05,254 --> 00:06:09,478
+So, that's naturally something
+to experiment with,
+
+78
+00:06:09,478 --> 00:06:12,520
+that we should have experienced
+immediately, I might not have
+
+79
+00:06:12,520 --> 00:06:15,780
+proposed this project if I had
+made this experience.
+
+80
+00:06:15,780 --> 00:06:19,812
+And the result is that the angle
+is closer and
+
+81
+00:06:19,812 --> 00:06:24,420
+60 degrees if we are relatively close
+to the ground, and apparently,
+
+82
+00:06:24,420 --> 00:06:27,412
+it decreases a little bit,
+if we raise the sensor,
+
+83
+00:06:27,412 --> 00:06:30,850
+but it still does not seem to be
+the miracle solution.
+
+84
+00:06:30,850 --> 00:06:34,650
+So the conclusion, and this is
+true for all
+
+85
+00:06:34,650 --> 00:06:40,334
+robotic projects, carefully
+analyze the sensors before
+
+86
+00:06:40,334 --> 00:06:46,635
+programming the application.
+That is what we did not do.
+
+87
+00:06:46,635 --> 00:06:52,400
+So Raphael followed the
+indications I had given him.
+
+88
+00:06:52,400 --> 00:06:55,260
+We will define a number
+
+89
+00:06:55,260 --> 00:06:59,864
+of angular positions to make measurements.
+
+90
+00:06:59,864 --> 00:07:05,694
+They can be represented as
+a horizontal diagram.
+
+91
+00:07:05,694 --> 00:07:09,646
+Opposite, well, we hope
+to have a very great distance.
+
+92
+00:07:09,646 --> 00:07:14,856
+As soon as the obstacle is touched, well there
+will be a distance that decreases, and then
+
+93
+00:07:14,856 --> 00:07:20,285
+suddenly may suddenly increase
+due to reflection.
+
+94
+00:07:20,285 --> 00:07:25,296
+So that's easy to observe,
+and graphically, well,
+
+95
+00:07:25,296 --> 00:07:31,170
+you see here that the distance is
+great, and then it has decreased, what
+
+96
+00:07:31,170 --> 00:07:37,090
+we are interested in is to recognize this
+area of ​​measurement, which we will talk about.
+
+97
+00:07:37,090 --> 00:07:42,640
+Then, move the robot, and well
+we will make impulses.
+
+98
+00:07:42,640 --> 00:07:46,252
+The idea is to make pulses of 10 ms
+
+99
+00:07:46,252 --> 00:07:50,546
+and then stop it at 10 ms, and to
+
+100
+00:07:50,546 --> 00:07:59,670
+measure the distance after this distance,
+to be sure that the robot is stable.
+
+101
+00:07:59,670 --> 00:08:02,720
+Maybe it's not essential, again, they
+
+102
+00:08:02,720 --> 00:08:06,880
+are something that deserve to be
+analyzed, as precisely as possible,
+
+103
+00:08:06,880 --> 00:08:09,299
+and if you have an oscilloscope,
+obviously, it
+
+104
+00:08:09,299 --> 00:08:13,000
+allows you to have a better
+understanding of the phenomena.
+
+105
+00:08:13,000 --> 00:08:15,368
+So we have to turn. So, there
+
+106
+00:08:15,368 --> 00:08:19,172
+I used definitions that change
+
+107
+00:08:19,172 --> 00:08:24,605
+the four bytes of both
+motors simultaneously.
+
+108
+00:08:24,605 --> 00:08:28,570
+This is much more compact
+than aligning digitalWrite.
+
+109
+00:08:28,570 --> 00:08:34,563
+The duration of the step is defined,
+and then, we define the
+
+110
+00:08:34,563 --> 00:08:40,370
+functions Step to the right, Step to the left,
+Advance, not necessarily delay
+
+111
+00:08:40,370 --> 00:08:43,178
+after making the Stop for Step Advance,
+
+112
+00:08:43,178 --> 00:08:46,010
+if you want to go faster in a
+straight line.
+
+113
+00:08:46,010 --> 00:08:49,770
+So there is no problem now to do
+
+114
+00:08:49,770 --> 00:08:54,384
+my Step of 10 ms and we have to make measurements.
+
+115
+00:08:54,384 --> 00:08:59,870
+So the proposal to make the
+measurements is to say, we will
+
+116
+00:08:59,870 --> 00:09:05,350
+move the robot which is, more or less,
+in the direction of the obstacle,
+
+117
+00:09:05,350 --> 00:09:09,318
+making him 5 steps to the left.
+
+118
+00:09:09,318 --> 00:09:15,384
+Then we will take 10 steps to
+the right, taking the
+
+119
+00:09:15,384 --> 00:09:20,138
+measurements, and, be careful, there is
+the famous problem of poles and intervals,
+
+120
+00:09:20,138 --> 00:09:25,296
+it will be necessary to decide whether
+to measure first and then the step, or,
+
+121
+00:09:25,296 --> 00:09:30,548
+in these cases the last measure
+should be added, or
+
+122
+00:09:30,548 --> 00:09:34,745
+the step and the measure afterwards,
+and in this case it was necessary,
+
+123
+00:09:34,745 --> 00:09:39,206
+we should have forgotten the first
+measure, if we have not thought of it.
+
+124
+00:09:39,206 --> 00:09:43,360
+Once the measurements
+have been completed, the
+
+125
+00:09:43,360 --> 00:09:48,920
+robot in a central position,
+to analyze the accumulated data.
+
+126
+00:09:48,920 --> 00:09:55,808
+Raphael, he preferred, right away,
+to return a good step to get in the
+
+127
+00:09:55,808 --> 00:09:58,640
+desired direction.
+
+128
+00:09:58,640 --> 00:10:01,790
+Uh, if we do as I said, to gather
+
+129
+00:10:01,790 --> 00:10:04,800
+all this data in a table, we have a
+
+130
+00:10:04,800 --> 00:10:10,614
+greater flexibility to then quietly
+analyze the table, show
+
+131
+00:10:10,614 --> 00:10:17,490
+its contents, troubleshoot, display ah,
+on, on the terminal naturally.
+
+132
+00:10:17,490 --> 00:10:20,980
+So we define a table of 11. The first
+
+133
+00:10:20,980 --> 00:10:26,559
+loop for position to the left, we do
+these, the five steps to the left.
+
+134
+00:10:26,559 --> 00:10:30,090
+Then we measure by filling the table.
+
+135
+00:10:30,090 --> 00:10:34,110
+And then we reposition ourselves,
+we add the last value here.
+
+136
+00:10:34,110 --> 00:10:36,542
+And then we reposition ourselves
+in the center.
+
+137
+00:10:36,542 --> 00:10:41,540
+So here is the programming is,
+is quite natural.
+
+138
+00:10:41,540 --> 00:10:46,284
+And the resulting program well,
+it does not pose too many problems
+
+139
+00:10:46,284 --> 00:10:50,550
+since there are no interruptions,
+that things can be done
+
+140
+00:10:50,550 --> 00:10:56,060
+one after the other with by having
+all the necessary time available.
+
+141
+00:10:56,060 --> 00:11:00,572
+The measurement is made by
+sweeping, as we have just seen.
+
+142
+00:11:00,572 --> 00:11:06,969
+We calculate the angle and there, the
+reasoning that must be done is where, there
+
+143
+00:11:06,969 --> 00:11:08,964
+may be several algorithms and
+
+144
+00:11:08,964 --> 00:11:11,480
+algorithms that are more reliable
+than others.
+
+145
+00:11:11,480 --> 00:11:15,470
+Uh, we have to work here on a difference,
+
+146
+00:11:15,470 --> 00:11:18,890
+on the derivative, in
+the background, of the signal.
+
+147
+00:11:18,890 --> 00:11:23,379
+Then this difference increases abruptly
+when we pass from the distance
+
+148
+00:11:23,379 --> 00:11:28,764
+here, relatively short, 50 cm, 1 meter,
+to a maximum distance of
+
+149
+00:11:28,764 --> 00:11:33,950
+3 meters which may be displayed by
+a value limited by the sensor.
+
+150
+00:11:33,950 --> 00:11:36,838
+So we can have a very big difference
+
+151
+00:11:36,838 --> 00:11:38,220
+of, variations.
+
+152
+00:11:38,220 --> 00:11:42,730
+A positive sound is expected
+here of sufficient amplitude.
+
+153
+00:11:42,730 --> 00:11:47,550
+A negative sound of sufficient
+amplitude is then expected.
+
+154
+00:11:47,550 --> 00:11:52,160
+we don't have to be disturbed by
+the fact that we had
+
+155
+00:11:52,160 --> 00:11:57,692
+passages in reflection at the
+beginning and possibly at the end.
+
+156
+00:11:57,692 --> 00:12:02,070
+So this is where you have
+to test the algorithm to be
+
+157
+00:12:02,070 --> 00:12:07,288
+sure that the flanks are located correctly.
+If you multiply the number
+
+158
+00:12:07,288 --> 00:12:12,360
+of steps, Raphael used 20,
+there I drew 10,
+
+159
+00:12:12,360 --> 00:12:17,451
+you decrease the amplitude of
+the steps and you should be sure
+
+160
+00:12:17,451 --> 00:12:22,456
+that the inevitable noise
+you have does not become
+
+161
+00:12:22,456 --> 00:12:27,490
+of the same order of magnitude as the
+footsteps. And of course, when the robot
+
+162
+00:12:27,490 --> 00:12:30,971
+gets closer, well, all these
+parameters change,
+
+163
+00:12:30,971 --> 00:12:33,349
+so that's where it's necessary to make a
+
+164
+00:12:33,349 --> 00:12:36,842
+very systematic study, by moving
+the robot by
+
+165
+00:12:36,842 --> 00:12:40,482
+hand, observing the values ​​
+on the terminal.
+
+166
+00:12:40,482 --> 00:12:45,820
+Once you have confidence that
+you have here sampled these two
+
+167
+00:12:45,820 --> 00:12:52,646
+parameters, the numerals, in the
+background, angular, you average to
+
+168
+00:12:52,646 --> 00:12:58,000
+know which direction ah, you have,
+in the background, the ideal
+
+169
+00:12:58,000 --> 00:13:02,459
+position with respect to these two
+measures, but these two measurement
+
+170
+00:13:02,459 --> 00:13:06,620
+are offset from the curve
+in fact huh since
+
+171
+00:13:06,620 --> 00:13:10,300
+there is a sampling that takes
+place with a certain delay.
+
+172
+00:13:10,300 --> 00:13:14,584
+So in the particular case of this drawing,
+ben you see we would go ah,
+
+173
+00:13:14,584 --> 00:13:18,260
+pile against the wall, which
+is not quite what we want.
+
+174
+00:13:18,260 --> 00:13:22,160
+So, of course, we could think
+about corrections or
+
+175
+00:13:22,160 --> 00:13:25,463
+just what we did, well it is, the
+
+176
+00:13:25,463 --> 00:13:29,810
+closer to, the obstacle, well, the more
+the error, in the bottom,
+
+177
+00:13:29,810 --> 00:13:34,300
+will be ah, will be redued compared
+to the width of the obstacle.
+
+178
+00:13:34,300 --> 00:13:39,320
+So here, then the programming ah, can be
+
+179
+00:13:39,320 --> 00:13:43,870
+done, in the background,
+without constraints but now,
+
+180
+00:13:43,870 --> 00:13:47,988
+if you want to add mustaches
+and then when you have, for example,
+
+181
+00:13:47,988 --> 00:13:53,010
+a shock against the obstacle ah, react
+correctly, which would be, for example,
+
+182
+00:13:53,010 --> 00:13:58,338
+to retreat one end and recalibrate
+the position of the hole, and
+
+183
+00:13:58,338 --> 00:14:04,040
+this mustache detection,
+must be integrated into
+
+184
+00:14:04,040 --> 00:14:09,230
+the procedure to advance,
+which is perhaps not very difficult
+
+185
+00:14:09,230 --> 00:14:15,050
+because, once again, the lead
+can be kept under control, in
+
+186
+00:14:15,050 --> 00:14:18,673
+the bottom, of a PWM and
+a delay but we will not
+
+187
+00:14:18,673 --> 00:14:22,866
+make a simple delay, we will have to make
+
+188
+00:14:22,866 --> 00:14:27,460
+one, small delays and, in
+each delay, test the whiskers.
+
+189
+00:14:27,460 --> 00:14:31,223
+Then, the more we complicate
+the functionality of course, the more
+
+190
+00:14:31,223 --> 00:14:34,958
+essential it becomes, in the bottom,
+to work
+
+191
+00:14:34,958 --> 00:14:39,564
+by interruptions. So can we measure the
+
+192
+00:14:39,564 --> 00:14:45,490
+distance by interruptions?
+Uh, yeah, we'll see how quickly.
+
+193
+00:14:45,490 --> 00:14:50,692
+Can not the steps for the scan
+be done by interruptions?
+
+194
+00:14:50,692 --> 00:14:53,950
+We can do everything by
+interruptions but is it worth it?
+
+195
+00:14:53,950 --> 00:14:56,719
+The advance, well we know
+that with the PWM
+
+196
+00:14:56,719 --> 00:14:59,204
+or the PFM, it is easy to manage by uh,
+
+197
+00:14:59,204 --> 00:15:00,470
+the interruption.
+
+198
+00:15:00,470 --> 00:15:04,110
+And then now the decisions,
+the correction algorithms
+
+199
+00:15:04,110 --> 00:15:07,937
+naturally, they are generally left to
+
+200
+00:15:07,937 --> 00:15:12,105
+the main program that needs
+the appropriate functions and we
+
+201
+00:15:12,105 --> 00:15:16,450
+correct the functions until
+the behavior is good.
+
+202
+00:15:16,450 --> 00:15:20,167
+So an approach when we want
+to work by interruptions is
+
+203
+00:15:20,167 --> 00:15:25,020
+to say: ben, for each operation,
+we will generate
+
+204
+00:15:25,020 --> 00:15:33,035
+a specific interrupt. And, it's
+often documented like that,
+
+205
+00:15:33,035 --> 00:15:37,860
+with libraries that, mysteriously,
+manage you by interrupt.
+
+206
+00:15:37,860 --> 00:15:40,238
+And then if you want to keep control, ben,
+
+207
+00:15:40,238 --> 00:15:43,022
+an approach that I have often
+used is to say
+
+208
+00:15:43,022 --> 00:15:46,006
+: every 100 microseconds, we will do an
+
+209
+00:15:46,006 --> 00:15:50,248
+interruption and then every
+100 microseconds, I will go
+
+210
+00:15:50,248 --> 00:15:55,230
+through a state machine
+that will, build me the distance.
+
+211
+00:15:55,230 --> 00:15:59,010
+And then, we will redo a small divisor to
+
+212
+00:15:59,010 --> 00:16:03,250
+say : but every 20 milliseconds
+I would like to do  something
+
+213
+00:16:03,250 --> 00:16:06,630
+else, for example, to move my
+engine forward, and then we
+
+214
+00:16:06,630 --> 00:16:10,620
+can still imagine other things
+happening more slowly.
+
+215
+00:16:10,620 --> 00:16:15,674
+So we have, we know exactly what
+happens, every time, and how
+
+216
+00:16:15,674 --> 00:16:17,220
+long it will take.
+
+217
+00:16:17,220 --> 00:16:21,120
+To measure the distance with
+the ultrasonic sensors,there
+
+218
+00:16:21,120 --> 00:16:23,813
+I will not go into detail but
+
+219
+00:16:23,813 --> 00:16:27,141
+there is, because we have
+something rather annoying since
+
+220
+00:16:27,141 --> 00:16:30,150
+the program we saw earlier is blocking.
+
+221
+00:16:30,150 --> 00:16:35,500
+A non-blocking solution, well is either
+to use a timer and then to locate
+
+222
+00:16:35,500 --> 00:16:40,900
+the rising edge, start the timer,
+locate the falling edge
+
+223
+00:16:40,900 --> 00:16:45,550
+so this is done by interrupts,
+the timer has the necessary logic
+
+224
+00:16:45,550 --> 00:16:49,658
+to do that, and then read
+the timer to get the value.
+
+225
+00:16:49,658 --> 00:16:53,956
+We can also, as I have just
+mentioned, make an interrupt every
+
+226
+00:16:53,956 --> 00:17:00,056
+100 microseconds and then go
+through a state machine that will
+
+227
+00:17:00,056 --> 00:17:06,476
+generate the pulse 100 microseconds,
+well it will be just one cycle to the next,
+
+228
+00:17:06,476 --> 00:17:14,771
+and then which will count to be sure
+that the sensor responds in less than
+
+229
+00:17:14,771 --> 00:17:20,240
+20 milliseconds, we saw that if it is there,
+it must respond within 5 milliseconds.
+
+230
+00:17:20,240 --> 00:17:25,330
+We can make a timeout so that,
+to say that it is useless to
+
+231
+00:17:25,330 --> 00:17:27,665
+start the engine if there is no
+
+232
+00:17:27,665 --> 00:17:30,840
+connected sensor or that
+the sensor is defective.
+
+233
+00:17:30,840 --> 00:17:31,608
+And then...
+
+234
+00:17:31,608 --> 00:17:37,314
+now, we go in the measure. And here again,
+
+235
+00:17:37,314 --> 00:17:42,580
+there is a sensor which will
+measure the duration of the pulse
+
+236
+00:17:42,580 --> 00:17:47,990
+with also a timeout since it is useless
+
+237
+00:17:47,990 --> 00:17:53,400
+to measure distances that theoretically
+would be more than 3 meters.
+
+238
+00:17:53,400 --> 00:17:56,668
+So obviously the sensor, the electronics
+of
+
+239
+00:17:56,668 --> 00:18:00,709
+the sensor does not
+necessarily fall on its feet
+
+240
+00:18:00,709 --> 00:18:03,894
+but if the manufacturer
+guarantees that there is a
+
+241
+00:18:03,894 --> 00:18:07,150
+cycle of 20 milliseconds, well we can
+
+242
+00:18:07,150 --> 00:18:10,620
+immediately restart after 20 milliseconds.
+
+243
+00:18:10,620 --> 00:18:16,515
+It would be dangerous to start again
+as soon as Echo goes to 0 since
+
+244
+00:18:16,515 --> 00:18:21,796
+it is not sure that the internal
+electronics of the sensor has
+
+245
+00:18:21,796 --> 00:18:23,850
+fallen back on its legs.
+
+246
+00:18:23,850 --> 00:18:28,981
+Well, other solutions to solve
+this problem, of course,
+
+247
+00:18:28,981 --> 00:18:33,960
+we could put a servo to orient the sensor,
+it would allow a continuous
+
+248
+00:18:33,960 --> 00:18:39,890
+displacement since while the robot
+advances and well could switch the,
+
+249
+00:18:39,890 --> 00:18:45,900
+the sensor from either sides
+and correct the trajectory.
+
+250
+00:18:45,900 --> 00:18:46,964
+But of course
+
+251
+00:18:46,964 --> 00:18:51,794
+, it supposes eh, that we see
+perfectly the openings thus
+
+252
+00:18:51,794 --> 00:18:57,380
+this is where we saw that this
+application poses a major problem.
+
+253
+00:18:57,380 --> 00:19:01,751
+Then by interruptions,
+ben there would be ordered,
+
+254
+00:19:01,751 --> 00:19:06,130
+There would be ordered engines
+and then the position
+
+255
+00:19:06,130 --> 00:19:09,092
+of the servo would make it
+possible to measure where is the
+
+256
+00:19:09,092 --> 00:19:12,360
+maximum distance and then
+correct the speeds
+
+257
+00:19:12,360 --> 00:19:13,630
+of the two engines.
+
+258
+00:19:13,630 --> 00:19:18,390
+Should we use another sensor?
+
+259
+00:19:18,390 --> 00:19:21,000
+So yes, since we, Iclaim that we can not
+
+260
+00:19:21,000 --> 00:19:26,950
+use these cheap sensors so
+cheap to make this application.
+
+261
+00:19:26,950 --> 00:19:29,326
+A narrow field ultrasonic sensor, I
+
+262
+00:19:29,326 --> 00:19:32,395
+do not know if they exist but probably
+that
+
+263
+00:19:32,395 --> 00:19:34,930
+industrially it exists but at prices which
+
+264
+00:19:34,930 --> 00:19:37,450
+are ten times higher if it is not more.
+
+265
+00:19:37,450 --> 00:19:41,290
+A sensor that would fit well
+is the Sharp PSD
+
+266
+00:19:41,290 --> 00:19:45,266
+of which we have ah, of which we
+spoke, that has been mentioned,
+
+267
+00:19:45,266 --> 00:19:49,315
+which is a little expensive but $
+that sends a light
+
+268
+00:19:49,315 --> 00:19:54,368
+spot and its reflection alllows
+to know what is the distance.
+
+269
+00:19:54,368 --> 00:19:57,750
+So there is no problem of width
+
+270
+00:19:57,750 --> 00:20:02,700
+of the obstacle, since even
+if we are sufficiently precise in
+
+271
+00:20:02,700 --> 00:20:08,290
+the angular displacement,
+a slit a few centimeters, not even 1
+
+272
+00:20:08,290 --> 00:20:14,080
+centimeter, could be seen but,
+again, to experiment in detail.
+
+273
+00:20:14,080 --> 00:20:17,477
+It is rare that manufacturer's
+specifications
+
+274
+00:20:17,477 --> 00:20:22,860
+are sufficiently precise to
+illuminate your precise application.
+
+275
+00:20:22,860 --> 00:20:27,400
+The infrared sensors that
+are used to measure distance,
+
+276
+00:20:27,400 --> 00:20:29,955
+it is generally, maximum, 5 to 10
+
+277
+00:20:29,955 --> 00:20:34,160
+centimeters and they are quite
+sensitive to the luminous environment.
+
+278
+00:20:34,160 --> 00:20:39,060
+The photoresistors, which
+are very cheap, are good
+
+279
+00:20:39,060 --> 00:20:42,740
+to track light, tracking
+
+280
+00:20:42,740 --> 00:20:48,237
+which is one of the traditional
+applications of mobile robots
+
+281
+00:20:48,237 --> 00:20:52,414
+that I just did not want to explain
+to you today because you have
+
+282
+00:20:52,414 --> 00:20:56,790
+many sites that explain this to you and
+you may have done it already in LEGO!
+
+283
+00:20:56,790 --> 00:20:59,820
+The mustaches, we said
+a few words, they are
+
+284
+00:20:59,820 --> 00:21:03,390
+easy to manage but obviously it's
+always a task a
+
+285
+00:21:03,390 --> 00:21:08,390
+little extra to be done in parallel
+with the other tasks, and a
+
+286
+00:21:08,390 --> 00:21:13,420
+management by interrupt is quite desired.
+
+287
+00:21:13,420 --> 00:21:17,515
+Then, an important concept,
+which we do not have
+
+288
+00:21:17,515 --> 00:21:23,862
+time to develop well in this
+course is the notion of timeout.
+
+289
+00:21:23,862 --> 00:21:27,588
+You have an application,
+this application, it
+
+290
+00:21:27,588 --> 00:21:29,464
+may very well happen that the
+
+291
+00:21:29,464 --> 00:21:31,876
+sensors do not respond, that the robot,
+
+292
+00:21:31,876 --> 00:21:35,210
+in our simple case, the robot is blocked.
+
+293
+00:21:35,210 --> 00:21:39,435
+Well it does not bother to move it by
+
+294
+00:21:39,435 --> 00:21:42,750
+hand but if we do things seriously,
+it would be nice
+
+295
+00:21:42,750 --> 00:21:49,125
+to say, if the robot remains locked
+for 3 seconds, well it's not normal,
+
+296
+00:21:49,125 --> 00:21:55,250
+we go, for example, back a little,
+make him look elsewhere and so on.
+
+297
+00:21:55,250 --> 00:21:57,637
+So we had talked about the "watchdog"
+
+298
+00:21:57,637 --> 00:22:01,256
+which is inside the processor, to monitor
+
+299
+00:22:01,256 --> 00:22:05,036
+in fact the overall operation of
+the processor, we
+
+300
+00:22:05,036 --> 00:22:07,620
+can apply the same, in the bottom,
+
+301
+00:22:07,620 --> 00:22:11,430
+with counters. A counter is regularly
+reset
+
+302
+00:22:11,430 --> 00:22:17,646
+but this counter counts by interrupt
+every second, for example.
+
+303
+00:22:17,646 --> 00:22:20,719
+If it arrives at 0, it means that
+we did not
+
+304
+00:22:20,719 --> 00:22:26,624
+reset regularly, and then run a task.
+
+305
+00:22:26,624 --> 00:22:30,142
+So, typically, when we test the
+mustache and then
+
+306
+00:22:30,142 --> 00:22:33,240
+we see that the whiskers
+have not been activated,
+
+307
+00:22:33,240 --> 00:22:37,580
+and the meter is reset to a certain
+
+308
+00:22:37,580 --> 00:22:42,238
+value, and then if, suddenly,
+the whiskers are
+
+309
+00:22:42,238 --> 00:22:46,533
+blocked, the counter counts,
+and well after a few
+
+310
+00:22:46,533 --> 00:22:49,730
+seconds, well we will do this step back.
+
+311
+00:22:49,730 --> 00:22:52,466
+Well, here, there would still be many
+
+312
+00:22:52,466 --> 00:22:55,925
+things to say to understand the sensors.
+
+313
+00:22:55,925 --> 00:22:58,661
+Some documents are proposed
+
+314
+00:22:58,661 --> 00:23:03,810
+in additional, with these lessons,
+to go a little more in
+
+315
+00:23:03,810 --> 00:23:08,540
+detail and then you explain
+some more specialized things.
+
+316
+00:23:08,540 --> 00:23:11,648
+Naturally, if you are a researcher
+and then
+
+317
+00:23:11,648 --> 00:23:15,048
+you want to make a mobile
+robot application
+
+318
+00:23:15,048 --> 00:23:20,740
+to understand intelligence or
+to have an industrial application,
+
+319
+00:23:20,740 --> 00:23:23,704
+there is a lot to understand.
+
+320
+00:23:23,704 --> 00:23:29,044
+The software is based on real-time kernels
+
+321
+00:23:29,044 --> 00:23:32,935
+and facilitate the management, in
+
+322
+00:23:32,935 --> 00:23:35,838
+the background, simultaneous tasks on
+
+323
+00:23:35,838 --> 00:23:41,050
+processors that naturally have to
+become much more efficient.
+
+324
+00:23:41,050 --> 00:23:44,195
+So, with this course,
+we hope to have
+
+325
+00:23:44,195 --> 00:23:49,958
+made you want to continue,
+to progress towards complexity
+
+326
+00:23:49,958 --> 00:23:54,702
+in small steps. And, by
+making enough small steps,
+
+327
+00:23:54,702 --> 00:24:00,200
+well you know that
+we walked on the moon!
+

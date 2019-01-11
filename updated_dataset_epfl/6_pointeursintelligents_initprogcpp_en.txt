@@ -1,0 +1,94 @@
+The pointers we have studied up until now are good old
+"C-style" pointers, which are without a doubt the most versatile and most powerful, but also the most dangerous pointers.
+Indeed, as we have seen, their use requires a lot of discipline.
+Everything that is allocated by the programmer as memory that is pointed to by these pointers must systematically be deallocated by the programmer.
+And this discipline is sometimes hard to respect systematically.
+If we want to allocate memory dynamically, as of C++11, we can use pointers that are somewhat more comfortable to use and which require less precautions of the programmer.
+These are so-called smart pointers, and I will briefly present them now.
+"Smart pointers" can be used by including the memory library.
+They have the advantage of deleting themselves when appropriate.
+This means that they manage deallocation of their associated memory themselves.
+The programmer does not need to worry about freeing memory anymore, which avoids problems related to forgetting the
+<i>delete</i> statement as with C-style pointers.
+The memory management of smart pointers uses so-called garbage-collecting techniques.
+There are 3 kinds of smart pointers in C++11.
+<i>unique_ptr, shared_ptr</i> and <i>weak_ptr</i>.
+The difference between these pointer types is essentially related to the number of pointers of a given type that are able to reference a same memory area.
+For example, in the case of <i>unique_ptr</i>s, only one <i>unique_ptr</i> can point towards a given dynamically allocated memory area such as this one.
+The situation where we would have a second <i>unique_ptr</i> pointing to the same dynamically allocated memory area is not possible.
+On the contrary, with <i>shared_ptr</i> and <i>weak_ptr</i>, one can have several pointers that point to the same dynamically allocated memory area.
+The difference between <i>shared</i> and <i>weak_ptr</i> will be explained briefly soon.
+C-style pointers can do everything.
+For example, in some situations, it is possible for two different pointers to reference, to point to the same memory area.
+This means that the programmer must show discipline, and be very careful.
+Imagine for example that in one part of the program, I call <i>delete p2</i>
+This will deallocate the memory area pointed to by p2, which is also pointed to by p1.
+So it is up to the programmer to be sufficiently careful to guarantee that freeing memory in one place will not have any ill effects on another part of the program.
+If we want to avoid this kind of problems and if we know in advance that there will be no need for several pointers to reference, to own a same memory area, then we should use the C++11 notion of unique_ptr.
+We saw that these pointers are such that only one single unique_ptr can reference a given dynamically-allocated memory area.
+So the situation where two unique_ptrs reference the same area is not possible; the situation we discussed earlier is not possible with these.
+This will avoid confusions such as the ones we described.
+A fairly logical consequence that follows, given that one and only one unique_ptr can reference a given memory area, is that unique_ptrs cannot be copied.
+Basically, in C++11, if I want to declare, to initialize a unique_ptr, then I will have to use the following syntax.
+So, unique_ptr. I must indicate what type of memory area the unique_ptr can point to.
+So here I declare a new unique_ptr that can point to an integer, and of course I give it a name.
+To initialize it, since it is a pointer, I need an address and so I can initialize it with the address of a dynamically allocated object.
+This is something I know how to do for an integer for example, via this kind of statement.
+Now if I try to create a copy of this unique_ptr, by declaring a pointer p1 and by copying the value of p2, this is illegal in C++11.
+This is to guarantee that there cannot be two unique_ptr-type pointers pointing to the same dynamically- allocated memory area.
+Thus, unique_ptrs cannot be copied, but they can be moved, that is, passed on farther.
+C++11 implements this with the so-called move semantic.
+This concept goes beyond the scope of this lecture, but I will briefly outline it later.
+So, about the syntax: to establish the syntax, let's look at a small example of declaration and initialization of a unique_ptr.
+Here, I declare a unique_ptr px, which can point to an integer.
+A unique_ptr is a pointer like any other in the sense that it will contain an address; here, it contains the address of a dynamically-allocated memory area for an integer.
+Aside from that, unique_ptrs will be used like any other pointer we have discussed up until now.
+For example, we can access the content pointed to by the unique_ptr by using the star operator, as we did with
+C-style pointers.
+We can of course also declare a vector, a dynamic array of unique_ptrs.
+Here is an example of a dynamic array named noms (TN: nom means "names") and whose elements are unique_ptrs capable of pointing to memory areas with a character array type.
+When we initialize this vector, we make use of dynamic allocation to get to the following situation
+So, our <i>noms</i> array contains two elements, two cells, each of which contains the address of a dynamically-allocated object.
+The first element contains the address of a dynamically allocated area containing the character array "Pierre", and the second element of the vector contains the address of a dynamically- allocated memory area containing the character array "Paul".
+So here, each element of the array points uniquely to a character array thanks to the concept of unique_ptr.
+Last example to illustrate among others the concept of moving versus copying.
+Here, imagine that in a program, we have a
+Personne type which is for example a structure representing the concept of a person and one of whose fields would be, for example, the name of the person, with a character array type.
+Through the <i>naissance</i> (TN: means
+"birth") function, we want to create a new object of type Personne, and to return the address of this object, stored in a unique_ptr.
+The line of code that handles creation of this object is as follows.
+Creation of the object is done using dynamic allocation.
+We dynamically create an object of type Personne.
+The address of this object is stored in the bb variable which is of type unique_ptr-to-Personne.
+So let's imagine that afterwards, we make the necessary initializations for the bb variable, for example by giving the name of the data structure with the name passed on to the function, and then we supply to the outside world the address of the object that we have just created.
+So we end up in this situation.
+We have a bb variable which contains the address of a dynamically-allocated object of type Personne, so the type that is stored is Personne.
+Now, let's place ourselves in the context of use of this "naissance" function.
+Here, I declare a variable adresse_quidam
+(TN: means "address_individual") of type unique_ptr-to-Personne, and
+I initialize it using the unique_ptr returned by the call to the "naissance" function.
+So here, we could imagine that we are in this situation, where the variable bb contains the address of a Personne, a person whose name is Pierre.
+And here, we can imagine that what we are doing in reality is copying to value of bb to another variable of type unique_ptr which would be named adresse_quidam.
+So this might well appear to be a copy, but in reality what is happening is a move, meaning that the value which was stored in bb is moved to the new variable, adresse_quidam and that the variable bb is no longer usable as-is, i.e that we still have only one single object pointing to the personne object and that we have not broken the fact that only one unique_ptr can point to a given object.
+So here, we implicitly used what is known in C++11 as the move semantic.
+What happens in this particular context is not a copy, but a move.
+C++11 knows, indeed, that at this step we are effecting a move and not a copy because the value that we are assigning to the object of type unique_ptr is in reality transient data originating from a function call.
+It is this transient data originating from this function call which is assigned to the unique_ptr, and in this case, we know that a move was made, and not a copy.
+Unique_ptrs are smart pointers, meaning that the memory which was associated to them is freed automatically, we do not need to worry about it.
+If however, we wanted to free this memory explicitly, it is also possible to do so, i.e to call delete ourselves, and so in this case, we would use a instruction that is specific to these pointers, the reset statement.
+At that moment, call ptr.reset(), which will result in freeing the memory associated to this pointer and assigning the nullptr value to the smart pointer ptr. 
+Unique_ptrs are very secure; we have just seen that they guarantee that each pointer is unique in pointing to a given memory area and so, this guarantees a very secure use. This means that it is recommended to use them in any situation possible.
+However, they obviously will not cover every need and in some cases, it is completely inevitable to guarantee that two different code fragments point to, use, the same memory area.
+In those cases, one will need other types of smart pointers, such as shared_ptr for example.
+A shared_ptr is such that several of them can point to the same memory area.
+Here we can imagine the situation where we have a code fragment "code1" and a code fragment "code2" which both point, via a pointer of type shared_ptr, to the same dynamically-allocated memory area which is this one.
+Technically, for it to be possible to automatically free a memory area referenced by shared_ptrs, it is necessary to keep track of the different code fragments, which point to this memory area.
+Thus, we can only deallocate this area automatically once no-one uses it anymore.
+And there can be cyclic dependence situations where we cannot manage to free the memory correctly when we use shared_ptrs.
+In those cases, we will have to also use weak_ptrs which will allow us to break these cycles brought about by the shared_ptrs.
+This is of course highly advanced compared to the contents of this lecture.
+The essential message I wanted to pass on is that these sort of tools exist, without necessarily going into detail about there use.
+What is important to remember is that if, in a simple situation, we wish to use smart pointers and we do not need several pointers to be able to point to the same memory area, the preferred solution is definitely unique_ptrs, which are secure and hassle-free compared to other types of smart pointers.
+Pointers are a wide topic, and there is still a lot to say, especially about smart pointers.
+We have simply presented these briefly so that you know that they exist.
+For most cases, we focused on understanding classic, C-style pointers, which you will get to encounter very frequently in the literature.

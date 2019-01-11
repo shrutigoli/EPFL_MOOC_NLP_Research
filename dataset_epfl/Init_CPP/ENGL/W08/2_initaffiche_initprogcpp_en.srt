@@ -1,0 +1,1737 @@
+1
+00:00:05,549 --> 00:00:07,293
+The coding of an application,
+whatever it is,
+
+2
+00:00:07,293 --> 00:00:09,703
+requires a careful thinking
+of the involved data
+
+3
+00:00:09,703 --> 00:00:12,350
+and of the fundamental functionalities
+
+4
+00:00:12,350 --> 00:00:14,795
+which will enable to implement
+the desired processing.
+
+5
+00:00:14,795 --> 00:00:17,646
+In the previous episode., we have already started this thinking
+
+
+6
+00:00:17,646 --> 00:00:19,909
+about the coding of the Connect Four game.
+
+7
+00:00:19,909 --> 00:00:22,242
+This has lead us to identify
+the fundamental types
+
+8
+00:00:22,242 --> 00:00:24,653
+in order to represent the game grid.
+
+9
+00:00:24,653 --> 00:00:26,423
+Today we will expand our
+reasoning
+
+10
+00:00:26,423 --> 00:00:28,980
+and focus on the
+basic funtionalities.
+
+11
+00:00:29,340 --> 00:00:32,107
+Little reminder: in the previous
+episode,
+
+12
+00:00:32,107 --> 00:00:34,318
+we have paid attention to
+the types of the involved data.
+
+13
+00:00:34,318 --> 00:00:39,280
+Very naturally, we have contemplated
+the modelling of the game grid.
+
+14
+00:00:39,280 --> 00:00:43,534
+Thus, we have introduced the
+new type "Grille" (TN: means "grid")
+
+15
+00:00:43,534 --> 00:00:45,784
+as a two-dimensional array.
+
+16
+00:00:45,784 --> 00:00:51,215
+We have also modeled the cells' content
+
+17
+00:00:51,215 --> 00:00:53,322
+of all the array's elements.
+
+18
+00:00:53,322 --> 00:00:56,242
+This has lead us to introduce a
+new enumerated type,
+
+19
+00:00:56,242 --> 00:00:59,906
+the type "Couleur" enabling us
+to represent
+
+20
+00:00:59,906 --> 00:01:02,747
+the content of each
+array cells.
+
+21
+00:01:03,700 --> 00:01:06,340
+The grid's size being fixed,
+we have naturally chosen
+
+22
+00:01:06,340 --> 00:01:11,311
+to use the "array" type, introduced in C++2011,
+letting us 
+
+23
+00:01:11,311 --> 00:01:13,050
+represent a fixed-size array.
+
+24
+00:01:13,050 --> 00:01:17,207
+We have simply declared the
+type "Grille" as
+
+25
+00:01:17,207 --> 00:01:21,176
+representing a two-dimensional array,
+
+26
+00:01:21,176 --> 00:01:24,053
+its size being fixed with
+6 rows and 7 columns.
+
+27
+00:01:24,053 --> 00:01:26,256
+Each element of the grid is of
+the type "Couleur".
+
+28
+00:01:26,256 --> 00:01:31,121
+"Couleur" being an enumerated type allowing only
+the values "vide" ("empty"), "rouge" ("red") and "jaune" ("yellow").
+
+29
+00:01:31,633 --> 00:01:33,814
+Once these types have been
+introduced, we can easily, in our program,
+
+30
+00:01:33,814 --> 00:01:38,676
+declare a Grille-type variable
+and assign values
+
+31
+00:01:38,676 --> 00:01:40,439
+to its different elements.
+
+32
+00:01:40,625 --> 00:01:43,698
+These values will be taken among
+the ones of the enumerated type,
+
+33
+00:01:43,698 --> 00:01:47,256
+that is, "vide", "rouge" or "jaune".
+
+34
+00:01:47,256 --> 00:01:49,827
+The fundamental types having
+been defined,
+
+35
+00:01:49,827 --> 00:01:52,359
+we will now focus on the
+first functionalities
+
+36
+00:01:52,359 --> 00:01:53,882
+we will operate on our grid.
+
+37
+00:01:53,882 --> 00:01:56,370
+At the beginning of the game,
+we will probably want to start
+
+38
+00:01:56,370 --> 00:01:59,380
+playing with an empty grid.
+
+39
+00:01:59,380 --> 00:02:04,457
+Therefore, we will have to focus on the
+initialization, letting us initialize
+
+40
+00:02:04,457 --> 00:02:08,282
+each of the array cells to the
+value "vide".
+
+41
+00:02:08,282 --> 00:02:12,138
+Also, we will have to allow
+the printing of the grid,
+
+42
+00:02:12,138 --> 00:02:15,722
+so that players may have an understanding
+of their advancement in the game.
+
+43
+00:02:15,722 --> 00:02:18,144
+In the this episode,
+
+44
+00:02:18,144 --> 00:02:22,286
+we will focus on implementing
+concretely these two functionalities.
+
+45
+00:02:22,286 --> 00:02:25,930
+We will forsee the coding of a function
+"initialise" (TN: means "initialize)
+
+46
+00:02:25,930 --> 00:02:28,181
+initializing the grid
+
+47
+00:02:28,181 --> 00:02:31,394
+as well as the coding of another
+function called "affiche" (TN: means "print")
+
+48
+00:02:31,394 --> 00:02:33,519
+which will print the grid.
+
+49
+00:02:33,519 --> 00:02:36,049
+Let us begin with the initialization.
+
+50
+00:02:36,049 --> 00:02:38,804
+Let us imagine how to
+concretely use
+
+51
+00:02:38,804 --> 00:02:41,193
+this "initialise" function
+in a program.
+
+52
+00:02:41,193 --> 00:02:44,899
+We can imagine that, in a program,
+we have previously declared
+
+53
+00:02:44,899 --> 00:02:50,063
+a Grille-type variable "grille". In order
+to initialize this grid,
+
+54
+00:02:50,063 --> 00:02:52,470
+we can imagine to write
+a function
+
+55
+00:02:52,470 --> 00:02:55,121
+which can be called like this.
+
+56
+00:02:55,121 --> 00:02:59,976
+We will call the function "intialise" taking,
+as paramter, the grid
+
+57
+00:02:59,976 --> 00:03:01,395
+in order to modify its content.
+
+58
+00:03:01,395 --> 00:03:02,802
+How will be modify its content?
+
+59
+00:03:02,802 --> 00:03:08,222
+Well, simply we will fill each of its
+cells with the value "vide".
+
+60
+00:03:08,222 --> 00:03:11,482
+Now, let us focus on the coding
+of the "initialise" function.
+
+61
+00:03:11,482 --> 00:03:14,504
+We can see that the function "initialise",
+the way we see it,
+
+62
+00:03:14,512 --> 00:03:17,423
+does not need to return any result.
+
+63
+00:03:17,440 --> 00:03:19,889
+Its purpose is to modify the grid,
+to initialize it.
+
+64
+00:03:19,889 --> 00:03:24,938
+Naturally, we will describe an
+"initialise" function whose
+
+65
+00:03:24,938 --> 00:03:28,863
+return type is "void",
+for we do not need
+
+66
+00:03:28,863 --> 00:03:31,898
+to retrieve a value after
+the execution
+
+67
+00:03:31,898 --> 00:03:33,856
+of the "initialise" function.
+
+68
+00:03:34,370 --> 00:03:38,116
+We will write the "initialise" function
+passing a Grille-type parameter.
+
+69
+00:03:38,116 --> 00:03:40,699
+The "initialise" function
+will have to modify the grid.
+
+70
+00:03:40,950 --> 00:03:43,424
+Therefore, once we have finished
+executing the function,
+
+71
+00:03:44,006 --> 00:03:46,664
+at this point of the program,
+
+72
+00:03:46,664 --> 00:03:49,701
+we will retrieve a grid, the contet of which
+has been modified.
+
+73
+00:03:49,701 --> 00:03:52,428
+For this reason, we will 
+have to resort
+
+74
+00:03:52,428 --> 00:03:56,171
+to  passing by reference
+
+75
+00:03:56,171 --> 00:04:00,786
+so that the grid will indeed be
+modified by the initialization function.
+
+76
+00:04:00,786 --> 00:04:04,548
+By the way, please note that this way
+to code the "initialise" function
+
+77
+00:04:04,548 --> 00:04:07,120
+is obviously not the only
+possible solution.
+
+78
+00:04:07,120 --> 00:04:12,273
+We could imagine that, instead
+of working directly on
+
+79
+00:04:12,273 --> 00:04:14,279
+ the provided grid,
+ the "initialise" function
+
+80
+00:04:14,279 --> 00:04:17,116
+ could return a
+
+81
+00:04:17,116 --> 00:04:19,213
+correctly initialized grid.
+
+82
+00:04:19,213 --> 00:04:21,058
+This would correspond to the following call.
+
+83
+00:04:21,058 --> 00:04:25,663
+Here, we would replace the two
+lines of code we have written here
+
+84
+00:04:25,663 --> 00:04:28,045
+by something like this.
+
+85
+00:04:28,839 --> 00:04:31,209
+We could call the
+"initialise" function which,
+
+86
+00:04:31,394 --> 00:04:34,956
+instead of modifiying a provided
+grid, would return a new grid.
+
+87
+00:04:35,680 --> 00:04:38,273
+At this point, the return type
+would no longer be "void"
+
+88
+00:04:38,309 --> 00:04:40,174
+but  "Grille" instead.
+
+89
+00:04:40,174 --> 00:04:41,772
+Also, any parameter would no longer be necessary
+
+90
+00:04:41,772 --> 00:04:43,869
+since the "initialise" function would
+return a grid.
+
+91
+00:04:43,869 --> 00:04:46,707
+This is another way to proceed,
+a way we have already discussed
+
+92
+00:04:46,707 --> 00:04:48,508
+in the course about "structures",
+
+93
+00:04:48,720 --> 00:04:51,166
+with the example of the function
+enabling
+
+94
+00:04:51,166 --> 00:04:53,109
+to "give birth to a new person".
+
+95
+00:04:53,109 --> 00:04:56,428
+In this episone, we have chosen an
+alternative conception,
+
+96
+00:04:56,428 --> 00:04:59,117
+especially illustrating the idea
+of by-reference passing.
+
+97
+00:04:59,117 --> 00:05:02,111
+The header of the function is now
+clearly defined
+
+98
+00:05:02,111 --> 00:05:05,384
+and we can move on to developping its body.
+
+99
+00:05:05,849 --> 00:05:09,279
+Let us focus on the content
+of the function body.
+
+100
+00:05:09,279 --> 00:05:11,973
+What this function has to do
+is, for each row of the array,
+
+101
+00:05:11,973 --> 00:05:18,930
+to iterate on each cell and assigning
+it the value "vide".
+
+102
+00:05:19,126 --> 00:05:21,968
+Let's see how we can proceed
+
+103
+00:05:21,968 --> 00:05:24,179
+to initialize a single row.
+
+104
+00:05:24,179 --> 00:05:27,610
+Let us imagine we are trying
+to do so for the first row of the grid.
+
+105
+00:05:27,610 --> 00:05:31,652
+Obviously, we will need
+to write a "for loop".
+
+106
+00:05:31,652 --> 00:05:35,119
+This loop will iterate on each
+element of the row.
+
+107
+00:05:35,119 --> 00:05:38,085
+We can imagine a range-based for-loop
+
+108
+00:05:38,085 --> 00:05:41,081
+which is written like this.
+
+109
+00:05:41,081 --> 00:05:46,015
+As a first introduction. we will first do so
+for the first row of the grid,
+
+110
+00:05:47,926 --> 00:05:51,479
+iterating square by square.
+
+111
+00:05:51,479 --> 00:05:53,140
+This is written like this.
+
+112
+00:05:53,140 --> 00:05:56,103
+We will fill the content,
+assigning the value "vide" to it.
+
+113
+00:05:56,849 --> 00:05:59,826
+At this point, as an exercise,
+we have written the lines of code
+
+114
+00:05:59,826 --> 00:06:02,722
+initializing the first row of the grid,
+
+115
+00:06:02,722 --> 00:06:05,625
+storing the value "vide"
+in each cell.
+
+116
+00:06:06,006 --> 00:06:08,335
+Here, we can simply
+close the function.
+
+117
+00:06:09,065 --> 00:06:12,248
+By the way, please note
+the use of a "reference" type
+
+118
+00:06:12,248 --> 00:06:16,766
+for the iteration variable in the
+range-based for-loop.
+
+119
+00:06:16,766 --> 00:06:20,044
+This is mandatory if we
+want the
+
+120
+00:06:20,044 --> 00:06:22,182
+content of each square to be modified.
+
+121
+00:06:23,345 --> 00:06:25,103
+If we compile the program as such,
+
+122
+00:06:25,103 --> 00:06:27,075
+we will however encounter
+a tiny problem.
+
+123
+00:06:27,081 --> 00:06:31,311
+The identifier "case" (TN: means "square"),
+although very natural in French in order to identify
+
+124
+00:06:31,311 --> 00:06:35,209
+a square of the array is actually
+a reserved keyword of the C++ language.
+
+125
+00:06:35,715 --> 00:06:39,458
+We are therefore not allowed
+to use it as a variable identifier.
+
+126
+00:06:39,696 --> 00:06:42,030
+Therefore, we will have to
+make a slight change
+
+127
+00:06:42,030 --> 00:06:44,195
+so that the program may effectively
+compile.
+
+128
+00:06:45,065 --> 00:06:47,461
+We will change the
+identifier name.
+
+129
+00:06:47,713 --> 00:06:51,985
+We way take the precaution
+to comment the reason behind this choice,
+
+130
+00:06:51,985 --> 00:06:54,504
+explaining that we are not allowed
+to use the reserved keyword "case"
+
+131
+00:06:54,616 --> 00:06:56,453
+since it is a reserved keyword of the language.
+
+132
+00:06:56,453 --> 00:07:01,404
+Obviously, we will have to rectify
+the identifier wherever it is used.
+
+133
+00:07:01,404 --> 00:07:02,883
+Like this.
+
+134
+00:07:04,223 --> 00:07:07,532
+Obviously, this processing
+we have implemented to initialize
+
+135
+00:07:07,764 --> 00:07:12,564
+the first row of the grid must be
+repeated for each row
+
+136
+00:07:12,564 --> 00:07:14,749
+so that we can initialize
+the whole grid.
+
+137
+00:07:14,749 --> 00:07:17,921
+It is natural to imagine
+imbricating these processing
+
+138
+00:07:17,921 --> 00:07:20,511
+in a first "for loop"
+
+139
+00:07:20,511 --> 00:07:24,243
+which will be tasked to iterate
+on all the rows
+
+140
+00:07:24,243 --> 00:07:26,363
+and realize exactly the same processing.
+
+141
+00:07:26,363 --> 00:07:29,902
+Let 's write this first "for loop"
+
+142
+00:07:29,902 --> 00:07:33,495
+iterating on all the rows
+of the grid.
+
+143
+00:07:33,495 --> 00:07:36,896
+Once again, we can use a range-based for-loop.
+
+144
+00:07:36,896 --> 00:07:39,806
+Therefore using a variable "ligne"
+(TN: means "row") iterating
+
+145
+00:07:39,806 --> 00:07:41,541
+on each row of the grid.
+
+146
+00:07:41,541 --> 00:07:45,033
+For each row,
+we will have to replace "grille[0]" by "grille[ligne]".
+
+147
+00:07:45,645 --> 00:07:47,626
+We are realizing the same
+processing as before,
+
+148
+00:07:47,626 --> 00:07:51,098
+thus storing the value "vide"
+inside each square.
+
+149
+00:07:52,349 --> 00:07:54,533
+We correct here our identation.
+
+150
+00:07:54,533 --> 00:07:58,247
+Finally we have all these
+lines of code,
+
+151
+00:07:58,247 --> 00:08:00,807
+enabling us to iterate on all the rows
+
+152
+00:08:00,807 --> 00:08:02,498
+in order to modify
+their content.
+
+153
+00:08:02,498 --> 00:08:06,667
+By the way, please note the passing by reference
+
+154
+00:08:06,667 --> 00:08:11,085
+for the range-based for-loop variable, so that
+
+155
+00:08:11,085 --> 00:08:14,121
+the grid will indeed be
+modified.
+
+156
+00:08:14,802 --> 00:08:20,095
+We are now able to initialize
+a previously declared grid
+
+157
+00:08:20,095 --> 00:08:23,253
+thanks to the Grille-type defined
+during the previous step.
+
+158
+00:08:23,253 --> 00:08:25,810
+Let us now focus on the
+printing of the grid.
+
+159
+00:08:25,810 --> 00:08:29,075
+As before, let us imagine the
+concrete utiliization
+
+160
+00:08:29,075 --> 00:08:30,823
+of this printing function.
+
+161
+00:08:30,823 --> 00:08:35,193
+It is always recommended to start off
+by imagining how the function
+
+162
+00:08:35,193 --> 00:08:37,802
+will be used before its
+effective coding.
+
+163
+00:08:38,165 --> 00:08:42,141
+Typically, we can imagine that,
+once the grid has been initialized,
+
+164
+00:08:42,141 --> 00:08:44,327
+and other processing done on the grid,
+
+165
+00:08:44,582 --> 00:08:46,474
+we will need to print it.
+
+166
+00:08:46,942 --> 00:08:50,064
+It is natural to imagine calling an "affiche" function
+(TN: "affiche" means "display"/"print")
+
+167
+00:08:50,064 --> 00:08:52,325
+taking, as parameter, the grid "affiche".
+
+168
+00:08:52,591 --> 00:08:54,857
+Let us now focus on the prototype.
+
+169
+00:08:55,303 --> 00:08:58,928
+As before, the type "void" is natural
+since the printing function
+
+170
+00:08:58,928 --> 00:09:02,578
+will simply print the grid
+on the terminal
+
+171
+00:09:02,578 --> 00:09:04,777
+and does not need to
+return any result.
+
+172
+00:09:05,365 --> 00:09:07,114
+Here, we pass the grid as parameter.
+
+173
+00:09:07,114 --> 00:09:09,019
+Now we are wondering :
+
+174
+00:09:09,210 --> 00:09:12,017
+Under what form should
+we pass the parameter "grille"?
+
+175
+00:09:12,017 --> 00:09:15,069
+Should we resort to passing
+by value or by reference?
+
+176
+00:09:15,069 --> 00:09:18,317
+The printing function's purpose
+is to print the values
+
+177
+00:09:18,317 --> 00:09:20,204
+of the different squares
+of the came grid.
+
+178
+00:09:20,204 --> 00:09:23,498
+Its goal is therefore not to
+modify the content of the grid.
+
+179
+00:09:23,498 --> 00:09:26,404
+Therefore, it rather natural to
+imagine
+
+180
+00:09:26,404 --> 00:09:30,677
+to resort to passing by value
+for the parameter "grille".
+
+181
+00:09:30,677 --> 00:09:32,654
+Indeed, it is not necessary
+
+182
+00:09:32,654 --> 00:09:35,558
+for the printing function to
+modify the grid's content.
+
+183
+00:09:35,558 --> 00:09:39,478
+However we have seen that,
+when passing by value, a copy
+
+184
+00:09:39,478 --> 00:09:43,343
+of the argument passed to the
+function is made
+
+185
+00:09:43,343 --> 00:09:45,063
+in an area local to the "affiche" function.
+
+186
+00:09:46,621 --> 00:09:49,429
+If the object passed as argument is big,
+
+187
+00:09:49,511 --> 00:09:51,688
+this copy can be quite resource consuming.
+
+188
+00:09:51,979 --> 00:09:55,073
+At this point, we therefore
+resort to an alternative,
+
+189
+00:09:55,073 --> 00:10:00,364
+an optimization consisting
+of passing the parameter by reference.
+
+190
+00:10:01,088 --> 00:10:04,353
+This will let the "affiche" function
+work directly
+
+191
+00:10:04,353 --> 00:10:07,523
+on the memory area corresponding
+to the passed argument,
+
+192
+00:10:07,952 --> 00:10:08,885
+without any copy.
+
+193
+00:10:09,336 --> 00:10:12,728
+However, we take the precaution
+to pass the argument by constant reference
+
+194
+00:10:12,728 --> 00:10:15,595
+in order to make sure that the "affiche"
+function,
+
+195
+00:10:15,595 --> 00:10:18,264
+even if it operates directly
+on the argument,
+
+196
+00:10:18,264 --> 00:10:20,687
+will not modify its
+content.
+
+197
+00:10:20,687 --> 00:10:23,112
+For example if, within
+the body of the "affiche" function,
+
+198
+00:10:23,112 --> 00:10:25,893
+we attempt to modify the grid's content,
+
+199
+00:10:25,893 --> 00:10:28,050
+it will result in an error
+upon the compiling.
+
+200
+00:10:28,050 --> 00:10:31,825
+By the way, please note that we could
+very well have written this:
+
+201
+00:10:31,825 --> 00:10:35,443
+This notation is perfectly
+equivalent to the former.
+
+202
+00:10:35,443 --> 00:10:38,512
+We can use both notations
+indefferently.
+
+203
+00:10:39,292 --> 00:10:43,099
+This here is an optimization
+letting the function
+
+204
+00:10:43,099 --> 00:10:44,956
+work directly on the argument but
+
+205
+00:10:44,956 --> 00:10:47,209
+adding in stead certain
+railings
+
+206
+00:10:47,209 --> 00:10:49,314
+hindering the function to
+modify the grid's content,
+
+207
+00:10:49,314 --> 00:10:50,539
+for this is not the purpose of the function.
+
+208
+00:10:50,539 --> 00:10:53,743
+This precautation was essential in C++98.
+
+209
+00:10:54,198 --> 00:10:58,341
+In C++2011 however, it is not
+always the case.
+
+210
+00:10:58,658 --> 00:11:02,824
+However, these practice considerations
+stretch beyond the range of this course.
+
+211
+00:11:03,205 --> 00:11:08,084
+We will simply settle for implementing
+this precautation:
+
+212
+00:11:08,302 --> 00:11:10,458
+good practice in order to avoid
+the unnecessary copy.
+
+213
+00:11:10,803 --> 00:11:14,607
+Here, the prototype of the "affiche" function
+will use the
+
+214
+00:11:14,607 --> 00:11:17,526
+passing by constant reference in order to
+avoid the copy.
+
+215
+00:11:17,953 --> 00:11:20,559
+Let's now proceed to code
+the body of the "affiche" function.
+
+216
+00:11:20,559 --> 00:11:22,222
+Here, the coding is rather natural.
+
+217
+00:11:22,222 --> 00:11:24,978
+It is rather similar to what we have
+done for the "initialise" function.
+
+218
+00:11:24,978 --> 00:11:30,391
+The goal will be to iterate
+on each of the grid's rows.
+
+219
+00:11:30,391 --> 00:11:33,473
+Then, for each of the grid's row,
+we will iterate on each square
+
+220
+00:11:33,473 --> 00:11:36,870
+in order to print its
+content in a particular format.
+
+221
+00:11:36,870 --> 00:11:39,436
+Here, we will not do any graphical display
+
+222
+00:11:39,720 --> 00:11:42,439
+but will simply print the content
+of each cell
+
+223
+00:11:42,697 --> 00:11:45,314
+on the terminal, following a particular
+convention.
+
+224
+00:11:45,853 --> 00:11:47,856
+In order to iterate on all the
+grid's rows,
+
+225
+00:11:47,856 --> 00:11:50,506
+a range-based for-loop is rather natural.
+
+226
+00:11:50,720 --> 00:11:54,439
+We know exactly how many rows and
+how many columns there are in the grid.
+
+227
+00:11:54,439 --> 00:11:58,221
+So here, for each of the grid's rows;
+
+228
+00:11:59,501 --> 00:12:02,583
+this is written like this, with a range-based for-loop;
+
+229
+00:12:02,583 --> 00:12:07,832
+we will iterate on each square of
+the considered row.
+
+230
+00:12:08,252 --> 00:12:10,752
+We will thus print the content
+of each square,
+
+231
+00:12:10,762 --> 00:12:12,096
+in a particular format.
+
+232
+00:12:12,490 --> 00:12:15,332
+We will have to resort to tests
+in order to know, depending on the content,
+
+233
+00:12:15,444 --> 00:12:17,748
+what is to be printed.
+
+234
+00:12:17,748 --> 00:12:21,140
+For example, if the square contains
+the value "vide",
+
+235
+00:12:21,140 --> 00:12:23,301
+that is, if the value of the enumerated
+type "Couleur", is "vide",
+
+236
+00:12:23,763 --> 00:12:28,085
+we can choose, by convention, to print
+a blank space on the terminal.
+
+237
+00:12:28,786 --> 00:12:31,126
+Otherwise, we will resort to other tests.
+
+238
+00:12:31,126 --> 00:12:35,345
+If the value of the square corresponds
+to the value "rouge" of the enumerated type,
+
+239
+00:12:35,345 --> 00:12:39,307
+second possible convention,
+we can choose any convention,
+
+240
+00:12:39,307 --> 00:12:42,332
+here, for example, an 'O' for the value "rouge".
+
+241
+00:12:42,428 --> 00:12:45,073
+Otherwise, last possible case,
+we know that it contains the value "jaune".
+
+242
+00:12:45,417 --> 00:12:50,175
+We make a printing choice:
+for example, an 'X'
+
+243
+00:12:50,208 --> 00:12:52,252
+signifying the value "jaune".
+
+244
+00:12:53,505 --> 00:12:56,470
+Here, we conclude the body
+of the first "for loop",
+
+245
+00:12:56,632 --> 00:12:58,123
+the inside "for loop".
+
+246
+00:12:58,123 --> 00:13:01,760
+At this point, we have
+printed the content of one row.
+
+247
+00:13:02,470 --> 00:13:06,078
+We take the precaution
+to generate a line break,
+
+248
+00:13:06,078 --> 00:13:07,936
+separating the different rows,
+
+249
+00:13:07,936 --> 00:13:09,396
+once a row has been
+printed entierely.
+
+250
+00:13:09,396 --> 00:13:13,586
+This closes the body of the
+very first "for loop".
+
+251
+00:13:13,991 --> 00:13:17,245
+Then, we will end the
+body of our "affiche" function.
+
+252
+00:13:17,668 --> 00:13:19,763
+You will note here, that it has not
+been necessary
+
+253
+00:13:19,779 --> 00:13:21,536
+in our range-based for-loop
+
+254
+00:13:21,536 --> 00:13:23,964
+to resort to the ampersand symbol ('&').
+
+255
+00:13:23,964 --> 00:13:24,879
+Why is that?
+
+256
+00:13:24,879 --> 00:13:28,429
+Because we are only consulting
+the content of the different elements.
+
+257
+00:13:28,429 --> 00:13:29,962
+We do not aim to modify their content.
+
+258
+00:13:30,182 --> 00:13:33,550
+In this case "auto", withtout the 
+by-reference symbol ('&')
+
+259
+00:13:33,550 --> 00:13:34,957
+is amply sufficient.
+
+260
+00:13:34,957 --> 00:13:37,361
+As good programmers,
+we will now
+
+261
+00:13:37,361 --> 00:13:39,199
+comment the "affiche" function.
+
+262
+00:13:39,199 --> 00:13:41,768
+Indeed the printing choices
+we have resorted to
+
+263
+00:13:41,768 --> 00:13:43,450
+are not necessarily forseeable.
+
+264
+00:13:43,450 --> 00:13:46,373
+It is therefore useful for someone
+consulting our code
+
+265
+00:13:46,373 --> 00:13:48,817
+to know the used conventions
+without having
+
+266
+00:13:48,817 --> 00:13:51,137
+to read the whole function
+body.
+
+267
+00:13:51,137 --> 00:13:55,757
+At this point, we take the
+precaution to comment our code,
+
+268
+00:13:55,757 --> 00:13:59,002
+explaining the conventions
+adopted for the coding.
+
+269
+00:13:59,002 --> 00:14:05,679
+We precise that we will print an "O"
+for a red square and "X" for a yellow one.
+
+270
+00:14:07,079 --> 00:14:09,749
+Testing the functionalities
+as we progress
+
+271
+00:14:09,749 --> 00:14:11,668
+in the coding of an application
+is absolutely indispensable
+
+272
+00:14:11,835 --> 00:14:14,451
+in order to produce
+a sturdy and high-quality code.
+
+273
+00:14:14,717 --> 00:14:16,267
+This recommandation has been
+given
+
+274
+00:14:16,267 --> 00:14:19,335
+at the very beginning of our case study
+regarding the Connect Four.
+
+275
+00:14:19,335 --> 00:14:22,612
+We will thus begin testing
+our first functionalities,
+
+276
+00:14:22,612 --> 00:14:25,721
+namely the grid initialization
+and its printing.
+
+277
+00:14:26,681 --> 00:14:28,401
+In order to test the aforementioned
+functionalities,
+
+278
+00:14:28,590 --> 00:14:30,639
+we simply need to write
+a little main program,
+
+279
+00:14:30,639 --> 00:14:37,359
+calling the functions "initialise"
+and "affiche" on a previously
+
+280
+00:14:37,622 --> 00:14:40,309
+declared grid.
+
+281
+00:14:40,309 --> 00:14:46,327
+Here, we call the initialization
+and printing
+
+282
+00:14:46,327 --> 00:14:48,893
+functionalities on our grid.
+
+283
+00:14:50,243 --> 00:14:54,214
+It could be natural to wish
+to test the printings
+
+284
+00:14:54,214 --> 00:14:55,632
+of all the possible forms.
+
+285
+00:14:55,632 --> 00:14:58,479
+If we simply initialize the grid
+and print it directly,
+
+286
+00:14:58,479 --> 00:15:00,779
+all the squares will be empty.
+
+287
+00:15:00,779 --> 00:15:05,080
+At this point, it is interesting to make sure
+that all the cases are correclty covered.
+
+288
+00:15:05,080 --> 00:15:07,751
+We will try to cover all cases
+by filling the grid,
+
+289
+00:15:07,751 --> 00:15:12,308
+at certain places with yellow disks,
+
+290
+00:15:12,308 --> 00:15:14,986
+at others with red disks.
+
+291
+00:15:14,986 --> 00:15:19,716
+We are doing just that here,
+on randomly chosen squares.
+
+292
+00:15:20,676 --> 00:15:24,727
+The expected printing, following
+the program execution
+
+293
+00:15:24,917 --> 00:15:27,233
+should look like this.
+
+294
+00:15:27,853 --> 00:15:32,776
+Here, for every square of the grid,
+
+295
+00:15:32,916 --> 00:15:34,906
+excepted the ones we have
+explicitly assigned,
+
+296
+00:15:34,906 --> 00:15:36,356
+we should print a blank space.
+
+297
+00:15:36,356 --> 00:15:39,433
+We are representing this here
+with this symbol for more clarity.
+
+298
+00:15:39,433 --> 00:15:43,218
+However, please note that, in reality,
+only a blank space will be printed.
+
+299
+00:15:43,218 --> 00:15:45,802
+And, for the two particular squares
+we have filled
+
+300
+00:15:45,802 --> 00:15:48,944
+with red and yellow disks, we will
+have particular printings.
+
+301
+00:15:48,944 --> 00:15:56,627
+Here, the square on the 2nd row,
+3rd column must be yellow;
+
+302
+00:15:56,627 --> 00:15:59,588
+this corresponds, according to our
+printing convention to an "X".
+
+303
+00:15:59,588 --> 00:16:05,222
+Here, we indeed have the row
+index 0, 1, 2.
+
+304
+00:16:05,222 --> 00:16:06,886
+This corresponds to this row number.
+
+305
+00:16:06,886 --> 00:16:14,047
+The column index 0, 1, 2, 3,
+which corresponds to this.
+
+306
+00:16:15,252 --> 00:16:19,228
+Similarly we should have the
+printing convention
+
+307
+00:16:19,228 --> 00:16:24,310
+of a red disk on the 2nd row,
+4th column.
+
+308
+00:16:24,886 --> 00:16:28,520
+Concretely, in our Connect Four
+game, this playtest allows
+
+309
+00:16:28,520 --> 00:16:32,525
+to create a grid with a yellow disk here
+and a red disk here.
+
+310
+00:16:32,525 --> 00:16:36,391
+The bases have now been set and
+we can start
+
+311
+00:16:36,391 --> 00:16:38,673
+to focus on more cosmetic aspects,
+
+312
+00:16:38,673 --> 00:16:40,048
+tweaking aspects.
+
+313
+00:16:40,113 --> 00:16:42,945
+Here, the printing of the grid
+is rather dry.
+
+314
+00:16:43,227 --> 00:16:45,616
+It is not easy to distinguish
+columns,
+
+315
+00:16:45,616 --> 00:16:49,071
+Also, the separation between blank
+spaces is somewhat hazy.
+
+316
+00:16:49,071 --> 00:16:51,845
+Therefore, it would be nice to
+improve this printing;
+
+317
+00:16:51,845 --> 00:16:54,904
+this can be done by completing
+the existing code,
+
+318
+00:16:54,904 --> 00:16:58,953
+adding the following aspects which
+we will now comment.
+
+319
+00:16:58,953 --> 00:17:02,534
+This should provide a more
+explicit printing.
+
+320
+00:17:02,534 --> 00:17:07,488
+Especially separating the different
+columns with vertical bars
+
+321
+00:17:07,488 --> 00:17:11,834
+and explicitly numbering the
+different columns
+
+322
+00:17:11,834 --> 00:17:14,846
+below the grid in order to make
+it easier to visualize
+
+323
+00:17:14,846 --> 00:17:16,531
+the content of our game grid.
+
+324
+00:17:16,531 --> 00:17:21,120
+What were the necessary additions
+leading to this printing?
+
+325
+00:17:21,120 --> 00:17:26,381
+Well, we begin, before each row,
+
+326
+00:17:26,381 --> 00:17:29,695
+to print a blank space
+followed by a vertical bar.
+
+327
+00:17:29,695 --> 00:17:33,529
+This will allow to print
+each of these elements for each row.
+
+328
+00:17:33,529 --> 00:17:39,599
+Then, following the printing
+of each case's content,
+
+329
+00:17:39,599 --> 00:17:42,283
+be it "vide", "rouge" or "yellow"
+
+330
+00:17:42,283 --> 00:17:47,180
+we print a vertical bar
+just after this printing.
+
+331
+00:17:47,180 --> 00:17:50,172
+Therefore, we will print
+each of these vertical bars here.
+
+332
+00:17:50,172 --> 00:17:53,455
+The reamining processing
+is rigorously identical.
+
+333
+00:17:53,455 --> 00:17:57,004
+Then, once the whole
+grid has been printed,
+
+334
+00:17:57,004 --> 00:18:01,754
+we will focus on printing this
+part above the grid.
+
+335
+00:18:01,754 --> 00:18:05,196
+This is fulfilled by these lines
+of code here.
+
+336
+00:18:05,196 --> 00:18:06,667
+Let us comment them.
+
+337
+00:18:06,667 --> 00:18:09,226
+We begin by printing
+an equals symbol, this symbol.
+
+338
+00:18:11,785 --> 00:18:14,345
+This is a particular case,
+
+339
+00:18:14,345 --> 00:18:16,401
+not corresponding to the
+content of a column.
+
+340
+00:18:16,401 --> 00:18:19,703
+It simply corresponds to the 
+blank space preceeding the first column.
+
+341
+00:18:20,173 --> 00:18:21,932
+Then, thanks to a "for loop",
+
+342
+00:18:22,930 --> 00:18:26,861
+we will iterate on all the rows
+in order to print their number.
+
+343
+00:18:28,216 --> 00:18:32,433
+We preceed the printing of each
+number with the equals symbol.
+
+344
+00:18:33,223 --> 00:18:37,055
+Actually, this "for loop" here
+will let us print
+
+345
+00:18:37,055 --> 00:18:42,643
+each number preceded by the equals sign.
+
+346
+00:18:42,659 --> 00:18:44,715
+Here, we took the precaution
+to number the columns
+
+347
+00:18:44,715 --> 00:18:47,929
+starting with 1, making it
+more readable.
+
+348
+00:18:47,929 --> 00:18:52,189
+Once this "for loop" has been executed,
+we will have printed
+
+349
+00:18:52,189 --> 00:18:55,266
+the last column number,
+preceeded by the equals symbol.
+
+350
+00:18:55,266 --> 00:18:58,086
+If we wish to close the printing
+harmoniously,
+
+351
+00:18:58,086 --> 00:19:01,022
+we still have to print
+this double equals symbol
+
+352
+00:19:01,022 --> 00:19:03,213
+which you can see here.
+
+353
+00:19:03,822 --> 00:19:07,285
+This is followed by as many
+line breaks as necessary.
+
+354
+00:19:07,285 --> 00:19:10,229
+At this point, we have
+tweaked our printing,
+
+355
+00:19:10,229 --> 00:19:11,931
+thus making it more readable.
+
+356
+00:19:12,991 --> 00:19:15,132
+Please note that we are
+not iterating
+
+357
+00:19:15,416 --> 00:19:17,909
+on all the grid's values.
+
+358
+00:19:18,202 --> 00:19:23,325
+We are iterating as many times
+as there are columns in the grid.
+
+359
+00:19:23,325 --> 00:19:26,546
+At this point,
+we are using a classical iteration
+
+360
+00:19:26,546 --> 00:19:28,563
+and not a range-based for-loop.
+
+361
+00:19:28,563 --> 00:19:34,193
+The "i"variable will take as many values as
+the number of columns in the grid.
+
+362
+00:19:34,388 --> 00:19:38,124
+The number of columns is
+a size-type element;
+
+363
+00:19:38,536 --> 00:19:43,433
+this is represented in C++
+with the "size_t" type.
+
+364
+00:19:43,806 --> 00:19:45,836
+This is good practice
+
+365
+00:19:45,836 --> 00:19:47,910
+for the coding of such processing.
+
+366
+00:19:49,270 --> 00:19:50,850
+We have no reached
+the end of this step.
+
+367
+00:19:51,054 --> 00:19:53,772
+We have been able to model
+a Connect Four grid.
+
+368
+00:19:54,122 --> 00:19:56,249
+We also know how to initialize
+it and print its content.
+
+369
+00:19:56,538 --> 00:19:59,057
+We can now move on to
+the heart of matter
+
+370
+00:19:59,240 --> 00:20:01,474
+which will be the object
+of the following sequences.

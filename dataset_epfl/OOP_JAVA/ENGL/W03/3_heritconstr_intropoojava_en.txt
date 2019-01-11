@@ -1,0 +1,76 @@
+In this episode, will will examine how inheritance effects constructors, that is to say, how instances are initialized.
+We saw in other videos on constructors that in an instantiation of a subclass, the data members have to be initialized.
+Which is what we do when, for example, we declare an instance "r" of the class Rectangle by passing the width and height.
+This is done with a constructor which is in charge of initializing the data members.
+But if the class Rectangle inherits from a class FigureGeometrique, then the class Rectangle receives the set of data members from the class FigureGeometrique.
+So the constructors of the class
+Rectangle are to initialize the data members of the class Rectangle, including those inherited from the superclass FigureGeometrique.
+However, it shouldn't be the class programmer of Rectangle who has to initialize the data members of the class FigureGeometrique himself, and he would perhaps even be incapable of doing this if the superclass had private data members which he couldn't access.
+So, how can the designer of the subclass Rectangle initialize the data members of the superclass FigureGeometrique?
+To do this, he has to call in the constructor of the class Rectangle the constructor of the class FigureGeometrique.
+So that the initialization of the inherited data members be done by calling the constructor of the superclass in the constructor of the subclass.
+Let's see how this is done in Java.
+To call the constructor of a superclass in the constructor of a subclass, you use the method "super".
+And this method super has to be called in the very beginning of the body of the constructor of the subclass.
+So the syntax  will look like this; in the subclass constructor, that can take several different parameters, in the opening of its body, we will have the invocation of the constructors of the superclass by simply writing like this the keyword "super" and passing to the necessary arguments to the superclass constructor we want to invoke.
+Thereupon, after this first line, we can continue to initialize the data members of the superclass.
+Note that if the superclass has a default constructor, it is not necessary to explicitly call the superclass constructor, because the compiler automatically calls the default superclass constructor.
+Lets thoroughly examine an example.
+First of all, if the superclass doesn't have a default constructor, then the class absolutely has to invoke a superclass constructor.
+Evidently, this implies that the subclass also has an explicit constructor where we can write this call of the superclass constructor.
+For example, if we conside the class FigureGeometrique, with no default constructor, but an explicit constructor which receives 2 parameters, to initialize the data member position here, then we would suppose that it has a constructor like this with 2 parameters x and y to establish the position of the geometric shape.
+Then we have a class Rectangle, here that is derived from the class FigureGeometrique, and in this class, we will have a constructor that receives parameters in order to initialize the data member position of the superclass
+FigureGeometrique.
+A rectangle is a geometric shape and has inherited position from FigureGeometrique, so a rectangle will also have a position that needs to be initialized, and of course, as usual, the parameters l and h to initialize its own member variables largeur and hauteur.
+This constructor here, takes
+4 parameters, and starts by invoking the constructor of the superclass with the keyword super, and passing the 2 parameters it takes to it: x and y.
+So here we have an invocation of this constructor that initializes the position.
+Next as usual, we will continue by initializing
+Rectangle's own data members largeur and hauteur with the parameters it received: l and h.
+In the case where the superclass FigureGeometrique has a default constructor, then as mentioned before, an explicit call with super of the constructor of the superclass from the constructor of the subclass is superfluous.
+So here for example, we have a class FigureGeometrique, which does have a default constructor, that is, a constructor without any parameters, that initializes the position at (0,0).
+So in this case, the subclass Rectangle doesn't have to explicitly invoke the default constructor and we have endowed it with a conventional constructor that takes 2 parameters l and h to initialize its width and height.
+But we see here there isn't an explicit invocation of the superclass constructor because in fact the default constructor of the superclass is automatically invoked by the compiler.
+Something I would like to underline and which is sometimes asked is that even if a subclass doesn't have any specific data members, it may be obliged to redefine a constructor in the subclass.
+The constructor of a subclass, even if there aren't any specific member variables in a subclass, can also used to invoke specific constructors of the superclass.
+Let's take an example, suppose that Carre inherits from the superclass Rectangle, a square is a special kind of rectangle whose width and height are of equal length.
+In this case, will not introduce supplementary data members to the subclass Carre
+(TN: "carre" means "square"), but we will nevertheless want to redefine a constructor for this class.
+The constructor of this subclass Carre will call the constructor of the superclass Rectangle by obliging it to have an equal length for the height and width.
+Note that this class Carre, will have nothing else than a constructor here that forces the constructor of its parent class to have equal width and height.
+There wouldn't be anything else, if in Rectangle, there aren't mutators setHauteur or setLargeur.
+But if we did have in the super class for instance a method setHauteur, which received for example a parameter h to set the height, then in the class Carre, we would need to redefine the method Sethauteur so as to guaranty that the height is always equal to the width, and so here, setHauteur would also set the width.
+And likewise, if we had a method to set the width, this method would also set the height so as to ensure that the height is always equal to the width in the class Carre.
+This concludes this example.
+So to summarize the implications of inheritance in constructors, every subclass has to invoke the constructors of its superclass, this is done with the method "super" and the necessary arguments for a constructor of the superclass.
+This call of the superclass constructor must be done in the first line of the child class's constructor's body.
+If super is invoked later in the body, or is even invoked twice, we will receive an error message from the compiler.
+No method other than a constructor of a subclass can invoke the method "super".
+"super" doesn't need to be invoked if the superclass has a default constructor.
+In this case, even if we forget to write "super" super, the default constructor will be invoked automatically by the compiler.
+I would like to remind you that this default constructor, that is, a constructor without any arguments, is a special case, because if we do not implement it, a default version of this default constructor is provided by the compiler, but the moment we implement another constructor, this defaulted default constructor is not provided anymore.
+And at this point, if we want a default constructor, we would have to write it ourselves.
+So to avoid this problem connected with inheritance,
+I recommend that you always declare at least one constructor and always explicitly invoke a superclass constructor from a subclass constructor.
+Even if it is the default constructor that you want to call, it is better to write it explicitly which is more clear for the time being.
+Let's come back to the order in which constructors are called in a class hierarchy.
+Suppose for example, that we have defined a class C, that contains certain data members and methods, and extends a class B, which has its own data members and methods, and which itself inherits from a class A that has its own data members and methods.
+And we declare an instance monC of the class C by calling a constructor of this class C.
+So what happens when we declare an instance like this?
+This constructor will call the constructor of B, whether by default or explicitly, and then initialize its own data members.
+So in calling this constructor we first call the constructor of the class B.
+And the constructor of the class B, will first call a constructor of its superclass.
+And so, in this call of the constructor of B in the constructor of the class C, the constructors of the superclass A will first be called.
+Thus the first thing that happens when a constructor of C is called, is the execution of the constructor of the super-superclass, the class at the topmost tier.
+So the constructor will start by initializing the data members a1 and a2 and so, in the construction of a C, we will have started the construction of a B which will have started a construction of a A.
+Therefore the first thing that happens in this construction of C, is the construction of its section A.
+I remind you that through inheritance,
+C inherits all the data members of B, and B inherits those of A, which results in C effectively having the data members a1 and a2.
+So in constructing C, we start by construction its section A.
+That's the first thing that happens.
+When constructing A is finished, we then continue in the constructor B to initialize B's own data members, in this case b1.
+Once B's construction is done, we come back to the execution of the constructor of C.
+Once this first constructor is finished executing, it will have initialized its section C.
+And so this completes the construction of C.
+So in the construction of a subclass instance, we first call the constructor of the highest class from which the subclass is derived, then call in turn the constructors of the intermediate classes, and finally end in the subclass constructor with the construction of the section of the subclass itself.
+So! This concludes this video on the consequences of inheritance in the instantiation of objects.

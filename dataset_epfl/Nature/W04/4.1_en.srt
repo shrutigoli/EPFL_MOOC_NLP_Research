@@ -1,0 +1,636 @@
+1
+00:00:03,420 --> 00:00:04,880
+Welcome back. 
+<i>Nature, In Code</i>.
+
+2
+00:00:04,880 --> 00:00:07,420
+We're in Chapter 4.
+This is Lecture 1.
+
+3
+00:00:07,420 --> 00:00:10,890
+In this chapter, 
+we'll learn all about mutation.
+
+4
+00:00:10,890 --> 00:00:13,430
+Recall what we learned 
+in the previous chapters.
+
+5
+00:00:13,430 --> 00:00:17,220
+In Chapter 2, we introduced 
+the <i>Hardy-Weinberg world</i>,
+
+6
+00:00:17,220 --> 00:00:21,180
+a world where there's no force 
+acting on the allele frequencies,
+
+7
+00:00:21,180 --> 00:00:23,480
+and where there is no evolution.
+
+8
+00:00:23,480 --> 00:00:27,000
+Then, in Chapter 3, we relaxed
+one of the key assumptions
+
+9
+00:00:27,000 --> 00:00:28,870
+of the Hardy-Weinberg world,
+
+10
+00:00:28,870 --> 00:00:31,950
+and that is the assumption 
+of infinite population sizes.
+
+11
+00:00:31,950 --> 00:00:36,380
+And we saw that when we start 
+considering finite population sizes,
+
+12
+00:00:36,380 --> 00:00:39,740
+then random sampling effects 
+would start kicking in,
+
+13
+00:00:39,740 --> 00:00:42,270
+leading to the phenomenon 
+of <i>genetic drift</i>.
+
+14
+00:00:42,270 --> 00:00:46,190
+And we learned that one 
+of the key consequences of genetic drift
+
+15
+00:00:46,190 --> 00:00:50,920
+is the ultimate, complete loss 
+of genetic variation.
+
+16
+00:00:50,920 --> 00:00:53,830
+Now, clearly, this is not what we 
+observe in the real world.
+
+17
+00:00:53,830 --> 00:00:56,690
+There is a lot of genetic variation 
+in the real world,
+
+18
+00:00:56,690 --> 00:01:01,400
+so there must be some process 
+countering this effect of genetic drift,
+
+19
+00:01:01,400 --> 00:01:03,910
+and that process is mutation.
+
+20
+00:01:03,910 --> 00:01:07,970
+<i>Mutation</i> is the ultimate generator 
+of genetic variation.
+
+21
+00:01:07,970 --> 00:01:12,670
+And in this video, 
+and in the future lectures of Chapter 4,
+
+22
+00:01:12,670 --> 00:01:15,400
+we'll learn all about mutation,
+
+23
+00:01:15,400 --> 00:01:18,610
+its effect on evolution,
+and most importantly, of course,
+
+24
+00:01:18,610 --> 00:01:21,840
+we'll implement this process 
+in JavaScript,
+
+25
+00:01:21,840 --> 00:01:24,380
+thereby, learning new JavaScript concepts.
+
+26
+00:01:24,380 --> 00:01:25,670
+So, let's get going.
+
+27
+00:01:25,670 --> 00:01:29,580
+So <i>mutation</i> is the random change 
+in the genetic sequence.
+
+28
+00:01:29,580 --> 00:01:33,030
+This happens, typically, 
+during <i>cell replication</i>.
+
+29
+00:01:33,030 --> 00:01:34,910
+So if you have a cell here--
+
+30
+00:01:34,910 --> 00:01:37,500
+and this is the genetic sequence 
+of the cell--
+
+31
+00:01:37,500 --> 00:01:39,400
+and now this cell replicates
+
+32
+00:01:39,400 --> 00:01:43,810
+so that you have two copies 
+after the replication step,
+
+33
+00:01:44,710 --> 00:01:47,520
+it's possible that during this step,
+
+34
+00:01:47,520 --> 00:01:52,480
+a small change will occur,
+a small error.
+
+35
+00:01:52,480 --> 00:01:55,720
+So there might be some mistake 
+that's being made here,
+
+36
+00:01:55,720 --> 00:01:59,380
+and then you have a mutation 
+in this new cell.
+
+37
+00:01:59,380 --> 00:02:02,180
+Now, this process is extremely rare
+
+38
+00:02:02,180 --> 00:02:05,980
+'cause the replication process 
+is generally incredibly accurate,
+
+39
+00:02:05,980 --> 00:02:08,500
+but occasionally, 
+mistakes do happen,
+
+40
+00:02:08,500 --> 00:02:12,730
+and these mistakes manifest themselves 
+as random mutations.
+
+41
+00:02:12,730 --> 00:02:16,710
+Now, if this process happens 
+in one of your body cells,
+
+42
+00:02:16,710 --> 00:02:19,400
+this is typically 
+an evolutionary dead end
+
+43
+00:02:19,400 --> 00:02:21,920
+because you're not passing on 
+your body cells,
+
+44
+00:02:21,920 --> 00:02:25,410
+your so-called <i>somatic cells</i>, 
+to your offspring.
+
+45
+00:02:25,410 --> 00:02:28,920
+If one of those mistakes happens 
+in the <i>germ-line</i>, though--
+
+46
+00:02:28,920 --> 00:02:32,860
+so the line of cells 
+that eventually produce the gametes,
+
+47
+00:02:32,860 --> 00:02:35,400
+the sperm, or the eggs--
+
+48
+00:02:35,400 --> 00:02:39,980
+then these mistakes 
+will be passed on to the next generation,
+
+49
+00:02:39,980 --> 00:02:44,430
+and it's those that matter 
+from an evolutionary perspective.
+
+50
+00:02:44,430 --> 00:02:47,430
+So how should we implement 
+this idea in JavaScript?
+
+51
+00:02:47,430 --> 00:02:50,180
+Well, <i>DNA</i> has four bases:
+
+52
+00:02:50,180 --> 00:02:53,480
+adenine, guanine, cytosine, and thymine,
+
+53
+00:02:53,480 --> 00:02:56,220
+and these are typically abbreviated
+by their first letter,
+
+54
+00:02:56,220 --> 00:02:58,460
+so A, G, C, and T.
+
+55
+00:02:58,460 --> 00:03:01,960
+So what I'm gonna do is, 
+I'm gonna reuse this concept of an array,
+
+56
+00:03:01,960 --> 00:03:05,160
+and I'm gonna store 
+a set of these letters.
+
+57
+00:03:05,160 --> 00:03:06,500
+So you know, let's say,
+for example,
+
+58
+00:03:06,500 --> 00:03:09,910
+'A', 'T', 'C',
+
+59
+00:03:09,910 --> 00:03:14,410
+another 'C', and a 'T', 
+and maybe a 'G',
+
+60
+00:03:14,410 --> 00:03:18,490
+and so on, okay,
+as an <i>array of strings</i>.
+
+61
+00:03:18,490 --> 00:03:21,140
+So these are strings 
+with a single character.
+
+62
+00:03:21,140 --> 00:03:23,840
+Now, you can use single 
+or double quotes, it doesn't matter
+
+63
+00:03:25,420 --> 00:03:29,510
+In reality, of course, your DNA sequences 
+are much, much longer.
+
+64
+00:03:29,510 --> 00:03:33,520
+Your cells contain <i>DNA sequences</i> 
+that are typically
+
+65
+00:03:33,520 --> 00:03:37,160
+of the order of 3 billion 
+of these bases,
+
+66
+00:03:37,160 --> 00:03:40,170
+but we're not gonna store 
+DNA sequences that long.
+
+67
+00:03:40,170 --> 00:03:41,700
+That's beyond the point.
+
+68
+00:03:41,700 --> 00:03:44,410
+But we're gonna store 
+DNA sequences like that,
+
+69
+00:03:44,410 --> 00:03:48,200
+and then we're simply gonna add 
+multiple of these sequences,
+
+70
+00:03:48,200 --> 00:03:50,150
+so multiple of these arrays
+
+71
+00:03:50,870 --> 00:03:54,050
+and, through that, 
+we get a two-dimensional array.
+
+72
+00:03:54,050 --> 00:03:58,420
+And now, this two-dimensional array 
+is essentially our population.
+
+73
+00:03:58,420 --> 00:04:01,660
+So we have, you know, 
+the arrays here.
+
+74
+00:04:01,660 --> 00:04:03,500
+Okay, these are DNA sequences.
+
+75
+00:04:04,700 --> 00:04:06,490
+And we have many, many DNA sequences
+
+76
+00:04:06,490 --> 00:04:09,910
+that will eventually 
+make up our population
+
+77
+00:04:09,910 --> 00:04:12,070
+in this two-dimensional array.
+
+78
+00:04:12,890 --> 00:04:16,220
+Now, we do want to go 
+in the third dimension.
+
+79
+00:04:16,220 --> 00:04:20,270
+Because this two-dimensional array 
+captures our population,
+
+80
+00:04:20,270 --> 00:04:23,000
+we want to see how this changes over time.
+
+81
+00:04:23,000 --> 00:04:26,190
+So what we're gonna do is, 
+we're gonna add a third dimension,
+
+82
+00:04:27,530 --> 00:04:30,150
+something like this,
+which is time,
+
+83
+00:04:30,150 --> 00:04:32,950
+and we want to see how this population--
+
+84
+00:04:32,950 --> 00:04:36,990
+which at each time step is represented 
+by a two-dimensional array--
+
+85
+00:04:36,990 --> 00:04:42,410
+is going to change 
+as we start to introduce mutations.
+
+86
+00:04:42,410 --> 00:04:45,840
+So, in order to help you 
+wrap around your head a little bit
+
+87
+00:04:45,840 --> 00:04:48,460
+about this concept 
+of multi-dimensional arrays,
+
+88
+00:04:48,460 --> 00:04:50,520
+here's how I tend to think of it:
+
+89
+00:04:50,520 --> 00:04:52,660
+So, right, 
+as we recall,
+
+90
+00:04:52,660 --> 00:04:56,200
+an <i>array</i> is essentially just a way 
+for us to store multiple values.
+
+91
+00:04:56,200 --> 00:04:58,030
+These can be numbers, 
+these can be strings,
+
+92
+00:04:58,030 --> 00:05:00,370
+can be whatever, 
+in JavaScript.
+
+93
+00:05:00,370 --> 00:05:05,060
+So, each of these boxes here, 
+contains an element in an array.
+
+94
+00:05:05,060 --> 00:05:07,210
+This is a <i>one-dimensional array</i>.
+
+95
+00:05:07,210 --> 00:05:10,150
+But sometimes, we want to 
+have many of those arrays,
+
+96
+00:05:10,150 --> 00:05:11,660
+and we want to store those, as well,
+
+97
+00:05:11,660 --> 00:05:15,220
+so we simply store these arrays
+in another array,
+
+98
+00:05:15,220 --> 00:05:17,220
+and we get a <i>two-dimensional array</i>.
+
+99
+00:05:17,220 --> 00:05:18,840
+And we've done this before.
+
+100
+00:05:19,910 --> 00:05:23,980
+So, before, we stored 
+the allele frequencies over time,
+
+101
+00:05:23,980 --> 00:05:27,900
+and then, each of these time series 
+of allele frequencies
+
+102
+00:05:27,900 --> 00:05:31,980
+would essentially be <i>A simulations</i>,
+and we had multiple simulations.
+
+103
+00:05:31,980 --> 00:05:33,690
+In our case, now, 
+for example,
+
+104
+00:05:33,690 --> 00:05:36,000
+we could have these DNA sequences--
+
+105
+00:05:36,000 --> 00:05:38,420
+each of these arrays is a DNA sequence--
+
+106
+00:05:38,420 --> 00:05:41,630
+and the set of DNA arrays
+
+107
+00:05:41,630 --> 00:05:44,180
+is itself, an array,
+a two-dimensional array,
+
+108
+00:05:44,180 --> 00:05:46,190
+and that would be the population.
+
+109
+00:05:46,190 --> 00:05:48,870
+So how do we bring this 
+to the third dimension?
+
+110
+00:05:48,870 --> 00:05:49,670
+Well, it's quite simple.
+
+111
+00:05:49,670 --> 00:05:53,470
+I mean, just think of this now, 
+as a three-dimensional structure,
+
+112
+00:05:53,470 --> 00:05:56,400
+and this would still be 
+your two-dimensional array here,
+
+113
+00:05:56,400 --> 00:05:59,420
+in the first generation, for example.
+
+114
+00:05:59,420 --> 00:06:02,420
+And now, we're gonna replicate 
+this entire structure,
+
+115
+00:06:02,420 --> 00:06:04,910
+this entire two-dimensional array,
+
+116
+00:06:04,910 --> 00:06:06,980
+and we're gonna create a second one.
+
+117
+00:06:06,980 --> 00:06:11,060
+And then, we'll be introducing mutations.
+
+118
+00:06:11,060 --> 00:06:13,690
+And so, we can now simply add this,
+
+119
+00:06:15,170 --> 00:06:16,720
+here, in this dimension,
+
+120
+00:06:16,720 --> 00:06:18,320
+so this would be <i>time</i>.
+
+121
+00:06:19,250 --> 00:06:21,550
+These will be our DNA sequences
+
+122
+00:06:23,150 --> 00:06:25,200
+as we did it before.
+
+123
+00:06:25,910 --> 00:06:29,460
+And, you know, 
+a set of these DNA sequences
+
+124
+00:06:29,460 --> 00:06:31,410
+will be our <i>population</i>.
+
+125
+00:06:31,410 --> 00:06:35,920
+And now, it's simply 
+gonna change, over time.
+
+126
+00:06:35,920 --> 00:06:39,430
+So we will now store 
+these two-dimensional arrays
+
+127
+00:06:39,430 --> 00:06:40,480
+in an array.
+
+128
+00:06:40,480 --> 00:06:42,750
+And so, this other array,
+this new array,
+
+129
+00:06:42,750 --> 00:06:45,910
+which stores many, many of those 
+two-dimensional arrays,
+
+130
+00:06:45,910 --> 00:06:48,620
+is now, essentially, 
+a <i>three-dimensional array</i>,
+
+131
+00:06:48,620 --> 00:06:53,720
+and, thereby, we can represent
+these populations over time
+
+132
+00:06:53,720 --> 00:06:58,140
+as we have many, many of those 
+two-dimensional population arrays.
+
+133
+00:06:58,140 --> 00:07:00,230
+So we're gonna 
+implement this in JavaScript.
+
+134
+00:07:00,230 --> 00:07:03,130
+I hope this visualization 
+helps you a little bit
+
+135
+00:07:03,130 --> 00:07:06,690
+to wrap your head around 
+three-dimensional arrays.
+
+136
+00:07:06,690 --> 00:07:09,430
+So, let's go ahead 
+and implement this in JavaScript.

@@ -1,0 +1,161 @@
+Welcome again, we're still talking about layering, but this time going in depth on two important stacks, the compute stack and the information stack.
+Now since these lectures are about layering, it's not how the layers themselves are implemented but rather how the stacks are organized and composed and the relationship between these varying stacks.
+But first a word of caution.
+Compute and information tend to be overloaded terms.
+Depending on your community, you may associate compute with a processor or CPU and information with memory or the memory hierarchy.
+And if you were to look at it from this perspective you may be tempted to actually create an association between the compute and the information stack and actually specifically an association that would look like this which is a diagram of the Finaman Architecture.
+And I'm not sure if I need to explain this in detail but the fundamentals of the Finaman Architecture could be summarized very simply, as saying that the program itself is stored in memory and the processor has a program counter to fetch connect instructions from memory.
+So compute and information in the context of the Finaman model are closely related concepts.
+If you were actually to expand on this, you may actually assume that by the compute stack we may talk about the internals that constitute a processor in by the information stack, we may talk about the internals that form the memory hierarchy and provide good performance.
+If you were to do so, you would actually be spot on in thinking about locality, which is going to be a topic of a lecture in a couple of weeks.
+But you would be actually missing the point when we are talking about layering which is the focus of this lecture today.
+So with that being said, let's talk about the compute stack.
+So to represent the computing stack
+I'm using a figure taken directly from the Saltzer and Kaashoek textbook.
+And it shows that there are three layers and two interfaces.
+The hardware layer below exposes an Instruction Set Architecture to software, and the software itself is organized as two distinct layers.
+There's the operating system layer and the application layer.
+Now the computing stack is unique in that it is customary for one layer to bypass a lower layer and directly execute instructions on the hardware layer.
+So specifically, applications execute instructions directly on the CPU without having to go through the operating system.
+Now that is what we call <i>direct execution</i>, commonly called <i>direct execution</i>.
+Now in general, layer bypass is frowned upon.
+But direct execution is actually necessary in the computing stack from a performance perspective, because otherwise the operating system would be left with the task of having to interpret the instructions of the applications.
+Now direct execution is however only acceptable if the lower software layer, which is the operating system, can create a secure sandbox that contains the upper software layer, the application to a well defined set of resources.
+And that containment is generally done and enforced by hardware.
+But it can be done in software as well.
+So in this simple example, which is in this figure, the hardware layer exposes primitives that are available only through the operating system.
+In particular, some privileged instructions.
+Only the operating system can issue these privileged instructions.
+By doing so, the operating system can ensure the integrity of the sandbox that it creates for each application process.
+Now all reasonable operating systems today provide that kind of protection, and that kind of layering, so even though you have direct execution from an implementation perspective, in reality, the layering is maintained.
+But keep in mind that this was not always the case.
+Windows 95, which ran on the world's desktop and which a few of you may be old enough to remember, is a perfect counter example.
+Even though the hardware had all the right primitives,
+Windows 95 chose to expose some critical in memory data structures directly to applications.
+As a result, applications could directly compromise the integrity of the sandbox, exposed by the operating system.
+Now fortunately, Windows 95 is not that interesting anymore.
+What's interesting these days in current architecture is that the notion of protection and bypass is remaining as relevant as ever.
+For example, virtual machine architectures have added a new layer in the hierarchy.
+Now we have to think of at least three layers, which we're showing in this picture.
+We now have an application layer like before.
+We have an operating system layer like before, but rather than running directly on the hardware, the operating system is actually running on top of a virtual machine monitor.
+Yet both the operating system and the application can still issue instructions directly, so that you have all the performance benefits of directly executing on the CPU.
+Now it means now that direct execution now applies across potentially two layers, allowing an application to bypass both the operating system and the hypervisor to directly issued instructions.
+In the last few years processors have added explicit hardware support for this feature so that it's easy to build a virtual machine stack and make the overheads of virtualization negligible.
+That means that a hypervisor or a virtual machine monitor can run at the most privileged level, an operating system at some intermediate level, and the application like before with the most reduced set of privileges possible.
+Yet all three can execute, direct the instructions on the CPU.
+Now that type of innovation has had a huge impact on the research community since we can now use those new hardware features to think about new layers and to compose new layered stacks in innovative ways.
+Here a few examples.
+For example you can use the hardware to create recursive virtual machines.
+There's an interesting paper that actually has a virtual machine monitor running a virtual machine monitor running a virtual machine monitor, running a virtual machine monitor, finally running an operating system in an application, that's a lot of layers and the paper was actually called "Turtles".
+There's another example, you can run a virtual machine monitor or hypervisor below that hypervisor, and you would do that so that you wouldn't have to trust the mid-level hypervisor for security perspective, so that you can have a guarantee that the mid-level hypervisor could not spoof on the content or inspect or spy on the content of the virtual machine and that interesting paper was called
+"Cloudvisor" it was an SOSP paper in 2011.
+What you can actually use the hardware differently to use virtualization to not create virtual machines but the sandbox processees from the operating systems, so create a mid layer between the OS and a process, that is there to provide an additional level of isolation guarantees, not implemented by the operating system.
+And there was a system called Dune published at OSDI in 2012 that leverages this hardware capability.
+Now we have a full dedicated lecture cycle on virtualization in a few weeks, for now we'll pause on the layering of the compute stack and shift gears and talk about the information stack.
+By information stack, I'm going to narrowly focus on the stack that handles structured data, there's an equally important information stack to think about unstructured data, but it's very important to start by having a good handle on how structured data is generally organized or typically organized today.
+So in doing so I'm specifically focusing on a layered architecture that includes a relational database since this is such an important use case.
+By that I mean that database is not an application as far as the field of computer systems is concerned but actually is part of the system domain.
+Let's look at the stack.
+In this picture, there are four layers, the database layer, the filesystem layer, the block layer, the volume layer, and then finally, the disk layer.
+I'm also listing here the APIs exposed by these various layers.
+Application make sequel calls, typically over some RPC protocol such as JDBC.
+That's the first API, on the UNIX system the database typically relies on POSIX API, so system calls to access files.
+Here I'm asumming a persistent file system if you remember the introductory module so the information stack typically goes to another two different layers, first the file system layer, and then the volume management layer.
+Now both these layers are internal to the operating system but they actually are very clearly separate distinct layers.
+Underneath the volume layer, the block driver layer issues block commands and that typically uses the SCSI protocol which is a hardware defined protocol to access those drives.
+Now one thing to note is that two of these layers expose the same interface, and that is the block interface.
+Both the SCSI protocol as well as the volume management layer expose a block interface and that is because volume management is a layer which exposes the same obstruction that the resource that it relies upon.
+That's a very specific form of layering called virtualization and again, as I mentioned, we'll have a dedicated lecture on virtualization in a few weeks.
+If we look at this picture here at this level detail, we have four layers.
+But in reality, many of these layers can be each expanded into multiple, distinct layers of their own.
+So let's start with the data layer.
+The data layer is the layer that manages the information as databases.
+Such databases typically follow what is known as the ANSI-SPARC three layer model.
+In that model, the individual presentation layer, the conceptual schema layer, and the internal representation layer are each architected into different layers.
+As with all good layers, each layer provides it's own level of abtraction, each layer relies on the layer below and each layer manages a namespace.
+So starting from the top, the presentation layer includes query languages, access control and many other elements.
+Below, the community view manages the community view that is, the externally visible elements of the schema, that is the namespace, that is exposed.
+Now internally, the community view relies on objects such as indices and logs that are provided by the physical layer.
+And finally, the physical layer itself implements these internal objects on top of physical resources and this picture on the right it is a disc, although in reality most databases are stored on file systems, as it's shown on the left.
+Let's move down one level, let's move specifically to the filesystem layer.
+In the previous module we talked about the POSIX layer and the VFS layer as two distinct building blocks of the storage stack.
+Here we're looking at the on-disc implementation of a specific filesystem.
+In other words the implementation of a specific filesystem driver.
+In this picture which is also taken from the textbook, illustrates the way the block layout of a UNIX filesystem is organized.
+What's interesting to note here is that the designers of the UNIX filesystem chose to architect the solution through a precise layering, by separating
+<i>inodes</i> from directories.
+Let me expand.
+The lower layer which is the <i>inode</i> layer allocates blocks and exposes the abstraction of a file.
+But in such a filesystem, the files are not named.
+Instead the meta data of each file is indexed with an array of anonymous <i>inodes</i>.
+Now in the upper layer, the directory layer the UNIX filesystem represents directories as files, so a directory is nothing more than an array of records that map a filename onto a particular <i>inode</i>.
+Now that strict layering is not accidental, instead it's the result of a deliberate effort to control the complexity of the design.
+For example, when a filesystem is corrupted, or simply when a filesystem needs repair after a crash, each layer can be independently managed and verified starting from the lower layers.
+That's precisely what tools such as what FS check do today on modern systems.
+Now let's move down another level below.
+File systems are laid on top of a block device abstraction.
+This could be any block device obstruction whether it's persistent or not and often file systems are laid on top of volumes.
+And a volume is nothing more than the virtualization of one or more physical disc drives.
+Now a single drive can be multiplexed into multi partitions and multiple disc drives can be aggregated into appearing like a single device.
+There's many ways to do this as there are RAID options.
+From a layering perspective, the thing to note is that the underlying resource and the exposed abstractions are identical.
+And again this definition of virtualization, so from a layering perspective, both in theory and in practice, the volume management layer could be trivially nested, recursively.
+Because you can trivially nest these layers recursively, you get combinations such as striped mirrors and mirrored stripes, which are common terms if you're looking at managing enterprise storage.
+In the first case you have RAID Zero which is layered on top of RAID One and in the other case you have
+RAID One layered on top of RAID Zero.
+To be honest with you,
+I always have to think about which is which.
+You can look it up too.
+The point is that you have layers that can be trivially nested and recursed with each other because the abstractions are all the same.
+So let's move down one layer below.
+By now you're probably hoping that this module is over, after all we are at the bottom of the stack, we're at the disc layer.
+Well, not quite.
+Actually, depending on your point of view things are just now starting to get interesting.
+That is because, like many terms in computer systems, storage is overloaded.
+So I prefer the definition of storage as a SCSI target.
+It's a little narrow since
+SCSI is only one possible protocol but the idea here is to define storage as an abstraction that is materialized by a well defined protocol, and in this case the protocol is SCSI.
+Now SCSI is nothing more than an RPC protocol.
+You have requests, you have response, the client's side is called initiator and the service side is called the target, there's a lingo associated with SCSI but it really is nothing more than an RPC protocol.
+Storage is really about being on the target or on the service side of that protocol.
+The target can be an actual disc, the two and half inch drive in your laptop is a SCSI target.
+The target code could also be a dedicated hardware component for example a RAID controller which is connected to multiple disks and in that example, the volume management and the RAID function that was previously described as part of the operating system is now implemented by the hardware itself.
+But storage target can and often is actually a much larger device.
+As a matter of fact, it's a computer of its own.
+Now the picture here is that of an enterprise class array and chances are your bank transactions are stored on either that device or the device made by one of their competitors.
+Now to put things in perspective, such a device literally weighs a ton, can have hundreds or thousands of disc drives, typically has at least four independent computer systems internally, that's because you have two redundant front end computers and two redundant back end computers and these are very complex systems, for example they automatically send you an email when something goes wrong and they definitely cost more than an apartment, even an apartment in Los An.
+So the point here, is that despite the immense internal complexity of that device, this is a device that exposes the abstraction of a disc.
+You have the same abstraction that ranges in terms of a price, from 100 francs, which would be the cost of a two and a half inch drive, to something that costs well over multiple millions of Swiss Francs.
+If you think about the importance of identifying the right layers and exposing the right abstractions, the storage industry which is a multi-billion dollar industry exists because of this well defined abstraction.
+Because it allowed them to innovate and change things and deliver new capabilities, and yet still maintain the appearance of just being nothing more than a disc drive.
+So I've talked about SCSI a few times already and if you remember,
+SCSI is nothing more than an RPC protocol, it was originally designed to be implemented on a hardware bus that is what parallel SCSI is today.
+But as a protocol, it could also be layered on top of other networking protocols, and that field of work is actually a pretty broad area, it's called storage networking, these are networking protocols in stack that carry storage traffic.
+Now I'm not going to go through the stacks of this picture in detail, what's important to note is that you have multiple different options, you have at least six stacks shown on this picture and there are many more, they each use different length network and end to end technologies to communicate.
+They also each have different management model, one important management model is called Fiber Channel which is a way to name initiators, targets and disc drives to create storage area networks.
+This is actually again as I mentioned, a relatively broad field and some people spend their entire careers focusing on that particular sub field of computer system.
+And this brings up the final observation in this module about layers.
+We tend to think of the layered stack as consisting of layers that each provide a distinct function.
+A little bit like a layered cake where clearly the crust plays a role that is different from the filling, that is different from the frosting.
+You may have multiple layers of filling in the middle but at the end of the day the crust is distinct and the layer above is clearly distinct.
+And yet from an implementation perspective the better mental analogy may actually be the Russian doll.
+Anytime you double click on the layer below you actually see it has all of the components, attributes and some of the issues that you actually had to add a layer above.
+The example we use is that clearly a disc is not a computer, they're two completely different abstractions, and yet a disc, from an implementation perspective very much looks like a computer.
+So it's time to summarize.
+We talked about the importance of layering.
+I made the point about the fact that they're not that many layers in computer systems, takes a tremendous amount of effort to define a properly architected layer.
+If you can do that, it can have a significant impact on the overall industry or on the field.
+Now even though there are not many elementary building blocks, there's a near infinite way in which you can combine different layers into interesting stacks.
+So there's flexibility in the composition.
+And then finally we saw the Russian doll example in the complex and the fact that if you double click on the layer you typically get all of the same attributes of the layer above.
+Now there are some cautionary points some of which we discussed in the module, some which we did not.
+Obviously you may have an intuition that layering adds overhead.
+It's important to minimize these overheads and sometimes you have techniques such as direct execution to minimize overheads.
+We also saw that layering adds complexity, unfortunately there's no silver bullet to the complexity problem, this is often one of the limiting elements associated with a layer design.
+Sometimes adding a layer can actually create more than having sort of a linear or proportional overhead it can actually create a non linear or sort of performance cliff.
+For example, if you have a filesystem that assumes rotating media and you deploy it on a flash drive, you may actually get quite poor performance or if you conversely deploy a filesystem that is optimized for a flash drive on a rotating media, the performance may actually be poor.
+And that is because the abstractions generally don't convey the underlined internal characteristics of the layer that is because it is abstraction that actually eliminates the internal implementation details.
+Even though sometimes these implementation details have a first order impact on performance.
+So we did not cover this in the lectures and that is because you will be reading a paper from Mesnier and others, it's an SOSP paper from SOSP '11 on Differentiated Storage Services which is all about reconciling the performance problem in the "A" layer design and doing it over the SCSI interface which we did discuss in detail in this module.
+Next up, we'll talk about client server.

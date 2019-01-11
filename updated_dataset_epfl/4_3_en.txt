@@ -1,0 +1,83 @@
+We'll now study the Gaussian elimination algorithm on an example.
+I want to solve the linear system Ax=b, x is the vector of the unkowns, x1, x2 until xN b is the right side of the equation with entries b1, ..., bN. and the matrix A has a particular structure, it is a tridiagonal matrix.
+There are 3's on the diagonal,
+-1 just below the diagonal ,
+-2 just above, and all the other entries are 0.
+Here is the matrix A for the linear
+ system I must solve, Ax=b.
+We'll see in chapters 10 to 14 that the discretization of partial differential equations in one space dimension leads to such tridiagonal matrices.
+The goal is to transform this linear system Ax=b in an equivalent system
+Ux=d where U is an upper triangular matrix, so I have 1's on its diagonal, and 0 in the lower triangular part.
+Since I chose U as an upper triangular matrix, and because the matrix on the left handside is tridiagonal the upper triangular part will be reduced to only a line above the diagonal with entries u1,u2, ... uN-1.
+Here is the same vector x
+of unknowns, and the right side will be changed, it's now the vector d, with entries d1, d2, ..., dN.
+What are the steps of this algorithm ?
+Step 1 : We want a 1 at the top here and 0 below.
+There are already 0 below here, so I only need to transform this 3 in 1 and this -1 in 0.
+So in order to transform this 3 into a 1
+I take the first line which is
+3*x1-2*x2=b1,
+I divide it by 3 which is the diagonal entry.
+We get x1-(2/3)x2 = b1/3.
+Ã©gal <i>b1</i> que je dois diviser par 3,
+In the algorithm I will call this entry u1 so we found the u1 we needed, ce coefficient, and then I must divide b1 by 3.
+I will only write down the first 2 lines of the linear system I get.
+Here on the second line 
+I still have -1, 3, 2,
+Here are the first lines of the linear system.
+There is have b2 and we
+ can continue all the way down.
+Then I will transform this
+-1 in a 0, so I add the 2 first lines.
+When computing this sum,
+I will get a 0 here, so I will have 1, u1, and still x1 and x2, then here I will get 
+0, 3+u1, -2+0 because we summed the first and second lines. et -2 + 0 au-dessus.
+On the right handside, 
+I'll call this quantity b1, so I get b1 on the first line and b1+b2 on the second.
+So that is my linear system when I sum the first 2 lines.
+<i>(Ã©crit)</i>
+Now, what we need to succeed is, we want a 1 here, so I must transform 3+u1 into 1, so I must divide this second line by (3+u1).
+I have 1, u1 on the first line, here x1, x2. and here b1, when dividing this line by (3+u1),
+I get a 1 wher the 3+u1 was, here I have -2/ (3+u1).
+I'll call this u2, which is the u2 I was looking for.
+I must take the right side b1+b2, and divide it by 3+u1.
+So in this linear system, I already have u1, u2, and also d1 and d2.
+Now I can write the 
+Gaussian elimination algorithm.
+We started from b, the N-vector with entries bj, j = 1,...,N, and we need the vector u that
+is over the diagonal of the matrix u, which is a (N-1)vector with entries uj.
+What did we do ?
+The first step was to take u1= -2/3, and also b1 = b1/3, we divided the first line by 3.
+It is the initialization step. u1 = -2/3 and b1 = b1/3.
+Then I do a loop, 
+Here after the first step, 
+I only drew the second line, but imagine we go to the last line, or last but one.
+I do a loop for i going from 2 to N-1, the last but one line.
+I take here u2=-2/(3+u1), so ui = -2/(3+u(i-1)), so for i=2
+I already have u1  which appears in the formula for u2.
+Then I must do the same thing on the right side, bi = (bi+b(i-1))/(3+u(i-1)), divisÃ© par (3 + (<i>ui-1</i>)).
+So here b2 =  (b1 + b2) / (3 + u1).
+When this loop from 
+2 to N-1 is over,
+I computed u(N-1) here, and b(N-1).
+I still need to compute is the last entry of the vector d.
+I didn't mention it, but the vectors b and d will be stored here in the same vector b.
+So I only have to do the last operation on the coefficient bN. bN= (bN+b(N-1))/(3+u(N-1)).
+I got the coefficients u1, u2, ..., uN-1 of the upper triangular matrix U, and the coefficients d1, d2, ..., dN-1 of the right handside that I put in the vector b.
+Now I only have to solve the linear system
+Ux=d, starting from the bottom: xN = dN, x(N-1) = d(N-1) - u(N-1)*xN that we already computed, and so on until we get x1.
+Now I ask two questions, the first one is : how many operations are needed to perform this algorithm?
+The answer is simple, here we have a loop from 2 to N-1, so the number of operations of this algorithm is we are talking about complexity of the algorithm, so it's O(N), which means that if we double N, we double the number of operations.
+The second question is: in the algorithm, there are divisions by 3+u(i-1), 3+u(N-1), ... can there be a division by 0?
+So, do we have a division by 0? 
+We claim the following result, without proof: if all the principal submatrices of A are regular, 
+<i>(Ã©crit)</i> that is to say invertible, then we do not have a division by 0.
+<i>(Ã©crit)</i>
+Thus I can execute the algorithm without any problem.
+So now, what are the principal submatrices of A? 
+The first principal submatrix of A is the entry 1,1.
+The second principal submatrix of A, is the restriction to the first 2 lines and 2 columns.
+The third principal submatrix of A, is the 3x3 matrix here of entries
+Aij, with i,j between 1 and 3, and so on.
+One can check that the first matrix, which is just 3, is regular, for the second one, compute the determinant, and we find something different from 0 and so on, we have to show that all the submatrices of A are regular then we'll have no problem.
+In fact, it can be proved that the matrix A is regular, invertible, and all the principal submatrices are also regular. au sens inversibles, vous verrez Ã§a par vous-mÃªmes.

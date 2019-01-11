@@ -1,0 +1,139 @@
+In the last episode, we learned how to code declarations of classes and instances (a.k.a. "objects") in C++, as well as data members and methods.
+But we are still not done yet with this chapter about
+"encapsulation and abstraction"; because we have only examined data members and methods, this axis of the diagram, but we still haven't examined how to separate the visible components, what is called the "interface", from the hidden components, the implementation details.
+So we still haven't seen this axis of the diagram.
+This will be the topic of this episode.
+As we learned in the video on the general aspects of object-oriented programming, it is not good that all the members of a class
+-- its data members and its methods -- are accessible to everyone; it is much better to limit external access to only a few well chosen methods.
+Concretely, for the class Rectangle we have decided to limit the interface to the method "surface" (TN: means "area") while the "largeur" and "hauteur" data members constitute the hidden elements, its implementation details.
+How do we translate this into C++ code?
+To this end, we will use two keywords called "access specifiers":
+"public" and "private".
+Let's start with the "private" keyword.
+It declares the components that are
+"implementation details", and must be hidden, i.e. "private".
+So here, we will declare the
+"hauteur" and "largeur" data members as private variables.
+With the keyword "private" followed by a colon, all the data members and methods that follow are inaccessible from outside of the class.
+This means they are accessible only from within the corresponding class.
+Please note that we can also have methods in the private section.
+Such methods can only be invoked by instances of the same class, but not from any other class, nor from the main().
+"Inaccessible from outside the class" means that, for example, if in main() or another class, we declare an instance "rect" of the Rectangle class and we try to access its height directly with "rect.hauteur" then we will get an error message that we are trying to access "hauteur" which is a private data member.
+The compiler will send a message: you can't do this: that component "is private".
+By default, if you don't specify the accessibility of the class members, so for example, if we haven't added this keyword, as we did up to this episode, by default, every member declared in this class is private.
+Strictly speaking, in this example because we did not specify anything for the method "surface" this method is also private.
+That being said, I really encourage you to systematically specify the access rights and explicitly define the private components with the "private" keyword and define the components that have to be accessible from the outside of the class with the access specifier keyword "public".
+So, here, if we want the "surface" method to be accessible by anyone, visible from anywhere, and be part of the interface, we will add here the keyword "public" followed by a colon.
+Like for "private", everything between the keywords "public" and "private" will be in the interface, and accessible to the public outside the class.
+Concretely, if we take up the last example where we declared in the main() an instance rect of the Rectangle class, we could, in the main(), with a variable z of type double, declared beforehand, call the "surface" method of the Rectangle class, because this method is public, and accessible from anywhere, especially in the main().
+If, in contrast, we had omitted the word "public" here, by default, the access would have been private and could not have been called the method from in the main().
+Its exactly for this reason why in the last episode, we said about this example, that its syntax was not completely correct because we didn't specify the access rights,
+--everything was private-- so we couldn't have accessed the data members and methods from the main function.
+Let's now recall some good practice presented in the earlier episode about the general principles of OOP.
+It's good practice to have as private all data members all of the methods that will serve as internal components and to have as public only a few  selected methods, that constitute the interface.
+It is very important to not have any data member in the public part.
+That being said, you could tell me that, if all the data members are private, how will we be able to use them?
+For example, if we wanted to modify the height of my rectangle,
+-- this in itself being debatable; do we really want to change the height of a rectangle? but let it be so. --
+Or assume that we want to access the height of the rectangle, just to know its value.
+How can we obtain the values of the dimensions of the rectangle if they are private data members, if we can't access them outside the class?
+I can't do something like this: declare a new rectangle and try to print its height.
+This is something that
+I cannot do because the data members were declared private.
+To solve this problem, we will include in the interface a few methods necessary to this end
+[called setters and getters] to manipulate the data members by modifying or consulting them.
+So for example a method to access the "hauteur" data member; or a method to modify the width.
+For instance, here we would like a method that provides the value of the height and we would write something like this: using a "getHauteur" method.
+(TN: means "getHeight").
+I would like to insist on this part of writing a program: you DON'T have to systematically include methods to modify or even to access the data members of a class, but you have to decide which data member can be modified or accessed from outside through methods.
+The methods that only provide the value of a data member are called "accessor methods",
+"get methods" or "getters", while methods that can modify the value of a data member are called "mutator methods", "set methods"
+ or "setters".
+Getters are const functions because they do not modify members, and so we put the keyword "const" after the header.
+Getters return the value of the data member, so if we want to return the value of "hauteur",
+"hauteur" being of type double, we will return a value of the same type with "double getHauteur()".
+This method being a const function, we write const here, and the method body consists simply of "return hauteur;".
+I remind you that methods have access to the data members of their class, so here it is indeed the height of the current instance.
+In the same way, we can declare an accessor method for the width.
+Setters or mutator methods have to modify some data member(s), by changing their value(s), and are thus "non-const functions".
+For the method to set a value of an instance's data member, it has to first receive a value, passed as argument.
+So the method receives the value to set but does not return anything, because its purpose is to set a value and not to return anything.
+So in the present example, in this method
+"setHauteur" (TN: means "setHeight"), value of the parameter "h" is copied to the "hauteur" data member, and likewise in "setLargeur", the value of the parameter
+"l" is copied to the "largeur" data member.
+Let's examine an entire example again with the Rectangle class.
+In the public interface, we declare the method "surface", we declare an accessor method for the height, which is a const function, we declare an accessor for the width, too, and we declare 2 mutators as on the last slide, that take as parameters respectively the value for the height and the value for the width.
+In the private section of the Rectangle class, that ends here with a semicolon, we have two data members:
+"hauteur" and "largeur".
+So how do we make use of these elements?
+In the main(), we declare an instance "rect1" of the Rectangle class, and use the method
+"setHauteur" to set the height of rect1 to 3.0.
+So what happens?
+With the instance "rect1", we invoke "setHauteur" which will set the height of rect1 to the value 3.0.
+Then we invoke the method "setLargeur" with the value 4.0 which results in the value 4.0 being placed in the width of rect1.
+I insist that it is indeed rect1 whose width is modified.
+Then to print the height of rect1, we would call "getHauteur" which will return the height, the height of rect1 of course, so it will return 3.0.
+My students frequently ask:
+"Why do we have to take all these complicated mesures?
+Why don't we simply declare everything as public so that all these variables can be accessed without having all these getters and setters, and especially without having to think about which methods to put in the interface?"
+But if we do this, like for example here with a label -- be it a name for the rectangle or some tool needed internally -- in this case we could declare an instance rect of the Rectangle class and promptly write for example
+"rec.hauteur = -36", therefore setting heights that have not been checked, that are not valid.
+There is absolutely no control over what another programmer using this class can or cannot do on the representations, instances, of this class.
+On the other hand, if we had obliged the users of this class to use set and get methods, such as setHauteur, we would have had the possibility to verify the values received so as to guaranty the validity of the values. 
+So in this case, we could test the value received, to see if it is less than or equal to zero, and if it is, we would send an error message
+(or do whatever appropriate).
+While if the value was valid, we can copy it to the height "hauteur".
+This guaranties that our rectangle always has a height that make sense.
+Another reason setters/getters are important: here we have access to all the data members, like this variable "label", and thus can access to all this variable's methods, for example, here the method
+"size".
+So imagine if you have writen 300 lines of code like this, that use this "label" (and its methods), and that one day, the programmer of the Rectangle class decides to change this label; then you have to throw  your 300 lines of code away, and write some new.
+On the other hand, if you had limited yourself to using the interface, which was specified beforehand, and which shouldn't be changed, if you use this interface externally, and the class programmer decides to change this label data member, he is the one who will have to recode his class, while you don't need to change anything because you only used the interface, and continue using the code you had written.
+These notions in OOP of [interface] constraints, of encapsulation, of abstraction, of interface restrictions, make really sense when writing large programs, where several people are sharing the code.
+It is actually in this context that
+OOP was invented, developed, and put in place.
+OOP is the basis of good programs that can evolve, develop, and mature thanks to their modularity.
+So even if you think now that it is fastidious to do this for the small programs seen in the exercises, think of this practice as the foundation for more complicated programming and good programming.
+Let's end this episode on a technical detail that raises questions from students, and that comes from what is called "name masking"
+Masking occurs when an identifier, a name,
+"is hidden by" another name.
+We saw this in the first course
+"Introduction to programming", with the masking of a variable "i" by a local variable "i".
+Remember that the scope of the local variable is the "for" loop, and so the the scope of this "i", is the "for" loop, and so the "i" here is indeed the "i" of the "for" that masks the blue "i" that still exists, but is hidden or masked in the red section,
+Here it is certainly the blue "i" that is masked in the "for" loop, masked by this "i".
+The same thing happens when declaring methods, for example, suppose that we declared a method "setHauteur" that receives a value for the height and so we choose a name that indicates that it is the value for the height.
+And so we declare
+"hauteur" as the name of the parameter.
+How do we then write the method's body?
+We would write "hauteur", the height of the rectangle is indeed the data member "hauteur", equals, and here "hauteur" the parameter, so this height here is what is received as parameter.
+The problem with writing it this way, is that the name "hauteur" ambiguously refers to two different things: the data member, as well as the parameter.
+Not so great for the compiler that will scold you with an error message saying it doesn't understand what you wrote.
+In this case, we can simply change the name of the variable, so as to not have two identical names anymore, as we did on a previous slide.
+Or we can clarify by specifiying which "hauteur" we want with a special feature called
+"the pointer this".
+The keyword "this" stands for a pointeur that points to the current instance.
+So "this" means we are referring to the current instance which roughly means "my address".
+For example, for a Rectangle r1, in a method f of r1, in such a method, "this" represents the address of r1.
+If we invoked on another instance r2,
+"this", this time, would mean the address of r2.
+So  in a method, "this" points to the address of the current instance.
+For example, we could write this:
+"this->hauteur" ("this", arrow, "hauteur")
+Let me say, because it is our first encounter with this symbol that the syntax "arrow" like this: "A->B" simply means  "(*A).B"
+If A is a pointer, then *A is the object pointed to and we take the field B of the object pointed to by A.
+This is a bit technical, and is not very important.
+Just remember this syntax and that if we have a pointer "this",
+"this->" allows us to access the methods and data members of the object pointed to by "this".
+Since "this" is "my address", that means "my data members".
+Here this->hauteur, refers indeed to the height of the current instance, which allows me to keep the name
+"hauteur" for the parameter.
+It is absolutely neccessary to use the keyword "this" in the case of masking.
+That being said, I reccommend that you avoid masking by having different names for the data members and the parameters that would be needed.
+To conclude this lesson, let's summarize what we have learned about access rights and the scope of members of a class.
+For access rights, there are
+2 keywords:
+"private" and "public" that apply to the lines that follow them,
+"private" for what is in the hidden part of the program, that is, all the members accessible only from within the class itself, and "public" for the members that we want to have accessible from anywhere in the code, in the main() or in another class.
+And, if we declare the data members x and y here private, they are accessible anywhere in the class, particularly in the methods, so for example, supposing that we haven't declared any other "y"s,
+"y" refers to the current instance.
+In contrast, masking can occur typically if we declare a variable like this, a parameter of a method, which, because of the rules of scope resolution seen before, will result in this name resolving to the nearest scope: the parameter, and if we want to access the data member x here, then we would have to "unmask" this name by adding the pointer "this" to access x.
+That said, I reccommend NOT to use this way of writing code, to not use "this" pointer but to rather make use of different names to differentiate between the data members and the parameters of your methods.

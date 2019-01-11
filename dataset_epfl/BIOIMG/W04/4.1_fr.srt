@@ -1,0 +1,1312 @@
+1
+00:00:04,570 --> 00:00:09,486
+La semaine dernière,on a parlé
+du mécanisme par lequel les rayons X
+
+2
+00:00:09,486 --> 00:00:12,474
+sont absorbés dans le tissu
+lorsque nous avons établi
+
+3
+00:00:12,474 --> 00:00:15,883
+que l'absorption des rayons X est le
+contraste majeur dans l'imagerie de rayons x
+
+4
+00:00:16,223 --> 00:00:19,560
+Donc, cette semaine, nous allons parler
+de la façon dont nous générons les images
+
+5
+00:00:19,560 --> 00:00:21,697
+à partir de ces données d'absorption
+
+6
+00:00:23,437 --> 00:00:25,467
+dans le monde réel.
+
+7
+00:00:25,647 --> 00:00:31,330
+On va parler de certaines complications
+qui surviennent dans le monde réel,
+
+8
+00:00:31,330 --> 00:00:34,318
+puis nous allons parler de l'algorithme
+de reconstruction
+
+9
+00:00:34,318 --> 00:00:37,801
+ce qui est nécessaire dans la seconde
+moitié des cours de cette semaine.
+
+10
+00:00:38,101 --> 00:00:41,602
+Mais d'abord, je voudrais commencer
+avec la technique sous-jacente,
+
+11
+00:00:41,602 --> 00:00:44,261
+montrant quelques exemples
+que c'est la tomographie
+
+12
+00:00:44,261 --> 00:00:45,751
+dont que nous parlons.
+
+13
+00:00:45,751 --> 00:00:48,201
+Il a été inventé dans les années 70.
+
+14
+00:00:48,481 --> 00:00:52,752
+Et ce que nous voyons ici est
+un exemple de l'utilisation
+
+15
+00:00:52,752 --> 00:00:57,893
+de la  tomographie nous avons
+ici un scanner CT
+
+16
+00:00:59,153 --> 00:01:00,623
+de l'abdomen.
+
+17
+00:01:00,623 --> 00:01:03,366
+Nous voyons ici une lésion,
+avant le traitement et après
+
+18
+00:01:03,366 --> 00:01:05,736
+comment la lésion a disparu.
+
+19
+00:01:08,123 --> 00:01:12,054
+Maintenant, voici un exemple d'un CT,
+les premiérs,1972
+
+20
+00:01:12,704 --> 00:01:16,367
+et vous pouvez apprécier la différence
+dans la qualité des images
+
+21
+00:01:16,367 --> 00:01:19,272
+par rapport à CT contemporaine
+avec celle du début.
+
+22
+00:01:19,272 --> 00:01:22,458
+Il faut vraiment mettre une flèche
+pour mettre en évidence la lésion ici
+
+23
+00:01:22,458 --> 00:01:27,309
+ceci est un CT crânien, celle d'une tête,
+et la lésion. c'est vraiment pas évidente
+
+24
+00:01:28,129 --> 00:01:30,269
+ce qui a généré cette lésion.
+
+25
+00:01:31,881 --> 00:01:37,714
+CT a été développé par Godfrey Hounsfield
+il a développé l'algorithme mathématique,
+
+26
+00:01:37,714 --> 00:01:43,357
+un ingénieur, et Allan Cormack,
+un physicien, il est représenté ici
+
+27
+00:01:43,357 --> 00:01:47,857
+et ils ont reçu le prix Nobel
+de physiologie et de médecine.
+
+28
+00:01:49,510 --> 00:01:52,931
+Voilà ce qu'un scanner CT resemble
+Je voulais vous le montre
+
+29
+00:01:52,931 --> 00:01:55,546
+de sorte que nous avons une idée
+de ce que nous parlons.
+
+30
+00:01:55,546 --> 00:01:59,326
+Ceci est le scanner,
+est dans cette enceinte, ici
+
+31
+00:01:59,326 --> 00:02:02,432
+ceci est le lit du patient
+vous mentirez sur ce lit du patient,
+
+32
+00:02:02,432 --> 00:02:07,172
+il se serait levée, puis
+entré dans ce trou ici
+
+33
+00:02:07,172 --> 00:02:10,574
+où le scan est en cours.
+
+34
+00:02:10,574 --> 00:02:13,415
+Ici serait la tête, la tête serait
+inséré ici.
+
+35
+00:02:13,415 --> 00:02:18,228
+Nous ne voulons pas montrer aux
+patients toutes les techniques dedans,
+
+36
+00:02:18,228 --> 00:02:23,201
+il y a une belle couverture couvrant
+la machinerie qui est derrière elle.
+
+37
+00:02:24,090 --> 00:02:26,561
+Et maintenant, nous regardons
+ici, dans cette video
+
+38
+00:02:26,561 --> 00:02:29,989
+nous regardons en fait à ce qui
+est dans la machine.
+
+39
+00:02:30,645 --> 00:02:33,545
+Comme vous pouvez le voir, il y a quelque
+chose qui tourne à l'intérieur
+
+40
+00:02:33,545 --> 00:02:36,943
+ce que nous voyons ici c'est l'intérieur,
+cette couverture ici est levé,
+
+41
+00:02:36,943 --> 00:02:39,571
+vous voyez la couverture est ici,
+et maintenant vous voyez ceci tournant,
+
+42
+00:02:39,571 --> 00:02:44,256
+et tout à fait un bruit incroyable
+que les machines, le scanner
+
+43
+00:02:44,256 --> 00:02:48,722
+est transformée pour produire le scan.
+
+44
+00:02:49,412 --> 00:02:53,601
+Donc, ceci est évidemment que nous ne
+voulons pas que le patient entende ni voir
+
+45
+00:02:53,601 --> 00:02:57,093
+ce serait intimidant et les gens
+auraient beaucoup plus de mal
+
+46
+00:02:57,093 --> 00:02:59,903
+à se conformer aux exigences de l'analyse.
+
+47
+00:03:00,113 --> 00:03:05,163
+Dans les cours de cette semaine,
+nous allons discuter de la raison derrière
+
+48
+00:03:05,163 --> 00:03:10,353
+pourquoi cette machine tourne, comment
+elle est utilisé pour générer des images.
+
+49
+00:03:11,382 --> 00:03:14,033
+CT est utilisé non seulement
+pour les patients humains.
+
+50
+00:03:14,033 --> 00:03:16,973
+Il est également utilisé dans
+la recherche  pour les modèles animaux.
+
+51
+00:03:17,223 --> 00:03:20,023
+Ici, je voulais vous donner
+quelques exemples.
+
+52
+00:03:20,343 --> 00:03:23,059
+Nous allons d'abord parler
+du scanner lui-même.
+
+53
+00:03:23,059 --> 00:03:26,846
+Vous pouvez voir c'est comment le scan,
+voici l'enceinte du scanner.
+
+54
+00:03:26,846 --> 00:03:31,359
+Voici la personne, voici l'ouverture
+ce bénévole, ici serait
+
+55
+00:03:31,359 --> 00:03:34,214
+sur le lit du patient, ici,
+et inséré dans le scanner.
+
+56
+00:03:34,214 --> 00:03:36,594
+Il est clair que l'ouverture
+ici ne convient pas
+
+57
+00:03:36,594 --> 00:03:41,264
+pour le sujet - pour le rongeur
+
+58
+00:03:41,834 --> 00:03:44,872
+de sorte que le scanner a été adapté
+pour les petits géometries
+
+59
+00:03:44,872 --> 00:03:49,392
+nous prenons avantage
+d'avoir une plus grande proximité
+
+60
+00:03:49,392 --> 00:03:51,993
+des détecteurs au sujet.
+
+61
+00:03:53,272 --> 00:03:57,144
+Maintenant, voici quelques exemples
+de microCT, quelques images.
+
+62
+00:03:57,144 --> 00:04:01,012
+Et microCT signifie vraiment, CT
+avec une grande resolution spatiale
+
+63
+00:04:01,012 --> 00:04:05,989
+nous parlons, généralement, ici,
+de 50 microns de resolution spatiale
+
+64
+00:04:05,989 --> 00:04:07,731
+dans le plan de résolution.
+
+65
+00:04:08,831 --> 00:04:11,031
+La première image est de l'abdomen.
+
+66
+00:04:11,031 --> 00:04:14,448
+Nous pouvons voir ici l'abdomen,
+nous voyons certaines lésions ici,
+
+67
+00:04:14,448 --> 00:04:18,259
+nous avons le coeur ici,
+et quelques autres organes.
+
+68
+00:04:18,709 --> 00:04:21,767
+Ceci est un microCT de
+la colonne vertébrale du rat.
+
+69
+00:04:21,767 --> 00:04:23,526
+Nous voyons la moelle épinière ici,
+
+70
+00:04:23,526 --> 00:04:27,126
+et les disques qui l'entoure.
+
+71
+00:04:27,906 --> 00:04:31,318
+Ceci est un exemple de reins
+avec IV contraste.
+
+72
+00:04:32,580 --> 00:04:37,584
+Nous avons le scanner CT,
+puis nous pouvons voir
+
+73
+00:04:37,584 --> 00:04:40,299
+les vaisseaux très lumineux
+ils ont des agents de contraste en eux
+
+74
+00:04:40,299 --> 00:04:42,879
+c'est ce que nous avons discuté
+la semaine dernière.
+
+75
+00:04:42,879 --> 00:04:46,260
+Nous pouvons voir le contraste
+améliore les reins.
+
+76
+00:04:46,260 --> 00:04:49,989
+Donc, c'est un contraste intraveineux
+qui met en évidence le flux sanguin
+
+77
+00:04:49,989 --> 00:04:51,671
+dans les reins.
+
+78
+00:04:52,391 --> 00:04:55,229
+Cet exemple, ici, est le cœur
+et les poumons.
+
+79
+00:04:55,229 --> 00:04:59,202
+On a les poumons ici dans l'obscurité,
+ils ont de faibles nombres CT.
+
+80
+00:04:59,522 --> 00:05:03,212
+Nous avons le coeur ici, voici
+la colonne vertébrale, etces points blanc
+
+81
+00:05:03,212 --> 00:05:04,802
+pouvez-vous deviner ce qu'ils sont?
+
+82
+00:05:05,482 --> 00:05:09,173
+Ils sont de la cage thoracique
+de ce rongeur.
+
+83
+00:05:09,732 --> 00:05:15,139
+Et si nous choisissons l'écran pour
+sélectionner la plus haute absorption,
+
+84
+00:05:15,139 --> 00:05:17,831
+nous allons évidemment chercher
+à haute densité d'électrons,
+
+85
+00:05:17,831 --> 00:05:19,378
+qui est, pour le calcium.
+
+86
+00:05:19,378 --> 00:05:22,947
+Ceci est l'os - et c'est une très belle
+image de haute résolution
+
+87
+00:05:22,947 --> 00:05:27,248
+du squelette du corps entier d'un rongeur
+
+88
+00:05:27,248 --> 00:05:28,978
+Dans cet exemple,
+
+89
+00:05:30,098 --> 00:05:34,614
+les agents de contraste intraveineuse sont
+utile pour représenter les vaisseaux sanguins.
+
+90
+00:05:34,614 --> 00:05:38,167
+Le changement de contraste
+peut être extraite à partir des images.
+
+91
+00:05:38,167 --> 00:05:41,701
+c'est un code couleur dans cette image en
+rouge, nous voyons donc la vascularisation.
+
+92
+00:05:41,701 --> 00:05:46,492
+Et cela se superpose à une image
+qui a été seuillée pour le squelette.
+
+93
+00:05:46,492 --> 00:05:50,097
+Ainsi, nous voyons le squelette
+de l'animal et la vasculature
+
+94
+00:05:50,097 --> 00:05:53,156
+où l'agent de contraste était.
+
+95
+00:05:53,156 --> 00:05:58,789
+Ainsi, ceci est un moyen d'illustrer l
+'architecture des vaisseaux sanguins
+
+96
+00:05:58,789 --> 00:06:02,113
+chez l'animal, superimposé de
+l'anatomie normale,
+
+97
+00:06:02,113 --> 00:06:04,214
+afin que nous puissions
+reconnaître où ils sont.
+
+98
+00:06:05,875 --> 00:06:09,605
+Avant de passer à la reconstruction
+des images, je veux discuter
+
+99
+00:06:11,055 --> 00:06:13,806
+de ce que l'absorption que
+nous avons discuté la semaine dernière
+
+100
+00:06:13,806 --> 00:06:15,939
+ce que cela signifie dans le monde réel.
+
+101
+00:06:15,939 --> 00:06:17,444
+Nous allons principalement parler
+
+102
+00:06:17,444 --> 00:06:20,929
+du coefficient d'atténuation linéaire
+<i> μ </ i>, ici.
+
+103
+00:06:21,279 --> 00:06:22,460
+Retournons.
+
+104
+00:06:22,860 --> 00:06:26,137
+Et nous supposerons ici, nous avons
+un tissu d'épaisseur <i> dx </ i>
+
+105
+00:06:26,137 --> 00:06:29,506
+ceci est un très petit épaisseur
+vous pouvez l'imaginer est un micron,
+
+106
+00:06:30,836 --> 00:06:33,088
+nanomètre, quelque chose comme ça.
+
+107
+00:06:33,088 --> 00:06:34,816
+Juste très, très petite.
+
+108
+00:06:35,656 --> 00:06:39,435
+On a alors un certain nombre de photons,
+<i> n </ i>, qui viennent à cette tranche,
+
+109
+00:06:39,435 --> 00:06:44,813
+puis on a un certain nombre de photons
+<i>n - dn</i>qui passent à travers la tranche
+
+110
+00:06:44,813 --> 00:06:50,187
+Donc, <i> dn </ i> photons ici, dans cet exemple,
+sont absorbés par cette couche de tissu
+
+111
+00:06:50,187 --> 00:06:52,662
+d'épaisseur <i> dx </ i>.
+
+112
+00:06:54,262 --> 00:06:57,583
+On a parlé la semaine dernière sur
+le coefficient d'atténuation linéaire,
+
+113
+00:06:57,583 --> 00:07:00,140
+qui a des unités d'un sur centimètre.
+
+114
+00:07:00,140 --> 00:07:03,570
+Et si nous avons supposé que
+sur l'épaisseur de <i> dx </ i>, ici,
+
+115
+00:07:03,570 --> 00:07:05,880
+qui est une bonne et loyale hypothèse,
+
+116
+00:07:05,880 --> 00:07:08,732
+nous avons vu que le nombre de photons
+
+117
+00:07:08,732 --> 00:07:14,495
+à la position <i>x</i> est donnée par le nombre
+de photons impactant la couche <i> N_0</i>
+
+118
+00:07:14,495 --> 00:07:17,307
+e fois à la <i> - μ x </ i>.
+
+119
+00:07:17,307 --> 00:07:19,663
+Maintenant, si <i> dx </ i> est très faible,
+l'on peut supposer
+
+120
+00:07:19,663 --> 00:07:22,444
+que <i> μ </ i> est constante
+dans <i> x. </ i>
+
+121
+00:07:23,454 --> 00:07:26,998
+Les mesures afin que nous voulons pour
+reconstruire,
+
+122
+00:07:26,998 --> 00:07:31,201
+est une image bidimensionnelle
+du coefficient d'atténuation linéaire,
+
+123
+00:07:31,201 --> 00:07:35,019
+donc je vais écrire ici que la fonction
+<i> μ </ i> de <i> x </ i> et <i> y </ i>.
+
+124
+00:07:36,271 --> 00:07:39,374
+Mais ce qui est réellement mesurée
+est le nombre de photons
+
+125
+00:07:39,374 --> 00:07:41,103
+qui arrivent dans le détecteur.
+
+126
+00:07:41,613 --> 00:07:45,081
+Alors, comment est le lien
+entre ces deux mesures
+
+127
+00:07:45,081 --> 00:07:46,601
+regardons cela.
+
+128
+00:07:46,601 --> 00:07:50,530
+il est en fait un simple logarithm de sorte
+que le logarithme des photons mesurés
+
+129
+00:07:50,530 --> 00:07:56,270
+divisé par les photons impactant sur
+la couche qui est égale à <i> - μ x </ i>.
+
+130
+00:07:56,270 --> 00:07:59,716
+Et puisque nous savons <i> x </ i>,
+nous pouvons, dans cet exemple,
+
+131
+00:07:59,716 --> 00:08:02,855
+nous pouvons en déduire
+le coefficient d'atténuation linéaire.
+
+132
+00:08:04,819 --> 00:08:08,388
+Ceci, ici, est l'exemple,
+pour un objet homogène
+
+133
+00:08:08,388 --> 00:08:09,953
+avec une épaisseur <i> x </ i>, ici.
+
+134
+00:08:09,953 --> 00:08:13,777
+Donc, nous avons supposé ici que cela
+est <i> x </ i>, pour cet exemple.
+
+135
+00:08:15,620 --> 00:08:20,320
+Maintenant, le contraste est bien défini
+pour les rayons X monochromatiques.
+
+136
+00:08:20,678 --> 00:08:24,928
+On a le coefficient d'atténuation linéaire
+pour une certaine énergie photonique
+
+137
+00:08:24,928 --> 00:08:28,057
+dans kiloélectron volts, qui
+est un parameter bien défini
+
+138
+00:08:28,557 --> 00:08:31,873
+et ainsi, nous obtenons
+un contraste très bien défini.
+
+139
+00:08:32,343 --> 00:08:35,420
+Mais, nous avons vu que
+le coefficient d'atténuation linéaire
+
+140
+00:08:35,420 --> 00:08:39,332
+dépend de l'énergie des photons,
+il dépend du nombre atomique,
+
+141
+00:08:39,332 --> 00:08:41,722
+et elle dépend de la densité électronique.
+
+142
+00:08:43,435 --> 00:08:47,455
+Cela a des conséquences
+dans la vie réelle.
+
+143
+00:08:47,455 --> 00:08:50,707
+Et l'une des conséquences
+est le durcissement du faisceau,
+
+144
+00:08:50,707 --> 00:08:54,362
+et l'autre est une profondeur
+de contraste dépendant.
+
+145
+00:08:55,541 --> 00:08:58,601
+Et ce que vous pouvez imaginer
+de la manière suivante.
+
+146
+00:08:59,781 --> 00:09:04,088
+Quand les photons arrivent au tissu,
+ils présentent un certain spectre d'énergie,
+
+147
+00:09:04,088 --> 00:09:08,009
+et ce spectre d'énergie présente
+une absorption différente,
+
+148
+00:09:08,009 --> 00:09:11,922
+Ainsi le coefficient d'atténuation linéaire
+dépend de l'énergie du photon <i> μ </ i>.
+
+149
+00:09:12,386 --> 00:09:18,162
+Et donc, on a une plus grande absorption,
+généralement, les energies-- inférieurs
+
+150
+00:09:18,162 --> 00:09:20,554
+ce qui signifie que le [inaudible]
+étant retiré
+
+151
+00:09:20,854 --> 00:09:25,473
+et l'énergie des photons qui passent
+plus profondément dans le tissu,
+
+152
+00:09:25,473 --> 00:09:29,733
+l'énergie moyenne, augmente, et c'est ce
+qu'on appelle le durcissement du faisceau.
+
+153
+00:09:29,733 --> 00:09:34,425
+Et cela parce que le <i> μ </ i>
+est dépendante de l'énergie des photons,
+
+154
+00:09:34,425 --> 00:09:38,498
+nous obtenons un contraste
+dépendante de la profondeur.
+
+155
+00:09:39,907 --> 00:09:42,274
+Alors, regardons cela dans le monde réel.
+
+156
+00:09:42,274 --> 00:09:46,574
+Et nous allons d'abord mettre l'accent sur
+le spectre d'énergie d'un tube à rayon x
+
+157
+00:09:46,574 --> 00:09:48,416
+ce que cela ressemble vraiment.
+
+158
+00:09:49,526 --> 00:09:52,515
+Donc, cela est la sortie
+par rapport à l'axe <i> y </ i>
+
+159
+00:09:52,515 --> 00:09:56,260
+sur la <i> x </ i> axe, nous avons l'énergie
+de photons en volts de kiloélectron,
+
+160
+00:09:56,260 --> 00:10:00,362
+Nous avons la répartition
+de la densité des photons
+
+161
+00:10:00,362 --> 00:10:03,217
+pour une fenêtre d'énergie donnée
+tracée ici.
+
+162
+00:10:03,907 --> 00:10:07,646
+Ce que nous avons d'abord,
+est le continuum de bremsstrahlung.
+
+163
+00:10:07,646 --> 00:10:12,423
+Rappelez-vous, nous avions parlé comment
+les rayons X sont générés
+
+164
+00:10:12,423 --> 00:10:15,255
+ils sont générés, principalement,
+par Bremsstrahlung,
+
+165
+00:10:15,255 --> 00:10:19,384
+et nous ne pouvons pas prédire
+exactement ce que l'energie
+
+166
+00:10:20,194 --> 00:10:22,954
+l'énergie précise est, donc,
+il y a un continuum
+
+167
+00:10:22,954 --> 00:10:26,642
+une distribution des énergies
+de photons qui sont donnés.
+
+168
+00:10:27,634 --> 00:10:30,274
+Nous avons aussi caractéristiques rayons x
+
+169
+00:10:30,274 --> 00:10:32,986
+qui est, quand on enlève
+un électron de coque intérieure
+
+170
+00:10:32,986 --> 00:10:34,851
+que l'on appelle les pics de rayonnement,
+
+171
+00:10:34,851 --> 00:10:38,211
+ou les rayons X caractéristiques,
+ou fluorescentes des rayons
+
+172
+00:10:38,211 --> 00:10:42,298
+et ceci est l'interaction avec
+electrons orbitale
+
+173
+00:10:42,678 --> 00:10:47,083
+et ici nous avons le K_α_1, α_2,
+et les lignes K_β, ici,
+
+174
+00:10:47,083 --> 00:10:48,658
+pour le tungstène.
+
+175
+00:10:50,611 --> 00:10:54,645
+Ce que nous savons, il y a
+une constante fondamentale qui est fixé,
+
+176
+00:10:54,645 --> 00:10:58,201
+et qui est l'energie  maximale du photon
+cette énergie de photons, ici,
+
+177
+00:10:58,201 --> 00:11:02,714
+dans cet exemple, est 90 kiloélectron
+volts, est donnée par la tension
+
+178
+00:11:02,714 --> 00:11:06,412
+appliqué sur le tube à rayons X
+à travers l'anode et la cathode,
+
+179
+00:11:06,412 --> 00:11:10,930
+dans ce cas il était de 90 kiloélectron
+volts donc, ceci est un limit-- fondamental
+
+180
+00:11:10,930 --> 00:11:14,708
+elle est définie par l'opérateur,
+on peut le mettre dans le scanner,
+
+181
+00:11:15,698 --> 00:11:18,642
+mais cela est le maximum que nous avons.
+
+182
+00:11:18,642 --> 00:11:21,213
+Nous ne pouvons pas avoir une énergie
+de photons qui est plus élevé que cela.
+
+183
+00:11:21,213 --> 00:11:24,823
+Vient simplement du fait que
+cette énergie du photon est,
+
+184
+00:11:24,823 --> 00:11:29,734
+lorsque les impacts d'un électron
+de la cible d'anode,
+
+185
+00:11:29,734 --> 00:11:31,904
+perd toute son énergie à la fois
+
+186
+00:11:31,904 --> 00:11:33,825
+en un seul photon.
+
+187
+00:11:34,985 --> 00:11:39,229
+Donc, ce que on c'est l'intensité totale
+qui est le nombre total de photons
+
+188
+00:11:39,229 --> 00:11:42,993
+qui sont produitest à l'intégrale
+de cette fonction, ici,
+
+189
+00:11:42,993 --> 00:11:47,153
+de zéro à l'infini, de la sortie
+relative, ici,
+
+190
+00:11:47,153 --> 00:11:52,859
+qui est l'intensité en fonction
+de l'énergie intégrée sur l'énergie.
+
+191
+00:11:53,949 --> 00:11:56,319
+Ceci est une fonction complexe
+que nous ne avons pas vraiment
+
+192
+00:11:56,319 --> 00:11:58,732
+un bon modèle mathématique ou physique
+
+193
+00:11:58,732 --> 00:12:02,692
+pour modéliser, donc ce que nous cherchons
+
+194
+00:12:02,692 --> 00:12:05,631
+est de caractériser
+d'une manière plus simple.
+
+195
+00:12:06,751 --> 00:12:11,390
+Et la façon dont cela est fait est de
+définir l'energie efficace de photons
+
+196
+00:12:11,390 --> 00:12:12,695
+E efficace.
+
+197
+00:12:12,695 --> 00:12:15,911
+Ce type de correspond au milieu
+
+198
+00:12:15,911 --> 00:12:19,041
+ou de l'énergie moyenne des photons
+
+199
+00:12:19,041 --> 00:12:21,716
+qui sont perçus par le sujet.
+
+200
+00:12:21,716 --> 00:12:26,203
+Ainsi, l'énergie effective, dans cet
+exemple,serait quelque chose comme ça,
+
+201
+00:12:28,773 --> 00:12:31,681
+à partir des rayons X qui quittent
+le tube à rayons x.
+
+202
+00:12:32,467 --> 00:12:34,443
+Maintenant, voici un terme que
+je dois introduire
+
+203
+00:12:34,443 --> 00:12:37,918
+que je voudrais vous présenter,
+qui est le terme de rayons X mous.
+
+204
+00:12:37,918 --> 00:12:41,359
+Ils sont doux, c
+ar ils ont une faible énergie.
+
+205
+00:12:41,359 --> 00:12:47,168
+On les appelés doux, parce qu'ils ne pénètrent
+pas très profondément dans les tissus.
+
+206
+00:12:48,278 --> 00:12:52,951
+Et, au contraire, nous avons le rayon
+dur, ils sont de haute énergie,
+
+207
+00:12:52,951 --> 00:12:56,830
+ils pénétrants plus, voilà pourquoi
+ils sont appelés rayons X durs.
+
+208
+00:12:58,309 --> 00:13:01,188
+Maintenant, si nous pensons que sur
+le processus de bremsstrahlung,
+
+209
+00:13:01,188 --> 00:13:06,710
+l'énergie minimale d'un photon
+qui est produit est proche de zéro.
+
+210
+00:13:06,710 --> 00:13:11,527
+en théorie, on peut produire des rayons X
+mous à l'intérieur des tubes à rayons X.
+
+211
+00:13:11,527 --> 00:13:13,444
+Mais ce n'est pas ce que nous
+voyons ici dans ce graphique.
+
+212
+00:13:13,444 --> 00:13:16,906
+Nous voyons l'énergie déposer
+ici à zéro à environ 10 keV.
+
+213
+00:13:18,315 --> 00:13:21,582
+Ce que nous avons est un filtrage
+de l'instrument
+
+214
+00:13:21,582 --> 00:13:24,866
+rappelez-vous, les rayons X sont produits
+dans vacuum dans un tube de rayon x
+
+215
+00:13:24,866 --> 00:13:28,507
+nous avons un verre là où les
+rayons X les sont autorisés à passer
+
+216
+00:13:28,507 --> 00:13:30,011
+vers le sujet.
+
+217
+00:13:30,011 --> 00:13:33,513
+Et que le verre filtre les
+rayons X très doux,
+
+218
+00:13:33,513 --> 00:13:35,047
+et rien ne se passe à travers.
+
+219
+00:13:35,047 --> 00:13:39,490
+Donc, nous allons avoir ce filtrage
+de l'instrument, ici, du verre,
+
+220
+00:13:39,490 --> 00:13:43,970
+par exemple, qui élimine photons
+et une conséquence
+
+221
+00:13:43,970 --> 00:13:48,947
+est que l'énergie effective est déplacé
+vers des énergies plus élevées.
+
+222
+00:13:48,947 --> 00:13:53,731
+Ainsi,le spectre de rayons X dans l'ensemble
+ou les rayons X quiimpacte le patient
+
+223
+00:13:53,731 --> 00:13:55,614
+sont de plus en plus difficile.
+
+224
+00:13:56,554 --> 00:13:59,867
+Ainsi, cette augmentation
+de l'énergie efficace
+
+225
+00:13:59,867 --> 00:14:03,647
+est le filtrage des rayons X mous
+
+226
+00:14:03,647 --> 00:14:07,619
+se fait par l'instrument,
+et ce retrait conduira
+
+227
+00:14:07,619 --> 00:14:11,621
+à un spectre de rayons X qui est décalé
+
+228
+00:14:11,621 --> 00:14:13,701
+à des énergies plus élevées
+et, par conséquent,
+
+229
+00:14:13,701 --> 00:14:15,454
+rayons X durs.
+
+230
+00:14:17,037 --> 00:14:22,086
+Alors, quelle est la conséquence
+de l'absorption dépend de l'énergie?
+
+231
+00:14:23,667 --> 00:14:26,553
+Donc, nous avons une conséquence semblable
+à ce que nous venons de parler
+
+232
+00:14:26,553 --> 00:14:28,931
+avec l'instrument dans le tissu.
+
+233
+00:14:29,651 --> 00:14:32,070
+Regardons le coefficient
+d'atténuation linéaire, ici.
+
+234
+00:14:32,070 --> 00:14:34,895
+Nous avons l'énergie de rayons X de zéro
+à une centaine de volts kiloélectron
+
+235
+00:14:34,895 --> 00:14:36,244
+sur l'axe des abscisses.
+
+236
+00:14:36,624 --> 00:14:39,950
+Et nous avons une échelle logarithmique
+du coefficient d'atténuation linéaire
+
+237
+00:14:39,950 --> 00:14:41,397
+sur l'axe des ordonnées.
+
+238
+00:14:41,837 --> 00:14:45,715
+Dans les gammes qui nous concerne
+par imagerie par rayons X,pour l'imagerie CT
+
+239
+00:14:45,715 --> 00:14:49,509
+nous traitons uniquement avec un effet
+photoélectrique et l'effet Compton.
+
+240
+00:14:50,987 --> 00:14:56,571
+Comme on peut  le voir, aux basses
+énergies, nous avons une domination plus forte
+
+241
+00:14:56,571 --> 00:15:00,133
+l'effetphotoélectrique de sorte que
+le coefficient d'atténuation linéaire
+
+242
+00:15:00,133 --> 00:15:03,492
+augmente de façon substantielle
+aux basses énergies.
+
+243
+00:15:04,316 --> 00:15:08,810
+Maintenant, qu'est-ce que cela signifie
+pour le monde réel?
+
+244
+00:15:11,143 --> 00:15:14,105
+Voyons ce que nous aurions,
+idéalement, nous aurions
+
+245
+00:15:14,105 --> 00:15:15,556
+des rayons X monochromatiques.
+
+246
+00:15:15,556 --> 00:15:19,073
+les rayons x monochromatique
+nous serait à cette position--
+
+247
+00:15:19,073 --> 00:15:23,719
+nous aurions une absorption uniforme
+de le rayon x;
+
+248
+00:15:23,719 --> 00:15:25,859
+l'énergie des photons ne change pas.
+
+249
+00:15:26,149 --> 00:15:29,074
+Mais en réalité,
+nous avons des polychromatique
+
+250
+00:15:29,074 --> 00:15:33,104
+rayons X multi-énergétiques.
+
+251
+00:15:34,434 --> 00:15:39,321
+Ainsi, la conséquence est que
+on a c'est l'absorption est non uniform
+
+252
+00:15:39,321 --> 00:15:41,113
+avec une énergie de photons.
+
+253
+00:15:41,113 --> 00:15:45,237
+C'est clair, le coefficient d'atténuation
+linéaire non uniforme, donc il change.
+
+254
+00:15:46,237 --> 00:15:49,959
+Le contraste, par conséquent, change avec
+de gros objets et avec la profondeur.
+
+255
+00:15:50,594 --> 00:15:56,052
+Une autre conséquence est que nous avons
+des doses de radiation excessive à un tissu superficiel
+
+256
+00:15:56,662 --> 00:15:58,395
+Donc, nous allons parler de la
+première conséquence:
+
+257
+00:15:58,395 --> 00:16:00,451
+le contraste change avec
+de grands objets.
+
+258
+00:16:01,191 --> 00:16:05,391
+Nous avons, comme les rayons X impact
+Disons que nous avons une distribution
+
+259
+00:16:05,391 --> 00:16:07,618
+des énergies de rayons X sur cette rangé
+
+260
+00:16:07,618 --> 00:16:11,608
+Nous avons tout d'abord une
+suppression de l'intensité
+
+261
+00:16:11,608 --> 00:16:14,689
+en energie basse du photon,
+nous avons une contribution
+
+262
+00:16:14,689 --> 00:16:18,492
+de l'effet photoélectrique
+au mécanisme de contraste.
+
+263
+00:16:18,792 --> 00:16:24,256
+Le faisceau de rayons X traverse le tissu,
+ces photons sont de préférence enlevés,
+
+264
+00:16:24,256 --> 00:16:28,822
+et nous avons donc une augmentation
+de la contribution de l'effet Compton
+
+265
+00:16:28,822 --> 00:16:32,568
+à l'absorption des rayons x.
+
+266
+00:16:32,568 --> 00:16:35,770
+Donc, nous avons un changement
+de l'effet photoélectrique à effet Compton.
+
+267
+00:16:36,200 --> 00:16:40,439
+si vous imaginez que ce soit la peau ici,
+alors que nous regardons, ici,
+
+268
+00:16:40,439 --> 00:16:46,383
+à une élimination des photons,dans
+les tissus superficiels, la peau, la graisse,
+
+269
+00:16:46,383 --> 00:16:48,608
+et ainsi de suite, et par conséquent,
+
+270
+00:16:48,608 --> 00:16:52,068
+une dose de rayonnement
+plus élevée à ces tissus.
+
+271
+00:16:53,648 --> 00:16:56,267
+Comment pouvons-nous atténuer cet effet?
+
+272
+00:16:56,997 --> 00:17:02,159
+Ainsi, la solution est en fait de
+réduire l'intensité des photons
+
+273
+00:17:02,159 --> 00:17:05,642
+pour les rayons X léger, qui est, pour
+les basses énergies, dans cette gamme ici
+
+274
+00:17:05,642 --> 00:17:11,862
+nous aimerions pas avoir trop d'énergie ici,
+et cela peut être, par exemple,
+
+275
+00:17:11,862 --> 00:17:15,098
+avec l'insertion d'une plaque
+d'aluminium de 3 millimètres,
+
+276
+00:17:15,098 --> 00:17:20,238
+ce qui élimine 90% des 20 photons keV.
+

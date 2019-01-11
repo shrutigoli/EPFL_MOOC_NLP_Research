@@ -1,0 +1,56 @@
+In certain situations, members defined in the superclass, do not completely satisfy the needs of the subclass.
+Redefinition or masking are concepts that can amend this complications.
+In a precedent video, we examined the example of an hierarchy of characters, and postulated that all these characters met another character in the same manner.
+We could imagine, for example, that when any character meets another, he only greets the other.
+But imagine if this way of implementing this method "rencontrer" was valid for most of the classes, but not all.
+For example, we could imagine that a warrior is somewhat more belligerent than the others, and when he meets another, instead of greeting him, he strikes him for example.
+Thus we are in a situation in which we consider
+2 possible implementations for the method "rencontrer".
+One for pacific characters, that will only greet the other character when they meet, and one for warriors, that will strike the other character when they meet.
+Can this be implemented in our first design, without having to change the class hierarchy?
+Happily, the answer is no, we can simply define in the class Guerrier, a method "rencontrer" that is specialized.
+So, in our class hierarchy, we will keep in the superclass Personnage, a generic method "rencontrer", which is satisfied for most subclasses, however, in the subclass guerrier, we will give the method rencontrer a new definition, in order that it corresponds to what we want a warrior to do in this subclass.
+So for a warrior, the specialized method will have precedence over the generic method rencontrer.
+The generic method will be invoked by default as long as the method is not redefined in the subclass.
+For instance, if in a program,
+I declare an object of type Magicien, and that I invoke the method rencontrer on it since the subclass Magicien does not have its own definition of this method, it's the generic method rencontrer inherited from Personnage that will be called here.
+Now, if I declare an object of type Guerrier and apply to it the method rencontrer, well this time, because the method has been redefined, in Guerrier, it will be this specialized method that will be applied.
+In a class hierarchy, it is possible that a name of a data member or method be used on several tiers of the hierarchy.
+In the last example, the method rencontrer with the same header, is found at 2 levels of the hierarchy.
+In this situation, we will speak of redefinition, a method is redefined so as to be adapted to the subclass.
+The english term for this is "overriding".
+Similarly, it is possible for a member variable to be present at several tiers of the hierarchy.
+For example, if in the superclass A we have a data member "a", it is possible to declare this data member "a" again in the subclass B.
+Consequently, we find a data member of the same name on 2 different levels of the hierarchy.
+In this case it is important to now, that an object of type B now has at its disposal 2 data members called "a", one that is directly in class B, and one inherited from A.
+If in the method B, we use the data member "a", it will be the one from the same class that is used, and not the one inherited from a.
+We say that the data member present in B
+"masks" the one of the same name defined in the superclass.
+So, for data members, we speak of "masking", or "shadowing".
+The shadowing of variables in an hierarchy is clearly a source of ambiguity, thus it is not a very common practice.
+On the other hand, method redefinition or "overriding", is a very useful and is used frequently.
+This device allows methods to be adapted to the specific needs of a subclass so as to specialize it.
+To summarize, the redefinition of methods in a class hierarchy consists of defining a method for the specific requirements of its class with the same header as a method already present in the superclass.
+In jargon, we callthe inherited method that can be used by subclasses of Personnage that do not override this method, the default method,.
+The method that redefines a default method is called a specialized method, and which is adapted to the individual needs of a subclass.
+As seen before, it is always the specialized method that has precedence over the default method, for example, if we declare an object of type Guerrier, and invoke the method rencontrer on this instance, it will be the specialized method rencontrer that will be called.
+In reality, an object of type Guerrier has 2 methods rencontrer, the one specific to its class, and the other inherited.
+In certain cases, it can be useful to call the default method even if it was redefined in the subclass.
+How can we do this?
+For example, imagine that we want to give our warrior some good manners, so that instead of attacking characters he meet he greets them instead.
+So this is the code for a pacific character, we want to keep the default method where the character greets his contacts but for a warrior, we want to keep a specialized method so that the warrior can attack people he accosts, but before clouting them we want to be able to invoke the default method so as to greet them.
+Which means concretely that we wish to call the generic method from the specialized method.
+The code allowing a character to greet another is indeed already code in the general method, so it is useless to duplicate it in the redefined method, so it makes more sense to invoke the default method without duplicating code.
+To access masked data members or the original methods of a superclass, necessitates a certain syntax in Java using the keyword super followed by a dot operator and the name of the member in question: "super.name_member".
+In our example, if I want to invoke the method rencontrer inherited from Personnage, then I write "super.rencontrer()", which means that I am calling the default method of the superclass.
+Of course, it is possible to follow up with more specific actions.
+Invoking a superclass method is very convenient, because it avoids duplicating code in the redefined method.
+Invoking a redefined method with this syntax allowed us to define a warrior so as to have more suitable behavior, and will first greet his adversary before showering him with blows, and this, without duplicating code.
+Note that in Java, it is not possible to invoke super several times in succession, and this kind of expression is forbidden.
+This means that if we have a subclass Sorcier, that inherits from a subclass Magicien, that is derived from a superclass Personnage, if the method rencontrer is defined in Personnage, and again in Magicien, and again in Sorcier, then the method rencontrer in Sorcier cannot avoid the method inherited from Magicien by invoking
+"super.super.rencontrer".
+The designers of Java probably considered this expression dangerous that an object of type "sub-subclass" be more like an object of type
+"super-superclass", than like an object of its direct class, its superclass, which is seen as weakening the "is-a" inheritance relationship.
+Note that this is not always limited in the other OOP languages, which authorize this kind of syntax, namely, that a sub-subclass can directly call a method of its super-superclass.
+Note that if the method rencontrer had not been defined at this intermediate level, then "super.rencontrer" would be valid and would simply call the method rencontrer in the most closely relate superclass in which it is defined, and so would indeed have used the method from the class Personnage.
+And this concludes this video.

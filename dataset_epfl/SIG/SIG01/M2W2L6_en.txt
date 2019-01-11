@@ -1,0 +1,228 @@
+Hello and welcome to this lesson which will focus on geometric spatial queries, a set of queries that is more specifically focused on extracting information on the nature and geometric properties of spatial objects stored in a database.
+The objective of this lesson is to explore this world of SQL queries that seeks to extract geometric characteristic properties from spatial objects stored in a database, so that you are able to retrieve information such as the coordinates of a point, the perimeter or length of a line, the surface of a polygon from spatial geometries hosted in a database.
+<I> There is a large number of different geometric spatial queries </ i>
+<I> with a wide variety of keywords that we cannot </ i>
+<I> obviously all review so we will present you </ i>
+<I> some situations, some typical queries </ i>
+<I> which we consider particularly important. </ I>
+<I> It's always a good idea to check out the sites </ i>
+<I> of specialized softwares, in this case the SpatiaLite site </ i>
+<I> and PostGIS site, </ i>
+<I> to get a more complete idea </ i>
+<I> of all the available functionalities in terms </ i>
+<I> of geometric spatial queries. </ I>
+<I> In general, the syntax is pretty much the same </ i>
+<I> in all cases with a particularity however </ i>
+<I> in the PostGIS world which, when </ i>
+<I> the query is on spatial objects, prefaces the keyword </ i>
+<I>with the underlined letters ST, 
+ST for Spatial Type, </ i>
+<I> which allows, in a SQL query, to clearly distinguish </ i>
+<I> everything that is addressing spatial properties </ i>
+<I> and that are specific to the
+PostGIS world versus PostgreSQL world </ i>
+<I> on which PostGIS is built. </ I>
+<I> But for the rest, the syntax is the same as in SpatiaLite </ i>
+<I> with a few rare exceptions. </ I>
+<I> In this lesson, we will first talk about the queries </ i>
+<I>that allow to select and to display geometries, </ i>
+<I> display in a map, or to consult the spatial reference used, </ i>
+<I> so the ESPG code. </ I>
+<I> We will then see some syntax of SQL queries, </ i>
+<I> of data conversion to transform geometries </ i>
+<I> in text or binary format, </ i>
+<I> queries that allow to extract, to consult the type of geometry </ i>
+<I> with which we are dealing and finally we will see a series of queries </ i>
+<I> that allow to retrieve the specific properties </ i>
+<I>of geometries. </ I>
+<I> The GEOMETRY keyword typically refers to the geometry attribute </ i>
+<I> of a spatial data table, </ i>
+<I> so the geometry of the spatial object </ i>
+<I> and it is used in selection queries </ i>
+<I> to display objects on a map. </ I>
+<I> It can also be used to extract </ i>
+<I> the reference of the projection system used </ i>
+<I> or a lot of other information that we will see later. </ I>
+<I> The syntax is based simply on the SELECT, </ i>
+<I> keyword, GEOMETRY, we select the geometries, </ i>
+<I> FROM, the name of the table to indicate the table </ i>
+<I> from which the geometries are extracted. </ I>
+<I> Then, we can imagine conditional clauses </ i>
+<I> which allow to sort, in the geometries, </ i>
+<I> those that meet certain criteria. </ I>
+<I> We will see an example later. </ I>
+<I> The SRID keyword with the GEOMETRY keyword in brackets </ i>
+<I> to extract the reference of the projection system used, </ i>
+<I> in this case the ESPG code. </ I>
+<I> An example of the application of these elements. </ I>
+<I> First, when it comes to selecting objects, </ i>
+<I> the easiest way is to use the integrated tool in QGIS </ i>
+<I> with a selection module which uses </ i>
+<I>the SQL language but the
+SELECT GEOMETRY FROM is hidden </ i>
+<I> and we simply add the criterion in the SQL syntax, </ i>
+<I> here the name that begins with d, </ i>
+<I> and we select all the districts whose name begins with d. </ I>
+<I> Second example, this time in the SpatiaLite module, </ i>
+<I> again with a query in the districts table </ i>
+<I> to select all districts of MahÃ©. </ I>
+<I> To display the results of the query, </ i>
+<I> they must be loaded as a new layer in QGIS, </ i>
+<I> a layer whose name and field that contains </ i>
+<I>the geometries must be defined. </ I>
+<I> Finally, just as we did with the QGIS query, </ i>
+<I> we can change the SpatiaLite request</ i>
+<I> by introducing a conditional clause </ i>
+<I> to limit the selection to districts whose name begins with d. </ I>
+<I> And again, we have to define the result of the query </ i>
+<I> as a new layer to display this selection of districts </ i>
+<I> in the map. </ I>
+<I> To retrieve the projection system of these objects, </ i>
+<I> we eliminate the conditional part of the query </ i>
+<I> and we add the SRID function that applies to geometries. </ I>
+<I> By executing this query, we see that all our objects, </ i>
+<I> or let's say a large part of our objects, are in 32740 which is actually </ i>
+<I> the UTM 40 South system </ i>
+<I> and we see with the DISTINCT keyword that the set of objects </ i>
+<I> have this same reference system. </ I>
+<I> The conversion functions, which also apply </ i>
+<I> to the GEOMETRY attribute, that can transform </ i>
+<I> a geometry into a text format to make it readable </ i>
+<I> or on the contrary, in binary format to store it </ i>
+<I> so that it takes up little space. </ I>
+<I> These two functions are very useful to export / import </ i>
+<I> datasets from one database to another </ i>
+<I> and convert them in another storage format. </ I>
+<I> The syntax is always fairly simple, </ i>
+<I> the SELECT keyword, the AsText function </ i>
+<I> with the geometry in brackets,
+FROM and the name of the table. </ I>
+<I> To illustrate this operation, we take </ i>
+<I> the QGIS SpatiaLite interface </ i>
+<I> and we simply write this request </ i>
+<I>of transformation of the hotel geometries into text </ i>
+<I> and we give an alias to this column, </ i>
+<I> we call it gg, so it comes from the hotel table </ i>
+<I> and we see that our column gg contains a series of multipoints </ i>
+<I> with the coordinates x y. </ I>
+<I> We can create a table from these results, </ i>
+<I> that we will call table 1, and we can add this table </ i>
+<I> in the SpatiaLite database. </ I>
+<I> We can consult the objects of this table. </ I>
+<I> We see that we find our multipoints </ i>
+<I> with a primary key that was added automatically. </ I>
+<I> The equivalent function to transform the geometry </ i>
+<I> into a binary number allows to observe in fact </ i>
+<I> that what we create is a geometric object </ i>
+<I> that we will be able to use for maps. </ I>
+<I> Let's suppose now that we have obtained, imported this table </ i>
+<I> that contains text geometries. </ I>
+<I> We can use a GeomFromText function </ i>
+<I> which allows to transform these text geometries </ i>
+<I> into binary geometries, so geometric objects </ i>
+<I> that we will then be able to use to display them in a map. </ I>
+<I> A series of functions that now allows </ i>
+<I> to recover the characteristics </ i>
+<I> of spatial geometry, starting with the type of geometry, </ i>
+<I> the number of points or the number of rings </ i>
+<I> it can contain and its envelope </ i>
+<I> so the bounding box, the rectangle that encompasses </ i>
+<I>the geometry. </ I>
+<I> The syntax is always of
+SELECT type, </ i>
+<I> the function GeometryType on Envelope </ i>
+<I> and the GEOMETRY keyword in brackets, </ i>
+<I> FROM and the name of the table. </ I>
+<I> So we illustrate this type of queries </ i>
+<I> with the function that allows to extract the type of geometry </ i>
+<I> of a layer, in this case, we will focus on the district layer. </ I>
+<I> and we see that the SQL syntax here is quite permissive </ i>
+<I> since we can simply mention the GEOMETRY attribute, </ i>
+<I> the name of the table, removing any ambiguity. </ I>
+<I> With the DISTINCT keyword, we can check that </ i>
+<I> the entire district layer is composed </ i>
+<I> of multipolygons. </ I>
+<I> If we now replace this extraction
+<I>of geometry type by the
+Envelope function, </ i>
+<I> we see that we create a series of geometric objects </ i>
+<I> and to add these geometric objects to the map, we must </ i>
+<I> make it a GEOMETRY column, define the table name </ i>
+<I> in which we wish to store the thing, </ i>
+<I> define the GEOMETRY field as containing the geometry </ i>
+<I> and execute the query. </ I>
+<I> So this query creates a layer called On Envelope </ i>
+<I> and we find the envelopes that include the different districts </ i>
+<I> of the island of MahÃ© here. </ I>
+<I> Among the many functions that return specific </ i>
+<I> properties of spatial geometries, </ i>
+<I> we will start simply by those returning</ i>
+<I> the coordinates xy of a point </ i>
+<I> with a very simple syntax of SELECT X type </ i>
+<I> in brackets, the geometry, comma Y, the geometry </ i>
+<I> if we want to extract the two coordinates, </ i>
+<I> FROM the name of the table. </ I>
+<I> This syntax is illustrated by selecting </ i>
+<I> the x and y coordinates of the Seychelles' hotels. </ i>
+<I> So here again, simply the
+GEOMETRY keyword, </ i>
+<I> the name of the table, removing any ambiguity. </ I>
+<I> We see that the result of the Greek colony </ i>
+<I> is in scientific notation and so we can use </ i>
+<I> a CastTo function towards an integer </ i>
+<I> to transform this scientific notation into an integer number </ i>
+<I> to make it more readable. </ I>
+<I> Second series of functions that concern </ i>
+<I> the polylines more with the extraction of the initial and the final points </ i>
+<I> of the polyline, StartPoint,
+EndPoint, </ i>
+<I> the length, Length and a test to check </ i>
+<I> if the polyline is open or closed </ i>
+<I> and possibly a test to check if it is </ i>
+<I> a ring or not, so if it is part of a polygon. </ I>
+<I> The syntax is of
+SELECT type, the function </ i>
+<I> in brackets the geometry,
+FROM the name of the table </ i>
+<I> as usual with a particularity, </ i>
+<I> the fact that the length function that returns the length </ i>
+<I> of the polyline is preceded by a capital G in SpatiaLite </ i>
+<I> for the simple reason that the LENGTH keyword </ i>
+<I> is a reserved word of
+SpatiaLite and in QGIS, </ i>
+<I> as I said at the beginning, this function </ i>
+<I> is written ST for spatial type, </ i>
+<I> underlined and then the LENGTH keyword. </ I>
+<I> As an example of this type of query, </ i>
+<I> we will extract the length from the road sections </ i>
+<I> of the Seychelles' road map. </ I>
+<I> And we see that by executing this request, </ i>
+<I> we obtain the length in meters </ i>
+<I> of these road sections. </ I>
+<I> Two functions which now concern more specifically </ i>
+<I>the polygons, the Centroid function </ i>
+<I> which returns the polygon barycenter, </ i>
+<I> the center of gravity of the polygon, </ i>
+<I> and the Area function that returns to its surface. </ I>
+<I> The syntax is always the same with the SELECT keyword, </ i>
+<I>the function, the geometry in brackets, </ i>
+<I> the FROM keyword and the name of the table. </ I>
+<I> So in our example here, we start by </ i>
+<I> selecting, by extracting the surfaces of Seychelles' districts. </ I>
+<I> That's it. So we have again a notation of scientific type. </ I>
+<I> If we now focus on Centroid, </ i>
+<I> we obrain geometric objects </ i>
+<I> that we may want to represent on the map. </ I>
+<I> So to do this, we must load the result as a layer </ i>
+<I> in QGIS, define the geometry, the geometry field </ i>
+<I> with the GEOMETRY keyword, give a name to the table </ i>
+<I> and make sure that the geometry field is called GEOMETRY. </ I>
+<I> By executing this request, we see that we create </ i>
+<I> a layer called centroid. </ I>
+<I> And if we display these centroid layers, </ i>
+<I> we see that we have yellow dots that appear </ i>
+<I> in the center of the
+Seychelles' districts. </ I>
+There you go. In this lesson, we have seen that we could use the query integrated into QGIS to select spatial objects based on conditional queries that use a SQL-like syntax.
+And we also saw that we could use the SQL functions either in SpatiaLite, we have not seen any example in PostGIS but it's the same thing, to extract properties or characteristics of geometries which are stored in a database.
+So, considering the selection functions of geometric objects, the functions which allow to extract the reference system used, so the ESPG code, from the format conversion functions to text or to binary to be able to transform, to graphically retrieve spatial objects, functions which allow to extract the proper characteristics of geometries like their type, their envelope, things like that and finally, a series of functions that allow to extract more numerical characteristics from space objects, the coordinates x y, the length of a line the surface of a point, etc.

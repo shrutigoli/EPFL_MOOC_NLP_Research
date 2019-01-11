@@ -1,0 +1,1317 @@
+1
+00:00:04,164 --> 00:00:06,989
+Après les notions d'encapsulation 
+et d'abstraction,
+
+2
+00:00:06,989 --> 00:00:09,832
+nous abordons dans cette
+séquence vidéo-ci et les suivantes
+
+3
+00:00:09,832 --> 00:00:13,785
+la troisième notion fondamentale
+de la programmation orientée objet
+
+4
+00:00:13,785 --> 00:00:15,508
+qu'est l'héritage.
+
+5
+00:00:15,698 --> 00:00:17,647
+Mais commençons de suite par un exemple,
+
+6
+00:00:17,647 --> 00:00:22,378
+et oublions un peu pour une fois les 
+rectangles et autres figures géométriques
+
+7
+00:00:22,378 --> 00:00:25,635
+pour nous concentrer 
+sur des personnages d'un jeu.
+
+8
+00:00:25,635 --> 00:00:28,094
+Imaginons qu'on veut 
+faire un jeu où on a par exemple
+
+9
+00:00:28,094 --> 00:00:31,341
+des guerriers, des magiciens, 
+des voleurs et autres...
+
+10
+00:00:31,891 --> 00:00:33,974
+Comment représenterions-nous cela ?
+
+11
+00:00:34,114 --> 00:00:36,288
+On pourrait imaginer
+une classe pour les guerriers,
+
+12
+00:00:36,288 --> 00:00:39,306
+une classe pour les voleurs, une classe 
+pour les magiciens, ainsi de suite.
+
+13
+00:00:39,876 --> 00:00:41,656
+Pour un guerrier on pourrait donc imaginer
+
+14
+00:00:41,656 --> 00:00:44,562
+qu'il ait comme attribut 
+typiquement un nom,
+
+15
+00:00:44,562 --> 00:00:47,981
+peut-être un niveau d'énergie, 
+une durée de vie,
+
+16
+00:00:48,321 --> 00:00:50,643
+un guerrier aurait certainement une arme.
+
+17
+00:00:51,122 --> 00:00:52,758
+Au niveau des méthodes, 
+on pourrait imaginer
+
+18
+00:00:52,758 --> 00:00:55,639
+qu'un guerrier peut rencontrer
+d'autres personnages.
+
+19
+00:00:56,399 --> 00:00:59,354
+De même pour le voleur, 
+il aurait peut-être aussi un nom,
+
+20
+00:00:59,354 --> 00:01:01,520
+une énergie, une durée de vie,
+
+21
+00:01:01,520 --> 00:01:04,764
+et il pourrait aussi rencontrer 
+d'autres personnages, voire les voler,
+
+22
+00:01:05,234 --> 00:01:08,789
+Le magicien lui aussi aurait son nom, 
+son énergie, sa durée de vie,
+
+23
+00:01:08,789 --> 00:01:10,581
+il pourrait rencontrer 
+d'autres personnages,
+
+24
+00:01:10,581 --> 00:01:13,983
+et il aurait peut-être une baguette 
+au lieu d'avoir une arme.
+
+25
+00:01:13,983 --> 00:01:17,528
+On pourrait également avoir des sorciers,
+comme des sortes de magiciens,
+
+26
+00:01:17,528 --> 00:01:20,297
+qui en plus d'avoir une baguette,
+auraient aussi un bâton.
+
+27
+00:01:20,297 --> 00:01:23,280
+Tout ceci dupliquerait beaucoup de codes,
+
+28
+00:01:23,280 --> 00:01:25,441
+ça nous ferait perdre beaucoup de temps 
+d'écrire tout cela,
+
+29
+00:01:25,441 --> 00:01:28,243
+et surtout poserait de gros problèmes
+de maintenance,
+
+30
+00:01:28,243 --> 00:01:31,176
+imaginons que l'on ne veuille plus que
+les personnages aient une durée de vie,
+
+31
+00:01:31,176 --> 00:01:33,318
+mais qu'ils aient par exemple
+des points de vie,
+
+32
+00:01:33,318 --> 00:01:36,712
+ou que l'énergie ne soit plus
+un <i>int</i> mais un <i>double</i>,
+
+33
+00:01:36,712 --> 00:01:40,391
+il faudrait alors corriger l'ensemble 
+des classes que nous avons développées,
+
+34
+00:01:40,391 --> 00:01:42,854
+c'est certainement pas
+une bonne façon de faire.
+
+35
+00:01:43,054 --> 00:01:45,723
+La notion d'héritage en programmation
+permet justement
+
+36
+00:01:45,723 --> 00:01:47,767
+de répondre à ce genre de problèmes,
+
+37
+00:01:47,767 --> 00:01:51,350
+en essayant de regrouper au maximum
+les parties communes,
+
+38
+00:01:51,350 --> 00:01:53,979
+attributs et méthodes communes
+dans des classes
+
+39
+00:01:53,979 --> 00:01:57,846
+qu'on va appeler des super-classes,
+qui regroupent des caractéristiques
+
+40
+00:01:57,846 --> 00:02:00,462
+qui sont ensuite enrichies 
+ou spécialisées
+
+41
+00:02:00,462 --> 00:02:02,965
+pour d'autres classes plus spécifiques.
+
+42
+00:02:03,335 --> 00:02:06,830
+Dans notre cas typiquement, 
+ça serait une classe Personnage,
+
+43
+00:02:06,830 --> 00:02:08,920
+un personnage générique 
+qui d'ailleurs répondrait
+
+44
+00:02:08,920 --> 00:02:11,687
+à un des problèmes de la conception 
+présentée jusqu'ici,
+
+45
+00:02:11,687 --> 00:02:15,837
+c'est qu'on n'avait pas 
+de classe de type Personnage.
+
+46
+00:02:15,837 --> 00:02:18,281
+En anticipant bien sûr 
+sur ce qui va suivre,
+
+47
+00:02:18,281 --> 00:02:20,949
+avec l'héritage, nous pourrions faire 
+quelque chose comme ceci,
+
+48
+00:02:20,949 --> 00:02:23,404
+avoir une classe Personnage
+qui regroupe
+
+49
+00:02:23,404 --> 00:02:25,636
+l'ensemble des caractéristiques
+communes,
+
+50
+00:02:25,636 --> 00:02:28,995
+nom, énergie, durée de vie,
+mais aussi des méthodes,
+
+51
+00:02:28,995 --> 00:02:32,218
+donc par exemple
+"rencontrer un personnage",
+
+52
+00:02:32,218 --> 00:02:33,774
+donc une classe Personnage qui regroupe
+
+53
+00:02:33,774 --> 00:02:35,819
+l'ensemble des caractéristiques 
+de ces personnages,
+
+54
+00:02:35,819 --> 00:02:39,908
+et dont hériterait le voleur, 
+le magicien, le guerrier,
+
+55
+00:02:39,908 --> 00:02:43,349
+ayant chacun ses spécificités,
+une arme pour le guerrier,
+
+56
+00:02:43,349 --> 00:02:45,031
+une baguette pour le magicien,
+
+57
+00:02:45,031 --> 00:02:49,034
+une spécialisation ici avec 
+une méthode <i>voler</i> pour le voleur,
+
+58
+00:02:49,034 --> 00:02:52,441
+et puis de la classe magicien, 
+on pourrait aussi faire
+
+59
+00:02:52,441 --> 00:02:55,104
+une extension supplémentaire,
+un héritage de plus,
+
+60
+00:02:55,104 --> 00:02:58,242
+pour avoir un sorcier 
+qui est une sorte de magicien,
+
+61
+00:02:58,242 --> 00:03:01,543
+qui aurait la baguette 
+et en plus un bâton.
+
+62
+00:03:01,543 --> 00:03:05,966
+Voilà ce à quoi sert l'héritage
+en programmation orientée objet.
+
+63
+00:03:05,966 --> 00:03:08,893
+Il représente la relation "est-un",
+
+64
+00:03:08,893 --> 00:03:13,397
+et permet d'éviter la duplication 
+de codes, d'attributs et de méthodes.
+
+65
+00:03:13,397 --> 00:03:16,693
+L'héritage permet ainsi de créer
+des classes plus spécialisées,
+
+66
+00:03:16,693 --> 00:03:19,056
+des classes enrichies.
+
+67
+00:03:19,056 --> 00:03:21,531
+On va parler donc de super-classes,
+
+68
+00:03:21,531 --> 00:03:25,246
+pour une classe à partir de laquelle 
+on va dériver des sous-classes.
+
+69
+00:03:25,246 --> 00:03:27,206
+On dira que les sous-classes héritent,
+
+70
+00:03:27,206 --> 00:03:29,643
+et on mettra la flèche 
+dans ce sens là,
+
+71
+00:03:29,643 --> 00:03:32,463
+les sous-classes héritent
+de la super-classe,
+
+72
+00:03:32,463 --> 00:03:35,414
+et ces sous-classes seront donc
+des extensions,
+
+73
+00:03:35,414 --> 00:03:37,932
+soit par ajout d'attributs de méthodes,
+
+74
+00:03:37,932 --> 00:03:40,019
+soit par spécialisation de méthodes,
+
+75
+00:03:40,019 --> 00:03:43,102
+ce seront des extensions 
+de la super-classe.
+
+76
+00:03:43,702 --> 00:03:45,779
+Avant de les détailler chacune
+sur un exemple,
+
+77
+00:03:45,779 --> 00:03:48,643
+voyons les implications 
+de la relation d'héritage.
+
+78
+00:03:48,643 --> 00:03:51,697
+Si on a une sous-classe C1 qui est créé
+
+79
+00:03:51,697 --> 00:03:54,765
+à partir d'une classe C,
+qui hérite d'une classe C,
+
+80
+00:03:54,765 --> 00:03:57,223
+on va dire que C1 "est un" C,
+
+81
+00:03:57,223 --> 00:03:59,293
+c'est-à-dire que le type est hérité.
+
+82
+00:03:59,293 --> 00:04:02,468
+Donc par exemple, si j'ai 
+une variable x de type C,
+
+83
+00:04:02,468 --> 00:04:05,464
+si j'ai une variable y de type C1,
+
+84
+00:04:05,464 --> 00:04:13,426
+je peux tout à fait mettre y dans x,
+un C1 est aussi un C.
+
+85
+00:04:13,426 --> 00:04:17,389
+Par ailleurs la classe C1 va hériter 
+de l'ensemble des attributs
+
+86
+00:04:17,389 --> 00:04:20,646
+et de l'ensemble 
+des méthodes de la classe C.
+
+87
+00:04:20,646 --> 00:04:23,303
+Quand on dit l'ensemble des attributs 
+et l'ensemble des méthodes,
+
+88
+00:04:23,303 --> 00:04:26,515
+c'est sauf les constructeurs,
+les constructeurs ne sont pas hérités.
+
+89
+00:04:26,515 --> 00:04:29,578
+Les attributs et les méthodes de C 
+seront donc disponibles
+
+90
+00:04:29,578 --> 00:04:34,490
+dans C1 sans qu'on ait besoin
+de les redéfinir explicitement.
+
+91
+00:04:34,490 --> 00:04:37,226
+Et enfin, des attributs et 
+des méthodes supplémentaires
+
+92
+00:04:37,226 --> 00:04:40,853
+peuvent être ajoutées à C1,
+c'est ce qu'on appelle l'enrichissement,
+
+93
+00:04:40,853 --> 00:04:45,559
+ou alors des méthodes héritées 
+de C dans C1 peuvent être redéfinies,
+
+94
+00:04:45,559 --> 00:04:48,083
+c'est ce qu'on appelle la spécialisation.
+
+95
+00:04:48,083 --> 00:04:50,533
+Revoyons tout ceci en détails 
+sur un exemple.
+
+96
+00:04:51,063 --> 00:04:54,686
+Imaginons donc que l'on ait créé 
+une super-classe Personnage,
+
+97
+00:04:54,686 --> 00:04:58,779
+et deux sous-classes guerrier et voleur, 
+par exemple.
+
+98
+00:04:58,779 --> 00:05:02,439
+Donc on a dit que lorsqu'une sous-classe C1,
+par exemple ici guerrier,
+
+99
+00:05:02,439 --> 00:05:04,844
+est créée à partir d'une super-classe C,
+
+100
+00:05:04,844 --> 00:05:07,929
+donc par exemple ici Personnage, 
+le type est hérité.
+
+101
+00:05:07,929 --> 00:05:12,671
+En fait un Guerrier est aussi 
+un Personnage,
+
+102
+00:05:12,671 --> 00:05:14,463
+ce qui nous permet d'écrire 
+le code suivant,
+
+103
+00:05:14,463 --> 00:05:18,565
+supposons qu'on ait donc déclaré 
+une variable p de type Personnage,
+
+104
+00:05:18,565 --> 00:05:22,281
+une variable g de type Guerrier,
+on les manipule,
+
+105
+00:05:22,281 --> 00:05:24,029
+et à un certain moment par exemple,
+
+106
+00:05:24,029 --> 00:05:27,284
+on dit que le Personnage p
+est le Guerrier g,
+
+107
+00:05:27,284 --> 00:05:29,876
+donc on met le Guerrier g 
+dans le Personnage p,
+
+108
+00:05:29,876 --> 00:05:34,370
+on peut tout à fait faire ceci,
+puisqu'un Guerrier est un Personnage.
+
+109
+00:05:34,370 --> 00:05:36,361
+Evidemment on ne peut pas 
+faire le contraire,
+
+110
+00:05:36,361 --> 00:05:38,512
+on ne peut pas écrire g = p,
+
+111
+00:05:38,512 --> 00:05:41,927
+un personnage générique 
+n'est pas un guerrier,
+
+112
+00:05:41,927 --> 00:05:45,076
+on peut avoir des personnages 
+qui sont des voleurs, des magiciens,
+
+113
+00:05:45,076 --> 00:05:47,491
+et on ne pourrait pas mettre
+un voleur dans un guerrier,
+
+114
+00:05:47,491 --> 00:05:49,322
+ça n'aurait pas de sens.
+
+115
+00:05:49,322 --> 00:05:51,179
+Donc ici, la relation est bien orientée,
+
+116
+00:05:51,179 --> 00:05:54,541
+c'est bien un guerrier 
+qui est un personnage.
+
+117
+00:05:54,541 --> 00:05:56,237
+De même, on pourrait imaginer donc
+
+118
+00:05:56,237 --> 00:06:00,039
+avoir une fonction qui permet
+d'afficher un personnage,
+
+119
+00:06:00,039 --> 00:06:04,602
+et on peut afficher g,
+qui est ici un guerrier,
+
+120
+00:06:04,602 --> 00:06:10,481
+qui est passé comme paramètre à la fonction 
+<i>afficher</i> en tant que personnage,
+
+121
+00:06:10,481 --> 00:06:12,877
+la fonction <i>afficher</i> le verra
+en tant que personnage,
+
+122
+00:06:12,877 --> 00:06:16,414
+on peut faire ceci parce que
+un Guerrier est un Personnage.
+
+123
+00:06:17,214 --> 00:06:18,896
+Deuxième aspect de l'héritage :
+
+124
+00:06:18,896 --> 00:06:23,310
+Guerrier va hériter, 
+c'est-à-dire recevoir, contenir
+
+125
+00:06:23,310 --> 00:06:26,446
+l'ensemble des attributs 
+et des méthodes de Personnage.
+
+126
+00:06:26,446 --> 00:06:30,030
+Donc par exemple, si Personnage
+avait un nom, une énergie,
+
+127
+00:06:30,030 --> 00:06:33,228
+une durée de vie, et disons 
+une méthode <i>rencontrer</i>,
+
+128
+00:06:33,228 --> 00:06:37,326
+et que Guerrier hérite 
+de la classe Personnage,
+
+129
+00:06:37,326 --> 00:06:41,985
+alors dans Guerrier on aura aussi un nom
+une énergie, une durée de vie,
+
+130
+00:06:41,985 --> 00:06:44,537
+sans qu'on ait besoin de les redéfinir,
+
+131
+00:06:44,537 --> 00:06:48,034
+et aussi une méthode rencontrer, donc
+on pourrait faire des choses comme ceci,
+
+132
+00:06:48,034 --> 00:06:51,582
+supposons qu'on ait donc ici
+un Guerrier g et un Voleur v,
+
+133
+00:06:51,582 --> 00:06:53,343
+qui est aussi un Personnage,
+
+134
+00:06:53,343 --> 00:06:58,111
+g ici, en tant que Guerrier, va hériter 
+la méthode <i>rencontrer</i>,
+
+135
+00:06:58,111 --> 00:07:00,924
+et donc on pourrait appeler, 
+pourvu que cette méthode
+
+136
+00:07:00,924 --> 00:07:04,003
+soit dans l'interface publique
+de Personnage,
+
+137
+00:07:04,003 --> 00:07:08,206
+on va pouvoir appeler "g.rencontrer(v)",
+
+138
+00:07:08,206 --> 00:07:13,017
+ici on passe le voleur v comme argument 
+à la méthode <i>rencontrer</i>,
+
+139
+00:07:13,017 --> 00:07:16,310
+mais ce qui m'importe ici c'est de voir 
+que la méthode <i>rencontrer</i>
+
+140
+00:07:16,310 --> 00:07:18,755
+est disponible, accessible dans g,
+
+141
+00:07:18,755 --> 00:07:22,614
+Guerrier a hérité de la méthode
+<i>rencontrer</i> de Personnage,
+
+142
+00:07:22,614 --> 00:07:25,846
+de même si on avait une méthode 
+quelconque dans Guerrier,
+
+143
+00:07:25,846 --> 00:07:30,156
+on pourrait directement comme ceci 
+utiliser l'attribut énergie
+
+144
+00:07:30,156 --> 00:07:33,229
+dans une méthode de guerrier,
+pourvu qu'il ne soit pas privé,
+
+145
+00:07:33,229 --> 00:07:39,783
+l'attribut énergie qui est hérité 
+de personnage dans la classe Guerrier,
+
+146
+00:07:39,783 --> 00:07:42,943
+sans qu'on ait besoin de rajouter
+aucune ligne de code,
+
+147
+00:07:42,943 --> 00:07:46,588
+c'est automatique, 
+c'est une des conséquences de l'héritage.
+
+148
+00:07:46,588 --> 00:07:49,891
+Troisième et dernier aspect enfin
+que nous voulions souligner,
+
+149
+00:07:49,891 --> 00:07:52,464
+même si les attributs 
+et les méthodes sont hérités,
+
+150
+00:07:52,464 --> 00:07:53,795
+qu'on les a dans les sous-classes,
+
+151
+00:07:53,795 --> 00:07:56,151
+on peut quand même 
+ajouter des attributs
+
+152
+00:07:56,151 --> 00:07:59,138
+et des méthodes supplémentaires,
+ce qu'on appelle l'enrichissement,
+
+153
+00:07:59,138 --> 00:08:02,803
+par exemple dans la classe Guerrier,
+on pourrait rajouter une arme,
+
+154
+00:08:02,803 --> 00:08:05,468
+et on peut aussi donc
+redéfinir des méthodes,
+
+155
+00:08:05,468 --> 00:08:07,485
+ce qu'on appelle, les spécialiser,
+
+156
+00:08:07,485 --> 00:08:09,727
+donc par exemple, on pourrait redéfinir
+
+157
+00:08:09,727 --> 00:08:12,590
+la méthode rencontrer
+dans la classe Voleur,
+
+158
+00:08:12,590 --> 00:08:14,124
+en disant que par exemple un Voleur
+
+159
+00:08:14,124 --> 00:08:17,549
+quand il rencontre un autre Personnage, 
+il le vole, par exemple.
+
+160
+00:08:17,929 --> 00:08:20,142
+L'héritage est donc une notion
+très importante
+
+161
+00:08:20,142 --> 00:08:21,878
+en programmation orientée <i>objet</i>,
+
+162
+00:08:21,878 --> 00:08:24,423
+parce qu'elle permet d'organiser le code,
+
+163
+00:08:24,423 --> 00:08:27,751
+de rendre la conception 
+beaucoup plus claire,
+
+164
+00:08:27,751 --> 00:08:30,819
+elle permet d'expliciter les relations 
+structurelles et sémantiques
+
+165
+00:08:30,819 --> 00:08:33,164
+qui existent entre différentes classes,
+
+166
+00:08:33,164 --> 00:08:35,647
+par exemple, un Guerrier est un Personnage,
+
+167
+00:08:35,647 --> 00:08:38,548
+un Sorcier est une sorte de Magicien.
+
+168
+00:08:38,548 --> 00:08:42,812
+Elle permet aussi donc d'éviter d'avoir
+à réécrire de grandes portions de code,
+
+169
+00:08:42,812 --> 00:08:45,414
+donc ce qu'on appelle
+de la redondance de code.
+
+170
+00:08:45,414 --> 00:08:48,853
+Attention donc à bien utiliser
+l'héritage à bon escient,
+
+171
+00:08:48,853 --> 00:08:53,007
+il faut utiliser l'héritage pour
+représenter la relation "est-un",
+
+172
+00:08:53,007 --> 00:08:55,688
+un Guerrier est un Personnage,
+
+173
+00:08:55,688 --> 00:08:57,902
+mais on ne va pas dire 
+qu'un Guerrier est une Arme,
+
+174
+00:08:57,902 --> 00:08:59,982
+on dit qu'un Guerrier a une Arme,
+
+175
+00:08:59,982 --> 00:09:03,560
+et pour représenter donc
+la relation "a/possède",
+
+176
+00:09:03,560 --> 00:09:06,673
+on utilisera ce qu'on avait vu
+jusqu'à maintenant, l'encapsulation.
+
+177
+00:09:06,793 --> 00:09:11,229
+Et donc, pour résumer, un Guerrier
+héritera de la classe Personnage,
+
+178
+00:09:11,229 --> 00:09:16,134
+mais encapsulera, aura
+comme attribut une arme.
+
+179
+00:09:16,814 --> 00:09:19,796
+Nous avons vu qu'une sous-classe 
+qui hérite d'une super-classe,
+
+180
+00:09:19,796 --> 00:09:22,605
+héritait, c'est-à-dire,
+recevait, possédait
+
+181
+00:09:22,605 --> 00:09:27,023
+les attributs et les méthodes de cette
+super-classe, sauf les constructeurs.
+
+182
+00:09:27,023 --> 00:09:29,975
+Cet aspect-là est transitif, 
+c'est-à-dire que si nous avons
+
+183
+00:09:29,975 --> 00:09:32,638
+une super-super-classe, 
+dont hérite la super-classe,
+
+184
+00:09:32,638 --> 00:09:34,993
+alors nous récupérons
+au niveau de la sous-classe,
+
+185
+00:09:34,993 --> 00:09:38,538
+l'ensemble des méthodes 
+et des attributs de ces classes,
+
+186
+00:09:38,538 --> 00:09:41,943
+donc plus concrètement, 
+si j'ai une super-super-classe A,
+
+187
+00:09:41,943 --> 00:09:46,772
+dont hérite une super-classe B,
+et dont hérite une classe C,
+
+188
+00:09:46,772 --> 00:09:51,993
+nous allons récupérer au niveau de C,
+les attributs et les méthodes de B,
+
+189
+00:09:51,993 --> 00:09:55,257
+mais également celles de A,
+puisque B hérite de A,
+
+190
+00:09:55,457 --> 00:09:58,846
+B récupère les attributs
+et les méthodes de A,
+
+191
+00:09:58,846 --> 00:10:01,798
+et donc dans B, j'ai bien
+les attributs et les méthodes de A,
+
+192
+00:10:01,798 --> 00:10:05,762
+et donc par transitivité, 
+je récupère au travers de B,
+
+193
+00:10:05,762 --> 00:10:09,828
+dans C également, les attributs
+et les méthodes de A.
+
+194
+00:10:09,828 --> 00:10:13,826
+Donc sur un exemple concret, si j'ai 
+par exemple une classe Personnage,
+
+195
+00:10:13,826 --> 00:10:16,168
+dont hérite une classe Magicien,
+
+196
+00:10:16,168 --> 00:10:19,279
+et disons qu'un sorcier 
+est une sorte de magicien,
+
+197
+00:10:19,279 --> 00:10:22,571
+donc la classe Sorcier 
+hérite de la classe Magicien.
+
+198
+00:10:22,571 --> 00:10:24,334
+A ce moment-là, dans la classe Sorcier,
+
+199
+00:10:24,334 --> 00:10:28,540
+nous aurons également un nom, 
+une énergie, une durée de vie,
+
+200
+00:10:28,540 --> 00:10:32,949
+lesquels ont été hérités, 
+ainsi que la méthode <i>rencontrer</i>,
+
+201
+00:10:32,949 --> 00:10:35,952
+lesquels ont été hérités dans le magicien,
+
+202
+00:10:35,952 --> 00:10:39,089
+et sont donc à nouveau hérités
+au niveau du Sorcier,
+
+203
+00:10:39,089 --> 00:10:44,693
+et bien sûr le Sorcier récupérera 
+en plus un attribut baguette,
+
+204
+00:10:44,693 --> 00:10:46,663
+hérité du Magicien.
+
+205
+00:10:46,663 --> 00:10:48,859
+Nous avons donc comme ceci par héritage,
+
+206
+00:10:48,859 --> 00:10:52,479
+un enrichissement progressif
+de différentes classes,
+
+207
+00:10:52,479 --> 00:10:55,440
+ce qui fait qu'au final, 
+nous allons trouver
+
+208
+00:10:55,440 --> 00:10:57,973
+si l'on dessine toutes les relations 
+d'héritage entre classes,
+
+209
+00:10:57,973 --> 00:11:02,545
+un schéma arborescent, 
+une structure d'arbre,
+
+210
+00:11:02,545 --> 00:11:06,057
+où on va voir toutes les dépendances
+entre les classes,
+
+211
+00:11:06,057 --> 00:11:07,618
+toutes les relations "est-un",
+
+212
+00:11:07,618 --> 00:11:11,585
+et les relations d'héritage, d'attributs, 
+de méthode et aussi de type,
+
+213
+00:11:11,585 --> 00:11:15,936
+qui va nous donner, ce que l'on appelle 
+une hiérarchie de classes,
+
+214
+00:11:15,936 --> 00:11:18,607
+avec les classes les plus générales 
+en haut, personnage,
+
+215
+00:11:18,607 --> 00:11:21,939
+et les classes les plus spécialisées,
+les plus enrichies, en bas.
+
+216
+00:11:22,829 --> 00:11:24,817
+Pour résumer, la relation d'héritage
+
+217
+00:11:24,817 --> 00:11:28,414
+nous permet donc d'éviter
+de la duplication de code,
+
+218
+00:11:28,414 --> 00:11:31,724
+en nous permettant de représenter 
+dans notre conception des programmes,
+
+219
+00:11:31,724 --> 00:11:35,671
+la relation "est-un",
+on va concevoir des super-classes,
+
+220
+00:11:35,671 --> 00:11:38,743
+qui seront plus générales, qu'on va 
+aussi appeler classes parentes,
+
+221
+00:11:38,743 --> 00:11:40,852
+qui vont regrouper les aspects 
+plus généraux,
+
+222
+00:11:40,852 --> 00:11:43,891
+et dont hériteront, ce qu'on appelle
+des sous-classes,
+
+223
+00:11:43,891 --> 00:11:45,312
+aussi des classes <i>enfant</i>,
+
+224
+00:11:45,312 --> 00:11:48,211
+qui récupéreront l'ensemble 
+des attributs, des méthodes,
+
+225
+00:11:48,211 --> 00:11:51,264
+et aussi le type de la super-classe
+dont elle dépend.
+
+226
+00:11:51,714 --> 00:11:54,775
+Voilà, tout ceci vous a donc présenté 
+d'un point de vue conceptuel
+
+227
+00:11:54,775 --> 00:11:57,722
+ce qu'est l'héritage, peut-être aussi
+d'un point de vue théorique,
+
+228
+00:11:57,722 --> 00:11:59,266
+mais comment en pratique faisons-nous
+
+229
+00:11:59,266 --> 00:12:02,628
+pour faire hériter une sous-classe 
+d'une super-classe ?
+
+230
+00:12:02,628 --> 00:12:05,033
+Commençons par regarder 
+un exemple concret.
+
+231
+00:12:05,033 --> 00:12:08,070
+Supposons que l'on veuille définir 
+une classe Rectangle
+
+232
+00:12:08,070 --> 00:12:11,469
+qui a une largeur et qui a une hauteur,
+
+233
+00:12:11,469 --> 00:12:13,938
+et qui est une figure géométrique,
+
+234
+00:12:13,938 --> 00:12:17,764
+lesquelles, figures géométriques, 
+ont une position.
+
+235
+00:12:17,764 --> 00:12:20,079
+On aurait donc le diagramme 
+d'héritage suivant,
+
+236
+00:12:20,079 --> 00:12:24,035
+une super-classe "FigureGeometrique"
+avec un attribut <i>position</i>,
+
+237
+00:12:24,035 --> 00:12:27,747
+et une sous-classe <i>Rectangle</i>,
+qui hérite de "FigureGeometrique",
+
+238
+00:12:27,747 --> 00:12:30,012
+un rectangle est une figure géométrique,
+
+239
+00:12:30,012 --> 00:12:32,523
+et qui aurait donc des attributs 
+supplémentaires,
+
+240
+00:12:32,523 --> 00:12:34,744
+elle hériterait bien sûr 
+de l'attribut position,
+
+241
+00:12:34,744 --> 00:12:36,673
+mais elle aurait des
+attributs supplémentaires,
+
+242
+00:12:36,673 --> 00:12:39,293
+que sont une largeur et une hauteur.
+
+243
+00:12:39,293 --> 00:12:42,101
+Mais comment tout ceci s'écrit-il
+concrètement en Java ?
+
+244
+00:12:42,101 --> 00:12:46,126
+La syntaxe pour faire hériter 
+une sous-classe d'une super-classe,
+
+245
+00:12:46,126 --> 00:12:49,255
+est simplement de rajouter
+le mot clé "extends"
+
+246
+00:12:49,255 --> 00:12:50,802
+et le nom de la super-classe,
+
+247
+00:12:50,802 --> 00:12:54,029
+derrière la première ligne 
+de définition de la sous-classe,
+
+248
+00:12:54,029 --> 00:12:56,846
+donc on aura 
+"class", puis le nom de la sous-classe,
+
+249
+00:12:56,846 --> 00:12:58,910
+"extends" suivi du nom de la super-classe,
+
+250
+00:12:58,910 --> 00:13:02,314
+et puis ensuite la définition 
+usuelle de la sous-classe,
+
+251
+00:13:02,314 --> 00:13:04,980
+c'est-à-dire la déclaration 
+des attributs et des méthodes
+
+252
+00:13:04,980 --> 00:13:06,936
+spécifiques à la sous-classe.
+
+253
+00:13:06,936 --> 00:13:09,553
+Donc par exemple, 
+si j'ai une classe rectangle
+
+254
+00:13:09,553 --> 00:13:13,153
+qui hérite de la classe 
+"FigureGeometrique",
+
+255
+00:13:13,153 --> 00:13:14,669
+j'écrirai la chose suivante,
+
+256
+00:13:14,669 --> 00:13:18,087
+"class Rectangle extends
+Figure Geometrique"
+
+257
+00:13:18,087 --> 00:13:21,501
+et j'écrirais donc en dessous
+la définition de la classe rectangle,
+
+258
+00:13:21,501 --> 00:13:23,023
+qui rajoute donc par exemple,
+
+259
+00:13:23,023 --> 00:13:28,397
+les deux attributs largeur et hauteur
+spécifiques à cette classe rectangle.
+
+260
+00:13:28,397 --> 00:13:33,209
+La seule à ajouter à la définition
+usuelle de notre classe Rectangle,
+
+261
+00:13:33,209 --> 00:13:36,699
+pour qu'elle hérite de la classe
+"FigureGeometrique",
+
+262
+00:13:36,699 --> 00:13:39,301
+c'est simplement cette portion-là de code.
+
+263
+00:13:40,271 --> 00:13:43,264
+De la même façon, si je reviens 
+à notre exemple des guerriers,
+
+264
+00:13:43,264 --> 00:13:45,494
+qui héritent des personnages,
+
+265
+00:13:45,494 --> 00:13:47,670
+on aurait donc comme ça 
+une classe Personnage
+
+266
+00:13:47,670 --> 00:13:50,997
+qui aurait déjà été définie,
+la façon donc de faire hériter
+
+267
+00:13:50,997 --> 00:13:53,368
+la classe Guerrier 
+de la classe Personnage,
+
+268
+00:13:53,368 --> 00:13:57,903
+c'est simplement de définir 
+"class Guerrier extends Personnage",
+
+269
+00:13:57,903 --> 00:14:00,505
+et puis ensuite donc de faire suivre
+
+270
+00:14:00,505 --> 00:14:03,475
+avec la définition spécifique
+de la classe Guerrier,
+
+271
+00:14:03,475 --> 00:14:08,797
+qui par exemple ici, rajouterait 
+un attribut qui est une arme.
+
+272
+00:14:09,707 --> 00:14:12,105
+Voilà, ceci conclut donc 
+cette introduction générale
+
+273
+00:14:12,105 --> 00:14:15,506
+sur le concept très important 
+en programmation orientée <i>objet</i>,
+
+274
+00:14:15,506 --> 00:14:17,238
+de l'héritage.
+
+275
+00:14:17,238 --> 00:14:20,354
+Les vidéos suivantes vont continuer
+à détailler ce concept
+
+276
+00:14:20,354 --> 00:14:22,189
+d'un point de vue un peu plus pratique,
+
+277
+00:14:22,189 --> 00:14:24,739
+en ce qui concerne ses détails 
+et ses implications.

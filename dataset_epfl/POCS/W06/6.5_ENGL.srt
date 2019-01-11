@@ -1,0 +1,1605 @@
+1
+00:00:04,473 --> 00:00:08,811
+We've already seen the idea of using 
+voting as a way to deal with failure.
+
+2
+00:00:08,811 --> 00:00:11,559
+And voting is really
+a fundamental concept.
+
+3
+00:00:11,559 --> 00:00:16,205
+We see it everywhere; its the foundation
+of democratic societies.
+
+4
+00:00:16,205 --> 00:00:21,273
+It embodies the belief that 
+multiple opinions are better that one.
+
+5
+00:00:21,273 --> 00:00:25,975
+And when a majority of potentially
+faulty people agree on something,
+
+6
+00:00:25,975 --> 00:00:27,818
+then they're probably right.
+
+7
+00:00:28,173 --> 00:00:32,945
+So we use this a a building block
+to develop much more sophisticated forms
+
+8
+00:00:32,945 --> 00:00:36,420
+of dealing with failures,
+especially in distributed systems,
+
+9
+00:00:36,420 --> 00:00:40,679
+which are systems that consist
+of nodes that can only communicate
+
+10
+00:00:40,679 --> 00:00:42,380
+by exchanging messages.
+
+11
+00:00:43,146 --> 00:00:45,871
+So what are some
+examples of such systems?
+
+12
+00:00:45,871 --> 00:00:49,529
+Well one of the simplest situations
+is agreeing on time.
+
+13
+00:00:49,529 --> 00:00:52,460
+Protocols like NTP
+are used by computers connected
+
+14
+00:00:52,460 --> 00:00:54,800
+by package switch variable
+latency networks
+
+15
+00:00:54,800 --> 00:00:57,618
+to agree on what the current time is.
+
+16
+00:00:57,618 --> 00:00:59,661
+It's one of the oldest 
+internet protocols,
+
+17
+00:00:59,661 --> 00:01:03,273
+precisely because agreeing on time
+is such a fundamental need
+
+18
+00:01:03,273 --> 00:01:04,991
+in a distribute environment.
+
+19
+00:01:05,281 --> 00:01:08,647
+Another example, involves the delivery 
+of messages to nodes
+
+20
+00:01:08,647 --> 00:01:10,113
+in a distribute system.
+
+21
+00:01:10,113 --> 00:01:15,518
+And often, it is important that all nodes
+process these messages in the same order.
+
+22
+00:01:15,518 --> 00:01:19,687
+And the nodes must collectively
+agree on that order.
+
+23
+00:01:20,047 --> 00:01:23,517
+Sometimes we want to take a checkpoint
+or snapshot of the state
+
+24
+00:01:23,517 --> 00:01:26,666
+of a distributed system
+while it keeps running.
+
+25
+00:01:26,666 --> 00:01:29,783
+So we need to collect a set
+of node level checkpoints
+
+26
+00:01:29,783 --> 00:01:31,494
+that are consistent with each other.
+
+27
+00:01:31,494 --> 00:01:35,027
+And this requires some way of voting
+or reaching consensus
+
+28
+00:01:35,027 --> 00:01:37,361
+on which those checkpoints should be.
+
+29
+00:01:37,651 --> 00:01:40,178
+But consider, for instance,
+a distributed database
+
+30
+00:01:40,178 --> 00:01:44,274
+where the different participants
+need to agree unequivocally
+
+31
+00:01:44,274 --> 00:01:47,693
+on whether a transaction
+can commit or must abort.
+
+32
+00:01:47,693 --> 00:01:49,996
+Its obviously crucial 
+that all involved nodes,
+
+33
+00:01:49,996 --> 00:01:52,677
+agree on the outcome of the transaction.
+
+34
+00:01:53,417 --> 00:01:57,388
+And for a final example, 
+there are process controlled systems
+
+35
+00:01:57,388 --> 00:02:01,000
+in automated assembly plans 
+were some action needs to be taken
+
+36
+00:02:01,000 --> 00:02:02,889
+when a component fails.
+
+37
+00:02:02,889 --> 00:02:07,683
+But what they should hear is that all
+parties involved need to agree
+
+38
+00:02:07,683 --> 00:02:09,618
+on the nature of that failure.
+
+39
+00:02:09,908 --> 00:02:14,908
+So if you think of the much simpler case
+of a cluster based web service,
+
+40
+00:02:14,908 --> 00:02:18,955
+one of these nodes might fail, 
+but then some other nodes need to agree
+
+41
+00:02:19,605 --> 00:02:22,663
+that the node is failed 
+and should be removed from the cluster.
+
+42
+00:02:22,663 --> 00:02:27,127
+If they don't agree, the web server
+can become terribly inconsistent.
+
+43
+00:02:28,737 --> 00:02:33,161
+Let's look at how an air
+traffic control system might work.
+
+44
+00:02:33,161 --> 00:02:36,773
+It's basically a bunch of ground base
+controllers with each controller
+
+45
+00:02:36,773 --> 00:02:39,120
+being in charge of some
+portion the air space.
+
+46
+00:02:39,500 --> 00:02:43,216
+And these controllers are responsible
+for directing the aircraft,
+
+47
+00:02:43,216 --> 00:02:46,952
+providing them adviser services,
+preventing collisions,
+
+48
+00:02:46,952 --> 00:02:49,762
+organizing the flow of traffic
+and so on and so forth.
+
+49
+00:02:49,762 --> 00:02:54,410
+And for all this to run smoothly,
+the system has to maintain, first of all,
+
+50
+00:02:54,868 --> 00:02:58,630
+information on the position of the planes
+and this state is, of course,
+
+51
+00:02:58,630 --> 00:03:01,059
+replicated for felpars.
+
+52
+00:03:01,899 --> 00:03:05,173
+The information obtained 
+from radar stations, has to obtained
+
+53
+00:03:05,173 --> 00:03:07,260
+and distributed
+to all nodes in the system
+
+54
+00:03:07,260 --> 00:03:09,480
+to the place, to the controllers, etc.
+
+55
+00:03:09,480 --> 00:03:12,550
+And then the operators, are in charge,
+of managing, controlling
+
+56
+00:03:12,550 --> 00:03:15,279
+and administering 
+the air traffic control system.
+
+57
+00:03:15,279 --> 00:03:19,580
+And all these entities need
+to agree on what needs to happen next.
+
+58
+00:03:19,580 --> 00:03:24,286
+And they need to be able to agree
+even when parts of the system fail.
+
+59
+00:03:24,286 --> 00:03:27,723
+And they need to agree 
+in a timely fashion.
+
+60
+00:03:27,723 --> 00:03:31,382
+And this is what we call
+the <i>consensus problem</i>.
+
+61
+00:03:31,792 --> 00:03:35,524
+Now in order to come up with
+principal solutions to this problem,
+
+62
+00:03:35,524 --> 00:03:37,795
+we often start by opening
+on an abstraction
+
+63
+00:03:37,795 --> 00:03:39,787
+of the real distributed system.
+
+64
+00:03:40,262 --> 00:03:44,537
+And this is often represented as a graph,
+in which the vertices correspond to nodes
+
+65
+00:03:44,537 --> 00:03:48,236
+and the edges represent,
+communication lengths.
+
+66
+00:03:48,616 --> 00:03:51,794
+Now the agreement problem says,
+we need all these nodes
+
+67
+00:03:51,794 --> 00:03:54,647
+to pick the same value "V".
+
+68
+00:03:55,137 --> 00:03:58,779
+Now in the case of our 'ATC' system:
+the air traffic control system,
+
+69
+00:03:58,779 --> 00:04:02,341
+we have controllers talking
+to pretty much everyone.
+
+70
+00:04:02,531 --> 00:04:04,590
+The databases also talk to each other.
+
+71
+00:04:04,590 --> 00:04:08,882
+The radar stations also talk to planes,
+and planes even talk to each other.
+
+72
+00:04:10,428 --> 00:04:15,285
+In fact, airplanes beyond a certain size,
+are equipped with special transponders
+
+73
+00:04:15,285 --> 00:04:18,904
+for collision avoidance,
+which is known as TCAS.
+
+74
+00:04:19,884 --> 00:04:24,380
+When planes come too close to each other,
+these transponders talk to each other
+
+75
+00:04:24,380 --> 00:04:27,405
+and notify the pilots
+of a potential collision.
+
+76
+00:04:27,405 --> 00:04:31,598
+And the automated TCAS systems,
+actually negotiates among the planes
+
+77
+00:04:31,598 --> 00:04:34,856
+and quickly decides which plane
+should take which maneuver.
+
+78
+00:04:35,026 --> 00:04:38,953
+And then the plane changes altitude
+or it can modify their climb
+
+79
+00:04:38,953 --> 00:04:40,680
+or sync rates, to avoid this collision.
+
+80
+00:04:40,680 --> 00:04:45,590
+And of course, goes without saying,
+it is always preferable for the planes
+
+81
+00:04:45,590 --> 00:04:48,858
+involved to agree 
+on who does what maneuver,
+
+82
+00:04:48,858 --> 00:04:52,297
+less they all do the same thing
+and therefore collide.
+
+83
+00:04:54,246 --> 00:04:58,709
+Now in such a setting, we say that,
+for consensus to be achieved,
+
+84
+00:04:58,709 --> 00:05:00,778
+we must have four key properties.
+
+85
+00:05:00,778 --> 00:05:02,940
+Now the theory people
+like to think of consensus
+
+86
+00:05:02,940 --> 00:05:07,962
+as starting with a proposed value,
+and then the nodes through the process
+
+87
+00:05:07,962 --> 00:05:11,461
+of achieving consensus, 
+decide a value.
+
+88
+00:05:11,461 --> 00:05:14,444
+So the result of consensus is a decision.
+
+89
+00:05:14,734 --> 00:05:18,123
+Now in terms of properties,
+of course there is agreement.
+
+90
+00:05:18,123 --> 00:05:22,198
+And what this means is that, 
+if a correct node decides value "V",
+
+91
+00:05:22,198 --> 00:05:26,856
+then every correct node in the system,
+decides the same value "V".
+
+92
+00:05:27,106 --> 00:05:30,345
+In other words, if a correct node
+believes that value "V"
+
+93
+00:05:30,345 --> 00:05:32,995
+was chosen by mutual agreement,
+then it must be the case
+
+94
+00:05:32,995 --> 00:05:35,526
+that all the other correct
+nodes believe the same.
+
+95
+00:05:36,256 --> 00:05:39,951
+And notice, we say nothing
+about what the faulty nodes do.
+
+96
+00:05:39,951 --> 00:05:42,440
+So we only care here
+about the correct nodes.
+
+97
+00:05:42,930 --> 00:05:46,990
+But agreement is not enough,
+we also need termination,
+
+98
+00:05:46,990 --> 00:05:50,413
+which basically means that within
+some finite amount of time,
+
+99
+00:05:50,413 --> 00:05:53,291
+every correct node decides some value.
+
+100
+00:05:53,835 --> 00:05:56,673
+A third property of consensus is validity.
+
+101
+00:05:56,673 --> 00:06:01,881
+Which says that, if it just so happens
+that all correct nodes have consensus
+
+102
+00:06:01,881 --> 00:06:05,880
+from the very start, meaning they all
+proposed the same value "V",
+
+103
+00:06:06,280 --> 00:06:09,232
+then it must be the case
+that every correct node
+
+104
+00:06:09,232 --> 00:06:12,042
+decides that particular value
+and not another.
+
+105
+00:06:12,982 --> 00:06:15,087
+And finally we have integrity.
+
+106
+00:06:15,163 --> 00:06:18,266
+This says that a correct node can
+decide at most one's,
+
+107
+00:06:18,566 --> 00:06:21,098
+basically implying that, 
+once you've made a decision,
+
+108
+00:06:21,098 --> 00:06:23,464
+a correct node cannot change its mind.
+
+109
+00:06:23,464 --> 00:06:27,829
+And additionally, whatever value
+a correct node decides,
+
+110
+00:06:27,829 --> 00:06:30,334
+must have been proposed by some node.
+
+111
+00:06:30,808 --> 00:06:33,489
+In other words, an agreed upon value
+cannot be something
+
+112
+00:06:33,489 --> 00:06:34,832
+made up out of thin air.
+
+113
+00:06:34,832 --> 00:06:39,312
+It must be a value that was actually
+proposed by one of the nodes.
+
+114
+00:06:39,912 --> 00:06:44,784
+You might look at this and think,
+"Hey, integrity implies validity."
+
+115
+00:06:45,624 --> 00:06:50,175
+But actually, this isn't the case,
+because integrity says the decided value
+
+116
+00:06:50,175 --> 00:06:52,603
+must have been proposed by some node.
+
+117
+00:06:52,603 --> 00:06:55,201
+So it could be a faulty node
+that proposed the value.
+
+118
+00:06:55,871 --> 00:07:00,424
+Whereas, validity refers exclusively
+to what happens with correct nodes.
+
+119
+00:07:01,887 --> 00:07:06,187
+Alright so, if an algorithm 
+provides these four properties,
+
+120
+00:07:06,187 --> 00:07:09,274
+then we say, it solves consensus.
+
+121
+00:07:09,684 --> 00:07:12,774
+Now you can see why all these four
+properties are useful for the case
+
+122
+00:07:12,774 --> 00:07:17,082
+of our air traffic control system
+that we were talking about earlier.
+
+123
+00:07:18,292 --> 00:07:22,806
+So let's see a simple way to accomplish
+this with a consensus for the case
+
+124
+00:07:22,806 --> 00:07:24,509
+when everything works okay.
+
+125
+00:07:24,509 --> 00:07:28,824
+Nothing fails; neither nodes 
+nor communication lengths.
+
+126
+00:07:29,314 --> 00:07:33,051
+So say the nodes in the system
+are labelled 'Ni'.
+
+127
+00:07:33,051 --> 00:07:37,028
+Each node can then choose
+its favorite value 'Vi',
+
+128
+00:07:37,028 --> 00:07:39,319
+and broadcast this to everyone else.
+
+129
+00:07:39,319 --> 00:07:43,611
+Then it waits to hear all the values
+proposed by the other nodes.
+
+130
+00:07:44,271 --> 00:07:46,414
+And after some time,
+every node in the system,
+
+131
+00:07:46,414 --> 00:07:49,813
+will have received the values 
+chosen by everyone else.
+
+132
+00:07:49,813 --> 00:07:53,846
+So they have a common 
+set of values: V1 through Vn.
+
+133
+00:07:54,726 --> 00:07:59,116
+Now at this point, each node applies
+a deterministic function,
+
+134
+00:07:59,391 --> 00:08:01,939
+to choose a value from the set.
+
+135
+00:08:02,249 --> 00:08:05,623
+For instance, everyone chooses
+the min or the max or whatever.
+
+136
+00:08:05,623 --> 00:08:10,509
+When you have nodes with ID's
+like with IP addresses,
+
+137
+00:08:10,509 --> 00:08:13,740
+you can also just pick the values
+proposed by the node with the smallest
+
+138
+00:08:13,740 --> 00:08:15,647
+or with the largest IP address.
+
+139
+00:08:15,647 --> 00:08:17,922
+It really doesn't matter 
+what the function is
+
+140
+00:08:17,922 --> 00:08:21,464
+as long as every node 
+uses the same function,
+
+141
+00:08:21,804 --> 00:08:24,432
+and the function is deterministic.
+
+142
+00:08:25,235 --> 00:08:28,922
+Now given that all the nodes see
+the same set of values
+
+143
+00:08:28,922 --> 00:08:31,157
+and apply the same
+deterministic function,
+
+144
+00:08:31,157 --> 00:08:35,074
+this guarantees that they end
+up choosing the same value.
+
+145
+00:08:35,688 --> 00:08:37,657
+Now does this solve consensus?
+
+146
+00:08:37,657 --> 00:08:38,841
+Well yeah.
+
+147
+00:08:38,841 --> 00:08:42,141
+And life's really easy 
+when there are no failures.
+
+148
+00:08:42,141 --> 00:08:46,590
+This algorithm achieves agreement;
+it does so within a finite amount of time,
+
+149
+00:08:46,590 --> 00:08:50,026
+and it guarantees
+both validity and integrity.
+
+150
+00:08:51,056 --> 00:08:54,231
+But what happens
+when there are failures?
+
+151
+00:08:55,419 --> 00:08:58,332
+Well there are a couple 
+of ways to reason about this.
+
+152
+00:08:58,332 --> 00:08:59,950
+One model is what we call:
+
+153
+00:08:59,950 --> 00:09:02,815
+<i>the synchronous model 
+of distributive systems</i>.
+
+154
+00:09:02,815 --> 00:09:06,489
+Even-though failures can occur,
+there's a really nice property
+
+155
+00:09:06,489 --> 00:09:09,145
+which is that:
+nothing can take forever.
+
+156
+00:09:09,475 --> 00:09:15,504
+So first, any message can take at most
+delta time, to reach its destination.
+
+157
+00:09:15,504 --> 00:09:18,562
+So it cannot dilly dally
+forever in the network.
+
+158
+00:09:18,962 --> 00:09:25,256
+And in the Internet, we use TTL's:
+the Time To Live field in my P pack;
+
+159
+00:09:25,477 --> 00:09:28,289
+it is to provide this property.
+
+160
+00:09:29,556 --> 00:09:34,041
+Second, a node cannot take forever
+to do it's computation.
+
+161
+00:09:34,041 --> 00:09:38,023
+It must respond within 
+a maximum theta amount of time.
+
+162
+00:09:38,733 --> 00:09:41,198
+And of course, this model 
+accepts failures
+
+163
+00:09:41,198 --> 00:09:44,392
+of both the communication
+lengths and the nodes.
+
+164
+00:09:44,392 --> 00:09:48,212
+And the lengths can both drop 
+and reorder messages as they wish.
+
+165
+00:09:48,212 --> 00:09:50,537
+And the nodes can either 
+exhibit <i>crash failures</i>,
+
+166
+00:09:50,537 --> 00:09:52,814
+Also known as <i>stopping failures</i>,
+
+167
+00:09:52,814 --> 00:09:55,509
+in which they halt 
+and never speak again.
+
+168
+00:09:55,756 --> 00:09:57,290
+Or they simply lie.
+
+169
+00:09:57,290 --> 00:10:00,098
+Which is what we call 
+a <i>Byzantine failure</i>.
+
+170
+00:10:00,898 --> 00:10:02,853
+So the synchronous model
+is a pretty reasonable model
+
+171
+00:10:02,853 --> 00:10:04,614
+if you think about the real world.
+
+172
+00:10:04,874 --> 00:10:07,824
+Of course some of its assumptions
+cannot always hold, you know like,
+
+173
+00:10:07,824 --> 00:10:10,253
+putting bounds on communication
+and computation time.
+
+174
+00:10:10,253 --> 00:10:15,156
+Because we may, for instance, hit a bug
+and get into some infinite loophole
+
+175
+00:10:15,156 --> 00:10:16,791
+of the nodes without wanting to.
+
+176
+00:10:16,791 --> 00:10:19,441
+And then they'll say
+that computation takes forever.
+
+177
+00:10:19,781 --> 00:10:23,463
+But now then let's--
+so this <i>Byzantine failure</i> model
+
+178
+00:10:23,463 --> 00:10:28,064
+is something actually I'd like us
+to talk about in a bit more depth.
+
+179
+00:10:28,824 --> 00:10:32,482
+This type of failure 
+was introduced in a classic paper
+
+180
+00:10:32,482 --> 00:10:34,982
+by Pease, Shostak and Lamport.
+
+181
+00:10:34,982 --> 00:10:38,780
+And the actual term was coined
+by Lamport a bit later.
+
+182
+00:10:39,820 --> 00:10:43,971
+Before this paper appeared, 
+it was generally assumed
+
+183
+00:10:43,971 --> 00:10:48,445
+that a three node system
+can tolerate one faulty node.
+
+184
+00:10:48,885 --> 00:10:51,688
+And this paper shows
+that <i>Byzantine faults</i>,
+
+185
+00:10:51,688 --> 00:10:54,118
+the so-called <i>Byzantine faults</i>
+in which a faulty node sends
+
+186
+00:10:54,118 --> 00:10:56,672
+inconsistent information
+to the other nodes,
+
+187
+00:10:56,672 --> 00:11:00,847
+can defeat any traditional
+three node algorithm.
+
+188
+00:11:02,168 --> 00:11:06,513
+So Lamport actually says that he figured
+that for a problem to be well known,
+
+189
+00:11:06,513 --> 00:11:08,649
+you know, like Dijkstra's
+<i>Dining Philosophers Problem</i>,
+
+190
+00:11:08,649 --> 00:11:11,338
+it has got to have a story behind it.
+
+191
+00:11:11,338 --> 00:11:16,500
+So the story here is a group of generals
+have to come to a common agreement
+
+192
+00:11:16,500 --> 00:11:19,594
+on whether to attack
+an enemy army or retreat.
+
+193
+00:11:19,714 --> 00:11:22,827
+But they can communicate 
+only by sending messengers
+
+194
+00:11:22,827 --> 00:11:25,700
+who might be captured 
+or die on their way.
+
+195
+00:11:26,060 --> 00:11:29,648
+Furthermore some of the generals
+may be traitors so they would try
+
+196
+00:11:29,648 --> 00:11:31,430
+to deceive the others.
+
+197
+00:11:31,560 --> 00:11:34,922
+Yet the challenge is to still
+have the good generals
+
+198
+00:11:34,922 --> 00:11:37,014
+reach a common decision.
+
+199
+00:11:37,361 --> 00:11:41,700
+And it seems that the Byzantine empire
+was full of treachery so Lamport
+
+200
+00:11:41,700 --> 00:11:44,379
+in the end, gave the generals
+the Byzantine nationality.
+
+201
+00:11:44,379 --> 00:11:49,247
+And since then, we know failures that 
+manifest as lies, as <i>Byzantine Failures</i>.
+
+202
+00:11:50,697 --> 00:11:55,248
+Now a <i>Byzantine Failure</i>
+is meant to model arbitrary behavior.
+
+203
+00:11:55,248 --> 00:11:59,512
+So it can therefore model pretty much
+any type of misbehavior.
+
+204
+00:11:59,512 --> 00:12:03,328
+It includes both omission failures
+such as crash failures
+
+205
+00:12:03,328 --> 00:12:07,672
+or failing to receive a request,
+or completing ignoring or non-responding.
+
+206
+00:12:07,942 --> 00:12:12,086
+As well as commission failures
+such as giving the wrong answer
+
+207
+00:12:12,086 --> 00:12:15,201
+or corrupting state 
+or being inconsistent.
+
+208
+00:12:15,641 --> 00:12:18,532
+So we can model with 
+<i>Byzantine failures</i>,
+
+209
+00:12:18,532 --> 00:12:23,042
+any form of bugs; any form
+of non-determinism in execution
+
+210
+00:12:23,042 --> 00:12:25,495
+like race conditions that can
+lead to data corruption.
+
+211
+00:12:25,495 --> 00:12:29,633
+Even deliberately malicious activity,
+whether it might result, say from a node
+
+212
+00:12:29,633 --> 00:12:32,067
+being broken into by a hacker.
+
+213
+00:12:33,247 --> 00:12:38,152
+So one of the key results in that paper,
+is an impossibility result.
+
+214
+00:12:38,152 --> 00:12:41,995
+It says that if you want
+to solve consensus in a system
+
+215
+00:12:41,995 --> 00:12:44,785
+that has "F" faulty nodes,
+
+216
+00:12:44,785 --> 00:12:49,015
+then you must have at least 
+3f+1 nodes in total.
+
+217
+00:12:49,015 --> 00:12:52,526
+Otherwise it's impossible
+to achieve consensus.
+
+218
+00:12:53,246 --> 00:12:55,913
+So clearly, if you have
+a three node system,
+
+219
+00:12:55,913 --> 00:13:01,562
+this paper says you cannot
+tolerate any of those nodes failing.
+
+220
+00:13:03,010 --> 00:13:06,796
+And Lamport's contribution to this
+landmark paper, was to to show that
+
+221
+00:13:07,196 --> 00:13:12,013
+if digital signatures are used,
+then 2f+1 nodes are enough
+
+222
+00:13:12,013 --> 00:13:14,978
+to tolerate "F" <i>Byzantine failures</i>.
+
+223
+00:13:15,111 --> 00:13:18,675
+Now in this context, digital
+signatures as used here,
+
+224
+00:13:18,675 --> 00:13:22,234
+are sort of a metaphor 
+since the signatures needs to be secure
+
+225
+00:13:22,234 --> 00:13:26,027
+only against random failure; 
+not against intelligent adversaries.
+
+226
+00:13:26,027 --> 00:13:29,689
+They're easier to implement 
+than true digital signatures
+
+227
+00:13:29,689 --> 00:13:32,676
+like fancier <i>crypto-base</i> stuff.
+
+228
+00:13:33,546 --> 00:13:37,659
+Now subsequent work has shown
+that another way of getting around
+
+229
+00:13:37,659 --> 00:13:41,560
+the 3f+1 limitation is to use
+randomized protocols.
+
+230
+00:13:41,560 --> 00:13:45,097
+In which case, one can obtain
+a probabilistic guarantee of agreement.
+
+231
+00:13:45,097 --> 00:13:48,588
+And in practice, this may 
+actually be good enough.
+
+232
+00:13:48,648 --> 00:13:53,373
+By the way, according to Lamport,
+the people at Boeing came across his work
+
+233
+00:13:53,373 --> 00:13:57,518
+in 1986, and that as a result,
+the people who built
+
+234
+00:13:57,518 --> 00:14:00,859
+the passenger planes at Boeing,
+became aware of the problems
+
+235
+00:14:00,859 --> 00:14:03,229
+and started designing
+their systems accordingly.
+
+236
+00:14:03,229 --> 00:14:06,352
+But in the late 80's and early 90's,
+the people at Boeing working
+
+237
+00:14:06,352 --> 00:14:09,708
+on military aircraft and on the space
+station as well as the people
+
+238
+00:14:09,708 --> 00:14:13,409
+at McDonnell Douglas, allegedly still
+did not understand the problem
+
+239
+00:14:13,409 --> 00:14:17,637
+and why it's not possible to achieve
+consensus unless you have
+
+240
+00:14:17,637 --> 00:14:19,224
+at least 3f+1 nodes.
+
+241
+00:14:19,809 --> 00:14:24,891
+So this impossibility result is really
+crucial to anyone who builds systems
+
+242
+00:14:25,711 --> 00:14:28,613
+that are meant to tolerate
+failures of this nature.
+
+243
+00:14:31,013 --> 00:14:35,039
+Now Paxos is a family of 
+algorithms or protocols;
+
+244
+00:14:35,849 --> 00:14:39,442
+we can call them either way,
+for solving consensus.
+
+245
+00:14:39,881 --> 00:14:44,420
+The Paxos includes a spectrum
+of trade offs between a number of nodes,
+
+246
+00:14:44,420 --> 00:14:47,569
+a number of message delays before
+learning the agreed value,
+
+247
+00:14:48,229 --> 00:14:51,100
+the activity level of individual
+participants as the number
+
+248
+00:14:51,100 --> 00:14:54,298
+of messages send, types 
+of a lot of different things.
+
+249
+00:14:54,298 --> 00:14:58,603
+That's why we have a family
+of algorithms not a single one.
+
+250
+00:14:58,603 --> 00:15:02,153
+It's a relatively complex 
+family of algorithms,
+
+251
+00:15:02,153 --> 00:15:04,220
+so I'll not describe it here.
+
+252
+00:15:04,220 --> 00:15:07,420
+But it's an extremely
+important one to know about.
+
+253
+00:15:07,840 --> 00:15:10,814
+For example, Goggle uses
+the Paxos algorithm
+
+254
+00:15:10,814 --> 00:15:14,890
+in their <i>Chubby Distributed 
+Lock Service</i> in order to keep replicas
+
+255
+00:15:14,890 --> 00:15:17,242
+consistent in case of failure.
+
+256
+00:15:17,242 --> 00:15:20,905
+And <i>Chubby</i> is used by Big Table
+which is in production
+
+257
+00:15:20,905 --> 00:15:23,397
+in Google Analytics and other products.
+
+258
+00:15:23,397 --> 00:15:27,474
+Google Spanner and Mega-store use
+the Paxos algorithm internally as well.
+
+259
+00:15:28,004 --> 00:15:32,511
+Microsoft uses Paxos in the autopilot
+cluster management service,
+
+260
+00:15:32,511 --> 00:15:36,185
+which is used at least at Bing,
+if not in other places.
+
+261
+00:15:36,185 --> 00:15:41,522
+XTREEMFS also uses a Paxos based
+least negotiable algorithm
+
+262
+00:15:41,522 --> 00:15:46,192
+for fault permanent and consistent
+replication of file data and meta data.
+
+263
+00:15:46,852 --> 00:15:51,656
+And a bunch of other not including--
+like Heroku uses Doozer which intern
+
+264
+00:15:51,656 --> 00:15:54,667
+implements Paxos for its consistent
+distributive data store.
+
+265
+00:15:54,667 --> 00:15:59,098
+So not surprisingly, Lamport's paper
+describing Paxos received
+
+266
+00:15:59,098 --> 00:16:03,286
+the ACMC-SIGOPS Hall
+of Fame Award in 2012.
+
+267
+00:16:03,676 --> 00:16:09,668
+As a side note, Apache ZooKeeper, 
+which is a centralized service
+
+268
+00:16:09,668 --> 00:16:13,758
+for maintaining configuration
+information, naming,
+
+269
+00:16:13,758 --> 00:16:17,120
+providing distribute synchronization,
+providing group services.
+
+270
+00:16:17,996 --> 00:16:21,667
+So this service, the ZooKeeper
+is sort of like Chubby
+
+271
+00:16:21,667 --> 00:16:24,351
+but it does not use standard Paxos.
+
+272
+00:16:24,351 --> 00:16:29,188
+And Yahoo research guys who built
+ZooKeeper, devised a protocol called Zab,
+
+273
+00:16:29,188 --> 00:16:32,756
+which is a totally ordered
+broadcast protocol
+
+274
+00:16:32,756 --> 00:16:37,072
+and it's very close to Paxos
+in spirit, but not exactly it.
+
+275
+00:16:39,364 --> 00:16:42,740
+Can you remember, we talked about
+the synchronous model in which
+
+276
+00:16:42,740 --> 00:16:46,567
+we always have upper bounds
+on the time it takes a message to travel
+
+277
+00:16:46,567 --> 00:16:49,677
+and on the time it takes a node
+to finish its computation.
+
+278
+00:16:50,377 --> 00:16:53,223
+There also exists what we call 
+the asynchronous model
+
+279
+00:16:53,223 --> 00:16:55,368
+of a distributed system 
+in which there are no bounds
+
+280
+00:16:55,368 --> 00:16:58,838
+on communication delays
+and no bounds on processing speed.
+
+281
+00:16:59,768 --> 00:17:04,618
+Now the reason this model is interesting
+is that it is fully general.
+
+282
+00:17:04,882 --> 00:17:10,356
+Basically, an open distributed system
+that covers a wide geographic area
+
+283
+00:17:10,826 --> 00:17:14,979
+or one that has unpredictable work loads,
+is in essence asynchronous.
+
+284
+00:17:14,979 --> 00:17:20,254
+Because we cannot predict what
+the bounds, delta and theta ought to be.
+
+285
+00:17:20,769 --> 00:17:25,278
+So if we have an algorithm or protocol
+that works in the asynchronous model,
+
+286
+00:17:25,278 --> 00:17:27,710
+then it will definitely work
+in the real world.
+
+287
+00:17:29,204 --> 00:17:33,454
+But when it comes to consensus,
+there's a fundamental impossibility result
+
+288
+00:17:33,454 --> 00:17:36,976
+proven by Fischer, Lynch and Paterson
+in 1985 and this something
+
+289
+00:17:36,976 --> 00:17:39,006
+we definitely need to know about.
+
+290
+00:17:39,472 --> 00:17:45,575
+This result states that "It is impossible
+to design a deterministic consensus
+
+291
+00:17:45,575 --> 00:17:49,431
+algorithm that works in an 
+asynchronous distributed system,
+
+292
+00:17:49,966 --> 00:17:53,284
+even if the only type
+of failure you can get,
+
+293
+00:17:53,284 --> 00:17:56,035
+is a single Crash
+failure of a node."
+
+294
+00:17:56,315 --> 00:17:59,785
+This is the simplest type of failure
+in which the node just crashes
+
+295
+00:17:59,918 --> 00:18:03,141
+and stays crashed; it doesn't lie,
+it doesn't do anything.
+
+296
+00:18:03,691 --> 00:18:08,409
+And so this result says, we cannot have
+a consensus algorithm for that situation,
+
+297
+00:18:08,409 --> 00:18:10,313
+if the system is asynchronous.
+
+298
+00:18:10,313 --> 00:18:13,589
+And this result is super important
+because it tells system designers
+
+299
+00:18:13,589 --> 00:18:17,258
+what the boundaries are of what
+they can expect to accomplish
+
+300
+00:18:17,258 --> 00:18:19,197
+in a fully asynchronous setting.
+
+301
+00:18:20,045 --> 00:18:26,794
+Now the intuition behind the proof
+is that, it is impossible to safely
+
+302
+00:18:26,794 --> 00:18:31,944
+distinguish between a Crash node,
+a very slow node, and a node
+
+303
+00:18:31,944 --> 00:18:35,273
+with which communications 
+are just very slow.
+
+304
+00:18:35,863 --> 00:18:39,764
+So as you might expect, the consensus
+property that ends up being violated
+
+305
+00:18:39,764 --> 00:18:41,526
+is typically termination.
+
+306
+00:18:42,324 --> 00:18:47,025
+Now researchers have found various sets
+of minimal assumptions,
+
+307
+00:18:47,025 --> 00:18:50,227
+that were satisfied by an asynchronous 
+distributed system,
+
+308
+00:18:50,227 --> 00:18:53,058
+make the consensus problem solvable.
+
+309
+00:18:53,178 --> 00:18:56,465
+And some of these are things
+like partial synchrony.
+
+310
+00:18:56,465 --> 00:19:00,548
+There also exists, randomized algorithms
+that give us a probabilistic guarantee
+
+311
+00:19:00,548 --> 00:19:03,718
+of consensus; one can use,
+for instance, failure detectors.
+
+312
+00:19:04,298 --> 00:19:08,238
+Then there are key agreement algorithms
+were the nodes need not agree
+
+313
+00:19:08,238 --> 00:19:10,772
+on a single value but can
+agree on a set of key values.
+
+314
+00:19:10,772 --> 00:19:14,484
+And this actually works as long as
+"F", the number of faulty nodes
+
+315
+00:19:14,484 --> 00:19:15,809
+is less than "K".
+
+316
+00:19:16,080 --> 00:19:18,883
+And so on, there are a number
+of ways to do this.
+
+317
+00:19:19,749 --> 00:19:22,820
+So now you may ask, 
+"Oh what about Paxos?"
+
+318
+00:19:23,540 --> 00:19:27,833
+Well, although no deterministic consensus
+protocol can guarantee termination
+
+319
+00:19:27,833 --> 00:19:31,250
+in an asynchronous system, 
+Paxos can still guarantee
+
+320
+00:19:31,250 --> 00:19:36,046
+the safety properties namely: 
+agreement, validity and integrity.
+
+321
+00:19:36,286 --> 00:19:39,927
+And the conditions that could prevent
+Paxos from terminating, turned out
+
+322
+00:19:39,927 --> 00:19:42,395
+to be somewhat hard to make
+happen in a real system.
+
+323
+00:19:42,963 --> 00:19:47,478
+Hence the relative success
+that Paxos has had in practice.
+
+324
+00:19:48,480 --> 00:19:53,650
+So to conclude, let's recap
+what we've learned about consensus.
+
+325
+00:19:53,650 --> 00:19:58,505
+First, it's a way to get multiple nodes
+in a distributed system to correctly
+
+326
+00:19:58,505 --> 00:20:03,335
+agree on the same value and to do so
+in a bounded amount of time.
+
+327
+00:20:04,165 --> 00:20:10,144
+Second, for this to work, we need at least
+3f+1 nodes in the system to participate
+
+328
+00:20:10,144 --> 00:20:14,659
+in this algorithm where "F" is the 
+number of potentially faulty nodes.
+
+329
+00:20:14,659 --> 00:20:18,163
+And finally, the FLP 
+impossibility result tells us
+
+330
+00:20:18,163 --> 00:20:22,895
+that in a fully asynchronous setting,
+if you have even as little
+
+331
+00:20:22,895 --> 00:20:27,805
+as one crash failure, it is impossible
+to achieve consensus
+
+332
+00:20:27,805 --> 00:20:33,721
+which means that one cannot design
+an algorithm that guarantees consensus
+
+333
+00:20:33,721 --> 00:20:35,806
+in such a situation.

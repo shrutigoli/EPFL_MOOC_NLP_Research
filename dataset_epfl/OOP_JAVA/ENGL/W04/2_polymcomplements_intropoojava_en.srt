@@ -1,0 +1,1143 @@
+1
+00:00:04,019 --> 00:00:06,933
+The objective of this episode is to present
+various small complements
+
+2
+00:00:06,933 --> 00:00:09,608
+related to polymorphism
+and inheritance.
+
+3
+00:00:09,856 --> 00:00:12,706
+The first subject we will cover
+concerns polymorphism
+
+4
+00:00:12,726 --> 00:00:14,827
+and how it applies to the
+construction of objects.
+
+5
+00:00:15,160 --> 00:00:17,670
+Constructors are somewhat special
+methods
+
+6
+00:00:17,676 --> 00:00:20,473
+in the sense that they are
+specifically dedicated
+
+7
+00:00:20,473 --> 00:00:23,270
+to constructing the current instance
+of a class.
+
+8
+00:00:23,270 --> 00:00:26,069
+They are not expected to have
+a polymorphic behavior.
+
+9
+00:00:26,239 --> 00:00:29,542
+Imagining a polymorphic constructor
+would mean that it
+
+10
+00:00:29,542 --> 00:00:33,582
+would be dedicated to initializing
+objects other than the current instance;
+
+11
+00:00:33,582 --> 00:00:34,900
+objects of subclass type,
+
+12
+00:00:34,900 --> 00:00:36,908
+for example, which doesn't
+really make sense.
+
+13
+00:00:36,908 --> 00:00:40,176
+However, nothing stops us from invoking
+a polymorphic method
+
+14
+00:00:40,176 --> 00:00:41,671
+in the body of a constructor.
+
+15
+00:00:42,031 --> 00:00:44,036
+But we advise against this.
+
+16
+00:00:44,234 --> 00:00:47,233
+Indeed, as we will see in the
+next example,
+
+17
+00:00:47,233 --> 00:00:49,520
+the method then acts on an object
+
+18
+00:00:49,520 --> 00:00:52,207
+which may be only partially
+initialized.
+
+19
+00:00:52,207 --> 00:00:55,534
+In this example, we have a
+superclass <i>A</i>
+
+20
+00:00:56,552 --> 00:01:01,111
+which contains a default constructor
+as well as an abstract method,
+
+21
+00:01:01,111 --> 00:01:04,291
+that it, a method without a body, <i>m</i>.
+
+22
+00:01:05,057 --> 00:01:08,627
+It so happens that the constructor
+invokes this method <i>m</i>.
+
+23
+00:01:09,010 --> 00:01:11,972
+Remember that an abstract class can
+never be instantiated
+
+24
+00:01:11,972 --> 00:01:15,732
+meaning that we can never
+call the constructor
+
+25
+00:01:15,732 --> 00:01:19,492
+of the class <i>A</i> like this,
+
+26
+00:01:21,742 --> 00:01:23,254
+since the class is abstract.
+
+27
+00:01:23,347 --> 00:01:26,257
+Invoking an abstract method
+in <i>A</i>'s constructor,
+
+28
+00:01:26,296 --> 00:01:29,026
+that is, invoking a method with no body,
+poses no problem
+
+29
+00:01:29,028 --> 00:01:31,753
+since we will never call this constructor
+
+30
+00:01:31,753 --> 00:01:34,068
+to instantiate an object of type <i>A</i>,
+
+31
+00:01:34,068 --> 00:01:37,204
+that is, an object for which <i>m</i> has
+no concrete definition.
+
+32
+00:01:37,605 --> 00:01:39,375
+Thus, this is completely legal.
+
+33
+00:01:39,578 --> 00:01:44,210
+Essentially, the method <i>m</i> will be invoked
+only if the constructor of a subclass
+
+34
+00:01:44,210 --> 00:01:46,540
+invokes the constructor of the superclass
+
+35
+00:01:46,598 --> 00:01:50,548
+and if this subclass has a concrete
+definition of the method <i>m</i>.
+
+36
+00:01:50,581 --> 00:01:53,581
+We have an example of this here,
+in the class <i>B</i>.
+
+37
+00:01:53,664 --> 00:01:58,034
+Class <i>B</i> inherits from <i>A</i> and
+overrides the method <i>m</i>.
+
+38
+00:01:58,416 --> 00:02:02,856
+The overriding simply consists in
+displaying a message
+
+39
+00:02:02,858 --> 00:02:06,472
+containing the value of the attribute <i>b</i> of
+class B. Class <i>B</i> can be instantiated,
+
+40
+00:02:06,472 --> 00:02:11,576
+since it overrides all the abstract methods
+inherited,
+
+41
+00:02:11,576 --> 00:02:13,700
+in this case, the method <i>m</i> only.
+
+42
+00:02:13,714 --> 00:02:17,404
+Now, let's see what happens when we
+create an instance of <i>B</i>.
+
+43
+00:02:18,063 --> 00:02:22,403
+The instance is created here using
+the default constructor for the class <i>B</i>.
+
+44
+00:02:22,509 --> 00:02:26,133
+We know that any constructor from a
+subclass must invoke
+
+45
+00:02:26,133 --> 00:02:29,940
+a constructor from the superclass
+when there is no explicit call
+
+46
+00:02:29,940 --> 00:02:32,015
+to the constructor via the <i>super</i> syntax,
+
+47
+00:02:32,015 --> 00:02:36,095
+so we know that there is an implicit
+call to the default constructor.
+
+48
+00:02:37,188 --> 00:02:40,988
+This call is made to initialize a
+current instance
+
+49
+00:02:44,874 --> 00:02:46,044
+which is a <i>B</i>.
+
+50
+00:02:48,622 --> 00:02:51,696
+At the moment <i>m</i> is called in
+<i>A</i>'s constructor,
+
+51
+00:02:51,696 --> 00:02:53,760
+since there is necessarily
+
+52
+00:02:53,760 --> 00:02:57,844
+dynamic binding in Java, the method
+will be chosen
+
+53
+00:02:57,844 --> 00:03:01,055
+based on the real nature
+of the instance
+
+54
+00:03:01,055 --> 00:03:04,266
+and so it is this method <i>m</i> which
+will be called.
+
+55
+00:03:04,266 --> 00:03:05,949
+Remember that at this stage,
+
+56
+00:03:05,949 --> 00:03:07,742
+we have not yet evaluated the
+instruction
+
+57
+00:03:07,742 --> 00:03:12,227
+which initializes the attribute <i>b</i> of <i>B</i>
+with a specific value.
+
+58
+00:03:12,254 --> 00:03:16,064
+As such, the attribute <i>b</i> has the value
+which is given to it by default
+
+59
+00:03:16,072 --> 00:03:19,332
+before any explicit initialization,
+which is the value zero.
+
+60
+00:03:19,588 --> 00:03:25,448
+This means that when the method <i>m</i> is
+executed, the attribute <i>b</i> has a value of zero
+
+61
+00:03:25,448 --> 00:03:29,683
+and the construction of a <i>B</i> will result
+in displaying the message
+
+62
+00:03:29,699 --> 00:03:31,049
+"b vaut: 0".
+
+63
+00:03:31,084 --> 00:03:36,434
+If for us, the object <i>B</i> is properly initialized
+only if its <i>b</i> attribute is worth 1,
+
+64
+00:03:36,929 --> 00:03:41,101
+then we can clearly see that this method <i>m</i>
+is working on an object
+
+65
+00:03:41,101 --> 00:03:43,041
+which is partially initialized.
+
+66
+00:03:43,401 --> 00:03:46,877
+Hence the original piece of advice:
+do not invoke polymorphic methods
+
+67
+00:03:46,877 --> 00:03:49,597
+in the body of constructors.
+
+68
+00:03:49,849 --> 00:03:52,749
+Let's move on to the second subject,
+completely independent from the first.
+
+69
+00:03:52,827 --> 00:03:55,922
+You no doubt remember the <i>toString</i> and
+<i>equals</i> methods that you learned
+
+70
+00:03:55,922 --> 00:03:57,105
+to write for classes.
+
+71
+00:03:57,105 --> 00:03:58,891
+But where exactly do these methods
+come from?
+
+72
+00:03:58,891 --> 00:04:00,147
+This is what we will see.
+
+73
+00:04:00,147 --> 00:04:02,701
+Remember, for example,
+the <i>toString</i> method.
+
+74
+00:04:02,701 --> 00:04:05,861
+It was imposed to you with a
+specific header.
+
+75
+00:04:05,870 --> 00:04:09,060
+It allowed, when it was present in a class,
+to define
+
+76
+00:04:09,122 --> 00:04:12,732
+a display format for the object in the
+form of a String.
+
+77
+00:04:12,806 --> 00:04:15,650
+This <i>toString</i> method allows us to
+produce more explicit displays
+
+78
+00:04:15,650 --> 00:04:17,844
+for objects.
+
+79
+00:04:17,844 --> 00:04:21,340
+Yet, <i>toString</i> is simply the overriding
+of a method
+
+80
+00:04:21,340 --> 00:04:23,900
+existing higher up in the class
+hierarchy.
+
+81
+00:04:24,445 --> 00:04:26,375
+But what does higher up mean
+since here, for example,
+
+82
+00:04:26,375 --> 00:04:28,615
+the <i>Rectangle</i> class inherits
+from nobody.
+
+83
+00:04:28,907 --> 00:04:31,674
+True, it inherits from nobody
+<i>explicitly</i>,
+
+84
+00:04:31,674 --> 00:04:36,404
+but in Java, every class that
+you write
+
+85
+00:04:36,404 --> 00:04:38,228
+inherits from a universal superclass
+which is the <i>Object</i> superclass.
+
+86
+00:04:38,286 --> 00:04:44,006
+And this happens without you
+needing to explicitly write an inheritance link.
+
+87
+00:04:46,531 --> 00:04:48,125
+Writing this is unnecessary,
+
+88
+00:04:48,125 --> 00:04:50,155
+but the inheritance link does indeed exist.
+
+89
+00:04:50,579 --> 00:04:52,879
+So in Java, every class that
+you define,
+
+90
+00:04:52,879 --> 00:04:57,719
+if it inherits from no class explicitly,
+inherits from <i>Object</i>.
+
+91
+00:04:57,948 --> 00:05:01,998
+Thus, we can affect an instance
+of any class
+
+92
+00:05:02,237 --> 00:05:04,467
+to a variable of type <i>Object</i>.
+
+93
+00:05:05,327 --> 00:05:09,216
+The <i>Object</i> superclass contains, among
+other things, the default definitions
+
+94
+00:05:09,216 --> 00:05:12,316
+for a certain number of methods
+useful to all possible objects,
+
+95
+00:05:12,414 --> 00:05:15,274
+such as <i>toString</i>, <i>equals</i> or <i>clone</i>.
+
+96
+00:05:15,460 --> 00:05:19,413
+For example, the default definition of 
+<i>toString</i> allows one
+
+97
+00:05:19,413 --> 00:05:24,433
+to display objects in the form of a
+representation of their references,
+
+98
+00:05:24,439 --> 00:05:27,114
+that is, something a little strange that
+we have already
+
+99
+00:05:27,114 --> 00:05:28,839
+encountered previously.
+
+100
+00:05:28,839 --> 00:05:32,466
+The default definition of <i>equals</i>, located
+in the <i>Object</i> superclass,
+
+101
+00:05:32,466 --> 00:05:37,636
+simply compares references by comparing
+2 objects using <i>==</i>.
+
+102
+00:05:37,966 --> 00:05:40,510
+In most cases, these default
+definitions
+
+103
+00:05:40,510 --> 00:05:43,304
+do not satisfy the needs for
+your own classes
+
+104
+00:05:43,304 --> 00:05:46,447
+and you are thus led to redefine them,
+
+105
+00:05:46,447 --> 00:05:49,590
+to allow a more explicit display,
+for example,
+
+106
+00:05:49,590 --> 00:05:52,735
+or a comparison which compares the contents,
+or a correct copy of your objects.
+
+107
+00:05:52,735 --> 00:05:55,635
+When we wrote the <i>toString</i>
+method
+
+108
+00:05:55,635 --> 00:05:57,935
+in the Rectangle class of our
+previous example,
+
+109
+00:05:57,935 --> 00:06:00,722
+we were actually overriding
+
+110
+00:06:00,722 --> 00:06:03,509
+the <i>toString</i> method inherited
+from <i>Object</i>.
+
+111
+00:06:03,509 --> 00:06:06,297
+Many predefined classes override
+these methods
+
+112
+00:06:06,297 --> 00:06:09,438
+and typically, the <i>String</i> class
+overrides the <i>toString</i> method,
+
+113
+00:06:09,438 --> 00:06:12,579
+as well as the <i>equals</i> method.
+
+114
+00:06:12,579 --> 00:06:15,720
+Let's go back to the case of the <i>equals</i>
+method as we wrote it up until now,
+
+115
+00:06:15,720 --> 00:06:17,240
+in the previous episodes.
+
+116
+00:06:17,470 --> 00:06:20,368
+In your opinion, does this header for
+the <i>equals</i> method
+
+117
+00:06:20,368 --> 00:06:23,948
+correspond to a redefinition of the
+one inherited from <i>Object</i>?
+
+118
+00:06:24,899 --> 00:06:28,119
+The answer is, of course, no. The
+<i>Object</i> class cannot
+
+119
+00:06:28,119 --> 00:06:29,903
+know of all the subclasses
+
+120
+00:06:29,903 --> 00:06:31,077
+which will be derived from it.
+
+121
+00:06:31,177 --> 00:06:33,542
+The header for the <i>equals</i> method
+as it exists
+
+122
+00:06:33,542 --> 00:06:35,417
+in the <i>Object</i> superclass is as follows:
+
+123
+00:06:35,417 --> 00:06:38,140
+this means, essentially, that the
+argument expected
+
+124
+00:06:38,140 --> 00:06:42,443
+by <i>equals</i> is of type <i>Object</i>,
+
+125
+00:06:42,443 --> 00:06:46,796
+and not of type <i>UneClasse</i> (TN: means "A Class")
+as we have seen up until now.
+
+126
+00:06:46,796 --> 00:06:52,383
+Thus, in the method <i>equals</i> of the
+Rectangle class, we had
+
+127
+00:06:52,383 --> 00:06:54,833
+a parameter of type Rectangle.
+
+128
+00:06:56,236 --> 00:06:58,355
+The <i>equals</i> methods that
+we have written
+
+129
+00:06:58,355 --> 00:07:00,724
+up until now are thus not
+overrides
+
+130
+00:07:00,724 --> 00:07:05,623
+of the <i>equals</i> method inherited from
+<i>Object</i>; rather, they are overloaded methods.
+
+131
+00:07:06,901 --> 00:07:10,002
+We speak of redefining,
+or overriding,
+
+132
+00:07:10,002 --> 00:07:13,103
+when a subclass's method
+
+133
+00:07:13,103 --> 00:07:16,205
+defines a method already present
+in the superclass,
+
+134
+00:07:16,210 --> 00:07:20,918
+a method with exactly the same name,
+list of parameters
+
+135
+00:07:20,918 --> 00:07:24,888
+and identical types, and with compatible
+return types.
+
+136
+00:07:25,596 --> 00:07:28,446
+What we mean by compatible is:
+for basic types,
+
+137
+00:07:28,446 --> 00:07:40,208
+they must be identical; for types defined
+using classes,
+
+138
+00:07:40,208 --> 00:07:44,577
+these types will be compatible
+if there is an inheritance link.
+
+139
+00:07:47,287 --> 00:07:50,527
+For example, if I have a superclass <i>A</i>
+
+140
+00:07:50,561 --> 00:07:52,981
+defining a method <i>m</i>,
+
+141
+00:07:53,463 --> 00:07:56,043
+returning an object of type <i>A</i>
+
+142
+00:07:56,447 --> 00:07:59,542
+If there exists a class <i>B</i>
+inheriting from <i>A</i>,
+
+143
+00:07:59,542 --> 00:08:04,382
+which defines a method <i>m</i>, but
+which returns a <i>B</i>,
+
+144
+00:08:04,582 --> 00:08:08,482
+since <i>B</i> inherits from <i>A</i>, we consider
+that the types are compatible in this case,
+
+145
+00:08:08,490 --> 00:08:12,300
+and so this is also considered as
+an override.
+
+146
+00:08:12,556 --> 00:08:15,855
+If these conditions are not met
+and we only have
+
+147
+00:08:15,855 --> 00:08:20,855
+the name of the method which is the same,
+we speak of overloading.
+
+148
+00:08:21,775 --> 00:08:25,044
+Defining the method <i>equals</i> by overloading,
+as we did
+
+149
+00:08:25,044 --> 00:08:27,433
+in the previous episodes,
+can work flawlessly,
+
+150
+00:08:27,433 --> 00:08:31,584
+however in Java, it is usually recommended
+to use overriding
+
+151
+00:08:32,094 --> 00:08:34,497
+because some methods of the 
+Java API,
+
+152
+00:08:34,497 --> 00:08:36,370
+typically methods which work
+
+153
+00:08:36,370 --> 00:08:38,174
+on so-called collections,
+
+154
+00:08:38,174 --> 00:08:39,588
+for example methods that will retrieve
+
+155
+00:08:39,588 --> 00:08:43,983
+a value from a collection,
+will implicitly use
+
+156
+00:08:43,983 --> 00:08:46,052
+the <i>equals</i> method,
+which has this exact header.
+
+157
+00:08:46,052 --> 00:08:48,309
+If it is not present in one
+of your classes
+
+158
+00:08:48,309 --> 00:08:50,196
+and you use this method,
+
+159
+00:08:50,196 --> 00:08:53,473
+then it is the default method, inherited
+from <i>Object</i>, that will be used,
+
+160
+00:08:53,473 --> 00:08:56,350
+which is not satisfactory
+in most cases.
+
+161
+00:08:56,350 --> 00:09:00,029
+So, how do we proceed if we really
+want to override the <i>equals</i> method
+
+162
+00:09:00,029 --> 00:09:02,839
+inherited from <i>Object</i> rather
+than overload it?
+
+163
+00:09:02,886 --> 00:09:08,040
+We present to you a possible way
+of overriding the <i>equals</i> method,
+
+164
+00:09:08,040 --> 00:09:11,250
+a fairly common solution that you can
+find in the litterature.
+
+165
+00:09:11,278 --> 00:09:14,525
+Note that there are other ways of
+writing this <i>equals</i> method,
+
+166
+00:09:14,525 --> 00:09:16,822
+this is just one solution among others.
+
+167
+00:09:16,822 --> 00:09:18,980
+The main difficulty we face
+
+168
+00:09:18,980 --> 00:09:21,208
+when we want to override the
+<i>equals</i> method
+
+169
+00:09:21,208 --> 00:09:23,554
+is that now, it can take as
+parameter
+
+170
+00:09:23,554 --> 00:09:27,564
+any type of object.
+When we used overloading,
+
+171
+00:09:31,911 --> 00:09:34,091
+the parameter had the same type
+
+172
+00:09:37,005 --> 00:09:40,615
+as the class in which we defined the
+overload, so this here,
+
+173
+00:09:44,939 --> 00:09:49,079
+and invoking the <i>equals</i> method
+on something other than a rectangle
+
+174
+00:09:53,005 --> 00:09:58,089
+for example a string, caused the
+compiler to react.
+
+175
+00:09:58,089 --> 00:09:59,643
+If there was just an overload:
+
+176
+00:09:59,643 --> 00:10:01,343
+the compiler would tell you:
+
+177
+00:10:01,343 --> 00:10:03,665
+"I am expecting a String, and you
+are giving me a Rectangle"
+
+178
+00:10:03,665 --> 00:10:09,817
+However, with an override, this form
+becomes legal,
+
+179
+00:10:09,817 --> 00:10:13,787
+the compiler won't say anything,
+it will accept this without a hitch.
+
+180
+00:10:16,050 --> 00:10:23,210
+Why? Because an object of type <i>String</i>
+is an <i>Object</i> by inheritance
+
+181
+00:10:23,278 --> 00:10:27,808
+and so this is totally legal, I can have
+a <i>String</i> in an <i>Object</i>.
+
+182
+00:10:28,583 --> 00:10:32,147
+Note that if we do not redefine the <i>equals</i>
+method in the Rectangle class,
+
+183
+00:10:32,147 --> 00:10:35,927
+at the moment we made such a call,
+we would use the <i>equals</i> method
+
+184
+00:10:35,929 --> 00:10:39,550
+as it is defined in the <i>Object</i> class,
+which only compares references
+
+185
+00:10:39,550 --> 00:10:41,767
+and doesn't necessarily apply
+the procedures
+
+186
+00:10:41,767 --> 00:10:43,984
+we would like to use
+
+187
+00:10:43,984 --> 00:10:46,203
+when we compare a rectangle with
+another object.
+
+188
+00:10:46,768 --> 00:10:49,848
+So it is up to the programmer
+of the <i>equals</i> method
+
+189
+00:10:49,848 --> 00:10:52,288
+to correctly define the body
+of their method
+
+190
+00:10:52,288 --> 00:10:55,559
+in order for the comparison with
+objects of types other than
+
+191
+00:10:55,559 --> 00:10:58,939
+rectangles to be donne correctly,
+for example by returning <i>false</i>.
+
+192
+00:10:59,040 --> 00:11:02,220
+We want a rectangle to be comparable
+to another rectangle,
+
+193
+00:11:02,220 --> 00:11:04,240
+but not to an object of another type.
+
+194
+00:11:04,240 --> 00:11:07,477
+To guarantee that a rectangle can
+be equal only
+
+195
+00:11:07,477 --> 00:11:10,214
+to another rectangle,
+
+196
+00:11:10,214 --> 00:11:14,020
+we have to test if the object passed
+as parameter is of the same class
+
+197
+00:11:14,020 --> 00:11:16,016
+as the Rectangle class.
+
+198
+00:11:16,016 --> 00:11:19,502
+This can be done using the
+<i>getClass</i> method
+
+199
+00:11:19,502 --> 00:11:22,148
+inherited once again from <i>Object</i>.
+
+200
+00:11:22,148 --> 00:11:26,476
+With this method, we can test
+if the class of the other object
+
+201
+00:11:26,810 --> 00:11:29,650
+is the same as the class of
+the current instance.
+
+202
+00:11:30,116 --> 00:11:32,476
+And if not, we return <i>false</i>.
+
+203
+00:11:33,518 --> 00:11:36,838
+To summarize, when we want to override
+the <i>equals</i> method,
+
+204
+00:11:36,842 --> 00:11:39,614
+we start, as we did for overloading,
+
+205
+00:11:39,614 --> 00:11:43,684
+by testing if the parameter has a
+<i>null</i> value:
+
+206
+00:11:43,684 --> 00:11:48,764
+if it is <i>null</i>, we return <i>false</i>.
+If not, and this is the new part,
+
+207
+00:11:48,864 --> 00:11:52,726
+we test if the other object is of the
+same class as the current instance.
+
+208
+00:11:53,064 --> 00:11:55,938
+If not, we return <i>false</i> here too.
+
+209
+00:11:55,938 --> 00:11:59,622
+And if so, if we know that <i>autreObjet</i>
+(TN: means "otherObject") is not <i>null</i>,
+
+210
+00:11:59,622 --> 00:12:05,164
+that the rectangle passed as parameter
+is indeed of class Rectangle,
+
+211
+00:12:05,164 --> 00:12:08,294
+then we can proceed to an
+attribute-by-attribute comparison,
+
+212
+00:12:08,294 --> 00:12:11,424
+as we did in the case of overloading.
+
+213
+00:12:11,424 --> 00:12:14,554
+But here, we have another little
+difficulty to overcome:
+
+214
+00:12:14,600 --> 00:12:17,992
+indeed, if I want to compare
+attribute-by-attribute,
+
+215
+00:12:17,992 --> 00:12:19,844
+I must test if the width
+of the current object
+
+216
+00:12:19,844 --> 00:12:22,378
+is the same as the width as the
+other object, <i>autreObjet</i>,
+
+217
+00:12:22,378 --> 00:12:24,912
+and if the height of the current object
+
+218
+00:12:24,912 --> 00:12:27,447
+is the same as the height
+of the other object.
+
+219
+00:12:27,447 --> 00:12:31,207
+Yet <i>autreObjet</i> is of type <i>Object</i>,
+which does not guarantee the presence
+
+220
+00:12:31,371 --> 00:12:33,291
+of the height and width attributes,
+<i>largeur</i> and <i>hauteur</i>.
+
+221
+00:12:33,747 --> 00:12:37,497
+We know that <i>autreObjet</i> does
+indeed contain a Rectangle,
+
+222
+00:12:37,502 --> 00:12:40,592
+we made sure of that with the
+precautions we took.
+
+223
+00:12:40,635 --> 00:12:43,755
+However, if we write something
+like this,
+
+224
+00:12:45,666 --> 00:12:50,014
+so if I try to compare the width of
+the current object
+
+225
+00:12:51,014 --> 00:12:52,882
+with the width of the other object,
+
+226
+00:12:54,182 --> 00:12:56,522
+by using this statement here,
+
+227
+00:12:58,703 --> 00:13:00,851
+the compiler will throw an
+error message
+
+228
+00:13:00,851 --> 00:13:04,182
+telling us that <i>autreObjet</i> is
+of type <i>Object</i>
+
+229
+00:13:04,182 --> 00:13:06,903
+which does not contain a <i>largeur</i>
+field.
+
+230
+00:13:06,903 --> 00:13:10,844
+Here, we convert <i>autreObjet</i> to
+a Rectangle. This is known as casting.
+
+231
+00:13:10,979 --> 00:13:16,549
+This guarantees to the compileer that
+it is possible to access the <i>largeur</i> field.
+
+232
+00:13:16,882 --> 00:13:20,827
+This will work perfectly here,
+since we have guaranteed
+
+233
+00:13:20,827 --> 00:13:26,607
+that at execution time, <i>autreObjet</i> will
+contain an object of type Rectangle.
+
+234
+00:13:26,897 --> 00:13:29,323
+If we try to do a cast
+
+235
+00:13:29,323 --> 00:13:31,749
+when <i>autreObjet</i> does
+not contain a Rectangle,
+
+236
+00:13:31,749 --> 00:13:34,175
+we will get an error message
+at execution time.
+
+237
+00:13:34,175 --> 00:13:35,610
+But this is not the case here.
+
+238
+00:13:35,610 --> 00:13:39,037
+So, basically, this is how
+we can proceed
+
+239
+00:13:39,037 --> 00:13:41,554
+to override the <i>equals</i> method
+
+240
+00:13:41,554 --> 00:13:43,724
+with the new dangers that arise
+
+241
+00:13:43,724 --> 00:13:46,164
+when we use overriding
+rather than overloading.
+
+242
+00:13:46,164 --> 00:13:49,236
+This ends our short episode on complements.

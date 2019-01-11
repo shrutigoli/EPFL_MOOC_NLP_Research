@@ -1,0 +1,1077 @@
+1
+00:00:03,960 --> 00:00:07,180
+Welcome back nature in code 
+We're in chapter 7 lecture 3.
+
+2
+00:00:07,180 --> 00:00:09,490
+We just initialized our population.
+
+3
+00:00:09,490 --> 00:00:14,530
+We have this huge population of 
+lots and lots of susceptible individuals
+
+4
+00:00:14,530 --> 00:00:18,590
+and one single infected
+individual patient zero.
+
+5
+00:00:18,590 --> 00:00:22,200
+So the epidemic now start,
+let's implement the simulation.
+
+6
+00:00:22,200 --> 00:00:23,880
+This is where we left off.
+
+7
+00:00:23,880 --> 00:00:28,270
+We have the call to init grid and then we
+draw the grid after initialization.
+
+8
+00:00:28,270 --> 00:00:29,990
+We saw that this works.
+
+9
+00:00:29,990 --> 00:00:33,370
+And now, what we need to do
+is we need to calculate the
+
+10
+00:00:33,370 --> 00:00:34,880
+new state of the population,
+
+11
+00:00:34,880 --> 00:00:38,880
+so to speak at each time step and 
+then we'd like to visualize this
+
+12
+00:00:38,890 --> 00:00:40,110
+and as before,
+
+13
+00:00:40,110 --> 00:00:45,100
+We're gonna used to set in thrall 
+method to actually slow down this process.
+
+14
+00:00:45,100 --> 00:00:48,700
+Otherwise everything will would 
+be calculated too fast and we
+
+15
+00:00:48,700 --> 00:00:52,660
+wouldn't really see anything 
+meaningful if you would visualize this
+
+16
+00:00:52,660 --> 00:00:57,340
+So we use this set inter wall
+as we've used it in Chapter 5
+
+17
+00:00:57,340 --> 00:01:00,650
+and you may recall that this
+
+18
+00:01:00,650 --> 00:01:06,130
+method takes 2 arguments to first 
+as the function to be called.
+
+19
+00:01:06,130 --> 00:01:10,090
+So this is the simulate 
+and visualize function
+
+20
+00:01:10,090 --> 00:01:12,150
+which we actually will have to define,
+
+21
+00:01:12,150 --> 00:01:17,000
+but I'm which is gonna call it simulated 
+and visualize and then
+
+22
+00:01:17,020 --> 00:01:23,890
+the second argument is the number 
+in milliseconds 40 interwall.
+
+23
+00:01:23,900 --> 00:01:28,530
+We're gonna say okay 50 milliseconds 
+then call dysfunction then
+
+24
+00:01:28,570 --> 00:01:31,510
+wait 50 male seconds then call function 
+and so on and so that,
+
+25
+00:01:31,510 --> 00:01:36,130
+that's I think a good enough large 
+enough slow down for us to see
+
+26
+00:01:36,130 --> 00:01:38,040
+meaningfully what's going on.
+
+27
+00:01:38,040 --> 00:01:42,140
+So what we have to do now 
+is to simply implement this function
+
+28
+00:01:42,140 --> 00:01:44,150
+simulated visualize,
+
+29
+00:01:44,150 --> 00:01:47,590
+so I'm just gonna copy the 
+name here simulated visualize
+
+30
+00:01:47,590 --> 00:01:49,190
+parentheses.
+
+31
+00:01:49,190 --> 00:01:52,820
+We have no parameters to simulate 
+and visualize as before it
+
+32
+00:01:52,820 --> 00:01:54,370
+simply this 2 things,
+
+33
+00:01:54,370 --> 00:02:00,140
+it calls a function that off all 
+the simulation so run time step
+
+34
+00:02:00,140 --> 00:02:01,770
+we should probably call this.
+
+35
+00:02:01,770 --> 00:02:04,410
+We will have to implement this.
+
+36
+00:02:04,410 --> 00:02:07,380
+So this is where all the calculations 
+will occur and then we
+
+37
+00:02:07,380 --> 00:02:10,450
+simply need to draw the grid
+again and to do this,
+
+38
+00:02:10,450 --> 00:02:12,370
+we'll use the upgrade grid function,
+
+39
+00:02:12,370 --> 00:02:15,430
+which is at this is essentially 
+exactly identical.
+
+40
+00:02:15,430 --> 00:02:19,440
+So you can copy does draw grid 
+line from here pasted here.
+
+41
+00:02:19,440 --> 00:02:23,570
+And then just simply changed 
+in the name here from draw grids
+
+42
+00:02:23,570 --> 00:02:28,440
+to update grid and now we have 
+the same color codes.
+
+43
+00:02:28,440 --> 00:02:31,040
+So this should work just fine.
+
+44
+00:02:31,040 --> 00:02:33,440
+Of course most of the work is still ahead.
+
+45
+00:02:33,440 --> 00:02:35,600
+We actually have to 
+implement the simulation
+
+46
+00:02:35,600 --> 00:02:37,930
+and this the meat is here in the
+
+47
+00:02:37,930 --> 00:02:40,080
+runtime step function.
+
+48
+00:02:40,080 --> 00:02:43,220
+So let's go ahead and
+define this function.
+
+49
+00:02:43,220 --> 00:02:45,320
+And I'm just gonna go ahead
+
+50
+00:02:45,320 --> 00:02:53,670
+and do this here so function 
+Run time step, oops, step.
+
+51
+00:02:53,670 --> 00:02:54,610
+Okay,
+
+52
+00:02:54,610 --> 00:02:56,420
+So in this function.
+
+53
+00:02:56,420 --> 00:03:02,370
+We need to define what should 
+happen at each time step
+
+54
+00:03:02,370 --> 00:03:06,060
+So generally there should be a couple 
+of things that happen at each
+
+55
+00:03:06,060 --> 00:03:09,970
+time step, perhaps most important 
+actually beyond the
+
+56
+00:03:09,970 --> 00:03:14,240
+infection in the cover is to make 
+sure that we do things correctly
+
+57
+00:03:14,240 --> 00:03:18,430
+with our temp grid and recall 
+why we have a temp grid.
+
+58
+00:03:18,430 --> 00:03:25,140
+We have a temporary so that we can 
+store to future state or next
+
+59
+00:03:25,140 --> 00:03:31,240
+time step state of of the population 
+in a temporary structure.
+
+60
+00:03:31,240 --> 00:03:36,700
+Otherwise if we wouldn't do this 
+then the future state of certain
+
+61
+00:03:36,700 --> 00:03:40,490
+individuals would already effect 
+the current state of other
+
+62
+00:03:40,530 --> 00:03:44,200
+individuals and this is something 
+that can lead to very subtle
+
+63
+00:03:44,200 --> 00:03:48,120
+subtle effects that are essentially 
+not showing what do you want
+
+64
+00:03:48,120 --> 00:03:48,950
+to show,
+
+65
+00:03:48,950 --> 00:03:54,410
+but they're actually simply an expression 
+of this mismatch between
+
+66
+00:03:54,410 --> 00:03:59,120
+the timing and we talked a little 
+bit about this in Chapter 5 and
+
+67
+00:03:59,150 --> 00:04:02,150
+because this is again the same kind 
+of simulation where he sort of
+
+68
+00:04:02,150 --> 00:04:05,980
+go through each cell on the grid 
+and then you effect start
+
+69
+00:04:05,980 --> 00:04:08,290
+affecting other individuals on the grid.
+
+70
+00:04:08,290 --> 00:04:11,830
+You wanna make sure that we have 
+this temporary grid in order.
+
+71
+00:04:11,830 --> 00:04:15,320
+So what we'll do is we will 
+basically each time said.
+
+72
+00:04:15,320 --> 00:04:22,450
+First, create a copy of the grid and this 
+copy will be the the temp grid
+
+73
+00:04:22,450 --> 00:04:26,450
+then we'll do whatever we need to 
+do with infection recovery and so on
+
+74
+00:04:26,450 --> 00:04:32,750
+updating the temp grid 
+and then we will copy the
+
+75
+00:04:32,750 --> 00:04:35,000
+values back from the temp grid.
+
+76
+00:04:35,000 --> 00:04:36,550
+So let's go ahead and do this,
+
+77
+00:04:36,550 --> 00:04:41,440
+So first of all, let's create a copy of the 
+grid into the 10th grid.
+
+78
+00:04:41,440 --> 00:04:46,290
+So what we'll do is that we can basically 
+take this code here from
+
+79
+00:04:46,330 --> 00:04:50,370
+in its grid. 
+We copied and we pasted here,
+
+80
+00:04:50,370 --> 00:04:55,190
+so this goes first over a great length 
+here and then this says grid I
+
+81
+00:04:55,210 --> 00:04:58,010
+equals an empty race, 
+so this sets up to 2 dimensional rate.
+
+82
+00:04:58,010 --> 00:04:59,040
+Right this is great.
+
+83
+00:04:59,040 --> 00:05:01,520
+We simply need to adapt this for temp grid.
+
+84
+00:05:01,520 --> 00:05:04,870
+So now it's setting up a 
+2 dimensional temp grid
+
+85
+00:05:04,870 --> 00:05:08,310
+and here in the inner loop 
+goes again over grid length.
+
+86
+00:05:08,310 --> 00:05:11,730
+So now what I need to do is 
+I simply need to say well,
+
+87
+00:05:11,730 --> 00:05:18,620
+I'd like to store into temp grid
+I I I whatever I have in grid.
+
+88
+00:05:20,550 --> 00:05:23,070
+I I I.
+
+89
+00:05:24,320 --> 00:05:25,590
+All right,
+
+90
+00:05:25,590 --> 00:05:27,270
+so that's the first step .
+
+91
+00:05:28,005 --> 00:05:31,005
+Now,
+
+92
+00:05:31,230 --> 00:05:33,420
+that I have is temp grid in place,
+
+93
+00:05:33,420 --> 00:05:36,860
+I can now go through 
+each individual in the grid
+
+94
+00:05:36,860 --> 00:05:39,920
+and do the things I need to do so.
+
+95
+00:05:39,920 --> 00:05:43,710
+What I'd like to do first is I'd 
+like to expose susceptible
+
+96
+00:05:43,710 --> 00:05:47,960
+individuals if they're in contact 
+with other individuals.
+
+97
+00:05:47,960 --> 00:05:49,640
+So before we do this,
+
+98
+00:05:49,640 --> 00:05:53,710
+What is actually mean?
+What does it mean for an individual
+
+99
+00:05:53,710 --> 00:05:56,280
+to be in contact with other individuals.
+
+100
+00:05:56,280 --> 00:05:58,850
+which individuals are those individuals?
+
+101
+00:05:58,850 --> 00:06:00,290
+So let's find out.
+
+102
+00:06:00,290 --> 00:06:03,890
+So what does it mean to be in 
+contact with other individuals?
+
+103
+00:06:03,890 --> 00:06:04,780
+Well, imagine.
+
+104
+00:06:04,780 --> 00:06:08,130
+Here we have our own world again as 
+a great and we have here focal
+
+105
+00:06:08,130 --> 00:06:10,450
+individual that is infected.
+
+106
+00:06:10,450 --> 00:06:16,210
+What does it mean concretely?
+Who is this individual going to expose?
+
+107
+00:06:16,210 --> 00:06:18,540
+Well let's think about 
+the real world here.
+
+108
+00:06:18,540 --> 00:06:21,220
+So for example if you have to flu.
+
+109
+00:06:21,220 --> 00:06:25,010
+Who are you going to expose?
+Are you going to expose everyone who
+
+110
+00:06:25,090 --> 00:06:27,150
+lives in the same country as you do?
+
+111
+00:06:27,150 --> 00:06:28,040
+No, of course not,
+
+112
+00:06:28,040 --> 00:06:32,490
+you have to be in some meaningful 
+contact that allows the
+
+113
+00:06:32,490 --> 00:06:35,980
+transmission of infectious material.
+
+114
+00:06:35,980 --> 00:06:37,570
+So in the case of flu,
+
+115
+00:06:37,570 --> 00:06:43,090
+you would probably have to be in close 
+proximity to individuals to infect them.
+
+116
+00:06:43,090 --> 00:06:46,290
+You can take the case 
+of the disease like measles,
+
+117
+00:06:46,290 --> 00:06:51,180
+measles is known to be able to remain 
+airborne for quite awhile
+
+118
+00:06:51,180 --> 00:06:53,090
+and remain infectious.
+
+119
+00:06:53,090 --> 00:06:56,580
+So if you have to measles,
+which I hope you never will.
+
+120
+00:06:56,580 --> 00:06:58,050
+And you are in the room,
+
+121
+00:06:58,050 --> 00:07:01,780
+then you will deposit infectious 
+material in that room and this
+
+122
+00:07:01,780 --> 00:07:05,050
+material will remain airborne 
+for a couple hours.
+
+123
+00:07:05,050 --> 00:07:08,070
+So you could leave this room and 
+someone else could come in 2
+
+124
+00:07:08,070 --> 00:07:11,630
+hours later and still get infected by you,
+
+125
+00:07:11,630 --> 00:07:12,550
+if you will.
+
+126
+00:07:12,550 --> 00:07:16,270
+And so here there wouldn't be any 
+physical proximity you could
+
+127
+00:07:16,270 --> 00:07:20,460
+indeed be far away at this point and 
+you wouldn't know this person.
+
+128
+00:07:20,460 --> 00:07:22,290
+but he would still have
+infected this person.
+
+129
+00:07:22,290 --> 00:07:25,280
+And then of course there's things like HIV-AIDS,
+
+130
+00:07:25,280 --> 00:07:26,890
+which are,
+
+131
+00:07:26,890 --> 00:07:28,390
+which can be transmitted sexually.
+
+132
+00:07:28,390 --> 00:07:30,770
+And so there would have 
+to be a sexual contact.
+
+133
+00:07:30,770 --> 00:07:35,510
+And so this really depends on the 
+specifics of the biology of the
+
+134
+00:07:35,510 --> 00:07:39,810
+pathogen in the example here for simplicity 
+and we're simply going
+
+135
+00:07:39,810 --> 00:07:43,850
+to assume that the neighbors 
+are to contacts.
+
+136
+00:07:43,850 --> 00:07:47,900
+So here we have this individual, 
+this individual has 8 ajacent
+
+137
+00:07:47,900 --> 00:07:51,400
+neighbors right this one 
+this one this one this one this
+
+138
+00:07:51,400 --> 00:07:55,980
+one so infectious material can be 
+transmitted to these contacts
+
+139
+00:07:55,980 --> 00:07:59,210
+and now it simply depends what 
+status these individuals
+
+140
+00:07:59,350 --> 00:08:03,450
+individuals are in for example 
+this individual here could be
+
+141
+00:08:03,560 --> 00:08:05,310
+infected already.
+
+142
+00:08:05,310 --> 00:08:07,880
+But maybe this one here wouldn't.
+
+143
+00:08:07,880 --> 00:08:10,980
+And this one here wouldn't let 
+this one here when as well.
+
+144
+00:08:10,980 --> 00:08:13,610
+So they are all susceptible.
+
+145
+00:08:13,610 --> 00:08:18,280
+But maybe there are 2 other individuals 
+down here that are
+
+146
+00:08:18,390 --> 00:08:20,860
+actually infected.
+
+147
+00:08:20,860 --> 00:08:24,740
+So in this concrete case what that 
+would mean is only these 5
+
+148
+00:08:24,880 --> 00:08:27,890
+individuals here could become infected,
+
+149
+00:08:27,890 --> 00:08:30,870
+simply because they did these 3 
+individuals here are already
+
+150
+00:08:30,870 --> 00:08:31,630
+infected.
+
+151
+00:08:31,630 --> 00:08:35,880
+And in fact some of these could 
+of course also at some point be
+
+152
+00:08:35,940 --> 00:08:37,020
+recovered.
+
+153
+00:08:37,020 --> 00:08:38,370
+And then also,
+
+154
+00:08:38,370 --> 00:08:41,950
+there could be no transmission because 
+we assumed that recovered
+
+155
+00:08:42,100 --> 00:08:47,910
+individuals cannot become infected again. 
+so every individual short
+
+156
+00:08:47,950 --> 00:08:51,880
+has 8 contacts but of course only 
+those that are susceptible can
+
+157
+00:08:51,880 --> 00:08:55,900
+become newly infected and 
+the maximum number here is 8.
+
+158
+00:08:55,900 --> 00:09:01,220
+Now that also means that 
+you are not only hit able to infect
+
+159
+00:09:01,220 --> 00:09:03,430
+8 other people around you.
+
+160
+00:09:03,430 --> 00:09:07,560
+But it also means that you can potentially 
+be exposed to up to 8
+
+161
+00:09:07,560 --> 00:09:09,930
+by up to 8 people right I mean if you,
+
+162
+00:09:09,930 --> 00:09:10,460
+for example,
+
+163
+00:09:10,460 --> 00:09:16,290
+now consider this poor fellow here 
+even if the remaining neighbors
+
+164
+00:09:16,290 --> 00:09:19,000
+here are all susceptible.
+
+165
+00:09:19,000 --> 00:09:20,350
+If you look at,
+
+166
+00:09:20,350 --> 00:09:22,250
+if you look at this individual here.
+
+167
+00:09:22,250 --> 00:09:27,660
+It is now being exposed by 4 individuals 
+and I'm gonna just draw
+
+168
+00:09:27,660 --> 00:09:31,080
+these here in these contacts 
+here in black.
+
+169
+00:09:31,080 --> 00:09:37,770
+So these are four contacts here in 
+the vicinity of this individual
+
+170
+00:09:38,050 --> 00:09:42,960
+among the 8 contacts here that are 
+actually infectious and so this
+
+171
+00:09:43,170 --> 00:09:47,370
+individual will have quite the exposure,
+
+172
+00:09:47,370 --> 00:09:49,050
+but this could of course be even stronger.
+
+173
+00:09:49,050 --> 00:09:51,810
+It could be that all the surrounding 
+individuals are in fact
+
+174
+00:09:51,930 --> 00:09:55,530
+infected and then the probability 
+of this individual also becoming
+
+175
+00:09:55,610 --> 00:09:59,510
+infected in the near future 
+is a very high,
+
+176
+00:09:59,510 --> 00:10:02,870
+so this is what it means 
+to have a contact.
+
+177
+00:10:02,870 --> 00:10:05,830
+Okay, so now with this 
+knowledge of contacts.
+
+178
+00:10:05,830 --> 00:10:09,750
+We now have everything we need to 
+know about how to implement this
+
+179
+00:10:09,750 --> 00:10:10,860
+. So,
+
+180
+00:10:10,860 --> 00:10:15,480
+let's go ahead and do this so I need 
+to go through each individual
+
+181
+00:10:15,480 --> 00:10:21,770
+, so I'm going to use these 2 loops 
+here first this looped and
+
+182
+00:10:21,770 --> 00:10:24,880
+then the I loop the inner loop.
+
+183
+00:10:24,880 --> 00:10:28,160
+Okay,
+
+184
+00:10:28,160 --> 00:10:33,360
+so now going through each individual 
+here, I have the coordinates I and II
+
+185
+00:10:33,360 --> 00:10:39,210
+and now I can simply say well if 
+an individual here is actually
+
+186
+00:10:39,250 --> 00:10:42,960
+infected then I'm gonna 
+exposed the neighbors,
+
+187
+00:10:42,960 --> 00:10:50,650
+the way it I'm gonna do this is simply 
+by saying okay if grid I II
+
+188
+00:10:50,650 --> 00:10:54,060
+is indeed infected.
+
+189
+00:10:54,060 --> 00:10:55,950
+So if the value here.
+
+190
+00:10:55,950 --> 00:11:02,720
+And of course double equal is I then 
+I'm gonna call a function and
+
+191
+00:11:02,720 --> 00:11:05,600
+I'm gonna call this function exposed 
+neighbors I could of course
+
+192
+00:11:05,670 --> 00:11:07,090
+also implement this right here,
+
+193
+00:11:07,090 --> 00:11:12,670
+but I think this is a great example 
+of outsourcing this neighbors
+
+194
+00:11:12,800 --> 00:11:19,050
+neighbors expose neighbors and 
+I'm gonna pass I and II as
+
+195
+00:11:19,160 --> 00:11:23,660
+arguments because this function 
+needs to know where we currently are.
+
+196
+00:11:23,660 --> 00:11:27,150
+So o exposed 
+neighbors I and II,
+
+197
+00:11:27,150 --> 00:11:30,700
+and we will implement this 
+function shortly,
+
+198
+00:11:30,700 --> 00:11:31,720
+but you know,
+Lets say,
+
+199
+00:11:31,720 --> 00:11:36,710
+we have this implemented so it the 
+neighbors have been exposed
+
+200
+00:11:37,090 --> 00:11:40,870
+have potentially been infected and 
+again we would actually have
+
+201
+00:11:41,000 --> 00:11:43,310
+infected the individuals on the grid,
+
+202
+00:11:43,310 --> 00:11:46,870
+because that would lead to the subtle 
+errors but we infected the
+
+203
+00:11:47,600 --> 00:11:51,810
+the individuals on the temp grid, 
+so now the temp grid really contains
+
+204
+00:11:51,810 --> 00:11:56,770
+the up to date version of 
+the grid as it should look like
+
+205
+00:11:57,040 --> 00:11:58,310
+at the next time steps.
+
+206
+00:11:58,310 --> 00:12:02,710
+So the last thing for us to do here 
+in this runtime so function is
+
+207
+00:12:02,710 --> 00:12:07,330
+to move these values now back 
+from temp grid into grid.
+
+208
+00:12:07,330 --> 00:12:12,790
+So essentially the reverse of this.
+So we can simply copy here.
+
+209
+00:12:12,790 --> 00:12:19,440
+The 2 loops once again. Okay. 
+Closing here to first one closing here
+
+210
+00:12:19,440 --> 00:12:23,530
+the second one and now we 
+simply do the reverse.
+
+211
+00:12:23,530 --> 00:12:29,090
+So we said okay in grade I I I I 
+would like to have whatever I
+
+212
+00:12:29,090 --> 00:12:32,260
+currently have in temp grid.
+
+213
+00:12:33,345 --> 00:12:36,635
+I I I
+
+214
+00:12:38,200 --> 00:12:44,040
+And so now you can see these 3 steps 
+right so here in this Nested loop
+
+215
+00:12:44,050 --> 00:12:48,370
+What we do is we set up the temp grid 
+by simply storing the
+
+216
+00:12:48,370 --> 00:12:53,660
+grid values into temp grid.
+Now temp grid is an exact replica of grid.
+
+217
+00:12:53,660 --> 00:12:58,220
+Then here we're gonna do whatever 
+we need to do in order to
+
+218
+00:12:58,220 --> 00:13:00,790
+get an infectious disease 
+process going on,
+
+219
+00:13:00,790 --> 00:13:04,110
+so here concretely we will expose 
+to neighbors and we will infect
+
+220
+00:13:04,210 --> 00:13:06,340
+them if necessary.
+
+221
+00:13:06,340 --> 00:13:12,130
+But this we will do on temp grid 
+so as to not get these strange effects.
+
+222
+00:13:12,130 --> 00:13:17,610
+And then we will finally 
+bring these values back
+
+223
+00:13:17,610 --> 00:13:22,830
+because temp grid now has the up 
+to date version of the grid,
+
+224
+00:13:22,830 --> 00:13:27,080
+now the grid grid is still the 
+same grid that it was before,
+
+225
+00:13:27,080 --> 00:13:28,030
+up here,
+
+226
+00:13:28,030 --> 00:13:31,460
+so we need to store these
+values back into grid
+
+227
+00:13:31,460 --> 00:13:35,490
+And that's what this 3rd 
+nested loop does here.
+
+228
+00:13:35,490 --> 00:13:36,850
+All right.
+
+229
+00:13:36,850 --> 00:13:38,940
+So with all of this in place,
+
+230
+00:13:38,940 --> 00:13:41,900
+we're pretty much ready and now the 
+only thing that we need to do
+
+231
+00:13:41,950 --> 00:13:46,500
+is we need to implement this method 
+expose neighbors and this will
+
+232
+00:13:46,500 --> 00:13:48,800
+do in the next lecture I'll see you there.

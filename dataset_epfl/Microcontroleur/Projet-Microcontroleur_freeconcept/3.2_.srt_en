@@ -1,0 +1,969 @@
+1
+00:00:04,505 --> 00:00:09,010
+Hello, we continue with the course
+"understanding microcontrollers."
+
+2
+00:00:09,010 --> 00:00:13,192
+And now we are going to talk
+about input-output and
+
+3
+00:00:13,192 --> 00:00:17,690
+perhaps it will finally be an
+opportunity to understand them.
+
+4
+00:00:17,690 --> 00:00:20,588
+I will start by giving you a brief
+reminder of
+
+5
+00:00:20,588 --> 00:00:25,170
+how to work with inputs-outputs
+with the Arduino system.
+
+6
+00:00:25,170 --> 00:00:29,590
+Then we will try to look in detail
+how the input-outputs
+
+7
+00:00:29,590 --> 00:00:33,220
+are made inside the microcontroller.
+
+8
+00:00:33,220 --> 00:00:36,101
+We will also look at how
+
+9
+00:00:36,101 --> 00:00:39,780
+the registers that allow to use the
+inputs-outputs are organised.
+
+10
+00:00:39,780 --> 00:00:41,920
+And finally, I will give some examples.
+
+11
+00:00:41,920 --> 00:00:46,708
+Until now, for input-output, we have used the
+
+12
+00:00:46,708 --> 00:00:54,160
+solution proposed by Arduino, or by the
+Wiring system from which Arduino is derived.
+
+13
+00:00:54,160 --> 00:01:01,380
+The idea was to give an arbitrary
+number to the input-output tabs.
+
+14
+00:01:01,380 --> 00:01:04,920
+I insist on the arbitrary word in
+the sense
+
+15
+00:01:04,920 --> 00:01:08,730
+that there is no logic related
+to microcontrollers.
+
+16
+00:01:08,730 --> 00:01:11,283
+It is rather a logic related to
+the card which
+
+17
+00:01:11,283 --> 00:01:15,410
+was used to give these
+numbers of input-output tabs.
+
+18
+00:01:15,410 --> 00:01:20,010
+In the software environment,
+there are specific procedures
+
+19
+00:01:20,010 --> 00:01:23,340
+for using inputs-outputs.
+
+20
+00:01:23,340 --> 00:01:28,615
+I mention the main ones here: pinMode
+which allows for example here to say
+
+21
+00:01:28,615 --> 00:01:33,726
+the entry number 3, I want it to
+be an ouput, then I can
+
+22
+00:01:33,726 --> 00:01:39,786
+use it by writing, always giving
+that number, giving the level.
+
+23
+00:01:39,786 --> 00:01:45,270
+In the same way, the entry number 4
+I want it to be an entry
+
+24
+00:01:45,270 --> 00:01:49,900
+and I can test this entry number 4.
+
+25
+00:01:49,900 --> 00:01:55,311
+The advantages of this system are: a
+great simplicity, they are also
+
+26
+00:01:55,311 --> 00:01:58,985
+the possibility of having a
+certain compatibility
+
+27
+00:01:58,985 --> 00:02:03,550
+between completely
+different a priori environments.
+
+28
+00:02:03,550 --> 00:02:08,993
+Some even think that this is the
+esperanto of microcontrollers.
+
+29
+00:02:08,993 --> 00:02:09,906
+However,
+
+30
+00:02:09,906 --> 00:02:12,550
+here, we want to understand
+
+31
+00:02:12,550 --> 00:02:16,050
+what lies behind these input-output tabs.
+
+32
+00:02:16,050 --> 00:02:23,210
+In all microcontrollers, the inputs
+outputs tabs are grouped together
+
+33
+00:02:23,210 --> 00:02:27,120
+They are grouped, quite often,
+in 8-bit words.
+
+34
+00:02:27,120 --> 00:02:33,545
+Sometimes in words of 16 or 32 bits.
+And, that's what we call ports.
+
+35
+00:02:33,545 --> 00:02:35,760
+The input-output ports.
+
+36
+00:02:35,760 --> 00:02:41,210
+Do not be afraid of these patterns,
+that's what the manufacturer gives us.
+
+37
+00:02:41,210 --> 00:02:48,388
+We see here that this manufacturer
+decided to call port, port D, port B.
+
+38
+00:02:48,388 --> 00:02:51,740
+Curiously, there is no port A
+in this case.
+
+39
+00:02:51,740 --> 00:02:55,553
+Others have used a different terminology.
+
+40
+00:02:55,553 --> 00:02:58,280
+Here, P1, with small numbers.
+
+41
+00:02:58,280 --> 00:03:01,400
+This is another way of expressing things.
+
+42
+00:03:01,400 --> 00:03:04,845
+It will be noticed that this is a
+processor which provides
+
+43
+00:03:04,845 --> 00:03:10,210
+ports with 16 bits, so from 0 to 15.
+
+44
+00:03:10,210 --> 00:03:14,700
+Also note here the term GPIO,
+which is extremely often used.
+
+45
+00:03:14,700 --> 00:03:19,000
+This means "general purpose input output".
+
+46
+00:03:19,000 --> 00:03:23,430
+So it's general purpose input-output tabs.
+
+47
+00:03:23,430 --> 00:03:27,000
+So the ports have names that are given
+
+48
+00:03:27,000 --> 00:03:28,640
+by the manufacturer.
+
+49
+00:03:28,640 --> 00:03:32,462
+For example, for PICs or AVRs,
+
+50
+00:03:32,462 --> 00:03:36,530
+the names PortA , Port B and
+so on are used.
+
+51
+00:03:36,530 --> 00:03:38,966
+In the case of the MSP430, there is
+
+52
+00:03:38,966 --> 00:03:42,290
+another terminology that has been
+chosen by the manufacturer.
+
+53
+00:03:42,290 --> 00:03:45,930
+The concepts are the same,
+the names are a little bit different.
+
+54
+00:03:45,930 --> 00:03:52,770
+Each individual paw inside the harbor
+also has a name, which is obviously
+
+55
+00:03:52,770 --> 00:03:54,385
+derived from the port name.
+
+56
+00:03:54,385 --> 00:03:59,170
+For AVRs, for example, PA0, PA1,
+PA2 and so on.
+
+57
+00:03:59,170 --> 00:04:05,370
+For the MSP430, to avoid calling P1.0
+which could have been interpreted as
+
+58
+00:04:05,370 --> 00:04:11,200
+P10, they called it P1.0, P1.1 and so on.
+
+59
+00:04:11,200 --> 00:04:14,294
+Inside the microcontroller,
+
+60
+00:04:14,294 --> 00:04:18,322
+there are specialized registers that allow
+
+61
+00:04:18,322 --> 00:04:20,390
+to manipulate these ports.
+
+62
+00:04:20,390 --> 00:04:24,720
+They often have a certain ah,
+similarity to each
+
+63
+00:04:24,720 --> 00:04:28,360
+other but they do not necessarily
+carry the same names.
+
+64
+00:04:28,360 --> 00:04:32,635
+If I take the three fundamental registers
+that will be mentioned just
+
+65
+00:04:32,635 --> 00:04:38,178
+now, on the AVR, they are
+called PortA, PinA,
+
+66
+00:04:38,178 --> 00:04:43,608
+DDRA, while on PICs they are
+called Port A and also PortA for
+
+67
+00:04:43,608 --> 00:04:48,415
+the input and TrisA, with
+a bit-by-bit inversion
+
+68
+00:04:48,415 --> 00:04:52,430
+compared to the DDRA, but the
+concepts are the same.
+
+69
+00:04:52,430 --> 00:04:56,880
+For the MSP430, they will be called
+P1OUT, P1IN,
+
+70
+00:04:56,880 --> 00:05:00,630
+P1DIR, in a way that is very
+systematic and logical.
+
+71
+00:05:00,630 --> 00:05:04,500
+We will now try to see clearly
+in these registers.
+
+72
+00:05:04,500 --> 00:05:09,340
+I recall one fundamental thing,
+an input-output tab
+
+73
+00:05:09,340 --> 00:05:14,426
+must be able at certain moments
+an output and
+
+74
+00:05:14,426 --> 00:05:19,740
+as an output we must be able to decide
+the value that is put in the output.
+
+75
+00:05:19,740 --> 00:05:23,210
+And this value must be memorised
+
+76
+00:05:23,210 --> 00:05:26,392
+until a new value is written.
+
+77
+00:05:26,392 --> 00:05:28,908
+Therefore we need a flip-flop,
+so we need a
+
+78
+00:05:28,908 --> 00:05:32,370
+register to store the value to be output.
+
+79
+00:05:32,370 --> 00:05:34,470
+For an entry, the problem
+
+80
+00:05:34,470 --> 00:05:37,750
+is a little different, we must
+be able to capture,
+
+81
+00:05:37,750 --> 00:05:42,120
+photograph, in a way, the value
+at a given moment.
+
+82
+00:05:42,120 --> 00:05:44,748
+So we need what is called a passer,
+
+83
+00:05:44,748 --> 00:05:48,332
+"tri-state driver" in such
+a way that the value which
+
+84
+00:05:48,332 --> 00:05:51,506
+is on the outside, so on the tab,
+can enter
+
+85
+00:05:51,506 --> 00:05:54,956
+in the microcontroller and
+read by the processor.
+
+86
+00:05:54,956 --> 00:05:59,592
+Finally, in order for the same
+tab to be used sometimes as
+
+87
+00:05:59,592 --> 00:06:05,070
+an input, sometimes as an output,
+a second changer will be required
+
+88
+00:06:05,070 --> 00:06:10,170
+to validate, or not to validate,
+the output value.
+
+89
+00:06:10,170 --> 00:06:16,330
+Here are two internal diagrams of an
+input-output tab of a microcontroller.
+
+90
+00:06:16,330 --> 00:06:19,630
+These are schems that are a
+little bit difficult to understand.
+
+91
+00:06:19,630 --> 00:06:21,970
+This one is quite detailed, very
+
+92
+00:06:21,970 --> 00:06:24,730
+exact and perfectly well designed
+but it is so
+
+93
+00:06:24,730 --> 00:06:26,780
+complete that we do not understand much.
+
+94
+00:06:26,780 --> 00:06:29,403
+This one is simplified and drawn in a way
+
+95
+00:06:29,403 --> 00:06:32,682
+a little incomprehensible since we have
+
+96
+00:06:32,682 --> 00:06:37,738
+both doors and transistors,and that on
+the other hand,we don't understand
+
+97
+00:06:37,738 --> 00:06:41,203
+well why, here they put a NAND door
+and here a door
+
+98
+00:06:41,203 --> 00:06:44,679
+NOR, it is necessary to analyze
+the desired functionality
+
+99
+00:06:44,679 --> 00:06:47,525
+to understand the reason for these doors.
+
+100
+00:06:47,525 --> 00:06:49,791
+Here is an internal diagram,
+
+101
+00:06:49,791 --> 00:06:52,572
+I would even say a simplified
+internal diagram
+
+102
+00:06:52,572 --> 00:06:56,780
+of an input-output tab of
+a microcontroller.
+
+103
+00:06:56,780 --> 00:06:58,390
+Let's try to understand it.
+
+104
+00:06:58,390 --> 00:07:02,570
+Here is the input-output tab.
+
+105
+00:07:02,570 --> 00:07:07,545
+I remind you that a tab must
+be an entry, sometimes an exit.
+
+106
+00:07:07,545 --> 00:07:11,445
+In the case of an input, the information
+will take
+
+107
+00:07:11,445 --> 00:07:14,815
+this path, will pass through this
+
+108
+00:07:14,815 --> 00:07:21,182
+this passe rto be distributed on the
+internal bus of the microprocessor,
+
+109
+00:07:21,182 --> 00:07:27,310
+which is in the microcontroller.
+And it is when we will
+
+110
+00:07:27,310 --> 00:07:33,150
+read this passer that the information
+will be taken into consideration.
+
+111
+00:07:33,150 --> 00:07:39,801
+When it is an output, it will be
+necessary to activate this passer.
+
+112
+00:07:39,801 --> 00:07:45,061
+It is drawn in a somewhat thicker
+way than the other because
+
+113
+00:07:45,061 --> 00:07:50,486
+It is a passer that must be able
+to draw more current since
+
+114
+00:07:50,486 --> 00:07:55,440
+its output is directly exposed
+to the tab of the microcontroller.
+
+115
+00:07:55,440 --> 00:08:00,732
+I take the opportunity to say that
+most microcontrollers are able,
+
+116
+00:08:00,732 --> 00:08:06,082
+currently, to provide approximately
+20 milliamps
+
+117
+00:08:06,082 --> 00:08:10,516
+in both directions as output current.
+
+118
+00:08:10,516 --> 00:08:15,460
+Therefore, the transistors associated
+with this passer must be of
+
+119
+00:08:15,460 --> 00:08:20,348
+sufficient surface area. So that passer,
+on the one hand, it must be
+
+120
+00:08:20,348 --> 00:08:25,658
+ordered to know impedance mode or if
+
+121
+00:08:25,658 --> 00:08:31,111
+it is in active mode. And of
+course, the value must be set
+
+122
+00:08:31,111 --> 00:08:35,620
+at the input for, if necessary,
+to be transmitted to the output.
+
+123
+00:08:35,620 --> 00:08:41,380
+So we have two flip-flops.
+The first corresponds
+
+124
+00:08:41,380 --> 00:08:47,039
+to a steering rocker, here I called it
+
+125
+00:08:47,039 --> 00:08:51,810
+P1DIR. When I write, in this flip-flop,
+
+126
+00:08:51,810 --> 00:08:56,151
+the value will be given to the smuggler.
+If I write a 1 here,
+
+127
+00:08:56,151 --> 00:09:00,950
+the passer will be out, my tab will be out.
+
+128
+00:09:00,950 --> 00:09:07,980
+When I write a 0, the smuggler becomes
+inactive, and then, the normal use is
+
+129
+00:09:07,980 --> 00:09:09,780
+to resume this tab so that
+
+130
+00:09:09,780 --> 00:09:12,680
+the data can enter the microcontroller.
+
+131
+00:09:12,680 --> 00:09:16,635
+When I have a 1 here, this passer being
+
+132
+00:09:16,635 --> 00:09:21,580
+active, I can pass a value on the output,
+
+133
+00:09:21,580 --> 00:09:25,570
+which can be a 1 or a 0, according to what
+
+134
+00:09:25,570 --> 00:09:31,550
+was written in this position, which
+took here the name P1OUT.
+
+135
+00:09:31,550 --> 00:09:35,210
+In fact, this scheme is not entirely
+complete.
+
+136
+00:09:35,210 --> 00:09:40,750
+I added here that it is possible
+to re-read
+
+137
+00:09:40,750 --> 00:09:46,220
+the value that is transmitted
+to the output,
+
+138
+00:09:46,220 --> 00:09:53,626
+that we are able to re-read the
+direction value that chooses the
+
+139
+00:09:53,626 --> 00:09:59,380
+mode of operation of the changer,
+which greatly facilitates the programming.
+
+140
+00:09:59,380 --> 00:10:04,410
+Let's now try to look at a bit of
+a software representation.
+
+141
+00:10:04,410 --> 00:10:12,060
+We talked about that flip-flop, of these
+flip-flops, and therefore of this register P1OUT.
+
+142
+00:10:12,060 --> 00:10:16,155
+We talked about P1DIR, also a set of
+
+143
+00:10:16,155 --> 00:10:20,100
+flip-flops which form a register,
+for example of 8 bits.
+
+144
+00:10:20,100 --> 00:10:25,480
+Generally, we will try to write values
+
+145
+00:10:25,480 --> 00:10:30,320
+in the bits of P1OUT and P1DIR.
+
+146
+00:10:30,320 --> 00:10:36,500
+While we are going to try
+to read data in P1IN,
+
+147
+00:10:36,500 --> 00:10:41,200
+we want to read the values ​​that appear
+
+148
+00:10:41,200 --> 00:10:45,205
+on the ouputs. As I said earlier, it is
+
+149
+00:10:45,205 --> 00:10:50,640
+also possible to re-read the register
+P1OUT, to read the register P1DIR for
+
+150
+00:10:50,640 --> 00:10:56,166
+convenience of programming.
+If I now try
+
+151
+00:10:56,166 --> 00:11:01,658
+to take a particular bit,
+for example here the bit
+
+152
+00:11:01,658 --> 00:11:06,684
+number 6, and to look at what I have
+
+153
+00:11:06,684 --> 00:11:11,940
+as combinations the two values
+​​that are here.
+
+154
+00:11:11,940 --> 00:11:14,540
+I could of course take any bit other
+
+155
+00:11:14,540 --> 00:11:16,670
+than the bit number 6,
+it is just an example.
+
+156
+00:11:16,670 --> 00:11:21,400
+The "Dir" can be set to 0 or 1.
+
+157
+00:11:21,400 --> 00:11:25,990
+The "Out" can be set to 0 or 1.
+
+158
+00:11:25,990 --> 00:11:26,730
+And I will,
+
+159
+00:11:26,730 --> 00:11:31,040
+here, write the role of the tabs
+in these different combinations.
+
+160
+00:11:31,040 --> 00:11:36,216
+So we remember that the register "Dir",
+P1DIR for example, allows
+
+161
+00:11:36,216 --> 00:11:41,324
+to say if it is an entry, is it at
+
+162
+00:11:41,324 --> 00:11:46,692
+0, or on the contrary if it is
+an output when it is at 1.
+
+163
+00:11:46,692 --> 00:11:51,750
+On the other hand, the P1OUT
+registry does not really have
+
+164
+00:11:51,750 --> 00:11:56,650
+any meaning when "Dir" is
+set to 0 since the passer of
+
+165
+00:11:56,650 --> 00:12:01,700
+output is inactive. On the
+other hand, when "Dir" is at 1,
+
+166
+00:12:01,700 --> 00:12:06,650
+then the "Out" will be transmitted
+to the outside: we
+
+167
+00:12:06,650 --> 00:12:11,946
+will have an output at 0 when the
+corresponding bit of "Out" is at 0.
+
+168
+00:12:11,946 --> 00:12:16,940
+The same for value 1. It is essential to
+
+169
+00:12:16,940 --> 00:12:21,715
+remember this table because
+we will, in fact, all the time
+
+170
+00:12:21,715 --> 00:12:24,588
+use it when we will choose the role of
+
+171
+00:12:24,588 --> 00:12:28,390
+input-output tab and assign
+values ​​to them.
+
+172
+00:12:28,390 --> 00:12:32,990
+That's why I drew it a second time here.
+
+173
+00:12:32,990 --> 00:12:39,130
+We are now ready to use these
+registers in C.
+
+174
+00:12:39,130 --> 00:12:41,900
+We'll use the assignment.
+
+175
+00:12:41,900 --> 00:12:47,836
+I will put in the register P1DIR,
+in the register P1OUT,
+
+176
+00:12:47,836 --> 00:12:53,010
+a value, which I here stupidly
+written in binary.
+
+177
+00:12:53,010 --> 00:12:57,982
+What do I mean by the fact that I put
+
+178
+00:12:57,982 --> 00:13:03,080
+here from the 1 to those places
+and 0 to the other places?
+
+179
+00:13:03,080 --> 00:13:07,200
+I want this tab to be an exit
+
+180
+00:13:07,200 --> 00:13:10,226
+and that this tab to be an exit.
+
+181
+00:13:10,226 --> 00:13:14,908
+Now, with this instruction, for
+these two tabs
+
+182
+00:13:14,908 --> 00:13:17,976
+which are output, I put the value 1
+
+183
+00:13:17,976 --> 00:13:24,554
+for the power tab 6, I set
+the value 0 for the power tab 0.
+
+184
+00:13:24,554 --> 00:13:28,139
+Note that these other values ​​have no
+
+185
+00:13:28,139 --> 00:13:32,820
+meaning since whatever the value of "Out",
+
+186
+00:13:32,820 --> 00:13:37,384
+when the corresponding "Dir" is 0,
+the tab is an
+
+187
+00:13:37,384 --> 00:13:41,362
+input and at that time P1OUT
+has no role to play anymore.
+
+188
+00:13:41,362 --> 00:13:44,608
+So the two important things that I say in
+
+189
+00:13:44,608 --> 00:13:48,349
+that line, is only that that bit is at
+
+190
+00:13:48,349 --> 00:13:55,600
+0, it is an output at 0, this bit is at 1,
+it is an output that is at 1.
+
+191
+00:13:55,600 --> 00:13:58,079
+What will happen now
+
+192
+00:13:58,079 --> 00:14:02,785
+for an entry? We're trying to test
+an entry,so we're going to
+
+193
+00:14:02,785 --> 00:14:08,680
+use P1IN. And here,
+for want of knowing how
+
+194
+00:14:08,680 --> 00:14:14,682
+to go about it, I have awkwardly
+written "if" P1IN is equal to this value.
+
+195
+00:14:14,682 --> 00:14:19,758
+In fact, I wanted to know if there
+was a 1 there.
+
+196
+00:14:19,758 --> 00:14:23,088
+But this instruction is visibly
+false because
+
+197
+00:14:23,088 --> 00:14:28,516
+in this case, not only I require a 1,
+here, in the bit of
+
+198
+00:14:28,516 --> 00:14:34,452
+power 0, 1, 2, 3, but I also demand
+and a priori this
+
+199
+00:14:34,452 --> 00:14:40,530
+is not what I wanted, a 0 here,
+a 0 there, a 0 there and so on.
+
+200
+00:14:40,530 --> 00:14:45,550
+Obviously, this way of working
+is not appropriate.
+
+201
+00:14:45,550 --> 00:14:48,254
+We lack two things:
+
+202
+00:14:48,254 --> 00:14:52,284
+we lack the independence
+of the bits and in addition,
+
+203
+00:14:52,284 --> 00:14:55,780
+I would say, we lack a good legibility.
+
+204
+00:14:55,780 --> 00:15:01,775
+This will be the subject of the
+next chapter, we will learn to write
+
+205
+00:15:01,775 --> 00:15:08,165
+these manipulations of bits
+inside registers in C.
+
+206
+00:15:08,165 --> 00:15:13,520
+We have therefore looked at
+the internal diagram of a tab of
+
+207
+00:15:13,520 --> 00:15:17,126
+a microcontroller, and we have
+learned to recognize
+
+208
+00:15:17,126 --> 00:15:19,910
+these registers: the direction register,
+
+209
+00:15:19,910 --> 00:15:27,400
+the output register and the input register,
+which makes it possible to read the value.
+

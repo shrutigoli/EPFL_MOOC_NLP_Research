@@ -1,0 +1,1046 @@
+1
+00:00:04,103 --> 00:00:06,452
+In this episode, we will consider
+
+2
+00:00:06,452 --> 00:00:09,041
+the effects of inheritance
+on constructors (initialization), 
+
+3
+00:00:09,041 --> 00:00:11,685
+and destructors.
+
+4
+00:00:12,692 --> 00:00:15,558
+We saw in a previous episode on constructors
+
+5
+00:00:15,558 --> 00:00:17,634
+that when a subclass is instantiated,
+
+6
+00:00:17,634 --> 00:00:19,769
+attributes need to be initialized.
+
+7
+00:00:19,769 --> 00:00:21,919
+This is what we do for example,
+
+8
+00:00:21,919 --> 00:00:25,951
+when we declare an instance 'r'
+of a class Rectangle
+
+9
+00:00:26,733 --> 00:00:29,950
+by giving its width and height.
+
+10
+00:00:31,275 --> 00:00:34,495
+This is done with
+a constructor
+
+11
+00:00:35,055 --> 00:00:37,757
+whose job it is to
+initialize the attributes.
+
+12
+00:00:38,335 --> 00:00:42,275
+But if the class Rectangle inherits
+from a class FigureGeometrique,
+
+13
+00:00:44,075 --> 00:00:47,292
+then the class Rectangle inherits
+a set of attributes
+
+14
+00:00:47,433 --> 00:00:48,934
+from the class FigureGeometrique.
+
+15
+00:00:49,540 --> 00:00:52,076
+So, the constructors of the
+class Rectangle
+
+16
+00:00:52,076 --> 00:00:55,049
+are responsible for initializing
+the class Rectangle's attributes,
+
+17
+00:00:55,518 --> 00:01:00,043
+which comprise those inherited
+from the superclass FigureGeometrique.
+
+18
+00:01:01,196 --> 00:01:04,549
+However, it shouldn't be
+the programmer of this subclass
+
+19
+00:01:04,549 --> 00:01:07,965
+who initializes the attributes
+
+20
+00:01:08,405 --> 00:01:10,160
+from the superclass FigureGeometrique.
+
+21
+00:01:10,393 --> 00:01:12,674
+He might even be incapable
+of doing this himself
+
+22
+00:01:12,674 --> 00:01:15,657
+if the superclass had
+private data members,
+
+23
+00:01:16,060 --> 00:01:17,512
+because he couldn't access them.
+
+24
+00:01:18,084 --> 00:01:20,561
+So, how will the programmer
+of Rectangle
+
+25
+00:01:20,561 --> 00:01:24,484
+accomplish this task?
+
+26
+00:01:24,913 --> 00:01:28,919
+He will invoke in the constructor
+of Rectangle
+
+27
+00:01:28,919 --> 00:01:32,058
+the constructor of the class
+FigureGeometrique.
+
+28
+00:01:32,872 --> 00:01:36,477
+The initialization of the inherited
+data members has to be done
+
+29
+00:01:36,477 --> 00:01:40,581
+by calling the constructors of the
+superclass in the constructor of the subclass.
+
+30
+00:01:41,072 --> 00:01:43,317
+Let's see how this is written in C++,
+
+31
+00:01:43,317 --> 00:01:44,721
+first from a general point of view
+
+32
+00:01:44,721 --> 00:01:46,445
+and then with an example.
+
+33
+00:01:47,088 --> 00:01:49,479
+Calling a constructor of the superclass
+
+34
+00:01:49,479 --> 00:01:51,385
+from the constructor of a subclass
+
+35
+00:01:51,385 --> 00:01:54,244
+is done in the section
+"initialization list".
+
+36
+00:01:54,532 --> 00:01:56,229
+This section,
+
+37
+00:01:56,229 --> 00:01:58,408
+which begins with a colon,
+
+38
+00:01:58,408 --> 00:02:02,160
+is positioned between the header
+of the subclass and its definition.
+
+39
+00:02:03,398 --> 00:02:07,260
+So, right after the header of the
+constructor of the child class,
+
+40
+00:02:07,260 --> 00:02:10,546
+in the initialization list, you start
+
+41
+00:02:10,546 --> 00:02:13,609
+by invoking the parent class in question
+
+42
+00:02:13,609 --> 00:02:16,015
+so you add the arguments
+that you need,
+
+43
+00:02:16,015 --> 00:02:18,229
+and naturally, the constructor of
+the superclass
+
+44
+00:02:18,229 --> 00:02:19,850
+carries the same name as the superclass.
+
+45
+00:02:20,115 --> 00:02:21,601
+Then with a comma,
+
+46
+00:02:21,601 --> 00:02:24,482
+just like we initialize the different
+data members,
+
+47
+00:02:24,482 --> 00:02:27,077
+you would have the rest of
+this initialization list
+
+48
+00:02:27,077 --> 00:02:29,100
+that initializes the data members.
+
+49
+00:02:29,706 --> 00:02:31,164
+Let's consider the example,
+
+50
+00:02:31,164 --> 00:02:35,077
+with the class Rectangle, here, that is the child
+of the class FigureGeometrique.
+
+51
+00:02:35,077 --> 00:02:39,117
+We defined a class FigureGeometrique that,
+let me remind you,
+
+52
+00:02:39,279 --> 00:02:42,559
+has a data member 'position'
+that is protected
+
+53
+00:02:43,107 --> 00:02:49,091
+and has a constructor that receives
+2 coordinates: x and y
+
+54
+00:02:49,686 --> 00:02:52,149
+in order to initialize the field 'position'.
+
+55
+00:02:52,541 --> 00:02:56,562
+So here, in the initialization list of
+the constructor FigureGeometrique
+
+56
+00:02:56,562 --> 00:02:59,974
+we have the initialization
+of its field position.
+
+57
+00:03:00,636 --> 00:03:03,604
+Now, look at the constructor
+of the subclass Rectangle,
+
+58
+00:03:03,604 --> 00:03:07,013
+the constructor of Rectangle will
+take as usual
+
+59
+00:03:07,013 --> 00:03:11,643
+2 parameters l and h to initialize
+its width and height,
+
+60
+00:03:11,741 --> 00:03:14,009
+as before, without inheritance,
+
+61
+00:03:14,009 --> 00:03:17,509
+but it will also take the 2 parameters
+x and y,
+
+62
+00:03:17,509 --> 00:03:20,641
+we decided here to put them first
+but this is not necessary,
+
+63
+00:03:20,641 --> 00:03:24,694
+to be able to initialize the position
+of the FigureGeometrique
+
+64
+00:03:24,694 --> 00:03:28,172
+through the constructor of FigureGeometrique
+
+65
+00:03:28,172 --> 00:03:29,749
+that takes 2 parameters.
+
+66
+00:03:29,911 --> 00:03:33,478
+So, the constructor of Rectangle will
+have its 4 parameters
+
+67
+00:03:33,478 --> 00:03:36,756
+then in the initialization list,
+
+68
+00:03:36,756 --> 00:03:39,394
+we call the constructor of
+FigureGeometrique,
+
+69
+00:03:39,394 --> 00:03:41,467
+here we chose to call 2 parameters,
+
+70
+00:03:41,467 --> 00:03:44,236
+followed by a comma,
+
+71
+00:03:44,236 --> 00:03:47,494
+then the initialization list
+of its own data members.
+
+72
+00:03:48,987 --> 00:03:51,242
+Here we invoked the superclass
+constructor
+
+73
+00:03:51,242 --> 00:03:53,749
+explicitly.
+
+74
+00:03:54,218 --> 00:03:58,067
+Of course, if the class
+has a default constructor,
+
+75
+00:03:58,067 --> 00:04:01,267
+this explicit invocation
+of the constructor
+
+76
+00:04:01,267 --> 00:04:02,741
+is redundant.
+
+77
+00:04:03,003 --> 00:04:04,615
+A default constructor,
+I recall,
+
+78
+00:04:04,615 --> 00:04:07,645
+is a constructor that
+doesn't take any arguments,
+
+79
+00:04:07,645 --> 00:04:10,367
+and doesn't need any arguments.
+
+80
+00:04:10,367 --> 00:04:13,828
+And in this case, it is
+not at all necessary to
+
+81
+00:04:13,828 --> 00:04:17,223
+explicitly call this constructor,
+
+82
+00:04:17,223 --> 00:04:20,270
+because the compiler will
+automatically
+
+83
+00:04:20,270 --> 00:04:21,747
+call the default constructor.
+
+84
+00:04:22,039 --> 00:04:24,570
+But we will have in any case
+
+85
+00:04:24,570 --> 00:04:26,793
+an invocation of the constructor.
+
+86
+00:04:27,303 --> 00:04:30,336
+However, if the class does not
+have a default constructor,
+
+87
+00:04:30,336 --> 00:04:33,478
+then of course an explicit call
+
+88
+00:04:33,478 --> 00:04:35,194
+of one of these constructors
+needs to be made,
+
+89
+00:04:35,194 --> 00:04:37,636
+without which, the compiler
+would not know what to do.
+
+90
+00:04:37,636 --> 00:04:41,046
+So, calling a parent class constructor
+is mandatory.
+
+91
+00:04:41,046 --> 00:04:43,640
+If the superclass doesn't have
+a default constructor,
+
+92
+00:04:43,640 --> 00:04:48,495
+then a an explicit constructor needs
+to be used
+
+93
+00:04:49,157 --> 00:04:53,818
+to make an explicit call in the
+
+94
+00:04:53,818 --> 00:04:56,547
+initialization list of the
+subclass's constructor.
+
+95
+00:04:56,574 --> 00:04:59,972
+Hence, the subclass has to have
+an explicit constructor,
+
+96
+00:04:59,972 --> 00:05:03,109
+to make an explicit call to
+
+97
+00:05:03,109 --> 00:05:05,158
+the superclass constructor.
+
+98
+00:05:05,917 --> 00:05:09,369
+Now if our FigureGeometrique
+had a default constructor,
+
+99
+00:05:09,369 --> 00:05:13,509
+it would not have been necessary to make this
+explicit call to a constructor,
+
+100
+00:05:13,509 --> 00:05:16,713
+and we could have omitted it.
+
+101
+00:05:16,713 --> 00:05:19,707
+Here is a different example,
+
+102
+00:05:19,707 --> 00:05:23,889
+where the class FigureGeometrique has
+a defaulted default constructor.
+
+103
+00:05:25,155 --> 00:05:27,369
+Let's see what happens in this case.
+
+104
+00:05:27,369 --> 00:05:31,106
+Here we have the constructor of
+the subclass Rectangle that,
+
+105
+00:05:31,106 --> 00:05:35,248
+in its initialization list, does not
+explicitly call
+
+106
+00:05:35,248 --> 00:05:38,769
+its superclass
+FigureGeometrique's constructors,
+
+107
+00:05:38,769 --> 00:05:41,919
+this is possible because the class
+FigureGeometrique
+
+108
+00:05:41,919 --> 00:05:44,155
+has a default constructor.
+
+109
+00:05:44,155 --> 00:05:46,517
+We suppose that we didn't write
+the constructor
+
+110
+00:05:46,517 --> 00:05:51,133
+and therefore it has the default constructor
+provided by default by the compiler.
+
+111
+00:05:51,537 --> 00:05:54,996
+So, we have here,
+in the beginning of the constructor
+
+112
+00:05:54,996 --> 00:05:56,826
+of the subclass Rectangle,
+
+113
+00:05:56,826 --> 00:06:01,077
+a call to the default constructor
+of the superclass FigureGeometrique.
+
+114
+00:06:01,266 --> 00:06:05,360
+Note that here, a default constructor
+is called twice,
+
+115
+00:06:05,360 --> 00:06:10,919
+because here, the class FigureGeometrique,
+has as data member, Position,
+
+116
+00:06:11,553 --> 00:06:14,417
+and because we didn't explicitly
+call the constructor,
+
+117
+00:06:14,417 --> 00:06:17,625
+it it the default constructor,
+that is provided by default,
+
+118
+00:06:17,724 --> 00:06:19,039
+by the compiler,
+
+119
+00:06:19,039 --> 00:06:22,797
+which will call the default
+constructors of each of the data members.
+
+120
+00:06:22,797 --> 00:06:25,740
+So here, the defaulted
+default constructor
+
+
+121
+00:06:25,740 --> 00:06:28,425
+calls the constructor
+by default of 'Position'.
+
+122
+00:06:29,046 --> 00:06:31,672
+To summarize, the call
+of the constructor of Rectangle,
+
+123
+00:06:31,672 --> 00:06:33,001
+for example,
+
+124
+00:06:33,001 --> 00:06:35,988
+if I wrote something like this,
+
+125
+00:06:36,139 --> 00:06:40,272
+'Rectangle r(3.0, 4.0);
+
+126
+00:06:41,063 --> 00:06:46,058
+would call the constructor of Rectangle
+here by passing 3.0 and 4.0 as parameters,
+
+127
+00:06:46,058 --> 00:06:49,871
+and would start by calling the 
+default constructor provided by default,
+
+128
+00:06:49,871 --> 00:06:52,960
+by the compiler of the
+class FigureGeometrique,
+
+129
+00:06:53,055 --> 00:06:55,710
+which would the constructor
+by default of 'Position',
+
+130
+00:06:55,710 --> 00:06:58,145
+(here I assume that Position
+is a class),
+
+131
+00:06:58,145 --> 00:07:00,989
+and that therefore there is
+a defaulted default constructor,
+
+132
+00:07:00,989 --> 00:07:03,991
+or a default constructor
+explicitly written.
+
+133
+00:07:04,413 --> 00:07:07,608
+We would then first have a construction
+by default of the position
+
+134
+00:07:07,608 --> 00:07:10,750
+that ends the default construction
+of FigureGeometrique,
+
+135
+00:07:10,750 --> 00:07:14,310
+and would then allow
+the constructor of Rectangle
+
+136
+00:07:14,310 --> 00:07:17,616
+to continue initializing its other
+data members.
+
+137
+00:07:18,829 --> 00:07:20,732
+We will come back in an instant
+
+138
+00:07:20,732 --> 00:07:24,034
+to the order constructors are
+called in a hierarchy.
+
+139
+00:07:24,802 --> 00:07:27,217
+But first of all, I would like
+to insist on something.
+
+140
+00:07:27,217 --> 00:07:29,243
+It is not necessary
+
+141
+00:07:29,243 --> 00:07:31,952
+to have supplementary fields
+in the subclass.
+
+142
+00:07:31,952 --> 00:07:35,689
+For example, if we have a square,
+
+143
+00:07:35,689 --> 00:07:38,497
+which is a certain sort of rectangle,
+
+144
+00:07:38,497 --> 00:07:41,779
+a square is a rectangle where the
+width is equal to its height,
+
+145
+00:07:41,948 --> 00:07:45,222
+then we will not introduce into the
+subclass Carre (TN: = "square"),
+
+146
+00:07:45,222 --> 00:07:46,611
+extra data members.
+
+147
+00:07:46,611 --> 00:07:49,222
+But we could anyway, in the constructor
+of Carre,
+
+148
+00:07:49,222 --> 00:07:50,802
+and we would have
+to do it here,
+
+149
+00:07:50,802 --> 00:07:53,097
+in this constructor that doesn't
+
+150
+00:07:53,097 --> 00:07:54,981
+add any fields,
+
+151
+00:07:54,981 --> 00:07:57,975
+call the
+
+152
+00:07:57,975 --> 00:08:00,145
+constructor of the superclass.
+
+153
+00:08:00,440 --> 00:08:02,478
+Look at this example in detail.
+
+154
+00:08:02,478 --> 00:08:05,910
+We say that a square is a rectangle,
+
+155
+00:08:05,910 --> 00:08:08,532
+in the class Rectangle, we have as usual,
+
+156
+00:08:08,737 --> 00:08:11,926
+data members for width and height,
+
+157
+00:08:11,926 --> 00:08:15,579
+which we inherited from the class Carre
+
+158
+00:08:15,579 --> 00:08:17,772
+and we would simply say
+a square is a rectangle
+
+159
+00:08:17,772 --> 00:08:20,127
+whose width equals its height.
+
+160
+00:08:20,598 --> 00:08:23,091
+And we would not add or change
+anything else in Carre.
+
+161
+00:08:23,414 --> 00:08:25,440
+So, we would simply declare the class Carre
+
+162
+00:08:25,440 --> 00:08:28,019
+as a subclass of Rectangle,
+
+163
+00:08:28,019 --> 00:08:31,256
+and not add anything in particular.
+
+164
+00:08:31,256 --> 00:08:33,890
+I will come back with a final remark
+in an instant.
+
+165
+00:08:33,890 --> 00:08:34,745
+Simply,
+
+166
+00:08:34,745 --> 00:08:38,864
+we will force the constructor here
+to take one unique dimension,
+
+167
+00:08:38,864 --> 00:08:41,587
+the length of the side
+of a square,
+
+168
+00:08:41,587 --> 00:08:45,200
+and to call the constructor of
+the superclass
+
+169
+00:08:45,820 --> 00:08:48,150
+by asking the constructor of
+the superclass
+
+170
+00:08:48,271 --> 00:08:51,655
+to have the same height and
+length,
+
+171
+00:08:52,423 --> 00:08:56,260
+and we wouldn't add anything
+else to the body
+
+172
+00:08:56,260 --> 00:08:57,740
+ of the subclass Carre.
+
+173
+00:08:57,835 --> 00:09:00,371
+So, and it's simply
+these 3 lines here,
+
+174
+00:09:00,371 --> 00:09:02,181
+and we don't need to add anything.
+
+175
+00:09:02,181 --> 00:09:05,142
+They suffice to define a square
+that is a rectangle
+
+176
+00:09:05,142 --> 00:09:09,314
+whose constructor is forced
+to give it sides of equal length.
+
+177
+00:09:09,924 --> 00:09:12,631
+Then, when we say that
+there is nothing to add,
+
+178
+00:09:12,631 --> 00:09:16,368
+of course, if in Rectangle,
+we had a method
+
+179
+00:09:16,628 --> 00:09:19,707
+for example the method
+SetHauteur
+
+180
+00:09:20,872 --> 00:09:23,798
+or the method SetLargeur,
+
+181
+00:09:24,248 --> 00:09:27,287
+then these 2 methods
+inherited from Carre
+
+182
+00:09:27,287 --> 00:09:30,353
+would have to be redefined
+
+183
+00:09:30,353 --> 00:09:33,023
+so that
+
+184
+00:09:33,023 --> 00:09:36,048
+the sides of the square
+would always be equal.
+
+185
+00:09:36,408 --> 00:09:38,898
+So we could try to do something
+like this,
+
+186
+00:09:38,898 --> 00:09:40,957
+in the class Carre,
+
+187
+00:09:42,367 --> 00:09:45,780
+by specializing the method SetHauteur,
+
+188
+00:09:46,688 --> 00:09:51,130
+which will shadow the method
+from Rectangle,
+
+189
+00:09:52,400 --> 00:09:55,814
+and would, of course set the
+height
+
+190
+00:09:57,586 --> 00:09:59,547
+to the value received,
+
+191
+00:09:59,742 --> 00:10:02,733
+but would also --and this
+is new in Carre--
+
+192
+00:10:03,443 --> 00:10:07,939
+set the width to equal
+
+193
+00:10:09,237 --> 00:10:11,637
+the new value too.
+
+194
+00:10:11,712 --> 00:10:14,673
+Therefore this supplementary
+line will be added
+
+195
+00:10:14,673 --> 00:10:16,906
+in the specialization of Carre,
+
+196
+00:10:17,069 --> 00:10:19,660
+and we would do the same
+for setLargeur.
+
+197
+00:10:20,714 --> 00:10:24,214
+To summarize, at this stage, each
+constructor of a subclass
+
+198
+00:10:24,214 --> 00:10:27,009
+has to call a superclass
+constructor
+
+199
+00:10:27,009 --> 00:10:30,845
+and this call comes
+first on the initialization list.
+
+200
+00:10:30,845 --> 00:10:34,083
+What happens if we forget to
+explicitly call
+
+201
+00:10:34,083 --> 00:10:36,130
+one of the constructors of the superclass?
+
+202
+00:10:36,727 --> 00:10:39,654
+Then, a constructor of the
+subclass automatically calls
+
+203
+00:10:39,654 --> 00:10:42,248
+the default constructor
+of the superclass
+
+204
+00:10:42,248 --> 00:10:45,867
+and, as expected, if the superclass
+doesn't have a default constructor,
+
+205
+00:10:45,867 --> 00:10:49,167
+an error occurs in
+the compiler.
+
+206
+00:10:50,005 --> 00:10:52,669
+I will take advantage to remind
+you that the default constructor,
+
+207
+00:10:52,669 --> 00:10:54,972
+that is to say, the constructor
+that doesn't take any arguments,
+
+208
+00:10:54,972 --> 00:10:57,574
+is a bit particular if
+we do not write it out.
+
+209
+00:10:57,574 --> 00:11:01,156
+We have then by default a version
+provided by the compiler
+
+210
+00:11:01,162 --> 00:11:03,012
+of this default constructor.
+
+211
+00:11:03,097 --> 00:11:05,868
+As soon as we write another
+constructor,
+
+212
+00:11:05,868 --> 00:11:09,264
+this defaulted default constructor
+is not available anymore,
+
+213
+00:11:09,264 --> 00:11:11,261
+and if we want a default constructor,
+
+214
+00:11:11,261 --> 00:11:12,791
+then we have to rewrite it.
+
+215
+00:11:13,362 --> 00:11:16,080
+So, to avoid problems
+with inheritance,
+
+216
+00:11:16,080 --> 00:11:17,378
+first of all,
+
+217
+00:11:17,378 --> 00:11:21,234
+I encourage you to always
+declare at least one constructor
+
+218
+00:11:21,234 --> 00:11:25,281
+and to explicitly invoke a
+superclass constructor
+
+219
+00:11:25,281 --> 00:11:26,648
+in the subclass.
+
+220
+00:11:26,648 --> 00:11:29,238
+Even though you might
+want to call the default constructor,
+
+221
+00:11:29,238 --> 00:11:31,269
+It is better to write it explicitly
+
+222
+00:11:31,269 --> 00:11:33,612
+as it makes the code more clear.
+
+223
+00:11:34,560 --> 00:11:36,452
+So this concludes this first part
+
+224
+00:11:36,452 --> 00:11:39,063
+of the consequences of inheritance
+on constructors.
+
+225
+00:11:39,063 --> 00:11:40,639
+In the 2nd part,
+
+226
+00:11:40,639 --> 00:11:43,717
+we will come back to the order
+in which constructors are called
+
+227
+00:11:43,717 --> 00:11:45,950
+in a class hierarchy,
+
+228
+00:11:45,950 --> 00:11:48,324
+to finish with a few complements.

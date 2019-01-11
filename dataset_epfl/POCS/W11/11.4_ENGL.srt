@@ -1,0 +1,859 @@
+1
+00:00:03,974 --> 00:00:06,456
+Now when you think about 
+the web you typically
+
+2
+00:00:06,456 --> 00:00:11,371
+think about very high throughput, 
+millions of concurrent transactions
+
+3
+00:00:11,371 --> 00:00:15,572
+and search queries being processed 
+by thousands of computers.
+
+4
+00:00:16,027 --> 00:00:20,355
+And you intuitively can think about 
+throughput as being the leading metric.
+
+5
+00:00:20,355 --> 00:00:23,451
+And indeed the DQ constant that 
+we saw in the previous module
+
+6
+00:00:23,451 --> 00:00:26,747
+is a throughput metric. It basically
+states that you can either have
+
+7
+00:00:26,747 --> 00:00:30,425
+more queries per second or larger queries 
+but that the product of the two
+
+8
+00:00:30,425 --> 00:00:33,663
+is a constant and is a function 
+of your infrastructure.
+
+9
+00:00:35,383 --> 00:00:38,108
+Now in reality latency 
+matters a great deal.
+
+10
+00:00:38,108 --> 00:00:40,587
+And we'll actually see why it matters
+
+11
+00:00:40,587 --> 00:00:43,077
+a great deal and why
+achieving low latency is hard.
+
+12
+00:00:43,077 --> 00:00:46,494
+And particularly one key point 
+is that increasing the DQ constant
+
+13
+00:00:46,494 --> 00:00:51,158
+of a site will not necessarily translate 
+into a low latency for the queries
+
+14
+00:00:51,158 --> 00:00:52,722
+that are being served.
+
+15
+00:00:52,722 --> 00:00:54,896
+Now there are a number 
+of reasons for this,
+
+16
+00:00:54,896 --> 00:00:58,425
+And the first reason is that the 
+architecture of giant scale services
+
+17
+00:00:58,425 --> 00:01:01,204
+has actually evolved noticeably 
+since the basic model
+
+18
+00:01:01,204 --> 00:01:03,190
+was proposed over a decade ago.
+
+19
+00:01:03,850 --> 00:01:07,326
+What we see are two pictures; 
+on the left is the basic model
+
+20
+00:01:07,326 --> 00:01:11,966
+as proposed in 2001 and on the right 
+is an illustration of
+
+21
+00:01:11,966 --> 00:01:15,425
+a more realistic deployment,
+at least as of 2009.
+
+22
+00:01:15,954 --> 00:01:19,723
+Now in the simple model on the left, 
+the load manager directs the load
+
+23
+00:01:19,723 --> 00:01:22,592
+among the various servers 
+which processes them.
+
+24
+00:01:22,768 --> 00:01:26,670
+Now assuming the DQ principle, 
+the latency of a rubber crest
+
+25
+00:01:26,670 --> 00:01:29,826
+would therefore increase 
+as the selected server reaches
+
+26
+00:01:29,826 --> 00:01:33,725
+some level of saturation 
+but if the servers are not overloaded
+
+27
+00:01:33,725 --> 00:01:36,030
+then the latency can 
+remain relatively low.
+
+28
+00:01:36,340 --> 00:01:40,566
+Now the reality is much more complex 
+and the picture on the right illustrates
+
+29
+00:01:40,566 --> 00:01:44,380
+that each webpage is actually 
+the result of multiple distribution
+
+30
+00:01:44,380 --> 00:01:48,326
+and aggregation steps among 
+multiple tiers of the data center.
+
+31
+00:01:49,405 --> 00:01:53,295
+At each layer there is a fan-out 
+to multiple servers of the lower layer,
+
+32
+00:01:53,723 --> 00:01:57,507
+followed by an aggregation of the results 
+into a single answer which is then
+
+33
+00:01:57,507 --> 00:02:00,053
+propagated back to the layer above.
+
+34
+00:02:00,377 --> 00:02:03,794
+Of course each server serves 
+multiple machines from the tier above,
+
+35
+00:02:03,794 --> 00:02:07,315
+so there's a fan-in request,
+which can create contention.
+
+36
+00:02:08,540 --> 00:02:12,933
+This has a severe implication 
+which is known as the tail latency effect.
+
+37
+00:02:13,857 --> 00:02:17,385
+Now the notion of tail latency simply 
+states that the latency of a service
+
+38
+00:02:17,385 --> 00:02:19,933
+is determined by the 
+slowest fan-out component,
+
+39
+00:02:20,571 --> 00:02:23,935
+and Jeff Dean and Louis Barroso 
+who happened to be two of the most
+
+40
+00:02:23,935 --> 00:02:28,347
+senior scientists at Google 
+illustrated this in a recent CACM paper.
+
+41
+00:02:29,575 --> 00:02:32,238
+And their graph is a synthetic 
+analytical model.
+
+42
+00:02:32,970 --> 00:02:35,895
+Assume that you have a fan-out 
+involving N servers,
+
+43
+00:02:35,895 --> 00:02:39,274
+and that the response will be 
+a high latency with some probability.
+
+44
+00:02:40,002 --> 00:02:44,103
+On the X-axis is the number of servers,
+and the three curves corresponds
+
+45
+00:02:44,103 --> 00:02:47,024
+to the scenario where 
+one in a 100, one in 1000,
+
+46
+00:02:47,266 --> 00:02:49,069
+or one in 10,000 requests are slow,
+
+47
+00:02:50,507 --> 00:02:54,511
+and the Y-axis is the probability 
+that any aggregate request would be slow.
+
+48
+00:02:56,078 --> 00:03:00,592
+In other words, that at least one of 
+the N requesting servers responds slowly.
+
+49
+00:03:00,592 --> 00:03:03,771
+So let's first consider the case 
+where N servers are involved
+
+50
+00:03:03,771 --> 00:03:07,244
+and one over N is the probability 
+of a slow response,
+
+51
+00:03:07,806 --> 00:03:11,268
+while the resulting probability 
+of a slow service is 63%,
+
+52
+00:03:12,534 --> 00:03:15,324
+and that occurs with 100 servers 
+at a probability of 100;
+
+53
+00:03:15,324 --> 00:03:16,534
+that's the blue line,
+
+54
+00:03:17,002 --> 00:03:19,462
+and 1000 servers, 
+the probability of 1000.
+
+55
+00:03:20,393 --> 00:03:23,766
+Now the green curve shows 
+the situation where the service
+
+56
+00:03:23,766 --> 00:03:26,571
+is really well implemented 
+and the probability of
+
+57
+00:03:26,571 --> 00:03:28,910
+a service response is extremely small.
+
+58
+00:03:29,396 --> 00:03:30,971
+It's one in 10,000.
+
+59
+00:03:31,124 --> 00:03:35,203
+Unfortunately what we see is that this 
+still has a significant overall impact
+
+60
+00:03:35,203 --> 00:03:38,516
+if the service depends on a relatively 
+small number of servers.
+
+61
+00:03:39,349 --> 00:03:40,734
+Now this is bad.
+
+62
+00:03:41,474 --> 00:03:44,596
+It's bad if the service is 
+the customer facing web request
+
+63
+00:03:44,596 --> 00:03:47,648
+because a fraction of the 
+web transaction would be slow.
+
+64
+00:03:48,152 --> 00:03:51,412
+But it's actually a lot worse 
+and totally unacceptable
+
+65
+00:03:51,412 --> 00:03:55,551
+if this is a middle layer service 
+since the upper tier
+
+66
+00:03:55,551 --> 00:03:57,372
+would then behave like the blue curve.
+
+67
+00:03:57,742 --> 00:03:59,889
+So if we have something 
+that is engineered
+
+68
+00:03:59,889 --> 00:04:04,667
+like the green curve at the layer below 
+but depends on a large number of servers,
+
+69
+00:04:05,920 --> 00:04:09,073
+we effectively have the behavior 
+and effect of the blue curve
+
+70
+00:04:09,073 --> 00:04:10,787
+at the layer above.
+
+71
+00:04:11,439 --> 00:04:14,521
+Now the importance of tail latency 
+has been known for awhile.
+
+72
+00:04:14,521 --> 00:04:18,948
+And one of the first major systems 
+that formalize and focused on this
+
+73
+00:04:19,586 --> 00:04:22,409
+was Dynamo which was published at SOSP.
+
+74
+00:04:23,384 --> 00:04:26,796
+The observation that human patience 
+is limited and that it ebbs
+
+75
+00:04:26,796 --> 00:04:29,898
+on customers tend to be very impatient 
+when making purchases,
+
+76
+00:04:29,898 --> 00:04:32,808
+and so a slow site means less revenue.
+
+77
+00:04:33,436 --> 00:04:35,452
+So the engineers 
+that designed Dynamo
+
+78
+00:04:35,452 --> 00:04:38,343
+and the core of the Amazon site 
+shifted their focus from
+
+79
+00:04:38,343 --> 00:04:43,303
+measuring throughput in yield 
+to measuring 99.9 latency
+
+80
+00:04:43,303 --> 00:04:45,091
+of the service request time.
+
+81
+00:04:45,231 --> 00:04:48,353
+Now the figure on the right, 
+which is taken from the paper,
+
+82
+00:04:48,353 --> 00:04:52,523
+measures both the average 
+and the 99.9 latency
+
+83
+00:04:52,737 --> 00:04:55,507
+of the distribution of 
+the Dynamo storage service.
+
+84
+00:04:56,392 --> 00:04:58,648
+Note that the graph 
+is on a log scale,
+
+85
+00:04:58,648 --> 00:05:00,847
+we see that their system 
+delivers a response
+
+86
+00:05:00,847 --> 00:05:03,951
+in the ten to 30 millisecond on average,
+
+87
+00:05:05,498 --> 00:05:07,451
+and those are the two curves below.
+
+88
+00:05:07,647 --> 00:05:11,730
+But it can take over 100 milliseconds 
+at the 99.9 percentile
+
+89
+00:05:11,730 --> 00:05:15,259
+which happens for 
+one in every 1000 queries.
+
+90
+00:05:15,956 --> 00:05:19,063
+So it turns out that achieving 
+low latency at the 99.9 percentile
+
+91
+00:05:19,063 --> 00:05:20,658
+is hard for a number of reasons.
+
+92
+00:05:20,658 --> 00:05:22,840
+We've already talked 
+about the long tail,
+
+93
+00:05:22,840 --> 00:05:25,150
+which occurs when 
+we have a lot of fan-out.
+
+94
+00:05:25,150 --> 00:05:27,601
+And we'll also talk about incasting.
+
+95
+00:05:28,379 --> 00:05:31,255
+But first let's close back on 
+this long tail question.
+
+96
+00:05:31,617 --> 00:05:35,036
+The figure on the right shows 
+that there is one order of magnitude
+
+97
+00:05:35,036 --> 00:05:38,393
+difference between the average latency 
+and the 99.9 percentile.
+
+98
+00:05:39,250 --> 00:05:44,278
+By definition one in 1000 requests 
+are above the 99.9 percentile latency.
+
+99
+00:05:45,728 --> 00:05:48,275
+And keep in mind that 
+Dynamo is a key value store
+
+100
+00:05:48,275 --> 00:05:53,329
+in that the upper layer applications 
+typically fan-out multiple requests
+
+101
+00:05:53,540 --> 00:05:56,102
+to a key value storage to build a webpage.
+
+102
+00:05:56,322 --> 00:05:58,996
+So we use a simple 
+model on the left
+
+103
+00:05:58,996 --> 00:06:02,099
+of the long tail to reason about 
+the impact of end user latency.
+
+104
+00:06:02,598 --> 00:06:04,866
+With one in 1000 off by 
+one order of magnitude
+
+105
+00:06:04,866 --> 00:06:09,712
+we can approximate the overall performance
+by looking at the red line of the graph.
+
+106
+00:06:10,720 --> 00:06:13,208
+Now if the long tail problem 
+was not enough,
+
+107
+00:06:13,213 --> 00:06:15,908
+there is another very pesky issue 
+that could impact
+
+108
+00:06:15,908 --> 00:06:18,431
+the latency of a high fan-out application.
+
+109
+00:06:18,448 --> 00:06:22,282
+And that issue is known as 
+the TCP incast problem
+
+110
+00:06:22,613 --> 00:06:26,082
+and the corresponding throughput collapse 
+that can occur.
+
+111
+00:06:26,290 --> 00:06:30,511
+On the picture on this figure, 
+imagine that the upper layer server
+
+112
+00:06:31,495 --> 00:06:33,950
+is on the right and issues 
+a fan-out request
+
+113
+00:06:33,950 --> 00:06:36,007
+to a number of servers on the left.
+
+114
+00:06:36,007 --> 00:06:39,364
+Each of the fan-out servers 
+must then reply the response
+
+115
+00:06:39,364 --> 00:06:40,523
+back to the requester,
+
+116
+00:06:41,398 --> 00:06:44,291
+and if all senders attempt 
+to communicate at the same time
+
+117
+00:06:44,291 --> 00:06:49,412
+congestion will occur in the network 
+between and specifically on the link
+
+118
+00:06:49,666 --> 00:06:51,963
+between the senders and the receiver.
+
+119
+00:06:52,413 --> 00:06:53,846
+There is a bottleneck.
+
+120
+00:06:54,082 --> 00:06:58,866
+That bottleneck leads to what is known as 
+the TCP incast problem.
+
+121
+00:07:00,364 --> 00:07:03,276
+Now since there's a shared link, 
+there can and will be
+
+122
+00:07:03,276 --> 00:07:05,542
+congestion on the link,
+but as we know
+
+123
+00:07:05,542 --> 00:07:08,851
+networking systems are designed 
+to handle congestion.
+
+124
+00:07:08,857 --> 00:07:12,053
+Switches have buffers that can 
+absorb instantaneous congestion
+
+125
+00:07:12,053 --> 00:07:15,086
+and TCP manages congestion 
+by reacting to dropped packets
+
+126
+00:07:15,813 --> 00:07:18,534
+and reducing the size of 
+the sliding window accordingly.
+
+127
+00:07:19,136 --> 00:07:23,308
+Now unfortunately this is precisely 
+what happens when TCP incasting
+
+128
+00:07:23,308 --> 00:07:26,975
+is measured and observed as shown 
+on the picture on the right.
+
+129
+00:07:27,020 --> 00:07:30,946
+As the number of senders increase, 
+the amount of useful traffic received
+
+130
+00:07:30,946 --> 00:07:36,165
+by the receiver actually goes down 
+to a tiny fraction of the link capacity.
+
+131
+00:07:36,916 --> 00:07:39,567
+So this is what we mean by 
+throughput collapse.
+
+132
+00:07:39,567 --> 00:07:42,837
+We're not talking about 
+percentages of capacity that is lost,
+
+133
+00:07:43,061 --> 00:07:46,990
+we're talking about orders of magnitude 
+of capacity that can be lost
+
+134
+00:07:46,990 --> 00:07:49,524
+as a result of this incasting problem.
+
+135
+00:07:49,524 --> 00:07:52,404
+So obviously a very bad thing 
+and actually one that
+
+136
+00:07:52,404 --> 00:07:57,025
+is reminiscent of congestion collapse
+that was observed in the 1980s
+
+137
+00:07:57,025 --> 00:08:00,451
+on the Internet and led to some of 
+the adaptive algorithms
+
+138
+00:08:00,451 --> 00:08:02,400
+that have been critical additions to TCP.
+
+139
+00:08:03,733 --> 00:08:07,256
+So today the study of TCP incasting 
+in data centers is
+
+140
+00:08:07,256 --> 00:08:09,464
+an area of active 
+research and development,
+
+141
+00:08:09,464 --> 00:08:12,117
+and something to keep in mind 
+when thinking about
+
+142
+00:08:12,117 --> 00:08:14,751
+the scale-ability of high 
+fan-out applications.
+
+143
+00:08:14,751 --> 00:08:16,923
+Now let's see if we can 
+put this together.
+
+144
+00:08:16,923 --> 00:08:20,487
+This week you'll be reading a paper 
+on Thialfi which is
+
+145
+00:08:20,487 --> 00:08:24,270
+Google's massively scale-able 
+notification service.
+
+146
+00:08:24,800 --> 00:08:27,891
+A very nice paper based on 
+strong principles that describe
+
+147
+00:08:27,891 --> 00:08:32,261
+a system that is designed to serve 
+notifications to millions of online users.
+
+148
+00:08:32,999 --> 00:08:37,139
+So obviously scale-ability is a first
+order of consideration of the design.
+
+149
+00:08:37,139 --> 00:08:39,807
+You'll actually note from 
+the figure on the right
+
+150
+00:08:39,807 --> 00:08:42,326
+that the paper evaluates 
+the latency of the service
+
+151
+00:08:42,326 --> 00:08:44,792
+as a function of 
+the number of online users,
+
+152
+00:08:45,458 --> 00:08:47,942
+and their evaluation shows 
+that the medium latency
+
+153
+00:08:47,942 --> 00:08:50,222
+for such a service to be 600 milliseconds.
+
+154
+00:08:50,851 --> 00:08:52,562
+Those are the blue squares.
+
+155
+00:08:52,638 --> 00:08:55,752
+So they're pretty much a constant 
+as the number of clients scale.
+
+156
+00:08:56,174 --> 00:08:59,876
+This is actually a
+very impressive result at a massive scale.
+
+157
+00:09:00,387 --> 00:09:03,074
+So keep that in mind 
+when you're reading the paper,
+
+158
+00:09:03,074 --> 00:09:07,328
+this did not happen by accident,
+but achieving a predictable
+
+159
+00:09:07,328 --> 00:09:11,008
+low latency for massively scale-able
+service was only possible because
+
+160
+00:09:11,008 --> 00:09:16,352
+it was a first order consideration 
+from the beginning of the design process.
+
+161
+00:09:16,886 --> 00:09:20,214
+Time to wrap up this module on latency 
+for Internet scale systems.
+
+162
+00:09:20,725 --> 00:09:22,266
+Latency is important.
+
+163
+00:09:22,266 --> 00:09:25,239
+It's important to measure-
+not just to measure the average
+
+164
+00:09:25,239 --> 00:09:28,199
+or the mean, but actually 
+to measure the distribution
+
+165
+00:09:28,199 --> 00:09:32,911
+captured in the 99.9 percentile 
+and in general capture
+
+166
+00:09:32,911 --> 00:09:36,146
+any jitter associated with 
+the latency of individual requests.
+
+167
+00:09:36,901 --> 00:09:39,765
+There's been a relentless pursuit 
+to measure latency,
+
+168
+00:09:39,765 --> 00:09:43,716
+there's also a relentless pursuit 
+to engineer systems that add scale,
+
+169
+00:09:43,716 --> 00:09:49,039
+and can deliver predictable low latency 
+and low latency jitter applications
+
+170
+00:09:49,039 --> 00:09:52,342
+for all of the various tiers of 
+the data center systems
+
+171
+00:09:52,342 --> 00:09:53,777
+that we have today.
+
+172
+00:09:53,777 --> 00:09:56,589
+We saw that there are 
+a number of really hard issues:
+
+173
+00:09:56,589 --> 00:09:59,654
+the notion of the long tail 
+and the tail out scale problem
+
+174
+00:09:59,654 --> 00:10:02,250
+makes it very difficult 
+to have a multilayer system
+
+175
+00:10:02,250 --> 00:10:05,357
+that operates with 
+predictable low latency.
+
+176
+00:10:05,357 --> 00:10:08,614
+We saw that there are not just 
+issues around application design,
+
+177
+00:10:08,614 --> 00:10:11,413
+there's also issues associated 
+with the network layer
+
+178
+00:10:11,413 --> 00:10:15,112
+in the context of the 
+TCP incasting problem.

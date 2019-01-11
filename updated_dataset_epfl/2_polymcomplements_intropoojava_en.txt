@@ -1,0 +1,108 @@
+The objective of this episode is to present various small complements related to polymorphism and inheritance.
+The first subject we will cover concerns polymorphism and how it applies to the construction of objects.
+Constructors are somewhat special methods in the sense that they are specifically dedicated to constructing the current instance of a class.
+They are not expected to have a polymorphic behavior.
+Imagining a polymorphic constructor would mean that it would be dedicated to initializing objects other than the current instance; objects of subclass type, for example, which doesn't really make sense.
+However, nothing stops us from invoking a polymorphic method in the body of a constructor.
+But we advise against this.
+Indeed, as we will see in the next example, the method then acts on an object which may be only partially initialized.
+In this example, we have a superclass <i>A</i> which contains a default constructor as well as an abstract method, that it, a method without a body, <i>m</i>.
+It so happens that the constructor invokes this method <i>m</i>.
+Remember that an abstract class can never be instantiated meaning that we can never call the constructor of the class <i>A</i> like this, since the class is abstract.
+Invoking an abstract method in <i>A</i>'s constructor, that is, invoking a method with no body, poses no problem since we will never call this constructor to instantiate an object of type <i>A</i>, that is, an object for which <i>m</i> has no concrete definition.
+Thus, this is completely legal.
+Essentially, the method <i>m</i> will be invoked only if the constructor of a subclass invokes the constructor of the superclass and if this subclass has a concrete definition of the method <i>m</i>.
+We have an example of this here, in the class <i>B</i>.
+Class <i>B</i> inherits from <i>A</i> and overrides the method <i>m</i>.
+The overriding simply consists in displaying a message containing the value of the attribute <i>b</i> of class B. Class <i>B</i> can be instantiated, since it overrides all the abstract methods inherited, in this case, the method <i>m</i> only.
+Now, let's see what happens when we create an instance of <i>B</i>.
+The instance is created here using the default constructor for the class <i>B</i>.
+We know that any constructor from a subclass must invoke a constructor from the superclass when there is no explicit call to the constructor via the <i>super</i> syntax, so we know that there is an implicit call to the default constructor.
+This call is made to initialize a current instance which is a <i>B</i>.
+At the moment <i>m</i> is called in
+<i>A</i>'s constructor, since there is necessarily dynamic binding in Java, the method will be chosen based on the real nature of the instance and so it is this method <i>m</i> which will be called.
+Remember that at this stage, we have not yet evaluated the instruction which initializes the attribute <i>b</i> of <i>B</i> with a specific value.
+As such, the attribute <i>b</i> has the value which is given to it by default before any explicit initialization, which is the value zero.
+This means that when the method <i>m</i> is executed, the attribute <i>b</i> has a value of zero and the construction of a <i>B</i> will result in displaying the message
+"b vaut: 0".
+If for us, the object <i>B</i> is properly initialized only if its <i>b</i> attribute is worth 1, then we can clearly see that this method <i>m</i> is working on an object which is partially initialized.
+Hence the original piece of advice: do not invoke polymorphic methods in the body of constructors.
+Let's move on to the second subject, completely independent from the first.
+You no doubt remember the <i>toString</i> and
+<i>equals</i> methods that you learned to write for classes.
+But where exactly do these methods come from?
+This is what we will see.
+Remember, for example, the <i>toString</i> method.
+It was imposed to you with a specific header.
+It allowed, when it was present in a class, to define a display format for the object in the form of a String.
+This <i>toString</i> method allows us to produce more explicit displays for objects.
+Yet, <i>toString</i> is simply the overriding of a method existing higher up in the class hierarchy.
+But what does higher up mean since here, for example, the <i>Rectangle</i> class inherits from nobody.
+True, it inherits from nobody
+<i>explicitly</i>, but in Java, every class that you write inherits from a universal superclass which is the <i>Object</i> superclass.
+And this happens without you needing to explicitly write an inheritance link.
+Writing this is unnecessary, but the inheritance link does indeed exist.
+So in Java, every class that you define, if it inherits from no class explicitly, inherits from <i>Object</i>.
+Thus, we can affect an instance of any class to a variable of type <i>Object</i>.
+The <i>Object</i> superclass contains, among other things, the default definitions for a certain number of methods useful to all possible objects, such as <i>toString</i>, <i>equals</i> or <i>clone</i>.
+For example, the default definition of 
+<i>toString</i> allows one to display objects in the form of a representation of their references, that is, something a little strange that we have already encountered previously.
+The default definition of <i>equals</i>, located in the <i>Object</i> superclass, simply compares references by comparing
+2 objects using <i>==</i>.
+In most cases, these default definitions do not satisfy the needs for your own classes and you are thus led to redefine them, to allow a more explicit display, for example, or a comparison which compares the contents, or a correct copy of your objects.
+When we wrote the <i>toString</i> method in the Rectangle class of our previous example, we were actually overriding the <i>toString</i> method inherited from <i>Object</i>.
+Many predefined classes override these methods and typically, the <i>String</i> class overrides the <i>toString</i> method, as well as the <i>equals</i> method.
+Let's go back to the case of the <i>equals</i> method as we wrote it up until now, in the previous episodes.
+In your opinion, does this header for the <i>equals</i> method correspond to a redefinition of the one inherited from <i>Object</i>?
+The answer is, of course, no. The
+<i>Object</i> class cannot know of all the subclasses which will be derived from it.
+The header for the <i>equals</i> method as it exists in the <i>Object</i> superclass is as follows: this means, essentially, that the argument expected by <i>equals</i> is of type <i>Object</i>, and not of type <i>UneClasse</i> (TN: means "A Class") as we have seen up until now.
+Thus, in the method <i>equals</i> of the
+Rectangle class, we had a parameter of type Rectangle.
+The <i>equals</i> methods that we have written up until now are thus not overrides of the <i>equals</i> method inherited from
+<i>Object</i>; rather, they are overloaded methods.
+We speak of redefining, or overriding, when a subclass's method defines a method already present in the superclass, a method with exactly the same name, list of parameters and identical types, and with compatible return types.
+What we mean by compatible is: for basic types, they must be identical; for types defined using classes, these types will be compatible if there is an inheritance link.
+For example, if I have a superclass <i>A</i> defining a method <i>m</i>, returning an object of type <i>A</i>
+If there exists a class <i>B</i> inheriting from <i>A</i>, which defines a method <i>m</i>, but which returns a <i>B</i>, since <i>B</i> inherits from <i>A</i>, we consider that the types are compatible in this case, and so this is also considered as an override.
+If these conditions are not met and we only have the name of the method which is the same, we speak of overloading.
+Defining the method <i>equals</i> by overloading, as we did in the previous episodes, can work flawlessly, however in Java, it is usually recommended to use overriding because some methods of the 
+Java API, typically methods which work on so-called collections, for example methods that will retrieve a value from a collection, will implicitly use the <i>equals</i> method, which has this exact header.
+If it is not present in one of your classes and you use this method, then it is the default method, inherited from <i>Object</i>, that will be used, which is not satisfactory in most cases.
+So, how do we proceed if we really want to override the <i>equals</i> method inherited from <i>Object</i> rather than overload it?
+We present to you a possible way of overriding the <i>equals</i> method, a fairly common solution that you can find in the litterature.
+Note that there are other ways of writing this <i>equals</i> method, this is just one solution among others.
+The main difficulty we face when we want to override the
+<i>equals</i> method is that now, it can take as parameter any type of object.
+When we used overloading, the parameter had the same type as the class in which we defined the overload, so this here, and invoking the <i>equals</i> method on something other than a rectangle for example a string, caused the compiler to react.
+If there was just an overload: the compiler would tell you:
+"I am expecting a String, and you are giving me a Rectangle"
+However, with an override, this form becomes legal, the compiler won't say anything, it will accept this without a hitch.
+Why? Because an object of type <i>String</i> is an <i>Object</i> by inheritance and so this is totally legal, I can have a <i>String</i> in an <i>Object</i>.
+Note that if we do not redefine the <i>equals</i> method in the Rectangle class, at the moment we made such a call, we would use the <i>equals</i> method as it is defined in the <i>Object</i> class, which only compares references and doesn't necessarily apply the procedures we would like to use when we compare a rectangle with another object.
+So it is up to the programmer of the <i>equals</i> method to correctly define the body of their method in order for the comparison with objects of types other than rectangles to be donne correctly, for example by returning <i>false</i>.
+We want a rectangle to be comparable to another rectangle, but not to an object of another type.
+To guarantee that a rectangle can be equal only to another rectangle, we have to test if the object passed as parameter is of the same class as the Rectangle class.
+This can be done using the
+<i>getClass</i> method inherited once again from <i>Object</i>.
+With this method, we can test if the class of the other object is the same as the class of the current instance.
+And if not, we return <i>false</i>.
+To summarize, when we want to override the <i>equals</i> method, we start, as we did for overloading, by testing if the parameter has a
+<i>null</i> value: if it is <i>null</i>, we return <i>false</i>.
+If not, and this is the new part, we test if the other object is of the same class as the current instance.
+If not, we return <i>false</i> here too.
+And if so, if we know that <i>autreObjet</i>
+(TN: means "otherObject") is not <i>null</i>, that the rectangle passed as parameter is indeed of class Rectangle, then we can proceed to an attribute-by-attribute comparison, as we did in the case of overloading.
+But here, we have another little difficulty to overcome: indeed, if I want to compare attribute-by-attribute,
+I must test if the width of the current object is the same as the width as the other object, <i>autreObjet</i>, and if the height of the current object is the same as the height of the other object.
+Yet <i>autreObjet</i> is of type <i>Object</i>, which does not guarantee the presence of the height and width attributes,
+<i>largeur</i> and <i>hauteur</i>.
+We know that <i>autreObjet</i> does indeed contain a Rectangle, we made sure of that with the precautions we took.
+However, if we write something like this, so if I try to compare the width of the current object with the width of the other object, by using this statement here, the compiler will throw an error message telling us that <i>autreObjet</i> is of type <i>Object</i> which does not contain a <i>largeur</i> field.
+Here, we convert <i>autreObjet</i> to a Rectangle. This is known as casting.
+This guarantees to the compileer that it is possible to access the <i>largeur</i> field.
+This will work perfectly here, since we have guaranteed that at execution time, <i>autreObjet</i> will contain an object of type Rectangle.
+If we try to do a cast when <i>autreObjet</i> does not contain a Rectangle, we will get an error message at execution time.
+But this is not the case here.
+So, basically, this is how we can proceed to override the <i>equals</i> method with the new dangers that arise when we use overriding rather than overloading.
+This ends our short episode on complements.

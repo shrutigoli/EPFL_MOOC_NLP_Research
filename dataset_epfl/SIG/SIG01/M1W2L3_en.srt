@@ -1,0 +1,929 @@
+﻿1
+00:00:22,869 --> 00:00:26,788
+Welcome to this lesson on the
+geo-referencing of images.
+
+2
+00:00:27,450 --> 00:00:30,667
+The images and rasters must be positioned
+
+3
+00:00:30,867 --> 00:00:33,441
+in the right place in a
+geographic information system
+
+4
+00:00:33,641 --> 00:00:35,388
+to be used correctly.
+
+5
+00:00:36,775 --> 00:00:39,758
+The objective of this lesson
+is to familiarize yourself
+
+6
+00:00:39,958 --> 00:00:44,077
+with the principles and the
+practice of the geo-referencing of images
+
+7
+00:00:44,277 --> 00:00:47,277
+so that at the end you are able
+
+8
+00:00:47,477 --> 00:00:50,477
+to geo-reference an image or manipulate
+
+9
+00:00:50,677 --> 00:00:53,340
+the geo-referencing parameters
+of these images.
+
+10
+00:00:54,190 --> 00:00:56,991
+<i> During the lesson,
+we will discuss successively </ i></i>
+
+11
+00:00:57,191 --> 00:00:59,641
+<i> about the geo-referencing
+problem, </ i></i>
+
+12
+00:01:00,203 --> 00:01:02,778
+<i> a brief description
+of this problem, </ i></i>
+
+13
+00:01:03,016 --> 00:01:07,159
+<i> the methodology used
+to geo-reference an image, </ i></i>
+
+14
+00:01:07,359 --> 00:01:10,617
+<i> an example of application,
+how </ i></i>
+
+15
+00:01:10,817 --> 00:01:14,342
+<i> geo-referencing is done
+with the QGIS software </ i></i>
+
+16
+00:01:14,580 --> 00:01:18,230
+<i> and finally, how to store,
+how to save </ i></i>
+
+17
+00:01:18,430 --> 00:01:22,912
+<i> the characteristic
+parameters of a geo-reference. </ I></i>
+
+18
+00:01:28,350 --> 00:01:30,551
+<i> Let's start with the problematic </ i></i>
+
+19
+00:01:30,751 --> 00:01:34,751
+<i> which is that of an image
+inherited from an external source </ i></i>
+
+20
+00:01:34,951 --> 00:01:36,621
+<i> for example an old scanned card </ i></i>
+
+21
+00:01:36,821 --> 00:01:41,737
+<i> or an aerial photograph
+whose reference coordinates have been lost, </ i></i>
+
+22
+00:01:41,937 --> 00:01:44,937
+<i> so an ordinary image
+devoid of any spatial reference </ i></i>
+
+23
+00:01:45,137 --> 00:01:49,068
+<i> that we wish to integrate into
+a geographic information system. </ I></i>
+
+24
+00:01:49,268 --> 00:01:51,545
+<i> To do this, it is necessary
+to be able to place it in the right place </ i></i>
+
+25
+00:01:51,745 --> 00:01:57,317
+<i> so to reconstitute the corresponding
+spatial reference system. </ I></i>
+
+26
+00:02:07,006 --> 00:02:09,508
+<i> The operation is perfomed
+in two steps. </</i>
+
+27
+00:02:09,708 --> 00:02:12,467
+<i> First, we will identify
+a series of points </ i></i>
+
+28
+00:02:12,667 --> 00:02:15,667
+<i> common to the image and
+to a reference map </ i></i>
+
+29
+00:02:15,867 --> 00:02:19,211
+<i> on which this image
+has to integrate. </ I></i>
+
+30
+00:02:19,411 --> 00:02:23,534
+<i> And subsequently,
+we will modify, transform the image </ i></i>
+
+31
+00:02:23,734 --> 00:02:26,160
+<i> move it, rotate it, change its
+scale </ i></i>
+
+32
+00:02:26,360 --> 00:02:29,697
+<i> to adjust it to the reference map. </ I></i>
+
+33
+00:02:31,210 --> 00:02:33,079
+<i> We need at least
+three control points, </ i></i>
+
+34
+00:02:33,279 --> 00:02:34,078
+<i> if possible more, </ i></i>
+
+35
+00:02:34,278 --> 00:02:36,431
+<i> they should be easy to identify </ i></i>
+
+36
+00:02:36,631 --> 00:02:39,949
+<i> both on the map and
+in the starting image. </ I></i>
+
+37
+00:02:40,149 --> 00:02:43,149
+<i> And these points should
+be spread if possible </ i></i>
+
+38
+00:02:43,349 --> 00:02:45,908
+<i> throughout the area that
+has to be geo-referenced </ i></i>
+
+39
+00:02:46,108 --> 00:02:51,109
+<i> so that the deformation
+of the image is approximately ... </ i></i>
+
+40
+00:02:51,359 --> 00:02:53,021
+<i>so that it is well
+distributed let's say </ i></i>
+
+41
+00:02:53,221 --> 00:02:56,790
+<i> and that there is no singularity. </ i></i>
+
+42
+00:02:57,540 --> 00:03:00,796
+<i> This geometrical transformation
+is composed of a translation </ i></i>
+
+43
+00:03:00,996 --> 00:03:03,343
+<i> of a scaling and a rotation, </ i></i>
+
+44
+00:03:03,543 --> 00:03:07,693
+<i> all of these operations
+characterizing a Helmert transformation </ i></i>
+
+45
+00:03:07,893 --> 00:03:09,392
+<i> or an affine transformation. </ I></i>
+
+46
+00:03:09,592 --> 00:03:12,592
+<i> There are other types
+of possible transformations, </ i></i>
+
+47
+00:03:12,792 --> 00:03:15,152
+<i> in particular polynomial
+transformations </ i></i>
+
+48
+00:03:15,352 --> 00:03:17,290
+<i>of the first, second or third order, </ i></i>
+
+49
+00:03:17,490 --> 00:03:20,897
+<i> the use of spleens or
+projections. </ I></i>
+
+50
+00:03:21,097 --> 00:03:24,097
+<i> All these approaches
+are less frequent. </ I></i>
+
+51
+00:03:24,297 --> 00:03:30,294
+<i> They are especially useful when
+the starting map is not very regular </ i></i>
+
+52
+00:03:30,494 --> 00:03:33,494
+<i> and that the deformation
+can take into account </ i></i>
+
+53
+00:03:33,694 --> 00:03:36,156
+<i> some local particularities </ i></i>
+
+54
+00:03:36,356 --> 00:03:39,312
+<i> to allow very
+specific adjustments </ I></i>
+
+55
+00:03:39,512 --> 00:03:44,322
+<i> Most of the time, however, we
+will use a Helmert transformation. </ I></i>
+
+56
+00:03:45,510 --> 00:03:51,331
+<i> Who says change of scale and
+rotation also says new grid </ i></i>
+
+57
+00:03:51,594 --> 00:03:55,846
+<i> for which the value
+of each pixel must be evaluated, </ i></i>
+
+58
+00:03:56,046 --> 00:03:59,971
+<i> so resampling the starting grid. </ I></i>
+
+59
+00:04:00,171 --> 00:04:04,711
+<i> This resampling can use the
+nearest neighbor approach </ i></i>
+
+60
+00:04:04,911 --> 00:04:08,595
+<i> where we simply take the value </ i></i>
+
+61
+00:04:08,789 --> 00:04:10,649
+<i> of the nearest original map cell. </ I></i>
+
+62
+00:04:11,174 --> 00:04:14,776
+<i> Resampling by the
+nearest neighbor method </ i></i>
+
+63
+00:04:14,976 --> 00:04:18,309
+<i> is the one that best
+respects the original image </ i></i>
+
+64
+00:04:18,509 --> 00:04:22,467
+so the one that will reduce
+the contrasts
+
+65
+00:04:22,667 --> 00:04:24,199
+<i> of the original image the least. </ I></i>
+
+66
+00:04:25,312 --> 00:04:28,503
+<i> The bi-linear bi-cubic
+approach is sometimes useful </ i></i>
+
+67
+00:04:28,703 --> 00:04:31,703
+<i> if the move, the scale
+change </ i></i>
+
+68
+00:04:31,903 --> 00:04:34,074
+<i> or the rotation are important </ i></i>
+
+69
+00:04:34,274 --> 00:04:38,297
+<i> and that the image
+in fact ... would become little readable </ i></i>
+
+70
+00:04:38,497 --> 00:04:40,109
+<i> because of the transformation. </ I></i>
+
+71
+00:04:49,510 --> 00:04:51,532
+Let's now take a concrete example </ i>
+
+72
+00:04:51,732 --> 00:04:54,126
+<i>of how geo-referencing
+is practiced </ i></i>
+
+73
+00:04:54,326 --> 00:04:55,803
+<i> with the QGIS software. </ I></i>
+
+74
+00:04:56,003 --> 00:04:57,768
+<i> So in QGIS, </ i></i>
+
+75
+00:04:57,968 --> 00:05:00,968
+<i>we will open
+the geo-referencing tool </ i></i>
+
+76
+00:05:01,168 --> 00:05:05,847
+<i> and in this tool, we will
+import the image to geo-reference </ i></i>
+
+77
+00:05:06,047 --> 00:05:09,047
+<i> in this case, an old map of Mahé. </ I></i>
+
+78
+00:05:09,247 --> 00:05:12,247
+<i> We are asked to specify
+the system of references </ i></i>
+
+79
+00:05:12,447 --> 00:05:14,207
+<i> the system of projections
+of references </ i></i>
+
+80
+00:05:14,407 --> 00:05:17,491
+<i> which must be the same
+as the projection system of the map. </ I></i>
+
+81
+00:05:18,728 --> 00:05:21,887
+<i>Then, we will add the control
+points, </ i></i>
+
+82
+00:05:22,087 --> 00:05:25,337
+<i> a first point on Pointe Matoopa </ i></i>
+
+83
+00:05:26,512 --> 00:05:30,668
+<i> to the West of Mahé and
+then a second point </ i></i>
+
+84
+00:05:30,868 --> 00:05:34,368
+<i>to the North-East on
+Pointe Machabée, </ i></i>
+
+85
+00:05:42,156 --> 00:05:47,028
+<i> a third point near the airport, </ i></i>
+
+86
+00:05:53,544 --> 00:05:57,028
+<i> a fourth point to
+the South of the island </ i></i>
+
+87
+00:06:04,053 --> 00:06:08,015
+<i> and a last point
+to the South-West at Pointe Lazare. </ I></i>
+
+88
+00:06:13,290 --> 00:06:16,067
+<i> When we start the
+geo-referencing operation, </ i></i>
+
+89
+00:06:16,267 --> 00:06:20,546
+<i> the system asks us to specify
+the parameters of this transformation. </ I></i>
+
+90
+00:06:20,758 --> 00:06:23,908
+<i> We choose in this case amongst
+the types of transformation </ i></i>
+
+91
+00:06:24,108 --> 00:06:25,703
+<i> the Helmert transformation, </ i></i>
+
+92
+00:06:25,903 --> 00:06:29,852
+<i>a resampling by the nearest neighbors </ i></i>
+
+93
+00:06:30,052 --> 00:06:33,641
+<i> and then we specify
+the output file </ i></i>
+
+94
+00:06:33,866 --> 00:06:37,057
+<i> so a tif image file </ i></i>
+
+95
+00:06:37,257 --> 00:06:41,974
+<i> that will simply
+have the starting file name </ i></i>
+
+96
+00:06:42,174 --> 00:06:43,920
+<i> plus the word which is Georef. </ I></i>
+
+97
+00:06:44,120 --> 00:06:49,101
+<i> We must also specify the
+projection system released </ i></i>
+
+98
+00:06:49,301 --> 00:06:51,820
+<i> so in this case,
+we worked with Mercator web </ i></i>
+
+99
+00:06:52,020 --> 00:06:54,971
+<i> both for the starting map, </ i></i>
+
+100
+00:06:55,171 --> 00:06:58,171
+<i> the imported map
+and the resulting map. </ I</i>
+
+101
+00:06:58,371 --> 00:07:03,199
+<i> We start the operation
+and before closing, </ i></i>
+
+102
+00:07:03,399 --> 00:07:06,399
+<i> we are still asked
+to save the adjustment points, </ i></i>
+
+103
+00:07:06,599 --> 00:07:08,406
+<i> the control points
+that have been defined. </ I></i>
+
+104
+00:07:09,018 --> 00:07:12,772
+<i> And we see that this map
+was actually added </ i></i>
+
+105
+00:07:12,972 --> 00:07:15,255
+to the geographic information system.
+
+106
+00:07:15,455 --> 00:07:18,455
+<i> We can modify its transparency
+in the properties </ i></i>
+
+107
+00:07:18,655 --> 00:07:20,334
+<i> to note that indeed </ i></i>
+
+108
+00:07:20,534 --> 00:07:24,514
+<i> this map-image is now
+placed in the right place. </ I></i>
+
+109
+00:07:24,714 --> 00:07:28,152
+<i> And by reviewing the various
+control points, </ i></i>
+
+110
+00:07:28,352 --> 00:07:33,736
+<i> we can see that the adjustment
+is not of such poor quality.</ I></i>
+
+111
+00:07:33,936 --> 00:07:41,117
+<i> A little bit of approximation
+here on the side of Baie Lazare... </ i></i>
+
+112
+00:07:41,960 --> 00:07:47,170
+<I> But overall,
+the adjustment is fairly accurate. </ I>
+
+113
+00:07:57,412 --> 00:08:01,015
+<i> Now let's see the parameters
+that define </ i></i>
+
+114
+00:08:01,215 --> 00:08:03,462
+<i> the transformation and
+how to store them. </ I></i>
+
+115
+00:08:03,662 --> 00:08:06,662
+<i> As I said earlier,
+a Helmert transformation </ i></i>
+
+116
+00:08:06,862 --> 00:08:08,399
+<i> is an affine transformation, </ i></i>
+
+117
+00:08:08,599 --> 00:08:11,566
+<i> that is to say a transformation
+which can be described </ i></i>
+
+118
+00:08:11,766 --> 00:08:16,752
+<i> by a linear combination
+of the x y coordinates, </ i></i>
+
+119
+00:08:16,952 --> 00:08:18,624
+<i> of the starting system.
+So each coordinate </ i></i>
+
+120
+00:08:18,824 --> 00:08:21,733
+<i> of the arrival system,
+x' y' here, </ i></i>
+
+121
+00:08:21,933 --> 00:08:24,180
+<i> is expressed as a
+linear combination </ i></i>
+
+122
+00:08:24,380 --> 00:08:31,517
+<i> of the x y starting coordinates and
+then from a constant term. </ I></i>
+
+123
+00:08:31,717 --> 00:08:34,394
+<i> This system actually includes
+6 parameters </ i></i>
+
+124
+00:08:34,594 --> 00:08:37,267
+<i> which are grouped together
+in what is called a World File </ i></i>
+
+125
+00:08:37,482 --> 00:08:40,794
+<i> describing in fact
+the geo-referencing of an image. </ I></i>
+
+126
+00:08:40,994 --> 00:08:43,574
+<i> And in this World File,
+these parameters are presented </ i></i>
+
+127
+00:08:43,774 --> 00:08:48,163
+<i> in the order described
+below with first the pixel size </ i></i>
+
+128
+00:08:48,363 --> 00:08:50,335
+<i> according to the x-axis, </ i></i>
+
+129
+00:08:50,535 --> 00:08:54,600
+<i> then the 2 rotation parameters
+around the y-axis and the x-axis, </ i></i>
+
+130
+00:08:54,800 --> 00:08:57,380
+<i> the size of the pixel
+according to y, </ i></i>
+
+131
+00:08:57,580 --> 00:09:00,580
+<i> and then finally
+the coordinates, the constant terms, </ i></i>
+
+132
+00:09:00,780 --> 00:09:05,780
+<i> the x y coordinates of the pixel center
+located on the top left of the image. </ I></i>
+
+133
+00:09:05,992 --> 00:09:11,988
+<i> So we see that if
+we define the position </ i></i>
+
+134
+00:09:12,188 --> 00:09:14,238
+<i> from the top left of the image, </ i></i>
+
+135
+00:09:14,438 --> 00:09:18,147
+<i> the cell size of the grid </ i></i>
+
+136
+00:09:18,347 --> 00:09:20,890
+<i> and then the rotation elements, </ i></i>
+
+137
+00:09:21,090 --> 00:09:24,845
+<i> we can actually position
+an image precisely </ i></i>
+
+138
+00:09:25,045 --> 00:09:26,895
+<i> in a geographic information
+system. </ I></i>
+
+139
+00:09:28,020 --> 00:09:29,988
+<i> In the example here to the
+right, </ i></i>
+
+140
+00:09:30,188 --> 00:09:32,559
+<i> when we have square
+pixels and no rotation, </ i></i>
+
+141
+00:09:32,759 --> 00:09:34,636
+<i> the angular terms are nil. </ I></i>
+
+142
+00:09:34,836 --> 00:09:39,668
+<i> And finally, the calculation
+of the coordinates of each point </ i></i>
+
+143
+00:09:39,868 --> 00:09:43,280
+<i> at the center of each
+pixel is quite simple. </ I></i>
+
+144
+00:09:43,768 --> 00:09:48,017
+<i> In the case where the transformation
+includes a rotation component, </ i></i>
+
+145
+00:09:48,217 --> 00:09:52,030
+<i> we see that in fact
+the D and B parameters </ i></i>
+
+146
+00:09:52,230 --> 00:09:54,365
+<i> are not in fact angles
+of rotation </ i></i>
+
+147
+00:09:54,565 --> 00:09:57,560
+<i> but represent the components
+according to x and y </ i></i>
+
+148
+00:09:57,760 --> 00:09:59,827
+<i> of the width and height
+of the pixel. </ I></i>
+
+149
+00:10:00,027 --> 00:10:03,661
+<i> And it is therefore more
+accurate to talk about components </ i></i>
+
+150
+00:10:03,861 --> 00:10:09,877
+<i> according to x and y, of projections
+rather than angular terms. </ I></i>
+
+151
+00:10:10,077 --> 00:10:14,255
+<i> Afterwards, the calculations become
+more complicated if the pixel is not square </ i></i>
+
+152
+00:10:14,455 --> 00:10:18,229
+<i> but that it has different dimensions
+according to y and according to x. </ I></i>
+
+153
+00:10:18,842 --> 00:10:21,429
+<i> These various parameters
+can be stored </ i></i>
+
+154
+00:10:21,629 --> 00:10:24,629
+<i> in an accompanying file,
+the World File precisely, </ i></i>
+
+155
+00:10:24,829 --> 00:10:30,392
+<i> with the rule that the
+accompanying file has the same name </ i></i>
+
+156
+00:10:30,592 --> 00:10:33,592
+<i> as the base file and
+an extension that depends </ i></i>
+
+157
+00:10:33,792 --> 00:10:36,392
+<i> on the image format,
+tfw for the tif </ i></i>
+
+158
+00:10:36,617 --> 00:10:39,992
+<i> and jgw for the jpeg,
+pgw for the png </ i></i>
+
+159
+00:10:40,192 --> 00:10:41,815
+<i> gfw for the gif. </ I></i>
+
+160
+00:10:42,227 --> 00:10:45,015
+<i> Or, the second possibility, </ i></i>
+
+161
+00:10:45,215 --> 00:10:48,777
+<i> store these information in the header
+of an image file in .tif format </ i></i>
+
+162
+00:10:49,040 --> 00:10:50,998
+<i> And we talk here about
+GEOTIFF format </ i></i>
+
+163
+00:10:51,198 --> 00:10:52,980
+<i> since it is a single file </ i></i>
+
+164
+00:10:53,180 --> 00:10:55,380
+<i> that contains
+the geo-referencing information, </ i></i>
+
+165
+00:10:55,580 --> 00:10:57,073
+<i> so an image that intrinsically </ i></i>
+
+166
+00:10:57,314 --> 00:10:59,627
+<i> contains the
+geo-referencing information. </ I></i>
+
+167
+00:10:59,899 --> 00:11:03,894
+<i> The GeotiffExamine utility
+that is free to access </ i></i>
+
+168
+00:11:04,094 --> 00:11:07,914
+<i> makes it easy
+to check if a TIFF file has </ i></i>
+
+169
+00:11:08,114 --> 00:11:10,163
+<i> the geo-referencing information </ i></i>
+
+170
+00:11:10,363 --> 00:11:13,216
+<i> and, if so, generates
+a World File </ i></i>
+
+171
+00:11:13,416 --> 00:11:15,360
+<i> or conversely, when
+we have the World File, </ i></i>
+
+172
+00:11:15,560 --> 00:11:18,284
+<i> to fill in
+the header of the TIFF file </ i></i>
+
+173
+00:11:18,484 --> 00:11:20,364
+<i> to transform a TIFF into
+Geotiff. </ I></i>
+
+174
+00:11:20,564 --> 00:11:25,077
+<i> We see for example that if we
+look for the geo-referenced file </ i></i>
+
+175
+00:11:25,277 --> 00:11:28,277
+<i> that we have just made and that
+we open this file </ i></i>
+
+176
+00:11:28,477 --> 00:11:30,676
+<i> with this utility, </ i></i>
+
+177
+00:11:30,876 --> 00:11:35,876
+<i> we see that the
+geo-referencing parameters </ i></i>
+
+178
+00:11:36,076 --> 00:11:38,959
+<i> are stored with the file itself </ i></i>
+
+179
+00:11:39,159 --> 00:11:41,712
+<i> and we can make
+the corresponding World File. </ I></i>
+
+180
+00:11:42,350 --> 00:11:46,541
+<i> As mentioned earlier,
+this World File has the tfw extension </ i></i>
+
+181
+00:11:46,741 --> 00:11:50,343
+<i> and if you open it with
+a simple text software, </ i></i>
+
+182
+00:11:50,543 --> 00:11:54,622
+<i> we find the 6 parameters
+that characterize </ i></i>
+
+183
+00:11:54,822 --> 00:11:59,607
+<i>the geometric transformation and
+the positioning of the image. </ I></i>
+
+184
+00:12:00,082 --> 00:12:03,418
+<i> The extension of this file,
+of this World File </ i></i>
+
+185
+00:12:03,640 --> 00:12:07,653
+<i> can be changed to jgw </ i></i>
+
+186
+00:12:07,853 --> 00:12:12,543
+<i> and the transformed name
+by removing the Georef suffix </ i></i>
+
+187
+00:12:12,743 --> 00:12:15,480
+<i> so that we can see
+that we can now import </ i></i>
+
+188
+00:12:15,680 --> 00:12:18,527
+<i> the original jpeg file using </ i></i>
+
+189
+00:12:18,727 --> 00:12:21,302
+<i>the geo-referencing information </ i></i>
+
+190
+00:12:21,510 --> 00:12:24,460
+<i> that was generated later. </ I></i>
+
+191
+00:12:26,897 --> 00:12:28,760
+<i> That is it. It is simple. </ I></i>
+
+192
+00:12:52,532 --> 00:12:54,128
+So, we are reaching the end of this lesson
+
+193
+00:12:54,328 --> 00:12:57,328
+which has allowed us to review the principles
+
+194
+00:12:57,528 --> 00:12:59,683
+and the practice of image geo-referencing
+
+195
+00:12:59,883 --> 00:13:04,857
+and to see how we can manipulate,
+record and manipulate
+
+196
+00:13:05,157 --> 00:13:09,275
+the referencing parameters in image files
+
+197
+00:13:09,475 --> 00:13:11,205
+or in accompanying files.
+

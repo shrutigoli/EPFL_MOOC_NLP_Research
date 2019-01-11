@@ -1,0 +1,99 @@
+In a previous episode, we examined the different steps that follow when we call a method.
+In the examples we have seen up until now, the arguments passed to the method were either simple values, or expressions to evaluate.
+We will now go into more detail and see what happens when the argument passed to the method is a variable, especially in the situation where the method modifies the parameter passed to it.
+So let's consider the following concrete situation.
+Suppose for example that we are in a main program which declares a variable v1 of the same type as the one expected by the method.
+When then invoke the method by passing it an argument, the variable v1.
+We saw in the previous episode that v1 was copied into v and [let's assume that] this method's purpose is to modify v.
+So the question we now ask ourselves is: when this method ends, is the variable v1, declared in the main program, modified by the method or not?
+In programming in general, we say that v is "passed by value" if the answer to this question is no, and on the contrary, that v is
+"passed by reference" if the answer to this question is yes.
+In the case of passing by value, what happens is that the method will work on a local copy of the argument it is passed, v1.
+So, when the method is called, when we call it, the variable v1 is simply copied into a local area v, local to the function, and any modification of this local area has no effect on the original variable
+In Java, let's first ask ourselves what does it means to "modify v", exactly.
+Because the answer to this question will depend on the nature of the type [of v].
+During an earlier episode on types, we learned that in Java, elementary data types were not manipulated in the same way as advanced data types.
+By advanced data types, I mean for example arrays or strings.
+Consequently, if I am manipulating elementary-type data, modifying v has only one possible interpretation
+If I try to modify v by assigning it a different value, then the memory area named v will clearly contain a value that is different from its previous value, which actually is a value
+ of 10, here.
+On the other hand, if I am working on advanced-type data, the situation is different.
+Indeed, we have seen that values of advanced data types were manipulated via references, via indirections.
+For example, if I manipulate a String-type variable, I am not manipulating the character striing directly,
+I am manipulating a reference to the character string.
+Thus, when I speak of "modifying v", what do I mean exactly [in this case]?
+Am I modifying the reference?
+Or am I modifying the memory area pointed to by the reference?
+Let's now place ourselves in the situation where our method takes a parameter of advanced data type.
+For example, we can imagine that "type" corresponds to an array of integers, and in this case the reference v is an indirection, a reference to an array of integers that we can represent in this way.
+There are thus two possibilities for modification here.
+The one that comes most easily to mind, perhaps, consists in putting a different value into v.
+This would mean that we are modifying the reference itself, which would result, since I am modifying the reference itself, in making v point to another array.
+Second possibility for modification: through the reference, I can modify the referenced object, for example by writing this, which would result in a modification of the second element of the array, like this.
+So in Java, there are actually  two questions to ask, rather than one.
+First question: if my method modifies the reference, is the variable, the reference passed as argument, modified at the end of the method?
+Second question: if I modify the object referenced by v1 via v, is the object referenced by v1 modified?
+It is important to know that in Java, there exists only passing by value, which means that a method is always working with only a copy of the argument that is passed to it when it is called.
+In the case of advanced data types, it is indeed a reference that is copied.
+If I place myself in the situation where
+I have a method "m", without a return type here, which takes as parameter a variable of some undefined data type named "x", suppose for example that in a main program, I call this method in the following way, where I declare a variable "val" of the correct type.
+I then call my method, passing it "val" as argument.
+It is important to know that at this moment, the value of val is copied into an area local to the method.
+So, let's go back to our original question, by examining the case where "type" is an elementary type.
+For example, we can imagine that type corresponds to the integer type, "int", and so the routine modifying v could simply be an incrementation of this nature.
+In our main program, v1 would be declared with an integer type and assigned an original value, and we would invoke the method on v1.
+So in this case, we find ourselves with a variable v1 which contains a value of 3 and at the moment the method is called, v1 is in fact copied into an area local to the method, named v.
+So here we would have a copy of the value.
+If we then execute the body of the method, we would modify the content of v since we are working on v and we see that at no time is the value of v1 affected by this modification.
+So when the type is elementary, the answer to this question is no because of the passage by value.
+So, let's now place ourselves in the situation where our method is working with an advanced data type.
+As an example of advanced data type, let's take an array of integers.
+So here, in our main program, we would write something that looks like this.
+Here, we end up in the following memory situation; so we have a variable v1 which contains a reference, the address, in a way, to the array 1, 2, 3.
+So at the moment this method call is made, we have seen that in Java, we know only passing by value, which means that v1 will be copied into a local area v, local to the method.
+So here we have a memory area v, local to the method, and in which we will copy the contents of v1, i.e the reference to the array.
+We clearly see here that both v and v1 point to the same array in memory.
+This means that for example, if I try to modify the object referenced via v, so if I try to do this in the method, if I modify the array via this link, since both v and v1 point to the same area, modifications done through v are visible through v1.
+This means that in the case where I carry out a routine in the method that modifies the referenced object, the answer to this question is yes.
+Let's now look at the second situation, let's try to write code which will modify, in the method, the reference itself.
+So here, due to passing by value, at the moment of the method call we have a copy of v1 in v, which means that we are in this situation here, where we have copied the reference in v, the reference to the array.
+Now, let's attempt to modify this reference.
+This can be done for example like this: I declare another array t, which has other values, and I modify the reference itself so I am making this assignment here.
+So here, I am in this memory situation,
+I have a variable t which contains a reference to another array, so I have this link, and I make this assignment, meaning that I modify the reference itself.
+This means that if I break this link, this link doesn't exist anymore, and now my local variable points to the array referenced by t.
+We thus see that with this manipulation, since we modified the reference on a local copy, v1 is not affected by this modification; when the execution of my method ends, at that moment I still have the address value within v1.
+Which means, basically, that if I carry out an instruction which modifies the reference itself, the answer to this question is still no, still because of the passage by value.
+Let's illustrate this discussion with real cases, with real examples.
+So, here we have a small main program which begins by declaring a variable "val". This variable has an elementary type,
+"int", which means that the value that is associated to it is directly stored in val. There is no abstraction, no reference.
+The second instruction invokes a method m by passing it val as argument.
+We have seen that in Java, there exists only passing by value, which means that the value of val is copied into an area local to the method which is named x here.
+So we are in the situation where x contains the same value as val, but in a different memory area.
+Then, the first instruction of the body of the method is executed, resulting in an incrementation of x. We thus end up with a value of 2 for x, and when we display the value of x, we can see that it does indeed contain a value of 2.
+Then, when the method ends, if we want to display the value of val, we realize that this value is left unchanged.
+It was not modified due to the passage by value.
+All this to say that the modifications in this case are effected inside the method and do not affect the external variable val.
+Here is another situation, where we modify a reference in the body of a method.
+Here, we have a main program which declares a variable tab of advanced type, an array of integer.
+Advanced types are manipulated via interactions, we are thus in this memory situation here, where tab points to an array which, in this case, contains one single element containing 1.
+Then, there is the call to the method m which is executed, and we have seen that there is only passing by value in 
+Java, meaning that tab is copied into an area local to the method which is x.
+So we are now in the situation where we have copied the value of tab into x and so x points to the same array in memory.
+When the body of the method is executed, the first instruction encountered is the one that creates a new array.
+It will thus point to the new array in memory with another reference, which in this case contains one single cell containing 100.
+The second instruction tries to modify the reference itself, so we assign to x the address of the new array, which results in breaking this link and creating a new one to this array.
+If, now, we display the value of the first cell of the array x, x[0], given the newly-created link, obviously has a value of 100.
+Once the method has finished executing and we display the value of the first cell of the tab array, we can see that the modification done on the reference itself is not visible on the argument because of the passage by value and thus the value of tab[0] remains unchanged and is still 1.
+So the result of the execution of this program show us that modifications done within a method on the reference itself are not visible outside of the method, still because of the passage by value.
+Last situation: modification of the referenced object in the body of a method.
+So we are now in the same situation as in the previous example, where the main program creates an array containing a single cell worth 1.
+When the method m is called by passing it tab as argument, still because of passage by value, tab is copied into x, where x is an area local to the method m.
+We can clearly see here that both tab and x reference the same array
+So here, when we execute the body of the method m, the first instruction encountered will alter the first cell of the array pointed to by x which will modify this cell.
+And we can see that the modification made on the first cell of the array x is also visible in tab.
+So the execution of this display instruction will clearly display that x[0] has a value of 100.
+When the execution of the method ends and we pass to the next display, since both tab and x point to the same array, displaying the value of tab[0] will also output 100.
+So the situation here is that the modification made inside the method is also visible outside of the method despite the passage by value.
+Why?
+Because both the area local to the method and the argument actually point to the same array.

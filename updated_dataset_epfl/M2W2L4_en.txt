@@ -1,0 +1,1660 @@
+1
+00:00:22,364 --> 00:00:23,332
+Hello.
+
+2
+00:00:23,532 --> 00:00:27,302
+This lesson will focus on the
+merging of queries
+
+3
+00:00:27,502 --> 00:00:30,225
+which we use when we want to associate
+
+4
+00:00:30,425 --> 00:00:33,509
+the results of two or more queries
+
+5
+00:00:33,709 --> 00:00:36,325
+to extract the common elements
+
+6
+00:00:36,525 --> 00:00:41,307
+or to remove from all the query results
+
+7
+00:00:41,507 --> 00:00:43,662
+the group of elements
+
+8
+00:00:43,850 --> 00:00:46,016
+that would be present in
+the results of another query.
+
+9
+00:00:47,349 --> 00:00:48,913
+We will also discuss
+
+10
+00:00:49,113 --> 00:00:50,934
+the use of query results
+
+11
+00:00:51,134 --> 00:00:54,141
+as part of another query
+
+12
+00:00:54,341 --> 00:00:57,041
+in the case where we nest a query
+
+13
+00:00:57,241 --> 00:00:58,341
+into another query,
+
+14
+00:00:58,541 --> 00:00:59,906
+what we do for example
+
+15
+00:01:00,106 --> 00:01:02,397
+when we would like to use
+an aggregation function
+
+16
+00:01:02,597 --> 00:01:06,178
+as the average number of
+employees of a series of companies
+
+17
+00:01:06,378 --> 00:01:09,384
+as a criterion to select
+
+18
+00:01:09,584 --> 00:01:12,117
+the SMEs which would have
+fewer employees
+
+19
+00:01:12,317 --> 00:01:12,954
+than the average.
+
+20
+00:01:13,154 --> 00:01:15,045
+The objective of this lesson
+
+21
+00:01:15,245 --> 00:01:18,178
+is to describe the principle 
+of merging queries
+
+22
+00:01:18,378 --> 00:01:20,966
+and to show that SQL queries
+
+23
+00:01:21,166 --> 00:01:23,699
+can contain other SQL queries,
+
+24
+00:01:24,086 --> 00:01:25,581
+so that at the end of the lesson
+
+25
+00:01:25,781 --> 00:01:28,887
+you are able to use merging queries
+
+26
+00:01:29,087 --> 00:01:31,251
+to assemble results,
+
+27
+00:01:31,451 --> 00:01:33,095
+to associate the results 
+of multiple queries
+
+28
+00:01:33,295 --> 00:01:37,411
+and to write nested queries.
+
+29
+00:01:38,511 --> 00:01:39,557
+In this lesson,
+
+30
+00:01:39,757 --> 00:01:41,124
+we will discuss successively
+
+31
+00:01:41,324 --> 00:01:43,469
+the topic of the merging queries
+
+32
+00:01:43,669 --> 00:01:46,887
+then we will see the nested queries
+
+33
+00:01:47,087 --> 00:01:48,403
+in the WHERE clause
+
+34
+00:01:48,603 --> 00:01:50,514
+before talking about nested queries
+
+35
+00:01:50,714 --> 00:01:51,683
+in the FROM clause
+
+36
+00:01:51,883 --> 00:01:54,436
+and we will end with the use
+
+37
+00:01:54,636 --> 00:01:56,376
+of the IN and NOT IN operators
+
+38
+00:01:56,576 --> 00:01:58,272
+in merging queries.
+
+39
+00:02:04,093 --> 00:02:05,875
+By using this table which summarizes
+
+40
+00:02:06,075 --> 00:02:08,346
+the basic syntax elements
+
+41
+00:02:08,546 --> 00:02:09,410
+of the SQL language,
+
+42
+00:02:09,610 --> 00:02:13,905
+we find all the selection,
+
+43
+00:02:14,105 --> 00:02:16,523
+conditional filtering, 
+aggregation and sorting clauses
+
+44
+00:02:16,723 --> 00:02:18,886
+that we saw in previous lessons.
+
+45
+00:02:19,086 --> 00:02:21,960
+We see that we still have to discuss
+
+46
+00:02:22,160 --> 00:02:23,177
+these merging clauses
+
+47
+00:02:23,377 --> 00:02:26,095
+with the UNION, INTERSECT 
+and EXCEPT keywords.
+
+48
+00:02:27,292 --> 00:02:28,996
+The UNION clause of the SQL language
+
+49
+00:02:29,196 --> 00:02:31,525
+allows us to put end to end 
+the results of several queries
+
+50
+00:02:31,725 --> 00:02:34,319
+which themselves use the SELECT command.
+
+51
+00:02:34,519 --> 00:02:36,244
+It is therefore a command that allows
+
+52
+00:02:36,444 --> 00:02:40,181
+to concatenate the results of
+two queries or more.
+
+53
+00:02:40,381 --> 00:02:43,916
+To use this merging clause
+
+54
+00:02:44,116 --> 00:02:46,946
+it is important that both requests
+
+55
+00:02:47,146 --> 00:02:48,170
+that we seek to combine
+
+56
+00:02:48,370 --> 00:02:50,190
+are structured in the same way,
+
+57
+00:02:50,390 --> 00:02:53,904
+so they have the same number
+and the same type of columns
+
+58
+00:02:54,104 --> 00:02:55,719
+and these columns appear in the same order
+
+59
+00:02:55,919 --> 00:02:58,260
+in the two tables that are linked
+
+60
+00:02:58,460 --> 00:02:59,546
+by the union query.
+
+61
+00:02:59,746 --> 00:03:01,272
+From there,
+
+62
+00:03:01,472 --> 00:03:02,332
+the syntax is simple
+
+63
+00:03:02,532 --> 00:03:04,574
+it is two SELECT clauses
+
+64
+00:03:04,774 --> 00:03:06,979
+which are simply connected by 
+the UNION keyword.
+
+65
+00:03:08,566 --> 00:03:10,524
+In the spirit it is an operation
+
+66
+00:03:10,724 --> 00:03:12,653
+which is similar to that 
+of the FULL JOIN
+
+67
+00:03:12,853 --> 00:03:15,631
+that we have seen in previous lessons,
+
+68
+00:03:15,831 --> 00:03:18,874
+except that in the join
+
+69
+00:03:19,074 --> 00:03:22,272
+the structure of the two sets 
+that we associate
+
+70
+00:03:22,472 --> 00:03:23,815
+can be completely different.
+
+71
+00:03:24,015 --> 00:03:26,538
+We have fields that are totally different
+
+72
+00:03:26,738 --> 00:03:29,578
+whereas here, when we
+unite the two tables
+
+73
+00:03:29,778 --> 00:03:30,783
+of two queries
+
+74
+00:03:30,983 --> 00:03:33,690
+it is really necessary that
+the structure is the same
+
+75
+00:03:33,890 --> 00:03:34,829
+in both cases.
+
+76
+00:03:35,029 --> 00:03:37,752
+The particularity of the 
+UNION ALL clause
+
+77
+00:03:37,952 --> 00:03:41,463
+consists of not eliminating 
+the duplicates
+
+78
+00:03:41,663 --> 00:03:43,866
+so if we have elements that are present
+
+79
+00:03:44,066 --> 00:03:47,145
+both in the first and in the second table
+
+80
+00:03:47,345 --> 00:03:48,670
+they both appear
+
+81
+00:03:48,870 --> 00:03:51,920
+whereas in the simple union query
+
+82
+00:03:52,120 --> 00:03:53,447
+the duplicates are eliminated.
+
+83
+00:03:53,647 --> 00:03:56,205
+Second type of merging query,
+
+84
+00:03:56,405 --> 00:03:57,944
+the intersection queries
+
+85
+00:03:58,144 --> 00:03:59,668
+with the INTERSECT clause
+
+86
+00:03:59,868 --> 00:04:02,961
+which allows to obtain the intersection
+
+87
+00:04:03,161 --> 00:04:04,417
+of the results of two queries.
+
+88
+00:04:05,623 --> 00:04:06,909
+As in the case of the union
+
+89
+00:04:07,109 --> 00:04:08,410
+it is important, and even essential,
+
+90
+00:04:08,610 --> 00:04:10,444
+that the two tables which we use
+
+91
+00:04:10,644 --> 00:04:13,816
+have the same number
+and the same type of columns
+
+92
+00:04:14,016 --> 00:04:16,497
+and that these columns are 
+listed in the same order.
+
+93
+00:04:17,697 --> 00:04:19,808
+From there, the syntax is 
+of the same nature
+
+94
+00:04:20,008 --> 00:04:23,017
+with two classic selection queries
+
+95
+00:04:23,217 --> 00:04:25,415
+connected by the INTERSECT keyword,
+
+96
+00:04:25,615 --> 00:04:26,680
+by the INTERSECT clause.
+
+97
+00:04:27,465 --> 00:04:28,449
+As before
+
+98
+00:04:28,649 --> 00:04:30,989
+we can link to the idea of ​​join
+
+99
+00:04:31,189 --> 00:04:34,047
+where we had the simple join
+
+100
+00:04:34,247 --> 00:04:39,577
+which consisted in linking
+the elements of the two sets,
+
+101
+00:04:39,777 --> 00:04:40,856
+of the two queries,
+
+102
+00:04:41,056 --> 00:04:44,279
+through a common field.
+
+103
+00:04:44,479 --> 00:04:45,835
+The difference here
+
+104
+00:04:46,035 --> 00:04:48,980
+is that the intersection
+between two requests
+
+105
+00:04:49,180 --> 00:04:50,897
+in a merging clause
+
+106
+00:04:51,097 --> 00:04:54,213
+implies that the structure 
+of the two sets
+
+107
+00:04:54,413 --> 00:04:55,426
+is the same
+
+108
+00:04:55,626 --> 00:04:57,150
+and not that we associate
+
+109
+00:04:57,350 --> 00:05:01,162
+two sets with rather 
+variable attributes.
+
+110
+00:05:02,639 --> 00:05:04,383
+Third type of merging request
+
+111
+00:05:04,583 --> 00:05:08,485
+that allows to extract from 
+the query results
+
+112
+00:05:08,685 --> 00:05:10,490
+those which would not be part
+
+113
+00:05:10,690 --> 00:05:12,752
+of a second query.
+
+114
+00:05:12,952 --> 00:05:14,837
+With the EXCEPT
+
+115
+00:05:15,037 --> 00:05:17,343
+or MINUS clause,
+
+116
+00:05:17,543 --> 00:05:19,043
+in some DBMS,
+
+117
+00:05:19,243 --> 00:05:20,377
+especially in MySQL,
+
+118
+00:05:20,577 --> 00:05:22,959
+the MINUS clause must be used.
+
+119
+00:05:23,159 --> 00:05:25,876
+Again, we must have the
+same number and the same type
+
+120
+00:05:26,076 --> 00:05:27,241
+of columns in the same order
+
+121
+00:05:27,441 --> 00:05:28,292
+in the 2 tables
+
+122
+00:05:28,492 --> 00:05:31,817
+with a syntax always 
+of the same nature,
+
+123
+00:05:32,017 --> 00:05:36,250
+two selection queries
+connected by the merging clause.
+
+124
+00:05:37,644 --> 00:05:38,699
+This type of fusion
+
+125
+00:05:38,899 --> 00:05:41,119
+resembles a left join
+
+126
+00:05:41,319 --> 00:05:42,256
+without intersection.
+
+127
+00:05:42,456 --> 00:05:46,253
+In set language
+
+128
+00:05:46,453 --> 00:05:47,932
+with this representation,
+
+129
+00:05:48,132 --> 00:05:49,631
+except that
+
+130
+00:05:49,831 --> 00:05:51,539
+in the case of a join
+
+131
+00:05:51,739 --> 00:05:54,564
+the structures of the tables
+are not the same.
+
+132
+00:05:56,065 --> 00:05:57,627
+To illustrate these merging queries
+
+133
+00:05:57,827 --> 00:05:59,876
+we take the Seychelles database
+
+134
+00:06:00,076 --> 00:06:02,204
+with the table of districts 
+and localities
+
+135
+00:06:02,404 --> 00:06:04,276
+and the fields that contain the names
+
+136
+00:06:04,476 --> 00:06:05,229
+of these two tables.
+
+137
+00:06:05,429 --> 00:06:07,080
+The query itself
+
+138
+00:06:07,280 --> 00:06:10,629
+that would combine these two tables
+
+139
+00:06:10,829 --> 00:06:13,481
+is written as you see it 
+
+140
+00:06:13,681 --> 00:06:16,420
+and we simply copy this query
+
+141
+00:06:16,620 --> 00:06:19,486
+to reproduce it a second time
+
+142
+00:06:19,686 --> 00:06:21,259
+before sorting it out
+
+143
+00:06:21,459 --> 00:06:23,313
+by deleting in the first case
+
+144
+00:06:23,513 --> 00:06:26,266
+the elements that are linked to the
+localities
+
+145
+00:06:26,466 --> 00:06:27,569
+and in the second case
+
+146
+00:06:27,769 --> 00:06:30,652
+the elements that are linked 
+to the districts
+
+147
+00:06:30,852 --> 00:06:32,684
+so as to obtain
+
+148
+00:06:32,884 --> 00:06:35,209
+the table that associates
+
+149
+00:06:35,409 --> 00:06:36,889
+the names of the districts
+
+150
+00:06:37,089 --> 00:06:38,085
+and the names of the localities
+
+151
+00:06:38,285 --> 00:06:40,801
+with 330 results.
+
+152
+00:06:41,001 --> 00:06:44,746
+We can then simply add the ALL keyword
+
+153
+00:06:44,946 --> 00:06:47,002
+to keep the duplicates
+
+154
+00:06:47,202 --> 00:06:51,544
+and we see that we move to 371 results
+
+155
+00:06:51,744 --> 00:06:53,689
+so there are about forty duplicates
+
+156
+00:06:53,889 --> 00:06:55,446
+that appear.
+
+157
+00:06:55,646 --> 00:06:58,453
+The intersection of the two sets
+
+158
+00:06:58,653 --> 00:07:01,414
+this time gives us 17 results,
+
+159
+00:07:01,614 --> 00:07:07,631
+so 17 localities that are 
+similar in name
+
+160
+00:07:07,831 --> 00:07:08,915
+to the districts.
+
+161
+00:07:09,115 --> 00:07:13,035
+Finally, the subtraction of localities
+
+162
+00:07:13,235 --> 00:07:14,833
+to all the district names
+
+163
+00:07:15,033 --> 00:07:16,079
+gives 8 results,
+
+164
+00:07:16,279 --> 00:07:18,065
+so 8 districts that 
+do not have equivalents
+
+165
+00:07:18,265 --> 00:07:19,545
+in the localities.
+
+166
+00:07:19,745 --> 00:07:22,528
+We can refine the research a little
+
+167
+00:07:22,728 --> 00:07:25,960
+by transforming the selection requests
+
+168
+00:07:26,160 --> 00:07:29,770
+and by limiting the district research
+
+169
+00:07:29,970 --> 00:07:31,931
+to those that begin with the letter T
+
+170
+00:07:32,131 --> 00:07:38,853
+and then doing the same thing 
+for the localities.
+
+171
+00:07:41,398 --> 00:07:42,604
+So we copy this clause
+
+172
+00:07:42,804 --> 00:07:47,149
+and paste it at the end of 
+the second request
+
+173
+00:07:47,349 --> 00:07:49,811
+and we replace the attribute
+
+174
+00:07:50,011 --> 00:07:51,520
+on which the filter focuses
+
+175
+00:07:51,720 --> 00:07:54,725
+by the LOCALITY keyword
+
+176
+00:07:54,925 --> 00:07:55,771
+in inverted commas
+
+177
+00:07:55,971 --> 00:07:58,435
+since there is a dash
+
+178
+00:07:58,635 --> 00:08:00,378
+that could cause a problem.
+
+179
+00:08:00,578 --> 00:08:01,943
+But we see that we have 4 results,
+
+180
+00:08:02,143 --> 00:08:05,104
+so 4 districts and localities
+
+181
+00:08:05,304 --> 00:08:06,380
+that start with T.
+
+182
+00:08:16,610 --> 00:08:17,643
+In the SQL world
+
+183
+00:08:17,843 --> 00:08:19,259
+we talk about nested queries,
+
+184
+00:08:19,459 --> 00:08:20,994
+imbricated queries
+
+185
+00:08:21,194 --> 00:08:22,416
+or subqueries
+
+186
+00:08:22,616 --> 00:08:26,915
+when a query is executed within
+another query.
+
+187
+00:08:27,115 --> 00:08:29,389
+This kind of layout
+
+188
+00:08:29,589 --> 00:08:32,133
+can be seen in the case of 
+SELECT clauses,
+
+189
+00:08:32,333 --> 00:08:33,325
+FROM clauses,
+
+190
+00:08:33,525 --> 00:08:34,556
+WHERE clauses
+
+191
+00:08:34,756 --> 00:08:35,879
+or HAVING clauses.
+
+192
+00:08:36,079 --> 00:08:40,183
+As there are several ways of using
+
+193
+00:08:40,383 --> 00:08:41,823
+the nested queries
+
+194
+00:08:42,023 --> 00:08:44,320
+there are also several types of syntax
+
+195
+00:08:44,520 --> 00:08:46,689
+that we will see a little more in detail
+
+196
+00:08:46,889 --> 00:08:49,182
+starting with the WHERE clause.
+
+197
+00:08:50,831 --> 00:08:52,256
+The syntax of a nested query
+
+198
+00:08:52,456 --> 00:08:53,278
+in the WHERE clause
+
+199
+00:08:53,478 --> 00:08:56,650
+consists in replacing in the condition
+
+200
+00:08:56,850 --> 00:08:58,191
+that the WHERE clause must check,
+
+201
+00:08:58,391 --> 00:09:00,574
+to replace the criterion
+
+202
+00:09:00,774 --> 00:09:02,555
+with an SQL query
+
+203
+00:09:02,755 --> 00:09:04,520
+placed brackets.
+
+204
+00:09:06,056 --> 00:09:08,502
+To illustrate the use of this
+type of nested query
+
+205
+00:09:08,702 --> 00:09:11,062
+we take this example
+
+206
+00:09:11,262 --> 00:09:13,469
+where we were looking 
+for the maximum value
+
+207
+00:09:13,669 --> 00:09:15,150
+of the number beds of the hotels 
+in the Seychelles.
+
+208
+00:09:15,350 --> 00:09:19,061
+We wanted to extract the hotel's name
+
+209
+00:09:19,261 --> 00:09:21,161
+which had the largest number of beds,
+
+210
+00:09:21,355 --> 00:09:23,024
+something that could be done
+
+211
+00:09:23,224 --> 00:09:25,639
+quite easily if you remember it
+
+212
+00:09:25,839 --> 00:09:27,126
+with SpatiaLite
+
+213
+00:09:27,326 --> 00:09:30,085
+but that was not doable with Postgres.
+
+214
+00:09:30,285 --> 00:09:33,541
+So we need a more elaborated
+request in this case
+
+215
+00:09:33,741 --> 00:09:38,014
+so we select the name and the
+number of beds of the hotel,
+
+216
+00:09:38,214 --> 00:09:39,138
+of the HOTELS table
+
+217
+00:09:39,338 --> 00:09:41,746
+and as a condition in the WHERE clause
+
+218
+00:09:41,946 --> 00:09:44,845
+we would like to select the hotels
+
+219
+00:09:45,045 --> 00:09:48,598
+whose bed number corresponds
+to the maximum value
+
+220
+00:09:48,798 --> 00:09:50,264
+of the number of beds.
+
+221
+00:09:50,464 --> 00:09:52,678
+It is written here a little naively
+
+222
+00:09:52,878 --> 00:09:55,899
+but in fact this maximum can be described
+
+223
+00:09:56,099 --> 00:09:59,574
+by the request of selection that
+we had earlier
+
+224
+00:09:59,774 --> 00:10:03,568
+so the maximum number of hotel beds
+
+225
+00:10:03,768 --> 00:10:08,286
+from the table of hotels
+
+226
+00:10:12,749 --> 00:10:14,293
+with as a condition...
+
+227
+00:10:15,898 --> 00:10:16,928
+no condition.
+
+228
+00:10:22,338 --> 00:10:24,581
+Here is the Berjaya.
+
+229
+00:10:29,349 --> 00:10:32,005
+We can also transform the query
+
+230
+00:10:32,205 --> 00:10:35,544
+to search for all the hotels
+
+231
+00:10:35,744 --> 00:10:37,706
+whose number of beds is above average
+
+232
+00:10:37,906 --> 00:10:40,921
+and there are 23 establishments.
+
+233
+00:10:41,121 --> 00:10:44,104
+The average if we remember
+
+234
+00:10:44,304 --> 00:10:45,676
+in a previous exercise
+
+235
+00:10:45,876 --> 00:10:47,617
+we saw that it was 38 beds.
+
+236
+00:10:47,817 --> 00:10:50,724
+So we have the list of hotels
+that have more than 38 beds.
+
+237
+00:10:53,316 --> 00:10:55,045
+In the case of Navicat
+
+238
+00:10:55,245 --> 00:10:57,237
+the thing is done graphically
+
+239
+00:10:57,437 --> 00:10:59,441
+so we select the fields
+
+240
+00:10:59,641 --> 00:11:01,255
+in the table
+
+241
+00:11:01,455 --> 00:11:03,548
+and then in the query constructor
+
+242
+00:11:03,748 --> 00:11:07,941
+we can add the different parameters.
+
+243
+00:11:08,141 --> 00:11:10,670
+We will search for the 
+number of beds above average.
+
+244
+00:11:10,870 --> 00:11:14,103
+The nested query
+
+245
+00:11:14,303 --> 00:11:16,898
+must still be manually written.
+
+246
+00:11:17,098 --> 00:11:19,710
+The graphic interface that 
+makes life easier
+
+247
+00:11:19,910 --> 00:11:20,759
+has its limits.
+
+248
+00:11:20,959 --> 00:11:22,823
+So, as earlier,
+
+249
+00:11:23,023 --> 00:11:26,298
+we associate, as search criteria,
+
+250
+00:11:26,498 --> 00:11:28,684
+the average value number of beds
+
+251
+00:11:28,884 --> 00:11:30,046
+in the hotel field
+
+252
+00:11:30,246 --> 00:11:32,133
+and here we will sort the hotels
+
+253
+00:11:32,333 --> 00:11:33,827
+in descending order,
+
+254
+00:11:34,027 --> 00:11:37,809
+in descending size.
+
+255
+00:11:47,927 --> 00:11:50,010
+In the case of a request nested
+in the FROM clause,
+
+256
+00:11:50,210 --> 00:11:51,643
+the principle is exactly the same
+
+257
+00:11:51,843 --> 00:11:54,611
+with the selection request
+
+258
+00:11:54,811 --> 00:11:58,643
+which replaces the table name
+
+259
+00:11:58,843 --> 00:12:02,101
+on which the query is made.
+
+260
+00:12:02,301 --> 00:12:05,463
+This type of syntax is possible
+
+261
+00:12:05,663 --> 00:12:08,263
+because a selection query
+
+262
+00:12:08,463 --> 00:12:10,469
+returns the equivalent of a table
+
+263
+00:12:10,669 --> 00:12:12,389
+in the database.
+
+264
+00:12:13,795 --> 00:12:16,340
+As we will use the same HOTELS 
+table several times
+
+265
+00:12:16,540 --> 00:12:17,404
+in the FROM clause,
+
+266
+00:12:17,604 --> 00:12:20,431
+we will have to resort to aliases,
+
+267
+00:12:20,631 --> 00:12:25,692
+which makes it easier 
+to write the SQL query.
+
+268
+00:12:25,892 --> 00:12:29,952
+So we begin by adding a second FROM clause
+
+269
+00:12:30,152 --> 00:12:32,382
+which is in the form of a request
+
+270
+00:12:32,582 --> 00:12:33,713
+and in this query
+
+271
+00:12:33,913 --> 00:12:36,683
+we will look for the average
+number of beds
+
+272
+00:12:36,883 --> 00:12:37,601
+of the hotels,
+
+273
+00:12:37,801 --> 00:12:40,966
+of a HOTELS table to which
+will give the H2 alias
+
+274
+00:12:41,166 --> 00:12:45,387
+to distinguish it from
+the first that the H alias.
+
+275
+00:12:51,519 --> 00:12:53,379
+This average number of beds
+
+276
+00:12:53,579 --> 00:12:56,110
+extracted from this second table
+
+277
+00:12:56,310 --> 00:13:01,766
+will be used in the conditional clause
+
+278
+00:13:01,966 --> 00:13:06,507
+with the necessity to use an alias
+
+279
+00:13:06,707 --> 00:13:09,639
+for that table of the FROM clause,
+
+280
+00:13:09,839 --> 00:13:13,181
+S for the synthesis table
+
+281
+00:13:13,381 --> 00:13:16,724
+and an alias also for the column
+
+282
+00:13:16,924 --> 00:13:18,261
+which contains the average values
+
+283
+00:13:18,461 --> 00:13:21,470
+so that we can reference this alias
+
+284
+00:13:21,670 --> 00:13:23,046
+in the conditional clause.
+
+285
+00:13:23,246 --> 00:13:25,994
+We get the same 23 results
+
+286
+00:13:26,194 --> 00:13:29,459
+as if we used the WHERE clause.
+
+287
+00:13:29,659 --> 00:13:33,686
+Same thing here in the case of Navicat
+
+288
+00:13:33,886 --> 00:13:38,105
+where we replace the HOTELS table
+
+289
+00:13:38,305 --> 00:13:39,063
+by an alias
+
+290
+00:13:39,263 --> 00:13:41,265
+which automatically updates the fields
+
+291
+00:13:41,465 --> 00:13:44,654
+and afterwards can be done again
+the same way
+
+292
+00:13:44,854 --> 00:13:46,331
+in the editor.
+
+293
+00:13:46,531 --> 00:13:52,790
+We copy here the average
+
+294
+00:13:52,990 --> 00:13:54,685
+calculation query,
+
+295
+00:13:54,885 --> 00:13:59,135
+we put aliases on the second 
+table of hotels,
+
+296
+00:13:59,335 --> 00:14:01,850
+one alias on this nested query,
+
+297
+00:14:02,050 --> 00:14:06,619
+an alias on the average,
+
+298
+00:14:06,819 --> 00:14:10,289
+which allows to complete
+
+299
+00:14:10,489 --> 00:14:11,547
+the selection request,
+
+300
+00:14:15,188 --> 00:14:17,437
+which allows to complete
+the conditional clause
+
+301
+00:14:17,637 --> 00:14:23,308
+and we keep the idea of ​​sorting in
+decreasing order.
+
+302
+00:14:36,501 --> 00:14:39,777
+We saw in the case of the nested query
+
+303
+00:14:39,977 --> 00:14:40,855
+in the WHERE clause
+
+304
+00:14:41,055 --> 00:14:44,734
+that an SQL query is used
+
+305
+00:14:44,934 --> 00:14:47,850
+to define the criterion which is used
+
+306
+00:14:48,050 --> 00:14:52,030
+in the condition that the 
+conditional clause must verify.
+
+307
+00:14:52,230 --> 00:14:54,298
+This is a special case
+
+308
+00:14:54,498 --> 00:14:57,550
+where the request that we use 
+returns only one value.
+
+309
+00:14:57,750 --> 00:15:00,062
+But it can happen, and often,
+
+310
+00:15:00,262 --> 00:15:01,578
+that the query used
+
+311
+00:15:01,778 --> 00:15:03,470
+returns multiple values
+
+312
+00:15:03,670 --> 00:15:06,093
+and that the condition we want to check
+
+313
+00:15:06,293 --> 00:15:08,267
+is that the selection criterion
+
+314
+00:15:08,467 --> 00:15:11,461
+corresponds to one of the values
+​​of this collection.
+
+315
+00:15:11,661 --> 00:15:12,865
+It is in this case
+
+316
+00:15:13,065 --> 00:15:15,800
+that we will use the IN and 
+NOT IN operators
+
+317
+00:15:16,000 --> 00:15:20,734
+to test the results
+
+318
+00:15:20,934 --> 00:15:22,278
+of the nested query.
+
+319
+00:15:22,478 --> 00:15:26,244
+The syntax is presented as previously
+
+320
+00:15:26,444 --> 00:15:29,327
+with simply the operator that changes
+
+321
+00:15:29,527 --> 00:15:34,892
+becoming IN instead of "equal"
+or "greater than".
+
+322
+00:15:35,092 --> 00:15:39,414
+To illustrate this type of 
+nested query use
+
+323
+00:15:39,614 --> 00:15:44,166
+we will take the example of the
+intersection queries
+
+324
+00:15:44,366 --> 00:15:46,836
+where we sought the districts
+
+325
+00:15:47,036 --> 00:15:49,477
+that have the same name as localities
+
+326
+00:15:49,677 --> 00:15:51,547
+or on the contrary
+
+327
+00:15:51,747 --> 00:15:53,464
+the districts that have no equivalents
+
+328
+00:15:53,664 --> 00:15:54,791
+in the collection of localities.
+
+329
+00:15:54,991 --> 00:15:59,013
+So we add the table of districts
+and localities,
+
+330
+00:15:59,213 --> 00:16:02,715
+we select the name of the district table
+
+331
+00:16:02,915 --> 00:16:05,149
+and add a criterion
+
+332
+00:16:05,349 --> 00:16:07,762
+to define the WHERE clause,
+
+333
+00:16:07,962 --> 00:16:10,346
+a criterion that will focus
+on the district name
+
+334
+00:16:10,546 --> 00:16:13,574
+and an IN operator
+
+335
+00:16:13,774 --> 00:16:15,345
+to say that we would like the name
+
+336
+00:16:15,545 --> 00:16:18,545
+to appear in the collection of
+locality names.
+
+337
+00:16:18,745 --> 00:16:20,702
+In this collection of locality names
+
+338
+00:16:20,902 --> 00:16:22,545
+we have to write it on foot
+
+339
+00:16:22,745 --> 00:16:26,142
+with the table name
+
+340
+00:16:26,342 --> 00:16:27,594
+always in inverted commas because
+of the dash,
+
+341
+00:16:27,794 --> 00:16:30,243
+the FROM clause
+
+342
+00:16:30,443 --> 00:16:33,089
+and the criterion being defined,
+
+343
+00:16:33,289 --> 00:16:34,867
+we can still sort out
+
+344
+00:16:35,067 --> 00:16:38,413
+by removing the table of localities
+from the main clause.
+
+345
+00:16:38,613 --> 00:16:40,190
+And when we execute this query
+
+346
+00:16:40,390 --> 00:16:41,537
+we see that we find
+
+347
+00:16:41,737 --> 00:16:43,152
+the 17 districts
+
+348
+00:16:43,352 --> 00:16:45,915
+which have an equivalent in the
+collection of localities.
+
+349
+00:16:46,115 --> 00:16:49,410
+To find the districts that have
+no equivalents
+
+350
+00:16:49,610 --> 00:16:51,784
+we simply reverse the sense
+of the NOT IN 
+
+351
+00:16:51,984 --> 00:16:52,926
+operator
+
+352
+00:16:53,126 --> 00:16:54,439
+and we find the 8 districts
+
+353
+00:16:54,639 --> 00:16:56,942
+that do not have a correspondent
+
+354
+00:16:57,142 --> 00:16:58,779
+in the collection of localities.
+
+355
+00:17:00,846 --> 00:17:01,828
+In the case of Navicat
+
+356
+00:17:02,028 --> 00:17:04,016
+we add the district
+
+357
+00:17:04,216 --> 00:17:05,344
+we select the name
+
+358
+00:17:05,544 --> 00:17:09,016
+and in the conditional clause
+
+359
+00:17:09,216 --> 00:17:11,809
+we will simply add
+
+360
+00:17:12,009 --> 00:17:13,924
+the "name of districts" field
+
+361
+00:17:17,211 --> 00:17:18,448
+replace the operator
+
+362
+00:17:18,648 --> 00:17:21,648
+so here it is called IS IN LIST
+
+363
+00:17:21,848 --> 00:17:24,735
+but which is translated in SQL
+
+364
+00:17:24,935 --> 00:17:26,489
+by simply the IN
+
+365
+00:17:26,689 --> 00:17:28,598
+and as before,
+
+366
+00:17:28,798 --> 00:17:33,210
+it is necessary to write the nested query
+
+367
+00:17:33,410 --> 00:17:35,289
+in an explicit manner
+
+368
+00:17:35,489 --> 00:17:38,347
+without forgetting the the quotation
+marks for the LOCALITY table
+
+369
+00:17:38,547 --> 00:17:45,525
+and by disabling the automatic
+addition of apostrophes
+
+370
+00:17:45,725 --> 00:17:49,617
+in the selection criterion.
+
+371
+00:17:49,817 --> 00:17:51,705
+When this query is executed
+
+372
+00:17:51,905 --> 00:17:54,538
+we find the 17 districts we were
+looking for
+
+373
+00:17:54,738 --> 00:17:57,222
+and for the complement
+
+374
+00:17:57,422 --> 00:17:59,331
+the operator is reversed
+
+375
+00:17:59,531 --> 00:18:02,611
+and we find the 8 districts which
+have no equivalents
+
+376
+00:18:02,811 --> 00:18:04,321
+in the collection of localities.
+
+377
+00:18:15,582 --> 00:18:16,999
+We have seen in this lesson
+
+378
+00:18:17,199 --> 00:18:22,797
+that it is possible to use merging clauses
+
+379
+00:18:22,997 --> 00:18:25,059
+to associate the results of 
+multiple queries,
+
+380
+00:18:25,259 --> 00:18:27,947
+either simply to associate them
+
+381
+00:18:28,147 --> 00:18:30,200
+or extract the common elements
+
+382
+00:18:30,400 --> 00:18:33,058
+or subtract the elements of a request
+
+383
+00:18:33,258 --> 00:18:34,812
+from the results of another query.
+
+384
+00:18:35,012 --> 00:18:37,485
+We have also seen that we could
+
+385
+00:18:37,685 --> 00:18:39,529
+use query results
+
+386
+00:18:39,729 --> 00:18:41,902
+as part of a query
+
+387
+00:18:42,102 --> 00:18:43,078
+from another request
+
+388
+00:18:43,278 --> 00:18:44,936
+in the FROM clause
+
+389
+00:18:45,111 --> 00:18:45,957
+in the WHERE clause
+
+390
+00:18:46,144 --> 00:18:48,310
+or in other places.
+
+391
+00:18:48,510 --> 00:18:51,252
+Finally, we saw that in some cases
+
+392
+00:18:51,452 --> 00:18:53,918
+we could use these nested queries
+
+393
+00:18:54,118 --> 00:18:56,843
+with the IN or NOT IN operator
+
+394
+00:18:57,043 --> 00:18:58,880
+to obtain the same results
+
+395
+00:18:59,080 --> 00:19:02,496
+as we would obtain with merging queries.
+

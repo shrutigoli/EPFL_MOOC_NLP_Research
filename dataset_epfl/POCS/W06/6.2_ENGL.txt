@@ -1,0 +1,146 @@
+So now that we've talked about redundancy, let's talk about one of the most important applications of the redundancy principle, and that is the ability to create fault-tolerant systems.
+And first, let's get one thing off the table.
+The alternative to fault tolerance, which would be the ability to avoid faults, is simply a symptom of denial.
+It might be one thing to reason about your own code, and to convince yourself that there are no bugs, and with the appropriate level of verification and checks, convince yourself that this is actually running free of any particular bug, but this code depends on other code.
+That code actually runs on top of an operating system.
+The operating system runs on top of hardware, which consists of multiple independent components, which may all fail.
+And then the system itself depends on environmental assumptions-- that there is enough power, for example, or that you have an Internet connection, in order to properly behave.
+So it's impossible to think about any computer systems without thinking about the possible faults that the system may encounter.
+And in order to reason about this it's first important to get a couple definitions off the table.
+And these two definitions are important to use consistently.
+They're the definitions of faults, and the definition of failure.
+So fault is an underlying defect.
+Now, because denial is not a strategy, we have to assume that we have potential faults, everywhere.
+The most obvious types of faults include bugs in our own code, bugs in somebody else's code, hardware components that go bad, memory that gets corrupted, mechanical parts that fail, power supplies that fail.
+When you look at this globally, there are other critically important types of faults-- a design fault, for example, or a sizing limitation.
+An operational fault, a canonical user error is also a fault, for the purpose of this conversation.
+Information-critical application, the scope of faults, extends well beyond the IT space, into considerations such as the failure of the power grids.
+Okay, so that's for the fault itself, now the fault does not mean the failure of the system.
+First, some faults may actually be latent-- in that they have no visible side effects, and other faults may be active.
+But beyond that, the ability to contain the impact of faults is the whole point of this conversation.
+So let's define a failure as when a module's not producing the desired result.
+A failure occurs only when an underlying fault is neither detected nor masked by the module.
+And this leads up to the concept of fault tolerance and fault-tolerance design.
+Fault tolerance is the systematic approach that allows us to build reliable systems out of unreliable components.
+This goal is achieved by applying two fundamental principles: redundancy, and modularity.
+Now here we apply the modularity principle in a precise way, so that errors can be handled internally, within a module, and without propagating to any other part of the system.
+So at its core, the fault-tolerance process is pretty much always about applying a three-step process, within each module.
+In the first step, you need to provide a mechanism to detect errors and faults.
+How we detect errors is a function of the module itself, but in general this assumes some redundancy within the module.
+If there is some memory module, for example, redundancy or coding can detect errors.
+If this is a hardware component, the component must have enough instrumentation capabilities to determine whether it is operating correctly, or not.
+In the second step, you have to design the system to ensure that any error is contained within the module.
+Again, ideally the modularity principle applies not only during the normal operation of the module, but also during error conditions.
+Take for example, the example of a library that has a corrupted data structure.
+Ideally, the effects of that corruption would be contained to that library.
+Client server designs, that rely on isolated processes ensure this guarantee, but single-address based designs do not.
+So discretionary modularity, which is what a library provides in its relationship with applications, is not sufficient to fault-containment purposes.
+Instead, we need to have a way to enforce the modularity at the boundaries of each module, during normal and abnormal operation.
+And third, and critically, the fault-tolerance design process is about having a remedy to errors, so that the overall system can continue to operate after the error itself, and this is done by masking the error and correcting it.
+And here again we rely on redundancy to ensure that we can mask the problem.
+So redundancy applies not only to data, it actually applies to all aspects of computer systems.
+The incarnation takes a different form.
+At a system level, in particular in digital design, you can apply redundancy to logic, and what is known as the <i>N-WAY modular redundancy system</i>.
+And in this picture, again, you have the three-way modular redundant circuit.
+Each circuit is totally independent, but its output feeds into a gate, and the gates themselves feed into a voter, which is also known as the <i>majority gate</i>.
+And in an NMR system, the majority rules.
+So if this if this a boolean circuit, there's always a majority, since each gate can only have one of two states.
+Now with a bit of luck, the vote is unanimous, but there could be a distending opinion, which is the minority report.
+By definition, this indicates a fault of the component.
+That fault must be signaled to an outside entity, for example to signal a repair.
+And in those systems, as the majority rules, the fault is presumed to be in the minority gate, and it's masked for further operation until the failed component can be replaced.
+Now the approach applies not only to digital design, but also to commercial systems.
+For example, the same algorithm of N-WAY modular redundancy could be performed by
+N totally independent modules on different machines who run N software which then vote on the winning result.
+This is used in avionics, for example, where by design, different approaches and algorithms are used to ensure the overall resiliency of the process.
+Now if the implementation of the modules is different, i.e., the software running on them is different, this approach is called <i>N-WAY programming</i>.
+And this makes sense for safety-critical applications, for example to fly airplanes, but these examples are rare and few and far between.
+And instead the field of computer systems has developed some systematic approaches that can build fault-tolerance into systems without going through the extremes of implementing
+N-WAY module redundancy or N-WAY programming.
+And the general principle is always around finding a way to respond to active fault within the systems, to contain them, and then to repair the system itself.
+So let's first talk about error containment.
+It is a key benefit of the enforced modularity principle.
+In a system, for example a layered system as shown on screen right now, the enforced modularity of each of the layers ensures the fault can be contained.
+Let me rephrase that sentence.
+Containment is possible because of enforced modularity, but although necessary, this is not a sufficient condition.
+As a matter of fact, we have different design options, and let's think a little bit about what the various design options in our system might be in the presence of a fault.
+Well first, if there's enough redundancy in the system, within the layer you can repair it transparently, mask the error, and keep operation.
+That's how ECC operates, for example, when it automatically repairs its own faults.
+Now if that's not possible, another solution is to explicitly report the error to the layer above.
+This is called <i>fail-fast</i>, and this is a case of the end-to-end principle being applied.
+Assume that the layer above will know best how to recover from the failure of the underlying module.
+Well alternatively, you can operate in <i>fail-safe</i> mode, that is ensure that the module will keep operating, and produce acceptable values.
+By acceptable, we mean values that are consistent with the theory of operation of the module itself.
+Now <i>fail-stop</i> might seem pretty harsh, but it's actually a pretty good choice.
+By fail-stop we just stop operating the module as soon as we detect a fault.
+Kernel panic is an example of fail-stop operation if some invariant in the operating system fails.
+Also you can operate with degraded specification, also known as <i>fail-soft</i>.
+And in some situations the fault has a performance implication without impacting the function, and thus is the case of fail-soft.
+RAID is actually an example of fail-soft, and particularly when the fault is permanent, that is you've lost a sector on a permanent basis, or a disk on a permanent basis.
+Until a replacement disk has been brought up online, and the RAID-5 parity has been fully reconstructed, the layer is operating with degraded specification, and possibly with degraded performance.
+That's because the RAID control in practice is competing for bandwidth with the application.
+And so in a fail-soft mode you're operating with degraded specification while the error is present.
+And then of course there's everyone's design favorite: do nothing, let the upper layer deal with a completely arbitrary specification that has not been determined.
+Now this classification may seem a little abstract, but it all boils down to how you respond to faults.
+And so let's walk through an example, and see what that means.
+So specifically let's look at what that means when there's an active fault in the system.
+Now this flowchart, which comes from the textbook, discusses the process to classify faults into two categories-- the ones that you can tolerate, and the ones that you cannot.
+Now the bad news here seems to be that most paths lead to the untolerated error and state.
+In reality, they're actually at different end states, as we will see.
+This flowchart is a useful guide.
+So let's actually walk through our concrete examples with memory errors.
+In this diagram there are only two layers that are shown, the memory subsystem and the operating system controlling applications as the second layer, and you'll see why in a second.
+Now by now, hopefully, you know about ECC's.
+Let's first study single-bit errors.
+As we all know these faults are both detected and masked within the DIMM itself, and therefore these are tolerated errors, as far as this flowchart is concerned.
+But let's now study double-bit errors.
+They can be detected, but they cannot be masked.
+So the flowchart goes from the detected error to the unmaskable error state.
+So that's the bad news.
+Now the good news is that modern computer systems have a <i>fail-fast</i> mechanism, and that fail-fast mechanism is called a <i>Machine Check Exception</i>, or an <i>MCE</i>.
+Think of an MCE as a signal raised by the DIMM that interrupts the CPU.
+As a matter of fact, that is pretty much what it does.
+And this brings up the second layer of this system, which is the operating system itself.
+Now because of MCE the OS has a way to detect faults.
+These are memory faults, where the memory has gone bad because of a double-bit error.
+Now the first thing that the OS does is to determine who uses that particular faulty page in memory.
+If the page is unused, either because it's free or because it's part of the file-system buffer cache, then it's actually sufficient for the operating system to mark it as invalid, never reuse it again, and keep operation.
+But if the page is used by one application, then the appropriate behavior is actually to propagate the fault-tolerance design one level up, and kill the application.
+And this provides the application fail-stop semantics in the case of double-bit errors.
+If the page is used by the operating system itself then obviously it's harder to resolve, and typically the operating system will actually issue a kernel panic, and trigger a fail-stop operation for the entire computer system itself.
+Now so far we've talked about trying to reduce the impact of failures, but this is actually not an acceptable situation for many applications that require a higher degree of availability.
+And for that people have developed and engineering discipline that eliminates systematically all possible single points of failure, either in hardware or in software in the system.
+And we're actually going to study one very classic example of such systems that has systematically eliminated all single points of failures, and that is the Tandem NonStop operating system and hardware platform that was developed during the 1980's.
+Now the computer scientists at Tandem get credit for having written the most seminal papers in this field, and I've found this technical report on the web that dates back to 1986, and actually very succinctly describes, on a single page, the design principles of fault-tolerant systems.
+And you'll notice that the second author for this technical report is Jim Gray, and Jim Gray has arguably been one of the most influential persons in the combined field of computer systems and databases.
+And this paper lists the key design principles on a single page.
+Now we've talked about modularity many times already, the first design principle.
+We've talked about fail-fast as a design option.
+Now in this context this is defined through the combination of self-checking, in other words redundancy, and fail-stop operations.
+The paper then defines single-fault tolerance, as follows:
+"When a hardware or software faults, its function is immediately taken over by another module-- given a mean time to repair measured in milliseconds.
+For processors or processes this means a second processor or process exists.
+For storage, it means the storage and paths to the storage are duplexed."
+In other words, there are no single points of failure.
+A definition does not get better than this.
+It then discusses the need for online maintenance.
+And this is actually part and parcel of the single-fault tolerance model, because after failure it is okay to operate in a degraded state for awhile, but you actually need to be able to go back to the fully protected state without requiring a service interruption, therefore the need to do online maintenance and perform online maintenance and repair of a running system.
+And then it actually talks about the need, even going back to the 1980's, for having a simple user interface that guides these operations, make it accessible to people who are responsible, in particular for the repair of these operations.
+So think about it--this is a technical report from nearly 30 years ago that describes the principles of fault-tolerant systems.
+So let's actually see what that means, and how those systems were built.
+Well, first it means redundant hardware with no single point of failure.
+This means redundant CPU's, redundant storage, redundant connections between the CPU and storage, and some redundant connection between the two CPU's so that they can know about each other's health.
+But this is actually not sufficient to achieve low recur time, in the presence of failures.
+For that you actually need to create a process pair, and in this model each process has a backup process, on the other processor, and the pair stays in sync through a special API that they need to follow.
+And that API ensures that the state is appropriately synchronized at all times between these two processes.
+So first the system calls themselves are mirrored, but the application level state is also mirrored as well through this API.
+So that if the primary fails, the secondary processor, or the operating system, can detect the failure, and it immediately signals the process to take over without losing transactions, and without having to repair the state of the transaction system from stable storage of the database, and that is because the two processes and their address space are kept logically in sync.
+Now think about this for a minute from a layering and a fault-tolerance perspective.
+Of course the hardware layers are self-checking, fail-fast, and redundantly deployed, but the process pair itself is also a distinct layer that is also self-checking, and can repair its own errors.
+So I actually find this pretty neat.
+With the mean time to repair measured in milliseconds for errors that could be masked, and an actual mean time between total system failures that was measured in years, at the time.
+And this is extremely impressive given that the individual components used to fail much more frequently.
+So let's just summarize this module.
+We saw redundancy and enforced modularity as the two foundations for the fault-tolerant design process.
+We saw that there is a systematic design process that helps you reason about errors, classify errors, and associate a particular failure semantic to any particular module in the system.
+Then we saw a glimpse about how to achieve fault tolerance in hardware, and the need to have redundant paths and duplicated resources, and we also saw a way of achieving the same goal in software through process pairs that depend on a special API.

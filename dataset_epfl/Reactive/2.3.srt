@@ -1,0 +1,604 @@
+1
+00:00:00,590 --> 00:00:03,470
+In the first two units of this week we
+have moved
+
+2
+00:00:03,470 --> 00:00:05,400
+from pure functional programming to a
+
+3
+00:00:05,400 --> 00:00:09,090
+combination of functional and imperative
+programming.
+
+4
+00:00:09,090 --> 00:00:12,650
+Another feature often associated with
+imperative programming are
+
+5
+00:00:12,650 --> 00:00:15,310
+loops, and these will be studied in this
+unit.
+
+6
+00:00:16,370 --> 00:00:18,240
+In fact, it turns out that loops,
+
+7
+00:00:18,240 --> 00:00:22,350
+as a feature, are nonessential for
+comparative languages.
+
+8
+00:00:22,350 --> 00:00:27,080
+With just variables we can already model
+all imperative programs.
+
+9
+00:00:27,080 --> 00:00:32,180
+So if an imperative program contains a
+loop, how do you emulate that?
+
+10
+00:00:32,180 --> 00:00:35,930
+Well, you can emulate the loop itself by
+using a function.
+
+11
+00:00:36,990 --> 00:00:38,410
+Let's see an example.
+
+12
+00:00:38,410 --> 00:00:42,160
+Here's a Scala program that uses the
+familiar while loop.
+
+13
+00:00:42,160 --> 00:00:47,130
+It's an example that raises x to the power
+of a exponent,
+
+14
+00:00:47,130 --> 00:00:52,970
+and it uses the usual loop that works with
+successive multiplications.
+
+15
+00:00:52,970 --> 00:00:55,890
+It's not the best way to express power in
+Scala.
+
+16
+00:00:55,890 --> 00:01:00,600
+It serves just to as an example to
+introduce a loop.
+
+17
+00:01:00,600 --> 00:01:05,350
+So in Scala, the while loop is actually a
+language construct, and while
+
+18
+00:01:05,350 --> 00:01:09,250
+is a keyword, but it turns out that it
+wouldn't have been necessary.
+
+19
+00:01:09,250 --> 00:01:13,371
+We could have defined while just using a
+function.
+
+20
+00:01:13,371 --> 00:01:18,032
+To show the difference between the
+built-in while and the function,
+
+21
+00:01:18,032 --> 00:01:21,587
+we name the function with all capitals,
+WHILE.
+
+22
+00:01:21,587 --> 00:01:25,749
+So that function WHILE can be defined as
+you see here.
+
+23
+00:01:25,749 --> 00:01:29,708
+It would be a function that takes a
+condition
+
+24
+00:01:29,708 --> 00:01:34,653
+and a command, and its result type would
+be Unit.
+
+25
+00:01:34,653 --> 00:01:36,893
+And what it would do is it would execute
+
+26
+00:01:36,893 --> 00:01:40,050
+the command, as long as the condition was
+true.
+
+27
+00:01:40,050 --> 00:01:43,670
+So, it would say, if condition holds, then
+execute
+
+28
+00:01:43,670 --> 00:01:47,400
+command, and do a recursive call to WHILE,
+
+29
+00:01:47,400 --> 00:01:49,710
+with the same condition at the same
+command.
+
+30
+00:01:49,710 --> 00:01:54,660
+If condition is false, simply return with
+the unit value.
+
+31
+00:01:54,660 --> 00:01:59,080
+So, one thing to notice that both the
+condition and the command must
+
+32
+00:01:59,080 --> 00:02:04,510
+be passed by name, so that they can be
+re-evaluated in each iteration.
+
+33
+00:02:04,510 --> 00:02:09,130
+Otherwise, if the condition was by value
+and maybe initially true,
+
+34
+00:02:09,130 --> 00:02:11,220
+the while loop would loop forever because
+the
+
+35
+00:02:11,220 --> 00:02:14,310
+condition would never be re-evaluated to
+be false.
+
+36
+00:02:15,562 --> 00:02:19,160
+The other observation is that the while
+loop is
+
+37
+00:02:19,160 --> 00:02:21,640
+tail recursive, so the recursive call
+happens as the
+
+38
+00:02:21,640 --> 00:02:25,090
+last action in this branch of the if, and
+
+39
+00:02:25,090 --> 00:02:30,300
+that means it can be implemented in
+constant stack space.
+
+40
+00:02:30,300 --> 00:02:34,860
+Implementing the recursive call back just
+to jump back to the beginning of
+
+41
+00:02:34,860 --> 00:02:39,245
+the code here, in a way which is just as
+efficient as a native while.
+
+42
+00:02:41,450 --> 00:02:44,240
+Now, you've seen how to emulate while
+loops
+
+43
+00:02:44,240 --> 00:02:46,830
+with just a function definition in the
+call.
+
+44
+00:02:46,830 --> 00:02:48,450
+What about repeat?
+
+45
+00:02:48,450 --> 00:02:52,470
+Let's write a function that implements a
+repeat loop to be used as
+
+46
+00:02:52,470 --> 00:02:55,400
+follows, REPEAT, command, and then it
+should
+
+47
+00:02:55,400 --> 00:02:57,970
+stop once the condition here is true.
+
+48
+00:02:59,150 --> 00:03:00,010
+How would you do that?
+
+49
+00:03:01,760 --> 00:03:03,255
+If we look at the usage of the
+
+50
+00:03:03,255 --> 00:03:06,700
+repeat function, then it's clear that the
+definition will,
+
+51
+00:03:06,700 --> 00:03:08,084
+should look like this.
+
+52
+00:03:08,084 --> 00:03:13,544
+REPEAT takes a by name parameter command
+of type arrow Unit and a by named
+
+53
+00:03:13,544 --> 00:03:19,750
+condition of type arrow Boolean, so it's
+also a by name parameter.
+
+54
+00:03:19,750 --> 00:03:25,570
+And its body would be like this.
+
+55
+00:03:25,570 --> 00:03:29,030
+So repeat, we said, should always execute
+command first.
+
+56
+00:03:31,400 --> 00:03:33,370
+And then if the condition is true,
+
+57
+00:03:37,150 --> 00:03:38,870
+it should stop.
+
+58
+00:03:38,870 --> 00:03:44,100
+And otherwise it should do a recursive
+call
+
+59
+00:03:44,100 --> 00:03:46,970
+with the same command and the same
+condition.
+
+60
+00:03:52,470 --> 00:03:54,836
+Now, here's a variation of the previous
+exercise.
+
+61
+00:03:54,836 --> 00:03:58,870
+Let's say I'm not happy with the previous
+syntax of repeat, and
+
+62
+00:03:58,870 --> 00:04:00,240
+I want to write something like
+
+63
+00:04:00,240 --> 00:04:04,940
+this instead, REPEAT, command, UNTIL,
+condition.
+
+64
+00:04:04,940 --> 00:04:07,030
+Can you devise a definition of a
+
+65
+00:04:07,030 --> 00:04:11,160
+repeat function that would support that
+call syntax?
+
+66
+00:04:11,160 --> 00:04:14,450
+That's actually feasible, even though it's
+quite a bit harder
+
+67
+00:04:14,450 --> 00:04:19,300
+than what we've shown in the previous
+example, so it's
+
+68
+00:04:19,300 --> 00:04:22,040
+left as an optional exercise for you.
+
+69
+00:04:22,040 --> 00:04:26,070
+It's not essential to follow any of the
+rest of the course, but if you want
+
+70
+00:04:26,070 --> 00:04:28,865
+to have some fun playing with the
+capabilities
+
+71
+00:04:28,865 --> 00:04:32,310
+of Scala syntax, then it should be quite
+instructive.
+
+72
+00:04:33,880 --> 00:04:37,170
+Now, we've seen two variants of a
+hypothetical repeat loop.
+
+73
+00:04:38,290 --> 00:04:42,120
+what I haven't told you yet is what syntax
+Scala actually uses.
+
+74
+00:04:42,120 --> 00:04:43,440
+Turns out neither of the two.
+
+75
+00:04:43,440 --> 00:04:44,420
+What Scala actually
+
+76
+00:04:44,420 --> 00:04:48,380
+uses is the same, again, as in C or in
+Java.
+
+77
+00:04:48,380 --> 00:04:51,110
+You write do and then some command.
+
+78
+00:04:53,560 --> 00:04:57,360
+And then you'd write while and then a
+condition.
+
+79
+00:05:02,550 --> 00:05:05,958
+So we've seen while loops and repeat loops
+and do loops,
+
+80
+00:05:05,958 --> 00:05:10,490
+the last category of loops that we should
+cover is for loops.
+
+81
+00:05:10,490 --> 00:05:13,950
+Here it turns out that the classical for
+loop that you'll find in
+
+82
+00:05:13,950 --> 00:05:19,650
+C or C++ or Java, cannot be modeled simply
+by a higher order function.
+
+83
+00:05:19,650 --> 00:05:23,034
+So if you look at such a for loop, you see
+the example
+
+84
+00:05:23,034 --> 00:05:27,714
+here, you see that there's actually a
+definition here, that i equals one,
+
+85
+00:05:27,714 --> 00:05:30,450
+that introduces a variable that is used
+later
+
+86
+00:05:30,450 --> 00:05:33,300
+on in the other parts of the for loop.
+
+87
+00:05:33,300 --> 00:05:37,284
+And that's something that cannot be
+straightforwardly
+
+88
+00:05:37,284 --> 00:05:41,690
+achieved by using just higher order
+function applications.
+
+89
+00:05:41,690 --> 00:05:45,496
+And, as a matter of fact, Scala does not
+have this kind of for loop.
+
+90
+00:05:45,496 --> 00:05:47,976
+What it has is a kind of for loop that is
+
+91
+00:05:47,976 --> 00:05:53,096
+similar to Java's extended for loop, so
+you would write something that's
+
+92
+00:05:53,096 --> 00:05:58,536
+equivalent to the example up here like
+this, for i ranging over one until three,
+
+93
+00:05:58,536 --> 00:06:04,900
+system out.print i plus space.
+And that would display one and two.
+
+94
+00:06:04,900 --> 00:06:07,780
+Now, this looks pretty much like a for
+
+95
+00:06:07,780 --> 00:06:10,730
+expression, like the ones you've seen in
+the functional
+
+96
+00:06:10,730 --> 00:06:12,970
+programming course and also in the first
+week
+
+97
+00:06:12,970 --> 00:06:15,715
+of this course, and in fact that's no
+accident.
+
+98
+00:06:15,715 --> 00:06:18,257
+For loops translate quite similarly
+
+99
+00:06:18,257 --> 00:06:20,635
+to for expressions, but where for
+
+100
+00:06:20,635 --> 00:06:24,489
+expressions translate into combinations of
+functions
+
+101
+00:06:24,489 --> 00:06:30,453
+map and flatMaps, for loops translate into
+combinations of the function foreach.
+
+102
+00:06:30,453 --> 00:06:33,090
+So, foreach is a function that's defined
+
+103
+00:06:33,090 --> 00:06:36,430
+on all collections with elements of type
+T.
+
+104
+00:06:36,430 --> 00:06:39,610
+It would take an argument which is a
+function
+
+105
+00:06:39,610 --> 00:06:42,600
+from T to Unit, give you back a Unit.
+
+106
+00:06:42,600 --> 00:06:43,570
+And its effect
+
+107
+00:06:43,570 --> 00:06:46,060
+would be to apply the given function
+
+108
+00:06:46,060 --> 00:06:48,960
+argument f to each element of the
+collection.
+
+109
+00:06:51,260 --> 00:06:54,616
+So, here's an example where you use two
+nested generators.
+
+110
+00:06:54,616 --> 00:06:58,884
+You let i range from one until three, j
+range over the
+
+111
+00:06:58,884 --> 00:07:04,840
+elements of the string abc, and you print
+i plus space plus j.
+
+112
+00:07:04,840 --> 00:07:10,780
+So in this case, that should print
+
+113
+00:07:10,780 --> 00:07:16,240
+1a, 1b, 1c, 2a, 2b, 2c.
+
+114
+00:07:16,240 --> 00:07:20,800
+That expression gets expanded into two
+nested calls of foreach.
+
+115
+00:07:20,800 --> 00:07:25,380
+You start with the first range, one one
+until three.
+
+116
+00:07:25,380 --> 00:07:31,408
+You apply the closure, i arrow something,
+to that range.
+
+117
+00:07:31,408 --> 00:07:36,933
+That closure takes each element i, taken
+from one until three, and there's
+
+118
+00:07:36,933 --> 00:07:42,750
+a nested call of foreach, where the base
+collection is the string abc.
+
+119
+00:07:42,750 --> 00:07:49,682
+The loop variable is the j, and the final
+result is the println.
+
+120
+00:07:49,682 --> 00:07:54,030
+So to summarize, we have seen the
+different forms
+
+121
+00:07:54,030 --> 00:07:57,400
+of loops that you would expect in
+imperative languages.
+
+122
+00:07:57,400 --> 00:08:03,180
+And have shown how each of these can, at
+least in principle, be translated
+
+123
+00:08:03,180 --> 00:08:07,844
+into more basic units in the Scala
+language.
+
+124
+00:08:07,844 --> 00:08:11,285
+While and repeat can be translated into
+simpler
+
+125
+00:08:11,285 --> 00:08:14,881
+cause of higher functions, and the
+extended for
+
+126
+00:08:14,881 --> 00:08:18,960
+loop gets translated into
+inter-combinations of the foreach
+
+127
+00:08:18,960 --> 00:08:21,940
+method, which is defined on every Scala
+collection.
+

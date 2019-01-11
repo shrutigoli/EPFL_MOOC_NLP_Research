@@ -1,0 +1,168 @@
+In previous videos, we have discussed the notion of consistency that is used in ACID transaction processing systems.
+That means we've got transactions that are conceptually executed atomically, and the executions of many, potentially, interleaving, overlapping concurrent transactions, is equivalent to a serial execution where there is no overlap.
+That means, the [inaudible] first transaction is going to read the output, the written values, of the cave transaction.
+It makes sense, in general, to also consider weaker notions of consistency.
+These are potentially useful to have more scalability in systems, but they come with their own disadvantages and problems.
+So before we are able to talk about weak consistency in general, we have to make a few assumptions.
+A priori, we will have to now assume that we don't talk about general, concurrent applications that work with data, but we have to think about, specifically, key-value stores.
+But the only semantics we have is that we can read and write values.
+Key-value pairs, potentially.
+In general, we'll have a distributed key-value storage, that means, the storage is distributed on multiple machines.
+There might be replication, but certainly, not all data will, in general, be stored at all machines.
+So if we don't have a sufficiently strong notion of consistency, it might well happen that a certain client writes a new value, and after that, another client reads that object, but sees an old value.
+That is excluded by what you would call strong consistency.
+It would be excluded, conceptually, by ACID transactions.
+So we assume a distributed key-value store model, and a client-server model here.
+Let's next discuss some special cases of weak consistency.
+The first is what is called causal consistency.
+So here, you have processes communicating with each other, changing values, and if a process A changes a value, and tells process B about it, so to say, then subsequently-- or communicates with process B, and might have said something that relates to this value, subsequently, process B must read this value, this written value by process A.
+So the kind of causal relationship--
+I've told you about it, so you know about it-- has to be preserved.
+Read-your-writes consistency is something closely related, or in a sense, a special case, where a process that has written something, has to subsequently, read its own value.
+Session consistency says that, basically, inside a predefined session, it's a bit like a transaction, a bag of subsequent changes, you will see consistently what you've changed, so to say.
+In monotonic read consistency, you will-- once you have started reading an object, you will, in subsequent reads, see the same version.
+And not an older version.
+The monotonic write consistency property means that if you write a new value for an object, and subsequently you overwrite this, then you will not end up with the older version of the write.
+But the writes are ordered correctly, so to say, within your own process.
+Now, eventual consistency, basically means that, a number of changes can be made, a number of reads are made, and after a certain point in time, if no further writes appear, no further changes happen, so to say, we wait a bit, and at some point, all reads will return the same-- the last updated value for each object.
+That means, we might be at-- while the system is not in a stable state, while changes happen, or briefly, thereafter, have processes that read values, and they are outdated values.
+Because, potentially, there might be multiple servers in these distributed key-value stores, and the data has not been propagated correctly yet.
+But with time, as data get more and more propagated, we have reached a stable state, and after that, every read, no matter which server we reach, sees the same value.
+So, a system that has reached this notion of consistency is said to have converged.
+This was, in a sense, the client-side viewpoint.
+So, from the viewpoint of the client, it might connect to any server in this distributed key-value store, and does reads and writes, and might observe certain inconsistencies.
+Of course, some of these inconsistencies are easier to resolve that others.
+For example, if already, by ensuring that a client always accesses the same server, which is a way of still achieving scalability by having many servers, serve many clients.
+Unless the server is implemented in a very strange way, certain notions of consistency are very easy to kind of ensure.
+For example, the notion of making sure that writes by the same process are not stored out of order, but are durable.
+Now let's look at the server-side.
+Let's assume there is <i>N</i> machines, in this distributed key-value store, that can store replicas of data.
+Let's assume that whenever we write, we write at least two <i>W</i> many replicas.
+And these have to, together, acknowledge receipt of the update before the update completes.
+So in a sense, the client, or the middleware that supports it, or a client library, will have to wait for all the acknowledgements of the machines that were asked to write down this value.
+When we read, we could say that we always read <i>R</i> replicas.
+From all different machines, we read the value.
+So what does this mean?
+We assume now that each machine might hold a replica of each object.
+And if the number of writes,
+<i>W</i> is equal to <i>N</i>, then is means that every time we write, we update all the replicas on all machines.
+That means if you read from any single machine, you will see the new value.
+And by requiring this receipt and acknowledgement, you basically do these writes atomically, so to say, from the viewpoint of the client who requests the write.
+But not necessarily from the viewpoint of the client who requests some reads.
+Now reads can also happen, in terms of multiple reads.
+And this might allow us to identify some inconsistency.
+For example, if writing has only happened to some of the replicas, and now we read several replicas, and they are not in the same version, we know that there is some inconsistency.
+And this gives us the basis, for basically, for example, collecting a quorum.
+So, if you for example, make three reads, and two of them are equal, and the third is different, you might for example, choose that the majority, so to say, the value that is represented by two machines, wins.
+This might not be the right thing to do in general, though.
+Now, however, suppose that this 
+<i>W</i> plus <i>R</i> is greater than <i>N</i>.
+Then strong consistency is ensured.
+So for example, if we have three machines that each can store replicas of objects, and <i>R</i> is two, and <i>W</i> is two, that means whenever we write, we write it to two machines, together.
+And then when we read, we read from two machines.
+We can basically identify inconsistencies.
+And then we just wait, or decide to read more copies-- more replicas, to decide which is the winner, so to say, which is the right value.
+So, by having <i>W</i> plus <i>R</i> to be greater than <i>N</i>, we can ensure strong consistency.
+And if, in general, <i>W</i> is not <i>N</i>, but is less than that, then this is usually called the quorum consensus method.
+So we will basically collect a quorum.
+If we have read enough values to be able to decide the right outcome, we are good.
+In general, if we want to optimize for read performance, we might, for example, take large <i>W</i> and <i>R</i> equals one.
+That means, we are not making our reads inefficient by having to read many, many machines, but by writing to many machines, making the value highly available, we can really paralyze the reads.
+Of course, that works best if the writes are relatively uncommon, compared to the reads.
+And of course, by having 
+<i>W</i> more than one, we have better availability, we can deal with failures of machines.
+Now if <i>W</i> plus <i>R</i> is less than or equal to <i>N</i>, then we've got a notion of weak consistency only.
+And then probably, it makes most sense, or maybe <i>only</i> sense to assume that <i>R</i> equals one.
+If we anyway cannot say anything about the correctness of the value, it doesn't make sense to read multiple values, potentially.
+We have talked about 
+ACID transactions before, and now let's think about weak consistencies for comparison.
+So, clearly, what counts against ACID transactions and in database management systems, is that strong consistency implemented in distributed scenario by two-phase commit, or Paxos, or strong consistency protocols like this, does not scale.
+This is well-known.
+You may have heard about the CAP theorem that essentially asserts a related statement.
+It has been discussed earlier by people, and observed earlier by people like Jim Gray, that actually, beyond a certain number of nodes in a distributed database management system that uses strong consistency, two-phase commit for example, adding more nodes makes the system actually not get fast.
+That means the transaction throughput doesn't increase anymore.
+So it doesn't make sense to add more machines.
+And whilst it's the communication overhead, ensuring strong consistency.
+If you think about two-phase commit for example, we need four times <i>N</i> many messages, essentially, to finalize the protocol where <i>N</i> is number of machines, overall, in the system.
+And of course, that's very costly.
+In a very large system with very many machines, there might be stragglers, there might be failures, and overall, the latencies of finalizing a transaction gets very high, and in general, that means, overall, that there's dependencies between transactions, and all these transactions of concurrency protocols, are disconnected-- just completely ruined throughput.
+So this is well-known.
+And this has lead to the rise of the so-called NoSQL movement in recent years, started by lots of web application companies like:
+Google, Ebay, Facebook, Yahoo, etc, that were unhappy with the scalability of database management systems, and built their own systems that use weaker notions of consistency to deal with the scalability issue.
+Of course, if you think about it, weak consistency might be cheaper to ensure, because in general, we will not need to do these strong consistency protocols that have these high latencies, obviously.
+The disadvantage of these weaker consistent systems, is that programming them is very hard and error-prone.
+In a sense, you will have to, in your applications-- every time you write an application-- deal with what happens when something went wrong, and you haven't reached strong consistency, you have the right/wrong values etc.
+So you might end up, in most sophisticated applications, basically re-implementing strong consistency protocols in the applications, which is, ultimately, not what you want.
+So, compared to that, programming ACID transaction programs is really foolproof, because you need know and understand very little about concurrency and the deeper side of distributed algorithms.
+You can just think as if there was no concurrency at all in the system, and you're working with single-node, single-threaded system that does your data reads and writes.
+This is actually a reason that few new systems nowadays use weak or eventual consistency.
+There is a few kind of bases and centers of using eventual consistency, specifically Amazon, that uses it for example, even nowadays, for managing shopping carts.
+Also also in some other places in its overall infrastructure.
+So it can actually happen that if you, on your machine, start two different browsers, and connect to Amazon, and start putting products into your shopping cart, then you will see, although you have the same user, and you have logged in as the same user, you might see two different states of your shopping carts, even after several updating runs.
+So what Amazon has to do, basically, it will propagate data, and ultimately at some point, will have to deal with conflict resolution if you have done inconsistent things in the two different browsers.
+It will have to some application- specific custom code that will have to decide what to do about this, and how to make the shopping carts consistent again.
+So also, Google, which initially was really, a very militant partisan of the NoSQL movement, and strongly opposed to classical strong consistency, is actually now building ACID systems.
+And if you look at the development of the whole sequence of major database management systems that they have built, you can see this development.
+So for example, in Bigtable in 2006, we had atomic tuple updates.
+So you could actually write tuples that consisted of several fields, atomically, but nothing else.
+So you could not build transactions in the classical sense.
+In 2011, they built MegaStore, or published a paper on MegaStore, where they supported the notion of entity groups, that means you could have atomicity across multiple tuples with certain constraints.
+Then in 2012, they presented Spanner, which is yet another such database system.
+And it's really not a database system.
+It is called a globally distributed database system.
+It does it on a quite large scale, but it really implements 
+ACID transactions.
+So how is this possible?
+Because they achieve classical strong consistency and it is still kind of claim to scale.
+Well the answer is probably that-- well the answer is not just <i>probably</i>, but <i>certainly</i> that they don't truly scale.
+The just achieve a certain high degree of size.
+And how do they do this?
+They actually implement a lot of specific machinery for ensuring strong consistency in hardware.
+So when Jim Gray wrote his paper, that I mentioned above, he actually measured this threshold above which it doesn't make sense to add more nodes to still be able to support something like two-phase commit, at about 70 nodes.
+But he also remarked that this number depends on hardware technology ultimately, and on lower level, software technology.
+For example, on how long it takes to transfer messages between machines, so they're lower bound on latencies.
+So if you can improve on these things, you can ultimately push this constant-- puts the constant number of nodes higher.
+And it might be just large enough that you can potentially at one day even support the largest applications.
+And that's basically what Spanner does.
+But it doesn't truly support scalability, and it needs a strong consistency mechanism.
+Another thing that I want to remark upon again, is the CAP theorem.
+So this is something that was essentially celebrated.
+Many people use it in all kinds of appropriate context, ultimately.
+And what it says, is basically, that in ultimately, a key-value store-- in a distributed key-value store if you like, you can only have at most, two of the following three properties.
+Which are: consistency, availability, and partition-tolerance.
+So, consistency, strong consistency is what you by now know.
+Availability is what you also know now.
+And partition-tolerance means, basically, that if you have this distributed system, consisting of many nodes in a network, and you partition the network, that means you cannot reach, from the viewpoint of a client let's say, or of certain servers, the remaining nodes, the system degrades gracefully.
+And it can still continue.
+It might not be fully available anymore, because certain data is not in that part of the system, but it's still continuous, and can do a gracefully degraded partial service.
+Now, weakly consistent systems, basically choose the two properties: availability and partition-tolerance, at the cost of not supporting consistency anymore.
+What's the alternative, really?
+Conceptually, the paper about the CAP theorem, originally that conjecture leads also to the proof doesn't exclude that you can take any pair of two properties, and build a system around it.
+So what about database management systems?
+There are two argumentations.
+Let's assume I've got a distributed database management system, and we are just not very fast.
+We basically don't keep up with our workload.
+Then we're getting, maybe, blocked, waiting for my two-phase commit to finish.
+In that case, we are not availability, or have bad availability, and basically what we are supporting is consistency partition-tolerance.
+Alternatively, you might say that basically, if you would reduce those overheads of communication, so to say, and of the protocols, and basically, the cost of computation to just execute the concurrency control protocols almost to zero, basically.
+Or make it infinitely small.
+Then you have consistency and availability.
+Of course.
+But of course it requires some kind of unrealistic, infinitely fast system that violates all of what we said about locality.
+But just by increasing the cost of communication between nodes a little, this is not true anymore.
+So in that sense, it is not partitioning-tolerant, because just this little latency for communicating, you could think of something like a network partition.
+Of course to some extent, all these comparisons, and all these considerations are somewhat limited in usefulness, simply because, in a sense, the CAP theorem is really not meant for this kind of consideration or for entire applications, in a sense.
+It is however, important to say that really, key-value stores-- this weakest notion of semantics-- just as reads and writes are independent and they don't care about anything else, they are no applications.
+And the CAP theorem really says only something about these key-value stores.
+So consistency refers to dealing with, basically, consistency of replicas.
+Even if you cannot deal with any atomicity across several different updates, as transactions would do.
+So in a sense, I would argue that if you look at real applications, that as we see nowadays, at Google and other places, really require something like transactions, then, something like a CS theorem, where <i>S</i> stands for scalability, and <i>C</i> of course, for consistency, would be more reasonable than the CAP theorem.
+Why is this?
+Well, if you want to think about scalability and performance in the context of real applications-- complex applications, where the workloads involve, potentially transactions, or something like this.
+Then it's not helpful to model scalability and performance using availability and partition-tolerance.
+That's why we had this strange argumentation about DMS's trading off for consistency and availability, or of consistency and partition-tolerance.
+So we could however say, because ultimately, given this argumentation, we can model, or translate the CAP theorem to a consistency or a scalability theorem where we can say,
+"you can have only one of these two."
+And in my opinion, that is more meaningful.
+And of course then,
+ACID systems would make the choice of taking consistency, while weaker consistent systems, of course, take the choice of scalability.

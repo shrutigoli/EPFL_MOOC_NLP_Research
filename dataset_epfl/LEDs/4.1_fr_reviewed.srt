@@ -1,0 +1,712 @@
+1
+00:00:00,025 --> 00:00:10,025
+[AUDIO_VIDE]
+
+2
+00:00:11,870 --> 00:00:12,670
+Bonjour.
+
+3
+00:00:12,670 --> 00:00:15,740
+Nous entrons véritablement
+dans le cœur de notre sujet.
+
+4
+00:00:15,740 --> 00:00:18,410
+Nous parlerons d'afficheurs
+matriciels à LED.
+
+5
+00:00:19,680 --> 00:00:22,100
+Nous introduirons d'abord
+la notion de pixels
+
+6
+00:00:22,100 --> 00:00:25,460
+et les caractéristiques
+des afficheurs matriciels.
+
+7
+00:00:25,460 --> 00:00:29,780
+Nous regarderons ensuite comment réaliser
+des matrices de LED et en particulier
+
+8
+00:00:29,780 --> 00:00:33,500
+comment utiliser des
+registres pour les piloter.
+
+9
+00:00:33,500 --> 00:00:35,940
+Nous parlerons ensuite de programmation
+
+10
+00:00:35,940 --> 00:00:40,690
+en mettant en évidence la génération
+et le rafraîchissement de l'image.
+
+11
+00:00:41,820 --> 00:00:46,160
+Le terme d'afficheur est utilisé pour
+désigner un dispositif électronique
+
+12
+00:00:46,160 --> 00:00:49,840
+permettant de présenter
+visuellement des données.
+
+13
+00:00:49,840 --> 00:00:54,250
+Lorsqu'il s'agit d'un afficheur matriciel,
+on a un ensemble de
+
+14
+00:00:54,250 --> 00:00:58,310
+pixels qui va permettre de
+composer des formes et des images.
+
+15
+00:00:59,850 --> 00:01:03,730
+La résolution c'est ce qu'on
+appelle la distance entre
+
+16
+00:01:03,730 --> 00:01:06,540
+un pixel et son plus proche voisin.
+
+17
+00:01:07,680 --> 00:01:11,060
+Le terme anglais souvent
+utilisé est le terme de pitch.
+
+18
+00:01:11,060 --> 00:01:15,140
+Si vous voyez par exemple pour
+décrire une matrice à LED le terme P6,
+
+19
+00:01:15,140 --> 00:01:20,180
+vous pouvez comprendre qu'il s'agit
+d'un pitch de 6 millimètres, et
+
+20
+00:01:20,180 --> 00:01:25,520
+cette distance de 6 millimètres correspond
+à la distance entre chaque pixel.
+
+21
+00:01:25,520 --> 00:01:28,595
+On parle aussi parfois
+de densité de pixels,
+
+22
+00:01:28,595 --> 00:01:34,080
+c'est-à-dire le nombre de pixels par unité
+de surface, par exemple en mètres carrés.
+
+23
+00:01:34,080 --> 00:01:39,900
+Voici un exemple d'afficheur matriciel
+à LED : on a des lignes de LED,
+
+24
+00:01:42,380 --> 00:01:47,890
+on a aussi des colonnes, on parle donc de
+la coordonnée X et de la coordonnée Y.
+
+25
+00:01:47,890 --> 00:01:51,380
+Les gens qui travaillent dans
+l'infographie ont l'habitude d'avoir une
+
+26
+00:01:51,380 --> 00:01:55,860
+origine qui se situe ici,
+en haut à gauche,
+
+27
+00:01:55,860 --> 00:01:59,750
+et non pas comme dans la physique,
+en bas à gauche.
+
+28
+00:02:00,860 --> 00:02:04,640
+Comment faire pour piloter
+un si grand nombre de LED?
+
+29
+00:02:04,640 --> 00:02:08,630
+Eh bien nous allons utiliser la
+technique des registres série/parallèle
+
+30
+00:02:08,630 --> 00:02:10,330
+que nous connaissons.
+
+31
+00:02:10,330 --> 00:02:15,730
+Ici nous avons un afficheur de 16 LED
+
+32
+00:02:15,730 --> 00:02:20,350
+par ligne, nous avons huit registres.
+
+33
+00:02:20,350 --> 00:02:26,520
+Chaque entrée est commandée par
+un port du microcontrôleur.
+
+34
+00:02:28,060 --> 00:02:32,995
+Les horloges, elles, sont communes
+entre chacun des huit registres
+
+35
+00:02:32,995 --> 00:02:38,930
+: l'horloge série et l'horloge parallèle.
+
+36
+00:02:40,160 --> 00:02:42,540
+Donc on a ici un ensemble de 128 LED,
+
+37
+00:02:42,540 --> 00:02:49,220
+qui sont pilotées par seulement
+dix broches du microcontrôleur.
+
+38
+00:02:49,220 --> 00:02:53,020
+Voilà un petit programme qui permet
+d'afficher un motif sur notre afficheur.
+
+39
+00:02:54,145 --> 00:02:55,895
+Tout d'abord, les initialisations,
+
+40
+00:02:55,895 --> 00:03:00,775
+en particulier mettre en sortie
+chacune des broches utilisées.
+
+41
+00:03:00,775 --> 00:03:05,885
+Et dans la boucle principale nous
+allons avoir une boucle for,
+
+42
+00:03:05,885 --> 00:03:11,720
+avec 16 itérations, qui correspondent
+chaque fois à une colonne.
+
+43
+00:03:11,720 --> 00:03:16,850
+Et dans cette colonne, nous allons
+allumer un seul pixel, un décalé de i
+
+44
+00:03:16,850 --> 00:03:23,540
+et pour que i ne dépasse pas huit, on va
+ici faire une limitation, un et logique
+
+45
+00:03:23,540 --> 00:03:29,420
+qui serait aussi un modulo, et donc on
+utilise P2OUT pour envoyer cette colonne.
+
+46
+00:03:29,420 --> 00:03:31,330
+Après avoir envoyé les données,
+
+47
+00:03:31,330 --> 00:03:36,600
+on envoie un coup d'horloge série
+puis un coup d'horloge parallèle.
+
+48
+00:03:38,300 --> 00:03:41,510
+Comment faire pour envoyer
+par exemple des caractères?
+
+49
+00:03:41,510 --> 00:03:48,040
+Eh bien nous aurons un générateur de
+caractères qui a été placé dans un
+
+50
+00:03:48,040 --> 00:03:54,200
+tableau Donc ce tableau ne changeant pas,
+on peut l'appeler constant.
+
+51
+00:03:54,200 --> 00:03:58,840
+On utilise des mots de huit bits,
+je les ai notés ici en binaire et si vous
+
+52
+00:03:58,840 --> 00:04:04,510
+regardez, si vouspenchez la tête,
+vous verrez que ici nous avons formé un A.
+
+53
+00:04:04,510 --> 00:04:10,490
+Ici, nous avons formé un B,
+ici nous avons formé un C, etc.
+
+54
+00:04:12,180 --> 00:04:13,330
+Pour afficher un texte,
+
+55
+00:04:13,330 --> 00:04:17,910
+nous allons mettre cette chaîne de
+caractères en mémoire et nous utiliserons
+
+56
+00:04:17,910 --> 00:04:22,700
+un pointeur pour aller chercher
+successivement chacun des caractères.
+
+57
+00:04:24,170 --> 00:04:28,030
+Voilà donc notre programme qui nous
+affiche ces quelques caractères.
+
+58
+00:04:29,030 --> 00:04:34,410
+Tant que le texte n'est pas terminé,
+donc que le
+
+59
+00:04:34,410 --> 00:04:40,790
+pointeur au texte ne pointe pas un
+caractère zéro qui est considéré comme
+
+60
+00:04:40,790 --> 00:04:43,550
+la fin de la chaîne de caractères, on va
+chercher le caractère : on va chercher
+
+61
+00:04:45,710 --> 00:04:51,460
+l'index du caractère dans la table,
+ici la table est multiplié par cinq
+
+62
+00:04:51,460 --> 00:04:57,240
+puisqu'il y a à chaque fois cinq
+colonnes pour faire un caractère,
+
+63
+00:04:57,240 --> 00:05:03,290
+et pour chacune de ces cinq colonnes eh
+bien il faut les envoyer sur la matrice
+
+64
+00:05:03,290 --> 00:05:07,460
+et donner les coups d'horloge comme tout à
+l'heure : on va attendre un certain temps.
+
+65
+00:05:07,460 --> 00:05:12,710
+À noter ici le tilde qui
+met en évidence le fait que
+
+66
+00:05:12,710 --> 00:05:17,310
+les caractères sont actifs à zéro,
+c'est bien un zéro à la sortie des
+
+67
+00:05:17,310 --> 00:05:22,010
+registres qui va allumer la
+diode lumineuse correspondante.
+
+68
+00:05:22,010 --> 00:05:25,180
+Ensuite on passe au caractère suivant.
+
+69
+00:05:25,180 --> 00:05:29,530
+On met à la fin de chaque
+caractère une colonne vide pour
+
+70
+00:05:29,530 --> 00:05:34,880
+bien les séparer visuellement et,
+de nouveau, on envoie les coups d'horloge.
+
+71
+00:05:34,880 --> 00:05:36,270
+Grâce à ces attentes,
+
+72
+00:05:36,270 --> 00:05:40,110
+on va pouvoir faire défiler notre
+petite texte sur notre afficheur.
+
+73
+00:05:41,850 --> 00:05:42,910
+Dans la pratique,
+
+74
+00:05:42,910 --> 00:05:48,410
+on rencontre rarement une géométrie aussi
+idéale que ce que nous avons présenté.
+
+75
+00:05:51,210 --> 00:05:53,120
+Dans la plupart des cas aussi,
+
+76
+00:05:53,120 --> 00:05:58,860
+nous utilisons des afficheurs multiplexés
+et le principe que nous avons utilisé
+
+77
+00:05:58,860 --> 00:06:05,410
+de faire directement décaler le texte sur
+notre affichage ne peut pas se réaliser,
+
+78
+00:06:05,410 --> 00:06:10,240
+nous devons passer à une autre technique
+qui consiste à générer l'image
+
+79
+00:06:10,240 --> 00:06:14,970
+puis la rafraîchir et ces deux
+étapes sont des étapes séparées.
+
+80
+00:06:14,970 --> 00:06:22,880
+Ce que nous allons faire, c'est créer une
+matrice qui correspond à notre afficheur.
+
+81
+00:06:22,880 --> 00:06:28,940
+Ici on a décidé de mettre des mots de 16
+bits, qui correspondent donc à une ligne
+
+82
+00:06:28,940 --> 00:06:34,420
+et de mettre huit entrées dans cette
+table Nblignes qui est égal à huit.
+
+83
+00:06:34,420 --> 00:06:38,000
+Ce sont donc des mots de
+16 bits qui sont utilisés,
+
+84
+00:06:38,000 --> 00:06:40,060
+on aurait pu faire d'autres choix,
+on le verra plus tard.
+
+85
+00:06:41,540 --> 00:06:46,430
+Lorsqu'il s'agit d'allumer un point
+à l'intérieur de cette matrice,
+
+86
+00:06:46,430 --> 00:06:49,990
+à partir des coordonnées
+X et des coordonnées Y,
+
+87
+00:06:49,990 --> 00:06:55,560
+c'est particulièrement simple,
+on va écrire ici Matrice, crochets, Y, ou,
+
+88
+00:06:55,560 --> 00:07:00,960
+égal c'est le set bit, un, [INAUDIBLE]
+X.
+
+89
+00:07:00,960 --> 00:07:06,340
+Si je reviens à la description précédente,
+on voit bien que je dois me déplacer
+
+90
+00:07:06,340 --> 00:07:12,530
+en y pour choisir un texte dans la
+matrice et que je dois allumer le
+
+91
+00:07:12,530 --> 00:07:18,560
+Xième bit en allant de zéro jusqu'à 15.
+
+92
+00:07:18,560 --> 00:07:23,370
+La même chose, naturellement,
+pour éteindre un point.
+
+93
+00:07:23,370 --> 00:07:28,890
+Cette fois on va faire la clear it,
+la mise a zéro du bit correspondant.
+
+94
+00:07:28,890 --> 00:07:35,070
+Et par exemple, pour créer une diagonale,
+on a défini ici le maximum en X
+
+95
+00:07:35,070 --> 00:07:41,200
+qui est 16, et le maximum en Y, qui
+a déjà été défini, qui est égal à huit.
+
+96
+00:07:41,200 --> 00:07:46,320
+Ici, on va, pour faire une
+diagonale sur notre afficheur,
+
+97
+00:07:46,320 --> 00:07:52,300
+aller de zéro jusqu'à huit,
+jusqu'à huit lignes.
+
+98
+00:07:52,300 --> 00:07:56,270
+et on va à chaque fois allumer un
+point qui aura comme coordonnées
+
+99
+00:07:57,910 --> 00:08:03,520
+pour Y la valeur i,
+et pour X une valeur qui sera le double
+
+100
+00:08:03,520 --> 00:08:08,180
+puisque MaxX/MaxY est effectivement
+égal à deux, de telle manière que la
+
+101
+00:08:08,180 --> 00:08:13,250
+diagonale se trace bien
+de cette manière là.
+
+102
+00:08:13,250 --> 00:08:16,850
+Nous avons donc ici généré une image,
+mais elle est purement virtuelle,
+
+103
+00:08:16,850 --> 00:08:21,100
+elle est à l'intérieur de la mémoire vive
+du microcontrôleur, elle n'est encore pas
+
+104
+00:08:21,100 --> 00:08:26,810
+du tout matérialisée : il va falloir
+maintenant afficher cette matrice.
+
+105
+00:08:26,810 --> 00:08:31,360
+Pour afficher la matrice, comme tout à
+l'heure, on va devoir réaliser une boucle
+
+106
+00:08:31,360 --> 00:08:37,560
+fois 16, donc pour chaque colonne,
+malheureusement, on n'a pas facilement
+
+107
+00:08:37,560 --> 00:08:43,280
+les valeurs, on doit aller rechercher
+les huit bits pour chaque colonne,
+
+108
+00:08:43,280 --> 00:08:49,570
+en allant de zéro à MaxY,
+c'est-à-dire de zéro à sept,
+
+109
+00:08:49,570 --> 00:08:54,520
+tester la valeur du bit correspondant et
+
+110
+00:08:54,520 --> 00:08:59,680
+allumer ou éteindre le bit correspondant.
+
+111
+00:08:59,680 --> 00:09:04,540
+Vous avez remarqué que j'ai dit allumer
+pour un clear et éteindre pour un set,
+
+112
+00:09:04,540 --> 00:09:07,810
+c'est toujours lié au fait que
+notre logique est inversée
+
+113
+00:09:07,810 --> 00:09:13,530
+et que un zéro va produire
+l'allumage d'une diode lumineuse.
+
+114
+00:09:13,530 --> 00:09:19,030
+Ensuite, le traditionnel coup
+d'horloge série et lorsqu'on
+
+115
+00:09:19,030 --> 00:09:24,240
+a tout éliminé, le coup d'horloge
+parallèle qui va faire que d'un seul coup,
+
+116
+00:09:24,240 --> 00:09:29,010
+l'ensemble de la matrice prendra
+une nouvelle valeur Après avoir
+
+117
+00:09:29,010 --> 00:09:33,670
+un peu peiné pour écrire cette procédure
+d'affichage, on se rend compte qu'il
+
+118
+00:09:33,670 --> 00:09:38,620
+aurait peut-être été plu intelligent
+d'envisager une matrice où cette fois
+
+119
+00:09:39,770 --> 00:09:45,100
+les colonnes se trouvent
+dans un mot de huit bits,
+
+120
+00:09:45,100 --> 00:09:48,160
+alors dans ce cas-là on a un nombre
+de colonnes qui est égal à 16,
+
+121
+00:09:48,160 --> 00:09:51,130
+donc on a une matrice qui a la
+même taille que tout à l'heure,
+
+122
+00:09:51,130 --> 00:09:57,670
+mais au lieu d'avoir huit fois deux
+octets, on a 16 fois un octet.
+
+123
+00:09:58,790 --> 00:10:03,615
+Et alors, dans ce cas-là, l'affichage de
+la matrice est beaucoup plus simple : il
+
+124
+00:10:03,615 --> 00:10:09,620
+suffit de prendre le contenu dans la
+matrice et de le mettre directement
+
+125
+00:10:09,620 --> 00:10:14,150
+sur le registre huit bits qui
+correspond aux bits d'une colonne.
+
+126
+00:10:15,340 --> 00:10:19,060
+Comment faire pour créer des
+animations sur notre afficheur?
+
+127
+00:10:19,060 --> 00:10:24,350
+Il faut préparer une image en mémoire, il
+faut envoyer son contenu sur l'afficheur,
+
+128
+00:10:24,350 --> 00:10:29,600
+attendre le temps nécessaire pour que
+l'œil puisse voir ce qui a été affiché
+
+129
+00:10:29,600 --> 00:10:31,760
+puis préparer une autre image, etc.
+
+130
+00:10:31,760 --> 00:10:36,190
+On voit bien qu'on a une alternance
+
+131
+00:10:36,190 --> 00:10:39,530
+génération de l'image puis
+rafraîchissement de l'affichage.
+
+132
+00:10:41,250 --> 00:10:45,762
+On va terminer par l'écriture d'un petit
+programme qui fait une animation de type
+
+133
+00:10:45,762 --> 00:10:52,110
+ping-pong : une balle va rebondir
+sur les bords de l'afficheur.
+
+134
+00:10:52,110 --> 00:10:55,550
+On va commencer à se trouver
+en position (X,Y)=0,
+
+135
+00:10:55,550 --> 00:11:01,410
+on terminera lorsqu'elle reviendra à
+cette position et, durant chaque cycle,
+
+136
+00:11:01,410 --> 00:11:08,240
+on va fondamentalement allumer
+le point concerné, la balle,
+
+137
+00:11:08,240 --> 00:11:13,470
+afficher la matrice et attendre un
+certain temps, puis éteindre le point,
+
+138
+00:11:13,470 --> 00:11:20,100
+et ensuite il va falloir calculer le
+prochain point : on va incrémenter X,
+
+139
+00:11:20,100 --> 00:11:26,370
+ou plus exactement lui ajouter la valeur
+sensX qui, au départ, est égal à un.
+
+140
+00:11:27,400 --> 00:11:33,060
+La même chose pour Y : on va lui ajouter
+sensY qui au début est égal à un.
+
+141
+00:11:34,420 --> 00:11:39,280
+Maintenant évidemment pour ne pas dépasser
+les bords, lorsqu'on va arriver à une
+
+142
+00:11:39,280 --> 00:11:45,570
+valeur plus grande que MaxX, eh bien on va
+
+143
+00:11:45,570 --> 00:11:51,480
+changer le sens en X et de la même
+manière on va changer le sens en Y.
+
+144
+00:11:53,340 --> 00:11:57,410
+Nous avons donc parlé de la notion
+de pixel, des caractéristiques des
+
+145
+00:11:57,410 --> 00:12:02,660
+afficheurs, en particulier le fameux
+pitch, nous avons vu comment faire des
+
+146
+00:12:02,660 --> 00:12:08,100
+matrices à LED, nous avons vu comment les
+programmer, et en particulier comment
+
+147
+00:12:08,100 --> 00:12:12,160
+utiliser le mécanisme de génération
+de l'image puis son rafraîchissement.

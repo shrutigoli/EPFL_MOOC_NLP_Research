@@ -1,0 +1,185 @@
+We've already seen the idea of using voting as a way to deal with failure.
+And voting is really a fundamental concept.
+We see it everywhere; its the foundation of democratic societies.
+It embodies the belief that multiple opinions are better that one.
+And when a majority of potentially faulty people agree on something, then they're probably right.
+So we use this a a building block to develop much more sophisticated forms of dealing with failures, especially in distributed systems, which are systems that consist of nodes that can only communicate by exchanging messages.
+So what are some examples of such systems?
+Well one of the simplest situations is agreeing on time.
+Protocols like NTP are used by computers connected by package switch variable latency networks to agree on what the current time is.
+It's one of the oldest internet protocols, precisely because agreeing on time is such a fundamental need in a distribute environment.
+Another example, involves the delivery of messages to nodes in a distribute system.
+And often, it is important that all nodes process these messages in the same order.
+And the nodes must collectively agree on that order.
+Sometimes we want to take a checkpoint or snapshot of the state of a distributed system while it keeps running.
+So we need to collect a set of node level checkpoints that are consistent with each other.
+And this requires some way of voting or reaching consensus on which those checkpoints should be.
+But consider, for instance, a distributed database where the different participants need to agree unequivocally on whether a transaction can commit or must abort.
+Its obviously crucial that all involved nodes, agree on the outcome of the transaction.
+And for a final example, there are process controlled systems in automated assembly plans were some action needs to be taken when a component fails.
+But what they should hear is that all parties involved need to agree on the nature of that failure.
+So if you think of the much simpler case of a cluster based web service, one of these nodes might fail, but then some other nodes need to agree that the node is failed and should be removed from the cluster.
+If they don't agree, the web server can become terribly inconsistent.
+Let's look at how an air traffic control system might work.
+It's basically a bunch of ground base controllers with each controller being in charge of some portion the air space.
+And these controllers are responsible for directing the aircraft, providing them adviser services, preventing collisions, organizing the flow of traffic and so on and so forth.
+And for all this to run smoothly, the system has to maintain, first of all, information on the position of the planes and this state is, of course, replicated for felpars.
+The information obtained from radar stations, has to obtained and distributed to all nodes in the system to the place, to the controllers, etc.
+And then the operators, are in charge, of managing, controlling and administering the air traffic control system.
+And all these entities need to agree on what needs to happen next.
+And they need to be able to agree even when parts of the system fail.
+And they need to agree in a timely fashion.
+And this is what we call the <i>consensus problem</i>.
+Now in order to come up with principal solutions to this problem, we often start by opening on an abstraction of the real distributed system.
+And this is often represented as a graph, in which the vertices correspond to nodes and the edges represent, communication lengths.
+Now the agreement problem says, we need all these nodes to pick the same value "V".
+Now in the case of our 'ATC' system: the air traffic control system, we have controllers talking to pretty much everyone.
+The databases also talk to each other.
+The radar stations also talk to planes, and planes even talk to each other.
+In fact, airplanes beyond a certain size, are equipped with special transponders for collision avoidance, which is known as TCAS.
+When planes come too close to each other, these transponders talk to each other and notify the pilots of a potential collision.
+And the automated TCAS systems, actually negotiates among the planes and quickly decides which plane should take which maneuver.
+And then the plane changes altitude or it can modify their climb or sync rates, to avoid this collision.
+And of course, goes without saying, it is always preferable for the planes involved to agree on who does what maneuver, less they all do the same thing and therefore collide.
+Now in such a setting, we say that, for consensus to be achieved, we must have four key properties.
+Now the theory people like to think of consensus as starting with a proposed value, and then the nodes through the process of achieving consensus, decide a value.
+So the result of consensus is a decision.
+Now in terms of properties, of course there is agreement.
+And what this means is that, if a correct node decides value "V", then every correct node in the system, decides the same value "V".
+In other words, if a correct node believes that value "V" was chosen by mutual agreement, then it must be the case that all the other correct nodes believe the same.
+And notice, we say nothing about what the faulty nodes do.
+So we only care here about the correct nodes.
+But agreement is not enough, we also need termination, which basically means that within some finite amount of time, every correct node decides some value.
+A third property of consensus is validity.
+Which says that, if it just so happens that all correct nodes have consensus from the very start, meaning they all proposed the same value "V", then it must be the case that every correct node decides that particular value and not another.
+And finally we have integrity.
+This says that a correct node can decide at most one's, basically implying that, once you've made a decision, a correct node cannot change its mind.
+And additionally, whatever value a correct node decides, must have been proposed by some node.
+In other words, an agreed upon value cannot be something made up out of thin air.
+It must be a value that was actually proposed by one of the nodes.
+You might look at this and think,
+"Hey, integrity implies validity."
+But actually, this isn't the case, because integrity says the decided value must have been proposed by some node.
+So it could be a faulty node that proposed the value.
+Whereas, validity refers exclusively to what happens with correct nodes.
+Alright so, if an algorithm provides these four properties, then we say, it solves consensus.
+Now you can see why all these four properties are useful for the case of our air traffic control system that we were talking about earlier.
+So let's see a simple way to accomplish this with a consensus for the case when everything works okay.
+Nothing fails; neither nodes nor communication lengths.
+So say the nodes in the system are labelled 'Ni'.
+Each node can then choose its favorite value 'Vi', and broadcast this to everyone else.
+Then it waits to hear all the values proposed by the other nodes.
+And after some time, every node in the system, will have received the values chosen by everyone else.
+So they have a common set of values: V1 through Vn.
+Now at this point, each node applies a deterministic function, to choose a value from the set.
+For instance, everyone chooses the min or the max or whatever.
+When you have nodes with ID's like with IP addresses, you can also just pick the values proposed by the node with the smallest or with the largest IP address.
+It really doesn't matter what the function is as long as every node uses the same function, and the function is deterministic.
+Now given that all the nodes see the same set of values and apply the same deterministic function, this guarantees that they end up choosing the same value.
+Now does this solve consensus?
+Well yeah.
+And life's really easy when there are no failures.
+This algorithm achieves agreement; it does so within a finite amount of time, and it guarantees both validity and integrity.
+But what happens when there are failures?
+Well there are a couple of ways to reason about this.
+One model is what we call:
+<i>the synchronous model of distributive systems</i>.
+Even-though failures can occur, there's a really nice property which is that: nothing can take forever.
+So first, any message can take at most delta time, to reach its destination.
+So it cannot dilly dally forever in the network.
+And in the Internet, we use TTL's: the Time To Live field in my P pack; it is to provide this property.
+Second, a node cannot take forever to do it's computation.
+It must respond within a maximum theta amount of time.
+And of course, this model accepts failures of both the communication lengths and the nodes.
+And the lengths can both drop and reorder messages as they wish.
+And the nodes can either exhibit <i>crash failures</i>,
+Also known as <i>stopping failures</i>, in which they halt and never speak again.
+Or they simply lie.
+Which is what we call a <i>Byzantine failure</i>.
+So the synchronous model is a pretty reasonable model if you think about the real world.
+Of course some of its assumptions cannot always hold, you know like, putting bounds on communication and computation time.
+Because we may, for instance, hit a bug and get into some infinite loophole of the nodes without wanting to.
+And then they'll say that computation takes forever.
+But now then let's-- so this <i>Byzantine failure</i> model is something actually I'd like us to talk about in a bit more depth.
+This type of failure was introduced in a classic paper by Pease, Shostak and Lamport.
+And the actual term was coined by Lamport a bit later.
+Before this paper appeared, it was generally assumed that a three node system can tolerate one faulty node.
+And this paper shows that <i>Byzantine faults</i>, the so-called <i>Byzantine faults</i> in which a faulty node sends inconsistent information to the other nodes, can defeat any traditional three node algorithm.
+So Lamport actually says that he figured that for a problem to be well known, you know, like Dijkstra's
+<i>Dining Philosophers Problem</i>, it has got to have a story behind it.
+So the story here is a group of generals have to come to a common agreement on whether to attack an enemy army or retreat.
+But they can communicate only by sending messengers who might be captured or die on their way.
+Furthermore some of the generals may be traitors so they would try to deceive the others.
+Yet the challenge is to still have the good generals reach a common decision.
+And it seems that the Byzantine empire was full of treachery so Lamport in the end, gave the generals the Byzantine nationality.
+And since then, we know failures that manifest as lies, as <i>Byzantine Failures</i>.
+Now a <i>Byzantine Failure</i> is meant to model arbitrary behavior.
+So it can therefore model pretty much any type of misbehavior.
+It includes both omission failures such as crash failures or failing to receive a request, or completing ignoring or non-responding.
+As well as commission failures such as giving the wrong answer or corrupting state or being inconsistent.
+So we can model with 
+<i>Byzantine failures</i>, any form of bugs; any form of non-determinism in execution like race conditions that can lead to data corruption.
+Even deliberately malicious activity, whether it might result, say from a node being broken into by a hacker.
+So one of the key results in that paper, is an impossibility result.
+It says that if you want to solve consensus in a system that has "F" faulty nodes, then you must have at least 
+3f+1 nodes in total.
+Otherwise it's impossible to achieve consensus.
+So clearly, if you have a three node system, this paper says you cannot tolerate any of those nodes failing.
+And Lamport's contribution to this landmark paper, was to to show that if digital signatures are used, then 2f+1 nodes are enough to tolerate "F" <i>Byzantine failures</i>.
+Now in this context, digital signatures as used here, are sort of a metaphor since the signatures needs to be secure only against random failure; not against intelligent adversaries.
+They're easier to implement than true digital signatures like fancier <i>crypto-base</i> stuff.
+Now subsequent work has shown that another way of getting around the 3f+1 limitation is to use randomized protocols.
+In which case, one can obtain a probabilistic guarantee of agreement.
+And in practice, this may actually be good enough.
+By the way, according to Lamport, the people at Boeing came across his work in 1986, and that as a result, the people who built the passenger planes at Boeing, became aware of the problems and started designing their systems accordingly.
+But in the late 80's and early 90's, the people at Boeing working on military aircraft and on the space station as well as the people at McDonnell Douglas, allegedly still did not understand the problem and why it's not possible to achieve consensus unless you have at least 3f+1 nodes.
+So this impossibility result is really crucial to anyone who builds systems that are meant to tolerate failures of this nature.
+Now Paxos is a family of algorithms or protocols; we can call them either way, for solving consensus.
+The Paxos includes a spectrum of trade offs between a number of nodes, a number of message delays before learning the agreed value, the activity level of individual participants as the number of messages send, types of a lot of different things.
+That's why we have a family of algorithms not a single one.
+It's a relatively complex family of algorithms, so I'll not describe it here.
+But it's an extremely important one to know about.
+For example, Goggle uses the Paxos algorithm in their <i>Chubby Distributed 
+Lock Service</i> in order to keep replicas consistent in case of failure.
+And <i>Chubby</i> is used by Big Table which is in production in Google Analytics and other products.
+Google Spanner and Mega-store use the Paxos algorithm internally as well.
+Microsoft uses Paxos in the autopilot cluster management service, which is used at least at Bing, if not in other places.
+XTREEMFS also uses a Paxos based least negotiable algorithm for fault permanent and consistent replication of file data and meta data.
+And a bunch of other not including-- like Heroku uses Doozer which intern implements Paxos for its consistent distributive data store.
+So not surprisingly, Lamport's paper describing Paxos received the ACMC-SIGOPS Hall of Fame Award in 2012.
+As a side note, Apache ZooKeeper, which is a centralized service for maintaining configuration information, naming, providing distribute synchronization, providing group services.
+So this service, the ZooKeeper is sort of like Chubby but it does not use standard Paxos.
+And Yahoo research guys who built
+ZooKeeper, devised a protocol called Zab, which is a totally ordered broadcast protocol and it's very close to Paxos in spirit, but not exactly it.
+Can you remember, we talked about the synchronous model in which we always have upper bounds on the time it takes a message to travel and on the time it takes a node to finish its computation.
+There also exists what we call the asynchronous model of a distributed system in which there are no bounds on communication delays and no bounds on processing speed.
+Now the reason this model is interesting is that it is fully general.
+Basically, an open distributed system that covers a wide geographic area or one that has unpredictable work loads, is in essence asynchronous.
+Because we cannot predict what the bounds, delta and theta ought to be.
+So if we have an algorithm or protocol that works in the asynchronous model, then it will definitely work in the real world.
+But when it comes to consensus, there's a fundamental impossibility result proven by Fischer, Lynch and Paterson in 1985 and this something we definitely need to know about.
+This result states that "It is impossible to design a deterministic consensus algorithm that works in an asynchronous distributed system, even if the only type of failure you can get, is a single Crash failure of a node."
+This is the simplest type of failure in which the node just crashes and stays crashed; it doesn't lie, it doesn't do anything.
+And so this result says, we cannot have a consensus algorithm for that situation, if the system is asynchronous.
+And this result is super important because it tells system designers what the boundaries are of what they can expect to accomplish in a fully asynchronous setting.
+Now the intuition behind the proof is that, it is impossible to safely distinguish between a Crash node, a very slow node, and a node with which communications are just very slow.
+So as you might expect, the consensus property that ends up being violated is typically termination.
+Now researchers have found various sets of minimal assumptions, that were satisfied by an asynchronous distributed system, make the consensus problem solvable.
+And some of these are things like partial synchrony.
+There also exists, randomized algorithms that give us a probabilistic guarantee of consensus; one can use, for instance, failure detectors.
+Then there are key agreement algorithms were the nodes need not agree on a single value but can agree on a set of key values.
+And this actually works as long as
+"F", the number of faulty nodes is less than "K".
+And so on, there are a number of ways to do this.
+So now you may ask, 
+"Oh what about Paxos?"
+Well, although no deterministic consensus protocol can guarantee termination in an asynchronous system, 
+Paxos can still guarantee the safety properties namely: agreement, validity and integrity.
+And the conditions that could prevent
+Paxos from terminating, turned out to be somewhat hard to make happen in a real system.
+Hence the relative success that Paxos has had in practice.
+So to conclude, let's recap what we've learned about consensus.
+First, it's a way to get multiple nodes in a distributed system to correctly agree on the same value and to do so in a bounded amount of time.
+Second, for this to work, we need at least
+3f+1 nodes in the system to participate in this algorithm where "F" is the number of potentially faulty nodes.
+And finally, the FLP impossibility result tells us that in a fully asynchronous setting, if you have even as little as one crash failure, it is impossible to achieve consensus which means that one cannot design an algorithm that guarantees consensus in such a situation.

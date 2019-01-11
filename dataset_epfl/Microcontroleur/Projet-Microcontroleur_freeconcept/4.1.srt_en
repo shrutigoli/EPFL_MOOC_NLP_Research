@@ -1,0 +1,1193 @@
+1
+00:00:05,590 --> 00:00:06,121
+Hello.
+
+2
+00:00:06,121 --> 00:00:09,320
+We continue the course,
+understanding microcontrollers.
+
+3
+00:00:09,320 --> 00:00:13,420
+Today we will talk about time management.
+
+4
+00:00:13,420 --> 00:00:19,919
+This is very unusual, when we've talked
+a lot about inputs and outputs
+
+5
+00:00:19,919 --> 00:00:25,460
+of microcontrollers, we will only
+speak in this module of outputs.
+
+6
+00:00:25,460 --> 00:00:30,764
+You can also see the program,
+we will study the duration of an
+
+7
+00:00:30,764 --> 00:00:36,210
+instruction, we will see how
+we can create active expectations.
+
+8
+00:00:36,210 --> 00:00:40,760
+We will also learn how
+to program sequencers.
+
+9
+00:00:40,760 --> 00:00:44,921
+We are also going to touch
+on a domain a little mysterious
+
+10
+00:00:44,921 --> 00:00:49,830
+called multi-tasking and even
+make an allusion to absolute time.
+
+11
+00:00:49,830 --> 00:00:51,425
+Let's Go!
+
+12
+00:00:51,425 --> 00:00:56,050
+You already know, certainly,
+the processor is running
+
+13
+00:00:56,050 --> 00:00:57,980
+instructions permanently.
+
+14
+00:00:57,980 --> 00:01:02,215
+In general, it does not stop,
+it executes instructions.
+
+15
+00:01:02,215 --> 00:01:04,710
+You also know that the duration
+
+16
+00:01:04,710 --> 00:01:08,890
+of an instruction is something
+extremely short,
+
+17
+00:01:08,890 --> 00:01:14,604
+a little too short for us
+to realize what it is.
+
+18
+00:01:14,604 --> 00:01:18,070
+And yet it is a perfectly real duration.
+
+19
+00:01:18,070 --> 00:01:21,745
+This duration will thus be able
+to be used
+
+20
+00:01:21,745 --> 00:01:24,500
+to manage the passing time.
+
+21
+00:01:24,500 --> 00:01:29,710
+It was mentioned that
+the microcontrollers have a clock,
+
+22
+00:01:29,710 --> 00:01:34,740
+for example on the AVR processors
+of the company Atmel,
+
+23
+00:01:34,740 --> 00:01:39,640
+we find an internal clock
+that is usually at 8 megahertz.
+
+24
+00:01:39,640 --> 00:01:43,932
+There is a calibration register, and the
+
+25
+00:01:43,932 --> 00:01:46,924
+calibration is factory-made
+in such a way that
+
+26
+00:01:46,924 --> 00:01:50,172
+we obtain a relatively good precision, say
+
+27
+00:01:50,172 --> 00:01:53,300
+about as good as the percent.
+
+28
+00:01:53,300 --> 00:01:56,020
+It is possible on these processors to
+
+29
+00:01:56,020 --> 00:01:58,982
+put quartz, often up to 20
+
+30
+00:01:58,982 --> 00:02:01,313
+Megahertz, which allows to go a
+
+31
+00:02:01,313 --> 00:02:03,850
+bit faster than the original 8 Megahertz.
+
+32
+00:02:03,850 --> 00:02:08,824
+I would also point out that
+the Arduino generally have
+
+33
+00:02:08,824 --> 00:02:12,028
+a quartz at 16 megahertz,
+and I recall that a quartz
+
+34
+00:02:12,028 --> 00:02:14,910
+allows for a much greater accuracy
+
+35
+00:02:14,910 --> 00:02:17,180
+than the 1% I mentioned earlier.
+
+36
+00:02:17,180 --> 00:02:22,262
+On the AVR it is also possible
+to divide the
+
+37
+00:02:22,262 --> 00:02:27,613
+frequency by 8, it is programmed
+in a flag that is not
+
+38
+00:02:27,613 --> 00:02:32,084
+lost when switching off the current.
+It allows to choose a frequency
+
+39
+00:02:32,084 --> 00:02:35,410
+of, for example, of 1 Megahertz
+instead of 8 Megahertz.
+
+40
+00:02:35,410 --> 00:02:37,280
+On the MSP430 processors
+
+41
+00:02:37,280 --> 00:02:42,612
+from Texas Instruments,
+there is an internal clock at 16
+
+42
+00:02:42,612 --> 00:02:47,741
+Megahertz, the peculiarity is that
+we can choose relatively freely the
+
+43
+00:02:47,741 --> 00:02:51,340
+frequency in the course
+of the program, and there are two
+
+44
+00:02:51,340 --> 00:02:56,720
+values ​​that are factory calibrated
+to 1 megahertz and 16 megahertz.
+
+45
+00:02:56,720 --> 00:03:02,440
+When a more precise time is to be managed,
+
+46
+00:03:02,440 --> 00:03:09,120
+a quartz at 32 kilohertz, so a quartz
+watchmaker that is more expensive.
+
+47
+00:03:09,120 --> 00:03:11,785
+I will obviously not go into the details
+
+48
+00:03:11,785 --> 00:03:14,800
+of these clocks, it would go
+beyond the scope of this course.
+
+49
+00:03:14,800 --> 00:03:19,860
+Is it possible to predict
+the length of an investigation?
+
+50
+00:03:19,860 --> 00:03:27,568
+So, in assembler, it is possible.
+A given instruction will take one or
+
+51
+00:03:27,568 --> 00:03:29,930
+more cycles of the clock.
+
+52
+00:03:29,930 --> 00:03:34,753
+For example, on AVR,
+almost all of the instructions
+
+53
+00:03:34,753 --> 00:03:40,115
+are executed in a single clock stroke,
+which means that we
+
+54
+00:03:40,115 --> 00:03:45,370
+have 125 nanoseconds for
+the execution of an instruction.
+
+55
+00:03:45,370 --> 00:03:48,646
+On the other hand, we are used
+to programming in C, and
+
+56
+00:03:48,646 --> 00:03:52,870
+here, we can't absolutely tell
+the execution time
+
+57
+00:03:52,870 --> 00:03:55,780
+of a line of a C instruction,
+
+58
+00:03:55,780 --> 00:03:59,124
+it would be necessary
+to look at the instructions
+
+59
+00:03:59,124 --> 00:04:04,720
+assembler that the compiler generated
+at the time of its compilation work.
+
+60
+00:04:04,720 --> 00:04:06,462
+On the other hand, since that the
+
+61
+00:04:06,462 --> 00:04:09,902
+execution time of
+an instruction is repetitive,
+
+62
+00:04:09,902 --> 00:04:15,770
+it is possible to execute loops whose
+duration will also be repetitive.
+
+63
+00:04:15,770 --> 00:04:17,886
+And that's how we'll
+
+64
+00:04:17,886 --> 00:04:23,507
+make the active loops
+that will allow you to manage
+
+65
+00:04:23,507 --> 00:04:28,770
+a little bit time. Let's try
+to look at this program.
+
+66
+00:04:28,770 --> 00:04:34,150
+It is marked that there is,
+inside, a first loop,
+
+67
+00:04:34,150 --> 00:04:39,605
+this loop will run a number
+of times, here the
+
+68
+00:04:39,605 --> 00:04:44,900
+value has been set. Note
+
+69
+00:04:44,900 --> 00:04:48,845
+that this variable has been set
+in volatile,
+
+70
+00:04:48,845 --> 00:04:53,335
+it is very important, in such a
+way that the execution of a
+
+71
+00:04:53,335 --> 00:04:56,240
+loop is not replaced by anything
+
+72
+00:04:56,240 --> 00:05:01,136
+by the compiler that
+always tries to optimize.
+
+73
+00:05:01,136 --> 00:05:05,387
+This loop for is included in a first
+
+74
+00:05:05,387 --> 00:05:10,024
+loop, which, will execute a number of
+
+75
+00:05:10,024 --> 00:05:16,042
+time linked to this input parameter,
+so we have a procedure that we have
+
+76
+00:05:16,042 --> 00:05:22,080
+called wait milliseconds, we pass it
+the duration parameter, it is this
+
+77
+00:05:22,080 --> 00:05:24,399
+duration that is used to
+
+78
+00:05:24,399 --> 00:05:27,730
+do the execution of a certain
+number of times this
+
+79
+00:05:27,730 --> 00:05:35,040
+loop, we understand better, therefore,
+that this procedure will make a wait, whose
+
+80
+00:05:35,040 --> 00:05:40,370
+duration is more or less
+proportional to this parameter.
+
+81
+00:05:40,370 --> 00:05:45,810
+It is clear that if we put 1 or if
+we put 2, we will not have a
+
+82
+00:05:45,810 --> 00:05:51,160
+linearity, on the other hand if we put 200,
+if we put 300, we will have a good linearity.
+
+83
+00:05:51,160 --> 00:05:55,450
+But since we know nothing
+about the execution time
+
+84
+00:05:55,450 --> 00:06:00,177
+of instructions, the only solution
+to have a procedure that is
+
+85
+00:06:00,177 --> 00:06:05,620
+correct from the point of view
+of time, is to calibrate yourself.
+
+86
+00:06:05,620 --> 00:06:08,470
+Then I propose to you a small quiz.
+
+87
+00:06:08,470 --> 00:06:14,020
+With which measuring device can
+we calibrate our waiting loop?
+
+88
+00:06:14,020 --> 00:06:17,386
+Can a frequency meter be used?
+
+89
+00:06:17,386 --> 00:06:20,510
+A chronometer? An oscilloscope?
+
+90
+00:06:20,510 --> 00:06:22,030
+A scale?
+
+91
+00:06:28,285 --> 00:06:33,339
+Then we see that a balance is not
+
+92
+00:06:33,339 --> 00:06:38,818
+quite the ideal tool for this kind
+of work, on the other hand a
+
+93
+00:06:38,818 --> 00:06:43,806
+frequencymeter is perfectly fine.
+An oscilloscope, that
+
+94
+00:06:43,806 --> 00:06:48,730
+allows to measure a period,
+also suits perfectly well.
+
+95
+00:06:48,730 --> 00:06:54,325
+But a chronometer can quite
+possibly also be used.
+
+96
+00:06:54,325 --> 00:06:57,972
+I have to tell you that I thought
+of the many African students
+
+97
+00:06:57,972 --> 00:07:02,149
+who will follow this course
+by asking this question.
+
+98
+00:07:02,149 --> 00:07:05,900
+We often complain there,
+there is no equipment
+
+99
+00:07:05,900 --> 00:07:10,870
+in laboratories, laboratories
+are not very accessible to students,
+
+100
+00:07:10,870 --> 00:07:14,831
+and well you see that with a
+simple chronometer, like the one
+
+101
+00:07:14,831 --> 00:07:16,640
+you find in most
+
+102
+00:07:16,640 --> 00:07:19,655
+mobile phones,
+you will be able to calibrate
+
+103
+00:07:19,655 --> 00:07:20,820
+your procedure.
+
+104
+00:07:20,820 --> 00:07:23,090
+Let's see how we will do
+this calibration.
+
+105
+00:07:23,090 --> 00:07:29,622
+Let's use our procedure ExpectationMs,
+which allows to wait for a certain number of
+
+106
+00:07:29,622 --> 00:07:35,120
+milliseconds, or that is supposed
+to wait a certain number of milliseconds.
+
+107
+00:07:35,120 --> 00:07:40,560
+Let us give it the parameter ten thousand,
+which will correspond to ten seconds,
+
+108
+00:07:40,560 --> 00:07:45,745
+let us change the state
+of the LED after 10 seconds,
+
+109
+00:07:45,745 --> 00:07:48,631
+it will then suffice to adjust the constant
+
+110
+00:07:48,631 --> 00:07:52,400
+which was called BaseTempsMs until we get
+
+111
+00:07:52,400 --> 00:07:56,250
+exactly the ten seconds on
+the chronometer,
+
+112
+00:07:56,250 --> 00:07:59,814
+and it will be rather repetitive, perfectly
+
+113
+00:07:59,814 --> 00:08:05,202
+repetitive if we have a quartz, repetitive
+with an accuracy better than 1%
+
+114
+00:08:05,202 --> 00:08:10,575
+if we simply have an oscillator as
+they are found in the microcontrollers.
+
+115
+00:08:10,575 --> 00:08:16,230
+I would point out that this limited accuracy
+is sufficient in many cases.
+
+116
+00:08:16,230 --> 00:08:20,961
+On the other hand, to manage
+the date and the time, there are
+
+117
+00:08:20,961 --> 00:08:25,430
+specialized circuits, and we shall have the
+occasion to discuss them later in this course.
+
+118
+00:08:25,430 --> 00:08:30,938
+Once again, the Arduino environment, and also
+
+119
+00:08:30,938 --> 00:08:36,102
+Energia, offer a similar procedure
+to that was developed
+
+120
+00:08:36,102 --> 00:08:37,350
+earlier.
+
+121
+00:08:37,350 --> 00:08:40,357
+It's called delay and we pass to it
+
+122
+00:08:40,357 --> 00:08:44,370
+a parameter that
+is expressed in milliseconds.
+
+123
+00:08:44,370 --> 00:08:48,093
+It seems to be done exactly as
+
+124
+00:08:48,093 --> 00:08:50,807
+we have just done,
+and you remember, that's what
+
+125
+00:08:50,807 --> 00:08:56,096
+allowed us to write our first program,
+which was a flashing in which
+
+126
+00:08:56,096 --> 00:09:01,360
+were alternated digitalWrite
+HIGH and delay,
+
+127
+00:09:01,360 --> 00:09:05,250
+then LOW and the same delay to flash.
+
+128
+00:09:05,250 --> 00:09:11,310
+So it must be remembered,
+this call delay is a blocking call.
+
+129
+00:09:11,310 --> 00:09:18,250
+If we start a delay, nothing
+happens during this period.
+
+130
+00:09:18,250 --> 00:09:23,800
+We now have everything
+we need to make sequencers.
+
+131
+00:09:23,800 --> 00:09:27,068
+We will make succeed assignments
+
+132
+00:09:27,068 --> 00:09:31,000
+of outputs, something that
+we know perfectly well,
+
+133
+00:09:31,000 --> 00:09:34,963
+and the expectations we have just learned.
+
+134
+00:09:34,963 --> 00:09:38,050
+Entries are not involved in this type
+
+135
+00:09:38,050 --> 00:09:40,810
+of program, but there is indeed
+
+136
+00:09:40,810 --> 00:09:44,765
+a number of applications,
+more than perhaps imagined,
+
+137
+00:09:44,765 --> 00:09:49,770
+that use only the outputs of the
+microcontroller without using the inputs.
+
+138
+00:09:49,770 --> 00:09:52,220
+I name some examples here:
+
+139
+00:09:52,220 --> 00:09:59,050
+A cyclical traffic light does not
+require inputs, nor a music box.
+
+140
+00:09:59,050 --> 00:10:05,820
+An animated cyclic or pseudo-random
+sign does not require inputs.
+
+141
+00:10:05,820 --> 00:10:07,900
+It is also the case of
+a luminous newspaper,
+
+142
+00:10:07,900 --> 00:10:10,550
+these last two subjects,
+
+143
+00:10:10,550 --> 00:10:13,360
+will be studied in more
+detail later in this course.
+
+144
+00:10:13,360 --> 00:10:16,640
+And there are certainly other applications.
+
+145
+00:10:16,640 --> 00:10:18,000
+Let's take the example
+
+146
+00:10:18,000 --> 00:10:22,705
+of the cyclic tricolor fire.
+We have two axes on which
+
+147
+00:10:22,705 --> 00:10:28,498
+cars can move in both directions,
+and we simply have
+
+148
+00:10:28,498 --> 00:10:33,140
+two lights for each direction,
+for each axe, they
+
+149
+00:10:33,140 --> 00:10:38,131
+are used at the same time,
+here for axe number 2.
+
+150
+00:10:38,131 --> 00:10:43,046
+The program is a sequencer.
+Before writing the
+
+151
+00:10:43,046 --> 00:10:47,076
+program, let us give a few
+
+152
+00:10:47,076 --> 00:10:49,432
+tools to make it more readable.
+
+153
+00:10:49,432 --> 00:10:54,596
+First, the use of enum to declare colors
+
+154
+00:10:54,596 --> 00:10:59,836
+green, orange and red, and
+then two procedures that turn on
+
+155
+00:10:59,836 --> 00:11:05,120
+the right color on axis 1,
+the correct color on axis number 2.
+
+156
+00:11:05,120 --> 00:11:08,339
+So each time you have
+to turn off the three
+
+157
+00:11:08,339 --> 00:11:14,212
+lights, and then you have
+to light the fire of the right color,
+
+158
+00:11:14,212 --> 00:11:19,950
+either red, orange, or green.
+
+159
+00:11:19,950 --> 00:11:23,576
+This is the main loop of this
+
+160
+00:11:23,576 --> 00:11:26,880
+program, we see that it is indeed a
+
+161
+00:11:26,880 --> 00:11:30,490
+sequencer, there
+are successive assignments of
+
+162
+00:11:30,490 --> 00:11:33,550
+exits and expectations, each of these
+
+163
+00:11:33,550 --> 00:11:38,722
+lines is presented in the same way.
+So there are three steps to
+
+164
+00:11:38,722 --> 00:11:43,980
+each of the axes.
+Pass the other axis to red,
+
+165
+00:11:43,980 --> 00:11:48,591
+the axis concerned into green,
+and wait for the
+
+166
+00:11:48,591 --> 00:11:53,865
+time the cars pass,
+then switch to orange on this axis, then
+
+167
+00:11:53,865 --> 00:11:58,862
+to red on this axis, each time with small
+
+168
+00:11:58,862 --> 00:12:03,728
+delays, and the same thing
+is done on the second axis.
+
+169
+00:12:03,728 --> 00:12:06,878
+We can ask one question: is it
+
+170
+00:12:06,878 --> 00:12:10,820
+possible to manage multiple
+tasks with a microcontroller?
+
+171
+00:12:10,820 --> 00:12:14,850
+I recall that the expectations,
+as we have seen, are blocking.
+
+172
+00:12:14,850 --> 00:12:19,726
+We have very easily blinked a LED
+
+173
+00:12:19,726 --> 00:12:24,706
+at 2 Hertz, but it's not so easy to add
+
+174
+00:12:24,706 --> 00:12:29,390
+a second LED that would flash
+at 3 Hertz, for example.
+
+175
+00:12:29,390 --> 00:12:33,060
+So here is an idea to solve this problem.
+
+176
+00:12:33,060 --> 00:12:38,380
+Try to use a main loop whose
+main duration is constant.
+
+177
+00:12:38,380 --> 00:12:44,630
+That means you do not have
+to use any other loops inside.
+
+178
+00:12:44,630 --> 00:12:46,892
+So this is a solution for
+
+179
+00:12:46,892 --> 00:12:51,010
+the problem of the double direction
+indicator at uneven frequencies.
+
+180
+00:12:51,010 --> 00:12:56,250
+We will use two variables counter1
+
+181
+00:12:56,250 --> 00:13:01,250
+and counter2. The main loop is the only
+
+182
+00:13:01,250 --> 00:13:08,070
+place where we find a while.
+Here, there is no while.
+
+183
+00:13:08,070 --> 00:13:11,530
+We only find IFs, which are not blocking.
+
+184
+00:13:11,530 --> 00:13:16,690
+We use the incrementation
+
+185
+00:13:16,690 --> 00:13:22,277
+of the counters at each cycle
+and we use the delay
+
+186
+00:13:22,277 --> 00:13:26,942
+of a millisecond for this main loop
+
+187
+00:13:26,942 --> 00:13:32,070
+to run with an approximately constant
+duration.
+
+188
+00:13:32,070 --> 00:13:37,488
+And then, at the beginning of each cycle,
+that is, when the counter
+
+189
+00:13:37,488 --> 00:13:42,809
+is at 0, we will reverse
+one of the LED or the other
+
+190
+00:13:42,809 --> 00:13:48,945
+LED, and when the meter
+has reached its maximum value,
+
+191
+00:13:48,945 --> 00:13:54,610
+here at 250 to have a quarter of a second,
+so to have a frequency of
+
+192
+00:13:54,610 --> 00:14:00,340
+2 Hertz, we will therefore reset
+the counter1 to 0, and here from the same
+
+193
+00:14:00,340 --> 00:14:06,020
+way, after 166 milliseconds,
+the counter2 is set to 0.
+
+194
+00:14:06,020 --> 00:14:07,668
+This technique,
+
+195
+00:14:07,668 --> 00:14:11,376
+which is therefore the use of a main loop
+
+196
+00:14:11,376 --> 00:14:15,310
+at constant duration is interesting
+
+197
+00:14:15,310 --> 00:14:20,442
+and we will have several times the opportunity
+to use it in the rest of this course.
+
+198
+00:14:20,442 --> 00:14:26,100
+Until now, we have always
+used relative times, it is also
+
+199
+00:14:26,100 --> 00:14:33,250
+possible to have an absolute time,
+in quotation marks, it is in fact the elapsed time
+
+200
+00:14:33,250 --> 00:14:37,930
+since the beginning of the program.
+It can be realized
+
+201
+00:14:37,930 --> 00:14:43,288
+simply by that structure. In the main loop
+
+202
+00:14:43,288 --> 00:14:48,549
+at constant time, a variable
+is incremented which is initialized
+
+203
+00:14:48,549 --> 00:14:53,572
+to 0. Obviously, it would be a little
+pity if we
+
+204
+00:14:53,572 --> 00:14:58,425
+already arrive at a return to 0 after
+
+205
+00:14:58,425 --> 00:15:03,142
+about 65000 milliseconds,
+that is to say just over a
+
+206
+00:15:03,142 --> 00:15:06,660
+minute, that is why we will use
+
+207
+00:15:06,660 --> 00:15:10,637
+an variable unsigned long that
+corresponds to
+
+208
+00:15:10,637 --> 00:15:14,840
+more than one month
+before returning to the value 0.
+
+209
+00:15:14,840 --> 00:15:20,420
+Here is another version
+of our double indicator
+
+210
+00:15:20,420 --> 00:15:23,606
+which seems simpler,
+the program is much shorter,
+
+211
+00:15:23,606 --> 00:15:28,615
+there is only one variable, our variable
+that manages the milliseconds that
+
+212
+00:15:28,615 --> 00:15:34,010
+pass, and here a division is used,
+more exactly the rest of the
+
+213
+00:15:34,010 --> 00:15:41,130
+division, to find out if we
+got to 150 or 166 milliseconds,
+
+214
+00:15:41,130 --> 00:15:48,250
+we can then reverse the state
+of each of the diodes.
+
+215
+00:15:48,250 --> 00:15:53,255
+But basically, is it really simpler?
+This is the program
+
+216
+00:15:53,255 --> 00:15:58,303
+that we had. It is certainly longer
+
+217
+00:15:58,303 --> 00:16:03,377
+in C, but is it longer when compiled?
+
+218
+00:16:03,377 --> 00:16:04,620
+Maybe not.
+
+219
+00:16:04,620 --> 00:16:09,786
+Here we have comparisons,
+and only mathematical calculation,
+
+220
+00:16:09,786 --> 00:16:15,327
+arithmetic calculations, we have
+two increments.
+
+221
+00:16:15,327 --> 00:16:18,431
+Here we have two divisions,
+
+222
+00:16:18,431 --> 00:16:21,110
+which are two operations
+which obviously take
+
+223
+00:16:21,110 --> 00:16:23,218
+more time and much more
+
+224
+00:16:23,218 --> 00:16:28,209
+space memory, more setup instructions.
+
+225
+00:16:28,209 --> 00:16:33,683
+We must therefore be vigilant,
+the solution that seems the simplest in C is not
+
+226
+00:16:33,683 --> 00:16:39,290
+always the simplest in assembler,
+and therefore not always the most effective.
+
+227
+00:16:39,290 --> 00:16:40,401
+Again,
+
+228
+00:16:40,401 --> 00:16:46,023
+the Arduino environment
+as well as Energia offer a
+
+229
+00:16:46,023 --> 00:16:51,822
+simillar procedure, it is possible to call
+this procedure millis, which gives
+
+230
+00:16:51,822 --> 00:16:57,190
+the number of milliseconds
+since the start of the program.
+
+231
+00:16:57,190 --> 00:17:01,950
+What is surprising is that Arduino
+also offers the micros procedure,
+
+232
+00:17:01,950 --> 00:17:05,662
+and this time it is not in milliseconds but
+
+233
+00:17:05,662 --> 00:17:09,661
+in microseconds, and
+then the explanation that I
+
+234
+00:17:09,661 --> 00:17:15,250
+gave you does not seems to be
+appropriate, because then the execution
+
+235
+00:17:15,250 --> 00:17:19,619
+of some assembly instructions may come
+
+236
+00:17:19,619 --> 00:17:24,637
+to seriously influence values ​​
+that are expressed in microseconds.
+
+237
+00:17:24,637 --> 00:17:27,806
+In milliseconds, there was a margin,
+
+238
+00:17:27,806 --> 00:17:30,767
+in microseconds, we are very
+close to the execution time
+
+239
+00:17:30,767 --> 00:17:34,590
+of an instruction. So they have a thing.
+
+240
+00:17:34,590 --> 00:17:39,860
+This involves the use
+of timers and interruption,
+
+241
+00:17:39,860 --> 00:17:43,000
+which we will soon see in this course.
+
+242
+00:17:43,000 --> 00:17:48,358
+I would like to remind you that
+we should not forgot that these two
+
+243
+00:17:48,358 --> 00:17:52,420
+are not blocking, do not wait but give
+
+244
+00:17:52,420 --> 00:17:55,866
+simply the clock, the value,
+in the background,
+
+245
+00:17:55,866 --> 00:18:01,095
+of the hour, it is like watching
+a clock, unlike the call
+
+246
+00:18:01,095 --> 00:18:06,952
+delay, which was a wait,
+which corresponds rather to a timer.
+
+247
+00:18:06,952 --> 00:18:12,845
+So we have seen that, for a certain
+length of time, it is possible to
+
+248
+00:18:12,845 --> 00:18:17,595
+prepare active waiting loops, it is
+
+249
+00:18:17,595 --> 00:18:21,080
+possible with this tool to make sequencers
+
+250
+00:18:21,080 --> 00:18:23,340
+which act on the outputs.
+
+251
+00:18:23,340 --> 00:18:28,980
+We also saw that it was possible
+to do multitasking,
+
+252
+00:18:28,980 --> 00:18:34,260
+that is to say to execute several processes
+in some way at the same time.
+
+253
+00:18:34,260 --> 00:18:39,892
+We also talked about absolute time,
+and we looked at
+
+254
+00:18:39,892 --> 00:18:44,330
+Arduino calls that matched
+these different functions.
+
+255
+00:18:44,330 --> 00:18:46,904
+In a future module,
+
+256
+00:18:46,904 --> 00:18:52,330
+we will then integrate
+the entries and not only
+
+257
+00:18:52,330 --> 00:18:57,840
+The outputs, and also manage
+them as a function of time.
+

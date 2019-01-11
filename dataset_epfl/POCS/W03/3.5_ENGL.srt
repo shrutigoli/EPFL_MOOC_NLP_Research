@@ -1,0 +1,334 @@
+1
+00:00:04,311 --> 00:00:06,819
+We are discussing 
+Butler Lampson's name service
+
+2
+00:00:06,819 --> 00:00:09,701
+and the third design goal 
+for the system is performance.
+
+3
+00:00:10,391 --> 00:00:14,156
+When a user looks up a name 
+they should get a response within say,
+
+4
+00:00:14,156 --> 00:00:17,669
+a few hundreds of milliseconds 
+even if the system happens
+
+5
+00:00:17,669 --> 00:00:20,363
+to be storing millions of name mappings.
+
+6
+00:00:20,929 --> 00:00:22,211
+Let's see how this is achieved.
+
+7
+00:00:23,560 --> 00:00:26,478
+To discuss the performance of the system, 
+we first need to look at
+
+8
+00:00:26,478 --> 00:00:28,293
+its operation in a bit more detail.
+
+9
+00:00:28,893 --> 00:00:32,281
+In an earlier slide, we said that given 
+the directory tree on the left,
+
+10
+00:00:32,872 --> 00:00:35,006
+this name maps to this value.
+
+11
+00:00:35,853 --> 00:00:38,863
+Let's see now what happens 
+when a user needs to obtain
+
+12
+00:00:38,863 --> 00:00:40,530
+this name to value mapping.
+
+13
+00:00:43,066 --> 00:00:46,010
+The first component of the name 
+is the directory identifier
+
+14
+00:00:46,010 --> 00:00:47,327
+of the root directory.
+
+15
+00:00:48,170 --> 00:00:51,856
+The assumption is that every machine 
+knows how to reach the root directory.
+
+16
+00:00:52,185 --> 00:00:56,138
+More specifically, every machine knows 
+how to reach at least one server
+
+17
+00:00:56,138 --> 00:00:58,394
+that stores a copy of the root directory.
+
+18
+00:01:00,124 --> 00:01:01,916
+The second component is DEC.
+
+19
+00:01:02,229 --> 00:01:05,932
+This is a local directory name 
+that only the root directory knows about.
+
+20
+00:01:06,282 --> 00:01:08,586
+So we need to ask 
+the root directory about it.
+
+21
+00:01:09,099 --> 00:01:13,898
+The root directory stores information 
+about the DEC directory in this form.
+
+22
+00:01:14,811 --> 00:01:16,977
+"DR" stands for directory reference.
+
+23
+00:01:17,637 --> 00:01:23,401
+311 is the directory identifier for DEC 
+and "delta" and "omega" are identifiers
+
+24
+00:01:23,401 --> 00:01:26,945
+for the servers that store copies 
+of the DEC directory.
+
+25
+00:01:28,628 --> 00:01:32,211
+So, from the point of view
+of the root directory
+
+26
+00:01:32,211 --> 00:01:36,894
+DEC is an entity, DR is a property of DEC
+
+27
+00:01:36,894 --> 00:01:40,898
+and the information about DEC 
+is the value of the DR property.
+
+28
+00:01:42,119 --> 00:01:45,288
+Which means that to learn how 
+to reach the DEC directory
+
+29
+00:01:45,288 --> 00:01:49,963
+we need to look up this name in 
+the root directory and get back its value.
+
+30
+00:01:52,471 --> 00:01:54,792
+So now we know how to reach 
+the DEC directory
+
+31
+00:01:54,792 --> 00:01:58,054
+and we need to learn how 
+to reach the SRC directory.
+
+32
+00:01:58,866 --> 00:02:02,914
+This is again a local directory name 
+that only the DEC directory knows about.
+
+33
+00:02:03,293 --> 00:02:05,459
+So we need to ask 
+the DEC directory about it.
+
+34
+00:02:06,088 --> 00:02:07,717
+The rest is as you would expect.
+
+35
+00:02:08,128 --> 00:02:12,018
+The DEC directory stores information 
+about the SRC directory in this form.
+
+36
+00:02:12,748 --> 00:02:15,510
+So to learn how to reach 
+the SRC directory
+
+37
+00:02:15,510 --> 00:02:19,684
+we need to look up this name in 
+the DEC directory and get back its value.
+
+38
+00:02:20,938 --> 00:02:22,480
+Let me make a parentheses here.
+
+39
+00:02:23,198 --> 00:02:26,646
+This is one of the most elegant aspects 
+of the design of this system.
+
+40
+00:02:27,339 --> 00:02:30,793
+All the metadata that are needed by 
+the system are stored
+
+41
+00:02:30,793 --> 00:02:34,243
+within the system itself as entities, 
+properties, and values.
+
+42
+00:02:34,806 --> 00:02:38,854
+That is the name service 
+is using itself as a name service.
+
+43
+00:02:41,902 --> 00:02:44,764
+At this point we know how 
+to reach the SRC directory
+
+44
+00:02:44,764 --> 00:02:46,989
+so we can ask it about Lampson.
+
+45
+00:02:47,707 --> 00:02:51,000
+We already know that the SRC directory 
+stores information about Lampson
+
+46
+00:02:51,000 --> 00:02:54,634
+in this form so we need to look up 
+this name in the SRC directory
+
+47
+00:02:54,634 --> 00:02:56,260
+and get back its value.
+
+48
+00:02:59,301 --> 00:03:02,276
+So three names had to be looked up 
+in order for a user
+
+49
+00:03:02,276 --> 00:03:03,721
+to obtain the value of Lampson.
+
+50
+00:03:04,095 --> 00:03:06,855
+This means that in an application 
+that needs to obtain this value
+
+51
+00:03:06,855 --> 00:03:09,019
+may incur significant latency.
+
+52
+00:03:09,803 --> 00:03:12,126
+Because it has to wait for many 
+look ups to complete.
+
+53
+00:03:12,777 --> 00:03:16,040
+How can we reduce this latency? 
+Through caching.
+
+54
+00:03:16,634 --> 00:03:20,522
+A user of the system that completes 
+a successful look up can cache the result
+
+55
+00:03:20,522 --> 00:03:21,778
+for some period of time.
+
+56
+00:03:22,372 --> 00:03:24,778
+However, there is a 
+price to pay for caching.
+
+57
+00:03:25,307 --> 00:03:28,409
+If a user is allowed to cache 
+a mapping for say an hour,
+
+58
+00:03:28,880 --> 00:03:31,515
+this means that this mapping 
+should not change for an hour.
+
+59
+00:03:31,918 --> 00:03:34,556
+Otherwise the user will end up 
+with a stale mapping.
+
+60
+00:03:35,089 --> 00:03:37,438
+To ensure that no user ends up 
+with a stale mapping
+
+61
+00:03:37,438 --> 00:03:40,286
+each entry is assigned 
+an expiration time
+
+62
+00:03:40,286 --> 00:03:43,235
+and changing it before 
+that time is forbidden.
+
+63
+00:03:43,896 --> 00:03:48,097
+So, what the system does is limit 
+the rate at which the value of a name
+
+64
+00:03:48,097 --> 00:03:51,608
+can change in order to decrease 
+the latency experienced
+
+65
+00:03:51,608 --> 00:03:53,709
+when looking up this name.
+
+66
+00:03:55,964 --> 00:03:59,261
+So, performance is achieved 
+through caching.
+
+67
+00:03:59,857 --> 00:04:03,812
+Each user of the system can cache 
+their most recent name lookups.
+
+68
+00:04:04,472 --> 00:04:07,481
+This, however, restricts the rate 
+at which we can change
+
+69
+00:04:07,481 --> 00:04:08,871
+the content of the directory.
+
+70
+00:04:09,367 --> 00:04:13,193
+Each entry is assigned an expiration time 
+and it is guaranteed not
+
+71
+00:04:13,193 --> 00:04:15,480
+to change before that time.

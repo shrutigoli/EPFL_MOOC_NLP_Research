@@ -1,0 +1,1672 @@
+1
+00:00:03,619 --> 00:00:07,318
+Welcome back Nature, in Code.
+We're in Chapter 3, Lecture 10.
+
+2
+00:00:07,318 --> 00:00:08,750
+In the previous lectures,
+
+3
+00:00:08,750 --> 00:00:12,100
+we implemented 
+genetic drift simulations in javascript
+
+4
+00:00:12,100 --> 00:00:15,309
+and then plotted the results 
+and everything works beautifully so far.
+
+5
+00:00:15,345 --> 00:00:18,004
+So what we like to do now 
+is to extend this a little bit
+
+6
+00:00:18,004 --> 00:00:22,404
+and actually plot multiple simulations
+in one figure.
+
+7
+00:00:22,404 --> 00:00:23,825
+So how are we going to do this?
+
+8
+00:00:23,825 --> 00:00:26,454
+Well, we need two-dimensional arrays
+
+9
+00:00:26,454 --> 00:00:29,895
+and we briefly touched upon them
+in the previous lecture.
+
+10
+00:00:29,895 --> 00:00:34,395
+In this video, we'll extend our 
+genetic drift simulation
+
+11
+00:00:34,395 --> 00:00:37,608
+to multiple simulations 
+using two-dimensional arrays
+
+12
+00:00:37,608 --> 00:00:38,824
+So let's get going.
+
+13
+00:00:38,911 --> 00:00:42,392
+What we have at the moment
+is this data array.
+
+14
+00:00:42,392 --> 00:00:49,790
+This data array contains many values
+like 0.49, 0.48,
+
+15
+00:00:50,320 --> 00:00:54,140
+0.485, and so on--
+many, many values.
+
+16
+00:00:54,140 --> 00:00:57,736
+in fact, it contains exactly 
+a thousand values.
+
+17
+00:00:57,736 --> 00:01:01,392
+Okay, so there's going to be
+1000 data points,
+
+18
+00:01:02,950 --> 00:01:06,264
+and this corresponds to one simulation.
+
+19
+00:01:06,264 --> 00:01:09,622
+And then we're essentially plotting
+those 1000 data points.
+
+20
+00:01:09,686 --> 00:01:12,361
+This is what we're doing already.
+
+21
+00:01:12,361 --> 00:01:14,667
+Now we'd like to extend this,
+
+22
+00:01:14,667 --> 00:01:20,734
+and we'd like to gave ten simulations
+for example, or 20 or hundreds,
+
+23
+00:01:20,734 --> 00:01:25,525
+but let's focus on the assumption
+that we'll have ten simulations.
+
+24
+00:01:25,525 --> 00:01:27,087
+So ten simulations,
+
+25
+00:01:27,087 --> 00:01:30,082
+and each of those simulations 
+will have 1000 data points.
+
+26
+00:01:30,082 --> 00:01:32,077
+So how do we store this?
+
+27
+00:01:32,077 --> 00:01:37,225
+Well, we could just store 10,000 
+data points into a one-dimensional array
+
+28
+00:01:37,225 --> 00:01:39,507
+but that's not a good way 
+to structure this.
+
+29
+00:01:39,507 --> 00:01:43,637
+The better way to structure this
+is to say, "Well, our data array
+
+30
+00:01:43,637 --> 00:01:49,378
+will contain itself ten arrays."
+
+31
+00:01:50,647 --> 00:01:53,135
+So ten arrays-- 
+we're not going to draw ten here
+
+32
+00:01:53,135 --> 00:01:56,550
+but we'll have ten elements here...
+
+33
+00:01:56,550 --> 00:01:59,859
+okay, ten arrays...
+
+34
+00:01:59,859 --> 00:02:02,446
+that will be contained in this array.
+
+35
+00:02:03,370 --> 00:02:06,199
+And then each of those arrays, alright,
+
+36
+00:02:06,199 --> 00:02:12,468
+each of those will now have
+the values... 0.49, 0.48,
+
+37
+00:02:12,468 --> 00:02:14,737
+0.47... whatever.
+
+38
+00:02:14,737 --> 00:02:19,317
+1000 data points, just as we had before,
+
+39
+00:02:19,317 --> 00:02:25,018
+1000 data points, which corresponds
+to one simulation.
+
+40
+00:02:27,089 --> 00:02:31,405
+But all of this is now stored
+in one single array here,
+
+41
+00:02:31,405 --> 00:02:35,572
+and this data array contains ten
+of those arrays.
+
+42
+00:02:35,572 --> 00:02:42,532
+So we're have a 10 times 
+1000 elements array.
+
+43
+00:02:42,555 --> 00:02:46,427
+The dimension of this data array
+will be 10 times 1000,
+
+44
+00:02:46,427 --> 00:02:49,952
+then we can just simple pass 
+this data array now
+
+45
+00:02:49,952 --> 00:02:51,601
+to the plotting function.
+
+46
+00:02:51,601 --> 00:02:54,341
+The plotting function 
+is already programmed in such a way
+
+47
+00:02:54,341 --> 00:02:56,827
+that it knows how to deal with this.
+
+48
+00:02:56,827 --> 00:02:58,980
+Let's implement this in javascript.
+
+49
+00:02:59,063 --> 00:03:03,674
+Here's our genetic drift simulation
+as it is at the moment.
+
+50
+00:03:03,674 --> 00:03:05,133
+It simply has this array,
+
+51
+00:03:05,133 --> 00:03:10,334
+values get pushed into this array,
+the P values, and then
+
+52
+00:03:11,077 --> 00:03:15,244
+we're going to hand this data over
+to the Draw a Line Chart function
+
+53
+00:03:15,244 --> 00:03:16,934
+and the data gets plotted.
+
+54
+00:03:16,934 --> 00:03:19,024
+Now, we need to extend this code
+
+55
+00:03:19,024 --> 00:03:23,718
+so that the data array will contain
+multiple arrays,
+
+56
+00:03:23,718 --> 00:03:27,395
+that each contain simulation results.
+
+57
+00:03:28,058 --> 00:03:30,369
+I'm going to go ahead and do this
+
+58
+00:03:30,369 --> 00:03:35,720
+Let's say I like to have the code
+do ten simulations.
+
+59
+00:03:36,550 --> 00:03:39,658
+So, this is currently a simulation, right?
+
+60
+00:03:39,658 --> 00:03:42,582
+Because for however many times
+I have stored in generations,
+
+61
+00:03:42,582 --> 00:03:44,887
+at the moment it's 1000,
+
+62
+00:03:45,221 --> 00:03:48,363
+I'm going to call this 
+<i>Next Generation Function</i>
+
+63
+00:03:48,363 --> 00:03:50,613
+and then that's it, that's one simulation.
+
+64
+00:03:50,707 --> 00:03:54,036
+What I'm going to do is
+I'm going to wrap this loop here
+
+65
+00:03:54,036 --> 00:03:57,696
+into a function,
+
+66
+00:03:58,106 --> 00:04:01,766
+and I'm going to call this function, 
+"simulation"
+
+67
+00:04:01,766 --> 00:04:04,838
+because it's essentially 
+a single simulation.
+
+68
+00:04:04,856 --> 00:04:08,555
+So, <i>simulation</i>... okay.
+
+69
+00:04:08,593 --> 00:04:12,582
+And then I'm going to wrap this here,
+with curly brackets.
+
+70
+00:04:12,582 --> 00:04:14,841
+Now, I'm going to cut this for loop
+
+71
+00:04:14,841 --> 00:04:19,320
+and we're going to paste it back here
+using the correct indentation.
+
+72
+00:04:19,398 --> 00:04:23,578
+It's the same loop that we had before,
+but now it's within a function.
+
+73
+00:04:23,578 --> 00:04:26,990
+Now I can simply call this function
+ten times,
+
+74
+00:04:26,990 --> 00:04:30,935
+and that of course I can do 
+using, again, a loop.
+
+75
+00:04:30,935 --> 00:04:37,986
+So I'm going to set up another loop here
+that says, <i>for var i = 0</i> so as usual,.
+
+76
+00:04:37,986 --> 00:04:41,617
+And then let's say, let's do this ten times,
+
+77
+00:04:42,757 --> 00:04:49,243
+and then increase the counter, obviously
+to avoid endless loops.
+
+78
+00:04:50,290 --> 00:04:53,510
+Now, I'm simply going to call, simulation.
+
+79
+00:04:53,571 --> 00:04:56,222
+Okay, so here now, 
+I'm calling this function,
+
+80
+00:04:56,222 --> 00:04:58,262
+simulation ten times,
+
+81
+00:04:58,262 --> 00:05:01,923
+and this simulations is essentially just
+a convenience function
+
+82
+00:05:01,923 --> 00:05:05,972
+that calls "next generation,"
+however many times we want it.
+
+83
+00:05:06,558 --> 00:05:07,911
+So that's a good start,
+
+84
+00:05:07,911 --> 00:05:12,317
+but now we need to adapt 
+this function here, "next generation"
+
+85
+00:05:12,317 --> 00:05:14,258
+to be able to deal with the fact that
+
+86
+00:05:14,258 --> 00:05:19,476
+we can't just now mindlessly push p values
+into a data array.
+
+87
+00:05:19,476 --> 00:05:23,970
+Otherwise, we would have this long array
+of ten thousand numbers.
+
+88
+00:05:23,970 --> 00:05:27,918
+What we instead want,
+is we want ten arrays,
+
+89
+00:05:27,918 --> 00:05:30,374
+one for each simulation,
+
+90
+00:05:30,374 --> 00:05:33,990
+and then those ten arrays will get stored
+in the data array.
+
+91
+00:05:33,990 --> 00:05:36,108
+So how do we do this?
+
+92
+00:05:36,108 --> 00:05:40,701
+Well, first of all, 
+the next generation function
+
+93
+00:05:40,701 --> 00:05:43,800
+should not really have to deal with this.
+
+94
+00:05:43,800 --> 00:05:48,217
+So what I'm going to do here is,
+I'm actually just going to correct--
+
+95
+00:05:48,293 --> 00:05:53,825
+hand the correct sub-array 
+of the current simulation
+
+96
+00:05:53,825 --> 00:05:55,981
+to this "next generation" function,
+
+97
+00:05:56,005 --> 00:05:58,056
+and it will then push it there,
+
+98
+00:05:58,056 --> 00:06:02,588
+and we have to sort out somewhere else
+where we deal with this.
+
+99
+00:06:02,617 --> 00:06:07,199
+Basically, I'm asking "next generation"
+to take one value
+
+100
+00:06:07,199 --> 00:06:11,248
+and I'm going to call this <i>simulation data</i>...
+
+101
+00:06:11,248 --> 00:06:13,803
+simulation data...
+
+102
+00:06:14,367 --> 00:06:16,296
+So one parameter here.
+
+103
+00:06:16,296 --> 00:06:18,256
+And basically now, 
+when I call this function
+
+104
+00:06:18,256 --> 00:06:23,757
+I have to pass the correct data array
+for this current simulation.
+
+105
+00:06:23,792 --> 00:06:28,044
+And then rather than pushing 
+the p values here into data,
+
+106
+00:06:28,044 --> 00:06:32,391
+I'm going to push it now 
+into this simulation data.
+
+107
+00:06:32,391 --> 00:06:34,409
+Let me copy this and then here,
+
+108
+00:06:34,409 --> 00:06:37,736
+I'm just going to say, 
+"simulation data push p".
+
+109
+00:06:37,736 --> 00:06:41,561
+So now, "next generation"
+is completely agnostic about this.
+
+110
+00:06:41,561 --> 00:06:45,573
+It just will receive a data array here,
+
+111
+00:06:45,573 --> 00:06:49,222
+and then when it's called as an argument,
+
+112
+00:06:49,222 --> 00:06:53,802
+then it will push the p value 
+that it calculates into this array.
+
+113
+00:06:55,145 --> 00:07:01,518
+Now we have to simply deal with the fact
+that we should have ten of these arrays
+
+114
+00:07:01,518 --> 00:07:05,145
+and they should be stored correctly
+in the data array.
+
+115
+00:07:06,775 --> 00:07:13,852
+What we can do is,
+we have now here ten iterations,
+
+116
+00:07:13,901 --> 00:07:16,148
+so we iterate ten times.
+
+117
+00:07:17,602 --> 00:07:21,515
+So <i>i</i> here is really the counter
+for our simulations
+
+118
+00:07:21,515 --> 00:07:24,473
+and therefore also, for our arrays.
+
+119
+00:07:25,311 --> 00:07:30,035
+What I'm going to do is every time
+before I actually run a simulation,
+
+120
+00:07:31,065 --> 00:07:36,591
+I'm going to push and new array
+into an empty array,
+
+121
+00:07:36,591 --> 00:07:38,826
+into this data array.
+
+122
+00:07:38,826 --> 00:07:40,731
+Okay, so like this.
+
+123
+00:07:40,731 --> 00:07:44,401
+So now, every time before I run 
+this simulation function,
+
+124
+00:07:44,401 --> 00:07:45,860
+before I execute it,
+
+125
+00:07:45,860 --> 00:07:52,394
+I'm pushing another empty array
+into the data array.
+
+126
+00:07:52,421 --> 00:07:57,082
+That's great because at the end
+we want to have ten arrays in data,
+
+127
+00:07:57,082 --> 00:07:58,822
+and each of those arrays,
+
+128
+00:07:58,822 --> 00:08:03,504
+each of them being one simulation
+data array in the data array.
+
+129
+00:08:04,313 --> 00:08:08,433
+Now, the only thing I have to take care of
+is I have to somehow make sure that
+
+130
+00:08:08,433 --> 00:08:11,904
+when I call this
+"next generation" function,
+
+131
+00:08:11,904 --> 00:08:16,055
+it passes on 
+the correct simulation data array,
+
+132
+00:08:16,055 --> 00:08:19,673
+the correct sub-array within data.
+
+133
+00:08:21,503 --> 00:08:26,803
+Here in "next generation," 
+I need to pass now this array.
+
+134
+00:08:28,007 --> 00:08:31,713
+It's going to be some array
+that is within data.
+
+135
+00:08:32,831 --> 00:08:36,491
+So data will contain ten arrays,
+
+136
+00:08:36,491 --> 00:08:41,972
+and so I can access this sub-array
+by simply accessing its element.
+
+137
+00:08:41,972 --> 00:08:43,552
+How am I going to do this?
+
+138
+00:08:43,552 --> 00:08:46,755
+Well, I'm simply going to say here
+things like, "data 0".
+
+139
+00:08:46,755 --> 00:08:51,369
+That will now be the first element,
+which itself is an array,
+
+140
+00:08:51,369 --> 00:08:54,555
+or I'm going to say "data 1"
+which is another array,
+
+141
+00:08:54,555 --> 00:08:56,033
+or "data 2," and so on.
+
+142
+00:08:56,944 --> 00:08:59,706
+What is the correct index here?
+
+143
+00:08:59,706 --> 00:09:05,252
+Well, I need a way to figure out
+which simulation we're currently in.
+
+144
+00:09:06,517 --> 00:09:07,688
+How do we know this?
+
+145
+00:09:07,688 --> 00:09:10,631
+Well, of course know it down here, right?
+
+146
+00:09:10,631 --> 00:09:15,968
+When <i>i</i> is 0, we're in the first simulation,
+
+147
+00:09:15,968 --> 00:09:18,258
+and so the correct index would be zero.
+
+148
+00:09:18,258 --> 00:09:21,630
+When <i>i</i> is 1, 
+we're in the second simulation
+
+149
+00:09:21,630 --> 00:09:24,264
+And so the correct index will be 1,
+and so on.
+
+150
+00:09:24,264 --> 00:09:26,750
+What I'm going to do is,
+I'm going to pass this information,
+
+151
+00:09:26,750 --> 00:09:30,399
+this <i>i</i> up to simulation.
+
+152
+00:09:31,309 --> 00:09:33,755
+I'm going to pass <i>i</i> to simulation,
+
+153
+00:09:33,780 --> 00:09:36,328
+in other words, I need to receive it here,
+
+154
+00:09:36,328 --> 00:09:39,236
+so I'm going to find a parameter here,
+
+155
+00:09:39,236 --> 00:09:42,496
+and I'm going to call this, 
+"parameter simulation counter"
+
+156
+00:09:42,496 --> 00:09:44,235
+because that's what it is.
+
+157
+00:09:44,849 --> 00:09:48,098
+And this simulation counter--
+so first time it's going to be 0,
+
+158
+00:09:48,098 --> 00:09:49,426
+the second time it's going to be 1,
+
+159
+00:09:49,426 --> 00:09:51,519
+the third time it's going to be 2,
+and so on,
+
+160
+00:09:51,519 --> 00:09:56,536
+that is going to be my index
+for the data array.
+
+161
+00:09:57,521 --> 00:09:59,269
+I hope you understand how this works
+
+162
+00:09:59,269 --> 00:10:02,088
+but I'll just briefly 
+walk you through this, again.
+
+163
+00:10:03,722 --> 00:10:06,422
+What's happening here is
+we're iterating ten times.
+
+164
+00:10:07,172 --> 00:10:09,133
+Each iteration, the first thing I do
+
+165
+00:10:09,133 --> 00:10:12,672
+is I push another empty array 
+into the data array,
+
+166
+00:10:12,672 --> 00:10:15,603
+and this is the one 
+that should now contain all the values
+
+167
+00:10:15,603 --> 00:10:17,681
+for this particular simulation.
+
+168
+00:10:17,681 --> 00:10:22,040
+Then I'm going to call simulation,
+and I'm going to pass it the <i>i</i> value,
+
+169
+00:10:22,040 --> 00:10:24,938
+just so that it knows,
+that simulation knows
+
+170
+00:10:24,938 --> 00:10:27,423
+which iteration we're currently in.
+
+171
+00:10:27,532 --> 00:10:29,733
+Okay, so in the beginning
+it's going to be zero.
+
+172
+00:10:29,733 --> 00:10:31,671
+So this function gets called,
+
+173
+00:10:31,671 --> 00:10:34,678
+this value will be passed on
+to "simulation counter,"
+
+174
+00:10:34,678 --> 00:10:37,863
+and now I'm going to call 
+"next generation"
+
+175
+00:10:37,863 --> 00:10:41,530
+and I'm going to pass it
+the correct simulation array
+
+176
+00:10:41,530 --> 00:10:46,151
+which is "data index simulation counter."
+
+177
+00:10:46,151 --> 00:10:48,583
+So it's going to be 0 
+for the first simulation,
+
+178
+00:10:48,583 --> 00:10:50,591
+1 for the second simulation,
+and so on,
+
+179
+00:10:50,591 --> 00:10:52,681
+and 9 for the last simulation.
+
+180
+00:10:53,185 --> 00:10:55,332
+And here, the "next generation" 
+doesn't really care.
+
+181
+00:10:55,332 --> 00:11:00,463
+Each just gets some array
+and it pushes the values into this.
+
+182
+00:11:00,673 --> 00:11:04,727
+So, let's save this and see 
+if everything works fine.
+
+183
+00:11:04,727 --> 00:11:06,603
+Okay, I'm going to save it...
+
+184
+00:11:07,106 --> 00:11:11,113
+and now we are going over to the browser.
+
+185
+00:11:11,113 --> 00:11:14,673
+We're going to reload things here.
+
+186
+00:11:14,673 --> 00:11:18,842
+And something works,
+but it looks a little weird.
+
+187
+00:11:18,842 --> 00:11:21,413
+What do we have here?
+Let's reload this a couple of times.
+
+188
+00:11:21,413 --> 00:11:23,093
+Oh, that looks interesting.
+
+189
+00:11:23,093 --> 00:11:24,831
+So, we've made a mistake,
+
+190
+00:11:24,831 --> 00:11:28,037
+and I've made it on purpose
+just to demonstrate.
+
+191
+00:11:28,037 --> 00:11:30,833
+Look at what happens here,
+so we start, 0.5
+
+192
+00:11:30,833 --> 00:11:33,301
+and then quickly go to in order value.
+
+193
+00:11:33,386 --> 00:11:36,675
+And then here, this simulation...
+
+194
+00:11:36,729 --> 00:11:40,888
+the A1 allele doesn't go to fixation,
+neither does the A2,
+
+195
+00:11:40,891 --> 00:11:43,850
+so we're here somewhere around 0.75.
+
+196
+00:11:44,288 --> 00:11:48,466
+Then the next simulation 
+seems to start at this value,
+
+197
+00:11:48,466 --> 00:11:50,319
+eventually goes to fixation,
+
+198
+00:11:50,437 --> 00:11:53,297
+and then the next simulation starts at 1.
+
+199
+00:11:53,297 --> 00:11:55,718
+And of course, once you lost 
+all genetic variation,
+
+200
+00:11:55,718 --> 00:11:57,837
+there's no way to get it back
+at the moment
+
+201
+00:11:57,837 --> 00:11:59,709
+because we don't have any other process,
+
+202
+00:11:59,709 --> 00:12:01,837
+and we don't have mutation
+or anything like that.
+
+203
+00:12:02,210 --> 00:12:03,749
+So there's something wrong here.
+
+204
+00:12:03,749 --> 00:12:06,798
+If I reload this again a couple of times,
+you can see the same phenomenon.
+
+205
+00:12:06,798 --> 00:12:10,479
+So the first simulation here in blue
+stops somewhere here,
+
+206
+00:12:10,479 --> 00:12:15,888
+and then the next simulation 
+mistakenly continues at this value.
+
+207
+00:12:15,978 --> 00:12:17,635
+Let me reload this again,
+
+208
+00:12:17,635 --> 00:12:19,208
+This is an interesting case,
+
+209
+00:12:19,208 --> 00:12:22,432
+and none of the simulations 
+actually goes to fixation.
+
+210
+00:12:22,432 --> 00:12:24,832
+The fourth one goes and then it's over.
+
+211
+00:12:24,968 --> 00:12:26,765
+Here's also a good example.
+
+212
+00:12:26,765 --> 00:12:30,218
+The first simulation 
+almost loses the A1 allele,
+
+213
+00:12:30,218 --> 00:12:34,626
+ends here at around 0.1 
+after 1000 generation.
+
+214
+00:12:34,626 --> 00:12:38,674
+Then the next simulation 
+mistakenly starts at 0.1
+
+215
+00:12:38,674 --> 00:12:41,100
+and then quickly get the A1
+quickly gets lost.
+
+216
+00:12:41,540 --> 00:12:44,911
+How do we fix this?
+Let's go back to the code.
+
+217
+00:12:44,911 --> 00:12:49,481
+The problem is we just keep pushing <i>p</i>
+into these arrays,
+
+218
+00:12:49,481 --> 00:12:51,019
+so that seems to work,
+
+219
+00:12:51,019 --> 00:12:55,098
+but we're actually 
+never resetting <i>p</i> to 0.5.
+
+220
+00:12:55,098 --> 00:12:58,762
+And of course, we have to do this,
+otherwise the next--
+
+221
+00:12:58,762 --> 00:13:00,381
+once the simulation is done,
+
+222
+00:13:00,381 --> 00:13:05,072
+the next simulation will start
+at whichever value <i>p</i> is currently at.
+
+223
+00:13:05,072 --> 00:13:09,361
+So here, what I'm going to do here
+in this simulation,
+
+224
+00:13:09,361 --> 00:13:14,951
+when the function simulation 
+gets executed, the first thing we do
+
+225
+00:13:14,951 --> 00:13:17,632
+before we call
+next generation a thousand times,
+
+226
+00:13:17,632 --> 00:13:22,313
+is we're going to set <i>p</i> back to 0.5.
+
+227
+00:13:22,313 --> 00:13:24,805
+So we're going to reset <i>p</i>.
+
+228
+00:13:25,202 --> 00:13:29,338
+Notice that I'm not using <i>var p</i>,
+and I hope you know now why
+
+229
+00:13:29,338 --> 00:13:34,566
+because what I would like to do now here
+is I'm talking about the global--
+
+230
+00:13:34,566 --> 00:13:38,256
+the variable and the global scope,
+the one that we defined up here.
+
+231
+00:13:38,256 --> 00:13:40,146
+That needs to get reset.
+
+232
+00:13:40,146 --> 00:13:42,909
+If I would say <i>var p</i>, that wouldn't work
+
+233
+00:13:42,909 --> 00:13:47,637
+because it would simply be 
+a local variable that no one cares about.
+
+234
+00:13:47,637 --> 00:13:51,246
+So, be careful to say here "p"
+
+235
+00:13:51,246 --> 00:13:54,125
+because we're talking about 
+this global "p" here.
+
+236
+00:13:54,125 --> 00:13:55,365
+<i>P</i>, we're not defining a variable,
+
+237
+00:13:55,365 --> 00:14:00,955
+we're simply overriding
+this p variable here, resetting it to 0.5
+
+238
+00:14:00,968 --> 00:14:04,728
+Okay, by the way, 
+something else we could do
+
+239
+00:14:04,728 --> 00:14:06,565
+since we're resetting it here,
+
+240
+00:14:06,565 --> 00:14:10,706
+we may also essentially get rid of 
+this initialization
+
+241
+00:14:10,706 --> 00:14:14,989
+because we're resetting it
+every time simulation gets called anyways,
+
+242
+00:14:14,989 --> 00:14:20,338
+which is also the case in the first time
+we called the simulation function.
+
+243
+00:14:20,649 --> 00:14:26,673
+Let's save this. Let's go over
+to the browser and let reload this.
+
+244
+00:14:27,392 --> 00:14:29,425
+This looks much better now.
+
+245
+00:14:29,425 --> 00:14:34,235
+You can see all of the simulations here
+start at 0.5,
+
+246
+00:14:35,482 --> 00:14:43,033
+And all of these simulations now
+are independent of each other, correctly.
+
+247
+00:14:43,150 --> 00:14:49,281
+And you can now really observe
+very interesting dynamics here.
+
+248
+00:14:49,492 --> 00:14:50,850
+Here in this particular case,
+
+249
+00:14:50,850 --> 00:14:55,436
+you can see that basically 
+two of the simulations,
+
+250
+00:14:55,436 --> 00:14:58,310
+you have a situation where 
+one of the alleles goes to fixation
+
+251
+00:14:58,310 --> 00:15:01,093
+and the other one gets lost 
+in the population.
+
+252
+00:15:01,164 --> 00:15:04,148
+Well, maybe it's three, 
+it's not quite clear here,
+
+253
+00:15:04,148 --> 00:15:05,853
+whatever this gray line goes to fixation,
+
+254
+00:15:05,853 --> 00:15:09,105
+but let's reload this, 
+let's take a look at another case.
+
+255
+00:15:09,211 --> 00:15:12,673
+So here actually, 
+quite a few go to fixations.
+
+256
+00:15:12,717 --> 00:15:15,863
+1, 2, 3... 4 of the simulations 
+go to fixation.
+
+257
+00:15:16,020 --> 00:15:20,979
+It seems like the purple one here
+also goes to fixation or the A1 gets lost,
+
+258
+00:15:20,987 --> 00:15:23,533
+but correspondingly, 2 goes to fixation,
+
+259
+00:15:23,533 --> 00:15:27,596
+and there are only a few,
+1, 2, 3, 4, 5 correspondingly left
+
+260
+00:15:27,596 --> 00:15:31,425
+where the genetic variance 
+hasn't been lost yet.
+
+261
+00:15:31,425 --> 00:15:34,196
+And so this is quite nice,
+you can reload this a couple of times
+
+262
+00:15:34,196 --> 00:15:36,843
+and you can see the different dynamics.
+
+263
+00:15:36,843 --> 00:15:40,108
+Most of the time, 
+sort of about half of the time
+
+264
+00:15:40,108 --> 00:15:45,014
+it seems genetic variation remains
+in about half of the simulations,
+
+265
+00:15:45,014 --> 00:15:50,304
+one of the alleles goes to fixation
+and you lose all genetic variation.
+
+266
+00:15:50,544 --> 00:15:51,632
+So that's really interesting.
+
+267
+00:15:51,632 --> 00:15:53,751
+Now we have this system in place,
+
+268
+00:15:53,751 --> 00:15:57,652
+these randomly stochastic simulations
+of genetic drift
+
+269
+00:15:57,652 --> 00:15:59,677
+So now we could go and play
+with those values.
+
+270
+00:15:59,677 --> 00:16:02,620
+Let's go back to the code, for example,
+
+271
+00:16:02,620 --> 00:16:07,060
+and let's set the population size to 200,
+
+272
+00:16:07,060 --> 00:16:11,678
+and also the generations now here,
+we're going to make this a little shorter
+
+273
+00:16:11,678 --> 00:16:15,084
+to 200 time steps, okay, 200 generations.
+
+274
+00:16:15,103 --> 00:16:19,068
+So let's save this, and go back
+and reload this.
+
+275
+00:16:19,068 --> 00:16:20,472
+Here's what we can see.
+
+276
+00:16:20,472 --> 00:16:23,666
+This is now a bit higher resolution
+because it's only 200 generations.
+
+277
+00:16:23,717 --> 00:16:29,087
+Some of the simulations go to fixation,
+and some, they don't.
+
+278
+00:16:30,297 --> 00:16:31,785
+That's interesting.
+
+279
+00:16:31,785 --> 00:16:33,768
+Now we could say, "Well, you know what,
+
+280
+00:16:33,768 --> 00:16:38,342
+let's reduce the population size
+to just 20 individuals."
+
+281
+00:16:38,354 --> 00:16:42,789
+So we set <i>n</i> to 20,
+we go back to the browser.
+
+282
+00:16:42,853 --> 00:16:48,544
+And look at this. In all ten simulations,
+the genetic variation is completely lost.
+
+283
+00:16:49,004 --> 00:16:52,303
+The A1 allele will either get lost
+and A2 will go to fixation
+
+284
+00:16:52,303 --> 00:16:54,241
+or the A1 allele goes to fixation.
+
+285
+00:16:55,848 --> 00:17:00,172
+This happens at different speeds here.
+All of them went very fast.
+
+286
+00:17:00,263 --> 00:17:04,492
+Here's actually one where 
+it doesn't get lost by generation 200.
+
+287
+00:17:04,492 --> 00:17:08,077
+I think that's quite rare,
+but of course it can occasionally happen.
+
+288
+00:17:08,077 --> 00:17:09,981
+Here's another one.
+
+289
+00:17:09,981 --> 00:17:15,636
+But you can see, typically, very quickly
+such a small population size
+
+290
+00:17:15,636 --> 00:17:19,004
+within typically less than 100 generation,
+
+291
+00:17:19,004 --> 00:17:22,362
+all genetic diversity is lost
+from this population.
+
+292
+00:17:22,362 --> 00:17:25,054
+So when you have small population sizes,
+
+293
+00:17:25,054 --> 00:17:28,083
+the effects of genetic drift 
+are very, very strong.
+
+294
+00:17:28,083 --> 00:17:33,514
+In fact, let's now go the other way
+and increase the population size,
+
+295
+00:17:33,514 --> 00:17:38,916
+not back to 200, but in fact,
+in another order of magnitude, to 2000.
+
+296
+00:17:38,916 --> 00:17:41,657
+Let's save this, let's go back.
+
+297
+00:17:41,657 --> 00:17:43,526
+So this is now the opposite.
+
+298
+00:17:43,631 --> 00:17:49,601
+You still have the drifting here,
+and you can reload this a couple of times.
+
+299
+00:17:49,601 --> 00:17:52,132
+It will always look roughly the same.
+
+300
+00:17:52,132 --> 00:17:56,605
+And you know, eventually some of those
+would actually go to fixation.
+
+301
+00:17:56,605 --> 00:17:58,544
+But after 200 generations,
+
+302
+00:17:58,544 --> 00:18:01,242
+you still have most of 
+the genetic diversity.
+
+303
+00:18:01,242 --> 00:18:07,184
+You can clearly see the effect of drift
+and how would becomes stronger over time,
+
+304
+00:18:07,184 --> 00:18:10,055
+just because these effects 
+started accumulating,
+
+305
+00:18:10,055 --> 00:18:12,846
+but clearly the effect here 
+is much, much weaker
+
+306
+00:18:12,846 --> 00:18:16,835
+when we have a population size
+that's 100 times larger.
+
+307
+00:18:16,835 --> 00:18:20,045
+So I just claimed-- well eventually,
+also in this case
+
+308
+00:18:20,045 --> 00:18:24,326
+with this large population size of 2000,
+it will go to fixation.
+
+309
+00:18:24,326 --> 00:18:27,032
+Is that really true? 
+Well, we can actually test it.
+
+310
+00:18:27,032 --> 00:18:31,003
+Let's just up 
+the generation number here to 2000.
+
+311
+00:18:31,003 --> 00:18:32,562
+So this might take a little longer
+
+312
+00:18:32,562 --> 00:18:35,573
+because it's now ten times
+more calculations
+
+313
+00:18:35,573 --> 00:18:38,312
+but let's reload it... yup, here we go.
+
+314
+00:18:38,312 --> 00:18:41,622
+So you can see the diversity here
+is already much larger.
+
+315
+00:18:41,622 --> 00:18:43,649
+I haven't seen anything go to fixation.
+
+316
+00:18:43,649 --> 00:18:49,623
+Actually here this one goes to fixation
+around generation 1,000.
+
+317
+00:18:50,533 --> 00:18:53,323
+None here, although this is very close.
+
+318
+00:18:53,323 --> 00:18:58,270
+Here and around generation 2000,
+the A2 allele went to fixation
+
+319
+00:18:58,270 --> 00:19:00,643
+the A1 allele got lost.
+
+320
+00:19:00,643 --> 00:19:05,716
+And in fact, let's just increment this
+to 20,000 generations.
+
+321
+00:19:05,716 --> 00:19:08,484
+So, if we reload this, 
+this now going to take a while,
+
+322
+00:19:08,484 --> 00:19:11,744
+because it has to calculate quite a bit,
+
+323
+00:19:11,744 --> 00:19:16,346
+but it will eventually do this, I hope.
+
+324
+00:19:16,346 --> 00:19:17,656
+And here it is.
+
+325
+00:19:17,656 --> 00:19:21,625
+So you can see now 
+over 20,000 generations,
+
+326
+00:19:21,625 --> 00:19:24,989
+all of these 10 simulations actually 
+go to fixation.
+
+327
+00:19:25,127 --> 00:19:26,926
+I'm going to reload this again.
+
+328
+00:19:27,115 --> 00:19:30,406
+So this is essentially now 
+the same effect as before,
+
+329
+00:19:30,406 --> 00:19:36,995
+when we had 20 population size 20, 
+and only 200 generations here as well.
+
+330
+00:19:37,052 --> 00:19:42,495
+All of them go to fixation by here
+around generation 10,000.
+
+331
+00:19:43,154 --> 00:19:48,114
+But you can see now in these simulations.
+the major effects of drift.
+
+332
+00:19:48,114 --> 00:19:54,165
+So what happens with drift is that
+you will ultimately lose genetic variation
+
+333
+00:19:54,165 --> 00:19:58,726
+because alleles will go to fixation,
+which means others will get lost.
+
+334
+00:19:58,726 --> 00:20:02,795
+That's the ultimate consequence 
+of genetic drift.
+
+335
+00:20:03,205 --> 00:20:05,666
+When that happens, at which speed?
+
+336
+00:20:05,666 --> 00:20:10,156
+Decidedly depends on 
+the population size.
+
+337
+00:20:10,156 --> 00:20:14,335
+If the population is very small, 
+this will happen much faster.
+
+338
+00:20:14,335 --> 00:20:18,056
+If it's a very large, 
+this will happen much slower.
+
+339
+00:20:18,056 --> 00:20:23,175
+That is how the population size relates
+to genetic drift.
+
+340
+00:20:23,175 --> 00:20:27,013
+And intuitively, this makes sense I hope.
+
+341
+00:20:27,013 --> 00:20:30,316
+It's just like a coin flipping example.
+
+342
+00:20:30,316 --> 00:20:35,808
+If we only flip a few coins,
+then the effect can be quite traumatic.
+
+343
+00:20:35,808 --> 00:20:40,067
+You very quickly get cases 
+where we have nine heads one tail
+
+344
+00:20:40,067 --> 00:20:44,176
+or even ten heads, 0 tails.
+
+345
+00:20:44,182 --> 00:20:50,424
+But if you have 1,000 coins 
+data is virtually never going to happen.
+
+346
+00:20:50,424 --> 00:20:56,413
+And so because these effects accumulate
+if you have large population sizes
+
+347
+00:20:56,413 --> 00:21:00,084
+these effects will take time
+but they will eventually accumulate
+
+348
+00:21:00,084 --> 00:21:04,123
+to such an extent 
+that it will lose one or the other allele
+
+349
+00:21:04,123 --> 00:21:08,383
+and eventually, even if you had 
+multiple alleles, not only two,
+
+350
+00:21:08,383 --> 00:21:12,213
+all of them would would get lost
+except one that will go to fixation.
+
+351
+00:21:12,717 --> 00:21:15,938
+Congratulations for implementing this.
+This is quite a feed.
+
+352
+00:21:15,938 --> 00:21:19,406
+You're now implementing 
+multiple simulation,
+
+353
+00:21:19,406 --> 00:21:23,638
+multiple stochastic simulations
+of genetic drift in javascript,
+
+354
+00:21:23,638 --> 00:21:28,725
+using the plotting library D3,
+and we're not even in Chapter 4,
+
+355
+00:21:28,725 --> 00:21:30,898
+so quite the feat, well done.
+
+356
+00:21:30,898 --> 00:21:34,760
+Now we implemented this 
+using two-dimensional array.
+
+357
+00:21:34,760 --> 00:21:37,779
+I hope you had some time 
+to wrap your head around this.
+
+358
+00:21:37,779 --> 00:21:40,640
+And in the next few chapters,
+
+359
+00:21:40,640 --> 00:21:44,758
+we'll take a look at some special cases,
+interesting phenomenon
+
+360
+00:21:44,758 --> 00:21:46,609
+in the context of genetic drift,
+
+361
+00:21:46,609 --> 00:21:52,428
+and we'll also get a little bit
+more mathematical handle on genetic drift.
+
+362
+00:21:52,428 --> 00:21:54,390
+So, I'll see you in the next lecture.

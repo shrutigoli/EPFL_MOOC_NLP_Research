@@ -1,0 +1,139 @@
+In the previous episodes, we have focused on how to manage the early life of an object.
+How to initialize the data members of an object when we are beginning to work with it.
+Now it is time to invest ourselves in managing what happens at the end of an object's life.
+This is the topic of this episode.
+Dealing with the end of an object's life is especially important when this object is mobilizing resources.
+Let us first examine a concrete example.
+Let us take a variant of our famous "Rectangle" class.
+Assume now that these data members, instead of having been declared as doubles, have been declared as pointers on doubles.
+Like this.
+Let us imagine that one of the constructors of "Rectangle" is alloccating memory for these two data member upon the object's declaration.
+For example, we can imagine there is a default constructor initializing the "hauteur" data member while dynamically allocating memory for a double.
+The same thing will be done for the width.
+This definition with pointers is certainly not the best possible definition for the "Rectangle" class.
+We are using it here simply as an illustrative example.
+Let us now imagine a program using the "Rectangle" class.
+For example, we could imagine to simply proceed in a main program. We would have instructions and, at a certain point, open a block
+-- for example through an "if" instruction.
+In this block, we are declaring a local "Rectangle"-type variable, typically initialize through the default constructor.
+Eventually, the block will be closed.
+Upon the execution of this program, when we reach this point of the execution, we will reserve a memory area for a "Rectangle"-type variable r.
+As data member, this variable will have the members "hauteur" and
+"largeur" containing pointers to two memory areas dynamically allocated by the constructor.
+When we reach this point at the program's execution, the variable "r", which was locally declared in this block, will not exist anymore. It thus will not be usable in the rest of the program.
+The question is therefore:
+What will happen to the ressources in the memory depending on this object r, which is no longer used in the program?
+It is important to release these resources after usage since these ressources have been dynamically allocated.
+We know that, regarding dynamically allocated memory (for example, a memory area dynamically allocated with a "new") must be explicitly desallocated by the progrmmer through a "delete" instruction.
+So, we are wondering : who/what will be tasked with this
+"delete", here?
+The solution letting the programmer- user free this memory (for example, here) once we know we do not need to use the variable "r" anymore and explicitly call the "delete" on each of the variable's data members is not a good solution.
+Do you know why?
+This is not good because it is weakening the encapsulation.
+If we wish to be able to do this, we cannot let our data members remain "private".
+They must essentially be accessible from outside the class.
+The alternative is to program public methods such as a getter providing us with the pointer to delete.
+However, as we have seen in our case study on the tic-tac-toe, delivering a pointer through a getter is almost as severe as a weakening of the encapsulation directly delivering the data member through the "public" keyword.
+Moreover, this explicit release of the resources from outside the class can lead to errors.
+For example, we could forget to release certain resources.
+It is also tedious since we have to do it systematically.
+Doing it this way is therefore clearly not a good solution.
+In order not to be forced to explicitly release resources required by the object from outside the class like this,
+C++ offers particular methods called the "destructors".
+These have the particularity to be automatically called at the end of instance's life.
+This means that, once we finish the block, the destructor method will automatically be called, thus letting us to release these resources without breaking the encapsulation nor having to deal with the previously mentioned inconveniences.
+We need to know that the resources we need to release at the end of an object's life are not always memory slots as we have in this example.
+There can be other things such as files or external devices.
+How is a destructor concretely written in C++?
+This method has the same name as the class but is preceded with the tilda symbol ( ~ ), as we can see here.
+The parameter list is always empty.
+In the destructor's body, we will put all the releasing operations that are necessary at the end of an object's life.
+Also, be aware that there can only be one possible destructor in the class
+-- overloading is not possible for destructors.
+If the destructor is not explicitly defined, the compiler will automatically generate a default minimal version.
+Let us go back to our little introductory example.
+Concretely, how will we program the destructor?
+Let us make room and write our destructor.
+Here, we declare our destructor method. tilda, same same as the class, and an empty parameter list.
+In the body, we will write the necessary operations in order to release resources.
+Like this.
+We can now conclude the writing of our class.
+This destructor will thus be automatically called upon the end of any instance's life.
+Typically, here, at this point of the program's execution, since this "r" variable does no longer exist outside the block, the destructor is called.
+We will thus release the resources bound to the object.
+And this without breaking the encapsulation which was the case in the previously proposed solution.
+If the "Rectangle" class had no pointer-type data member and if, more importantly, it had not itself resorted to the dynamic allocation of the memory areas tied with its data members, it would not have been necessary to explicitly program a destructor like here.
+In this case, the compiler will automatically generate a default version of the destructor with an empty body
+(without any instruction inside).
+Now, we could wondering:
+Should we always be content with this minimal version of the default destructor when we do not allocate any resource in the class.
+The answer follows here.
+Let us move to another concrete example and suppose that we wish to count the number of a class's instances, active at a certain time in a program.
+For example, let us suppose we wish to count the number of rectangle instances present in a program.
+We could imagine we use a "compteur" (= counter) variable in order to count them.
+We will focus on its definition later.
+This variable will work like this.
+At the beginning, "compteur" is 0; we do not have any Rectangle instance yet.
+Then, we will create a first
+"Rectangle" instance with the default constructor.
+We now wish for the counter to be automatically updated and account for one active "Rectangle".
+We here open a block in which we declare a second Rectangle "r2".
+We now wish for "compteur" to contain 2 since we now have two Rectangle instances: r2 and r1.
+When we finish executing this block, the variable r2, ceases to exist.
+There is therefore only one
+Rectangle instance left: the instance r1.
+We therefore wish for "compteur" to be properly updated, comptabilizing only one instance present.
+At the end of the program, we wish for our "compteur" to contain 0 since neither r1 nor r2 are present anymore.
+How should we proceed?
+For now, at this point, in your learning, regarding the "compteur" variable, we have no better option declaring a global variable outside the "main". This is no good solution and we will come back to this in the next episode.
+For the rest, the idea is simple: the constructor will be tasked incrementing our counter every time we build a new rectangle.
+If we settle with this only, the counting will not be satisfactoy since we are merely incrementing the counter every time an instance is brought to life but never decrementing the counter.
+Here, typically, after the creation of the first instance,
+"compteur" will be 1.
+After the creation of the second instance,
+"compteur" will be 2.
+And nothing will have the counter decrement.
+This means that, at the end of the block, we will totalize (incorrectly) two instances instead of one.
+Also, at the end of the program, we will be incorrectly counting two instances instead of zero.
+We are thus forced to explicitly define the destructor so that the counting is done appropriately and the "compteur" variable be decremented every time an object ceases to be.
+Concretely, here, in addition to the constructor incrementing the counter every time a rectangle is built, we will need to have the destructor decrement the counter every time an instance ceases to exist.
+This typically ranks among the situations where the default version of the destructor with an empty body is not satisfactory
+-even if our class is never explicitly allocating resources.
+With this version of the "Rectangle" class, incrementing the counter in the constructor and decrementing in the destructor, our counting is now done appropriately.
+For example, at this stage of the execution, the r2 variable is no longer defined; the r2 object does not exist anymore.
+The destructor will automatically be called and the counter will be decremented, thus accounting for one instance only.
+Similarly, here, the variable r1 ceases to be, is not defined anymore.
+The destructor is thus automatically called, bringing the counter back to zero.
+However, what happens to this example if we invite the copy constructor to the party?
+For example, let us say that, in this block, in addition to the declaration of an r2 instance built thanks to the default constructor, we have the declaration of another instance r3, built thanks to the copy constructor.
+We can see that the argument passed to the constructor is here another rectangle.
+What about our counting?
+Obviously, we would like to account for 3 instances: r3, r2 and r1.
+What is, concretely, the value of the counter at these 3 places?
+Could you tell what is the value of "compteur" at each of these places indicated with a question mark?
+Here, the problem is that, in the "Rectangle" class, we have not provided any explicit definition to the copy constructor.
+Here, we thus necessarily use the default version of the copy constructor which, obviously, will not do anything regarding the instance counting.
+Therefore, the copy of a rectangle eludes the instance counter.
+Here, typically, our counter which contained 2, since it is impacted by the copy constructor, will remain to 2.
+When we reach this block, there are no longer usable instances.
+The destructor will thus be called once for r2 and another for r3, each time decrementing the counter.
+We will thus decrement the counter twice and its value will be zero, which is wrong since we are still supposed to account for this r1 instance.
+Here, for the same reasons, we will end up with our counter containing -1 : our "compteur" variable will be -1 instead of 0.
+In order to correct this, we need to add, to the previous code, the explicit definition of the copy constructor.
+This explicit definition will be tasked with the incrementation of the counter whenever we create a new rectangle through copy.
+At this point, when we call the copy constructor here, we indeed have our counter incremented; the counting is thus correct, with 3 here.
+The counter is then decremented twice, and will contain 1, which is correct since we are now accounting this r1 instance correctly.
+Similarly, the final counting will be correct.
+From this discussion arises a general rule followed by every good C++ programmer.
+Here it is:
+If we are to explicitly modify the destructor, the copy constructor or the assignment operator
+(which we will discuss in a later episode) then we will probably have to modify the other two aswell.
+These three make a whole.
+In any way, we at least have to wonder on the impact of the definition of one of these elements on the others.
+By the way, please note that, in C++,
+-- though it is an advanced notion, going beyond the scope of this course -- we can add to this list
+(including the destructor, the copy constructor and the assignment operator forming a whole together), we can add the the "move constructor" and the "move operator".
+We are mentioning this here only for the sake of completion.
+This concludes our chapter on the construction/destruction of an object.
+We will go back to this when we will talk about inheritance.
+In the meantime, you will discover the notion of operator overloading in the next episodes.

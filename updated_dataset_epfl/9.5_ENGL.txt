@@ -1,0 +1,255 @@
+Let's look more into classical logics.
+I already mentioned propositional logic, first-order logic, higher-order logic, and modal logics.
+I assume that you know propositional logic from other grad education.
+The idea there is there is propositions that are either true or false, and have no further structure.
+For example, like, "It currently rains".
+Or, "The ground is wet".
+And that can make logical statements about them using combinations like:
+<i>and, or, not</i>, and using these defined implications.
+For example, let's say, if it rains, then the ground is wet.
+And that would be a statement that is either true or false, over a set of decisions that are true or false.
+Now, first-order logic generalizes this by having, rather than propositions, predicates that basically can take, so to say, they have more structure-- they are corresponding to relations.
+And that can quantify over variables.
+For example, I can say for <i>x</i>, if <i>x</i> is a student, then <i>x</i> loves POCS.
+And so I've got relations, you know relations, students, and POCS.
+Or you can think of them as sets if you like.
+And there's a universal quantifier 
+"for all x" that says, you know, for all these potential values <i>x</i>, if <i>x</i> is a value in the student relation, then <i>x</i> loves POCS.
+Overall, conceptually, this "for all" quantifies, loops over, if you like to call it that way, an infinite number of potential values for <i>x</i>, an unbounded number.
+But it is safe to do this, because you only care about those values that actually are in student.
+And only for those we have to check that they are also love POCS.
+Now higher-order logics generalize exactly this first-order predicate logic by having quantifiers that are not just about this little <i>x</i> individual values, but you can quantify entire relations.
+So I can ask, for example,
+"Does there exist a student relation that has certain properties?"
+So I can quantify both over these relations, and over these individual items, like students.
+And that would be second-order logic.
+And then there is so-called modal logics, and there's many different forms of those.
+There's for example, a so-called temporal logics, there's computation-tree logics, etc.
+And the idea there is, that I have--
+I can start with propositional logic, or I can start with first-order logic, and add so-to-call, modes of truth.
+It might sometimes be called a POCS operator.
+And it's a bit like a quantifier.
+And it has different depurations depending on what application 
+I want to deal with.
+For example if it's let's say, a computaiton-tree logic, to talk about the logics in properties of programs.
+I don't want to go into this absolute definition of model logics here, but we're going to look into some examples later.
+So I will not say much more on propositional logic.
+I assume you know that very well.
+I'll talk about first-order logic now, because of it's potential as a DSL.
+So first, it's the most important, widely-studied logic in the mathematics.
+It's been studied since the 19th century, since Gottlob Frege.
+And there is one thing that is very elegant.
+It's deeply studied, there is huge amount of results known that can be useful in all kinds of ways.
+Of course, to some extent, this is for a theoretician to know those, but some of them are relatively straight-forward things, and they are very to use.
+One important thing is--
+That's an important observation that makes a logical language, in general, a language elegant, and somehow it feels well-rounded if it has these properties.
+But there is multiple alternative characterizations of the logics that look superficially very different, that might have different natural uses, and that are all exactly equivalent.
+Which somewhat lends credibility to the fact that this is a well- rounded, well-chosen language, that might be just natural and good for something.
+So for example, with first-order logic, we know that there is this logic itself.
+Predicate logic as we have discussed it just now.
+In addition, also called calculus in the context of databases.
+Relational calculus.
+There's also something called relational algebra which is an algebraic language-- a variable-free, quantification-free language, that is basically completely operator based.
+So you could think of it as a function language, but you could think also of it as an imperative language.
+Just a composition of operators that does exactly the same thing-- has exactly the same expressive power, which is kind of elegant.
+And then, for example, there is also a game classification of first-order logic called Ehrenfeuchtâ€“FraÃ¯ssÃ© games, which-- where you can play a game to have exactly the meaning of these logics.
+So why is that interesting?
+Well, the EF games are probably not very practically important for systems people, but they actually give a relatively straight-forward way to prove expressibility, or non-expressibility results.
+For example, that there is no hope that a certain property can be expressed in first-order logic.
+Which might be practically relevant.
+If you for example, try, since first-order logic is equivalent to relational algebra, express a certain property in relational algebra to run a database system, to test this property, it might just not be possible.
+And you might be able to prove this.
+So we don't look like somebody who hasn't achieved that goal, you could prove, to say, to your boss, if they asked you to do this, that it's not your fault that you couldn't find that query, because it cannot exist.
+Now more important in practice is the algebraic representation, because that's they way to actually execute things in practice.
+The logical characterization using universal and existential quantifiers over infinite domains of potential values for these variables, doesn't lead directly in a nice way to an implementation.
+An official implementation.
+However, there is this known translation in correspondence to relational algebra.
+And that is something that is very easy to implement.
+There is for example, joins, which are probably the most important-- most interesting operator, and we already have discussed joins in the locality module.
+So this kind of connection between these different viewpoints of first-order logic makes it kind of versatile and useful.
+If I want to implement it in a practical system,
+I use an internal translation of the logic to relational algebra and execute the algebra-- implement algebra operators as code.
+And I can optimize that way, for example.
+On the other hand,
+I still have this kind of declarative logical flavor of first-order logic that I can use to actually say what I want, to get at a result, rather than how to get it.
+While relational algebra feels more in flavor like how to get things.
+So that's also called a cryptomorphism.
+Those kind of surprising, alternative viewpoints-- things that look superficially, completely different, actually have the same power-- the same thing.
+And that's kind of cool.
+Now let's look at SQL.
+Again, the probably most successful declarative language so far.
+Implemented in lots and lots of different systems.
+Not just database systems, but particular database systems.
+So here's an SQL example.
+This SQL query that says,
+<i>SELECT s.id FROM student s</i>, etc.
+So this query asks for what?
+It asks for the IDs of students, such that doesn't exist for such a student.
+A tuple in the course taken table, which has that ID, has the student ID, and the grade is less than four.
+It's return would be a failing grade.
+So that says, give me the students who have never failed a course.
+Give me the students, such that doesn't exist a course for that student, which has been taken by the student, and omit that student of the bad grade.
+So what you see is--
+Well let me actually express the same query in first-order logic.
+Or relational calculus, it's just below there.
+And I've written, there's this so-called comprehension, that means kind of, set semantics with saying, give me the objects <i>s.id</i>, such that--
+That's the vertical bar.
+And then a first-order logic formula which says,
+<i>student(sid)</i> and not exists.
+I'm using completely plain syntax, and not universal quantifiers, and existential quantifiers, which are these turned around E's and A's, as you might remember.
+And "not" is the kind of angle.
+I just write plain English here.
+So here, I show you the formula.
+First-order formula for that query.
+Again, this set notation in curly parenthesis, give me the <i>s.id's</i>, such that some property holds-- which is written in first-order logic-- that's called a comprehension.
+Anyway, that's relational calculus, and the condition is first-order predicate logic.
+And you see the very strong correspondence of that with the SQL query.
+It's just like different syntax.
+And it's of course, very declarative.
+I don't say at all, how to compute it,
+I say what I want to get.
+And these <i>WHERE NOT EXISTS</i> are a purely declarative way of saying this.
+I don't say, iterate over this, and exclude these things, check--
+You know, have an accumulated check that, while I iterate over these, 
+I don't find any occurrence.
+I do this by saying <i>WHERE NOT EXISTS</i>.
+Abstractly, you cannot-- absolutely not implement this.
+But in practice, you can turn it to relational algebra, that's going to work very well.
+So let's talk about modal logics.
+I already said there is different kinds of modal logics.
+They all share some commonality, which is there is some notion of mode of truth, which is something like some modified form of a quantifier.
+And important examples are so-called temporal logics.
+There's actually whole families of temporal logics.
+In particular, there's different models and philosophies on whether time in the future is branching out, or is a linear sequence.
+If there's kind of some, quantum mechanical future, or not.
+And we've got this, not quantified, this mode.
+Let's call it "eventually".
+And we can talk about that, 
+"eventually" being-- meaning that, at some point in the future, some statement is true.
+That means it might be very long, finite path until then, and then, it becomes true.
+It doesn't mean that is always stays true, but at some point, it becomes true in the future, in one of these potential futures maybe.
+If it's branching out.
+And I've got the classical, let's say propositional logic, but you could also build temporal logics around first-order logic.
+Then it gets more complicated, but let's say that there's propositions.
+So I can build formulas, compositionally, out of propositions, boolean connectives, like not and or, and using this "eventually".
+And I can think of not eventually not, as "always".
+If it never can happen that it's not, that means it's always true.
+And with that, I can for example, express my safety conditions about a system.
+I can say, can a certain bad thing ever happen in the system?
+So that relates to logics of computation.
+So I can for example, so-called, computation-tree logic (CTL) or dynamic logics, which are the foundation of much of Computer Aided Verification and formal methods.
+So I can use these to model systems, and what happens in programs, computations.
+And I can then automatically verify certain statement and phrase in such logics, potentially.
+So the input to such a system would then be not just a formula, but also a model of the system.
+That is described separately, it's not a logical formula.
+And that is something we have to then verify.
+But there's also many other flavors of modal logic.
+For example, epistemic logic, which is the logic of knowledge.
+There I can model negative introspection.
+I can say, the mode of truth is "knows", and I can say, well, if "P" is not true, then 
+I know that "P" is not true.
+So I've got full negative introspection, which is something very powerful.
+But that's some statement that I can make here.
+I can claim that, and can check maybe, if I have model of what I really know, and what is true in the world.
+Let's talk about temporal logics, in general, modal logics, a bit more-- something a bit more about semantics.
+So the basic model, for at least propositional modal logics is, so-called Kripke structures.
+And they are kind of finite-state systems, that modeling for example, hardware, or protocols.
+So the idea is that, something like a finite-state machine, or a directed graph of the states, and there's transitions between them, and at each state, there is a node label, which is something-- a set of propositions that true, and the others are false.
+So for example, in this example, 
+I've got a state as one, and in state as one, 
+<i>p</i> and <i>q</i> are true.
+For example, it rains, and the ground is wet.
+And in state as two, only <i>q</i> is true.
+So the ground is wet, but it doesn't rain anymore.
+And in state three, probably the ground is dry, and it just started raining, so it's now raining, but the ground it dry.
+Only <i>p</i> is true, for example.
+So this is a way of modelling a system.
+And then I can use a logical formula to reason about it.
+I can for example say, the statement, eventually <i>q</i> and next <i>o</i> is not <i>q</i>.
+So I've built this formula using the mode of truth "eventually".
+And "always" is another one, but it is really redundant, just like, for all in <i>EXISTS</i>, one can express the other.
+<i>EXISTS</i> is not for all not and visa versa.
+For all is not <i>EXISTS</i> not.
+And here is to say with modal operators, for example,
+"always" is something that is always true if there doesn't exist a future where it's not true.
+So I could think about that statement.
+"Eventually" talks about some time in the future.
+A finite set of steps in this finite-state machine-- the current state, which might be the start state let's say.
+I will get to a point where that formula is true.
+That I say eventually the formula is true,
+<i>q</i> and blah blah.
+"Next" means something becomes true in the next state.
+And "always" means in all future steps, it will be true.
+And (Not <i>q</i>) means the opposite of <i>q</i>, of course.
+With temporal logics, or computation-tree logics, it can reason about possible computation paths.
+So in modal, my system is a Kripke structure, and then I can say things like, it's not true that eventually it terminates.
+Which is the same as, 
+It doesn't always terminate.
+So we can--
+The question is, is this statement true?
+Can we reach a program state from which there is no way to terminate?
+Which would be, maybe a bad state in the system, halting problem is violated here, if you don't-- if this is something that you don't want to happen.
+An operating system won't be able to execute forever, so that might be possible.
+So as I already said, 
+"eventually" and "always" are modal analogs of existentially neurolistic quantification.
+And of course, it's convenient for encoding safety and liveness properties, and that can be used for automatic verification of system specifications.
+Think about that.
+I mean, how else would you want to do this?
+If you want to build a verification system where you can, kind of script what you want to verify, where you separate the question you want to ask about a system specification, from the specification.
+Would you want to write this query-- this question, so to say, in "C"?
+No, it would be terrible-- writing in "C" would mean building the whole verification system by hand for every question.
+You could think of other languages.
+But not so clear how you would do that otherwise.
+It's just a very ideal solution here.
+So that's an example of a logic that is just perfect for it's purpose, really.
+Another example, 
+I mentioned epistemic logic, where you can reason about knowledge.
+So you've got a mode of truth that is called "knows".
+It can do formulas that way.
+So I can for example, say, knows that doesn't know "P".
+So I know that I don't know proposition "P".
+For example, there will be again, this negative introspection thing.
+Or I can say, if teaches, then the prof knows that the student knows the material-- the PROCS material.
+So this would be multimodal epistemic logic.
+There is two modes here.
+But in general, there could be more modes for every particular actor.
+Kprof and Kstudent doesn't correspond to "eventually" and "always".
+They are at opposites, they are kind of orthogonal, so to say.
+So I can make multimodal logics, and this would be the example of epistemic logic.
+So let's say a few words about complexity of logics because in particular systems people will often tend to connect logics with very slow computations, and in general, they are right.
+I mean, there is important problems about logic that we might want to solve, and they're just, very hard.
+And so there is multiple computation problems related to these logics, and it's important to understand which one is actually the one that you want to look at.
+Before we can tell whether this problem is actually hard or not.
+So, importantly, in particular, there is this so-called model checking problem.
+Then there is the satisfiability problem for logic, and there is the validity or theoremhood problem.
+So model checking is something-- a specific discipline of-- verification, but don't think of it only that way.
+So, what is a model of a logical formula?
+It's state of the world in which the formula is true.
+So for example, in first-order logic-- or let's say starting with propositional logic, if I've got a set of propositions true, and others being false, and on that world, so to say, a proposition formula is true, then this is a model.
+That state of the world.
+First-order logic in a relational database, so to say, can be a model if a boolean first-order logic query, is true on it.
+So that's the idea here.
+So in a sense, query relation is model checking.
+Specifically, boolean queries, but that's a minor detail, actually, because you can always think of a query computing result as testing for every possible tuple.
+The boolean query is that tuple in the result.
+And that can rephrase the first-order logic formulas and it becomes a boolean.
+But satisfiability and and theoremhood are fundamentally different questions.
+Satisfiability is a question that says, give me a formula, but no database.
+No potential model.
+Is there a model at all?
+Is there some world in which this formula becomes true at all?
+Or is it unsatifiable? 
+It can never become true.
+And the opposite is theoremhood.
+It's a bit like this not EXIST not thing.
+If something is unsatisfiable, then it's negation is a theorem.
+It's always true.
+So satisfiability and theoremhood are basically dual problems.
+And usually they are much harder than model checking.
+In some cases, they're exponentially harder, in other cases, one model checking might be very easy.
+And theoremhood and satisfiability might be undesirable.
+For example, in first-order logic, this is the case.
+First-order logic, evaluating it, model checking, is in <i>PTIME</i>, for a given fixed formula, given the database, you can do it very efficiently.
+However, satisfiability and theoremhood for first-order logic are undesirable.
+So you have to understand that, and it depends on the logic.
+There is many different modal logics, there is huge spectrum of complexity results, and this desirability result for logics, and it depends on the scenario, whether it's efficient or not.

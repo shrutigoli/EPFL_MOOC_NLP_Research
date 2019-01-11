@@ -1,0 +1,1521 @@
+1
+00:00:04,285 --> 00:00:08,570
+Bonjour, on a vu le concept d'interruption
+avec les timers.
+
+2
+00:00:08,570 --> 00:00:11,841
+On va en reparler en détail aujourd'hui,
+montrer
+
+3
+00:00:11,841 --> 00:00:16,606
+la différence entre scrutation, polling et
+puis l'interruption, parler
+
+4
+00:00:16,606 --> 00:00:20,178
+des vecteurs et des routines
+d'interruptions qui sont
+
+5
+00:00:20,178 --> 00:00:23,794
+appelés par le processeur et qui utilisent
+la pile.
+
+6
+00:00:23,794 --> 00:00:30,578
+Je reviens 15 ans en arrière quand le
+microcontrôleur 16F877 a été annoncé.
+
+7
+00:00:30,578 --> 00:00:34,735
+C'était le plus performant de l'époque.
+
+8
+00:00:34,735 --> 00:00:40,502
+Son mécanisme d'interruption était d'avoir
+une interruption unique, autorisée, comme
+
+9
+00:00:40,502 --> 00:00:48,296
+on l'avait vu, par un bit d'interruption
+général et devant cette possibilité
+
+10
+00:00:48,296 --> 00:00:53,347
+d'interruption, il y a plusieurs flags, le
+timer, une entrée externe
+
+11
+00:00:53,347 --> 00:00:57,070
+et je ne me souviens plus de ce que
+faisait celle-là.
+
+12
+00:00:57,070 --> 00:01:02,236
+Et, le 877, ça c'est ce qu'on
+
+13
+00:01:02,236 --> 00:01:07,350
+avait dans la génération précédente, le
+84.
+
+14
+00:01:07,350 --> 00:01:13,690
+Le 877 rajoutait toute une fonctionnalité
+avec des timers et, chaque
+
+15
+00:01:13,690 --> 00:01:20,720
+fois, vous avez un timer supplémentaire
+avec son bit d'autorisation.
+
+16
+00:01:20,720 --> 00:01:22,421
+Du point de vue interne,
+
+17
+00:01:22,421 --> 00:01:28,185
+l'architecture était très simple, vous
+aviez un compteur d'adresse,
+
+18
+00:01:28,185 --> 00:01:32,725
+vous aviez la mémoire programme avec une
+position
+
+19
+00:01:32,725 --> 00:01:37,115
+de démarrage pour le programme principal
+et une
+
+20
+00:01:37,115 --> 00:01:42,320
+position de démarrage pour les
+interruptions à l'adresse 4.
+
+21
+00:01:42,320 --> 00:01:47,589
+Donc, au début du programme, il fallait
+mettre une instruction de
+
+22
+00:01:47,589 --> 00:01:51,314
+saut dans la partie d'exécution et puis la
+
+23
+00:01:51,314 --> 00:01:55,190
+routine d'interruption pouvait s'exécuter
+à partir de 4.
+
+24
+00:01:55,190 --> 00:02:00,715
+Quand il y avait interruption ou quand il
+y avait une routine qui était
+
+25
+00:02:00,715 --> 00:02:05,990
+appelée, et bien, la pile offrait la
+possibilité de quelques accès à imbriquer.
+
+26
+00:02:05,990 --> 00:02:13,320
+Bien, l'amélioration, c'est de dire :
+c'est quand même embêtant
+
+27
+00:02:13,320 --> 00:02:19,900
+quand on a une interruption, de balayer
+tous ces flags, c'est du polling,
+
+28
+00:02:19,900 --> 00:02:25,720
+comme on dit en anglais, pour savoir
+lequel a créé l'interruption.
+
+29
+00:02:25,720 --> 00:02:31,143
+Bien sur on, avec les enable, on a activé
+seulement les fl, les quelques
+
+30
+00:02:31,143 --> 00:02:35,146
+interruptions qu'on va utiliser dans
+l'application mais
+
+31
+00:02:35,146 --> 00:02:39,015
+le perfectionnement évident pour la
+prochaine génération,
+
+32
+00:02:39,015 --> 00:02:44,060
+c'était de dire : si on s'intéresse à
+cette interruption, ce serait
+
+33
+00:02:44,060 --> 00:02:49,600
+agréable qu'elle aille directement appeler
+un vecteur,
+
+34
+00:02:49,600 --> 00:02:54,130
+si elle est autorisée naturellement,
+appeler un
+
+35
+00:02:54,130 --> 00:02:59,404
+vecteur dans le processeur, partir
+directement à une
+
+36
+00:02:59,404 --> 00:03:04,380
+adresse différente.
+Et, là, le terme
+
+37
+00:03:04,380 --> 00:03:11,088
+de vecteur est utilisé mais c'est une
+adresse de saut et comme on le voit dans
+
+38
+00:03:11,088 --> 00:03:16,046
+cet exemple pour un processeur un petit
+peu plus récent mais c'est en fait un AVR
+
+39
+00:03:16,046 --> 00:03:19,320
+plus simple que celui des cartes Arduino,
+vous
+
+40
+00:03:19,320 --> 00:03:22,272
+avez un certain nombre de vecteurs qui
+sont
+
+41
+00:03:22,272 --> 00:03:25,488
+préparés en mémoire : vous avez le reset,
+
+42
+00:03:25,488 --> 00:03:29,280
+vous avez le timer overflow, qu'on a déjà
+vu,
+
+43
+00:03:29,280 --> 00:03:32,721
+et euh, cette liste se prolonge d'année en
+
+44
+00:03:32,721 --> 00:03:36,930
+année en fonction de la complexité des
+processeurs.
+
+45
+00:03:36,930 --> 00:03:40,920
+Alors, il y a différentes catégories
+d'interruptions.
+
+46
+00:03:40,920 --> 00:03:44,241
+Vous pouvez avoir une pin extérieure qui
+demande
+
+47
+00:03:44,241 --> 00:03:49,337
+une interruption, c'est ce qu'on appelle
+l'external interrupt.
+
+48
+00:03:49,337 --> 00:03:54,454
+Vous avez le pin change, j'en reparle tout
+à l'heure, vous avez
+
+49
+00:03:54,454 --> 00:03:59,132
+le timer, qu'on connait, vous avez le
+convertisseur A/D, on
+
+50
+00:03:59,132 --> 00:04:03,960
+en a parlé mais je n'ai pas dit qu'il
+pouvait déclencher une interruption.
+
+51
+00:04:03,960 --> 00:04:09,704
+En général, effectivement, avec la routine
+analogRead, on attend
+
+52
+00:04:09,704 --> 00:04:15,020
+que ça soit terminé, c'est la fonction
+analogRead
+
+53
+00:04:15,020 --> 00:04:19,889
+qui attend sur le flag pour savoir quand
+la conversion
+
+54
+00:04:19,889 --> 00:04:21,180
+est terminée.
+
+55
+00:04:21,180 --> 00:04:24,370
+Alors évidemment qu'on pourrait faire
+autre chose pendant ce temps
+
+56
+00:04:24,370 --> 00:04:27,140
+et avoir une interruption au moment où le
+flag s'active.
+
+57
+00:04:27,140 --> 00:04:29,930
+Il y a en général un canal analogique
+
+58
+00:04:29,930 --> 00:04:34,520
+qui mesure la température à l'intérieur du
+processeur.
+
+59
+00:04:34,520 --> 00:04:39,450
+Donc ce qu'on pourrait programmer là,
+c'est que au dessus d'une
+
+60
+00:04:39,450 --> 00:04:44,908
+certaine température, et bien il y a une
+interruption et que vous déclenchez une
+
+61
+00:04:44,908 --> 00:04:48,384
+action euh, de clignotement spécial par
+exemple.
+
+62
+00:04:48,384 --> 00:04:51,662
+Vous avez naturellement des interruptions
+associées
+
+63
+00:04:51,662 --> 00:04:54,910
+aux possibilités de communication, on en
+reparlera.
+
+64
+00:04:54,910 --> 00:04:58,060
+Vous avez le Watchdog.
+
+65
+00:04:58,060 --> 00:04:59,908
+Qu'est-ce que c'est?
+
+66
+00:04:59,908 --> 00:05:02,744
+Et bien, le chien va hurler si vous ne
+vous
+
+67
+00:05:02,744 --> 00:05:05,432
+occupez pas de lui donner à manger en
+temps voulu.
+
+68
+00:05:05,432 --> 00:05:10,356
+En d'autres termes, vous avez un compteur
+qui décroît
+
+69
+00:05:10,356 --> 00:05:18,750
+pour arriver à 0 et quand il arrive à 0,
+ça crée cette interruption euh, watchdog.
+
+70
+00:05:18,750 --> 00:05:25,086
+Et ce que vous devez faire dans le
+programme, c'est remettre dans ce registre
+
+71
+00:05:25,086 --> 00:05:33,270
+watchdog une valeur suffisamment grande
+pour avoir le temps de la réactiver.
+
+72
+00:05:33,270 --> 00:05:35,349
+Alors, ça ça peut être utilie,
+
+73
+00:05:35,349 --> 00:05:40,780
+par exemple, dans une, dans une station
+météo où tout à coup une perturbation
+
+74
+00:05:40,780 --> 00:05:46,134
+due à un éclair, par exemple, peut faire
+dérailler le processeur, il
+
+75
+00:05:46,134 --> 00:05:50,102
+y a peu de chances qu'il retombe dans le
+programme principal, qui réactive
+
+76
+00:05:50,102 --> 00:05:52,680
+ce watchdog toutes les minutes, par
+exemple,
+
+77
+00:05:52,680 --> 00:05:55,930
+vous vérifiez que le fonctionnement est
+correct.
+
+78
+00:05:55,930 --> 00:06:00,569
+Si la fonction n'est plus correcte, ben,
+au bout d'une minute, il va y avoir une
+
+79
+00:06:00,569 --> 00:06:06,070
+action de réinitialisation déclanchée par
+cette routine watchdog.
+
+80
+00:06:06,070 --> 00:06:09,535
+Vous avez des exceptions, ça devient un
+petit peu plus compliqué
+
+81
+00:06:09,535 --> 00:06:11,930
+mais il y en a une qui est facile à
+comprendre.
+
+82
+00:06:11,930 --> 00:06:14,810
+Dans une division, vous n'avez pas le
+droit de
+
+83
+00:06:14,810 --> 00:06:17,370
+diviser par 0, si vous faites cette erreur
+de
+
+84
+00:06:17,370 --> 00:06:21,094
+programme, et bien, un processeur moderne
+va appeler une
+
+85
+00:06:21,094 --> 00:06:25,803
+routine d'exception qui va vous sortir des
+calculs arithmétiques
+
+86
+00:06:25,803 --> 00:06:30,107
+dans lesquels vous n'avez aucun espoir
+d'obtenir une réponse valable.
+
+87
+00:06:30,107 --> 00:06:34,850
+Il peut y avoir des détections de mauvais
+fonctionnement interne.
+
+88
+00:06:34,850 --> 00:06:39,995
+Vous avez enfin le "non maskable
+interrupt"
+
+89
+00:06:39,995 --> 00:06:45,140
+et ben, ça veut simplement dire qu'il n'a
+pas la porte et qui permet de désactiver.
+
+90
+00:06:45,140 --> 00:06:47,686
+Donc c'est souvent, enfin dans les anciens
+
+91
+00:06:47,686 --> 00:06:51,093
+processeurs, associé à une pin qui
+permettait
+
+92
+00:06:51,093 --> 00:06:55,715
+de récupérer le processeur et n'existe
+plus
+
+93
+00:06:55,715 --> 00:07:00,210
+sur les processeurs récents que j'ai vus.
+
+94
+00:07:00,210 --> 00:07:05,510
+Et vous avez comme dernier recours, le
+reset, qui évidemment
+
+95
+00:07:05,510 --> 00:07:10,584
+n'est pas vraiment un, un vecteur
+d'interruption, c'est le
+
+96
+00:07:10,584 --> 00:07:15,585
+démarrage du processeur qui se fait en
+position 0 pour certains processeurs,
+
+97
+00:07:15,585 --> 00:07:18,570
+éventuellement ça peut être au sommet de
+la mémoire.
+
+98
+00:07:18,570 --> 00:07:22,962
+Je mentionne encore ce sleep, qui en fait
+n'est pas une interruption,
+
+99
+00:07:22,962 --> 00:07:26,168
+c'est une possibilité de programmation
+qu'on
+
+100
+00:07:26,168 --> 00:07:30,288
+reverra, qui en fait, endort le
+processeur.
+
+101
+00:07:30,288 --> 00:07:35,728
+Endormir, ben ça veut dire qu'on va
+désactiver le plus possible
+
+102
+00:07:35,728 --> 00:07:40,682
+de ses fonctions, garder une horloge qui
+ne fait que de surveiller
+
+103
+00:07:40,682 --> 00:07:44,756
+les interruptions et, dès qu'il y a une
+interruption, et bien
+
+104
+00:07:44,756 --> 00:07:48,760
+le processeur va se réveiller pour servir
+cette interruption.
+
+105
+00:07:48,760 --> 00:07:54,270
+Donc c'est un moyen d'économiser beaucoup
+d'énergie puisqu'au lieu que le processeur
+
+106
+00:07:54,270 --> 00:08:00,160
+tourne dans une boucle à la vitesse
+maximum et gaspille la même énergie
+
+107
+00:08:00,160 --> 00:08:05,690
+que d'habitude, et bien on l'endort et il
+se réveille dès qu'il y a
+
+108
+00:08:05,690 --> 00:08:11,390
+une sollicitation interne ou externe.
+Si je regarde
+
+109
+00:08:11,390 --> 00:08:16,210
+maintenant un petit peu l'organisation en
+mémoire de ce processeur.
+
+110
+00:08:16,210 --> 00:08:18,494
+Donc on a vu qu'il y a toute une série de
+
+111
+00:08:18,494 --> 00:08:23,555
+vecteurs qui vont se trouver au début de
+la mémoire flash.
+
+112
+00:08:23,555 --> 00:08:29,440
+Ensuite, ben, vous aurez le programme,
+vous aurez les fonctions.
+
+113
+00:08:29,440 --> 00:08:30,870
+Vous remarquez
+
+114
+00:08:30,870 --> 00:08:34,280
+que la fin de la mémoire est une partie
+
+115
+00:08:34,280 --> 00:08:38,694
+réservée, dans le fond, pour le programme
+de démarrage hein,
+
+116
+00:08:38,694 --> 00:08:42,535
+c'est un programme relativement compliqué
+qui surveille USB et qui
+
+117
+00:08:42,535 --> 00:08:47,580
+va vous permettre, via USB, de venir
+remplir ce programme.
+
+118
+00:08:47,580 --> 00:08:51,668
+Alors, c'est une zone protégée puisque,
+naturellement, il ne
+
+119
+00:08:51,668 --> 00:08:56,076
+faut pas que vous puissiez, en déclarant
+votre programme,
+
+120
+00:08:56,076 --> 00:08:59,040
+venir intervenir dans cette zone.
+
+121
+00:08:59,040 --> 00:09:03,168
+Bien, du côté de la mémoire vive, donc là
+on a vu que
+
+122
+00:09:03,168 --> 00:09:08,165
+c'était un, une largeur de 16 bits, toutes
+les instructions sont 16 bits.
+
+123
+00:09:08,165 --> 00:09:11,980
+Dans les processeurs 8 bits, et bien, on
+prends deux mots consécutifs.
+
+124
+00:09:11,980 --> 00:09:15,599
+Là, c'est un processeur 8 bits, parce que
+la mémoire
+
+125
+00:09:15,599 --> 00:09:19,490
+de donnée est 8 bits, l'unité arithmétique
+est 8 bits.
+
+126
+00:09:19,490 --> 00:09:21,466
+Et vous trouvez
+
+127
+00:09:21,466 --> 00:09:26,803
+des registres de travail dans lesquels
+euh, le calcul va
+
+128
+00:09:26,803 --> 00:09:31,390
+se faire, tous les, tous les transferts
+importants vont se faire.
+
+129
+00:09:31,390 --> 00:09:35,035
+Quand on a besoin de plus d'informations,
+et bien on
+
+130
+00:09:35,035 --> 00:09:38,615
+va chercher dans la mémoire vive et c'est
+plus lent,
+
+131
+00:09:38,615 --> 00:09:42,580
+les transferts perdent du temps donc on
+s'efforce de gérer,
+
+132
+00:09:42,580 --> 00:09:46,756
+c'est le travail du compilateur, de gérer
+au mieux ces registres
+
+133
+00:09:46,756 --> 00:09:52,535
+pour que l'exécution soit rapide et de
+préparer au moment de la compilation pour
+
+134
+00:09:52,535 --> 00:09:58,610
+que l'on mette la bonne information dans
+mémoire vive ou dans les registres.
+
+135
+00:09:58,610 --> 00:10:02,870
+Vous avez, ici, les registres
+d'entrées-sorties, le timer, les
+
+136
+00:10:02,870 --> 00:10:06,580
+bords, et cetera, 64 positions sont
+réservées pour ça.
+
+137
+00:10:06,580 --> 00:10:11,974
+Et puis en plus de ça, on en a parlé, vous
+avez cette mémoire, E carré
+
+138
+00:10:11,974 --> 00:10:17,210
+PROM, jusqu'à l'adresse un FF.
+Donc, 100 c'est 256.
+
+139
+00:10:17,210 --> 00:10:23,604
+Vous avez, ici, 512, position mémoire des
+PROM.
+
+140
+00:10:23,604 --> 00:10:30,110
+Alors, revenons, pour préciser, ces
+interrupt externes.
+
+141
+00:10:30,110 --> 00:10:33,035
+Donc, vous avez, dans le cas des
+processeurs
+
+142
+00:10:33,035 --> 00:10:37,802
+qu'on trouve sur Arduino, deux pins qui
+peuvent déclencher
+
+143
+00:10:37,802 --> 00:10:39,590
+une interruption.
+
+144
+00:10:39,590 --> 00:10:46,880
+Et alors, vous avez le vecteur int zéro
+qui va être appelé,
+
+145
+00:10:46,880 --> 00:10:52,470
+si vous avez activé les deux pins, int un,
+si vous avez activé l'autre des deux pins.
+
+146
+00:10:52,470 --> 00:10:55,242
+Et maintenant, évidemment, alors on va
+laisser
+
+147
+00:10:55,242 --> 00:10:57,790
+le choix à l'utilisateur de dire, est-ce
+
+148
+00:10:57,790 --> 00:11:00,030
+que c'est un flanc montant, un flanc
+
+149
+00:11:00,030 --> 00:11:05,308
+descendant, un changement qui va activer
+l'interruption?
+
+150
+00:11:05,308 --> 00:11:11,686
+Alors, cette information, vous la trouvez
+dans un registre,
+
+151
+00:11:11,686 --> 00:11:17,560
+et là, j'ai copié quelques petites parties
+de la documentation du fabricant.
+
+152
+00:11:17,560 --> 00:11:25,028
+Et on vous dit, voilà, ces deux bits vous
+permettent d'avoir le choix suivant.
+
+153
+00:11:25,028 --> 00:11:30,340
+Si c'est la configuration zéro zéro, et
+bien, c'est un
+
+154
+00:11:30,340 --> 00:11:36,275
+low level, c'est un, un état zéro, vous
+avez peut-être de la peine à lire.
+
+155
+00:11:36,275 --> 00:11:42,144
+Si c'est zéro un, c'est un changement, any
+logical change.
+
+156
+00:11:42,144 --> 00:11:46,550
+Si c'est un zéro, c'est un flanc
+descendant.
+
+157
+00:11:46,550 --> 00:11:51,280
+Si c'est zéro, euh, un, c'est un flanc
+montant.
+
+158
+00:11:51,280 --> 00:11:55,755
+Donc, vous choisissez quand votre
+interruption va être déclenchée
+
+159
+00:11:55,755 --> 00:12:00,460
+en disant, ben, dans ce registre EICR, et
+
+160
+00:12:00,460 --> 00:12:05,682
+bien, on va activer, par exemple, falling
+edge en
+
+161
+00:12:05,682 --> 00:12:10,940
+prenant ce bit-là qui va se trouver activé
+
+162
+00:12:10,940 --> 00:12:15,980
+dans ce mode de configuration.
+Maintenant, en plus
+
+163
+00:12:15,980 --> 00:12:20,840
+de ça, il faut savoir que le flag
+d'interruption
+
+164
+00:12:20,840 --> 00:12:25,680
+sera dans ce registre, à cette position.
+En fait, le
+
+165
+00:12:25,680 --> 00:12:30,695
+vecteur, d'interruption va nous faciliter
+ça, mais ce qui est très
+
+166
+00:12:30,695 --> 00:12:35,620
+important, c'est d'activer cette
+interruption avec
+
+167
+00:12:35,620 --> 00:12:40,770
+un interrupt enable.
+Donc ça, dans cet interrupt
+
+168
+00:12:40,770 --> 00:12:45,920
+enable mask, on va activer le int un.
+
+169
+00:12:45,920 --> 00:12:49,420
+Et ça, ça a été fait, c'est à faire dans
+le setup.
+
+170
+00:12:49,420 --> 00:12:54,268
+Ensuite, une fois qu'on a activé toutes,
+préparé toutes les interruptions, on va
+
+171
+00:12:54,268 --> 00:12:59,640
+pouvoir faire le set interrupt enable SEI,
+et
+
+172
+00:12:59,640 --> 00:13:05,044
+le programme, dorénavant, sera sensible à
+ces
+
+173
+00:13:05,044 --> 00:13:11,214
+interruptions.
+Alors, au niveau des fonctions qu'il faut
+
+174
+00:13:11,214 --> 00:13:15,910
+définir à ceci, à cet interrupt, et bien,
+le
+
+175
+00:13:15,910 --> 00:13:21,500
+compilateur, en association avec le
+processeur,
+
+176
+00:13:21,500 --> 00:13:26,680
+vous permet d'écrire ISR, interrupt
+service routine,
+
+177
+00:13:26,680 --> 00:13:31,870
+et le nom int un vect va être reconnu
+
+178
+00:13:31,870 --> 00:13:36,710
+pour aller exécuter ce qui doit être
+exécuté
+
+179
+00:13:36,710 --> 00:13:40,860
+lorsque cette interruption est activée.
+
+180
+00:13:40,860 --> 00:13:45,768
+Alors là, j'ai décidé tout simplement
+qu'on fait clignoter une led.
+
+181
+00:13:45,768 --> 00:13:49,620
+Donc, c'est tout le contenu de cette
+procédure d'interruption.
+
+182
+00:13:49,620 --> 00:13:54,165
+Initialiser les registres, demander au
+processeur
+
+183
+00:13:54,165 --> 00:13:56,733
+de partir à la bonne adresse, dans
+
+184
+00:13:56,733 --> 00:14:01,970
+le bon vecteur d'interruption, et faire ce
+que vous avez à faire avec quelques
+
+185
+00:14:01,970 --> 00:14:03,870
+petites règles que l'on verra, si on
+essaye
+
+186
+00:14:03,870 --> 00:14:06,240
+de faire quelque chose d'un petit peu plus
+compliqué.
+
+187
+00:14:06,240 --> 00:14:12,120
+Alors, Arduino vous dit, oh la la, c'est
+trop compliqué pour vous.
+
+188
+00:14:12,120 --> 00:14:17,178
+On va vous fournir un attachInterrupt.
+On va
+
+189
+00:14:17,178 --> 00:14:22,476
+fournir une librairie attachInterrupt, et
+une fois que vous avez
+
+190
+00:14:22,476 --> 00:14:27,530
+défini le pin mode, vous écrivez
+attachInterrupt,
+
+191
+00:14:27,530 --> 00:14:32,366
+vous écrivez le numéro de la pin, mais
+dans
+
+192
+00:14:32,366 --> 00:14:36,570
+certains cas, c'est le numéro zéro un de
+ces interruptions.
+
+193
+00:14:36,570 --> 00:14:42,855
+Vous donnez le nom de la procédure que
+vous devez exécuter, et vous dites avec
+
+194
+00:14:42,855 --> 00:14:46,310
+des mots-clés que vous trouvez à tel
+endroit,
+
+195
+00:14:46,310 --> 00:14:50,660
+si c'est low, si c'est change, et cetera.
+
+196
+00:14:50,660 --> 00:14:52,715
+Et puis ensuite,
+
+197
+00:14:52,715 --> 00:14:57,966
+dans votre programme, dans la partie des
+fonctions,
+
+198
+00:14:57,966 --> 00:15:02,549
+il faudra définir la fonction faire
+quelque chose, qui
+
+199
+00:15:02,549 --> 00:15:07,532
+ici, était simplement, clignoter, et voilà
+comment
+
+200
+00:15:07,532 --> 00:15:12,370
+ça s'inscrit dans l'esprit Arduino où la
+réponse à
+
+201
+00:15:12,370 --> 00:15:17,810
+l'interruption sera naturellement beaucoup
+plus lente, puisque chaque
+
+202
+00:15:17,810 --> 00:15:21,950
+fois, ce sont les procédures qui testent
+et qui déclarent.
+
+203
+00:15:21,950 --> 00:15:28,050
+Donc, à vous de choisir.
+Et parlons maintenant des pin change.
+
+204
+00:15:28,050 --> 00:15:32,562
+Alors, le pin change agit sur plusieurs
+bits à la fois.
+
+205
+00:15:32,562 --> 00:15:38,256
+Il agit, en fait, sur un port pour savoir
+s'il y a eu changement.
+
+206
+00:15:38,256 --> 00:15:42,990
+L'application type, c'est un clavier
+balayé où en fait,
+
+207
+00:15:42,990 --> 00:15:45,090
+étant donné que vous avez beaucoup trop de
+
+208
+00:15:45,090 --> 00:15:48,460
+touches, vous pouvez pas les relier
+directement au processeur.
+
+209
+00:15:48,460 --> 00:15:55,640
+On fait un réseau où on va sélectionner
+une rangée de touches, et les touches qui
+
+210
+00:15:55,640 --> 00:15:57,944
+sont pressées, donc, on va mettre un zéro
+
+211
+00:15:57,944 --> 00:16:00,900
+dans le cas particulier, puisqu'on a des
+pôles amp.
+
+212
+00:16:00,900 --> 00:16:04,660
+Les touches qui sont pressées vont passer
+à zéro.
+
+213
+00:16:04,660 --> 00:16:08,430
+Alors, chacune de ces touches
+
+214
+00:16:08,430 --> 00:16:13,720
+va être, lues.
+Là, j'en ai dessiné qu'une seule.
+
+215
+00:16:13,720 --> 00:16:18,123
+Mais ça veut dire que je me suis intéressé
+à
+
+216
+00:16:18,123 --> 00:16:23,689
+cette, à ce, cette pin,
+
+217
+00:16:23,689 --> 00:16:28,584
+ici.
+Et puis, pour dire que je m'intéresse à
+
+218
+00:16:28,584 --> 00:16:34,025
+cette pin, je dois agir sur un masque qui
+va activer,
+
+219
+00:16:34,025 --> 00:16:40,356
+ici, la porte ET pour que la logique qui
+suit soit attentive à ce qui se
+
+220
+00:16:40,356 --> 00:16:44,196
+passe sur cette pin, donc ça, c'est
+toujours
+
+221
+00:16:44,196 --> 00:16:48,740
+ce principe général qu'on trouve avec les
+autorisations.
+
+222
+00:16:48,740 --> 00:16:51,420
+Alors, qu'est-ce qui se passe maintenant?
+
+223
+00:16:51,420 --> 00:16:53,832
+Vous n'avez pas appuyé sur cette touche.
+
+224
+00:16:53,832 --> 00:16:57,312
+Donc, vous avez un un.
+Ce un passe dans un registre à décalage.
+
+225
+00:16:57,312 --> 00:16:59,132
+Vous vous souvenez, ils continuent dans
+
+226
+00:16:59,132 --> 00:17:02,048
+le registre à décalage, puisqu'ils sont
+nettement
+
+227
+00:17:02,048 --> 00:17:04,860
+connectés à la suite de l'un iii.
+
+228
+00:17:04,860 --> 00:17:10,900
+là vous avez, une porte OU exclusif, un et
+un, ça veut dire zéro.
+
+229
+00:17:10,900 --> 00:17:16,203
+Maintenant, vous appuyez sur la touche,
+là, qu'est-ce qui se passe?
+
+230
+00:17:16,203 --> 00:17:19,013
+Vous allez voir un zéro, ici, d'abord, qui
+
+231
+00:17:19,013 --> 00:17:23,140
+va passer par la porte, puisque vous avez
+autorisé.
+
+232
+00:17:23,140 --> 00:17:24,460
+Ce zéro va être
+
+233
+00:17:24,460 --> 00:17:29,576
+copié dans la première bascule, et
+attention, là,
+
+234
+00:17:29,576 --> 00:17:35,390
+maintenant, il y a toujours un un, ici.
+J'ai un zéro, là.
+
+235
+00:17:35,390 --> 00:17:39,440
+Donc, la porte OU exclusif va passer à un.
+
+236
+00:17:39,440 --> 00:17:45,180
+Donc, le flag PCF pin change
+
+237
+00:17:45,180 --> 00:17:50,220
+et i flag est activé.
+S'il a été autorisé
+
+238
+00:17:50,220 --> 00:17:55,928
+avec un interrupt enable, si les
+interrupts sont actives, vous êtes partis
+
+239
+00:17:55,928 --> 00:18:02,020
+dans la routine qui va vous dire que vous
+avez activé sur cette touche.
+
+240
+00:18:02,020 --> 00:18:07,152
+Et étant donné qu'on vous offre que la
+possibilité de faire un pin change, et
+
+241
+00:18:07,152 --> 00:18:11,202
+bien, vous aurez également une
+interruption quand c'est
+
+242
+00:18:11,202 --> 00:18:15,382
+relâché, et on ne reparlera pas des
+claviers
+
+243
+00:18:15,382 --> 00:18:19,619
+balayés, mais, si vous les étudiez, et
+bien, vous apprendrez
+
+244
+00:18:19,619 --> 00:18:22,171
+que ça peut être prudent de mettre des
+diodes à chaque
+
+245
+00:18:22,171 --> 00:18:25,075
+intersection pour éviter qu'il y ait ce
+qu'on appelle les touches
+
+246
+00:18:25,075 --> 00:18:28,510
+fantômes, des touches qui apparaîssent,
+alors qu'on les a pas sollicitées.
+
+247
+00:18:28,510 --> 00:18:34,607
+Alors voilà, on a pu faire une petite
+révision de système logique, ici, et c'est
+
+248
+00:18:34,607 --> 00:18:37,553
+multiplié sur, et bien, dans les, dans les
+
+249
+00:18:37,553 --> 00:18:40,770
+processeurs Arduino, vous avez, sauf
+erreur, une vingtaine
+
+250
+00:18:40,770 --> 00:18:46,108
+de fois, cette logique, et vous pouvez
+
+251
+00:18:46,108 --> 00:18:51,462
+distribuer les actions de votre, clavier
+sur les pins qui
+
+252
+00:18:51,462 --> 00:18:55,423
+vous arrangent, mais ensuite, je ne dis
+pas que
+
+253
+00:18:55,423 --> 00:19:00,176
+c'est trivial de trouver la routine qui
+fonctionne bien.
+
+254
+00:19:00,176 --> 00:19:02,510
+Bon, je reviens à mon timer.
+
+255
+00:19:02,510 --> 00:19:05,898
+On avait vu qu'il pouvait créer une
+interruption.
+
+256
+00:19:05,898 --> 00:19:08,955
+Donc, on a initialisé les RJ.
+Je vais pas vous répéter.
+
+257
+00:19:08,955 --> 00:19:14,216
+Le but, maintenant, c'est de voir un petit
+peu plus en détail, une
+
+258
+00:19:14,216 --> 00:19:20,180
+routine qui me semble très, très utile
+pour beaucoup, beaucoup d'applications.
+
+259
+00:19:20,180 --> 00:19:26,450
+Alors, vous avez initialisé vos timers
+avec son horloge,
+
+260
+00:19:26,450 --> 00:19:31,769
+avec son masque, et vous avez lancé les
+interruptions.
+
+261
+00:19:31,769 --> 00:19:37,470
+Donc, au moment où vous aurez toutes les
+100 microsecondes,
+
+262
+00:19:37,470 --> 00:19:42,354
+une interruption qui vous amène, ici, dans
+timer
+
+263
+00:19:42,354 --> 00:19:47,412
+2 overflow, le flag est automatiquement
+remis à zéro.
+
+264
+00:19:47,412 --> 00:19:52,330
+C'est la procédure générale, avec, euh,
+avec AVR.
+
+265
+00:19:52,330 --> 00:19:56,623
+Vous réinitialisez votre timer pour avoir
+une nouvelle auto,
+
+266
+00:19:56,623 --> 00:19:59,650
+interruption dans 100 microsecondes.
+
+267
+00:19:59,650 --> 00:20:03,638
+Et maintenant, vous êtes partis pour faire
+ce
+
+268
+00:20:03,638 --> 00:20:07,190
+que vous voulez, et l'exemple que
+j'explique un petit
+
+269
+00:20:07,190 --> 00:20:10,600
+peu plus en détail, parce qu'il comprend,
+il correspond
+
+270
+00:20:10,600 --> 00:20:13,420
+mieux à, à quelque chose que je fais
+fréquemment.
+
+271
+00:20:13,420 --> 00:20:17,770
+Toutes les 100 microsecondes, vous avez
+envie de gérer
+
+272
+00:20:17,770 --> 00:20:21,970
+un encodeur, encodeur de rotation, on en
+parlera prochainement.
+
+273
+00:20:21,970 --> 00:20:26,535
+Toutes les 100 microsecondes, il faut
+gérer des moteurs pas à
+
+274
+00:20:26,535 --> 00:20:30,644
+pas, parce que les transitions, pour les
+pas, doivent être assez précises.
+
+275
+00:20:30,644 --> 00:20:33,270
+On parle aussi des moteurs pas à pas,
+prochainement.
+
+276
+00:20:33,270 --> 00:20:37,920
+Et maintenant, on n'a plus besoin de faire
+les choses aussi fréquemment.
+
+277
+00:20:37,920 --> 00:20:43,070
+Donc, on met en route, on surveille un
+compteur par 40,
+
+278
+00:20:43,070 --> 00:20:47,000
+qui toutes les 40 fois recommence, et ce
+qui veut dire
+
+279
+00:20:47,000 --> 00:20:53,350
+qu'on va continuer, on va exécuter, toutes
+les quatre millisecondes, euh,
+
+280
+00:20:53,350 --> 00:20:58,994
+cette fonction qui est du Pfm, euh, ça
+c'est
+
+281
+00:20:58,994 --> 00:21:04,890
+mon petit préféré, pour remplacer le PVM.
+On en reparlera aussi en détail.
+
+282
+00:21:04,890 --> 00:21:08,490
+Et maintenant, j'aimerais encore faire
+quelque chose
+
+283
+00:21:08,490 --> 00:21:12,585
+toutes les secondes, et dois rafraîchir la
+mémoire
+
+284
+00:21:12,585 --> 00:21:15,030
+à propos du, de watchdog.
+
+285
+00:21:15,030 --> 00:21:20,744
+Vous lancez une opération, vous attendez
+une touche d'un clavier.
+
+286
+00:21:20,744 --> 00:21:25,950
+Et bien, si cette touche ne vient pas, il
+faut arrêter d'attendre à un moment donné.
+
+287
+00:21:25,950 --> 00:21:28,597
+Donc, ça, c'est qu'on appelle le, le
+concept du,
+
+288
+00:21:28,597 --> 00:21:31,780
+du time out, du forclos, devrait-on dire
+en français.
+
+289
+00:21:31,780 --> 00:21:38,124
+Et là, je réalise une fonction time out
+qui pourrait être programmée
+
+290
+00:21:38,124 --> 00:21:43,690
+en fonction des besoins.
+Alors, toutes les secondes, ça, c'est avec
+
+291
+00:21:43,690 --> 00:21:49,640
+ce petit compteur qui va compter 250 fois
+quatre millisecondes.
+
+292
+00:21:49,640 --> 00:21:53,560
+Je décompte un time out, et si ce
+
+293
+00:21:53,560 --> 00:21:57,950
+compteur arrive à zéro, je dois faire
+quelque chose.
+
+294
+00:21:57,950 --> 00:22:00,200
+Et puis, ce quelque chose, ce sera
+
+295
+00:22:00,200 --> 00:22:03,425
+une procédure que je vais définir, qui
+s'appelle
+
+296
+00:22:03,425 --> 00:22:04,550
+alarme time out.
+
+297
+00:22:04,550 --> 00:22:08,918
+Et maintenant, je dois faire quelque
+chose, puisqu'ici,
+
+298
+00:22:08,918 --> 00:22:12,150
+j'ai, je vais sans arrêt passer à travers.
+
+299
+00:22:12,150 --> 00:22:17,538
+Donc, il faudrait éviter que, que le
+compteur time out
+
+300
+00:22:17,538 --> 00:22:21,610
+reste à zéro, si ce n'est pas, moi qui ai
+décidé.
+
+301
+00:22:21,610 --> 00:22:24,592
+Donc, c'est dans le programme principal
+qu'on
+
+302
+00:22:24,592 --> 00:22:27,342
+va définir une valeur supérieure à zéro.
+
+303
+00:22:27,342 --> 00:22:28,890
+Et maintenant qu'on
+
+304
+00:22:28,890 --> 00:22:33,640
+est arrivé à zéro, il faut rester
+tranquille.
+
+305
+00:22:33,640 --> 00:22:36,896
+Donc là, une solution, c'est de
+réincrémenter le
+
+306
+00:22:36,896 --> 00:22:42,550
+timer, comme ça, on sera différent de
+zéro.
+
+307
+00:22:42,550 --> 00:22:44,534
+Donc, ce qu'on a vu aujourd'hui,
+
+308
+00:22:44,534 --> 00:22:47,670
+c'est cette différence entre polling et
+interruption.
+
+309
+00:22:47,670 --> 00:22:51,660
+C'est la puissance de ces vecteurs
+d'interruption qui
+
+310
+00:22:51,660 --> 00:22:54,260
+oblige à comprendre un petit peu, la
+structure
+
+311
+00:22:54,260 --> 00:22:57,355
+du processeur, si on veut travailler
+directement avec
+
+312
+00:22:57,355 --> 00:23:00,715
+cette mise en route d'interruption qui est
+très efficace.
+
+313
+00:23:00,715 --> 00:23:04,635
+Et je vois qu'on n'a pas beaucoup parlé de
+la pile qui, en fait, est simplement un
+
+314
+00:23:04,635 --> 00:23:10,890
+petit peu plus grande que dans le cas des
+appels de procédures fonctions
+
+315
+00:23:10,890 --> 00:23:18,160
+usuelles, puisqu'il faut sauver un peu
+plus de l'état du processeur.

@@ -1,0 +1,803 @@
+1
+00:00:00,025 --> 00:00:10,025
+[AUDIO_VIDE]
+
+2
+00:00:12,250 --> 00:00:13,180
+>> Bonjour.
+
+3
+00:00:13,180 --> 00:00:16,520
+Nous connaissons les
+afficheurs matriciels,
+
+4
+00:00:16,520 --> 00:00:21,290
+mais lorsqu'ils deviennent grands,
+les schémas deviennent compliqués et
+
+5
+00:00:21,290 --> 00:00:25,280
+nous allons chercher une solution
+aujourd'hui pour obtenir des schémas plus
+
+6
+00:00:25,280 --> 00:00:30,960
+simples en utilisant la technique que nous
+connaissons de multiplexage temporel.
+
+7
+00:00:30,960 --> 00:00:36,080
+Nous allons voir comment l'implémenter,
+nous allons voir ses limites,
+
+8
+00:00:36,080 --> 00:00:39,340
+en particulier ses conséquences
+sur la luminosité,
+
+9
+00:00:39,340 --> 00:00:43,670
+et nous allons voir comment
+programmer ce type d'afficheur.
+
+10
+00:00:43,670 --> 00:00:47,100
+On connaît maintenant bien le
+schéma d'un afficheur matriciel.
+
+11
+00:00:48,710 --> 00:00:54,164
+Chaque LED doit être commandée
+par un registre série/parallèle.
+
+12
+00:00:54,164 --> 00:00:59,200
+Les données vont être
+transmises dans les registres
+
+13
+00:00:59,200 --> 00:01:05,430
+avec des horloges qui sont communes,
+l'horloge série et l'horloge parallèle.
+
+14
+00:01:05,430 --> 00:01:10,280
+On connaît aussi la manière de produire
+les signaux, mettre l'information, ici,
+
+15
+00:01:10,280 --> 00:01:15,120
+sur les huit entrées,
+donner l'heure sur l'horloge série,
+
+16
+00:01:15,120 --> 00:01:18,390
+mettre la deuxième information,
+la troisième, etc.
+
+17
+00:01:18,390 --> 00:01:22,760
+dans ce cas là jusqu'à la seizième,
+et tout à la fin,
+
+18
+00:01:22,760 --> 00:01:24,500
+donner le coup sur l'horloge parallèle.
+
+19
+00:01:26,080 --> 00:01:28,620
+Évidemment, lorsqu'on
+augmente le nombre de LED,
+
+20
+00:01:28,620 --> 00:01:31,590
+on augmente le nombre de
+registres et de résistances.
+
+21
+00:01:32,850 --> 00:01:39,670
+Avec une simple matrice de 32 fois 32,
+c'est 1024 sorties qu'il faut piloter.
+
+22
+00:01:39,670 --> 00:01:44,670
+On pourra pour cela, par exemple, utiliser
+128 circuits intégrés et registres,
+
+23
+00:01:44,670 --> 00:01:48,520
+74 HC595, avec 1024 résistances série.
+
+24
+00:01:48,520 --> 00:01:57,020
+C'est beaucoup, et il en faut déjà trois
+fois plus si c'est une matrice RGB,
+
+25
+00:01:57,020 --> 00:02:00,660
+avec donc des LED rouges,
+vertes et bleues, pour chaque pixel.
+
+26
+00:02:01,900 --> 00:02:06,540
+On va gagner un petit peu en utilisant
+des registres 16 bits à sortie à courant
+
+27
+00:02:06,540 --> 00:02:11,700
+constant, comme le SUM2016,
+mais malgré tout,
+
+28
+00:02:11,700 --> 00:02:16,590
+pour notre matrice de 32 fois 32 pixels,
+c'est 192
+
+29
+00:02:16,590 --> 00:02:20,925
+circuits intégrés et autant de
+résistances qu'il faudra monter.
+
+30
+00:02:20,925 --> 00:02:24,170
+Est-il possible d'obtenir
+des schémas plus simples?
+
+31
+00:02:24,170 --> 00:02:30,240
+Eh bien oui, avec le multiplexage
+temporel, que nous connaissons déjà!
+
+32
+00:02:30,240 --> 00:02:34,640
+L'utilisation du multiplexage temporel
+passe par l'idée de regrouper
+
+33
+00:02:35,720 --> 00:02:38,230
+les anodes et les cathodes par direction.
+
+34
+00:02:39,300 --> 00:02:40,580
+Toutes les anodes de
+
+35
+00:02:48,500 --> 00:02:51,020
+sept rangées de LED, sont connectées
+
+36
+00:02:51,020 --> 00:02:51,520
+ensemble, et toutes les cathodes, de sept
+rangées de LED sont connectées ensemble.
+
+37
+00:02:52,850 --> 00:02:56,980
+Ici, pour un afficheur de 4 fois 8,
+c'est-à-dire 32 pixels, on
+
+38
+00:02:59,270 --> 00:03:03,905
+a seulement, 4 plus 8,
+signaux de commande.
+
+39
+00:03:03,905 --> 00:03:06,460
+Est-ce que ça fonctionne?
+
+40
+00:03:06,460 --> 00:03:08,410
+Comment fait-on pour allumer cette LED?
+
+41
+00:03:08,410 --> 00:03:15,230
+Eh bien nous allons mettre du plus,
+ici, nous allons mettre du moins,
+
+42
+00:03:15,230 --> 00:03:19,233
+ici, et notre LED va s'allumer.
+
+43
+00:03:19,233 --> 00:03:22,890
+Comment fait-on pour allumer cette LED?
+
+44
+00:03:24,410 --> 00:03:25,860
+Facile!
+
+45
+00:03:25,860 --> 00:03:33,290
+Je mets du plus, ici, je mets du moins,
+ici, la LED va s'allumer.
+
+46
+00:03:33,290 --> 00:03:39,340
+Si je souhaite allumer les deux LED
+en même temps, je mets du plus,
+
+47
+00:03:39,340 --> 00:03:43,500
+ici, du plus, ici, du moins, ici,
+du moins, ici ; mes deux LED s'allument,
+
+48
+00:03:44,890 --> 00:03:51,295
+mais attention cette LED peut aussi
+s'allumer, le courant passant ici,
+
+49
+00:03:51,295 --> 00:03:56,490
+celle-ci va aussi s'allumer,
+le courant passant par ici.
+
+50
+00:03:57,690 --> 00:04:03,460
+Cette solution n'est donc pas utilisable,
+sauf si on utilise le multiplexage
+
+51
+00:04:03,460 --> 00:04:09,290
+temporel où on va successivement s'occuper
+de cette ligne et de cette ligne.
+
+52
+00:04:11,370 --> 00:04:14,556
+En l'occurence, on va plutôt
+s'occuper de celle-là, de celle-là,
+
+53
+00:04:14,556 --> 00:04:17,530
+de celle-là, de celle-là, alternativement.
+
+54
+00:04:17,530 --> 00:04:19,160
+C'est le multiplexage temporel.
+
+55
+00:04:20,210 --> 00:04:26,140
+Pour notre afficheur de quatre lignes de
+huit LED, nous allons devoir envoyer les
+
+56
+00:04:26,140 --> 00:04:31,140
+huit premières données avec les huit coups
+d'horloge, le coup d'horloge parallèle,
+
+57
+00:04:31,140 --> 00:04:36,740
+puis attendre l'affichage de la première
+ligne pendant un certain temps.
+
+58
+00:04:36,740 --> 00:04:41,610
+Puis la même chose pour la seconde ligne,
+avec une attente
+
+59
+00:04:41,610 --> 00:04:46,760
+pour que la ligne soit visible,
+la troisième, la quatrième ligne.
+
+60
+00:04:46,760 --> 00:04:51,750
+Nous avons donc un cycle complet
+qu'il va falloir répéter, si possible
+
+61
+00:04:51,750 --> 00:04:55,590
+au moins 100 fois par seconde pour que
+l'œil ne s'en rende pas trop compte.
+
+62
+00:04:56,950 --> 00:05:04,670
+On voit donc que notre schéma ne
+nécessite qu'un registre série/parallèle.
+
+63
+00:05:04,670 --> 00:05:09,190
+Par contre il faut faire attention
+aux questions de courant.
+
+64
+00:05:09,190 --> 00:05:14,980
+Si nous décidons de balayer
+sur les anodes, lorsque
+
+65
+00:05:14,980 --> 00:05:20,970
+la première série d'anodes est concernée,
+on pourra avoir jusqu'à
+
+66
+00:05:20,970 --> 00:05:28,030
+huit LED allumées en même temps,
+donc le courant ici sera de huit LED.
+
+67
+00:05:28,030 --> 00:05:33,040
+Par contre, le courant ici, puisqu'on
+ne sélectionne qu'une ligne, sera,
+
+68
+00:05:33,040 --> 00:05:37,530
+soit le courant d'une LED,
+soit aucun courant,
+
+69
+00:05:37,530 --> 00:05:39,540
+si la LED en question doit
+être éteinte à ce moment.
+
+70
+00:05:41,160 --> 00:05:46,800
+C'est la raison pour laquelle il faut,
+impérativement, mettre des résistances
+
+71
+00:05:46,800 --> 00:05:52,690
+de limitation de l'autre
+côté que le balayage.
+
+72
+00:05:54,420 --> 00:05:56,880
+Ici nous avons choisi
+de balayer les anodes,
+
+73
+00:05:56,880 --> 00:06:01,150
+nous devons donc mettre les
+résistances sur les cathodes
+
+74
+00:06:01,150 --> 00:06:06,160
+et nous devons mettre des
+amplificateurs sur les anodes ; ici,
+
+75
+00:06:06,160 --> 00:06:11,850
+un transistor PNP qui va permettre, à
+partir de la commande du micro contrôleur,
+
+76
+00:06:11,850 --> 00:06:17,490
+d'envoyer un courant suffisant pour aller
+jusqu'à allumer huit LED en même temps.
+
+77
+00:06:17,490 --> 00:06:22,500
+À noter que, lorsqu'il s'agit de matrices
+plus grandes, on utilisera plutôt des
+
+78
+00:06:22,500 --> 00:06:27,990
+transistors MOS, de type canal P,
+qui ont l'avantage d'avoir
+
+79
+00:06:27,990 --> 00:06:33,070
+une résistance interne plus faible,
+donc une dissipation de puissance moindre.
+
+80
+00:06:33,070 --> 00:06:35,670
+Ici, une seule cathode sera commandée,
+
+81
+00:06:35,670 --> 00:06:40,530
+donc la sortie d'un registre
+est largement suffisante.
+
+82
+00:06:40,530 --> 00:06:47,550
+Mais attention, il est possible avec ce
+type de registre de tirer un courant,
+
+83
+00:06:47,550 --> 00:06:52,560
+avec une valeur zéro, d'une certaine
+importance ; la valeur du courant qu'on
+
+84
+00:06:52,560 --> 00:06:57,570
+peut fournir, si on voulait utiliser le
+schéma inverse, est beaucoup plus faible.
+
+85
+00:06:57,570 --> 00:07:00,720
+On remarque ici que dans
+ces quatre signaux,
+
+86
+00:07:02,210 --> 00:07:07,070
+il n'y en a jamais qu'un seul
+qui est utilisé à la fois.
+
+87
+00:07:07,070 --> 00:07:12,550
+Pour des multiplexages avec plus
+d'entrées, on utilisera volontiers
+
+88
+00:07:12,550 --> 00:07:18,600
+un démultiplexeur ou un décodeur comme par
+exemple le circuit 74HC138, avec trois
+
+89
+00:07:20,160 --> 00:07:25,900
+adresses et une sélection,
+on peut avoir nos huit sorties.
+
+90
+00:07:27,100 --> 00:07:31,210
+Et on pourrait facilement en utiliser
+deux, en utilisant les deux polarités de
+
+91
+00:07:31,210 --> 00:07:37,230
+la output binable pour avoir 16 sorties
+à partir de quatre bits d'adresses.
+
+92
+00:07:37,230 --> 00:07:39,090
+Ce circuit est extrêmement
+souvent utilisé,
+
+93
+00:07:39,090 --> 00:07:41,460
+dans des afficheurs
+matriciels multiplexés.
+
+94
+00:07:42,700 --> 00:07:45,790
+On est bien d'accord qu'on
+a simplifié le schéma,
+
+95
+00:07:45,790 --> 00:07:50,310
+mais qu'on a affaibli
+l'intensité lumineuse.
+
+96
+00:07:50,310 --> 00:07:52,890
+En effet, avec un multiplexage par quatre,
+
+97
+00:07:52,890 --> 00:07:57,100
+une LED au maximum peut être
+allumée par quart du temps.
+
+98
+00:07:57,100 --> 00:08:00,580
+Alors on peut partiellement
+compenser ce problème
+
+99
+00:08:01,700 --> 00:08:06,570
+en utilisant l'astuce que les LED ont,
+certes un courant nominal,
+
+100
+00:08:06,570 --> 00:08:11,610
+qu'il ne faut pas dépasser en permanence,
+mais elles ont aussi un courant
+
+101
+00:08:11,610 --> 00:08:16,940
+maximal, qu'on a le droit d'atteindre,
+mais pas en permanence.
+
+102
+00:08:16,940 --> 00:08:23,196
+Très souvent, on choisira un courant
+de l'ordre de 150 % du courant nominal.
+
+103
+00:08:23,196 --> 00:08:25,980
+Il faut quand même dire
+qu'il faut faire attention,
+
+104
+00:08:25,980 --> 00:08:30,000
+lorsqu'on est en train de mettre au point
+le logiciel, si notre programme fait des
+
+105
+00:08:30,000 --> 00:08:35,490
+erreurs, si notre programme maintient
+en permanence une rangée allumée,
+
+106
+00:08:35,490 --> 00:08:40,270
+on pourrait surcharger les LED
+et leur faire du mal ; on va,
+
+107
+00:08:40,270 --> 00:08:43,730
+en tout cas,
+diminuer très nettement leur durée de vie.
+
+108
+00:08:43,730 --> 00:08:45,190
+Je peux donner comme conseil,
+
+109
+00:08:45,190 --> 00:08:50,070
+lorsqu'on met au point un afficheur
+matriciel, on le sous-alimente,
+
+110
+00:08:50,070 --> 00:08:54,370
+de telle manière qu'on limite un peu
+le courant pour ce genre de cas.
+
+111
+00:08:55,780 --> 00:08:58,930
+Alors essayons de comparer
+un peu ces architectures.
+
+112
+00:08:58,930 --> 00:09:03,450
+Un multiplexage par deux ne
+perd que peu de luminosité.
+
+113
+00:09:03,450 --> 00:09:06,400
+Par contre,
+on ne simplifie pas beaucoup le schéma.
+
+114
+00:09:07,530 --> 00:09:11,880
+J'ai vu ce type d'architecture dans
+des grands panneaux pour faire des
+
+115
+00:09:11,880 --> 00:09:13,930
+murs de LED, un petit peu anciens.
+
+116
+00:09:13,930 --> 00:09:17,790
+Il est probable qu'à l'époque les
+registres étaient relativement coûteux
+
+117
+00:09:17,790 --> 00:09:22,920
+et gagner la moitié des registres était
+un avantage financier non négligeable.
+
+118
+00:09:22,920 --> 00:09:25,950
+Ce n'est, apparemment,
+plus tellement le cas maintenant.
+
+119
+00:09:25,950 --> 00:09:30,130
+Le multiplexage par quatre semble
+être un compromis intéressant,
+
+120
+00:09:30,130 --> 00:09:32,710
+et je pense qu'il a toute sa place.
+
+121
+00:09:32,710 --> 00:09:36,890
+Les multiplexages par huit ou
+par 16 occasionnent une perte de
+
+122
+00:09:36,890 --> 00:09:41,870
+luminosité significative, on peut les
+utiliser pour des afficheurs d'intérieur.
+
+123
+00:09:41,870 --> 00:09:45,460
+Ce sera plus difficile pour
+des afficheurs d'extérieur,
+
+124
+00:09:45,460 --> 00:09:48,930
+qui nécessitent une intensité
+lumineuse plus importante.
+
+125
+00:09:48,930 --> 00:09:53,010
+Les facteurs de multiplexage plus
+important me semblent avoir peu d'intérêt,
+
+126
+00:09:53,010 --> 00:09:54,770
+tant ils limitent la luminosité.
+
+127
+00:09:55,780 --> 00:09:58,120
+Il faut toutefois mentionner
+un élément important.
+
+128
+00:09:59,230 --> 00:10:04,780
+Dans le cas d'une panne d'une LED
+dans un afficheur multiplexé,
+
+129
+00:10:04,780 --> 00:10:07,850
+il peut y avoir des perturbations
+sur les LED voisines.
+
+130
+00:10:07,850 --> 00:10:12,590
+à cause de l'interconnexion des LED,
+selon cette matrice XY.
+
+131
+00:10:14,520 --> 00:10:19,890
+Et ça signifie qu'on est plus
+sensible à une panne d'une LED,
+
+132
+00:10:19,890 --> 00:10:22,600
+elle aura des effets
+visuels plus importants.
+
+133
+00:10:22,600 --> 00:10:25,380
+C'est un point qu'il faut aussi,
+souvent, prendre en ligne de compte.
+
+134
+00:10:26,570 --> 00:10:30,540
+Qu'en est-il maintenant des
+programmes de commande d'un afficheur
+
+135
+00:10:30,540 --> 00:10:31,830
+matriciel multiplexé?
+
+136
+00:10:31,830 --> 00:10:34,980
+Eh bien c'est assez similaire
+
+137
+00:10:34,980 --> 00:10:40,390
+au programme pour commander un afficheur
+matriciel non multiplexé, mais cette fois,
+
+138
+00:10:40,390 --> 00:10:45,010
+c'est la procédure qui génère les cycles
+qui va devenir notre base de temps.
+
+139
+00:10:45,010 --> 00:10:50,700
+On devra l'exécuter en permanence,
+il n'est pas possible d'attendre avec
+
+140
+00:10:50,700 --> 00:10:55,580
+une information sur l'afficheur,
+il faut en permanence la rafraîchir.
+
+141
+00:10:56,700 --> 00:11:02,190
+Voilà notre procédure qui gère les
+cycles d'affichage de la matrice.
+
+142
+00:11:02,190 --> 00:11:04,750
+On va passer le nombre
+de cycles en paramètre,
+
+143
+00:11:04,750 --> 00:11:10,090
+et on aura une première boucle
+qui s'occupera de ce nombre.
+
+144
+00:11:10,090 --> 00:11:12,460
+On aura à l'intérieur une boucle qui,
+elle,
+
+145
+00:11:12,460 --> 00:11:16,840
+s'occupera des quatre lignes,
+et, à l'intérieur,
+
+146
+00:11:16,840 --> 00:11:20,920
+on aura une boucle qui s'occupe de
+l'envoi des huit bits d'une ligne.
+
+147
+00:11:20,920 --> 00:11:25,520
+On teste le bit en question.
+
+148
+00:11:25,520 --> 00:11:28,210
+On éteint, s'il faut allumer la LED,
+
+149
+00:11:29,350 --> 00:11:34,600
+parce qu'un zéro sur le registre
+va allumer la LED correspondante.
+
+150
+00:11:34,600 --> 00:11:40,510
+On envoie un coup d'horloge série,
+à la fin des huit bits,
+
+151
+00:11:40,510 --> 00:11:43,720
+un coup d'horloge parallèle,
+et naturellement,
+
+152
+00:11:43,720 --> 00:11:49,240
+l'attente d'une ligne qui doit
+être de 2,5 millisecondes,
+
+153
+00:11:49,240 --> 00:11:55,730
+si on veut avoir un cycle global de 10
+millisecondes, c'est-à-dire 100 hertz.
+
+154
+00:11:55,730 --> 00:12:00,030
+Vous vous souvenez probablement
+de notre petit programme Ping,
+
+155
+00:12:00,030 --> 00:12:04,820
+qui permettait de faire rebondir un
+point sur les bords de l'afficheur.
+
+156
+00:12:04,820 --> 00:12:06,670
+Voilà comment on l'avait écrit.
+
+157
+00:12:06,670 --> 00:12:11,540
+Eh bien,
+il faudra juste modifier ces deux lignes.
+
+158
+00:12:11,540 --> 00:12:17,770
+Au lieu d'afficher toute la matrice
+puis d'attendre le temps qu'on souhaite,
+
+159
+00:12:17,770 --> 00:12:21,610
+on va afficher, n cycles,
+
+160
+00:12:21,610 --> 00:12:27,250
+de la matrice et l'affichage
+fait office de délai.
+
+161
+00:12:27,250 --> 00:12:31,440
+Naturellement, dans ce cas là,
+l'unité de délai sera 10 millisecondes.
+
+162
+00:12:32,680 --> 00:12:37,220
+On a vu que le multiplexage
+temporel pour les afficheurs
+
+163
+00:12:37,220 --> 00:12:42,850
+matriciels est intéressant parce qu'il
+permet de simplifier les schémas.
+
+164
+00:12:42,850 --> 00:12:46,470
+On a vu qu'il ne complique pas
+trop la partie logicielle.
+
+165
+00:12:46,470 --> 00:12:50,660
+Mais attention,
+il a des conséquences sur la luminosité.
+
+166
+00:12:50,660 --> 00:12:54,180
+C'est toutefois une technologie qui est
+extrêmement utilisée, même actuellement.

@@ -1,0 +1,1099 @@
+﻿1
+00:00:05,545 --> 00:00:07,704
+Hi.
+In this tutorial
+
+2
+00:00:07,920 --> 00:00:09,609
+I will explain
+to you how to build
+
+3
+00:00:09,832 --> 00:00:11,734
+single cell
+electrical models
+
+4
+00:00:12,417 --> 00:00:11,798
+
+
+5
+00:00:15,717 --> 00:00:12,555
+We will first give you an
+introduction to the simulator we use.
+
+6
+00:00:15,930 --> 00:00:18,497
+This simulator is also
+called NEURON.
+
+7
+00:00:18,846 --> 00:00:22,590
+We will first build a single
+compartmental model.
+
+8
+00:00:23,241 --> 00:00:25,983
+We will add some
+current injections
+
+9
+00:00:26,166 --> 00:00:28,724
+and record the voltage
+from this model
+
+10
+00:00:29,026 --> 00:00:31,872
+and we will add some ion channels
+to the membrane.
+
+11
+00:00:32,793 --> 00:00:34,553
+Let me first show
+how to load
+
+12
+00:00:34,792 --> 00:00:37,090
+the neuron simulator
+into Python.
+
+13
+00:00:37,294 --> 00:00:40,777
+This is simply done
+by importing NEURON.
+
+14
+00:00:41,803 --> 00:00:46,063
+As you can see, there's a link here
+to the documentation
+
+15
+00:00:46,255 --> 00:00:49,154
+of the NEURON simulator
+so that you can have a look at
+
+16
+00:00:49,353 --> 00:00:53,370
+all the different functions that we
+are going to use later in this notebook.
+
+17
+00:00:53,583 --> 00:00:56,699
+Historically, the NEURON Simulator
+was controlled using the HOC language.
+
+18
+00:00:56,876 --> 00:01:00,218
+More and more scientists are switching
+to the Python interface of NEURON.
+
+19
+00:01:00,734 --> 00:01:02,967
+In Python there's something
+called the HOCObject.
+
+20
+00:01:03,155 --> 00:01:06,431
+which can be accessed by the
+'h' property of the neuron module
+
+21
+00:01:06,640 --> 00:01:09,408
+which contains the HOC
+functionality of NEURON.
+
+22
+00:01:09,750 --> 00:01:12,750
+For example, to load the
+'stdrun.hoc' file
+
+23
+00:01:13,189 --> 00:01:15,473
+which contains some
+handy functionality
+
+24
+00:01:15,669 --> 00:01:21,943
+one calls the HOC function
+load_file using this function call.
+
+25
+00:01:22,894 --> 00:01:26,819
+We also want to make sure that we
+always start from a clean simulator.
+
+26
+00:01:27,237 --> 00:01:31,606
+So with this comment here,
+the 'stdinit'
+
+27
+00:01:31,902 --> 00:01:37,699
+we can reset the
+state of the stimulator.
+
+28
+00:01:39,099 --> 00:01:41,257
+Also for this tutorial
+it's important to know
+
+29
+00:01:41,439 --> 00:01:45,151
+that all the values used
+in NEURON have a certain unit.
+
+30
+00:01:45,614 --> 00:01:50,689
+Here is a link to the different
+units which will be used
+
+31
+00:01:50,962 --> 00:01:54,386
+and I have specified the most
+important ones below.
+
+32
+00:01:55,417 --> 00:01:58,652
+What we will do in this tutorial
+is construct a neuron
+
+33
+00:01:58,979 --> 00:02:01,540
+consisting of
+multiple compartments.
+
+34
+00:02:01,741 --> 00:02:04,154
+Let's start
+with one compartment.
+
+35
+00:02:04,520 --> 00:02:08,282
+I first want to introduce to you how
+NEURON looks at a neuron.
+
+36
+00:02:08,788 --> 00:02:11,728
+We basically have a
+detailed morphology
+
+37
+00:02:11,920 --> 00:02:15,068
+that was reconstructed
+by experimenters
+
+38
+00:02:16,059 --> 00:02:19,965
+and NEURON will load this
+kind of morphology.
+
+39
+00:02:20,478 --> 00:02:25,477
+It will then discretize
+this morphology
+
+40
+00:02:25,679 --> 00:02:28,482
+in different segments
+or compartments
+
+41
+00:02:29,072 --> 00:02:30,896
+which you can
+for example see here.
+
+42
+00:02:31,096 --> 00:02:35,128
+So this is a zoomed-in version
+of a part of a dendrite.
+
+43
+00:02:35,872 --> 00:02:38,337
+The different segments
+are these parts here
+
+44
+00:02:38,526 --> 00:02:44,953
+and you see the diameter and length
+of every segment on this graph.
+
+45
+00:02:46,811 --> 00:02:48,762
+We also have something
+called a section.
+
+46
+00:02:48,940 --> 00:02:51,248
+A section is something
+between two branch points.
+
+47
+00:02:51,429 --> 00:02:53,932
+So here you have one branch point.
+Here you have one branch point.
+
+48
+00:02:54,116 --> 00:02:58,253
+A section is a piece
+of dendrite
+
+49
+00:02:58,480 --> 00:03:00,696
+or any part of
+of the neuron
+
+50
+00:03:00,930 --> 00:03:03,480
+between two
+branch points.
+
+51
+00:03:04,846 --> 00:03:08,633
+After discretizing the space
+NEURON will run
+
+52
+00:03:08,852 --> 00:03:12,152
+an electrical simulation
+of this morphology.
+
+53
+00:03:12,389 --> 00:03:14,464
+We will see
+the details later
+
+54
+00:03:14,680 --> 00:03:16,680
+but here you
+can already see
+
+55
+00:03:16,946 --> 00:03:20,770
+an example of
+such an electrical circuit
+
+56
+00:03:20,969 --> 00:03:22,594
+that's been
+simulated.
+
+57
+00:03:22,826 --> 00:03:26,914
+Basically every segment
+is replaced by
+
+58
+00:03:27,252 --> 00:03:29,427
+a tiny
+electrical circuit
+
+59
+00:03:29,670 --> 00:03:31,958
+and all the segments
+are connected
+
+60
+00:03:32,131 --> 00:03:35,248
+by wires
+with some resistance.
+
+61
+00:03:35,870 --> 00:03:39,102
+In this tutorial we will build
+a ball and stick model.
+
+62
+00:03:39,539 --> 00:03:43,650
+The ball is the soma of the cell
+and the stick is a dendrite.
+
+63
+00:03:44,139 --> 00:03:47,889
+In light gray you see the
+morphology of the model
+
+64
+00:03:48,086 --> 00:03:49,624
+that we are
+going to build.
+
+65
+00:03:49,856 --> 00:03:53,256
+In dark black is the
+equivalent electrical circuit.
+
+66
+00:03:53,577 --> 00:03:56,677
+We will go into the detail
+of all the components later
+
+67
+00:03:57,014 --> 00:04:01,883
+but basically again we have
+one segment or compartment
+
+68
+00:04:02,080 --> 00:04:05,547
+that represents the soma
+and we have different
+
+69
+00:04:05,836 --> 00:04:07,961
+segments in
+the dendrite.
+
+70
+00:04:09,883 --> 00:04:14,764
+So let's start with
+the soma of the cell.
+
+71
+00:04:16,188 --> 00:04:18,019
+So let's start
+with the soma.
+
+72
+00:04:19,690 --> 00:04:23,803
+Initially we'll create
+a section in NEURON
+
+73
+00:04:24,015 --> 00:04:26,865
+that represents the soma
+and we wont add
+
+74
+00:04:27,051 --> 00:04:29,564
+any channels to
+the membrane of the soma.
+
+75
+00:04:29,758 --> 00:04:33,221
+It means that we will
+only have a capacitance
+
+76
+00:04:33,924 --> 00:04:38,017
+that represents the
+membrane of our soma.
+
+77
+00:04:39,360 --> 00:04:41,398
+Creating the soma
+is done by
+
+78
+00:04:41,601 --> 00:04:44,163
+creating a section object
+in NEURON.
+
+79
+00:04:45,015 --> 00:04:48,040
+This section object
+has a name
+
+80
+00:04:48,441 --> 00:04:52,631
+and also has a variable that
+specifies a number of segments
+
+81
+00:04:52,821 --> 00:04:55,859
+so basically a soma
+is one compartment.
+
+82
+00:04:57,473 --> 00:04:59,018
+Every section
+in NEURON
+
+83
+00:04:59,217 --> 00:05:01,942
+is basically represented
+as a cylinder
+
+84
+00:05:02,139 --> 00:05:05,189
+which is the same
+with the soma here.
+
+85
+00:05:05,596 --> 00:05:09,121
+Then you can see the length
+and the diameter of these sections.
+
+86
+00:05:09,314 --> 00:05:12,601
+For example you can do this
+by setting the 'L' attribute
+
+87
+00:05:12,810 --> 00:05:16,023
+to the soma to 40
+which will be 40 microns
+
+88
+00:05:16,258 --> 00:05:20,633
+and you can also set the diameter
+of the soma to 40 microns too
+
+89
+00:05:21,173 --> 00:05:26,347
+which basically will represent
+a sphere instead of a cylinder.
+
+90
+00:05:27,700 --> 00:05:29,675
+The area function
+can be used
+
+91
+00:05:29,952 --> 00:05:32,677
+to calculate the surface area
+of the soma.
+
+92
+00:05:32,957 --> 00:05:35,970
+And we can actually
+use the equation of
+
+93
+00:05:36,240 --> 00:05:38,365
+the surface area of
+a cylinder to see
+
+94
+00:05:38,559 --> 00:05:41,534
+if what NEURON says to us
+is correct.
+
+95
+00:05:42,114 --> 00:05:45,077
+As you can see
+if you execute this block here
+
+96
+00:05:45,272 --> 00:05:49,547
+you get exactly the
+same value for the 
+
+97
+00:05:49,766 --> 00:05:53,424
+area of the membrane
+of the soma.
+
+98
+00:05:54,405 --> 00:05:58,255
+Maybe you find it a bit strange that
+everything in NEURON is a cylinder
+
+99
+00:05:58,446 --> 00:06:02,459
+because basically the soma in most
+cells looks like a sphere
+
+100
+00:06:02,817 --> 00:06:05,730
+but you can also see here
+that it actually doesn't matter
+
+101
+00:06:05,931 --> 00:06:11,155
+too much because if we calculate
+the surface area of a sphere
+
+102
+00:06:11,362 --> 00:06:15,292
+with the diameter and length
+of the cylinder to be specified
+
+103
+00:06:15,669 --> 00:06:17,419
+we get exactly
+the same value.
+
+104
+00:06:18,169 --> 00:06:22,319
+Now we have specified the shape
+of the single compartmental cell.
+
+105
+00:06:22,828 --> 00:06:25,652
+Electrically, the only component
+that is present for now
+
+106
+00:06:25,873 --> 00:06:28,161
+is the capacitance
+of the cell membrane.
+
+107
+00:06:28,443 --> 00:06:31,668
+We can retrieve or set a
+specific membrane capacitance
+
+108
+00:06:32,184 --> 00:06:36,242
+by accessing the 'cm' field
+as we can see here.
+
+109
+00:06:36,977 --> 00:06:38,634
+The units
+of this field are
+
+110
+00:06:38,813 --> 00:06:41,920
+microfarad per square centimeter
+(μF/cm2).
+
+111
+00:06:42,161 --> 00:06:45,020
+This specific capacitance
+that is stored in that variable
+
+112
+00:06:45,226 --> 00:06:52,289
+is only a value per cm²
+so per surface area of the soma.
+
+113
+00:06:52,504 --> 00:06:55,242
+If you want to know
+the total capacitance of the soma,
+
+114
+00:06:55,440 --> 00:07:00,652
+you have to multiply this by
+the total surface area of the soma
+
+115
+00:07:00,862 --> 00:07:03,874
+and as you can see here
+we get this kind of value.
+
+116
+00:07:04,095 --> 00:07:06,245
+You only have to be careful
+with the units
+
+117
+00:07:06,434 --> 00:07:12,447
+because the surface area
+is in micrometer squared (μm²)
+
+118
+00:07:12,640 --> 00:07:18,815
+while the capacitance
+is per cm²
+
+119
+00:07:19,036 --> 00:07:22,852
+so you need to have a
+correction factor for the units.
+
+120
+00:07:24,620 --> 00:07:27,874
+Now we have
+this electrical circuit.
+
+121
+00:07:29,452 --> 00:07:33,415
+What does this mean?
+We have the internals of the cell
+
+122
+00:07:33,625 --> 00:07:36,838
+which is marked by this
+connector here
+
+123
+00:07:37,163 --> 00:07:40,476
+and we have the outside of
+the cell which is grounded.
+
+124
+00:07:40,889 --> 00:07:42,664
+What we will
+do in NEURON is
+
+125
+00:07:42,878 --> 00:07:46,403
+calculate the voltage difference
+between the inside of the cell
+
+126
+00:07:46,609 --> 00:07:48,409
+and the
+outside of the cell
+
+127
+00:07:49,626 --> 00:07:52,438
+NEURON stores the
+voltage difference between inside
+
+128
+00:07:52,612 --> 00:07:55,662
+and outside of the cell
+in a variable called 'v'.
+
+129
+00:07:56,567 --> 00:07:59,598
+So for example even if you
+didn't do any simulation yet
+
+130
+00:07:59,800 --> 00:08:04,350
+you can already ask an initial value
+of this value at the soma.
+
+131
+00:08:04,860 --> 00:08:09,173
+I also want to point out
+this 0.5 value here
+
+132
+00:08:09,846 --> 00:08:13,972
+so basically
+every section you can ask
+
+133
+00:08:14,181 --> 00:08:17,094
+certain variables
+at different locations.
+
+134
+00:08:17,738 --> 00:08:20,983
+The 0.5 here means
+that it's the middle of the soma.
+
+135
+00:08:21,192 --> 00:08:24,192
+If you want to have one side
+of the soma, you take zero
+
+136
+00:08:24,422 --> 00:08:26,922
+and the other side it's 1
+so it's basically
+
+137
+00:08:27,682 --> 00:08:30,482
+there is a range variable
+between zero and 1
+
+138
+00:08:31,604 --> 00:08:33,354
+that you
+can specify.
+
+139
+00:08:34,004 --> 00:08:38,328
+As you can see, the voltage
+of the soma is -65 mV (millivolts).
+
+140
+00:08:38,528 --> 00:08:42,116
+This is roughly the
+typical value of a neuron at rest.
+
+141
+00:08:43,389 --> 00:08:45,852
+Then we also have
+the time variable
+
+142
+00:08:46,386 --> 00:08:49,398
+of the simulator which
+will advance during our simulation
+
+143
+00:08:49,589 --> 00:08:51,853
+but at the moment
+this is set to zero.
+
+144
+00:08:52,052 --> 00:08:54,577
+Then we also have to set
+the variable called 'tstop'
+
+145
+00:08:54,800 --> 00:08:57,800
+which will define how long
+our simulation will run.
+
+146
+00:08:58,349 --> 00:09:02,166
+To record the time and voltage
+we create two neuron vector objects.
+
+147
+00:09:02,978 --> 00:09:05,978
+These objects have a record method
+that when passed
+
+148
+00:09:06,257 --> 00:09:09,431
+a reference to a variable
+will record the value of that variable 
+
+149
+00:09:09,661 --> 00:09:11,421
+in the vector
+during the simulation.
+
+150
+00:09:11,628 --> 00:09:15,086
+For example, here we
+record the time and the voltage.
+
+151
+00:09:15,302 --> 00:09:17,990
+Now, running the simulation
+is as easy as
+
+152
+00:09:18,277 --> 00:09:20,428
+just calling
+the run method.
+
+153
+00:09:21,844 --> 00:09:25,364
+The run method will basically
+advance the time from zero
+
+154
+00:09:25,567 --> 00:09:29,080
+to the variable tstop
+we have defined.
+
+155
+00:09:29,770 --> 00:09:31,883
+In this case
+100 ms.
+
+156
+00:09:32,137 --> 00:09:35,137
+I've also created
+a little plot function to show
+
+157
+00:09:35,322 --> 00:09:36,860
+the time
+and the voltage.
+
+158
+00:09:37,929 --> 00:09:43,669
+As you can see, the voltage during
+our simulation has stayed the same.
+
+159
+00:09:46,118 --> 00:09:48,468
+You can also see this
+from the equations,
+
+160
+00:09:48,670 --> 00:09:53,270
+so basically NEURON is
+integrating an equation
+
+161
+00:09:53,954 --> 00:09:55,857
+like the one
+you can see here,
+
+162
+00:09:56,568 --> 00:10:00,281
+and if we put
+a zero current 
+
+163
+00:10:00,495 --> 00:10:03,367
+so we didn't inject any current
+in the model at the moment,
+
+164
+00:10:03,564 --> 00:10:05,811
+we actually get
+a variable of dV
+
+165
+00:10:06,011 --> 00:10:08,748
+which is
+a voltage difference of zero,
+
+166
+00:10:09,122 --> 00:10:12,326
+which perfectly explains
+our plot here.
+
+167
+00:10:13,510 --> 00:10:15,867
+To make this simulation
+a bit more interesting
+
+168
+00:10:16,058 --> 00:10:18,082
+we'll inject
+a current.
+
+169
+00:10:18,401 --> 00:10:20,551
+You basically do this
+by sticking a pipette
+
+170
+00:10:20,883 --> 00:10:24,233
+into the soma
+and injecting a certain current.
+
+171
+00:10:24,985 --> 00:10:28,371
+This is done by creating
+an 'iclamp' object in Neuron.
+
+172
+00:10:29,000 --> 00:10:33,138
+The 'iclamp' object let's us
+specify the amount of current
+
+173
+00:10:33,322 --> 00:10:35,290
+we are going to inject
+in nanoamps (nA)
+
+174
+00:10:35,632 --> 00:10:39,091
+and also the delay and
+the duration of the stimulus.
+
+175
+00:10:40,221 --> 00:10:44,123
+When we run our simulation
+we now get this kind of curve.
+
+176
+00:10:45,152 --> 00:10:49,849
+Basically now we are integrating
+this equation here
+
+177
+00:10:50,112 --> 00:10:53,017
+but unlike in
+the previous simulation,
+
+178
+00:10:53,217 --> 00:10:55,550
+the I_m is not
+zero anymore
+
+179
+00:10:55,918 --> 00:11:02,146
+but is equal to the value of
+the amplitude of the 'iclamp'.
+
+180
+00:11:03,587 --> 00:11:06,676
+When we fill out
+all the variables is this equation
+
+181
+00:11:07,380 --> 00:11:11,042
+we actually can calculate
+how much voltage difference
+
+182
+00:11:11,352 --> 00:11:12,995
+we are going
+to see in the plot.
+
+183
+00:11:13,218 --> 00:11:16,371
+So here we are actually
+comparing the voltage difference
+
+184
+00:11:16,874 --> 00:11:20,121
+reported by the simulation
+and by our little calculation
+
+185
+00:11:20,315 --> 00:11:23,390
+and it shows that
+these values are exactly the same.
+
+186
+00:11:24,058 --> 00:11:27,233
+In a real neuron
+you don't just have a capacitance
+
+187
+00:11:27,432 --> 00:11:28,757
+that forms
+the membrane
+
+188
+00:11:28,968 --> 00:11:31,747
+but this membrane
+also contains ion channels.
+
+189
+00:11:31,997 --> 00:11:33,972
+Let's start adding
+these to our model.
+
+190
+00:11:34,388 --> 00:11:37,266
+The first one we'll add
+is the lead conductors.
+
+191
+00:11:37,801 --> 00:11:41,253
+To insert such channels
+we have to insert
+
+192
+00:11:41,449 --> 00:11:44,444
+certain mechanisms
+in NEURON.
+
+193
+00:11:44,863 --> 00:11:48,123
+The mechanism represents which
+equations NEURON has to use
+
+194
+00:11:48,323 --> 00:11:51,011
+to calculate the
+ion channel currents.
+
+195
+00:11:51,808 --> 00:11:55,598
+One example is
+the 'hh' mechanism
+
+196
+00:11:56,024 --> 00:11:59,120
+which represents the
+Hodgkin-Huxley model.
+
+197
+00:11:59,455 --> 00:12:02,593
+When adding this 'hh' mechanism
+NEURON will integrate
+
+198
+00:12:02,833 --> 00:12:06,836
+the following equation to
+get the membrane voltage over time.
+
+199
+00:12:07,668 --> 00:12:10,846
+Like I said, at the moment we are
+mostly interested in the leak current
+
+200
+00:12:11,029 --> 00:12:15,730
+so we are going to set the
+sodium and potassium currents
+
+201
+00:12:15,928 --> 00:12:17,665
+to zero
+for the moment;
+
+202
+00:12:18,110 --> 00:12:20,723
+so the final equation
+is this.
+
+203
+00:12:21,409 --> 00:12:23,144
+Now we have introduced
+two new variables.
+
+204
+00:12:23,340 --> 00:12:26,597
+We have the 'E_leak'
+and we have the 'G_leak'.
+
+205
+00:12:27,684 --> 00:12:31,260
+The 'G_leak' is set by the
+'gl_hh' variable
+
+206
+00:12:31,447 --> 00:12:33,647
+and we can set it
+to a certain value.
+
+207
+00:12:34,269 --> 00:12:36,619
+Now we can also
+set the 'E_leak'
+
+208
+00:12:36,829 --> 00:12:40,034
+and the 'E_leak' is basically
+the potential that the
+
+209
+00:12:40,384 --> 00:12:43,734
+leakage channel
+will pull the cell to.
+
+210
+00:12:44,131 --> 00:12:45,756
+Basically at the moment
+we are going to set it
+
+211
+00:12:45,941 --> 00:12:47,766
+to exactly the
+reversal potential so that
+
+212
+00:12:47,982 --> 00:12:51,919
+the cell will always naturally
+fall back to the reversal potential.
+
+213
+00:12:53,421 --> 00:12:56,692
+When we now simulate this
+you see that our graph has changed.
+
+214
+00:12:57,490 --> 00:12:59,302
+I have now
+a little question for you.
+
+215
+00:12:59,537 --> 00:13:01,444
+Compare this graph
+to the previous one
+
+216
+00:13:02,048 --> 00:13:04,512
+and if you look at the equations,
+do you understand
+
+217
+00:13:04,712 --> 00:13:08,286
+why the voltage flattens out
+at the end of the stimulus here?
+
+218
+00:13:09,359 --> 00:13:12,509
+Also as an exercise,
+when you assume
+
+219
+00:13:12,714 --> 00:13:17,353
+that the time derivative
+between 40 and 60 milliseconds (ms)
+
+220
+00:13:17,850 --> 00:13:22,438
+is zero, calculate the average
+voltage in that interval.
+

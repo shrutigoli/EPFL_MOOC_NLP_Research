@@ -1,0 +1,1710 @@
+1
+00:00:00,000 --> 00:00:09,400
+Bonjour, Nous continuons le cours,
+"Comprendre les microcontrôleurs".
+
+2
+00:00:09,400 --> 00:00:11,668
+Nous n'avons pas encore beaucoup parlé de
+
+3
+00:00:11,668 --> 00:00:15,100
+microcontrôleurs, mais cette fois, nous
+allons enfin
+
+4
+00:00:15,100 --> 00:00:18,310
+toucher un tout petit peu aux
+microcontrôleurs,
+
+5
+00:00:18,310 --> 00:00:21,303
+sans encore en parler avec beaucoup de
+détails.
+
+6
+00:00:21,303 --> 00:00:25,190
+Dans ce module, nous allons parler de
+systèmes séquentiels.
+
+7
+00:00:25,190 --> 00:00:28,180
+Nous parlerons en particulier de comment
+représenter
+
+8
+00:00:28,180 --> 00:00:30,750
+un système séquentiel par un graphe
+d'état.
+
+9
+00:00:30,750 --> 00:00:35,315
+Nous regarderons aussi comment réaliser,
+comment synthétiser
+
+10
+00:00:35,315 --> 00:00:39,660
+une machine d'état, euh, pour un système
+séquentiel,
+
+11
+00:00:39,660 --> 00:00:42,028
+et finalement on montrera que la solution
+la
+
+12
+00:00:42,028 --> 00:00:47,510
+plus simple, c'est peut-être, justement,
+d'utiliser un microcontrôleur.
+
+13
+00:00:47,510 --> 00:00:50,300
+On avait vu précédemment ce qu'est
+
+14
+00:00:50,300 --> 00:00:55,559
+un système logique, avec ses entrées, avec
+ses
+
+15
+00:00:55,559 --> 00:01:00,996
+sorties, et la description avec une table
+de vérité pour
+
+16
+00:01:00,996 --> 00:01:04,388
+autant qu'il s'agisse d'un système
+combinatoire, et on va
+
+17
+00:01:04,388 --> 00:01:08,730
+justement, voir des systèmes qui ne sont
+pas combinatoires, aujourd'hui.
+
+18
+00:01:08,730 --> 00:01:11,656
+Pour vous convaincre que tous les systèmes
+ne
+
+19
+00:01:11,656 --> 00:01:15,242
+sont pas combinatoires, je vous propose un
+exemple.
+
+20
+00:01:15,242 --> 00:01:18,470
+En plus, cet exemple, nous allons
+l'utiliser
+
+21
+00:01:18,470 --> 00:01:21,080
+durant tout le cours, enfin à plusieurs
+occasions.
+
+22
+00:01:21,080 --> 00:01:23,840
+En tout cas, nous aurons l'occasion d'en
+reparler.
+
+23
+00:01:23,840 --> 00:01:27,552
+Alors, j'essaie de vous expliquer un petit
+peu de quoi il s'agit.
+
+24
+00:01:27,552 --> 00:01:29,350
+C'est un système de perceuse.
+
+25
+00:01:29,350 --> 00:01:34,014
+On a les pièces qui doivent être percées
+au moyen d'une mèche.
+
+26
+00:01:34,014 --> 00:01:41,102
+Ici, le moteur qui fait tourner la mèche.
+Et lors d'une utilisation manuelle,
+
+27
+00:01:41,102 --> 00:01:45,936
+l'ouvrier devait placer la pièce au bon
+endroit, la fixer, et
+
+28
+00:01:45,936 --> 00:01:51,165
+ensuite, faire descendre la perceuse à une
+certaine vitesse, jusqu'en
+
+29
+00:01:51,165 --> 00:01:56,500
+bas, puis ensuite, remonter pour dégager
+la mèche.
+
+30
+00:01:56,500 --> 00:02:01,280
+On souhaite automatiser ce processus, et
+alors, on va
+
+31
+00:02:01,280 --> 00:02:06,560
+rajouter à notre dispositif, ici, un petit
+bouton
+
+32
+00:02:06,560 --> 00:02:10,666
+start qui va permettre de démarrer, de
+lancer le
+
+33
+00:02:10,666 --> 00:02:14,730
+percement, au moment où la pièce aura été
+fixée.
+
+34
+00:02:14,730 --> 00:02:18,558
+Et donc, je rappelle le scénario, la
+perceuse doit
+
+35
+00:02:18,558 --> 00:02:24,170
+descendre jusqu'en bas, puis doit remonter
+jusqu'en haut et s'arrêter.
+
+36
+00:02:24,170 --> 00:02:27,360
+Première question qu'on pourrait se poser,
+
+37
+00:02:27,360 --> 00:02:31,060
+le système qui commande le moteur
+vertical,
+
+38
+00:02:31,060 --> 00:02:35,460
+quelles sont ses entrées, quelles sont ses
+sorties, pour le moment?
+
+39
+00:02:35,460 --> 00:02:37,847
+Combien de, d'entrées a-t-il?
+
+40
+00:02:37,847 --> 00:02:39,860
+Combien de sorties a-t-il?
+
+41
+00:02:39,860 --> 00:02:46,082
+Alors, la réponse est effectivement,
+
+42
+00:02:46,082 --> 00:02:51,085
+est que, le système a trois entrées et
+deux sorties.
+
+43
+00:02:51,085 --> 00:02:56,146
+Je vais vous l'expliquer.
+Quelles sont les entrées dont on a besoin?
+
+44
+00:02:56,146 --> 00:02:59,666
+Tout le monde pense, euh, qu'il y a
+effectivement une
+
+45
+00:02:59,666 --> 00:03:03,976
+entrée qui s'appelle start; ce n'est pas
+trop difficile à trouver.
+
+46
+00:03:03,976 --> 00:03:05,839
+Y a-t-il d'autres entrées?
+
+47
+00:03:05,839 --> 00:03:07,730
+Oui, il y a d'autres entrées.
+
+48
+00:03:07,730 --> 00:03:12,520
+Une entrée qui s'appelle bas, qui
+correspond au fait que j'ai dit
+
+49
+00:03:12,520 --> 00:03:17,571
+que quand le, la perceuse était arrivée en
+bas, il fallait remonter.
+
+50
+00:03:17,571 --> 00:03:21,111
+Donc, il faut bien un système de détection
+qui donne l'information,
+
+51
+00:03:21,111 --> 00:03:22,740
+lorsqu'on est arrivé en bas.
+
+52
+00:03:22,740 --> 00:03:25,092
+Il s'agit en l'occurence d'un interrupteur
+de
+
+53
+00:03:25,092 --> 00:03:27,674
+fin de course qui donne cette information.
+
+54
+00:03:27,674 --> 00:03:32,670
+Et de la même manière, on a un signal qui,
+euh, note qu'on est arrivé en haut.
+
+55
+00:03:32,670 --> 00:03:37,789
+En ce qui concerne les sorties, le moteur
+qui se trouve, ici, c'est lui
+
+56
+00:03:37,789 --> 00:03:42,794
+qui va permettre de faire descendre et de
+faire monter le dispositif.
+
+57
+00:03:42,794 --> 00:03:46,442
+Il y a un seul moteur, mais il y a besoin
+de deux
+
+58
+00:03:46,442 --> 00:03:49,400
+valeurs pour le commander.
+Pourquoi?
+
+59
+00:03:49,400 --> 00:03:53,110
+Et bien parce que ce moteur, en fait, a
+trois modes de fonctionnement.
+
+60
+00:03:53,110 --> 00:03:55,125
+À certains moments, il est arrêté.
+
+61
+00:03:55,125 --> 00:03:58,216
+À certains moments, il tourne dans un sens
+qui correspond
+
+62
+00:03:58,216 --> 00:04:00,439
+à la descente, et à un autre moment, il
+tourne
+
+63
+00:04:00,439 --> 00:04:04,044
+dans l'autre sens, et donc ces trois modes
+de fonctionnement
+
+64
+00:04:04,044 --> 00:04:08,230
+du moteur doivent être présentés par au
+minimum, deux sorties.
+
+65
+00:04:08,230 --> 00:04:11,856
+Par exemple, une sortie qui s'appelerait
+
+66
+00:04:11,856 --> 00:04:16,400
+avance, et une sortie qui s'appelerait
+recule.
+
+67
+00:04:16,400 --> 00:04:25,200
+Donc, nous avons notre système avec les
+trois entrées, avec les deux sorties,
+
+68
+00:04:25,200 --> 00:04:31,320
+dont on, naïvement, de voir si une table
+de vérité va nous permettre de le décrire.
+
+69
+00:04:31,320 --> 00:04:35,994
+Prenons la première ligne de la table de
+vérité.
+
+70
+00:04:35,994 --> 00:04:37,020
+Nous avons
+
+71
+00:04:37,020 --> 00:04:41,940
+start qui est à zéro, haut qui est à zéro,
+bas qui est à zéro.
+
+72
+00:04:41,940 --> 00:04:45,135
+Le fait que start soit à zéro siginifie
+que l'ouvrier
+
+73
+00:04:45,135 --> 00:04:48,250
+n'est pas en train de presser sur le
+bouton start.
+
+74
+00:04:48,250 --> 00:04:51,850
+Le fait qu'on ne soit ni en haut, ni
+
+75
+00:04:51,850 --> 00:04:56,164
+en bas, laisse entendre que la perceuse
+est quelque part
+
+76
+00:04:56,164 --> 00:04:59,342
+au milieu, et d'après le fonctionnement
+que j'ai décrit tout
+
+77
+00:04:59,342 --> 00:05:01,939
+à l'heure, si elle est au milieu, c'est
+qu'elle est,
+
+78
+00:05:01,939 --> 00:05:03,710
+par exemple, en train de descendre.
+
+79
+00:05:03,710 --> 00:05:08,214
+Alors, effectivement, on pourrait mettre,
+ici, une valeur un, suivie
+
+80
+00:05:08,214 --> 00:05:11,890
+d'un zéro, qui correspondrait au fait que
+le moteur avance.
+
+81
+00:05:11,890 --> 00:05:15,842
+Mais, évidemment, ça serait aussi possible
+d'être dans la
+
+82
+00:05:15,842 --> 00:05:20,885
+situation, ou alors, on est en train de
+monter.
+
+83
+00:05:20,885 --> 00:05:25,070
+C'est-à-dire que on est à un pour le
+recul, et à zéro pour l'avance.
+
+84
+00:05:25,070 --> 00:05:27,050
+Donc, pour cette seule
+
+85
+00:05:27,050 --> 00:05:31,354
+ligne, on a deux, euh, valeurs différentes
+de sorties.
+
+86
+00:05:31,354 --> 00:05:33,932
+Donc, le système n'est pas un système
+
+87
+00:05:33,932 --> 00:05:37,052
+combinatoire, et en quelques sortes, on
+peut
+
+88
+00:05:37,052 --> 00:05:41,760
+tirer un trait sur la table de vérité,
+elle n'est pas utile dans ce cas-là.
+
+89
+00:05:41,760 --> 00:05:44,504
+Il faut trouver une autre manière
+
+90
+00:05:44,504 --> 00:05:48,840
+de représenter notre, euh, système
+séquentiel.
+
+91
+00:05:48,840 --> 00:05:53,290
+Bon, ce qu'on va utiliser, c'est un graphe
+d'état.
+
+92
+00:05:53,290 --> 00:05:58,131
+L'idée, c'est de trouver des états à notre
+système.
+
+93
+00:05:58,131 --> 00:06:02,725
+Alors, les états correspondent au fait
+qu'on peut dire, le
+
+94
+00:06:02,725 --> 00:06:06,511
+système est en train de, il est dans une
+situation stable.
+
+95
+00:06:06,511 --> 00:06:08,490
+Par exemple, il est à l'arrêt.
+
+96
+00:06:08,490 --> 00:06:13,290
+Il est à l'arrêt, ou bien il est en train
+de descendre, ou bien il est en
+
+97
+00:06:13,290 --> 00:06:15,564
+train de monter, et dans ce cas-là, ce
+
+98
+00:06:15,564 --> 00:06:18,364
+n'est pas difficile de trouver qu'on a
+effectivement ces
+
+99
+00:06:18,364 --> 00:06:20,250
+trois états qui sont présentés, là.
+
+100
+00:06:20,250 --> 00:06:23,632
+À chaque état correspond très clairement
+les
+
+101
+00:06:23,632 --> 00:06:27,220
+valeurs, euh, des signaux avance et
+recule.
+
+102
+00:06:27,220 --> 00:06:31,800
+Pour l'arrêt, on a avance et recule qui
+sont à zéro.
+
+103
+00:06:31,800 --> 00:06:37,622
+Pour la descente, avance est à un et
+recule est à zéro, et c'est
+
+104
+00:06:37,622 --> 00:06:41,722
+le contraire pour la montée, recule est à
+un et avance est à zéro.
+
+105
+00:06:41,722 --> 00:06:43,433
+Qu'est-ce qui va nous permettre
+
+106
+00:06:43,433 --> 00:06:45,793
+de passer de l'état arrêt à l'état
+descente?
+
+107
+00:06:45,793 --> 00:06:48,010
+Et bien, on va appeler ça une transition.
+
+108
+00:06:48,010 --> 00:06:50,635
+Je vais dessiner, ici, une flèche qui va
+
+109
+00:06:50,635 --> 00:06:53,990
+nous permettre de passer de l'arrêt à la
+descente.
+
+110
+00:06:53,990 --> 00:06:58,360
+Quelle est la condition qui est liée à
+cette transition?
+
+111
+00:06:58,360 --> 00:07:02,730
+Et bien, évidemment, c'est le bouton
+start.
+
+112
+00:07:02,730 --> 00:07:08,900
+On pourrait se poser la question, est-ce
+qu'il y a une transition qui permet
+
+113
+00:07:08,900 --> 00:07:10,990
+de passer de descente à arrêt?
+
+114
+00:07:10,990 --> 00:07:15,037
+Et bien, on se rend compte que avec le
+scénario que j'ai décrit tout
+
+115
+00:07:15,037 --> 00:07:18,460
+à l'heure, il n'y a pas de situation où on
+passe de descente à arrêt.
+
+116
+00:07:18,460 --> 00:07:22,130
+Lorsqu'on a terminé la descente, on doit
+remonter, mais on ne doit pas s'arrêter.
+
+117
+00:07:22,130 --> 00:07:25,304
+Donc, en fait, cette, euh, flèche n'existe
+pas.
+
+118
+00:07:25,304 --> 00:07:29,712
+Donc, je vais tout simplement l'enlever.
+Il n'y aura pas besoin de la dessiner.
+
+119
+00:07:29,712 --> 00:07:31,710
+De la même manière, on aura des
+transitions
+
+120
+00:07:31,710 --> 00:07:33,730
+de descente à montée, et de montée à
+arrêt.
+
+121
+00:07:33,730 --> 00:07:34,220
+De telle
+
+122
+00:07:34,220 --> 00:07:39,120
+manière que finalement, notre graphe
+d'état se présente de cette manière-là.
+
+123
+00:07:39,120 --> 00:07:45,320
+Je rappelle, on a les états représentés
+par, euh, par exemple, un ovale.
+
+124
+00:07:45,320 --> 00:07:48,037
+On a des transitions.
+
+125
+00:07:48,037 --> 00:07:54,310
+À chaque état est associé un nom, mais
+surtout associé des valeurs de sorties,
+
+126
+00:07:54,310 --> 00:07:59,314
+et à chaque transition, est associée une
+condition pour cette, pour que
+
+127
+00:07:59,314 --> 00:08:03,170
+cette transition soit, euh, passée, soit
+validée.
+
+128
+00:08:03,170 --> 00:08:07,180
+La question qui se pose maintenant, c'est
+comment réaliser
+
+129
+00:08:07,180 --> 00:08:09,875
+avec les circuits logiques que l'on
+connaît, des portes
+
+130
+00:08:09,875 --> 00:08:13,935
+logiques, des bascules, notre système
+séquentiel, notre machine d'état,
+
+131
+00:08:13,935 --> 00:08:16,520
+à partir du graphe d'état que nous avons
+décrit?
+
+132
+00:08:16,520 --> 00:08:19,450
+Alors, la solution se présente de la
+manière suivante.
+
+133
+00:08:19,450 --> 00:08:24,402
+Étant donné qu'on a des états, et que ces
+états doivent être maintenus, on va
+
+134
+00:08:24,402 --> 00:08:28,953
+utiliser deux bascules qui vont permettre
+de mémoriser
+
+135
+00:08:28,953 --> 00:08:32,550
+la valeur de avance et la valeur de
+recule.
+
+136
+00:08:32,550 --> 00:08:36,356
+On va, ici, prévoir une horloge qui va, un
+
+137
+00:08:36,356 --> 00:08:41,185
+certain nombre de fois par seconde, en
+permanence, par exemple,
+
+138
+00:08:41,185 --> 00:08:44,920
+à une fréquence de 100 hertz, ou de 1
+kilohertz,
+
+139
+00:08:44,920 --> 00:08:48,768
+recalculer le nouvel état pour le mettre
+sur les sorties.
+
+140
+00:08:48,768 --> 00:08:49,878
+Comment peut-on
+
+141
+00:08:49,878 --> 00:08:51,506
+calculer ce nouvel état?
+
+142
+00:08:51,506 --> 00:08:54,720
+Et bien, on a besoin d'un système
+combinatoire.
+
+143
+00:08:54,720 --> 00:08:58,824
+Certes, ce système combinatoire, va
+utiliser comme entrée,
+
+144
+00:08:58,824 --> 00:09:02,497
+les entrées de notre système séquentiel,
+les fameux
+
+145
+00:09:02,497 --> 00:09:08,862
+signaux start, bas et haut, et ils ne sont
+pas suffisants, on l'a vu tout à l'heure.
+
+146
+00:09:08,862 --> 00:09:14,430
+On a également besoin de reprendre l'état
+présent pour calculer l'état futur.
+
+147
+00:09:14,430 --> 00:09:15,310
+Je reprends
+
+148
+00:09:15,310 --> 00:09:17,690
+l'exemple de tout à l'heure.
+
+149
+00:09:17,690 --> 00:09:20,820
+Si je suis en train de descendre, c'est
+parce que
+
+150
+00:09:20,820 --> 00:09:23,350
+je suis en train de descendre, que je dois
+continuer.
+
+151
+00:09:23,350 --> 00:09:25,420
+Ce n'est pas les entrées qui me le disent.
+
+152
+00:09:25,420 --> 00:09:30,968
+Et si j'étais, au contraire, dans la même
+situation avec start, bas et haut qui sont
+
+153
+00:09:30,968 --> 00:09:36,332
+à zéro, mais que je suis dans l'état de
+monter, je dois continuer à monter.
+
+154
+00:09:36,332 --> 00:09:40,552
+Donc, l'état présent est réutilisé pour
+calculer le,
+
+155
+00:09:40,552 --> 00:09:41,650
+l'état futur.
+
+156
+00:09:41,650 --> 00:09:46,830
+Et alors, l'état futur est présent, ici,
+et il est chargé par le coup d'horloge
+
+157
+00:09:46,830 --> 00:09:49,290
+dans les deux bascules qui est donné,
+
+158
+00:09:49,290 --> 00:09:52,956
+euh, donc, par cette horloge, par cet
+oscillateur.
+
+159
+00:09:52,956 --> 00:09:58,514
+À noter que ces deux bascules ont la même
+horloge, et on parle dans ce cas-là de
+
+160
+00:09:58,514 --> 00:10:03,920
+système séquentiel synchrone, c'est le
+terme technique qui est utilisé.
+
+161
+00:10:03,920 --> 00:10:05,840
+Il faut maintenant réaliser
+
+162
+00:10:05,840 --> 00:10:12,000
+le système combinatoire qui est donc, un
+sous-ensemble de notre système séquentiel.
+
+163
+00:10:12,000 --> 00:10:14,032
+Il a cinq entrées.
+
+164
+00:10:14,032 --> 00:10:20,723
+Oh là là, ça signifie qu'il a 32 lignes,
+puisque le nombre de combinaisons
+
+165
+00:10:20,723 --> 00:10:25,974
+possibles de cinq entrées, c'est deux à la
+puissance cinq, c'est-à-dire 32.
+
+166
+00:10:25,974 --> 00:10:29,690
+visiblement, je ne vais pas avoir la place
+sur mon tableau, ici.
+
+167
+00:10:29,690 --> 00:10:30,762
+Je vous avais dit,
+
+168
+00:10:30,762 --> 00:10:35,195
+toutefois, que, euh, lorsqu'on parlait de
+table de vérité, on n'était
+
+169
+00:10:35,195 --> 00:10:39,300
+pas du tout obligé de les faire dans
+l'ordre binaire traditionnel.
+
+170
+00:10:39,300 --> 00:10:41,156
+Et en fait, dans ce cas-là, ce que je
+
+171
+00:10:41,156 --> 00:10:43,660
+vais faire, c'est que je vais tenter de
+parcourir
+
+172
+00:10:43,660 --> 00:10:46,928
+mon graphe d'état, en mettant les valeurs,
+et on
+
+173
+00:10:46,928 --> 00:10:50,580
+va voir que les choses vont se passer
+relativement bien.
+
+174
+00:10:50,580 --> 00:10:56,664
+Je commence par me dire, je suis dans
+l'état arrêt,
+
+175
+00:10:56,664 --> 00:11:00,900
+avec recule et avance qui sont à zéro.
+
+176
+00:11:00,900 --> 00:11:04,500
+Quel est, ou quels sont les états futurs
+possibles de
+
+177
+00:11:04,500 --> 00:11:08,010
+cet état arrêt?
+Et bien, en fait, il y a deux cas.
+
+178
+00:11:08,010 --> 00:11:15,212
+Il y a le cas où on va rester à l'arrêt,
+et le cas ou au contraire,
+
+179
+00:11:15,212 --> 00:11:22,302
+on va passer à la descente.
+Vous êtes d'accord que, ici, ça représente
+
+180
+00:11:22,302 --> 00:11:24,278
+l'arrêt, dans les deux cas.
+
+181
+00:11:24,278 --> 00:11:27,470
+Ici, je reste à l'arrêt, ici, je passe à
+la decente.
+
+182
+00:11:27,470 --> 00:11:32,500
+J'ai les mêmes valeurs qu'ici.
+Qu'est-ce qui va permettre, maintenant,
+
+183
+00:11:32,500 --> 00:11:37,499
+de savoir si on doit rester à l'arrêt, ou
+au contraire, passer à la descente?
+
+184
+00:11:37,499 --> 00:11:40,305
+Et bien, c'est tout naturellement le
+bouton start.
+
+185
+00:11:40,305 --> 00:11:42,788
+Lorsqu'il est à zéro, on reste à l'arrêt.
+
+186
+00:11:42,788 --> 00:11:45,494
+Lorsqu'il est à un, on va passer à la
+descente.
+
+187
+00:11:45,494 --> 00:11:47,850
+Et au fond, peu importe les valeurs
+
+188
+00:11:47,850 --> 00:11:50,850
+de haut ou de bas, dans ce cas-là.
+
+189
+00:11:50,850 --> 00:11:56,040
+Et vous voyez que, euh, cette manière, au
+fond de, de, de noter,
+
+190
+00:11:56,040 --> 00:12:01,230
+ici, avec C X, cette ligne représente en
+fait quatre ligne de la table de vérité.
+
+191
+00:12:01,230 --> 00:12:08,070
+Puisqu'on a les combinaisons avec 0, 0, 0,
+1, 1, 0 et 1, 1.
+
+192
+00:12:08,070 --> 00:12:10,144
+Et la même chose pour la ligne suivante.
+
+193
+00:12:10,144 --> 00:12:12,889
+Alors on peut maintenant continuer notre
+parcours de
+
+194
+00:12:12,889 --> 00:12:13,690
+notre graphe.
+
+195
+00:12:13,690 --> 00:12:18,760
+Je vais euh, voir ce qu'il se passe
+lorsque je suis à l'état "descente".
+
+196
+00:12:18,760 --> 00:12:24,337
+Et de nouveau il y a deux cas possibles,
+le cas où je continue à descendre
+
+197
+00:12:24,337 --> 00:12:29,120
+et le cas où je vais au contraire passer à
+la montée.
+
+198
+00:12:29,120 --> 00:12:35,410
+Et qu'est-ce qui va déterminer si on reste
+à la descente ou si on passe à la montée?
+
+199
+00:12:35,410 --> 00:12:38,335
+Et bien c'est tout naturellement le fait
+que "bas"
+
+200
+00:12:38,335 --> 00:12:44,218
+soit atteint ou qu'il ne soit pas atteint.
+Et de nouveau, on ne s'inquiète pas des
+
+201
+00:12:44,218 --> 00:12:50,870
+valeurs de "start" et de "haut" pour ce
+choix de l'état futur.
+
+202
+00:12:50,870 --> 00:12:56,761
+Et finalement, je peux terminer maintenant
+mon euh, mon parcours en prenant
+
+203
+00:12:56,761 --> 00:13:02,460
+le cas où je suis, cette fois à la montée,
+les deux cas où je suis à la montée.
+
+204
+00:13:02,460 --> 00:13:03,516
+Je peux rester
+
+205
+00:13:03,516 --> 00:13:08,113
+à la montée ou, au contraire, je peux
+passer à l'arrêt.
+
+206
+00:13:08,113 --> 00:13:15,448
+Et, cette fois, c'est l'état du haut qui
+va influencer euh, l'état futur.
+
+207
+00:13:15,448 --> 00:13:21,000
+Et les boutons "start", les valeurs de bas
+ne sont pas importantes.
+
+208
+00:13:21,000 --> 00:13:26,670
+J'ai terminé le parcours de mon graphe
+d'état.
+
+209
+00:13:26,670 --> 00:13:28,638
+Je n'ai pas terminé ma table
+
+210
+00:13:28,638 --> 00:13:29,480
+de vérité.
+
+211
+00:13:29,480 --> 00:13:33,005
+Je vous avais en fait dit qu'il était
+indispensable que
+
+212
+00:13:33,005 --> 00:13:36,260
+tous les cas soient prévus dans la table
+de vérité.
+
+213
+00:13:36,260 --> 00:13:40,908
+Donc, je dois encore signaler ce cas-là,
+quelles que soient les
+
+214
+00:13:40,908 --> 00:13:46,006
+valeurs de A euh, de "haut", de "bas" et
+de "start".
+
+215
+00:13:46,006 --> 00:13:50,298
+Quand j'ai cette valeur à 1 pour "avance"
+et
+
+216
+00:13:50,298 --> 00:13:53,997
+1 pour "recule", c'est un état qui n'est
+pas prévu.
+
+217
+00:13:53,997 --> 00:13:57,474
+Par conséquent, ça semble être une erreur
+technique en quelque sorte.
+
+218
+00:13:57,474 --> 00:14:00,030
+Par exemple lorsque on alimente notre
+montage,
+
+219
+00:14:00,030 --> 00:14:02,760
+on pourrait tomber par hasard dans cet
+état-là.
+
+220
+00:14:02,760 --> 00:14:06,290
+Et, évidemment, dans ce cas-là, il faut
+rapidement revenir
+
+221
+00:14:06,290 --> 00:14:09,251
+à l'état neutre du système qui est l'état
+"arrêt".
+
+222
+00:14:09,251 --> 00:14:12,440
+Et cette fois, j'ai une table de vérité
+qui est complète.
+
+223
+00:14:12,440 --> 00:14:14,992
+J'ai ici, quatre lignes, quatre lignes,
+quatre
+
+224
+00:14:14,992 --> 00:14:17,975
+lignes, quatre lignes, quatre lignes,
+quatre lignes.
+
+225
+00:14:17,975 --> 00:14:18,695
+Huit lignes.
+
+226
+00:14:18,695 --> 00:14:19,235
+J'ai donc
+
+227
+00:14:19,235 --> 00:14:21,830
+bien en tout mes 32 lignes de ma table de
+vérité.
+
+228
+00:14:21,830 --> 00:14:27,286
+Ça va être relativement simple maintenant
+à partir de cette table de vérité de
+
+229
+00:14:27,286 --> 00:14:34,230
+trouver les, la formule logique, avec les
+expressions de l'algèbre de Boole.
+
+230
+00:14:34,230 --> 00:14:38,331
+C'est exactement ce qu'on avait fait dans
+les systèmes combinatoires.
+
+231
+00:14:38,331 --> 00:14:44,268
+Par exemple, ce 1 ici, correspond au fait
+que "bas"
+
+232
+00:14:44,268 --> 00:14:48,200
+est à 1, "recule" est à 0, "avance" est à
+1.
+
+233
+00:14:48,200 --> 00:14:51,518
+Donc "bas", "recule" barre, "avance".
+
+234
+00:14:51,518 --> 00:14:55,190
+Je prends un autre exemple : ce 1 là
+correspond au fait
+
+235
+00:14:55,190 --> 00:14:59,790
+que "bas" est à 0, "recule" est à 0,
+"avance" est à 1.
+
+236
+00:14:59,790 --> 00:15:04,886
+"Bas" barre, "recule" barre, "avance".
+Et donc les
+
+237
+00:15:04,886 --> 00:15:09,858
+"et" logiques ici pour regrouper chaque
+fois les deux termes.
+
+238
+00:15:09,858 --> 00:15:15,716
+J'ai donc ma formule définitive.
+C'est alors facile maintenant d'avoir le
+
+239
+00:15:15,716 --> 00:15:23,256
+schéma qu'on va pouvoir euh, dessiner avec
+les portes "ou" et avec les portes "et".
+
+240
+00:15:23,256 --> 00:15:28,840
+Alors voilà donc le schéma logique que
+nous avons dessiné tout à l'heure.
+
+241
+00:15:28,840 --> 00:15:31,720
+Vous reconnaissez les entrées ici sur des
+interrupteurs
+
+242
+00:15:31,720 --> 00:15:34,400
+avec affichage des valeurs pour qu'on voit
+bien.
+
+243
+00:15:34,400 --> 00:15:35,003
+Le système
+
+244
+00:15:35,003 --> 00:15:38,930
+combinatoire avec les inverseurs pour
+avoir les signaux inversés.
+
+245
+00:15:38,930 --> 00:15:41,735
+Les deux bascules qui vont donc prendre
+
+246
+00:15:41,735 --> 00:15:45,475
+les sorties des portes "ou" pour les
+enregister.
+
+247
+00:15:45,475 --> 00:15:50,475
+L'horloge, qui va permettre de euh,
+valider et d'enregistrer l'état.
+
+248
+00:15:50,475 --> 00:15:54,984
+Ici, les deux sorties "avance" et "recule"
+et l'utilisation de
+
+249
+00:15:54,984 --> 00:15:59,450
+ces valeurs pour le système combinatoire
+selon donc, le schéma.
+
+250
+00:15:59,450 --> 00:16:00,708
+Alors maintenant,
+
+251
+00:16:00,708 --> 00:16:05,724
+on va se placer dans une situation
+réaliste : la perceuse est en haut
+
+252
+00:16:05,724 --> 00:16:10,820
+et l'utilisateur euh, va bientôt presser
+sur le bouton "start".
+
+253
+00:16:10,820 --> 00:16:15,204
+Et lorsqu'il presse sur le bouton "start",
+voilà, la prochaine fois
+
+254
+00:16:15,204 --> 00:16:19,380
+que l'horloge est pressée, on passe bien
+dans le mode "avance".
+
+255
+00:16:19,380 --> 00:16:22,507
+On peut presser d'autre fois sur le clock,
+ça ne change rien.
+
+256
+00:16:22,507 --> 00:16:25,510
+Comme le système va descendre, il va
+quitter le "haut".
+
+257
+00:16:25,510 --> 00:16:29,860
+Voilà, il ne se passe toujours rien.
+
+258
+00:16:29,860 --> 00:16:32,869
+L'utilisateur va cesser de presser sur le
+bouton "start"
+
+259
+00:16:32,869 --> 00:16:35,360
+puisqu'il voit que le démarrage a bien été
+fait.
+
+260
+00:16:35,360 --> 00:16:36,504
+Il ne se passe toujours rien à la
+
+261
+00:16:36,504 --> 00:16:38,720
+sortie, on ne change pas d'état, on
+descend toujours.
+
+262
+00:16:38,720 --> 00:16:41,063
+Jusqu'au moment où on arrive en bas et à
+
+263
+00:16:41,063 --> 00:16:44,684
+ce moment là on passe effectivement à la
+montée, "recule"
+
+264
+00:16:44,684 --> 00:16:47,470
+est activé et on va conserver cet état
+malgré le
+
+265
+00:16:47,470 --> 00:16:50,940
+fait qu'on va quitter le bas puisque la
+perceuse remonte.
+
+266
+00:16:50,940 --> 00:16:56,498
+Et c'est seulement au moment où on va
+arriver en haut que le système
+
+267
+00:16:56,498 --> 00:17:02,010
+va se retrouver dans l'état initial où on
+est arrêté.
+
+268
+00:17:02,010 --> 00:17:04,530
+C'est bien joli d'avoir fait la
+simulation,
+
+269
+00:17:04,530 --> 00:17:07,512
+mais nous souhaitons maintenant réaliser
+ce montage.
+
+270
+00:17:07,512 --> 00:17:10,860
+Le réaliser d'une manière concrète avec
+des circuits intégrés
+
+271
+00:17:10,860 --> 00:17:14,170
+logiques tels qu'on en a parlé dans les
+derniers chapitres.
+
+272
+00:17:14,170 --> 00:17:16,060
+Voilà donc notre schéma complet
+
+273
+00:17:16,060 --> 00:17:19,520
+avec le schéma bloc et le détail du
+système combinatoire.
+
+274
+00:17:19,520 --> 00:17:25,905
+Pour réaliser l'horloge, on pourrait
+utiliser un circuit du type NE555.
+
+275
+00:17:25,905 --> 00:17:30,750
+Ceux qui ont fait un petit peu
+d'électronique le connaissent très bien.
+
+276
+00:17:30,750 --> 00:17:36,254
+Et pour la petite histoire, c'est le
+circuit intégré le plus fabriqué
+
+277
+00:17:36,254 --> 00:17:41,220
+au monde depuis sa conception il y a une
+quarantaine
+
+278
+00:17:41,220 --> 00:17:45,075
+d'années et j'ajoute encore que sa
+conception a été faite par un ingénieur
+
+279
+00:17:45,075 --> 00:17:48,770
+suisse qui travaillait à l'époque dans la
+société américaine Signetics.
+
+280
+00:17:48,770 --> 00:17:54,740
+Pour réaliser les bascules, les deux
+bascules que
+
+281
+00:17:54,740 --> 00:18:00,885
+nous avons ici, on va utiliser un circuit,
+par exemple,
+
+282
+00:18:00,885 --> 00:18:06,272
+du type 74HC74.
+Pour réaliser le système combinatoire
+
+283
+00:18:06,272 --> 00:18:12,817
+dont on a le schéma ici, on va utiliser un
+circuit intégré qui contient trois portes
+
+284
+00:18:12,817 --> 00:18:20,430
+NAND à trois entrées.
+Ce circuit s'appelle 74HC10.
+
+285
+00:18:20,430 --> 00:18:25,630
+On va même avoir besoin de deux de ces
+circuits intégrés pour pouvoir avoir ces
+
+286
+00:18:25,630 --> 00:18:31,402
+deux portes et il faudra également
+utiliser un circuit
+
+287
+00:18:31,402 --> 00:18:38,825
+du type 74HC04 qui permettra de fournir
+les inverseurs
+
+288
+00:18:38,825 --> 00:18:44,135
+dont on a besoin pour les différentes
+valeurs qui sont inversées ici à l'entrée.
+
+289
+00:18:44,135 --> 00:18:50,235
+Donc finalement, si je compte, un, deux,
+trois, quatre, cinq circuits
+
+290
+00:18:50,235 --> 00:18:55,780
+intégrés pour réaliser ce petit automate
+qui commande donc notre perceuse.
+
+291
+00:18:55,780 --> 00:18:56,492
+Ça n'est
+
+292
+00:18:56,492 --> 00:18:59,429
+plus un schéma digne du XXIème siècle.
+
+293
+00:18:59,429 --> 00:19:05,078
+Aujourd'hui, nous sommes capables de
+réaliser avec un seul circuit intégré.
+
+294
+00:19:05,078 --> 00:19:08,191
+Il existe aujourd'hui une solution plus
+simple que
+
+295
+00:19:08,191 --> 00:19:11,590
+la solution qui utilise les circuits
+logiques traditionnels.
+
+296
+00:19:11,590 --> 00:19:16,050
+Et, vous l'avez probablement deviné, cette
+solution, c'est un microcontrôleur.
+
+297
+00:19:16,050 --> 00:19:21,808
+Ce microcontrôleur a justement les pattes
+qui nous arrangent bien : la masse, le VCC
+
+298
+00:19:21,808 --> 00:19:24,870
+pour les deux alimentations.
+
+299
+00:19:24,870 --> 00:19:28,630
+Ces trois pattes pourront être utilisées
+comme entrées.
+
+300
+00:19:28,630 --> 00:19:31,990
+Ces deux pattes pourront être utilisées
+comme sorties.
+
+301
+00:19:31,990 --> 00:19:34,197
+Et on a même ici une fonction "reset"
+qu'on
+
+302
+00:19:34,197 --> 00:19:37,795
+pourra utiliser par exemple pour l'arrêt
+d'urgence de notre perceuse.
+
+303
+00:19:37,795 --> 00:19:41,890
+Je vous présente même ici le schéma de
+mise en oeuvre de ce circuit intégré.
+
+304
+00:19:41,890 --> 00:19:46,020
+C'est extrêmement simple, il faut le
+brancher.
+
+305
+00:19:46,020 --> 00:19:46,944
+Il faut rajouter
+
+306
+00:19:46,944 --> 00:19:49,782
+quelques composants discrets : une
+résistance et
+
+307
+00:19:49,782 --> 00:19:52,330
+un condensateur, c'est bien peu de chose.
+
+308
+00:19:52,330 --> 00:19:56,130
+Et on peut entrer ici avec les trois
+signaux.
+
+309
+00:19:56,130 --> 00:19:58,280
+On aura ici les sorties.
+
+310
+00:19:58,280 --> 00:20:01,272
+Alors, il reste une partie un petit peu
+mystérieuse
+
+311
+00:20:01,272 --> 00:20:04,624
+qui est cette partie-là avec ce connecteur
+de programmation.
+
+312
+00:20:04,624 --> 00:20:08,410
+On aura évidemment l'occasion d'en
+reparler euh, avec plus de détails.
+
+313
+00:20:08,410 --> 00:20:12,410
+Il est tout de même à noter que lorsque
+vous achetez ce circuit intégré,
+
+314
+00:20:12,410 --> 00:20:15,060
+votre montage ne va pas marcher
+
+315
+00:20:15,060 --> 00:20:17,551
+parce qu'un microcontrôleur, ça doit être
+programmé
+
+316
+00:20:17,551 --> 00:20:18,929
+et c'est justement le but de ce
+
+317
+00:20:18,929 --> 00:20:21,950
+cours, d'apprendre aussi à programmer ces
+microcontrôleurs.
+
+318
+00:20:21,950 --> 00:20:27,584
+Alors j'ai tenté le, l'expérience de
+programmer un
+
+319
+00:20:27,584 --> 00:20:33,190
+microcontrôleur selon la logique qui nous
+est inspirée par ce schéma-là.
+
+320
+00:20:33,190 --> 00:20:37,180
+Ce programme que j'ai écrit n'est pas
+optimal.
+
+321
+00:20:37,180 --> 00:20:37,855
+On verra
+
+322
+00:20:37,855 --> 00:20:41,005
+dans quelques leçons des manières plus
+élégantes
+
+323
+00:20:41,005 --> 00:20:46,328
+d'écrire ce programme mais il fonctionne
+parfaitement bien.
+
+324
+00:20:46,328 --> 00:20:50,808
+On remarque que l'horloge ici, qui permet,
+beaucoup
+
+325
+00:20:50,808 --> 00:20:54,390
+de fois par seconde, de recalculer l'état
+courant.
+
+326
+00:20:54,390 --> 00:20:58,002
+Elle est, au fond, donnée par cette
+information
+
+327
+00:20:58,002 --> 00:21:00,930
+ici, boucle, avec un début et une fin.
+
+328
+00:21:00,930 --> 00:21:03,198
+Ce programme va effectivement être répété
+
+329
+00:21:03,198 --> 00:21:04,080
+en permanence.
+
+330
+00:21:04,080 --> 00:21:07,545
+Ce qui jouera un peu près le même rôle que
+l'horloge.
+
+331
+00:21:07,545 --> 00:21:11,660
+Maintenant, les entrées ici doivent être
+lues, on
+
+332
+00:21:11,660 --> 00:21:15,034
+a des procédures de lecture de ces
+signaux.
+
+333
+00:21:15,034 --> 00:21:18,388
+Pour le start, à partir de la patte
+"start", pour
+
+334
+00:21:18,388 --> 00:21:21,468
+le bas, à partir de la patte "bas" et
+cetera.
+
+335
+00:21:21,468 --> 00:21:23,102
+Même chose pour le haut.
+
+336
+00:21:23,102 --> 00:21:27,795
+Ensuite on a notre système combinatoire
+qu'il va falloir programmer.
+
+337
+00:21:27,795 --> 00:21:28,510
+On reconnaît
+
+338
+00:21:28,510 --> 00:21:30,655
+ici les formules de tout à l'heure sauf
+
+339
+00:21:30,655 --> 00:21:33,400
+que la syntaxe est un tout petit peu
+différente.
+
+340
+00:21:33,400 --> 00:21:35,116
+Voilà le "et" logique.
+
+341
+00:21:35,116 --> 00:21:39,180
+Voilà la "ou" logique et voilà
+l'"inversion" logique.
+
+342
+00:21:39,180 --> 00:21:40,908
+Et finalement, on a donc nos
+
+343
+00:21:40,908 --> 00:21:44,666
+signaux "AvancePlus" et "ReculePlus" qui
+correspondent
+
+344
+00:21:44,666 --> 00:21:49,130
+donc aux sorties du système combinatoire
+et donc aux entrées des bascules.
+
+345
+00:21:49,130 --> 00:21:54,515
+Il faut maintenant que les bascules soient
+implémentées sour forme d'enregistrement
+
+346
+00:21:54,515 --> 00:21:56,720
+de la valeur qu'on vient de calculer dans
+
+347
+00:21:56,720 --> 00:21:59,900
+une variable "Avance" et la même chose
+pour "Recule".
+
+348
+00:21:59,900 --> 00:22:02,690
+Et finalement, il faut que les sorties
+soient mises à
+
+349
+00:22:02,690 --> 00:22:06,844
+disposition à l'extérieur du circuit par
+la procédure "digitalWrite" en
+
+350
+00:22:06,844 --> 00:22:10,372
+signalant que le signal "Avance" doit être
+copié dans la
+
+351
+00:22:10,372 --> 00:22:14,895
+patte qui correspond à l'"avance" et la
+même chose pour "Recule".
+
+352
+00:22:14,895 --> 00:22:20,034
+Nous avons donc découvert un peu les
+systèmes séquentiels en regardant comment
+
+353
+00:22:20,034 --> 00:22:22,452
+il est possible de les décrire avec un
+
+354
+00:22:22,452 --> 00:22:25,864
+graphe d'état, de les réaliser avec une
+machine
+
+355
+00:22:25,864 --> 00:22:29,300
+d'état, dont la réalisation physique est
+parfois un
+
+356
+00:22:29,300 --> 00:22:32,430
+peu compliquée avec des portes logiques et
+des bascules.
+
+357
+00:22:32,430 --> 00:22:35,454
+Et finalement, on a aussi vu que le
+microcontrôleur allait nous
+
+358
+00:22:35,454 --> 00:22:41,240
+aider à réaliser de manière beaucoup plus
+simple un tel montage.

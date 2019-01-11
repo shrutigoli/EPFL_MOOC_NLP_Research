@@ -1,0 +1,1588 @@
+1
+00:00:01,690 --> 00:00:06,170
+In the previous lecture we have seen how
+the lifecycle of an actor looks like.
+
+2
+00:00:06,170 --> 00:00:10,690
+That it starts, that it may be restarted
+and that it finally stops.
+
+3
+00:00:10,690 --> 00:00:14,420
+This life cycle has implications and we'll
+see 2 of these in this session.
+
+4
+00:00:17,600 --> 00:00:20,900
+When we look at an actor from the outside,
+the only thing we can
+
+5
+00:00:20,900 --> 00:00:25,110
+see about the life cycle is the transition
+it goes through when it stops.
+
+6
+00:00:26,910 --> 00:00:29,370
+The only actor which can observe that
+another
+
+7
+00:00:29,370 --> 00:00:32,260
+actor starts is the one which creates it.
+
+8
+00:00:32,260 --> 00:00:37,580
+And as soon as it has it has the actor ref
+in hand, the child actor has at least
+
+9
+00:00:37,580 --> 00:00:42,960
+been alive for some period of time.
+Other actors which learn of the existence
+
+10
+00:00:42,960 --> 00:00:46,860
+of this actor by getting the actor ref,
+know also
+
+11
+00:00:46,860 --> 00:00:50,060
+that at some point in time, the actor was
+alive.
+
+12
+00:00:50,060 --> 00:00:54,280
+But in order to find out more, they need
+to exchange messages with it.
+
+13
+00:00:54,280 --> 00:00:57,360
+We have seen that restarts are not
+externally visible.
+
+14
+00:00:57,360 --> 00:00:59,080
+The ActorRef stays valid.
+
+15
+00:00:59,080 --> 00:01:02,820
+And if the restart is successful, the
+actor will handle messages afterwards
+
+16
+00:01:02,820 --> 00:01:07,640
+again meaning that an external observer
+cannot really tell if an actor was
+
+17
+00:01:07,640 --> 00:01:08,600
+restarted or not.
+
+18
+00:01:09,630 --> 00:01:13,960
+The only thing which can be seen is if the
+actor stops responding.
+
+19
+00:01:15,100 --> 00:01:18,830
+But what does it mean if we don't hear
+back from somebody we call?
+
+20
+00:01:20,050 --> 00:01:24,450
+It might be that the other end is just not
+there anymore.
+
+21
+00:01:24,450 --> 00:01:27,640
+It might also be that our means of
+communication are broken.
+
+22
+00:01:29,320 --> 00:01:33,680
+To remove the ambiguity between an actor
+which has terminated and
+
+23
+00:01:33,680 --> 00:01:38,700
+one which is just not replying anymore,
+there exists the feature called
+
+24
+00:01:38,700 --> 00:01:43,670
+DeathWatch, which is a means to monitor
+the life cycle of an actor.
+
+25
+00:01:43,670 --> 00:01:49,200
+Any actor can register its interest in
+Monitoring the life cycle of an Actor
+
+26
+00:01:49,200 --> 00:01:50,892
+for which it has the ActorRef by
+
+27
+00:01:50,892 --> 00:01:55,030
+calling context.watch and giving it the
+target ActorRef.
+
+28
+00:01:56,250 --> 00:01:59,030
+When the target Actor terminates, the
+Actor
+
+29
+00:01:59,030 --> 00:02:03,300
+which monitors it will receive a
+terminated message.
+
+30
+00:02:03,300 --> 00:02:05,750
+Within this message, the actor ref is
+given
+
+31
+00:02:05,750 --> 00:02:08,740
+of the target which it was that just
+terminated.
+
+32
+00:02:08,740 --> 00:02:11,540
+So that the monitor can disambiguate
+
+33
+00:02:11,540 --> 00:02:13,810
+between multiple actors it might be
+monitoring.
+
+34
+00:02:14,920 --> 00:02:19,040
+The meaning of this terminated message is
+that this actor
+
+35
+00:02:19,040 --> 00:02:23,159
+will not receive any further direct
+communication from the target.
+
+36
+00:02:24,170 --> 00:02:26,390
+Of course, messages might still be en
+route if
+
+37
+00:02:26,390 --> 00:02:32,330
+they were sent via different intermediate
+actors, but direct messages
+
+38
+00:02:32,330 --> 00:02:35,920
+sent from the target to the monitoring
+actor will
+
+39
+00:02:35,920 --> 00:02:38,930
+have been received before the terminated
+message, if at all.
+
+40
+00:02:40,640 --> 00:02:43,400
+The DeathWatch API consists of 2 methods.
+
+41
+00:02:43,400 --> 00:02:49,670
+Which are offered on the actor context.
+Watch given a target when registered
+
+42
+00:02:49,670 --> 00:02:52,160
+that we want to watch that target.
+
+43
+00:02:52,160 --> 00:02:56,520
+And unwatch on the other hand will remove
+this registration.
+
+44
+00:02:56,520 --> 00:02:59,630
+Akka takes care that after you called
+unwatch, the
+
+45
+00:02:59,630 --> 00:03:03,340
+terminated message for that target will no
+longer be delivered.
+
+46
+00:03:04,910 --> 00:03:07,740
+This holds true even in the case when
+unwatch is
+
+47
+00:03:07,740 --> 00:03:11,600
+called at the time during which the actor
+is currently terminating.
+
+48
+00:03:11,600 --> 00:03:12,920
+There is no race condition here.
+
+49
+00:03:14,460 --> 00:03:14,850
+The third
+
+50
+00:03:14,850 --> 00:03:18,179
+piece of the API is the terminated message
+itself.
+
+51
+00:03:19,260 --> 00:03:21,830
+There are a few things to be noted about
+it.
+
+52
+00:03:21,830 --> 00:03:25,510
+First of all Terminated is a special
+message.
+
+53
+00:03:25,510 --> 00:03:32,140
+You cannot create it yourself, hence it is
+declared private except for our Akka.
+
+54
+00:03:32,140 --> 00:03:33,960
+This prohibits your code to use the
+
+55
+00:03:33,960 --> 00:03:37,340
+constructor or the companion objects apply
+method.
+
+56
+00:03:38,450 --> 00:03:40,580
+The main data this message
+
+57
+00:03:40,580 --> 00:03:44,420
+transports is the ActorRef of the Actor
+which has
+
+58
+00:03:44,420 --> 00:03:48,290
+terminated, but there are 2 additional
+bits of information.
+
+59
+00:03:49,620 --> 00:03:54,620
+First of all, whether the existence of
+this Actor could be confirmed.
+
+60
+00:03:54,620 --> 00:03:58,370
+By the system and the second gives
+information
+
+61
+00:03:58,370 --> 00:04:01,710
+whether this message has been synthesized
+by the system.
+
+62
+00:04:01,710 --> 00:04:03,560
+As we will learn in the next session.
+
+63
+00:04:05,780 --> 00:04:09,280
+I'll explain the first of the 2 flags with
+a little drawing here.
+
+64
+00:04:10,370 --> 00:04:15,900
+Let's say, we have one actor here.
+The watcher
+
+65
+00:04:18,350 --> 00:04:22,300
+which wants to watch another actor here,
+the
+
+66
+00:04:22,300 --> 00:04:29,040
+watchee.
+Let's make up some words.
+
+67
+00:04:30,720 --> 00:04:36,090
+If the watch message Is delivered while
+the watchee is alive.
+
+68
+00:04:40,630 --> 00:04:44,540
+That registers just a call back
+[INAUDIBLE],
+
+69
+00:04:44,540 --> 00:04:48,260
+so to speak for when the actor stops.
+
+70
+00:04:50,250 --> 00:04:53,729
+During this process, the terminator will
+be sent.
+
+71
+00:04:58,340 --> 00:04:59,150
+And in this case,
+
+72
+00:05:01,300 --> 00:05:02,880
+the system knows that the actor has
+
+73
+00:05:02,880 --> 00:05:06,120
+existed, because the actor itself sent the
+message.
+
+74
+00:05:07,590 --> 00:05:12,180
+After an actor stops, its Ref might stay
+there.
+
+75
+00:05:13,250 --> 00:05:16,640
+But the actor itself is completely gone,
+removed from the system.
+
+76
+00:05:18,280 --> 00:05:26,550
+So if the watch comes in at this point,
+then the reply is generated by the
+
+77
+00:05:26,550 --> 00:05:30,210
+system when it cannot find the target.
+
+78
+00:05:32,300 --> 00:05:35,770
+And in this case the flag is set to false,
+
+79
+00:05:35,770 --> 00:05:40,380
+because akka does not know whether this
+actor has ever existed.
+
+80
+00:05:40,380 --> 00:05:44,380
+The actor ref could for all intents and
+purposes have been faked.
+
+81
+00:05:46,760 --> 00:05:49,550
+Now that we know about the data which are
+contained in
+
+82
+00:05:49,550 --> 00:05:54,060
+a terminated message, there are 2 extra
+pieces of information here.
+
+83
+00:05:54,060 --> 00:06:00,260
+First, it extends a trait called
+AutoReceiveMessage which is an akka
+
+84
+00:06:00,260 --> 00:06:03,630
+marker trait signalling that terminated
+messages
+
+85
+00:06:03,630 --> 00:06:06,520
+are handled by the ActorContext
+especially.
+
+86
+00:06:07,710 --> 00:06:11,800
+The reason for this is that the terminated
+message must not be delivered
+
+87
+00:06:11,800 --> 00:06:13,930
+after unwatch has been called.
+
+88
+00:06:13,930 --> 00:06:17,670
+And what this also means is that
+terminated messages cannot be forwarded.
+
+89
+00:06:18,890 --> 00:06:24,210
+The last piece of information here is that
+Terminated is possibly harmful.
+
+90
+00:06:24,210 --> 00:06:25,810
+And we will see later what that means.
+
+91
+00:06:27,660 --> 00:06:30,940
+Let us now see how we can use this
+feature.
+
+92
+00:06:30,940 --> 00:06:32,730
+The first place where we try it out is the
+
+93
+00:06:32,730 --> 00:06:37,810
+getter from the link checker example which
+has been used
+
+94
+00:06:37,810 --> 00:06:43,010
+throughout the last weeks.
+This getter retrieves a body of
+
+95
+00:06:43,010 --> 00:06:47,780
+an HTML document from the web somewhere,
+extracts all links, and then it used
+
+96
+00:06:47,780 --> 00:06:53,690
+to, after sending back the links, send to
+its parent a done message.
+
+97
+00:06:53,690 --> 00:06:55,560
+This can be removed.
+
+98
+00:06:55,560 --> 00:06:58,850
+In this case, we just stop ourselves, and
+
+99
+00:06:58,850 --> 00:07:01,830
+in case of failure, we also just stop
+ourselves.
+
+100
+00:07:03,600 --> 00:07:07,410
+Because the purpose of the done message
+was to serve as an end
+
+101
+00:07:07,410 --> 00:07:11,720
+of conversation marker so that the parent
+knows when the getter is done.
+
+102
+00:07:13,040 --> 00:07:15,880
+Using DeathWatch, that is no longer
+necessary.
+
+103
+00:07:15,880 --> 00:07:17,840
+Once the getter stops, a terminated will
+
+104
+00:07:17,840 --> 00:07:19,890
+be delivered, and that serves the same
+purpose.
+
+105
+00:07:21,320 --> 00:07:24,670
+Before we can look at how we need to
+modify the controller,
+
+106
+00:07:24,670 --> 00:07:28,680
+which was the parent, if you remember
+there is one more thing
+
+107
+00:07:28,680 --> 00:07:30,380
+we need to talk about.
+
+108
+00:07:30,380 --> 00:07:33,770
+We see here, and we have seen, every actor
+
+109
+00:07:33,770 --> 00:07:36,240
+is created by by one other actor, its
+parent.
+
+110
+00:07:37,570 --> 00:07:43,240
+That also means that every actor can be
+the parent to possibly many child actors.
+
+111
+00:07:43,240 --> 00:07:46,390
+And the context keeps a list of all the
+children.
+
+112
+00:07:47,910 --> 00:07:51,890
+You can access it by calling
+context.children,
+
+113
+00:07:51,890 --> 00:07:54,880
+which gives an iterable of actor refs, or
+
+114
+00:07:54,880 --> 00:08:00,490
+you can also query it by taking a name and
+asking does this
+
+115
+00:08:00,490 --> 00:08:04,250
+child exist, and then you get back either
+some actor ref or none.
+
+116
+00:08:06,670 --> 00:08:10,970
+The list which is kept by the actor
+context follows very clear semantics.
+
+117
+00:08:12,480 --> 00:08:15,850
+When you call context actor and the call
+returns, the
+
+118
+00:08:15,850 --> 00:08:19,200
+child has in the process been entered in
+to the list.
+
+119
+00:08:20,470 --> 00:08:22,810
+As soon as the child terminates, it will
+tell
+
+120
+00:08:22,810 --> 00:08:26,780
+its parents even if you do not use
+DeathWatch.
+
+121
+00:08:26,780 --> 00:08:29,890
+And the parent will remove the child from
+the list.
+
+122
+00:08:31,070 --> 00:08:31,950
+If you do use
+
+123
+00:08:31,950 --> 00:08:34,720
+DeathWatch, then that will have happened
+
+124
+00:08:34,720 --> 00:08:37,620
+before you received the terminated
+message.
+
+125
+00:08:37,620 --> 00:08:40,250
+This is important because at any given
+time, there
+
+126
+00:08:40,250 --> 00:08:43,410
+can be only one child of a given actor.
+
+127
+00:08:43,410 --> 00:08:44,860
+Which has a certain name.
+
+128
+00:08:46,660 --> 00:08:49,760
+If you try to create another child with
+
+129
+00:08:49,760 --> 00:08:52,050
+the same name, then you will get an
+exception.
+
+130
+00:08:53,690 --> 00:08:56,540
+The reason for this is precisely the
+children list.
+
+131
+00:08:58,340 --> 00:09:02,140
+Actors are identified by their names,
+hence they must be unique.
+
+132
+00:09:03,160 --> 00:09:06,140
+Now we can finish the modification of
+
+133
+00:09:06,140 --> 00:09:09,730
+the relationship between getter and
+controller using DeathWatch.
+
+134
+00:09:11,720 --> 00:09:15,320
+First of all, we install a supervisor
+strategy.
+
+135
+00:09:15,320 --> 00:09:17,171
+We use a one for one strategy.
+
+136
+00:09:18,460 --> 00:09:24,120
+And in all cases of exceptions, we say
+restart, but we only do that 5 times.
+
+137
+00:09:25,340 --> 00:09:28,680
+Once a getter has failed 5 times, it will
+be stopped.
+
+138
+00:09:29,930 --> 00:09:36,040
+The second modification is that we do not
+need to keep our own list of child actors.
+
+139
+00:09:36,040 --> 00:09:38,050
+We had a map in this actor.
+
+140
+00:09:38,050 --> 00:09:43,290
+Instead we apply context watch to the
+result of context actorOf here,
+
+141
+00:09:44,740 --> 00:09:49,210
+which registers our interest in the
+terminated message, and when that comes.
+
+142
+00:09:50,890 --> 00:09:54,720
+We just check, was that the last getter
+which just terminated?
+
+143
+00:09:54,720 --> 00:09:58,610
+And in that case, we send the result to
+our parent.
+
+144
+00:09:59,730 --> 00:10:03,410
+If remember, there was an overall timeout
+which we
+
+145
+00:10:03,410 --> 00:10:07,280
+wanted to set.
+And once we get this RecieveTimeout here,
+
+146
+00:10:08,560 --> 00:10:15,870
+we used to tell all children To abort by
+sending them a special message.
+
+147
+00:10:15,870 --> 00:10:17,340
+We can replace that now.
+
+148
+00:10:17,340 --> 00:10:23,030
+First of all, we use context.children, and
+then we just use context.stop
+
+149
+00:10:23,030 --> 00:10:27,390
+to stop them, which will result in us
+getting the terminated message here.
+
+150
+00:10:30,560 --> 00:10:34,030
+There is one other thing which is new in
+this actor,
+
+151
+00:10:34,030 --> 00:10:39,590
+and that is the use of context.actor of,
+with just one argument.
+
+152
+00:10:39,590 --> 00:10:44,320
+Normally we used a name and it is always a
+good idea to give
+
+153
+00:10:44,320 --> 00:10:48,710
+actors good names so that you can identify
+them for example in log messages.
+
+154
+00:10:50,540 --> 00:10:55,650
+But since names need to be unique within
+an actor, it might be cumbersome
+
+155
+00:10:55,650 --> 00:10:57,740
+to generate them such that this holds.
+
+156
+00:10:58,760 --> 00:11:03,590
+If you do not specify a name yourself,
+akka will choose one.
+
+157
+00:11:03,590 --> 00:11:06,180
+And it will start with a dollar sign, so
+if you ever
+
+158
+00:11:06,180 --> 00:11:09,620
+see that, that is the result of not giving
+a name here.
+
+159
+00:11:12,180 --> 00:11:15,150
+This part of the name space is reserved
+for these internal
+
+160
+00:11:15,150 --> 00:11:19,380
+names so that they can be guaranteed not
+to clash with anything.
+
+161
+00:11:19,380 --> 00:11:22,660
+Hence, you cannot create an actor whose
+name begins with a dollar sign.
+
+162
+00:11:24,660 --> 00:11:28,800
+The previous example demonstrated the use
+of DeathWatch as an end
+
+163
+00:11:28,800 --> 00:11:33,450
+of conversation marker, but it also has
+other uses, for example.
+
+164
+00:11:33,450 --> 00:11:37,290
+To fail-over.
+In this example, we have a major
+
+165
+00:11:37,290 --> 00:11:41,040
+actor which is supposed to connect to some
+database.
+
+166
+00:11:41,040 --> 00:11:47,050
+It starts out with a prime, where it
+creates an actor for some database.
+
+167
+00:11:47,050 --> 00:11:51,310
+It watches that one and will use that one.
+Code is of course, not shown here.
+
+168
+00:11:52,720 --> 00:11:57,050
+With that has a fatal error and
+terminates.
+
+169
+00:11:57,050 --> 00:12:01,730
+This case is handled and will become the
+backup configuration.
+
+170
+00:12:01,730 --> 00:12:02,930
+And in here,
+
+171
+00:12:02,930 --> 00:12:06,800
+something else could be done, for example,
+connecting to a different database
+
+172
+00:12:06,800 --> 00:12:12,470
+or storing updates in memory until the
+main database comes back online.
+
+173
+00:12:12,470 --> 00:12:14,210
+You can implement any strategy you want.
+
+174
+00:12:15,870 --> 00:12:20,790
+So far, we have looked at the consequence
+of the actor's end of life cycle.
+
+175
+00:12:21,860 --> 00:12:26,280
+Now we will investigate what follows from
+its ability to restart.
+
+176
+00:12:27,680 --> 00:12:28,130
+For this,
+
+177
+00:12:28,130 --> 00:12:30,363
+I will use a small actor hierarchy.
+
+178
+00:12:32,710 --> 00:12:35,190
+Let's say we have an actor named top here.
+
+179
+00:12:37,200 --> 00:12:41,680
+It has child actors A and B.
+
+180
+00:12:44,330 --> 00:12:50,730
+And they again have child actors A1,
+
+181
+00:12:50,730 --> 00:12:57,380
+A2, and so on.
+Child actors and their state are
+
+182
+00:12:57,380 --> 00:13:02,520
+considered to be part of an actor's state
+which is accumulated during its lifetime.
+
+183
+00:13:02,520 --> 00:13:05,770
+Hence during a restart, children are
+affected.
+
+184
+00:13:05,770 --> 00:13:09,730
+They are either recreated or restarted.
+
+185
+00:13:09,730 --> 00:13:15,640
+This means If for example, this Actor is
+restarted, nothing else happens,
+
+186
+00:13:15,640 --> 00:13:20,950
+but if this Actor is restarted, this whole
+sub-tree is affected,
+
+187
+00:13:20,950 --> 00:13:26,040
+and if top was to be restarted, then the
+whole tree would be affected.
+
+188
+00:13:27,100 --> 00:13:31,930
+Assuming an equal distribution of failures
+in these Actors.
+
+189
+00:13:31,930 --> 00:13:35,000
+It is already obvious that those at the
+bottom
+
+190
+00:13:35,000 --> 00:13:39,090
+here will experience most restarts of all.
+
+191
+00:13:39,090 --> 00:13:44,120
+The purpose of a restart was to reset the
+actor to a known good state.
+
+192
+00:13:45,190 --> 00:13:47,300
+This means that all changes the actor did
+
+193
+00:13:47,300 --> 00:13:50,430
+to its state will be lost during a
+restart.
+
+194
+00:13:50,430 --> 00:13:51,350
+That was the purpose.
+
+195
+00:13:52,610 --> 00:13:55,020
+But what if these changes are important?
+
+196
+00:13:55,020 --> 00:13:58,390
+What if they are needed for the function
+of the system?
+
+197
+00:13:58,390 --> 00:14:00,290
+Then they need to be recreated
+
+198
+00:14:00,290 --> 00:14:04,700
+upon a restart, and that can be a very
+inconvenient operation.
+
+199
+00:14:05,940 --> 00:14:09,720
+Therefore it is desirable to do that as
+rarely as possible.
+
+200
+00:14:10,830 --> 00:14:13,950
+From the observation that the bottom
+actors will
+
+201
+00:14:13,950 --> 00:14:18,320
+be restarted most, it immediately follows
+that the more
+
+202
+00:14:18,320 --> 00:14:22,210
+important the states and its changes are,
+the
+
+203
+00:14:22,210 --> 00:14:24,410
+higher up in the hierarchy they should be
+kept.
+
+204
+00:14:25,620 --> 00:14:28,450
+But there is one thing more which we can
+do.
+
+205
+00:14:28,450 --> 00:14:34,180
+In addition, we can make sure that we
+delegate risky tasks
+
+206
+00:14:34,180 --> 00:14:39,100
+down the hierarchy to have them performed
+at the very bottom.
+
+207
+00:14:39,100 --> 00:14:41,190
+And if something which is risky, goes
+wrong.
+
+208
+00:14:41,190 --> 00:14:43,610
+And causes the actor to restart, the
+
+209
+00:14:43,610 --> 00:14:46,780
+effect that we'll have will be rather
+localized.
+
+210
+00:14:46,780 --> 00:14:49,030
+Instead of throughout the whole hierarchy.
+
+211
+00:14:50,880 --> 00:14:54,820
+This is called the error kernel pattern,
+and it is one of
+
+212
+00:14:54,820 --> 00:15:00,790
+the reasons why the application of the
+actor mole in Erlang was successful.
+
+213
+00:15:02,170 --> 00:15:05,130
+Therefore, akka goes one step further.
+
+214
+00:15:05,130 --> 00:15:09,460
+You have seen that in akka, this
+supervision is mandatory.
+
+215
+00:15:09,460 --> 00:15:11,070
+It is not optional.
+
+216
+00:15:11,070 --> 00:15:14,180
+So in akka, you are forced to create these
+hierarchies.
+
+217
+00:15:17,620 --> 00:15:20,200
+When we look at the full example of the
+[UNKNOWN] checker
+
+218
+00:15:20,200 --> 00:15:26,290
+from last week, we see that Intuitively,
+we apply this pattern.
+
+219
+00:15:26,290 --> 00:15:30,430
+The receptionist is at the peak of the
+hierarchy and
+
+220
+00:15:30,430 --> 00:15:34,410
+it has the important state which is, which
+requests are outstanding.
+
+221
+00:15:35,670 --> 00:15:38,860
+And the getters, which are exposed to all
+
+222
+00:15:38,860 --> 00:15:43,080
+the difficulties of parsing input from
+websites, for example.
+
+223
+00:15:43,080 --> 00:15:46,240
+Alright at the bottom, because they're
+most likely to fail.
+
+224
+00:15:48,160 --> 00:15:51,980
+Using the features of supervision and
+DeathWatch, we
+
+225
+00:15:51,980 --> 00:15:56,560
+can make the receptionist and controller
+more resilient.
+
+226
+00:15:56,560 --> 00:16:02,270
+By using the terminated message to react
+to unforeseen failure.
+
+227
+00:16:02,270 --> 00:16:07,320
+Doing that is quite straightforward.
+First, we install a SupervisorStrategy.
+
+228
+00:16:07,320 --> 00:16:08,700
+There is a prefabricated
+
+229
+00:16:08,700 --> 00:16:10,610
+one, the stoppingStrategy.
+
+230
+00:16:11,640 --> 00:16:16,030
+For any failure of any child, it will just
+issue a stop command.
+
+231
+00:16:17,900 --> 00:16:19,930
+The second modification which we need to
+do
+
+232
+00:16:19,930 --> 00:16:23,480
+is that we need to register for
+DeathWatch.
+
+233
+00:16:23,480 --> 00:16:28,110
+There was only one place in the
+receptionist in runNext where we then need
+
+234
+00:16:28,110 --> 00:16:31,110
+to call context watch to watch the
+
+235
+00:16:31,110 --> 00:16:34,050
+controller before we send it the check
+message.
+
+236
+00:16:35,670 --> 00:16:38,770
+The lost modifications are found in the
+running behavior.
+
+237
+00:16:40,350 --> 00:16:43,990
+If we get a successful result back from a
+controller.
+
+238
+00:16:45,330 --> 00:16:49,740
+We now need to stop it, and before we do
+that we
+
+239
+00:16:49,740 --> 00:16:54,740
+call unwatch so that we do not get the
+terminated message anymore.
+
+240
+00:16:54,740 --> 00:16:57,440
+The next thing we then do is, as usual
+
+241
+00:16:57,440 --> 00:17:00,820
+check whether there is something in the
+queue, and run
+
+242
+00:17:00,820 --> 00:17:01,510
+it if so.
+
+243
+00:17:02,840 --> 00:17:06,150
+If a controller terminates without having
+sent a result,
+
+244
+00:17:07,380 --> 00:17:10,020
+we will get the terminated message because
+we watched it.
+
+245
+00:17:11,480 --> 00:17:14,190
+In that case, we generate the failed
+result for the
+
+246
+00:17:14,190 --> 00:17:18,550
+client here, and then we go on to the next
+job.
+
+247
+00:17:20,560 --> 00:17:26,050
+In this case, we do not need to check the
+actorRef.
+
+248
+00:17:26,050 --> 00:17:28,910
+For which we get the terminated message
+because at
+
+249
+00:17:28,910 --> 00:17:32,590
+any given point in time, there can be only
+one.
+
+250
+00:17:32,590 --> 00:17:34,865
+This is the reason why we use unwatch
+here.
+
+251
+00:17:35,900 --> 00:17:39,210
+The controller which successfully
+completed its mission
+
+252
+00:17:39,210 --> 00:17:41,880
+is no longer of interest to us.
+
+253
+00:17:41,880 --> 00:17:45,848
+The terminated if it is received, will
+have come from the next one.
+
+254
+00:17:45,848 --> 00:17:50,940
+Apropos, what happens if we do not
+
+255
+00:17:50,940 --> 00:17:55,960
+handle terminated messages.
+I still owe you an explanation for why it
+
+256
+00:17:55,960 --> 00:18:02,280
+extends the marker trait possibly harmful.
+Let me show you how these 2 are related.
+
+257
+00:18:04,060 --> 00:18:08,130
+But before we can go there, we need to
+look at one more thing first.
+
+258
+00:18:09,800 --> 00:18:11,930
+What we have learned so far
+
+259
+00:18:11,930 --> 00:18:17,270
+was that actors can only communicate with
+other actors if they know their ActorRef.
+
+260
+00:18:18,870 --> 00:18:23,890
+Taking a step back and imagining not
+abstract
+
+261
+00:18:23,890 --> 00:18:29,020
+actors but a roomful of people, this
+corresponds to pairs
+
+262
+00:18:29,020 --> 00:18:32,480
+of people talking directly with each other
+or groups
+
+263
+00:18:32,480 --> 00:18:37,280
+forming which send themselves messages in
+a circle for example.
+
+264
+00:18:38,710 --> 00:18:43,130
+But if you have a lot of people in a room,
+there is another possibility.
+
+265
+00:18:43,130 --> 00:18:46,300
+You can shout, and then everybody who
+wants
+
+266
+00:18:46,300 --> 00:18:48,570
+to listen will hear what you are saying.
+
+267
+00:18:50,470 --> 00:18:54,050
+The same concept exists in akka, and it is
+called EventStream.
+
+268
+00:18:55,620 --> 00:18:59,080
+Publishing messages to an EventStream is
+like sending
+
+269
+00:18:59,080 --> 00:19:02,130
+them, but you just don't know to whom.
+
+270
+00:19:02,130 --> 00:19:03,720
+You're sending to an unknown audience.
+
+271
+00:19:04,730 --> 00:19:09,810
+And all actors in the system have the
+ability to listen in on certain channels.
+
+272
+00:19:11,610 --> 00:19:13,960
+The API for that is rather simple.
+
+273
+00:19:15,100 --> 00:19:21,220
+Publish has the same signature as till,
+and in the end it does the same thing.
+
+274
+00:19:21,220 --> 00:19:24,270
+Once you publish an event, everyone
+subscribed
+
+275
+00:19:24,270 --> 00:19:26,610
+to that type of event will get it.
+
+276
+00:19:28,670 --> 00:19:32,200
+To subscribe, the subscribe method takes
+the ActorRef.
+
+277
+00:19:32,200 --> 00:19:35,860
+Which wants to receive the notifications
+and a
+
+278
+00:19:35,860 --> 00:19:39,310
+topic in the form of a Java class object.
+
+279
+00:19:41,090 --> 00:19:43,960
+These classes are similar to Scalas types.
+
+280
+00:19:45,360 --> 00:19:49,600
+But they're given by what the Java virtual
+machine supports, so the
+
+281
+00:19:49,600 --> 00:19:53,800
+types you can express in this system are
+less powerful than Scalas.
+
+282
+00:19:53,800 --> 00:19:59,510
+Still its very useful.
+For example, looking at a
+
+283
+00:19:59,510 --> 00:20:04,870
+log event trait.
+This might have concrete sub classes,
+
+284
+00:20:07,600 --> 00:20:09,640
+from debug to error for example.
+
+285
+00:20:11,760 --> 00:20:18,730
+And if you say class of debug, you get the
+debug class object.
+
+286
+00:20:18,730 --> 00:20:21,890
+And if you subscribe to that, you will get
+all the debug messages.
+
+287
+00:20:23,420 --> 00:20:25,380
+If on the other hand you subscribe to the
+
+288
+00:20:25,380 --> 00:20:28,260
+log event class, you will get all of
+these.
+
+289
+00:20:29,630 --> 00:20:33,410
+An actor can also unsubscribe from a
+particular topic.
+
+290
+00:20:33,410 --> 00:20:36,020
+Or unsubscribe completely from the
+EventStream.
+
+291
+00:20:37,740 --> 00:20:41,620
+This is just a small example which shows
+how this looks like in code.
+
+292
+00:20:42,770 --> 00:20:45,440
+Every actor system has an EventStream.
+
+293
+00:20:45,440 --> 00:20:51,110
+It is therefore accessible by saying
+context.system.eventStream.
+
+294
+00:20:51,110 --> 00:20:54,600
+And this listener subscribes itself to all
+LogEvents
+
+295
+00:20:54,600 --> 00:20:56,230
+which it will then get and then receive.
+
+296
+00:20:57,260 --> 00:21:03,920
+And the behavior, and in post stop, it is
+good style to unsubscribe from all events.
+
+297
+00:21:05,990 --> 00:21:10,350
+Armed with this knowledge, we can look at
+what happens to unhandled messages.
+
+298
+00:21:11,390 --> 00:21:16,160
+The actor.receive type is a partial
+function, which means
+
+299
+00:21:16,160 --> 00:21:18,940
+that for any given input, it might not
+apply.
+
+300
+00:21:20,200 --> 00:21:25,790
+Those messages which do not match are
+called unhandled and they are passed into
+
+301
+00:21:25,790 --> 00:21:31,130
+the method with the same name.
+The accepts any, and you can override
+
+302
+00:21:31,130 --> 00:21:36,720
+it but the default behavior is that it is
+matching on the type
+
+303
+00:21:36,720 --> 00:21:41,990
+and if it is a terminated message, then a
+new death pact exception is thrown.
+
+304
+00:21:44,580 --> 00:21:48,412
+The default supervisor strategy will treat
+this death pact
+
+305
+00:21:48,412 --> 00:21:52,120
+exception in a way that it responds with a
+stop command.
+
+306
+00:21:53,480 --> 00:21:57,320
+This is inspired by the Erlang model of
+linking 2 processes.
+
+307
+00:21:58,460 --> 00:22:04,150
+The intention is if I'm monitoring Another
+process, and I do not
+
+308
+00:22:04,150 --> 00:22:10,050
+specially handle the terminated message.
+Then what I want is to terminate together
+
+309
+00:22:10,050 --> 00:22:10,550
+with it.
+
+310
+00:22:11,670 --> 00:22:14,670
+All other unhandled messages are published
+to the
+
+311
+00:22:14,670 --> 00:22:18,480
+events stream as unhandled messages, and,
+as I
+
+312
+00:22:18,480 --> 00:22:20,950
+have shown you previously, you could for
+example,
+
+313
+00:22:20,950 --> 00:22:24,730
+register a listener to log them if you
+want.
+
+314
+00:22:26,360 --> 00:22:31,440
+In order to demonstrate this feature, I
+have modified the main program
+
+315
+00:22:31,440 --> 00:22:36,470
+of our [UNKNOWN] link checker.
+to include the context.watch
+
+316
+00:22:36,470 --> 00:22:37,380
+for the receptionist.
+
+317
+00:22:39,300 --> 00:22:43,420
+The reason is that the whole application
+exists only to support The
+
+318
+00:22:43,420 --> 00:22:47,600
+existence of the receptionist, and it has
+no purpose once that has died.
+
+319
+00:22:49,300 --> 00:22:52,090
+And you see simply not handling the
+
+320
+00:22:52,090 --> 00:22:56,160
+terminated in here will do what is
+commented.
+
+321
+00:22:56,160 --> 00:22:59,880
+We signed the death pact with the
+receptionist.
+
+322
+00:22:59,880 --> 00:23:02,820
+In order to see this in action We
+
+323
+00:23:02,820 --> 00:23:08,260
+need to make it fail because otherwise
+this behavior will not be demonstrated.
+
+324
+00:23:08,260 --> 00:23:11,510
+So let me hack in a bit here.
+
+325
+00:23:16,040 --> 00:23:19,330
+This is a crude way to make the actor not
+respond.
+
+326
+00:23:19,330 --> 00:23:20,520
+But it will serve its purpose.
+
+327
+00:23:24,690 --> 00:23:31,220
+Running the application yields the
+well-known failure for the first one.
+
+328
+00:23:31,220 --> 00:23:34,110
+Then we have 1, 2 successful retrievals.
+
+329
+00:23:39,120 --> 00:23:42,470
+But on the third one, the controller will
+not respond.
+
+330
+00:23:42,470 --> 00:23:44,360
+It will just stop itself.
+
+331
+00:23:44,360 --> 00:23:47,650
+Now, we see the application gets Monitored
+
+332
+00:23:47,650 --> 00:23:52,620
+actor receptionist terminated, and then it
+shuts down.
+
+333
+00:23:54,820 --> 00:23:59,130
+Feel free to experiment with this by
+inserting, for example, probabilistic
+
+334
+00:23:59,130 --> 00:24:04,290
+failures throughout the hierarchy, and see
+how supervision takes care of things.
+

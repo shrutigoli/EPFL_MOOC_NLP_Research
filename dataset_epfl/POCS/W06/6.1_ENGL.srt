@@ -1,0 +1,666 @@
+1
+00:00:04,302 --> 00:00:06,617
+Welcome to POCS again.
+This week we'll talk about
+
+2
+00:00:06,617 --> 00:00:08,632
+redundancy and fault tolerance.
+
+3
+00:00:08,726 --> 00:00:12,277
+Now redundancy is one of the most
+important principles of computer systems.
+
+4
+00:00:12,277 --> 00:00:15,321
+It actually has roots
+in digital systems design.
+
+5
+00:00:15,321 --> 00:00:17,813
+And fault tolerance is one of 
+the most important attributes
+
+6
+00:00:17,813 --> 00:00:19,723
+that we could associate with 
+any of the systems
+
+7
+00:00:19,723 --> 00:00:21,684
+we've built through careful design.
+
+8
+00:00:22,398 --> 00:00:26,098
+So this is a broad topic and as usual 
+break it into different components.
+
+9
+00:00:26,690 --> 00:00:28,418
+First we'll talk about redundancy itself
+
+10
+00:00:28,418 --> 00:00:30,568
+and the techniques by which
+we can achieve it.
+
+11
+00:00:31,366 --> 00:00:34,518
+Then we'll talk about the fundamentals 
+of the fault tolerance design process.
+
+12
+00:00:35,898 --> 00:00:38,345
+Then in the third module we'll shift 
+and start talking briefly about
+
+13
+00:00:38,345 --> 00:00:41,498
+the metrics and a little bit word
+of caution about some of the most
+
+14
+00:00:41,498 --> 00:00:43,443
+commonly used metrics in the field.
+
+15
+00:00:44,798 --> 00:00:47,652
+In the fourth module we'll talk about 
+high-availability.
+
+16
+00:00:47,652 --> 00:00:49,306
+And high-availability is an approach
+
+17
+00:00:49,306 --> 00:00:52,251
+in which we apply 
+a sweeping simplification
+
+18
+00:00:52,251 --> 00:00:56,137
+and the separation of state in order 
+to create simple systems
+
+19
+00:00:56,137 --> 00:00:58,408
+that can achieve a 
+high degree of availability.
+
+20
+00:00:59,591 --> 00:01:02,354
+In the fifth module, George Candea 
+will actually talk to us
+
+21
+00:01:02,354 --> 00:01:05,847
+about consensus in the presence of 
+fully distributed systems
+
+22
+00:01:05,847 --> 00:01:08,961
+including systems that have 
+various types of faults
+
+23
+00:01:08,961 --> 00:01:12,038
+including Byzantine Fault and talk about 
+some of the complications
+
+24
+00:01:12,038 --> 00:01:16,591
+associated with achieving consensus 
+in these fully distributed systems.
+
+25
+00:01:17,169 --> 00:01:18,587
+And then I'll come back 
+in the final module
+
+26
+00:01:18,587 --> 00:01:23,122
+and we'll put it all together 
+by comparing two case studies.
+
+27
+00:01:23,516 --> 00:01:26,581
+Two very very different ways 
+of achieving the same degree
+
+28
+00:01:26,581 --> 00:01:28,186
+of fault-tolerance in modern systems.
+
+29
+00:01:29,193 --> 00:01:30,489
+So let's talk about redundancy.
+
+30
+00:01:31,168 --> 00:01:33,684
+And first redundancy is 
+an overloaded term
+
+31
+00:01:33,684 --> 00:01:35,921
+and if you look it up 
+and thank you Wikipedia
+
+32
+00:01:36,286 --> 00:01:37,834
+you'll see different definitions for it.
+
+33
+00:01:38,597 --> 00:01:40,890
+First, it actually has a precise 
+definition in the context
+
+34
+00:01:40,890 --> 00:01:42,053
+of information theory.
+
+35
+00:01:42,821 --> 00:01:45,122
+There redundancy equates 
+the wasted space used
+
+36
+00:01:45,122 --> 00:01:46,346
+to carry certain data.
+
+37
+00:01:47,302 --> 00:01:49,793
+Now outside of our scientific field 
+it has a meaning as well.
+
+38
+00:01:50,498 --> 00:01:53,873
+For example, in certain countries 
+that speak a dialect of American,
+
+39
+00:01:54,179 --> 00:01:56,894
+a redundancy is a synonym 
+for a layoff or termination.
+
+40
+00:01:57,928 --> 00:02:01,091
+It also has a precise meaning 
+in product design,
+
+41
+00:02:01,557 --> 00:02:05,309
+where a feature is considered redundant 
+if the same task could be achieved
+
+42
+00:02:05,309 --> 00:02:06,690
+through multiple different ways.
+
+43
+00:02:07,878 --> 00:02:10,331
+And the people who are responsible 
+for product design often refer
+
+44
+00:02:10,331 --> 00:02:13,928
+to this situation as a belt and suspenders
+approach to the system.
+
+45
+00:02:14,624 --> 00:02:16,640
+That is because you have 
+two possible ways
+
+46
+00:02:16,640 --> 00:02:18,566
+of achieving the same function.
+
+47
+00:02:19,100 --> 00:02:21,901
+Now this brings up, of course, 
+to the case of redundancy
+
+48
+00:02:21,901 --> 00:02:25,044
+in fashion with belts and suspenders 
+as a fashion statement
+
+49
+00:02:25,044 --> 00:02:27,502
+that you may not want to try this at home.
+
+50
+00:02:28,597 --> 00:02:31,305
+But redundancy in 
+computer systems is very different.
+
+51
+00:02:31,779 --> 00:02:35,623
+It is aptly fundamental, 
+it has a positive connotation,
+
+52
+00:02:35,623 --> 00:02:39,117
+it is the foundation for digital design 
+and computer system.
+
+53
+00:02:39,882 --> 00:02:42,178
+Now in digital design, 
+redundancy is defined
+
+54
+00:02:42,178 --> 00:02:45,237
+as the ability to automatically 
+detect and correct
+
+55
+00:02:45,237 --> 00:02:46,714
+deviations for normal behavior.
+
+56
+00:02:47,348 --> 00:02:49,951
+And you can do that 
+both in space or in time.
+
+57
+00:02:50,711 --> 00:02:53,460
+And here's an example of 
+space-space redundancy,
+
+58
+00:02:53,777 --> 00:02:56,541
+it's the classic three way 
+modular redundancy
+
+59
+00:02:56,541 --> 00:02:58,943
+that is fundamental to digital design.
+
+60
+00:02:59,348 --> 00:03:03,252
+You replicate the circuit three times 
+and you have a discrete fourth circuit
+
+61
+00:03:03,252 --> 00:03:05,648
+which is the majority gate 
+that is the responsible
+
+62
+00:03:05,648 --> 00:03:07,323
+to determine the correct output.
+
+63
+00:03:10,352 --> 00:03:12,628
+Now redundancy also applies 
+to computer systems
+
+64
+00:03:12,628 --> 00:03:14,995
+as we'll see the different ways 
+in which this can be done.
+
+65
+00:03:15,620 --> 00:03:18,386
+You can achieve this through coding, 
+through data replication,
+
+66
+00:03:18,386 --> 00:03:22,422
+through N-way modular redundancy 
+this time applied to other aspects
+
+67
+00:03:22,422 --> 00:03:24,188
+not just digital designs 
+but computer systems.
+
+68
+00:03:24,655 --> 00:03:27,535
+And by replication of 
+the entire software stack.
+
+69
+00:03:29,186 --> 00:03:32,613
+But let's first talk about redundancy 
+in the context of coding.
+
+70
+00:03:33,466 --> 00:03:37,863
+Coding is a way to achieve redundancy 
+in an incremental and efficient way.
+
+71
+00:03:39,227 --> 00:03:42,371
+This is a principle technique used 
+to detect, contain, and mask faults
+
+72
+00:03:42,371 --> 00:03:46,367
+that occur in memory subsystems 
+and in communication subsystems.
+
+73
+00:03:47,154 --> 00:03:49,918
+Now coding is cheap since it only requires
+
+74
+00:03:49,918 --> 00:03:54,074
+an incremental amount of redundancy.
+Just add a few bits and you increase
+
+75
+00:03:54,074 --> 00:03:55,964
+the resiliency of the overall systems.
+
+76
+00:03:56,917 --> 00:03:59,995
+So for memories, 
+error correcting codes, or ECC,
+
+77
+00:04:00,560 --> 00:04:03,416
+have been a saving grace in improving 
+the availability of computer systems.
+
+78
+00:04:04,152 --> 00:04:06,397
+And this is an instance of 
+space redundancy.
+
+79
+00:04:07,908 --> 00:04:12,019
+Now because they repair single bit errors 
+which eliminate many forms of failures,
+
+80
+00:04:12,528 --> 00:04:14,759
+ECCs improve availability of the systems.
+
+81
+00:04:15,528 --> 00:04:17,852
+In addition, they can detect 
+double bit errors
+
+82
+00:04:18,637 --> 00:04:20,826
+which allow the computer systems 
+to take appropriate action.
+
+83
+00:04:21,703 --> 00:04:23,939
+And in many cases the action 
+is either to stop execution
+
+84
+00:04:24,219 --> 00:04:26,293
+or to take down a particular process.
+
+85
+00:04:27,712 --> 00:04:31,419
+Now similarly for disk, various forms 
+of RAID use coding
+
+86
+00:04:31,419 --> 00:04:33,817
+to recover data efficiently 
+in the presence of
+
+87
+00:04:33,817 --> 00:04:35,446
+sector failures or drive failures.
+
+88
+00:04:36,287 --> 00:04:40,430
+RAID5 for example uses 
+a simple parity encoding using XOR
+
+89
+00:04:40,430 --> 00:04:43,098
+which is then symmetrically 
+distributed across sectors
+
+90
+00:04:44,239 --> 00:04:46,430
+and that helps you deal with 
+signal drive failures.
+
+91
+00:04:46,940 --> 00:04:50,500
+RAID6 extends the concept by using 
+much more advanced mathematics,
+
+92
+00:04:50,879 --> 00:04:53,851
+Galois fields to be precise, 
+and that provides you
+
+93
+00:04:53,851 --> 00:04:58,660
+the ability to tolerate two independent 
+drive failures within a RAID group
+
+94
+00:04:58,660 --> 00:05:00,146
+without losing any data.
+
+95
+00:05:01,607 --> 00:05:04,401
+Now coding is also present 
+in all communication layers.
+
+96
+00:05:05,068 --> 00:05:07,607
+And here this is an instance 
+of time redundancy.
+
+97
+00:05:08,617 --> 00:05:11,602
+At the network link layer, layer one,
+forward-error-correction
+
+98
+00:05:11,824 --> 00:05:14,545
+is used to correct transmission 
+errors as they occur.
+
+99
+00:05:15,625 --> 00:05:19,274
+And at layer two, CRC are used 
+to detect transmission errors
+
+100
+00:05:19,274 --> 00:05:22,250
+on the link itself
+and that is a link local check.
+
+101
+00:05:23,155 --> 00:05:26,601
+And then finally, checksums are 
+often present at the end layer,
+
+102
+00:05:26,601 --> 00:05:30,230
+at layer four, and that is the well known 
+TCP checksum for example.
+
+103
+00:05:31,333 --> 00:05:33,547
+You can actually take 
+the approach even further
+
+104
+00:05:33,547 --> 00:05:37,714
+and apply the end-to-end principle 
+of applying incremental redundancy
+
+105
+00:05:37,714 --> 00:05:40,431
+for end-to-end checks 
+in communication or in storage.
+
+106
+00:05:41,125 --> 00:05:45,797
+For example, the data integrity field 
+or DIF part of the SCSI standard
+
+107
+00:05:46,295 --> 00:05:49,736
+is a way to ensure the end-to-end integrity 
+of sectors written on disk.
+
+108
+00:05:51,694 --> 00:05:54,579
+Now coding applies best 
+to well defined structures
+
+109
+00:05:55,079 --> 00:05:57,355
+such as cache lines, disk sectors, 
+and network packets.
+
+110
+00:05:58,419 --> 00:06:00,746
+Obviously its main virtue 
+is that it is very efficient
+
+111
+00:06:01,093 --> 00:06:04,720
+because it is incremental, the overheads 
+are measured in percentages
+
+112
+00:06:04,720 --> 00:06:06,103
+of the underlying resource.
+
+113
+00:06:07,147 --> 00:06:10,498
+Now when that does not work,
+replication is the
+
+114
+00:06:10,498 --> 00:06:12,692
+big hammer of redundancy.
+
+115
+00:06:13,458 --> 00:06:16,135
+And that is either where 
+we double or triple the resources
+
+116
+00:06:16,294 --> 00:06:19,793
+required to ensure availability 
+or durability of information.
+
+117
+00:06:21,059 --> 00:06:22,455
+So RAID1 is a classic example.
+
+118
+00:06:23,436 --> 00:06:27,095
+Rather than having the content on 
+a single disk you mirror it on two disks.
+
+119
+00:06:27,776 --> 00:06:29,540
+Works great, works fast.
+
+120
+00:06:29,989 --> 00:06:32,355
+So if performance is more 
+important than capacity,
+
+121
+00:06:32,355 --> 00:06:36,371
+use the big hammer of redundancy 
+which is simply replication
+
+122
+00:06:36,371 --> 00:06:38,414
+and, in this case, RAID1 mirroring.
+
+123
+00:06:39,106 --> 00:06:43,138
+Now replication is also commonly used 
+for scale out data storage access systems
+
+124
+00:06:43,138 --> 00:06:45,159
+such as Amazon S3 or Hadoop.
+
+125
+00:06:45,727 --> 00:06:49,647
+And this time by replicating the data 
+not twice but three times,
+
+126
+00:06:49,940 --> 00:06:51,734
+now why three times and not two?
+
+127
+00:06:52,098 --> 00:06:54,534
+Well there are a few good reasons 
+that have to do with ensuring
+
+128
+00:06:54,534 --> 00:06:57,336
+both the durability and the 
+availability of data
+
+129
+00:06:57,336 --> 00:07:00,043
+in the presence of disk failures, 
+server failures
+
+130
+00:07:00,043 --> 00:07:02,091
+and even possibly rack failures.
+
+131
+00:07:02,654 --> 00:07:04,257
+And in particular considering 
+the repair time
+
+132
+00:07:04,257 --> 00:07:07,815
+that could grow very large given 
+the size of disks and the bandwidth
+
+133
+00:07:07,815 --> 00:07:09,481
+available across networks these days.
+
+134
+00:07:11,243 --> 00:07:14,082
+Okay, so we've talked about redundancy 
+and the main message
+
+135
+00:07:14,082 --> 00:07:15,724
+is that redundancy is a good thing.
+
+136
+00:07:16,288 --> 00:07:18,365
+And then we talked a little bit 
+about two ways
+
+137
+00:07:18,365 --> 00:07:19,941
+in which we can achieve redundancy.
+
+138
+00:07:20,101 --> 00:07:22,811
+Coding, which is a form of 
+incremental redundancy
+
+139
+00:07:22,811 --> 00:07:26,436
+and then replication, the big hammer 
+of redundancy when it applies to data.
+
+140
+00:07:27,172 --> 00:07:30,472
+Next we'll talk about how we can apply 
+the same concept to systems.

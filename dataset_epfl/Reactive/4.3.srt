@@ -1,0 +1,883 @@
+1
+00:00:00,650 --> 00:00:04,110
+Now that we've seen how observables are
+the dual
+
+2
+00:00:04,110 --> 00:00:08,730
+of iterables, how futures are the duals of
+tries, it's
+
+3
+00:00:08,730 --> 00:00:12,480
+and we've seen plenty of examples of
+observables, let's
+
+4
+00:00:12,480 --> 00:00:16,395
+look a little bit deeper in the mechanisms
+underneath observable.
+
+5
+00:00:18,630 --> 00:00:20,440
+Here's a fragment from one of our earlier
+
+6
+00:00:20,440 --> 00:00:24,260
+examples where we had our stream of
+earthquakes.
+
+7
+00:00:26,030 --> 00:00:29,230
+And that wasn't observable of earthquakes
+and
+
+8
+00:00:29,230 --> 00:00:32,290
+we subscribe to the stream and that mean,
+
+9
+00:00:32,290 --> 00:00:34,450
+means that we kind of receive all
+
+10
+00:00:34,450 --> 00:00:37,350
+the notifications whenever there is a new
+earthquake.
+
+11
+00:00:37,350 --> 00:00:41,030
+The observer and the subscriptions will be
+notified.
+
+12
+00:00:41,030 --> 00:00:43,850
+And we said that if you're not interested
+in receiving
+
+13
+00:00:43,850 --> 00:00:49,040
+anymore updates, you unsubscribe from the
+subscription.
+
+14
+00:00:49,040 --> 00:00:53,950
+And what that means, when you unsubscribe,
+you retract your observer from the
+
+15
+00:00:53,950 --> 00:00:58,869
+earthquate stream, and you will not be
+notified anymore, of any future updates.
+
+16
+00:00:59,950 --> 00:01:04,360
+Now, it's important to distinguish between
+two kinds of observables.
+
+17
+00:01:04,360 --> 00:01:08,850
+The first kind are called hot observables.
+A hot observable is
+
+18
+00:01:08,850 --> 00:01:12,140
+an observable where all subscribers, in
+this case
+
+19
+00:01:12,140 --> 00:01:15,990
+we have four subscribers, all share the
+same source.
+
+20
+00:01:17,390 --> 00:01:22,410
+And this source will produce values
+independent of how many subscribers
+
+21
+00:01:22,410 --> 00:01:26,890
+there are and independently of whether the
+subscribers come and go.
+
+22
+00:01:26,890 --> 00:01:31,560
+For example, UIEvents are, are hot
+observables.
+
+23
+00:01:31,560 --> 00:01:34,180
+Your mouse moves happen independently
+
+24
+00:01:34,180 --> 00:01:37,770
+of how many Event handlers you have
+subscribed to them.
+
+25
+00:01:39,720 --> 00:01:43,570
+The other kind of observables are called
+cold observables.
+
+26
+00:01:43,570 --> 00:01:48,590
+A cold observable has its own private
+source for each subscriber.
+
+27
+00:01:48,590 --> 00:01:53,550
+For example, the observable stream of
+earthquakes, is a Cold Observable.
+
+28
+00:01:53,550 --> 00:01:56,800
+Nothing happens until you subscribe to it,
+in
+
+29
+00:01:56,800 --> 00:01:59,460
+which case it may, will make a network
+call
+
+30
+00:01:59,460 --> 00:02:03,080
+to the web servers and start producing all
+the values.
+
+31
+00:02:05,840 --> 00:02:09,590
+The difference between cold and hot
+observers is
+
+32
+00:02:09,590 --> 00:02:13,720
+important when we talk about
+unsubscription versus cancellation.
+
+33
+00:02:14,830 --> 00:02:18,970
+In general unsubscribing just means that
+the
+
+34
+00:02:18,970 --> 00:02:23,082
+observer that unsubscribes does not get
+any further notifications.
+
+35
+00:02:23,082 --> 00:02:31,220
+For example, if this observer here
+unsubscribes, it will just not receive any
+
+36
+00:02:31,220 --> 00:02:34,150
+notifications from this observable of T.
+
+37
+00:02:34,150 --> 00:02:38,810
+But notice, there may be other active
+observers, so, when this
+
+38
+00:02:38,810 --> 00:02:43,860
+one unsubscribes, it doesn't mean that you
+can cancel the computation here.
+
+39
+00:02:43,860 --> 00:02:47,360
+Because yeah, there might be another one
+listening.
+
+40
+00:02:47,360 --> 00:02:49,790
+But we will be quite sloppy, and we will
+
+41
+00:02:49,790 --> 00:02:56,370
+say, cancel and unsubscribing
+interchagably, but typically when you
+
+42
+00:02:56,370 --> 00:03:01,180
+unsubscribe, it doesn't mean that the
+underlying computation gets cancelled.
+
+43
+00:03:01,180 --> 00:03:04,390
+What most APIs do, is they try to do a
+best effort that
+
+44
+00:03:04,390 --> 00:03:07,270
+in case there's no subscribers left, they
+
+45
+00:03:07,270 --> 00:03:09,930
+will try to cancel the underlying
+computation.
+
+46
+00:03:12,510 --> 00:03:14,760
+Here's the trait that defines
+subscriptions.
+
+47
+00:03:16,100 --> 00:03:21,470
+Subscription is only a single method
+called unsubscribe that returns unit.
+
+48
+00:03:21,470 --> 00:03:25,550
+And the companion object has an apply
+method, a factory
+
+49
+00:03:25,550 --> 00:03:30,210
+method that takes a block of work, and
+returns a subscription.
+
+50
+00:03:30,210 --> 00:03:32,780
+Now there's many, many kinds of
+subscriptions, and
+
+51
+00:03:32,780 --> 00:03:34,924
+we will look at the whole family right
+now.
+
+52
+00:03:36,130 --> 00:03:38,240
+The first type of subscription
+
+53
+00:03:38,240 --> 00:03:40,345
+is the Boolean subscription.
+
+54
+00:03:40,345 --> 00:03:44,900
+A Boolean subscription has an additional
+method, it's unsubscribed, that you
+
+55
+00:03:44,900 --> 00:03:49,048
+can use to check whether the subscription
+has been unsubscribed or not.
+
+56
+00:03:49,048 --> 00:03:54,130
+The next sub-type of subscription is
+CompositeSubscription.
+
+57
+00:03:54,130 --> 00:03:57,040
+A composite subscription is like a
+collection of
+
+58
+00:03:57,040 --> 00:04:00,610
+subscriptions where you can add and remove
+subscriptions.
+
+59
+00:04:00,610 --> 00:04:03,450
+And when you unsubscribe on
+
+60
+00:04:03,450 --> 00:04:07,260
+the CompositeSubscription, all inner
+subscriptions get unsubscribed.
+
+61
+00:04:08,920 --> 00:04:14,150
+And the third sub-type of a subscription
+is a MultipleAssignmentSubscription.
+
+62
+00:04:14,150 --> 00:04:18,640
+A multiple assignment subscription is like
+a proxy for an inner
+
+63
+00:04:18,640 --> 00:04:23,570
+subscription that you can set and replace
+but there
+
+64
+00:04:23,570 --> 00:04:28,450
+is always one inner subscription active.
+Here's some
+
+65
+00:04:28,450 --> 00:04:32,770
+sample code that uses the simplest form,
+the basic supscription.
+
+66
+00:04:32,770 --> 00:04:36,029
+It creates a new subscription with, as the
+
+67
+00:04:36,029 --> 00:04:39,140
+work printing you know, bye, bye, I'm out
+fishing.
+
+68
+00:04:40,140 --> 00:04:46,040
+When you go and subscribe twice, you have
+to be, make sure that this is idempotent.
+
+69
+00:04:46,040 --> 00:04:47,480
+So typically what happens, the
+
+70
+00:04:47,480 --> 00:04:50,690
+implementation of subscription will call
+unsubscribe
+
+71
+00:04:50,690 --> 00:04:54,060
+here, so it will print bye, bye I'm out
+fishing once.
+
+72
+00:04:54,060 --> 00:04:57,140
+And then when you call it a second time,
+it remembers that
+
+73
+00:04:57,140 --> 00:05:00,470
+it has been unsubscribed and it will not
+print a second time.
+
+74
+00:05:02,070 --> 00:05:03,340
+But if you implement your own
+
+75
+00:05:03,340 --> 00:05:07,500
+subscriptions, make sure that it's
+idempotent.
+
+76
+00:05:07,500 --> 00:05:10,100
+That you can call unsubscribe any times
+because
+
+77
+00:05:10,100 --> 00:05:12,230
+it could be that you hand out a
+subscription
+
+78
+00:05:12,230 --> 00:05:15,160
+to multiple threads, and each of these
+threads,
+
+79
+00:05:15,160 --> 00:05:18,760
+independently of each other, might want to
+call unsubscribed.
+
+80
+00:05:20,820 --> 00:05:24,550
+Our next sample shows the
+BooleanSubsciption.
+
+81
+00:05:24,550 --> 00:05:27,240
+This BooleanSbuscription has the same
+trivial body
+
+82
+00:05:27,240 --> 00:05:29,530
+as the previous example gone out fishing.
+
+83
+00:05:30,580 --> 00:05:33,000
+But the special thing about a
+BooleanSubsciption
+
+84
+00:05:33,000 --> 00:05:36,280
+was that it had this method isUnsubsribed.
+
+85
+00:05:36,280 --> 00:05:40,055
+So after we have created the
+BooleanSubsciption, when we ask
+
+86
+00:05:40,055 --> 00:05:45,180
+isUnsubscribed, this will return false
+because we have not yet unsubscribed.
+
+87
+00:05:45,180 --> 00:05:47,440
+As soon as we unsubscribe and
+
+88
+00:05:47,440 --> 00:05:50,940
+we ask is unsubscribed again then it will
+return true.
+
+89
+00:05:52,490 --> 00:05:56,090
+When we draw pictures of subscriptions
+we'll use a
+
+90
+00:05:56,090 --> 00:05:59,180
+solid circle to indicate the subscription
+that has not
+
+91
+00:05:59,180 --> 00:06:02,210
+yet been unsubscribed, and we will use a
+dashed
+
+92
+00:06:02,210 --> 00:06:05,779
+circle to indicate an subscription that
+has been unsubscribed.
+
+93
+00:06:07,430 --> 00:06:12,770
+Let's look at Composite Subscriptions now.
+First of all, we define a Boolean
+
+94
+00:06:12,770 --> 00:06:19,180
+subscription that prints A.
+A normal subscription that prints B.
+
+95
+00:06:19,180 --> 00:06:20,580
+And then we will add these
+
+96
+00:06:20,580 --> 00:06:23,380
+two subscriptions to the composite
+subscription.
+
+97
+00:06:23,380 --> 00:06:26,092
+So, what we get now is one composite
+subscription.
+
+98
+00:06:26,092 --> 00:06:30,500
+Look at, it's as a solid circle because it
+has not yet been unsubscribed.
+
+99
+00:06:30,500 --> 00:06:36,990
+And it contains two sub-subscriptions that
+also have not yet been unsubscribed.
+
+100
+00:06:36,990 --> 00:06:38,710
+So if we ask,
+
+101
+00:06:38,710 --> 00:06:41,920
+is the composite unsubscribed?
+This will return false.
+
+102
+00:06:42,970 --> 00:06:45,670
+Right?
+Because the line is still solid.
+
+103
+00:06:45,670 --> 00:06:48,810
+If we now unsubscribe from the composite
+
+104
+00:06:48,810 --> 00:06:51,760
+subscription, and we ask whether it's
+subscribed.
+
+105
+00:06:51,760 --> 00:06:54,960
+We will see it's now unsubscribed.
+
+106
+00:06:54,960 --> 00:06:57,840
+And if we ask whether A is unsubscribed, A
+
+107
+00:06:57,840 --> 00:07:01,740
+was a boolean subscription, it will also
+say true.
+
+108
+00:07:01,740 --> 00:07:03,230
+And you see that here in the picture,
+
+109
+00:07:04,440 --> 00:07:10,010
+that both A and B, once we unsubscribe
+from the composite subscription.
+
+110
+00:07:10,010 --> 00:07:16,200
+Both the inner subscriptions will also be
+unsubscribed, so this behaves like a unit
+
+111
+00:07:16,200 --> 00:07:21,320
+of, like a, a, a set of subscriptions that
+all get unsubscribed together.
+
+112
+00:07:23,210 --> 00:07:25,800
+Now you can ask yourself, what happens
+here if
+
+113
+00:07:25,800 --> 00:07:29,860
+we have another subscription, C, that we
+add to
+
+114
+00:07:29,860 --> 00:07:35,440
+the composite subscription, after we have
+already unsubscribed it?
+
+115
+00:07:37,130 --> 00:07:38,580
+What do you think would be the answer?
+
+116
+00:07:40,890 --> 00:07:46,250
+Well, there's two possibilities, if our
+composite subscription has not
+
+117
+00:07:46,250 --> 00:07:50,610
+yet been unsubscribed, adding C to it will
+do nothing.
+
+118
+00:07:50,610 --> 00:07:54,020
+It will just add C to it and it won't
+touch C.
+
+119
+00:07:54,020 --> 00:08:00,460
+However, if we try to add C to an already
+unsubscribed composite subscription,
+
+120
+00:08:00,460 --> 00:08:06,195
+we will eagerly unsubscribe from C, so C
+will also be, become dashed.
+
+121
+00:08:06,195 --> 00:08:13,440
+Multi-assignments are our last example of
+complex subscriptions.
+
+122
+00:08:13,440 --> 00:08:19,130
+Again, we define subscription A and B, in
+this case, just simple subscriptions.
+
+123
+00:08:19,130 --> 00:08:20,810
+And we grade a new multiassignment
+
+124
+00:08:20,810 --> 00:08:25,040
+subscription, and ask whether it is
+unsubscribed.
+
+125
+00:08:25,040 --> 00:08:29,010
+Well, it is unsubscribed and it contains
+A.
+
+126
+00:08:30,140 --> 00:08:31,379
+Now, when we
+
+127
+00:08:32,550 --> 00:08:36,000
+change the subscription from A to B.
+
+128
+00:08:36,000 --> 00:08:38,090
+A just gets removed and nothing happens
+
+129
+00:08:38,090 --> 00:08:41,870
+with A, and now the
+MultiAssignmentSubscription contains B.
+
+130
+00:08:41,870 --> 00:08:45,690
+And as soon as we unsubscribe from
+
+131
+00:08:45,690 --> 00:08:50,890
+the MultiAssignmentSubscription, then also
+B will be unsubscribed.
+
+132
+00:08:50,890 --> 00:08:53,580
+The difference between a multi-assignment
+subscription and
+
+133
+00:08:53,580 --> 00:08:57,565
+a composite subscription is that a
+multi-assignment
+
+134
+00:08:57,565 --> 00:09:02,680
+subscription always has a single
+subscription that gets replaced.
+
+135
+00:09:02,680 --> 00:09:08,050
+Where as a composite subscription has a
+whole sets of subscriptions.
+
+136
+00:09:09,420 --> 00:09:13,010
+But we have to ask the same question that
+we asked before.
+
+137
+00:09:13,010 --> 00:09:16,390
+What happens when we change the
+subscription of
+
+138
+00:09:16,390 --> 00:09:21,500
+a multi assignment subscription, once it's
+already been unsubscribed?
+
+139
+00:09:24,600 --> 00:09:28,150
+The answer is unsurprising, and very
+natural.
+
+140
+00:09:29,190 --> 00:09:34,470
+When we try to set the subscription of a,
+a MultiAssignmentSubscription
+
+141
+00:09:34,470 --> 00:09:39,440
+that is not yet unsubscribed, we will just
+replace the inner subscription.
+
+142
+00:09:39,440 --> 00:09:42,750
+However, if the
+MultiAssignmentSubscription
+
+143
+00:09:42,750 --> 00:09:45,560
+has already been unsubscribed, setting
+
+144
+00:09:45,560 --> 00:09:49,880
+the subscription will eagerly unsubscribe
+from that new subscription.
+
+145
+00:09:51,070 --> 00:09:52,760
+And, that's what you see here in the
+picture.
+
+146
+00:09:52,760 --> 00:09:56,190
+Once you've set this guy in there, it will
+become unsubscribed.
+
+147
+00:09:57,860 --> 00:10:01,790
+The last question we have to ask ourselves
+is, what happens if we have
+
+148
+00:10:01,790 --> 00:10:06,240
+an composite or multiassignment
+subscription, where the
+
+149
+00:10:06,240 --> 00:10:10,550
+inner subscription gets unsubscribed from
+the outside.
+
+150
+00:10:10,550 --> 00:10:15,630
+So here you see I'm going to sub,
+unsubscribe from the inner subscription.
+
+151
+00:10:15,630 --> 00:10:16,410
+Since the outer
+
+152
+00:10:16,410 --> 00:10:22,350
+subscription has no way to get notified of
+any changes in the
+
+153
+00:10:22,350 --> 00:10:27,298
+inner subscription, the only reasonable
+thing that we can do is that is that the
+
+154
+00:10:27,298 --> 00:10:31,920
+outer subscription still has a solid arrow
+that, you know, you still have
+
+155
+00:10:31,920 --> 00:10:36,440
+to unsubscribe from it, because it has no
+way to see what happened inside.
+
+156
+00:10:38,960 --> 00:10:42,020
+Here's a little quiz with subscriptions.
+
+157
+00:10:43,090 --> 00:10:46,780
+We declare four subscriptions, a Boolean
+subscription
+
+158
+00:10:46,780 --> 00:10:50,200
+that prints A, a regular subscription that
+
+159
+00:10:50,200 --> 00:10:53,150
+prints B, and we creates, as before,
+
+160
+00:10:53,150 --> 00:10:55,950
+a composite subscription that contains A
+and B.
+
+161
+00:10:57,150 --> 00:10:59,630
+What we're going to do now, however, is
+we're
+
+162
+00:10:59,630 --> 00:11:04,010
+going to create a multi-assignment
+subscription, and add the
+
+163
+00:11:04,010 --> 00:11:06,890
+composite subscription as the inner
+
+164
+00:11:06,890 --> 00:11:09,579
+subscription of that multi-assignment
+subscription.
+
+165
+00:11:10,880 --> 00:11:16,230
+And then, we unsubscribe from C, we
+unsubscribe from the composite
+
+166
+00:11:16,230 --> 00:11:22,240
+subscription, which of the following
+statements, A, B, C or D is true?
+
+167
+00:11:25,270 --> 00:11:29,000
+Okay, let's look at the answers one by
+one.
+
+168
+00:11:30,120 --> 00:11:32,320
+First line b isUnsubscribed.
+
+169
+00:11:32,320 --> 00:11:34,030
+Well lets look at B.
+
+170
+00:11:34,030 --> 00:11:37,720
+B is not a boolean subscription so this is
+a type error.
+
+171
+00:11:39,790 --> 00:11:42,940
+So this is invalid.
+So that answer is not correct.
+
+172
+00:11:44,470 --> 00:11:46,330
+Now look at A.
+
+173
+00:11:46,330 --> 00:11:52,400
+A is unsubscribed it's false.
+However, A was part of the composite
+
+174
+00:11:52,400 --> 00:11:58,057
+subscription that we unsubscribed, so
+after this statement here,
+
+175
+00:11:58,057 --> 00:12:04,250
+c.unsubscribed, a.isUnsubscribed would be
+true.
+
+176
+00:12:04,250 --> 00:12:04,800
+So this
+
+177
+00:12:04,800 --> 00:12:07,230
+one is false, as well.
+
+178
+00:12:08,810 --> 00:12:13,950
+Now let's look at the answer c here,
+m.isUnsubscribed equals true.
+
+179
+00:12:15,590 --> 00:12:19,210
+Let's have a look.
+Well we never unsubscribe from m.
+
+180
+00:12:19,210 --> 00:12:23,610
+So m is still, you know, unsubscribed.
+So, this is also false.
+
+181
+00:12:25,190 --> 00:12:28,440
+And let's see if the last answer is
+correct.
+
+182
+00:12:28,440 --> 00:12:29,850
+C is unsubscribed,
+
+183
+00:12:29,850 --> 00:12:31,790
+that is right because we have our
+
+184
+00:12:31,790 --> 00:12:34,900
+composite subscription here and we
+unsubscribe from it.
+
+185
+00:12:34,900 --> 00:12:36,790
+So, this is the correct answer.
+

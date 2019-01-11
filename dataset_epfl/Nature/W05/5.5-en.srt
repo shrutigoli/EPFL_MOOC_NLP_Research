@@ -1,0 +1,2423 @@
+1
+00:00:02,954 --> 00:00:04,409
+Welcome back,
+Nature, In Code.
+
+2
+00:00:04,597 --> 00:00:06,784
+We are in Chapter 5, Lecture 5.
+
+3
+00:00:06,984 --> 00:00:08,586
+We just finished
+the implementation
+
+4
+00:00:08,797 --> 00:00:10,697
+of choosing Mating Partners.
+
+5
+00:00:10,897 --> 00:00:12,909
+Now what we need to do
+is we need to implement
+
+6
+00:00:13,109 --> 00:00:14,772
+The Production of Offspring.
+
+7
+00:00:14,972 --> 00:00:16,915
+and we will do this, of course,
+the way it works
+
+8
+00:00:17,103 --> 00:00:19,753
+in nature, which
+is by Mendelian inheritance.
+
+9
+00:00:19,953 --> 00:00:22,253
+Alright, so here we are,
+back in our code.
+
+10
+00:00:22,578 --> 00:00:25,478
+This was the pick Mating Partner
+function that we looked at
+
+11
+00:00:25,653 --> 00:00:26,578
+in the last lecture.
+
+12
+00:00:26,778 --> 00:00:27,932
+We implemented it here.
+
+13
+00:00:28,132 --> 00:00:31,682
+And now, the only remaining function
+that is not implemented
+
+14
+00:00:31,882 --> 00:00:33,863
+is this get_offspring function.
+
+15
+00:00:34,063 --> 00:00:37,820
+So, this get_offspring function
+takes two individuals
+
+16
+00:00:38,020 --> 00:00:40,635
+namely, the focal individual,
+the current individual,
+
+17
+00:00:40,822 --> 00:00:42,723
+that lives on grid (i,ii),
+
+18
+00:00:42,923 --> 00:00:44,566
+and the Mating Partner,
+
+19
+00:00:44,766 --> 00:00:46,553
+that we just selected.
+
+20
+00:00:46,753 --> 00:00:49,398
+And by the way, the way
+it is implemented at the moment
+
+21
+00:00:49,598 --> 00:00:54,035
+is that, this can indeed
+be the same individual
+
+22
+00:00:54,235 --> 00:00:55,735
+this would be called Selfing.
+
+23
+00:00:55,910 --> 00:00:57,928
+It is not unusual actually
+in nature
+
+24
+00:00:58,515 --> 00:01:00,965
+It should be relatively
+straightforward for you
+
+25
+00:01:01,165 --> 00:01:04,165
+to change this
+in the pick_mating_partner function
+
+26
+00:01:04,365 --> 00:01:06,943
+If you wanted to avoid the i, ii
+
+27
+00:01:07,143 --> 00:01:09,818
+is relatively identical to j, jj.
+
+28
+00:01:10,018 --> 00:01:12,618
+But we are not going to do
+that, because in terms of biology
+
+29
+00:01:12,818 --> 00:01:15,143
+not much would change anyways.
+
+30
+00:01:15,343 --> 00:01:18,855
+But we need to implement
+this get_offspring function
+
+31
+00:01:19,055 --> 00:01:21,350
+now so that when we pass it
+
+32
+00:01:21,550 --> 00:01:23,000
+to parent genotypes,
+
+33
+00:01:23,200 --> 00:01:27,012
+we get an appropriate
+offspring genotype
+
+34
+00:01:27,212 --> 00:01:29,350
+that we then put here
+on the temp_grid.
+
+35
+00:01:29,712 --> 00:01:30,950
+So how do we do this?
+
+36
+00:01:31,150 --> 00:01:34,250
+Well, the answer
+is Mendelian Inheritance.
+
+37
+00:01:34,425 --> 00:01:36,340
+So, to understand
+Mendelian Inheritance,
+
+38
+00:01:36,540 --> 00:01:40,865
+we have to go back
+150 years roughly to Austria
+
+39
+00:01:41,128 --> 00:01:43,053
+and to a monk
+by the name of Mendel.
+
+40
+00:01:43,253 --> 00:01:45,940
+who discovered
+The Laws of Genetic Inheritance.
+
+41
+00:01:46,153 --> 00:01:48,090
+And the first law of Mendel
+states that 
+
+42
+00:01:48,540 --> 00:01:52,028
+the alleles segregate
+during deformation of gametes
+
+43
+00:01:52,228 --> 00:01:56,753
+and each parent passes on one
+allele  to the offspring individual.
+
+44
+00:01:56,953 --> 00:01:58,913
+and this, of course,
+is nothing new for us.
+
+45
+00:01:59,113 --> 00:02:00,675
+We have assumed this all along
+
+46
+00:02:00,850 --> 00:02:03,650
+but we are now making
+it more explicit
+
+47
+00:02:03,850 --> 00:02:07,463
+in this lecture
+because we have to implement
+
+48
+00:02:07,663 --> 00:02:10,789
+this explicitly
+in an individual based fashion.
+
+49
+00:02:11,602 --> 00:02:14,495
+Okay, there are essentially
+six combinations
+
+50
+00:02:14,708 --> 00:02:16,616
+six distinct combinations.
+
+51
+00:02:16,829 --> 00:02:19,329
+And you could swap parent 1
+and parent 2, if you wanted to
+
+52
+00:02:19,529 --> 00:02:20,957
+it makes no difference.
+
+53
+00:02:21,157 --> 00:02:23,115
+But the six combinations
+are the following.
+
+54
+00:02:23,615 --> 00:02:27,155
+Either both
+are homo-zygotes of the same type.
+
+55
+00:02:27,442 --> 00:02:29,655
+So, for example, A1A1 one parent,
+
+56
+00:02:29,855 --> 00:02:31,542
+and A1A1 the other parent,
+
+57
+00:02:31,742 --> 00:02:36,442
+or, A2A2 one parent
+and A2A2 the other parent.
+
+58
+00:02:37,630 --> 00:02:41,830
+Or, one of them
+is a homo-zygote
+
+59
+00:02:42,030 --> 00:02:44,642
+but the other
+is a hetero-zygote.
+
+60
+00:02:44,842 --> 00:02:46,017
+So, we have here,
+for example
+
+61
+00:02:46,217 --> 00:02:48,407
+A1A1
+and the hetero-zygote,
+
+62
+00:02:48,607 --> 00:02:51,294
+or A2A2,
+and the hetero-zygote.
+
+63
+00:02:52,294 --> 00:02:55,906
+They could both be homo-zygotes
+but of different types.
+
+64
+00:02:56,106 --> 00:02:58,833
+So, one is A1A1
+and the other is A2A2.
+
+65
+00:02:59,220 --> 00:03:02,570
+Or finally, they could
+both be hetero-zygotes.
+
+66
+00:03:02,795 --> 00:03:04,634
+So, both are A1A2.
+
+67
+00:03:04,834 --> 00:03:09,446
+And now, each of them will create
+the corresponding gametes
+
+68
+00:03:09,646 --> 00:03:12,048
+and then pass on
+one of the alleles
+
+69
+00:03:12,248 --> 00:03:13,648
+into the offspring.
+
+70
+00:03:13,848 --> 00:03:16,348
+So, we get these
+different combinations.
+
+71
+00:03:16,548 --> 00:03:19,948
+So if all of them,
+if both parents are A1A1
+
+72
+00:03:20,148 --> 00:03:23,335
+then obviously all the gametes
+are going to be A1A1.
+
+73
+00:03:23,560 --> 00:03:26,048
+And then,
+there is a 100% probability
+
+74
+00:03:26,373 --> 00:03:30,832
+that the offspring
+will be A1A1 as well.
+
+75
+00:03:31,144 --> 00:03:32,419
+The same, of course,
+is true
+
+76
+00:03:32,619 --> 00:03:34,069
+if they are both A2A2.
+
+77
+00:03:34,707 --> 00:03:39,825
+All the offspring
+are going to be A2A2, 100%.
+
+78
+00:03:40,025 --> 00:03:41,861
+Now, things get
+a bit more interesting
+
+79
+00:03:42,061 --> 00:03:45,899
+if we do not have
+the exact same zygote genotype.
+
+80
+00:03:46,161 --> 00:03:48,849
+For example,
+let us take a look at both
+
+81
+00:03:49,049 --> 00:03:51,111
+having a homo-zygote genotype
+
+82
+00:03:51,311 --> 00:03:52,463
+but the different one.
+
+83
+00:03:52,663 --> 00:03:55,663
+So, in this case,
+one of the parents
+
+84
+00:03:55,863 --> 00:03:57,851
+will only contribute
+with A1 alleles
+
+85
+00:03:58,051 --> 00:04:00,517
+and the other will contribute
+only A2 alleles.
+
+86
+00:04:01,192 --> 00:04:04,554
+So again, we actually
+get a 100% outcome.
+
+87
+00:04:04,767 --> 00:04:08,292
+The offspring, they all
+have the same genotypes
+
+88
+00:04:08,554 --> 00:04:11,192
+but now it is
+all the hetero-zygote.
+
+89
+00:04:11,392 --> 00:04:14,042
+Now, what if,
+if one of them is a homo-zygote,
+
+90
+00:04:14,242 --> 00:04:15,459
+for example A2A2
+
+91
+00:04:15,659 --> 00:04:16,575
+or A1A1,
+
+92
+00:04:16,775 --> 00:04:19,190
+and the other
+is a hetero-zygote.
+
+93
+00:04:19,390 --> 00:04:22,390
+Well, one of the parents,
+the one that is homo-zygote
+
+94
+00:04:22,590 --> 00:04:24,484
+only contributes one of the alleles.
+
+95
+00:04:24,684 --> 00:04:27,182
+But the other one contributes both.
+
+96
+00:04:27,382 --> 00:04:30,517
+So, that means
+that in 50% of the cases,
+
+97
+00:04:31,730 --> 00:04:34,117
+you get a corresponding
+homo-zygote.
+
+98
+00:04:34,317 --> 00:04:36,092
+Here in this case
+it would be A1A1,
+
+99
+00:04:36,805 --> 00:04:38,339
+And in 50% of the cases
+
+100
+00:04:38,539 --> 00:04:40,757
+you get the hetero-zygote.
+
+101
+00:04:40,957 --> 00:04:44,895
+So here, it is essentially
+the hetero-zygote individual
+
+102
+00:04:45,095 --> 00:04:47,528
+that determines
+what the outcome will be.
+
+103
+00:04:48,241 --> 00:04:49,634
+Same situation here.
+
+104
+00:04:49,834 --> 00:04:53,612
+We have one individual
+only contributing A2 alleles
+
+105
+00:04:53,812 --> 00:04:58,174
+and the other contributing
+the A2 and the A1 alleles.
+
+106
+00:04:58,374 --> 00:05:00,372
+So, it really depends
+on this one.
+
+107
+00:05:00,572 --> 00:05:02,797
+So, again,
+50% of the cases
+
+108
+00:05:02,997 --> 00:05:04,879
+we get the homo-zygote.
+
+109
+00:05:05,079 --> 00:05:07,345
+But, in 50% of the cases, we get
+
+110
+00:05:07,557 --> 00:05:11,157
+ the corresponding hetero-zygote,
+A1A2.
+
+111
+00:05:11,982 --> 00:05:13,903
+Perhaps, the most interesting case
+
+112
+00:05:14,103 --> 00:05:17,078
+is if both are hetero-zygotes
+
+113
+00:05:17,303 --> 00:05:19,803
+because then both
+will contribute 
+
+114
+00:05:20,003 --> 00:05:21,290
+both types of alleles
+
+115
+00:05:21,490 --> 00:05:23,290
+A1A2 to the offspring.
+
+116
+00:05:23,490 --> 00:05:24,622
+And as you can see here,
+
+117
+00:05:24,822 --> 00:05:27,326
+in 25% of the cases,
+
+118
+00:05:27,526 --> 00:05:30,623
+so if both
+happen to contribute A1 alleles,
+
+119
+00:05:30,811 --> 00:05:33,598
+which happens in 50% of Parent 1
+and 50% of Parent 2.
+
+120
+00:05:33,798 --> 00:05:38,634
+So combined 25%,
+we get the homozygote A1A1.
+
+121
+00:05:38,922 --> 00:05:41,464
+Same logic for A2A2.
+
+122
+00:05:41,664 --> 00:05:44,408
+25% chance that this happens.
+
+123
+00:05:44,608 --> 00:05:45,809
+And the rest,
+
+124
+00:05:46,434 --> 00:05:49,509
+gets one type of allele
+from one parent
+
+125
+00:05:49,709 --> 00:05:52,594
+but the other type of allele
+from the other parent
+
+126
+00:05:52,794 --> 00:05:57,006
+but it is 50% probability
+that we get the hetero-zygote.
+
+127
+00:05:57,369 --> 00:06:01,391
+So these are the possible
+outcomes, the probabilities,
+
+128
+00:06:01,591 --> 00:06:05,328
+given these six
+possible combinations.
+
+129
+00:06:05,541 --> 00:06:06,440
+and what we have to do
+
+130
+00:06:06,640 --> 00:06:08,944
+is we have to implement
+these probabilities
+
+131
+00:06:09,144 --> 00:06:11,786
+and given two parent genotypes,
+
+132
+00:06:11,986 --> 00:06:15,048
+return the correct,
+but still,
+
+133
+00:06:15,273 --> 00:06:19,999
+potentially randomly chosen genotype
+as an offspring in JavaScript.
+
+134
+00:06:20,187 --> 00:06:22,572
+Alright, so now that
+we have this background knowledge
+
+135
+00:06:22,772 --> 00:06:25,172
+we can implement this function here,
+get_offspring.
+
+136
+00:06:25,360 --> 00:06:27,597
+So, we are going to do that
+right here.
+
+137
+00:06:27,822 --> 00:06:30,919
+Ant this will need some space,
+so I am just going to roll up here
+
+138
+00:06:31,119 --> 00:06:32,748
+and I am going to say,
+
+139
+00:06:32,948 --> 00:06:37,648
+a function get_offspring.
+
+140
+00:06:40,723 --> 00:06:47,223
+And this function has
+two parameters,
+
+141
+00:06:49,298 --> 00:06:52,671
+namely Parent 1
+and Parent 2.
+
+142
+00:06:52,871 --> 00:06:56,011
+And, I will do quite a bit
+of typing here
+
+143
+00:06:56,211 --> 00:06:58,186
+so I am going to make
+this a little simpler here
+
+144
+00:06:58,386 --> 00:07:01,386
+and I am going to say P1
+and P2.
+
+145
+00:07:01,586 --> 00:07:04,586
+So, these just stand
+for the two parents.
+
+146
+00:07:04,786 --> 00:07:07,786
+I should say Parent 1
+
+147
+00:07:08,599 --> 00:07:12,161
+We said on the beginning,
+we should always type things,
+
+148
+00:07:12,361 --> 00:07:15,811
+call things the way
+they are easy to understand.
+
+149
+00:07:16,011 --> 00:07:19,974
+So, I think Parent 1
+and Parent 2 are fine.
+
+150
+00:07:20,174 --> 00:07:22,436
+But, nevertheless,
+actually what I am going to do
+
+151
+00:07:22,636 --> 00:07:25,136
+is I am going to set up
+these local variables here
+
+152
+00:07:25,336 --> 00:07:29,411
+P1, that I will set to Parent 1
+
+153
+00:07:29,611 --> 00:07:33,649
+and P2 set to Parent 2.
+
+154
+00:07:35,424 --> 00:07:40,049
+So, these two lines now
+I just put
+
+155
+00:07:40,249 --> 00:07:42,211
+so that I have to type
+a little less.
+
+156
+00:07:42,886 --> 00:07:45,161
+which is important,
+because you do not want to spend
+
+157
+00:07:45,361 --> 00:07:47,980
+too much time
+in front of your computer
+
+158
+00:07:48,180 --> 00:07:49,377
+watching me type.
+
+159
+00:07:49,577 --> 00:07:52,266
+But otherwise,
+I would not do this.
+
+160
+00:07:53,054 --> 00:07:56,678
+Call variables the way
+they are supposed to be called.
+
+161
+00:07:57,115 --> 00:07:58,140
+Alright, so.
+
+162
+00:07:58,340 --> 00:08:00,127
+We have six combinations
+
+163
+00:08:00,327 --> 00:08:01,981
+So basically, we just have to go
+
+164
+00:08:02,181 --> 00:08:03,750
+through the six combinations
+
+165
+00:08:03,950 --> 00:08:05,447
+and we have to ask ourselves
+
+166
+00:08:05,734 --> 00:08:07,909
+given Parent 1 and Parent 2,
+
+167
+00:08:08,422 --> 00:08:11,072
+which one of the six combinations
+are we in.
+
+168
+00:08:11,272 --> 00:08:14,509
+And then, roll a dice,
+if it is necessary,
+
+169
+00:08:14,709 --> 00:08:18,422
+and pick the appropriate genotype.
+
+170
+00:08:18,622 --> 00:08:20,534
+So let us go ahead and do this.
+
+171
+00:08:20,734 --> 00:08:23,600
+So, the first thing
+I am going to test here
+
+172
+00:08:23,775 --> 00:08:25,491
+for example, the first case
+I am going to test here
+
+173
+00:08:25,679 --> 00:08:29,916
+is, if both of the parents
+are A1A1.
+
+174
+00:08:30,116 --> 00:08:32,629
+So, what we write here
+will simply be
+
+175
+00:08:32,829 --> 00:08:37,841
+if P1 equals, and again,
+here we are doing equality test,
+
+176
+00:08:38,029 --> 00:08:39,641
+so the double equal sign.
+
+177
+00:08:39,841 --> 00:08:43,679
+"A1A1"
+
+178
+00:08:45,716 --> 00:08:52,716
+and P2,
+so the other parent is also "A1A1".
+
+179
+00:08:54,729 --> 00:08:58,041
+Be careful here that
+you do not enter any typos here.
+
+180
+00:08:58,616 --> 00:09:01,241
+Okay, so if that is the case,
+
+181
+00:09:02,179 --> 00:09:07,416
+ We know no number drawing
+is necessary
+
+182
+00:09:07,616 --> 00:09:09,256
+no dice throwing,
+
+183
+00:09:09,456 --> 00:09:13,431
+because we know the offspring
+is going to be "A1A1".
+
+184
+00:09:13,631 --> 00:09:16,543
+So, we can essentially terminate
+the function here and simply
+
+185
+00:09:16,743 --> 00:09:20,693
+say, return "A1A1".
+
+186
+00:09:22,468 --> 00:09:27,168
+So, if that is the case,
+we can simply write, return "A1A1"
+
+187
+00:09:27,368 --> 00:09:30,131
+What does that mean? It means,
+well we are actually return A1A1
+
+188
+00:09:30,331 --> 00:09:32,506
+and also, the function
+will be terminated
+
+189
+00:09:32,706 --> 00:09:38,143
+and all these other tests here below
+would not to be executed
+
+190
+00:09:38,343 --> 00:09:39,381
+would not need to be tested
+
+191
+00:09:39,581 --> 00:09:42,206
+because we have
+already found our combination
+
+192
+00:09:42,406 --> 00:09:44,084
+And we are
+now going to essentially do this
+
+193
+00:09:44,284 --> 00:09:45,084
+six times.
+
+194
+00:09:45,284 --> 00:09:46,959
+So this is the first case.
+
+195
+00:09:47,459 --> 00:09:50,231
+So, let us take a look
+at a more complicated case.
+
+196
+00:09:50,431 --> 00:09:51,256
+The next one.
+
+197
+00:09:51,669 --> 00:09:54,606
+I am going to assume
+that one of the parents is A1A1
+
+198
+00:09:54,806 --> 00:09:57,306
+and the other is the hetero-zygote,
+A1A2.
+
+199
+00:09:57,506 --> 00:09:59,057
+Okay, so I am going to say,
+
+200
+00:09:59,257 --> 00:10:08,269
+else if, {} this condition is true,
+
+201
+00:10:08,507 --> 00:10:09,694
+I am going to do something.
+
+202
+00:10:09,894 --> 00:10:11,394
+I am setting this up here already.
+
+203
+00:10:11,594 --> 00:10:13,273
+Okay, so, what is the condition?
+
+204
+00:10:13,473 --> 00:10:17,823
+One of them has to be A1A1
+and the other has to be A1A2.
+
+205
+00:10:18,023 --> 00:10:21,998
+Now, of course,
+I do not care which one is A1A1
+
+206
+00:10:22,198 --> 00:10:23,810
+and I do not care which one is A1A2,
+
+207
+00:10:24,010 --> 00:10:26,110
+but I have to test for both cases.
+
+208
+00:10:26,310 --> 00:10:29,310
+It could be, that P1 is A1A1
+
+209
+00:10:29,510 --> 00:10:30,523
+so Parent 1.
+
+210
+00:10:31,098 --> 00:10:34,710
+And P2 is A1A2,
+or it could be the other way around.
+
+211
+00:10:34,923 --> 00:10:38,410
+So I need to make sure
+I catch both of these cases.
+
+212
+00:10:38,610 --> 00:10:40,033
+So here now we are going to combine
+
+213
+00:10:40,233 --> 00:10:43,233
+the "and" operator
+with the "or" operator.
+
+214
+00:10:43,783 --> 00:10:52,395
+Because the first is going to be
+P1 equaling A1A1,
+
+215
+00:10:53,220 --> 00:11:02,983
+And P2 equalling A1A2.
+
+216
+00:11:03,895 --> 00:11:05,958
+Now, if I only would
+test for this,
+
+217
+00:11:06,158 --> 00:11:10,083
+I would miss the case
+where P2 is actually A1A1
+
+218
+00:11:10,358 --> 00:11:13,283
+and P1 is A1A2.
+
+219
+00:11:13,483 --> 00:11:16,620
+And those were the exact same cases
+but I would not capture it here.
+
+220
+00:11:16,820 --> 00:11:19,583
+So, what I need to do
+is I need to have
+
+221
+00:11:19,783 --> 00:11:20,845
+second statement here.
+
+222
+00:11:21,045 --> 00:11:23,545
+So I am going
+to put this here in parenthesis, 
+
+223
+00:11:25,745 --> 00:11:28,595
+and then I am going to copy
+this bit here,
+
+224
+00:11:29,645 --> 00:11:30,870
+And I am going to say
+
+225
+00:11:32,108 --> 00:11:32,520
+Or
+
+226
+00:11:32,720 --> 00:11:34,707
+So now we use
+the double pipe symbol here
+
+227
+00:11:35,357 --> 00:11:37,309
+And I am simply pasting this
+
+228
+00:11:37,646 --> 00:11:40,909
+but I now swap P1 with P2.
+
+229
+00:11:41,959 --> 00:11:43,684
+So I hope you can see
+how this works.
+
+230
+00:11:43,884 --> 00:11:47,621
+If it is either this case,
+or this case,
+
+231
+00:11:48,234 --> 00:11:52,009
+the only being
+that I swapped P1 with P2
+
+232
+00:11:52,209 --> 00:11:54,871
+I did not need to do this here
+obviously, because
+
+233
+00:11:55,071 --> 00:11:56,471
+they are identical.
+
+234
+00:11:57,084 --> 00:11:57,946
+But here, they are not.
+
+235
+00:11:58,146 --> 00:12:01,384
+So I need to test
+to both of these scenarios.
+
+236
+00:12:02,496 --> 00:12:04,346
+So what do we need to do?
+
+237
+00:12:04,546 --> 00:12:07,085
+We saw on the previous slide
+and in this case
+
+238
+00:12:07,285 --> 00:12:10,035
+half of the time,
+the offspring is going to be A1A1
+
+239
+00:12:10,235 --> 00:12:12,818
+and half of the time,
+it is going to be A1A2.
+
+240
+00:12:13,056 --> 00:12:14,919
+So what I am simply
+going to say here
+
+241
+00:12:15,157 --> 00:12:20,381
+if Math_random, 
+smaller than 0.5
+
+242
+00:12:20,581 --> 00:12:22,250
+This is our fair coin.
+
+243
+00:12:22,450 --> 00:12:26,987
+I will return "A1A1"
+
+244
+00:12:28,037 --> 00:12:30,187
+Otherwise, 
+
+245
+00:12:30,387 --> 00:12:37,312
+I will return "A1A2"
+
+246
+00:12:39,125 --> 00:12:41,887
+Alright, so that is our second case.
+
+247
+00:12:42,087 --> 00:12:43,625
+That was likely more complicated
+
+248
+00:12:43,825 --> 00:12:46,075
+but again, it uses construct
+
+249
+00:12:46,287 --> 00:12:48,187
+and ideas
+that you are all familiar with.
+
+250
+00:12:48,387 --> 00:12:51,387
+We are simply now combining
+these in a single function.
+
+251
+00:12:51,587 --> 00:12:53,800
+So this is going to be
+a fairly complex function
+
+252
+00:12:54,000 --> 00:12:56,650
+but, hey, it Mendelian Inheritance.
+
+253
+00:12:56,850 --> 00:12:58,575
+That is quite something.
+
+254
+00:12:58,775 --> 00:12:59,937
+Alright, third case.
+
+255
+00:13:00,137 --> 00:13:01,262
+What are we going to assume?
+
+256
+00:13:01,475 --> 00:13:06,262
+We are going to assume
+that one of them is A1A1
+
+257
+00:13:06,512 --> 00:13:08,725
+and the other
+is now A2A2.
+
+258
+00:13:08,925 --> 00:13:11,925
+So basically, we have
+the same situation as here.
+
+259
+00:13:12,125 --> 00:13:13,602
+So we can copy that.
+
+260
+00:13:13,802 --> 00:13:15,252
+We are going to copy that.
+
+261
+00:13:16,827 --> 00:13:19,302
+Of course, make sure
+close to parenthesizes here.
+
+262
+00:13:19,502 --> 00:13:22,202
+So now we want to make sure
+that one of them is A1A1
+
+263
+00:13:22,402 --> 00:13:24,539
+and the other is A2A2.
+
+264
+00:13:24,739 --> 00:13:27,964
+So be sure to switch this here
+to A2A2.
+
+265
+00:13:28,164 --> 00:13:29,939
+And again,
+because they are not the same,
+
+266
+00:13:30,139 --> 00:13:33,139
+we need to test
+for the (inaudible) situation
+
+267
+00:13:33,339 --> 00:13:36,508
+where P2 will be A1A1
+
+268
+00:13:36,708 --> 00:13:38,429
+And P1 will be A2A2.
+
+269
+00:13:38,629 --> 00:13:41,417
+So, again,
+switch here to 2.
+
+270
+00:13:42,192 --> 00:13:44,096
+Alright, so if that is the case,
+
+271
+00:13:44,571 --> 00:13:46,037
+then, what is going to happen?
+
+272
+00:13:46,237 --> 00:13:48,958
+We have seen before,
+this is a very simple outcome
+
+273
+00:13:49,189 --> 00:13:51,414
+because one of the parents
+is going to contribute A1
+
+274
+00:13:51,602 --> 00:13:53,402
+the other is going to contribute A2.
+
+275
+00:13:53,602 --> 00:13:56,602
+So it is a guaranteed A1A2.
+
+276
+00:13:57,152 --> 00:14:00,452
+So,
+return "A1A2".
+
+277
+00:14:02,251 --> 00:14:03,439
+Alright, so,
+
+278
+00:14:03,639 --> 00:14:05,552
+we have already implemented
+half of it.
+
+279
+00:14:05,752 --> 00:14:07,530
+50%. Well Done!
+
+280
+00:14:07,755 --> 00:14:10,142
+Let us take a look
+at the next example.
+
+281
+00:14:10,342 --> 00:14:14,493
+Let us go for A1A2
+and A1A2.
+
+282
+00:14:14,693 --> 00:14:17,124
+So both of them
+are A1A2.
+
+283
+00:14:17,324 --> 00:14:19,887
+So that is
+the most complicated case.
+
+284
+00:14:20,087 --> 00:14:21,745
+So, how do we do this?
+
+285
+00:14:21,945 --> 00:14:24,645
+Well, again,
+else if,
+
+286
+00:14:26,095 --> 00:14:27,883
+Now what I am going
+to say here
+
+287
+00:14:28,083 --> 00:14:33,133
+is, if P1 equals A1A2,
+
+288
+00:14:35,120 --> 00:14:41,095
+and P2 equals A1A2.
+
+289
+00:14:41,295 --> 00:14:43,108
+Now again, the same genotype.
+
+290
+00:14:43,295 --> 00:14:45,958
+So I do not have to test
+for the (inaudible) situation.
+
+291
+00:14:46,158 --> 00:14:47,661
+because it is exactly identical.
+
+292
+00:14:47,936 --> 00:14:50,549
+But the outcome here
+is a bit more complicated
+
+293
+00:14:50,749 --> 00:14:53,103
+because here we have
+three possible outcomes.
+
+294
+00:14:53,678 --> 00:14:55,903
+From these two genotypes,
+
+295
+00:14:56,103 --> 00:14:59,603
+ we can generate
+all three possible genotypes.
+
+296
+00:14:59,803 --> 00:15:03,691
+So this is the most diverse
+outcome here.
+
+297
+00:15:03,891 --> 00:15:05,906
+25% We get the A1A1,
+
+298
+00:15:06,106 --> 00:15:08,201
+25% we get the A1A2
+
+299
+00:15:08,401 --> 00:15:12,789
+and finally,50% of the time
+we get the hetero-zygote.
+
+300
+00:15:12,989 --> 00:15:15,449
+But again, we already know
+how to do this
+
+301
+00:15:15,649 --> 00:15:17,774
+using the set of number lines..
+
+302
+00:15:18,924 --> 00:15:21,524
+..principle that we used previously
+
+303
+00:15:21,724 --> 00:15:23,249
+when we set up the grid.
+
+304
+00:15:23,449 --> 00:15:24,735
+So we can simply say,
+
+305
+00:15:24,935 --> 00:15:27,935
+First of all, we are going to draw
+a random number.
+
+306
+00:15:28,498 --> 00:15:30,248
+We are going to do this here
+
+307
+00:15:30,986 --> 00:15:33,149
+and I am going to say
+Math_random
+
+308
+00:15:33,349 --> 00:15:36,561
+I will actually tell you in a second
+why I do it like this.
+
+309
+00:15:37,161 --> 00:15:38,899
+Okay, we are going to draw
+a random number
+
+310
+00:15:39,099 --> 00:15:40,482
+and now we are going
+to test here
+
+311
+00:15:40,682 --> 00:15:48,703
+if the random number
+is smaller than 0.25,
+
+312
+00:15:52,003 --> 00:15:54,965
+then we are going to return
+the A1A1.
+
+313
+00:15:56,053 --> 00:16:00,803
+So, in 25% of the cases,
+we are going to return A1A1.
+
+314
+00:16:02,540 --> 00:16:03,953
+Else if, 
+
+315
+00:16:06,353 --> 00:16:10,915
+this random number
+happens to be
+
+316
+00:16:11,990 --> 00:16:16,653
+a larger than 0.75,
+
+317
+00:16:17,090 --> 00:16:20,968
+So this is 1 minus 0.25.
+
+318
+00:16:21,168 --> 00:16:25,455
+And that would also
+happen in 25% of the cases.
+
+319
+00:16:25,655 --> 00:16:31,180
+So in this case, we are going
+to return the other homo-zygote A2A2.
+
+320
+00:16:31,655 --> 00:16:33,118
+And finally else,
+
+321
+00:16:34,043 --> 00:16:35,468
+so none of those have happened
+
+322
+00:16:35,668 --> 00:16:37,205
+in the remaining 50%.
+
+323
+00:16:37,430 --> 00:16:43,318
+So else is simply
+going to return "A1A2".
+
+324
+00:16:43,693 --> 00:16:45,093
+So, couple of observations.
+
+325
+00:16:45,280 --> 00:16:45,930
+First of all,
+
+326
+00:16:46,130 --> 00:16:49,130
+we have these if, else ifs
+here nested
+
+327
+00:16:49,330 --> 00:16:50,812
+within another else if.
+
+328
+00:16:51,125 --> 00:16:52,687
+So, that is, I think
+a first
+
+329
+00:16:52,887 --> 00:16:54,375
+or something
+that has been rare.
+
+330
+00:16:54,700 --> 00:16:57,575
+But you will see,
+you can do it like the "for" loops.
+
+331
+00:16:57,775 --> 00:17:00,088
+You can nest these statements
+
+332
+00:17:00,288 --> 00:17:03,288
+however complicated
+you would want to do this.
+
+333
+00:17:03,488 --> 00:17:06,488
+And again, this is why
+the indentation is so important
+
+334
+00:17:06,688 --> 00:17:08,901
+because you can very easily see
+
+335
+00:17:09,101 --> 00:17:13,651
+which curly brackets belong
+to which statement.
+
+336
+00:17:13,851 --> 00:17:16,449
+And the other thing
+you may have been asking
+
+337
+00:17:16,649 --> 00:17:18,324
+yourself is,
+why did not I say
+
+338
+00:17:18,524 --> 00:17:22,953
+if Math_random equals
+or smaller than 0.25
+
+339
+00:17:23,153 --> 00:17:24,263
+and the same here.
+
+340
+00:17:24,463 --> 00:17:26,456
+Well, it is as we did up here.
+
+341
+00:17:26,656 --> 00:17:29,169
+It is because we are testing
+multiple times.
+
+342
+00:17:29,569 --> 00:17:31,554
+We are concretely testing
+twice, namely,
+
+343
+00:17:31,754 --> 00:17:33,324
+here, this is a test.
+
+344
+00:17:33,524 --> 00:17:34,517
+And this is a test.
+
+345
+00:17:35,029 --> 00:17:37,954
+And we have to make sure
+we are testing with the same number.
+
+346
+00:17:38,154 --> 00:17:41,154
+Because if we would just put
+Math_random here and here,
+
+347
+00:17:41,354 --> 00:17:44,079
+these would actually
+be two different random numbers
+
+348
+00:17:44,304 --> 00:17:45,443
+that would be a mistake.
+
+349
+00:17:45,680 --> 00:17:47,740
+We have to test
+with the same number.
+
+350
+00:17:48,003 --> 00:17:49,717
+Up here, it is not an issue
+
+351
+00:17:49,917 --> 00:17:52,054
+because we are only
+having one test
+
+352
+00:17:52,254 --> 00:17:53,105
+nd then the else.
+
+353
+00:17:53,305 --> 00:17:57,261
+So it is fine if we do not store
+this in an intermediary variable.
+
+354
+00:17:57,461 --> 00:17:59,245
+But down here,
+it would.
+
+355
+00:17:59,583 --> 00:18:03,845
+This was the first case,
+and certainly the most complicated.
+
+356
+00:18:05,295 --> 00:18:07,635
+The second last case
+would be that
+
+357
+00:18:07,835 --> 00:18:11,735
+one of them is A2A2, and the other
+one is the hetero-zygote.
+
+358
+00:18:12,048 --> 00:18:16,055
+So basically, it is
+the same situation
+
+359
+00:18:16,255 --> 00:18:17,401
+as this one.
+
+360
+00:18:17,601 --> 00:18:20,601
+Except, this one
+should be A2A2.
+
+361
+00:18:20,801 --> 00:18:23,645
+So, we can copy this,
+I think that is fine.
+
+362
+00:18:23,845 --> 00:18:25,246
+Let us copy this here
+
+363
+00:18:25,446 --> 00:18:27,400
+and put it down here.
+
+364
+00:18:28,313 --> 00:18:30,165
+And what we need to do
+here now,
+
+365
+00:18:30,365 --> 00:18:35,440
+is we need to change the homo-zygote
+A1A1 to A2A2.
+
+366
+00:18:35,640 --> 00:18:37,033
+We need to do this here
+
+367
+00:18:37,233 --> 00:18:39,082
+and we need to do this here.
+
+368
+00:18:40,057 --> 00:18:42,123
+And also, of course,
+the return value
+
+369
+00:18:42,323 --> 00:18:43,561
+needs to be changed.
+
+370
+00:18:43,761 --> 00:18:46,419
+Because we will either, in half
+of the cases, 
+
+371
+00:18:46,619 --> 00:18:48,143
+return the A2A2.
+
+372
+00:18:49,130 --> 00:18:51,788
+or in the other half of the cases,
+the hetero-zygote
+
+373
+00:18:52,575 --> 00:18:55,946
+And then, we have the sixth
+and the final case.
+
+374
+00:18:56,146 --> 00:18:58,683
+So here, we could now
+essentially just say
+
+375
+00:18:58,883 --> 00:19:02,279
+"else", I am going
+to be completely explicit.
+
+376
+00:19:02,479 --> 00:19:04,752
+And I am going to say,
+just so that we know,
+
+377
+00:19:04,952 --> 00:19:09,766
+what we are talking about here,
+else if both of them are A2A2.
+
+378
+00:19:09,966 --> 00:19:21,504
+So else if, P1 equals A2A2,
+and P2 equals A2A2.
+
+379
+00:19:21,704 --> 00:19:24,104
+And again, no need to check
+the (inaudible) situation 
+
+380
+00:19:24,304 --> 00:19:25,726
+because it is identical.
+
+381
+00:19:25,988 --> 00:19:27,668
+They are both the same genotypes.
+
+382
+00:19:27,868 --> 00:19:31,395
+In this case,
+of course, I would simply return
+
+383
+00:19:31,595 --> 00:19:36,257
+an A2A2, because that is the only
+genotype that these parents
+
+384
+00:19:36,457 --> 00:19:37,245
+can generate. 
+
+385
+00:19:37,445 --> 00:19:39,095
+Alright so, this is it! 
+
+386
+00:19:39,295 --> 00:19:40,854
+Mendelian Inheritance
+
+387
+00:19:41,579 --> 00:19:46,127
+granted this is probably the longest
+function that we developed so far
+
+388
+00:19:46,327 --> 00:19:48,350
+and will probably be
+the longest function
+
+389
+00:19:48,613 --> 00:19:51,438
+but you can already see,
+with a bit of nice structuring
+
+390
+00:19:51,638 --> 00:19:54,043
+and very straightforward logic,
+
+391
+00:19:54,243 --> 00:19:56,781
+this is straightforward
+to implement.
+
+392
+00:19:57,143 --> 00:19:59,294
+So now, let us see
+if this actually works
+
+393
+00:19:59,494 --> 00:20:02,494
+and ensure that we have not
+done any typos,
+
+394
+00:20:02,694 --> 00:20:04,023
+What I would like to do now
+
+395
+00:20:04,223 --> 00:20:07,736
+is I would like to output
+the result now
+
+396
+00:20:07,936 --> 00:20:09,599
+of this simulation.
+
+397
+00:20:09,799 --> 00:20:12,803
+So what I am going to do
+if you scroll down here
+
+398
+00:20:13,003 --> 00:20:15,837
+in the run_generation,
+
+399
+00:20:16,037 --> 00:20:21,160
+we had these functions
+that we called here
+
+400
+00:20:21,447 --> 00:20:23,746
+the pick_mating_partner,
+the_get_offspring and so on
+
+401
+00:20:23,946 --> 00:20:26,154
+and then here,we have
+generation counter
+
+402
+00:20:26,354 --> 00:20:29,211
+So it would be nice actually
+here to call a function
+
+403
+00:20:29,411 --> 00:20:32,686
+that will print the data
+of the current generation.
+
+404
+00:20:32,886 --> 00:20:36,731
+So, I am going to call
+this "print_data"
+
+405
+00:20:37,994 --> 00:20:40,426
+print_data,
+and now of course,
+
+406
+00:20:40,788 --> 00:20:42,345
+I have to implement
+this function
+
+407
+00:20:42,545 --> 00:20:44,137
+and I am going
+to do this up here.
+
+408
+00:20:44,337 --> 00:20:48,839
+So,
+function print_data
+
+409
+00:20:52,027 --> 00:20:52,802
+Okay?
+
+410
+00:20:53,614 --> 00:20:56,143
+Now what does this function
+need to do?
+
+411
+00:20:56,581 --> 00:20:59,655
+Recall that
+we have these variables
+
+412
+00:20:59,855 --> 00:21:04,643
+for the A1A1,
+A1A2 and A2A2 genotypes
+
+413
+00:21:05,006 --> 00:21:09,575
+And we can now use these,
+reuse them rather,
+
+414
+00:21:09,775 --> 00:21:11,173
+because already used
+them once,
+
+415
+00:21:11,373 --> 00:21:12,454
+when we set things up.
+
+416
+00:21:13,279 --> 00:21:16,033
+And so here,
+in "print_data"
+
+417
+00:21:16,433 --> 00:21:19,373
+first thing I am going to do
+is I am going to reset those.
+
+418
+00:21:19,848 --> 00:21:20,548
+to zero.
+
+419
+00:21:20,748 --> 00:21:25,525
+A1A1, A1A2 and A2A2,
+
+420
+00:21:25,761 --> 00:21:27,618
+all of them
+are going to be reset to zero.
+
+421
+00:21:27,818 --> 00:21:30,217
+Do not put bar here,
+because that would mean
+
+422
+00:21:30,417 --> 00:21:32,111
+you would create a local variable
+
+423
+00:21:32,311 --> 00:21:34,039
+that is in the scope
+of this function
+
+424
+00:21:34,239 --> 00:21:37,508
+We actually want to override
+the global variables here.
+
+425
+00:21:38,233 --> 00:21:40,097
+And then we are going
+to iterate
+
+426
+00:21:40,297 --> 00:21:43,576
+through the array,
+
+427
+00:21:43,776 --> 00:21:46,239
+using nested for loop.
+
+428
+00:21:46,989 --> 00:21:48,997
+So, for "i" equals zero,
+
+429
+00:21:49,197 --> 00:21:51,161
+This is not very standard,
+
+430
+00:21:51,361 --> 00:21:52,586
+you know this very well.
+
+431
+00:21:53,024 --> 00:21:59,336
+"i" smaller than grid length,
+"i" equals "i+1"
+
+432
+00:22:00,736 --> 00:22:05,424
+And then the exact same thing
+for the second dimension.
+
+433
+00:22:05,624 --> 00:22:09,686
+I am just going to copy this,
+going to replace the "i" with "ii",
+
+434
+00:22:09,886 --> 00:22:12,203
+here, here,
+here and here.
+
+435
+00:22:13,003 --> 00:22:15,403
+And now I am simply
+going to check now 
+
+436
+00:22:15,603 --> 00:22:21,040
+the content, basically,
+of grid [i] [ii] 
+
+437
+00:22:21,240 --> 00:22:24,027
+which is now
+the new generation
+
+438
+00:22:24,440 --> 00:22:25,415
+my genotypes.
+
+439
+00:22:26,302 --> 00:22:28,146
+So, what I am simply
+going to do here
+
+440
+00:22:28,346 --> 00:22:31,346
+I am going to say,
+if this grid here
+
+441
+00:22:31,546 --> 00:22:34,871
+is A1A1, 
+
+442
+00:22:35,071 --> 00:22:40,143
+then, I am going to account
+up by 1.
+
+443
+00:22:40,343 --> 00:22:42,387
+The A1A1 counter obviously.
+
+444
+00:22:42,587 --> 00:22:46,449
+So, A1A1 equals A1A1 plus one.
+
+445
+00:22:50,187 --> 00:22:52,112
+You can already see
+ here
+
+446
+00:22:52,312 --> 00:22:55,311
+quite nicely
+that I forgot to close
+
+447
+00:22:55,511 --> 00:22:57,959
+curly brackets,
+and that is really the benifit
+
+448
+00:22:58,159 --> 00:23:01,200
+this type of inundation.
+
+449
+00:23:01,400 --> 00:23:03,411
+It would be extremely
+easy to miss
+
+450
+00:23:03,611 --> 00:23:05,895
+if did not have that,
+but you can just see here.
+
+451
+00:23:06,095 --> 00:23:08,267
+If you look at this,
+there is a gap here
+
+452
+00:23:08,455 --> 00:23:09,828
+or something is not right.
+
+453
+00:23:10,240 --> 00:23:11,692
+And you can immediately
+see, yup,
+
+454
+00:23:11,892 --> 00:23:16,030
+I did forget to close
+this opening curly bracket here.
+
+455
+00:23:16,230 --> 00:23:18,304
+Okay, let me do this before I continue.
+
+456
+00:23:18,504 --> 00:23:20,929
+Alright, good!
+
+457
+00:23:21,129 --> 00:23:26,096
+So,
+else if it happens to be
+
+458
+00:23:26,296 --> 00:23:31,417
+we can for example,
+check for the A1A2.
+
+459
+00:23:32,655 --> 00:23:36,942
+A1A2,
+okay?
+
+460
+00:23:37,442 --> 00:23:40,278
+Then, of course,
+I am goung to up A1A2
+
+461
+00:23:40,478 --> 00:23:41,360
+counter by 1.
+
+462
+00:23:41,635 --> 00:23:45,247
+So, A1A2 equals
+A1A2 plus one,
+
+463
+00:23:46,135 --> 00:23:50,834
+And finally,
+else, this case,
+
+464
+00:23:51,034 --> 00:23:54,419
+It needs to be
+an A2A2.
+
+465
+00:23:54,619 --> 00:23:55,930
+No other choices.
+
+466
+00:23:57,030 --> 00:23:58,330
+Very good!
+
+467
+00:23:58,530 --> 00:24:00,817
+So now we has this function
+
+468
+00:24:01,504 --> 00:24:03,205
+we calculate all of this,
+
+469
+00:24:03,942 --> 00:24:07,267
+But what we are not counting,
+rather than calculating.
+
+470
+00:24:07,517 --> 00:24:08,647
+We are not printing anything,
+
+471
+00:24:08,897 --> 00:24:10,497
+so, of course,
+we should do that, so here,
+
+472
+00:24:10,697 --> 00:24:13,879
+when I am done with the "for" loop,
+I am going to say,
+
+473
+00:24:14,154 --> 00:24:17,158
+first of all, I need to know
+which generation we are in.
+
+474
+00:24:17,358 --> 00:24:18,769
+So I am simply going to say
+
+475
+00:24:19,744 --> 00:24:22,244
+"generation",
+I am going to use
+
+476
+00:24:22,444 --> 00:24:24,188
+String Concatenation here
+
+477
+00:24:24,388 --> 00:24:25,897
+using the generation counter
+
+478
+00:24:27,759 --> 00:24:31,707
+and then maybe a go on,
+just to be nice.
+
+479
+00:24:33,069 --> 00:24:33,882
+Good!
+
+480
+00:24:34,669 --> 00:24:37,153
+And then,
+another console lock
+
+481
+00:24:37,341 --> 00:24:39,457
+where I am actually outputing
+the data.
+
+482
+00:24:39,845 --> 00:24:41,583
+So I am simply
+going to output
+
+483
+00:24:41,783 --> 00:24:46,358
+A1A1, A1A2
+and A2A2.
+
+484
+00:24:47,433 --> 00:24:49,462
+Alright, so now we save this
+
+485
+00:24:49,662 --> 00:24:51,031
+we got back to the browser,
+
+486
+00:24:51,231 --> 00:24:52,586
+and we see
+if all of this worked.
+
+487
+00:24:52,786 --> 00:24:54,092
+So here we are,
+in the browser.
+
+488
+00:24:54,292 --> 00:24:55,896
+Here is still the (jnaudible).
+
+489
+00:24:56,096 --> 00:24:57,690
+so we are going
+'to reload this
+
+490
+00:24:58,749 --> 00:24:59,986
+and it worked!
+
+491
+00:25:00,186 --> 00:25:01,417
+So, no mistakes,
+
+492
+00:25:02,767 --> 00:25:05,125
+and what you can see here
+
+493
+00:25:05,325 --> 00:25:07,465
+is that we do start.
+
+494
+00:25:07,665 --> 00:25:12,640
+Again, roughly here,
+at Hardy Wineberck with 25%,
+
+495
+00:25:14,440 --> 00:25:15,914
+But as you can see very quickly
+
+496
+00:25:16,114 --> 00:25:18,541
+things seem to be changing
+quite a bit.
+
+497
+00:25:18,741 --> 00:25:21,741
+For example, we have a lot
+of A1A1 here
+
+498
+00:25:21,941 --> 00:25:26,053
+and not as much A1A2 anymore.
+
+499
+00:25:26,566 --> 00:25:28,512
+So let us just reload this
+once again
+
+500
+00:25:29,599 --> 00:25:31,383
+Yup!
+Kind of the same story.
+
+501
+00:25:31,628 --> 00:25:36,828
+So we are losing
+a lot of the A1A2s,
+
+502
+00:25:37,028 --> 00:25:39,796
+over gaining A1A1s and A2A2s
+
+503
+00:25:39,996 --> 00:25:41,807
+So, let us reload this once again.
+
+504
+00:25:42,882 --> 00:25:43,869
+Similar story.
+
+505
+00:25:44,069 --> 00:25:45,633
+So, there seems to be
+a pattern here.
+
+506
+00:25:45,833 --> 00:25:48,833
+Now, it is obviously
+very hard to just look at these
+
+507
+00:25:49,033 --> 00:25:52,783
+values, and then say well,
+I think what is happening here
+
+508
+00:25:53,008 --> 00:25:56,333
+is the following, no,
+we now need to visualize this.
+
+509
+00:25:56,558 --> 00:26:00,446
+That is why we implemented
+a spatial model in the first place
+
+510
+00:26:00,646 --> 00:26:02,564
+so that we can understand
+the process
+
+511
+00:26:02,764 --> 00:26:05,014
+by also looking at this.
+
+512
+00:26:05,239 --> 00:26:06,616
+And this is what
+we will do
+
+513
+00:26:06,816 --> 00:26:07,925
+in the next lectures.
+
+514
+00:26:08,125 --> 00:26:10,240
+We will now take this code, 
+
+515
+00:26:10,440 --> 00:26:14,552
+a generate a very nice
+visual representation
+
+516
+00:26:14,752 --> 00:26:15,877
+of the dynamics here
+
+517
+00:26:16,090 --> 00:26:17,927
+and we will do this
+in the next lecture.
+
+518
+00:26:18,127 --> 00:26:19,116
+Alright, well done!
+
+519
+00:26:19,316 --> 00:26:20,628
+You have essentially
+implemented
+
+520
+00:26:20,828 --> 00:26:23,588
+a full spatial
+stochastic simulation
+
+521
+00:26:23,788 --> 00:26:25,860
+of a Population Generic Process.
+
+522
+00:26:26,060 --> 00:26:29,772
+Now, to put the icing on the cake,
+we are going visualize
+
+523
+00:26:29,972 --> 00:26:31,397
+dynamic of all of this.
+
+524
+00:26:31,622 --> 00:26:32,674
+It will look great
+
+525
+00:26:32,874 --> 00:26:34,149
+and we will do this
+in the next lecture.
+
+526
+00:26:34,349 --> 00:26:35,324
+So I will see you there.
+

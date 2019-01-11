@@ -1,0 +1,175 @@
+In the previous episode, we have seen how to write the main loop, allowing the players to take their turns and play.
+Only missing was the stopping condition.
+Thus, we still need to write something here so that the loop will stop either once a player has won or once the grid is full.
+For now, we will focus on the case where we expect the loop to stop because one of the two players has won.
+To that end, we will simply introduce a new function called "est_ce_gagne"
+(TN: means "is_it_won").
+We will call this functions as follows.
+We will store the result of the "est_ce_gagne" function
+ inside a variable called "gagne"
+(TN: means "won" or "wins").
+This bool-type variable
+"gagne" will receive the return value of the function
+"est_ce_gagne".
+As argument, the "est_ce_gagne" function will receive the grid, and the color of the player who has just played.
+Also, we will need to declare our "gagne" variable.
+Since we will need to use it as the stopping condition, we need to declare "gagne" outiside the loop, that is, somewhere around here.
+Now, we can use the "gagne" variable in our stopping condition.
+This will simply be written like this.
+We will repeat the loop as long as the player has not won.
+We now need to write this "est_ce_gagne" function; this will probably be the trickiest part of our program.
+So, how should we proceed?
+Actually, there are several ways to write this "est_ce_gagne" function.
+The strategy we are offering is the following:
+We will run through the grid row by row and column by column until we encounter a disk which color is the color of the player who has just played.
+Let us say, for example, that the red player has just played.
+This newly-dropped disk is here.
+Now, we will start from this disk and look over the grid in several directions, horizontally, vertically and diagonally.
+Thus, we will count the same-colored disks, starting from this one here.
+If, for example, we consider this direction here, we can count
+1, 2, 3, 4 red disks; the red player has thus won.
+If, on the other hand, we have looked over the whole grid without counting at least
+4 disks, we know that the player has not won.
+By the way, we do not have to consider all the directions.
+Actually, we will only have to count the disks in 4 directions.
+For example, we will choose the Northeast, the East, the Southeast, and the South.
+But why is it possible to consider these 4 directions only?
+We said that we were going to look over the grid line by line and column by column.
+Let' assume once more that the red player has played, the first disk we have found is this one.
+We will now start counting the disks in this direction here; we have only counted one disk, this one.
+Same thing for this direction here and this direction here; there is only one disk in these 3 directions.
+In this direction here, we count
+2 disks, which is still not enough to win.
+We will now keep looking over the grid.
+The next red disk we will find is this one, in this direction here.
+In this direction, we will only count
+2 disks, which is not enough to win. In this direction and this direction here, we will only count one disk: still not enough to win.
+Thus, we will keep looking over the grid until we reach this disk here.
+We will count the disks in this direction here.
+This time, we will count 1, 2, 3, 4 disks; we thus know that the red player has won.
+In order to prove that the red player has indeed aligned 4 disks, we can either start from this disk here, and go in this direction here or start from this disk here and go in this direction here.
+Therefore, we only need to consider one of the two directions.
+And the same goes for the 6 other directions.
+We will only consider this direction here and not this direction here.
+We will consider this direction here and not this one.
+This direction here and not this one.
+Therefore, we only need to consider 4 directions.
+Now, we will need to code this strategy and write the "est_ce_gagne" function.
+Be reminded that we will call the
+"est_ce_gagne" function as follows.
+We will store the return value of the function inside a bool-type variable.
+Also, the function receives the grid and the color of the player who has just played as its two parameters.
+The header of this function will thus be this one here.
+The result will be a bool-type value.
+We will pass the grid by constant reference since the grid does not need to be modified.
+In this "est_ce_gagne" function, the second parameter is a "Couleur"-type variable.
+Our strategy is to look over the grid.
+We will do just do that thanks to two "for loops".
+Since we need the disk coordinates, we will use two "old-style for loops"; these will be written as follows.
+The variables "ligne" et "colonne" will contain the coordinates of the disk from which we will start counting the aligned disks. In order to simplify the writing of this code, we will introduce a local variable called "couleur_case"
+(TN: means "square_color").
+This variable will contain the color of the disk.
+If the square color is the same as the color of the player who has just played, we will count the disks aligned, starting from this square, in the 4 directions we are focusing on.
+Since counting the aligned disks is no easy task, we will introduce a new function called "compte"
+(TN: means "count).
+What arguments does this "compte" function need?
+First of all, of course, the grid.
+Also needed is the square from which we will count the aligned disks; this corresponds simply to the variables "ligne" and "colonne".
+We will also need the direction in which we are counting the disks.
+So, how can we define this direction?
+Let us suppose that we wish to count the disks in the Northeast direction.
+Then, in order to move from one square to the next, we will subtract 1 from the row and add 1 to the column.
+Thus, we will use these variables here: this -1 and this +1 as arguments of the "compte" function.
+This means that we will be counting in the Northeast direction.
+The "compte" function will return the number of same-colored aligned disks.
+We know that if this number of aligned disks is greater or equal to 4, the player has won.
+But why greater or equal to 4 instead of simply 4?
+Of course because we may and can align more than 4 disks.
+Obviously, we will also need to consider the 3 other directions.
+We will thus proceed this way.
+In order to count the disks horizontally, we will not change the "ligne" here, thus using 0 as argument here.
+On the other hand, we will move onto the next column which is why we use the value +1 as the last argument.
+Now to count the disks in the Southweast direction
+In order to move from one square to the next, we will add 1 to the row
+-- thus using the value +1 here-- and we will also add 1 to the column
+-- thus using the value -1 here.
+We still need to deal with the very last direction.
+In order to count disks in the South direction, we will move from one square to the next by adding 1 to the row
+-- thus using the value +1 here -- but the column will not change
+-- thus using the value 0 here.
+If one of these 4 conditions is true, we know that the player has won.
+Since only one of these conditions needs to be true, we used "or" here.
+In this case, our function will return true.
+We here close the previously opened braces.
+Reaching this point of our function, this means that we have looked over the whole grid without ever passing by here.
+Indeed, if we had, we would already have exited the function.
+We therefore know that we were not able to count 4 or more aligned disks; thus, the player has not won, yet.
+The function will thus return false.
+Obviously, we still have to write the "compte" function.
+We are calling this "compte" function here, for example.
+It will return the number of aligned disks which is for sure a non-negative integer, which is why we used the "unsigned int" type in order to define the return type of the function.
+The first parameter of the function is thus the grid, passed, once again, by constant reference.
+The two following parameters are simply the row and the column of the square from which we will start counting the disks.
+The last two parameters of the function are the two values which will define the couting direction.
+These can be positive or negative integers; we will thus use the int type.
+We will call these parameters "dir_ligne" and "dir_colonne" in order to signify that these two values will correspond to the row and column for a given direction.
+We will resort to a variable "compteur" initialized to 0. Its type is the same as the return type of the "compte" function.
+It will keep the count of aligned disks.
+What should the "compte" function do exactly?
+It must start from the square with the coordinates "ligne_depart" and "colonne_depart".
+It must loop over the grid following a given direction as long as it encounters disks which color is the same as the disk located on "ligne_depart" and "colonne_depart".
+How will we do this?
+We will use variables "ligne" and "colonne" which will be initialized to
+"ligne_depart" and "colonne_depart".
+At every loop, in order to move from one square to the next, we will add "dir_ligne" to the variable "ligne" and add "dir_colonne" to the variable "colonne".
+Since we will look over the grid as long as we encounter disks which color is the same as the disk in "ligne_depart" and "colonne_depart" we will use a "while loop".
+At every loop, we will have found a new disk of the selected color and will thus increment the
+"compteur" variable.
+How will we writte all this?
+Well, we will start by declaring the variables "ligne" and colonne" initialized to "ligne_depart" and "colonne_depart".
+As we said, we are using a "while loop" with a stopping condition depending on the color of the disk on "ligne" and "colonne".
+We will keep going as long as the color of this disk is the same as the color of the disk on
+"ligne_depart" and "colonne_depart".
+At every loop we will thus increment the "compteur" variable since we have found a new disk which color is the same as the first one.
+Then, we will add
+"dir_ligne" and "dir_colonne" to "ligne" and "colonne".
+By the way, please note that we haved added blank spaces here and here in order to align the " = " and
+" + " signs on these two lines; this makes the code easier to read and makes it obvious that the variables "ligne" and "colonne" share the same nature.
+When we exit the loop, this means that we have found a disk which color was not the good one.
+We can thus return the value contained in the "compteur" variable.
+However, this is not entierely correct.
+Do you see why?
+At this point, similarly to the "joue" function, if we do not add conditions to our "while loop", the possibility remains that we could exit the "grille" array.
+We will follow the path opened with the alternative version of the "joue" function and use the same solution.
+Namely, we will add a test regarding the variable "ligne", making sure that it remains less than the size of "grille".
+The same goes for the variable "colonne".
+Finally, we will return to our "est_ce_gagne" function and notive that, if the row of the starting square has 0, 1 or 2 as index, there is not need to search in this direction here, for example.
+Indeed, we already know that the player could not possiblity align four disks in this direction here.
+We could align 3 disks at most, if we are starting from the row number 2.
+The same goes if we are starting from the edge of the grid and are counting the disks towards the right or if we are starting from the bottom of the grid and counting the disks downward.
+Therefore, the "est_ce_gagne" function executes more operations than necessary.
+We will thus add conditions preventing the disk counting whenever we are sure 4 disks could not possibly be aligned.
+This will be written as follows:
+We are considering the
+Northeast direction.
+So that at least 4 disks could be aligned, the row needs to be strictly greater than 2.
+Also, the column should not be too big; feel free to check that, in fact, the column must be less than the number of columns minus 4.
+This will be written as follows.
+If we are searching for disks aligned horizontally, we only nest to test the column.
+The test will be the same as before.
+The test for the
+Southeast direction will be written like this.
+This time, we will make sure that that neither the row nor the column are too big.
+In the case where we count the disks in the South direction, we simply need to verify that the row is not too big.
+Now, as you can see, we have introduced several repetitions.
+Indeed, this expression appears here, here and here.
+This expression also appears here.
+In order to avoid this, we will introduce two constants which will contain the values of these expressions.
+This will be written like this.
+We will call our constants "ligne_max" and "colonne_max"
+(TN: means "max_column").
+We will use them wherever the previous expressions were used.
+VoilÃ ! This is now the final version of our
+"est_ce_gagne" and "compte" functions.
+Now, we only need to deal with the situation where the grid becomes full without any player having won.
+This will be the subject of the very last video.

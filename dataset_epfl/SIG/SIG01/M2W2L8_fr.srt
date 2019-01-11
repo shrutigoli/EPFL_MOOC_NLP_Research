@@ -1,0 +1,2239 @@
+1
+00:00:22,689 --> 00:00:25,516
+Cette leçon va donc porter
+sur les bases de données NoSQL
+
+2
+00:00:25,716 --> 00:00:28,926
+qui sont une vaste famille
+
+3
+00:00:29,126 --> 00:00:32,099
+regroupant un grand nombre
+de types de base de données différentes
+
+4
+00:00:32,299 --> 00:00:37,101
+et qui se distinguent des bases
+de données relationnelles classiques
+
+5
+00:00:37,301 --> 00:00:38,773
+que nous avons vu jusqu'à présent
+
+6
+00:00:38,973 --> 00:00:42,237
+par le fait qu'à l'origine
+elles n'implémentaient pas
+
+7
+00:00:42,437 --> 00:00:43,364
+le langage SQL.
+
+8
+00:00:43,564 --> 00:00:46,118
+Donc la logique de stockage
+de l'information
+
+9
+00:00:46,318 --> 00:00:47,175
+est un peu différente
+
+10
+00:00:47,375 --> 00:00:49,570
+et les règles d'utilisation
+également.
+
+11
+00:00:49,770 --> 00:00:51,337
+Nous aborderons toutes ces questions
+
+12
+00:00:51,537 --> 00:00:52,749
+au cours de la leçon.
+
+13
+00:00:52,949 --> 00:00:55,093
+L'objectif de cette leçon
+
+14
+00:00:55,293 --> 00:00:57,824
+est donc de compléter un petit peu
+ce que nous avons appris
+
+15
+00:00:58,024 --> 00:00:59,190
+des bases de données relationnelles
+
+16
+00:00:59,390 --> 00:01:00,879
+en ouvrant le champ
+
+17
+00:01:01,079 --> 00:01:03,732
+à l'exploration des bases
+de données NoSQL
+
+18
+00:01:03,932 --> 00:01:05,967
+et peut-être plus particulièrement
+
+19
+00:01:06,167 --> 00:01:07,173
+à l'une d'entre elles
+
+20
+00:01:07,373 --> 00:01:09,106
+qui est la base de données Mongo.
+
+21
+00:01:10,040 --> 00:01:11,238
+Au terme de cette leçon
+
+22
+00:01:11,438 --> 00:01:13,197
+vous devriez être
+en mesure d'expliquer
+
+23
+00:01:13,397 --> 00:01:16,138
+en quoi le monde NoSQL
+
+24
+00:01:16,338 --> 00:01:19,131
+se différencie du monde des bases
+de données relationnelles
+
+25
+00:01:19,331 --> 00:01:23,358
+et vous devriez être capable
+d'utiliser un petit peu
+
+26
+00:01:23,558 --> 00:01:25,502
+une de ces bases de données.
+
+27
+00:01:26,932 --> 00:01:28,960
+Dans cette leçon
+nous parlerons tout d'abord
+
+28
+00:01:29,160 --> 00:01:31,268
+des origines du NoSQL
+
+29
+00:01:31,468 --> 00:01:33,302
+puis nous passerons en revue
+
+30
+00:01:33,502 --> 00:01:35,814
+les différents types de bases
+de données NoSQL
+
+31
+00:01:36,014 --> 00:01:37,488
+et les systèmes de gestion
+de bases de données
+
+32
+00:01:37,688 --> 00:01:38,492
+qui leur sont associés
+
+33
+00:01:38,692 --> 00:01:41,189
+avant de concentrer notre attention
+
+34
+00:01:41,389 --> 00:01:42,322
+plus particulièrement
+
+35
+00:01:42,522 --> 00:01:44,277
+sur MongoDB
+
+36
+00:01:44,477 --> 00:01:47,829
+qui est un type de base
+de données NoSQL.
+
+37
+00:01:48,029 --> 00:01:50,878
+Et pour terminer, nous verrons
+
+38
+00:01:51,078 --> 00:01:54,028
+comment les fonctions CRUD
+
+39
+00:01:54,228 --> 00:01:56,991
+donc Create, Read, Update, Delete,
+
+40
+00:01:57,191 --> 00:02:00,556
+sont implémentées
+dans un système comme MongoDB.
+
+41
+00:02:07,421 --> 00:02:09,226
+Nous avons vu dans la leçon
+
+42
+00:02:09,426 --> 00:02:11,275
+portant sur les bases de données
+relationnelles
+
+43
+00:02:11,475 --> 00:02:14,030
+que ce type de base de données
+stocke les données
+
+44
+00:02:14,230 --> 00:02:17,059
+dans des tables
+dont les colonnes ont des types
+
+45
+00:02:17,259 --> 00:02:18,243
+bien définis,
+
+46
+00:02:18,443 --> 00:02:21,314
+que ces tables peuvent être
+liées entre elles
+
+47
+00:02:21,514 --> 00:02:22,723
+par des relations,
+
+48
+00:02:22,923 --> 00:02:25,641
+que l'interrogation des données
+
+49
+00:02:25,841 --> 00:02:28,580
+repose sur un langage standardisé,
+
+50
+00:02:28,780 --> 00:02:29,574
+le SQL,
+
+51
+00:02:29,774 --> 00:02:32,526
+et finalement que les transactions
+
+52
+00:02:32,726 --> 00:02:33,679
+effectuées dans ces tables
+
+53
+00:02:33,879 --> 00:02:36,606
+répondent en général
+aux principes ACID
+
+54
+00:02:36,806 --> 00:02:41,773
+à savoir atomicité, cohérence,
+isolation et durabilité.
+
+55
+00:02:41,973 --> 00:02:46,878
+Atomicité signifiant que toutes
+les modifications d'une transaction
+
+56
+00:02:47,078 --> 00:02:48,840
+doivent être effectuées avec succès,
+
+57
+00:02:49,040 --> 00:02:51,635
+faute de quoi l'ensemble
+de ces modifications
+
+58
+00:02:51,835 --> 00:02:52,935
+doit être invalidé.
+
+59
+00:02:53,135 --> 00:02:55,589
+Cohérence, qu'une transaction 
+n'est validée
+
+60
+00:02:55,789 --> 00:02:57,803
+que si toutes les règles
+en vigueur sont respectées
+
+61
+00:02:58,003 --> 00:02:59,137
+sur le type de données,
+
+62
+00:02:59,337 --> 00:03:00,523
+sur les contraintes, les primaires,
+
+63
+00:03:00,723 --> 00:03:02,730
+les valeurs nulles,
+possibles ou pas, etc.
+
+64
+00:03:03,892 --> 00:03:06,234
+Isolation signifie
+que l'exécution simultanée
+
+65
+00:03:06,434 --> 00:03:08,567
+de deux transactions est équivalente
+
+66
+00:03:08,767 --> 00:03:10,683
+à leur exécution séquentielle
+
+67
+00:03:10,883 --> 00:03:13,724
+donc une transaction n'affecte pas
+l'autre transaction
+
+68
+00:03:13,924 --> 00:03:17,279
+et la durabilité signifie
+qu'après validation
+
+69
+00:03:17,479 --> 00:03:19,096
+les données sont enregistrées
+de manière durable,
+
+70
+00:03:19,296 --> 00:03:22,130
+indépendamment d'erreurs, de crash
+ou d'autres dysfonctionnements
+
+71
+00:03:22,330 --> 00:03:23,161
+qui peuvent survenir.
+
+72
+00:03:24,806 --> 00:03:26,736
+La seconde génération web
+a vu apparaître
+
+73
+00:03:26,936 --> 00:03:30,968
+des services qui gèrent
+de très gros volumes de données
+
+74
+00:03:31,168 --> 00:03:33,815
+comme Google, Amazon, Facebook,
+LinkedIn, etc
+
+75
+00:03:34,015 --> 00:03:40,431
+et qui doivent faire face à de brusques
+afflux de traffic ponctuels.
+
+76
+00:03:40,631 --> 00:03:43,500
+Afflux de traffic signifie
+généralement
+
+77
+00:03:43,700 --> 00:03:45,186
+diminution du temps de réponse,
+
+78
+00:03:45,386 --> 00:03:47,214
+diminution de l'enthousiasme
+des utilisateurs
+
+79
+00:03:47,414 --> 00:03:48,669
+et perte de rentabilité,
+
+80
+00:03:48,869 --> 00:03:50,633
+d'où la nécessité de maintenir
+
+81
+00:03:50,833 --> 00:03:52,309
+les fonctionnalités
+et les performances
+
+82
+00:03:52,509 --> 00:03:53,615
+en cas de forte demande,
+
+83
+00:03:53,815 --> 00:03:56,643
+caractéristique qu'on appelle
+la scalabilité
+
+84
+00:03:56,843 --> 00:03:57,918
+ou l'évolutivité.
+
+85
+00:03:59,187 --> 00:04:01,378
+Ce maintien des fonctionnalités
+et des performances
+
+86
+00:04:01,578 --> 00:04:03,440
+peut être obtenu
+par accroissement de puissance
+
+87
+00:04:03,640 --> 00:04:06,110
+et on parle alors
+de scalabilité verticale
+
+88
+00:04:06,310 --> 00:04:09,343
+ou par démultiplication des noeuds
+
+89
+00:04:09,543 --> 00:04:10,825
+et distribution des services
+
+90
+00:04:11,025 --> 00:04:12,114
+sur les noeuds du réseau
+
+91
+00:04:12,314 --> 00:04:14,936
+et on parle alors
+de scalabilité horizontale.
+
+92
+00:04:16,158 --> 00:04:18,843
+Un meilleur ajustement des logiciels
+aux types de données gérées
+
+93
+00:04:19,043 --> 00:04:21,405
+permet également d'accélérer
+
+94
+00:04:21,605 --> 00:04:22,444
+le traitement des données
+
+95
+00:04:22,644 --> 00:04:24,445
+et de maintenir la performance.
+
+96
+00:04:25,632 --> 00:04:28,295
+On voit donc que les bases
+de données NoSQL
+
+97
+00:04:28,495 --> 00:04:30,574
+regroupent un ensemble
+d'alternatives
+
+98
+00:04:30,774 --> 00:04:32,096
+aux bases de données relationnelles
+
+99
+00:04:32,296 --> 00:04:35,410
+qui ont été développées
+dès la fin des années 90
+
+100
+00:04:35,610 --> 00:04:38,419
+pour répondre au besoin
+de maintien des performances
+
+101
+00:04:38,619 --> 00:04:41,222
+de certain gros acteurs du web
+
+102
+00:04:41,422 --> 00:04:43,436
+qui gèrent de très grosses
+bases de données,
+
+103
+00:04:43,636 --> 00:04:47,334
+de complexité faible à modérée.
+
+104
+00:04:47,534 --> 00:04:53,877
+Les principales caractéristiques
+des bases de données NoSQL
+
+105
+00:04:54,077 --> 00:04:58,114
+se trouvent tout d'abord dans la forme
+de stockage des données
+
+106
+00:04:58,314 --> 00:05:01,816
+qui diffère pas mal
+de ce à quoi on est habitué
+
+107
+00:05:02,016 --> 00:05:03,691
+dans le monde des bases
+de données relationnelles
+
+108
+00:05:03,891 --> 00:05:06,482
+dans le fait de ne pas fournir,
+
+109
+00:05:06,682 --> 00:05:07,391
+en tout cas à l'origine,
+
+110
+00:05:07,591 --> 00:05:10,080
+d'implémentation du langage SQL,
+
+111
+00:05:10,280 --> 00:05:14,327
+dans le fait
+de ne pas apporter de support
+
+112
+00:05:14,527 --> 00:05:15,518
+aux jointures,
+
+113
+00:05:15,718 --> 00:05:17,271
+donc on ne peut pas
+faire de jointure
+
+114
+00:05:17,471 --> 00:05:19,021
+dans les bases de données NoSQL,
+
+115
+00:05:19,221 --> 00:05:23,222
+de fonctionner en système distribué,
+
+116
+00:05:23,422 --> 00:05:25,400
+c'est-à-dire de distribuer
+les données
+
+117
+00:05:25,600 --> 00:05:27,808
+sur plusieurs serveurs
+
+118
+00:05:28,008 --> 00:05:33,404
+et finalement une tendance
+à ne pas implémenter
+
+119
+00:05:33,604 --> 00:05:35,626
+les principes ACID.
+
+120
+00:05:37,255 --> 00:05:40,013
+Le principe
+de la scalabilité horizontale,
+
+121
+00:05:40,213 --> 00:05:44,468
+et donc de vouloir distribuer
+le service ou les données
+
+122
+00:05:44,668 --> 00:05:46,678
+sur les nombreuses machines
+
+123
+00:05:46,878 --> 00:05:48,295
+constituant un réseau,
+
+124
+00:05:48,495 --> 00:05:50,328
+donc sur un ensemble de noeuds,
+
+125
+00:05:50,528 --> 00:05:55,709
+conduit tout droit à ce théorème
+dit "théorème CAP"
+
+126
+00:05:55,909 --> 00:06:01,422
+qui stipule que seul 2 des 3 critères
+de cohérence de disponibilité
+
+127
+00:06:01,622 --> 00:06:03,746
+et de tolérance au partitionnement
+
+128
+00:06:03,946 --> 00:06:05,958
+peuvent être satisfaits
+simultanément.
+
+129
+00:06:06,158 --> 00:06:10,123
+Cohérence signifiant
+que tous les noeuds d'un système
+
+130
+00:06:10,323 --> 00:06:12,312
+voient exactement les mêmes données
+au même moment.
+
+131
+00:06:12,512 --> 00:06:16,424
+Disponibilité que chaque fois
+que l'on envoie une requête
+
+132
+00:06:16,624 --> 00:06:18,298
+vers l'un des noeuds du système
+
+133
+00:06:18,498 --> 00:06:20,488
+on est certain de recevoir
+une réponse
+
+134
+00:06:20,688 --> 00:06:23,022
+soit en terme de succès
+
+135
+00:06:23,222 --> 00:06:24,224
+ou d'échec de la requête
+
+136
+00:06:24,424 --> 00:06:25,576
+mais on reçoit une réponse.
+
+137
+00:06:26,800 --> 00:06:28,898
+La notion de tolérance
+au partitionnement
+
+138
+00:06:29,098 --> 00:06:31,587
+qui exprime l'idée
+
+139
+00:06:31,787 --> 00:06:34,097
+que dans un système distribué
+
+140
+00:06:34,297 --> 00:06:37,046
+il arrive fréquemment
+que les différents noeuds
+
+141
+00:06:37,246 --> 00:06:38,611
+puissent être isolés
+les uns des autres
+
+142
+00:06:38,811 --> 00:06:41,036
+soit parce qu'un noeud
+ne fonctionne plus,
+
+143
+00:06:41,236 --> 00:06:44,548
+il a été victime d'un crash,
+
+144
+00:06:44,748 --> 00:06:47,417
+une coupure de courant,
+des ruptures de communication,
+
+145
+00:06:47,617 --> 00:06:49,343
+la communication ne passe plus, etc.
+
+146
+00:06:50,055 --> 00:06:52,097
+Dans le cas des systèmes NoSQL
+
+147
+00:06:52,297 --> 00:06:55,860
+où l'on essaye de répartir
+la charge et l'information
+
+148
+00:06:56,060 --> 00:06:58,387
+sur les nombreux noeuds d'un réseau,
+
+149
+00:06:58,587 --> 00:07:02,257
+le partitionnement est une réalité,
+
+150
+00:07:02,457 --> 00:07:05,067
+si bien qu'en fait il faut choisir
+
+151
+00:07:05,267 --> 00:07:08,435
+de privilégier la cohérence
+ou la disponibilité.
+
+152
+00:07:08,635 --> 00:07:10,287
+Dans le premier cas
+
+153
+00:07:10,487 --> 00:07:11,818
+les systèmes que l'on appelle "CP",
+
+154
+00:07:12,018 --> 00:07:14,426
+donc plutôt
+cohérence partitionnement,
+
+155
+00:07:14,626 --> 00:07:19,050
+cela signifie que l'on attend
+une synchronisation des noeuds
+
+156
+00:07:19,250 --> 00:07:21,649
+avant d'assurer la réponse
+
+157
+00:07:21,849 --> 00:07:23,872
+avec le risque d'avoir
+de temps en temps
+
+158
+00:07:24,072 --> 00:07:26,662
+des timeout ou des erreurs,
+
+159
+00:07:26,862 --> 00:07:27,825
+des messages d'erreur,
+
+160
+00:07:28,025 --> 00:07:30,937
+et donc le critère de disponibilité
+n'est pas respecté.
+
+161
+00:07:31,137 --> 00:07:34,832
+Ou alors on va vers des solutions AP,
+
+162
+00:07:35,032 --> 00:07:37,424
+donc où on privilégie
+la disponibilité.
+
+163
+00:07:37,624 --> 00:07:40,346
+Dans ce cas-là
+le noeud que l'on interroge
+
+164
+00:07:40,546 --> 00:07:42,747
+va renvoyer la dernière 
+version disponible
+
+165
+00:07:42,947 --> 00:07:45,325
+d'une donnée au niveau d'un noeud,
+
+166
+00:07:45,525 --> 00:07:47,340
+ce qui veut dire que l'on accepte
+
+167
+00:07:47,540 --> 00:07:50,080
+que tous les noeuds puissent
+ne pas toujours être à jour
+
+168
+00:07:50,280 --> 00:07:53,663
+et des fois renvoyer
+des valeurs différentes.
+
+169
+00:07:53,863 --> 00:07:56,305
+Après, toute la question est de savoir
+
+170
+00:07:56,505 --> 00:07:59,379
+quelle est la durée
+de mise à jour tolérable.
+
+171
+00:08:00,178 --> 00:08:03,008
+On voit que les bases
+de données relationnelles,
+
+172
+00:08:03,208 --> 00:08:05,088
+qui de par leur nature même,
+
+173
+00:08:05,288 --> 00:08:08,130
+de par l'existence
+de relations entre les tables,
+
+174
+00:08:08,330 --> 00:08:12,344
+se prêtent mal
+à une distribution des données
+
+175
+00:08:12,544 --> 00:08:14,020
+sur plusieurs machines différentes,
+
+176
+00:08:14,220 --> 00:08:19,138
+se trouvent en général
+dans le registre CA,
+
+177
+00:08:19,338 --> 00:08:21,186
+donc cohérence-disponibilité,
+
+178
+00:08:21,386 --> 00:08:27,016
+mais ne se prêtent pas du tout
+à une scalabilité horizontale
+
+179
+00:08:27,216 --> 00:08:29,598
+par répartition sur un réseau.
+
+180
+00:08:39,660 --> 00:08:40,999
+Si l'on regarde d'un peu plus près
+
+181
+00:08:41,199 --> 00:08:42,929
+le monde des bases de données NoSQL
+
+182
+00:08:43,129 --> 00:08:45,414
+on s'aperçoit qu'on peut distinguer
+
+183
+00:08:45,614 --> 00:08:48,979
+quatre grandes familles
+de bases de données NoSQL
+
+184
+00:08:49,179 --> 00:08:53,098
+qui se distinguent par la manière
+dont elles stockent l'information.
+
+185
+00:08:53,298 --> 00:08:55,403
+La première de ces familles
+
+186
+00:08:55,603 --> 00:08:57,982
+est constituée par les bases
+de données de type clé-valeur
+
+187
+00:08:58,182 --> 00:09:00,894
+qui sont donc basées
+sur des dictionnaires
+
+188
+00:09:01,094 --> 00:09:03,477
+permettant d'accéder
+à la valeur d'un objet
+
+189
+00:09:03,677 --> 00:09:05,716
+par l'intermédiaire d'une clé
+qui doit être unique.
+
+190
+00:09:05,916 --> 00:09:07,921
+Comme exemple, on peut voir ici
+
+191
+00:09:08,121 --> 00:09:10,569
+que la clé peut être représentée
+par un prénom,
+
+192
+00:09:10,769 --> 00:09:11,821
+Pierre ou Henri,
+
+193
+00:09:12,021 --> 00:09:13,517
+qui donne accès
+à une série de valeurs,
+
+194
+00:09:13,717 --> 00:09:18,067
+le type l'activité, l'âge, le type
+d'activité sportive, etc.
+
+195
+00:09:18,267 --> 00:09:21,036
+Les principaux systèmes de gestion
+de bases de données
+
+196
+00:09:21,236 --> 00:09:23,564
+qui implémentent ce type clé-valeur
+
+197
+00:09:23,764 --> 00:09:25,780
+sont Redis et Voldemort
+
+198
+00:09:25,980 --> 00:09:27,698
+qui a été développé par LinkedIn
+
+199
+00:09:27,898 --> 00:09:29,097
+pour gérer ses bases de données.
+
+200
+00:09:30,068 --> 00:09:32,576
+Le second type de base
+de données NoSQL
+
+201
+00:09:32,776 --> 00:09:34,283
+est le type orienté colonne
+
+202
+00:09:34,483 --> 00:09:38,509
+qui s'apparente un petit peu
+au modèle relationnel
+
+203
+00:09:38,709 --> 00:09:43,510
+puisque les données peuvent être
+représentées par des tables.
+
+204
+00:09:43,710 --> 00:09:46,981
+Simplement, le stockage
+est organisé par colonnes
+
+205
+00:09:47,181 --> 00:09:49,480
+sur une base clé-valeur
+
+206
+00:09:49,680 --> 00:09:51,228
+où l'on associe pour chaque colonne
+
+207
+00:09:51,428 --> 00:09:56,381
+la clé avec la valeur de cette clé
+dans cette colonne.
+
+208
+00:09:56,581 --> 00:09:58,906
+L'avantage de ce système
+est de permettre
+
+209
+00:09:59,106 --> 00:10:01,429
+une gestion très dynamique
+
+210
+00:10:01,629 --> 00:10:04,047
+d'un nombre très élevé de colonnes.
+
+211
+00:10:04,871 --> 00:10:07,226
+Les principaux systèmes
+de gestion de base de données
+
+212
+00:10:07,426 --> 00:10:12,471
+qui implémentent ce modèle sont
+Cassandra, Hbase, BigTable et Vertica.
+
+213
+00:10:14,092 --> 00:10:16,108
+Le troisième type de base
+de données NoSQL
+
+214
+00:10:16,308 --> 00:10:17,992
+que l'on appelle "orienté document"
+
+215
+00:10:18,192 --> 00:10:21,111
+repose également
+sur un paradigme clé-valeur
+
+216
+00:10:21,311 --> 00:10:24,235
+en associant à la clé des documents
+
+217
+00:10:24,435 --> 00:10:28,393
+qui sont de type JSON ou XML.
+
+218
+00:10:28,593 --> 00:10:30,902
+Donc on a ici toujours
+le même exemple
+
+219
+00:10:31,102 --> 00:10:31,963
+de Pierre et de Henri
+
+220
+00:10:32,163 --> 00:10:34,379
+avec étudiant 1 et étudiant 2
+
+221
+00:10:34,579 --> 00:10:35,634
+qui sont les clés
+
+222
+00:10:35,834 --> 00:10:39,418
+et derrière une syntaxe JSON
+
+223
+00:10:39,618 --> 00:10:42,083
+qui donne les attributs de l'objet.
+
+224
+00:10:42,708 --> 00:10:46,115
+Les systèmes de gestion de bases
+de données qui implémentent ce modèle
+
+225
+00:10:46,315 --> 00:10:50,940
+sont principalement
+CouchDB, SimpleDB et MongoDB.
+
+226
+00:10:52,847 --> 00:10:57,470
+Et finalement, les bases de données
+NoSQL de type "orienté graphe"
+
+227
+00:10:57,670 --> 00:10:59,819
+qui se basent
+sur la théorie des graphes,
+
+228
+00:11:00,019 --> 00:11:02,171
+sur les notions de noeud,
+de relation et de propriété
+
+229
+00:11:02,371 --> 00:11:06,138
+pour stocker l'information,
+
+230
+00:11:06,338 --> 00:11:08,630
+ici relative aux étudiants
+Pierre et Henri.
+
+231
+00:11:08,830 --> 00:11:14,390
+Le principal, et seul quasiment,
+système de gestion de bases de données,
+
+232
+00:11:14,590 --> 00:11:16,174
+le seul système un peu abouti,
+
+233
+00:11:16,374 --> 00:11:17,800
+est Neo4J.
+
+234
+00:11:18,000 --> 00:11:21,900
+Dans cette figure qui reprend
+les idées du théorème CAP
+
+235
+00:11:22,100 --> 00:11:25,989
+on a représenté les différents types
+
+236
+00:11:26,189 --> 00:11:27,516
+de système de gestion
+de bases de données
+
+237
+00:11:27,716 --> 00:11:30,372
+en fonction de leurs caractéristiques,
+
+238
+00:11:30,572 --> 00:11:33,668
+de leur positionnement
+dans ce diagramme
+
+239
+00:11:33,868 --> 00:11:36,366
+en représentant en rouge-orangé
+
+240
+00:11:36,566 --> 00:11:39,132
+les systèmes de gestion de bases
+de données relationnelles,
+
+241
+00:11:39,332 --> 00:11:41,303
+notamment Postgres, MySQL, etc.
+
+242
+00:11:41,503 --> 00:11:44,606
+Les systèmes en vert,
+
+243
+00:11:44,806 --> 00:11:45,964
+de type clé-valeur,
+
+244
+00:11:46,164 --> 00:11:47,642
+comme Voldemort et Redis.
+
+245
+00:11:47,842 --> 00:11:50,507
+Les systèmes orientés
+colonne en jaune,
+
+246
+00:11:50,707 --> 00:11:53,748
+avec Cassandra du côté CP,
+
+247
+00:11:53,948 --> 00:11:55,808
+HBase et BigTable du côté AP.
+
+248
+00:11:56,008 --> 00:11:57,321
+Et finalement en bleu
+
+249
+00:11:57,521 --> 00:12:00,872
+les systèmes SGBD orientés document
+
+250
+00:12:01,072 --> 00:12:03,803
+où l'on voit que MongoDB
+
+251
+00:12:04,003 --> 00:12:08,563
+est un système
+qui est du côté de la disponibilité
+
+252
+00:12:08,763 --> 00:12:12,613
+alors que ses alter-egos,
+SimpleBD et CouchDB,
+
+253
+00:12:12,813 --> 00:12:14,681
+sont plutôt du côté de la cohérence.
+
+254
+00:12:24,717 --> 00:12:27,231
+MongoDB est donc une base
+de données NoSQL libre
+
+255
+00:12:27,431 --> 00:12:28,675
+de type orienté document.
+
+256
+00:12:28,875 --> 00:12:31,657
+Dans cette base de données
+
+257
+00:12:31,857 --> 00:12:34,618
+la notion de table qu'on avait dans
+les bases de données relationnelles
+
+258
+00:12:34,818 --> 00:12:36,496
+est remplacée
+par la notion de collection.
+
+259
+00:12:36,696 --> 00:12:43,083
+On a donc ici l'exemple de la table
+Postgres des hôtels des Seychelles.
+
+260
+00:12:43,283 --> 00:12:48,053
+Si on regarde comment
+ces données sont gérées dans Mongo
+
+261
+00:12:48,253 --> 00:12:50,720
+on a ici un interface utilisateur
+
+262
+00:12:50,920 --> 00:12:53,055
+qui permet de voir 
+cette collection d'objets,
+
+263
+00:12:53,255 --> 00:12:54,533
+donc les hôtels,
+
+264
+00:12:54,733 --> 00:12:57,518
+124 objets dans la collection
+
+265
+00:12:57,718 --> 00:13:01,287
+et puis pour chaque objet
+
+266
+00:13:01,487 --> 00:13:03,770
+une structure arborescente
+
+267
+00:13:03,970 --> 00:13:07,026
+identifiant le type d'objet,
+la collection de ses propriétés,
+
+268
+00:13:07,226 --> 00:13:09,275
+la géométrie
+et dans la géométrie
+
+269
+00:13:09,475 --> 00:13:10,024
+les coordonnées.
+
+270
+00:13:10,224 --> 00:13:13,095
+Cette représentation arborescente
+
+271
+00:13:13,295 --> 00:13:16,512
+peut être transformée
+en une représentation au format JSON
+
+272
+00:13:16,712 --> 00:13:19,037
+où l'on retrouve
+cette idée de collection
+
+273
+00:13:19,237 --> 00:13:22,870
+dans la syntaxe
+propre au format JSON.
+
+274
+00:13:23,070 --> 00:13:26,513
+Elle peut également être représentée
+dans une vue tabulaire
+
+275
+00:13:26,713 --> 00:13:30,315
+simplement
+avec des étages successifs
+
+276
+00:13:30,515 --> 00:13:35,905
+que l'on peut parcourir
+pour accéder aux coordonnées
+
+277
+00:13:36,105 --> 00:13:38,218
+ou aux propriétés des objets.
+
+278
+00:13:41,952 --> 00:13:44,487
+Second élément important
+la notion de schéma de données
+
+279
+00:13:44,687 --> 00:13:47,516
+qui, dans une base de données
+relationnelle,
+
+280
+00:13:47,716 --> 00:13:48,769
+est très importante.
+
+281
+00:13:48,969 --> 00:13:50,845
+Elle est incontournable.
+
+282
+00:13:51,045 --> 00:13:54,572
+Dans un système comme Mongo
+
+283
+00:13:54,772 --> 00:13:57,201
+on est libre de stocker les données
+absolument comme on veut
+
+284
+00:13:57,401 --> 00:13:59,276
+de mettre tout ce qu'on veut
+dans une collection.
+
+285
+00:13:59,476 --> 00:14:02,962
+Par contre, si l'on veut
+pouvoir utiliser les données
+
+286
+00:14:03,162 --> 00:14:04,587
+stockées dans une base
+de données Mongo
+
+287
+00:14:04,787 --> 00:14:06,666
+pour représenter
+des objets dans une carte
+
+288
+00:14:06,866 --> 00:14:10,260
+on a intérêt à ce que ces objets
+suivent une certaine structure
+
+289
+00:14:10,460 --> 00:14:13,327
+pour retrouver les coordonnées
+du point
+
+290
+00:14:13,527 --> 00:14:14,785
+et les propriétés de l'objet.
+
+291
+00:14:14,985 --> 00:14:18,262
+La meilleure manière
+de retrouver cette structure
+
+292
+00:14:18,462 --> 00:14:22,262
+c'est de stocker au départ des objets
+qui ont cette structure.
+
+293
+00:14:22,462 --> 00:14:24,136
+En d'autres termes,
+
+294
+00:14:24,336 --> 00:14:26,829
+la base de données Mongo
+n'est pas contraignante
+
+295
+00:14:27,029 --> 00:14:29,129
+du point de vue
+schématisation des données
+
+296
+00:14:29,329 --> 00:14:32,730
+par contre
+de négliger la schématisation
+
+297
+00:14:32,930 --> 00:14:34,734
+rend la vie
+beaucoup plus compliquée.
+
+298
+00:14:35,917 --> 00:14:37,767
+Dénormalisation et jointure.
+
+299
+00:14:37,967 --> 00:14:40,720
+Dans un système de base
+de données relationnelle,
+
+300
+00:14:40,920 --> 00:14:42,846
+lorsqu'on veut ajouter
+un élément d'information,
+
+301
+00:14:43,046 --> 00:14:45,269
+comme dans le cas
+des hôtels des Seychelles,
+
+302
+00:14:45,469 --> 00:14:47,170
+si l'on souhaite ajouter
+l'information
+
+303
+00:14:47,370 --> 00:14:49,480
+relative aux propriétaires
+de ces hôtels,
+
+304
+00:14:49,680 --> 00:14:53,893
+comme plusieurs hôtels
+peuvent avoir le même propriétaire
+
+305
+00:14:54,093 --> 00:14:56,060
+pour éviter la redondance de données
+
+306
+00:14:56,260 --> 00:14:58,509
+on créerait une table séparée
+indirecte
+
+307
+00:14:58,709 --> 00:15:00,863
+qui recense les propriétaires
+
+308
+00:15:01,063 --> 00:15:02,930
+et on ajouterait
+dans la table d'origine
+
+309
+00:15:03,130 --> 00:15:05,437
+une colonne avec l'identifiant
+des propriétaires.
+
+310
+00:15:06,894 --> 00:15:09,511
+On établirait ainsi une jointure
+entre ces deux tables.
+
+311
+00:15:09,711 --> 00:15:12,330
+Ce processus de séparation
+de données
+
+312
+00:15:12,530 --> 00:15:15,335
+c'est ce qu'on appelle, dans le monde
+des bases de données relationnelles,
+
+313
+00:15:15,547 --> 00:15:16,344
+la normalisation.
+
+314
+00:15:16,956 --> 00:15:19,381
+Notons au passage
+que l'une des faiblesses
+
+315
+00:15:19,581 --> 00:15:20,428
+du monde relationnel,
+
+316
+00:15:20,628 --> 00:15:24,659
+qui a déjà été évoquée
+lorsqu'on a présenté ce domaine,
+
+317
+00:15:24,859 --> 00:15:27,727
+la difficulté qu'il y aurait ici
+
+318
+00:15:27,927 --> 00:15:29,034
+à stocker l'information 
+
+319
+00:15:29,234 --> 00:15:31,160
+dans le cas où un hôtel
+aurait plusieurs propriétaires.
+
+320
+00:15:32,034 --> 00:15:34,196
+Dans le cas de Mongo
+on pourrait bien entendu
+
+321
+00:15:34,396 --> 00:15:36,197
+procéder d'une manière analogue
+
+322
+00:15:36,397 --> 00:15:40,191
+en ajoutant dans le document JSON
+
+323
+00:15:40,391 --> 00:15:42,247
+un champ ID du propriétaire
+
+324
+00:15:42,447 --> 00:15:46,509
+et puis en ayant une liste
+toujours au format JSON
+
+325
+00:15:46,709 --> 00:15:48,437
+de propriétaires avec leurs adresses.
+
+326
+00:15:48,637 --> 00:15:50,045
+Notons au passage
+
+327
+00:15:50,245 --> 00:15:52,366
+que la syntaxe JSON
+
+328
+00:15:52,566 --> 00:15:55,546
+permet facilement
+de représenter le cas
+
+329
+00:15:55,746 --> 00:15:56,714
+de plusieurs propriétaires.
+
+330
+00:15:56,914 --> 00:15:59,032
+En réalité, dans le monde NoSQL
+
+331
+00:15:59,232 --> 00:16:00,622
+comme on n'implémente pas
+les jointures
+
+332
+00:16:00,822 --> 00:16:03,655
+on préfère lister explicitement
+
+333
+00:16:03,855 --> 00:16:07,374
+les éléments d'information
+liés au propriétaire,
+
+334
+00:16:07,574 --> 00:16:10,007
+quitte à vivre
+avec une certaine redondance.
+
+335
+00:16:10,207 --> 00:16:13,510
+C'est pour cette raison
+que les systèmes NoSQL
+
+336
+00:16:13,710 --> 00:16:14,970
+se prêtent particulièrement bien
+
+337
+00:16:15,170 --> 00:16:17,414
+à gérer des grands volumes
+de données
+
+338
+00:16:17,614 --> 00:16:19,847
+mais des données
+qui ont une faible complexité
+
+339
+00:16:20,047 --> 00:16:22,930
+avec peu de relations tabulaires.
+
+340
+00:16:23,130 --> 00:16:25,460
+Dans le cas où on a des systèmes
+de données complexes
+
+341
+00:16:25,660 --> 00:16:27,988
+avec des tables qui sont liées
+les unes aux autres,
+
+342
+00:16:28,188 --> 00:16:32,515
+le système de base de données
+relationnelle reste plus intéressant
+
+343
+00:16:32,715 --> 00:16:34,067
+en général.
+
+344
+00:16:43,630 --> 00:16:45,780
+Pour terminer
+nous allons voir quelques exemples
+
+345
+00:16:45,980 --> 00:16:48,835
+d'implémentation
+des fonctions de base
+
+346
+00:16:49,035 --> 00:16:50,499
+des bases de données.
+
+347
+00:16:50,699 --> 00:16:53,488
+Donc les fonctions de création,
+de lecture,
+
+348
+00:16:53,688 --> 00:16:56,288
+de mise à jour
+et de suppression de données
+
+349
+00:16:56,488 --> 00:16:59,676
+que l'on regroupe
+sous l'acronyme CRUD.
+
+350
+00:16:59,876 --> 00:17:02,178
+On commence
+avec l'insertion de données,
+
+351
+00:17:02,378 --> 00:17:03,922
+on va systématiquement comparer
+
+352
+00:17:04,122 --> 00:17:10,143
+la syntaxe SQL avec la syntaxe
+que l'on retrouve dans Mongo.
+
+353
+00:17:10,343 --> 00:17:15,352
+Dans le SQL, l'introduction
+d'un nouveau jeu de données
+
+354
+00:17:15,552 --> 00:17:16,516
+dans la table des hôtels
+
+355
+00:17:16,716 --> 00:17:18,980
+implique les mots-clés INSERT INTO,
+
+356
+00:17:19,180 --> 00:17:21,031
+la liste des colonnes
+
+357
+00:17:21,231 --> 00:17:23,998
+et puis la liste des valeurs
+correspondant à ces colonnes.
+
+358
+00:17:25,106 --> 00:17:26,098
+Dans le cas de Mongo
+
+359
+00:17:26,298 --> 00:17:27,791
+on a quelque chose
+d'un peu équivalent
+
+360
+00:17:27,991 --> 00:17:30,671
+avec simplement les mots-clés DB
+
+361
+00:17:30,871 --> 00:17:32,483
+qui réfèrent à la base
+de données en cours,
+
+362
+00:17:32,683 --> 00:17:35,439
+hôtels c'est la collection visée
+
+363
+00:17:35,639 --> 00:17:38,782
+et on insère dans cette collection
+un nouvel objet
+
+364
+00:17:38,982 --> 00:17:40,929
+qui a trois attributs
+
+365
+00:17:41,129 --> 00:17:43,195
+le nom, le nombre de chambre,
+le nombre de lit et le statut
+
+366
+00:17:43,395 --> 00:17:45,946
+avec les valeurs de ces 4 attributs.
+
+367
+00:17:46,146 --> 00:17:48,169
+Mise à jour de données.
+
+368
+00:17:48,369 --> 00:17:51,201
+Dans le cas SQL, le mot-clé UPDATE,
+
+369
+00:17:51,401 --> 00:17:52,388
+la table hôtels
+
+370
+00:17:52,588 --> 00:17:54,148
+et puis le mot-clé SET,
+
+371
+00:17:54,348 --> 00:17:57,885
+la variable que l'on souhaite changer,
+
+372
+00:17:58,085 --> 00:18:00,903
+donc la variable chambre qui passe à 6
+
+373
+00:18:01,103 --> 00:18:03,860
+et la clause conditionnelle
+
+374
+00:18:04,060 --> 00:18:09,242
+pour identifier l'hôtel sur lequel
+le nombre de chambres a augmenté à 6.
+
+375
+00:18:09,442 --> 00:18:11,509
+L'équivalent du côté Mongo
+
+376
+00:18:11,709 --> 00:18:14,305
+avec le mot-clé UPDATE également
+
+377
+00:18:14,505 --> 00:18:16,033
+qui s'applique
+sur la collection hôtels
+
+378
+00:18:16,233 --> 00:18:20,732
+et puis simplement
+la référence à l'objet
+
+379
+00:18:20,932 --> 00:18:21,829
+qui va changer,
+
+380
+00:18:22,029 --> 00:18:23,918
+donc on va rechercher des objets
+
+381
+00:18:24,118 --> 00:18:25,583
+dont le nom correspond
+à "beach bungalows"
+
+382
+00:18:25,783 --> 00:18:27,893
+et on va appliquer un set
+
+383
+00:18:28,093 --> 00:18:29,220
+sur la variable chambre
+
+384
+00:18:29,420 --> 00:18:30,288
+qui prend la valeur 6.
+
+385
+00:18:30,488 --> 00:18:34,425
+Donc dans l'esprit, quelque chose
+d'assez similaire au langage SQL.
+
+386
+00:18:34,625 --> 00:18:37,151
+Pour la suppression de données
+
+387
+00:18:37,351 --> 00:18:40,060
+le DELETE FROM du langage SQL,
+
+388
+00:18:40,260 --> 00:18:41,979
+suivi du nom de la table
+
+389
+00:18:42,179 --> 00:18:44,196
+et puis de la clause conditionnelle
+
+390
+00:18:44,396 --> 00:18:49,140
+que l'on retrouve
+à peu près à l'identique
+
+391
+00:18:49,340 --> 00:18:51,368
+dans Mongo avec la fonction REMOVE
+
+392
+00:18:51,568 --> 00:18:53,213
+appliquée à la collection hôtels,
+
+393
+00:18:53,413 --> 00:18:54,840
+on supprime le document
+
+394
+00:18:55,040 --> 00:19:00,265
+qui a pour attribut-nom
+"beach bungalows".
+
+395
+00:19:01,325 --> 00:19:03,288
+Enfin quelques exemples de requêtes
+
+396
+00:19:03,488 --> 00:19:04,336
+plus générales
+
+397
+00:19:04,536 --> 00:19:07,844
+à commencer par la requête
+de sélection des hôtels
+
+398
+00:19:08,044 --> 00:19:10,824
+dont le nombre de chambres 
+est supérieur à 10.
+
+399
+00:19:11,024 --> 00:19:14,034
+Dans le SQL, SELECT FROM classique
+
+400
+00:19:14,234 --> 00:19:15,651
+avec une clause conditionnelle.
+
+401
+00:19:15,851 --> 00:19:18,838
+Dans Mongo
+on retrouve le mot-clé FIND
+
+402
+00:19:19,038 --> 00:19:20,763
+qui permet de rechercher des objets.
+
+403
+00:19:20,963 --> 00:19:22,787
+Le critère de recherche
+
+404
+00:19:22,987 --> 00:19:23,788
+dans la première ligne,
+
+405
+00:19:23,988 --> 00:19:25,988
+le champ chambre
+
+406
+00:19:26,188 --> 00:19:29,447
+et puis l'opérateur "plus grand que"
+
+407
+00:19:29,647 --> 00:19:33,338
+caractérisé par l'esperluette
+qui précède le mot-clé GT
+
+408
+00:19:33,538 --> 00:19:35,437
+et puis le critère 10
+
+409
+00:19:35,637 --> 00:19:37,252
+et dans la deuxième ligne
+
+410
+00:19:37,452 --> 00:19:39,755
+les choses
+que l'on souhaite renvoyer
+
+411
+00:19:39,955 --> 00:19:42,676
+comme l'identifiant de l'objet
+est renvoyé par défaut,
+
+412
+00:19:42,876 --> 00:19:44,792
+on doit mettre un zéro
+
+413
+00:19:44,992 --> 00:19:47,154
+si on ne veut pas avoir
+l'identifiant
+
+414
+00:19:47,354 --> 00:19:50,189
+et puis un 1 pour renvoyer le nom.
+
+415
+00:19:50,389 --> 00:19:52,538
+Donc c'est 0, 1, true, false.
+
+416
+00:19:53,000 --> 00:19:56,600
+Un second exemple
+de requête basique similaire,
+
+417
+00:19:56,800 --> 00:20:02,022
+donc compter le nombre d'objets
+renvoyés par la requête de sélection 
+
+418
+00:20:02,235 --> 00:20:05,107
+des hôtels dont le nombre
+de chambres est supérieur à 10
+
+419
+00:20:05,307 --> 00:20:07,848
+avec quelque chose
+d'assez équivalent
+
+420
+00:20:08,048 --> 00:20:09,616
+dans Mongo, une fonction "count"
+
+421
+00:20:09,816 --> 00:20:11,821
+appliquée à la collection des hôtels
+
+422
+00:20:12,021 --> 00:20:14,922
+et portant sur le fait
+que les chambres...
+
+423
+00:20:15,122 --> 00:20:17,133
+le nombre de chambre est égal à 10.
+
+424
+00:20:17,333 --> 00:20:20,130
+Dernier exemple de requête
+
+425
+00:20:20,330 --> 00:20:21,234
+un peu plus élaboré
+
+426
+00:20:21,434 --> 00:20:23,853
+où l'on cherche à lister
+
+427
+00:20:24,053 --> 00:20:29,502
+le nombre d'hôtels
+qu'il y a pour chaque statut.
+
+428
+00:20:29,702 --> 00:20:30,776
+Dans le SQL
+
+429
+00:20:30,976 --> 00:20:34,551
+une requête classique
+avec un groupement par statut
+
+430
+00:20:34,751 --> 00:20:38,287
+et on compte dans chaque statut
+le nombre de candidat.
+
+431
+00:20:38,487 --> 00:20:40,934
+Dans le cas de MongoDB
+
+432
+00:20:41,134 --> 00:20:43,943
+on utilise le mot-clé
+la fonction d'agrégation
+
+433
+00:20:44,143 --> 00:20:46,085
+portant sur la collection des hôtels
+
+434
+00:20:46,285 --> 00:20:50,299
+avec comme règle de groupement
+le statut
+
+435
+00:20:50,499 --> 00:20:54,855
+et comme règle de calcul la somme.
+
+436
+00:20:55,055 --> 00:20:57,525
+Ces quelques exemples montrent donc
+
+437
+00:20:57,725 --> 00:21:00,982
+que dans un logiciel NoSQL
+comme Mongo
+
+438
+00:21:01,182 --> 00:21:03,318
+qui n'implémente pas le langage SQL
+
+439
+00:21:03,518 --> 00:21:07,093
+on dispose quand même
+d'un langage de requête
+
+440
+00:21:07,293 --> 00:21:09,218
+qui permet d'interroger les données
+
+441
+00:21:09,418 --> 00:21:10,374
+de manière efficace.
+
+442
+00:21:10,574 --> 00:21:13,391
+Langage qui est d'ailleurs
+implémenté
+
+443
+00:21:13,591 --> 00:21:15,345
+dans l'interface graphique.
+
+444
+00:21:15,995 --> 00:21:18,368
+Mais avant de passer
+à l'interface graphique
+
+445
+00:21:18,568 --> 00:21:21,891
+regardons déjà comment se présentent
+les choses en ligne de commande
+
+446
+00:21:22,091 --> 00:21:25,546
+qui est quand même
+le mode d'utilisation initial
+
+447
+00:21:25,746 --> 00:21:26,916
+et principal de Mongo.
+
+448
+00:21:27,116 --> 00:21:30,400
+Avec la commande Mongo
+
+449
+00:21:30,600 --> 00:21:32,622
+on accède au shell de Mongo,
+
+450
+00:21:32,822 --> 00:21:35,234
+USE SEYCHELLES pour dire
+qu'on veut utiliser
+
+451
+00:21:35,434 --> 00:21:36,403
+la base de données Seychelles
+
+452
+00:21:36,603 --> 00:21:37,916
+qui va s'appeler maintenant DB
+
+453
+00:21:38,116 --> 00:21:42,020
+et DB HOTELS, donc en référence 
+la collection des hôtels
+
+454
+00:21:42,220 --> 00:21:43,810
+et on cherche le premier objet
+de la collection
+
+455
+00:21:44,010 --> 00:21:46,207
+qui est l'hôtel Beach Bungalow,
+
+456
+00:21:46,407 --> 00:21:48,231
+donc affiché en format JSON.
+
+457
+00:21:50,014 --> 00:21:53,178
+Dans le cas d'un interface
+utilisateur graphique
+
+458
+00:21:53,378 --> 00:21:54,499
+un peu plus élaboré
+
+459
+00:21:54,699 --> 00:21:58,425
+on a un petit outil
+de création de requête,
+
+460
+00:21:58,625 --> 00:22:02,645
+on peut par exemple
+glisser le champ nom
+
+461
+00:22:02,845 --> 00:22:07,922
+et rechercher tous les hôtels
+
+462
+00:22:08,122 --> 00:22:09,745
+dont le nom commence par B 
+
+463
+00:22:09,945 --> 00:22:14,708
+et on en trouve
+toute une série habituelle.
+
+464
+00:22:20,318 --> 00:22:20,929
+Voilà.
+
+465
+00:22:31,861 --> 00:22:32,619
+Dans cette leçon
+
+466
+00:22:32,819 --> 00:22:34,584
+nous avons donc exploré un petit peu
+
+467
+00:22:34,784 --> 00:22:36,880
+le monde des bases de données NoSQL.
+
+468
+00:22:37,080 --> 00:22:40,046
+Nous avons notamment vu
+un petit peu pour quelles raisons
+
+469
+00:22:40,246 --> 00:22:43,240
+ces bases de données
+avaient été développées
+
+470
+00:22:43,440 --> 00:22:45,454
+comme alternative
+au modèle relationnel.
+
+471
+00:22:45,654 --> 00:22:49,237
+Nous avons vu qu'il existait
+quatre types principaux
+
+472
+00:22:49,437 --> 00:22:50,871
+de bases de données NoSQL
+
+473
+00:22:51,071 --> 00:22:54,612
+caractérisées par la manière dont elles
+gèrent le stockage de l'information.
+
+474
+00:22:54,812 --> 00:22:57,602
+Nous avons ensuite approfondi
+un petit peu
+
+475
+00:22:57,802 --> 00:23:00,842
+les caractéristiques de MongoDB,
+
+476
+00:23:01,042 --> 00:23:05,681
+qui est une base de données de type
+orienté document.
+
+477
+00:23:05,881 --> 00:23:09,158
+Nous avons vu comment
+la donnée était gérée,
+
+478
+00:23:09,358 --> 00:23:12,341
+comment on gère la schématisation,
+la structuration de l'information.
+
+479
+00:23:12,541 --> 00:23:15,922
+Nous avons vu comment
+on gère les jointures
+
+480
+00:23:16,122 --> 00:23:17,005
+et ce genre de choses.
+
+481
+00:23:17,205 --> 00:23:18,351
+Et pour conclure
+
+482
+00:23:18,551 --> 00:23:20,009
+nous avons pris quelques exemples
+
+483
+00:23:20,209 --> 00:23:22,982
+de l'implémentation
+des fonctionnalités principales
+
+484
+00:23:23,182 --> 00:23:25,980
+d'interrogation de données,
+
+485
+00:23:26,180 --> 00:23:27,322
+d'insertion de données,
+
+486
+00:23:27,522 --> 00:23:28,256
+de mise à jour,
+
+487
+00:23:28,456 --> 00:23:29,580
+de requête,
+
+488
+00:23:29,780 --> 00:23:33,109
+en comparant la syntaxe du monde SQL
+
+489
+00:23:33,309 --> 00:23:36,224
+avec la syntaxe utilisée
+dans un logiciel comme Mongo
+
+490
+00:23:36,424 --> 00:23:38,023
+pour arriver à la conclusion
+
+491
+00:23:38,223 --> 00:23:42,223
+que, même si dans la forme
+les choses sont assez différentes,
+
+492
+00:23:42,423 --> 00:23:45,139
+dans l'esprit
+on fait assez facilement
+
+493
+00:23:45,339 --> 00:23:46,417
+le passage de l'un à l'autre.
+
+494
+00:23:47,834 --> 00:23:50,616
+Voilà, c'était donc 
+la dernière leçon
+
+495
+00:23:50,816 --> 00:23:53,335
+de cette première partie du cours.
+
+496
+00:23:53,535 --> 00:23:57,393
+J'en profite pour féliciter
+à l'avance
+
+497
+00:23:57,593 --> 00:24:00,455
+tous ceux d'entre vous
+qui m'auront suivi jusque-là.
+
+498
+00:24:01,616 --> 00:24:02,963
+Bravo.
+

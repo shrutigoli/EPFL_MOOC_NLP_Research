@@ -1,0 +1,112 @@
+In this episode, we will see how polymorphism complements abstraction very well and how it allows us to better define classes on an abstract level.
+But first, let's go over a few reminders on polymorphism.
+"Subtype polymorphism", to be precise,
+[TN: sometimes a.k.a. "inclusion polymorphism" or "dynamic polymorphism"] refers to the fact that instances of a subclass, which can substitute for instances of the superclass, keep their own properties instead of being considered as having the properties of the superclass especially with regards to their behavior, that is, the methods to be invoked will be determined at runtime depending on the actual nature of the instances involved.
+The definition may seem complicated but the principle is actually quite simple.
+For example, if I have a general class called "Personnage" (TN: means "Character") with a subclass "Voleur" (TN: means "Thief"): a thief is indeed a character.
+We also have "Magicien", "Guerrier",
+(TN: "Magician", "Warrior"), etc.
+Magicians, warriors and thieves, even if they are all characters, will be able to behave as different instances, for example when they meet.
+For example, if a thief meets another character he might steal from him; if a warrior meets another character, he might hit him, etc.
+So for example if I have a character "p1" who meets a character "p2", the "rencontrer" method here will adapt to the real nature of the instance "p1" and will thus meet "p2" as a thief if "p1" is a "Thief", as a magician if "p1" is a "Magician", or as a warrior if "p1" is a "Warrior".
+And remember that to have polymorphism you need inheritance to have this general class with regards to which the methods will adapt depending on the specific subclasses.
+Inheritance thus, but also dynamic binding.
+Remember, too, that dynamic binding consists in calling the right method depending on the instance.
+So to go back to an example from a previous episode, imagine that we organize a meet-up between a warrior and a thief.
+This method here organizes a meeting between two characters taken as arguments and displays a message and calls the "rencontrer" method of character 'a', which is the first argument received here, with character 'b', received as the second argument here.
+And dynamic binding will ensure that when we meet a warrior 'g' as the parameter 'a', it is the "rencontrer" method of the warrior ("Guerrier") which will, dynamically, during the execution of this piece of code, check that 'a' is a warrior to call the "rencontrer" method of the "Guerrier" class and not the "rencontrer" method of the "Personnage" class, despite the fact that 'a' is described as a "Personnage" here,
+If we called the "rencontrer" method of the "Personnage" class which would be a static binding depending only on what is written statically, whereas what happens in Java is dynamic binding where we will call the "rencontrer" method of the instance which is passed.
+We look at what the instance is: it is a "Guerrier" (warrior), so here we will call the "rencontrer" method of the "Guerrier" class.
+That's it for reminders.
+Let's now see how these ingredients, how polymorphism, will allow us to better specify our programs at a more abstract level by introducing this notion of abstract classes and abstract methods.
+Let's start by presenting the problem that these abstract methods address.
+At the highest level of a hierarchy, we don't necessarily know how to define a method which we know will exist for all the subclasses
+For example, if we imagine a very general class representing nondescript, closed geometric shapes,
+Then, in this class it will be quite difficult to define how to calculate its surface area.
+Calculating the surface area of a nondescript geometric figure is certainly something that is hard to define, we wouldn't really know how to do it.
+However, we know that for all closed figures, for example circles, which are closed figures, we know that for each specific closed figure we should be able to defined a "surface" method.
+So, we imagine that in all of these closed geometric figures, we will have a "surface" method, even if we don't know how to define it at the most abstract level.
+And yet, to push the problem a little further yet, we can even imagine that this
+"surface" method would be used at the highest level, for example to calculate the volume occupied by a surface over a given height.
+This volume would depend on the height and on the geometric figure and would be defined as the product of the height multiplied by the surface of the close figure.
+So we could even call this method without knowing how we would define it at the highest level.
+It would be defined for all the actual cases of closed figures.
+The correct way of doing this, of coding a method which we know must exist but which we do not necessarily know how to define at the superclass level, is to introduce the method as an "abstract method".
+Let's illustrate once more this concept of "abstract methods" using another example; so, let's go back to character games, where we have warriors, who are characters [inheritance], magicians, who also are characters [inheritance], thieves, etc.
+The class "Jeu" (TN: means "game") would of course contain several characters, here we decided to put them in a dynamic array of characters.
+And imagine that in the game, we wish to display the whole set of characters.
+So of course, we would write a loop iterating over the set of characters, this "persos" array here.
+And for each of these characters, we would display this very character.
+The problem is, how do we display a generic character?
+We don't know how to display a generic character.
+We certainly know how to display a warrior, we certainly know how to display a magician or a thief.
+So each of the specialized subclasses knows how it should be displayed but at the general level of a character, we don't necessarily know how to display it.
+However, we know that we need to.
+Here, at the very general level of the game, we know we will need to display characters.
+So how do we do this?
+Of course, if we do nothing at the level of the "Personnage" class, if we don't define the "afficher" method
+(TN: means "display")  in "Personnage" then the code "afficher" in
+"Jeu" will not compile since we are calling the "afficher" method of a "Personnage" and the compiler would not know what to do
+Thus, it would throw an error.
+So, in order to be able to write this at the global level of the game, we must define an "afficher" method in each "Personnage" class.
+Moreover, we would like to impose to each of the subclasses, to warriors and magicians, to display themselves with their own "afficher" method.
+We would like them to have a specific method and we would like for this specific method to be called when we make a general call here at the game level.
+Basically, we want to force the subclasses to have a specific method and we want this method to be polymorphic.
+But how do we do this if we don't know, suppose that we don't know how to display a generic character?
+Moreover, how do we impose the fact that this "afficher" method must be redefined?
+How do we force its re-definition in the subclasses?
+First solution for the first problem: how to define the display for a generic character.
+One way would be to have some arbitrarily-defined method, for example, suppose that here, arbitrarily, we define that the display for a generic character is no display at all.
+This solution is a really, really bad idea because first, it is a bad model of reality, characters should not be displayed as nothing so it doesn't correspond to anything, the display is incorrect. And on top of that, the display would be incorrect if a subclass were to forget to redefine the method, so we would have some characters that would not be displayed, phantom characters, and this would be rather inconvenient for the game.
+What's more, this solution does not address the second problem, it does not force the subclasses to redefine their own "afficher" methods.
+The only good solution is thus to signal that the "afficher" method must exist and must be redefined in each of the subclasses
+This is known as an "abstract method".
+So you have a second example, which, I hope, allows you to understand the point of having abstract methods such as this one, defined at the level of superclasses, of abstract classes.
+Now, let's see how this is actually written in Java.
+To have an abstract method in Java, we simply prepend the reserved keyword
+"abstract" to its header and we simply end this header with a semicolon ( ; ) without writing a body, without giving it any definition because abstract methods don't have a definition in the class in which they were introduced.
+They simply serve to impose to the subclasses which we do not want to define as being abstract
+-- we will come back to this in a moment -- that they should redefine this inherited abstract method.
+And these methods must be contained within an abstract class, and again we will come back to this in a moment, and an abstract class is a class which also has the "abstract" keyword in its header.
+So for example here, we want the "Personnage" class to be an abstract class so we will add the "abstract" keyword to the header like so, at the beginning of the class header and it will contain an abstract method, such as the method 
+"abstract afficher" here.
+If we go back to our example with the closed figures, remember that the idea was to have closed figures to define a "surface" method.
+But we do not know how to define this "surface" method in a general way at the level of the "FigureFermee" class and so this "surface" method becomes an abstract method and the  "FigureFermee" class becomes an abstract class and we imagine that we will have concrete subclasses defining closed figures such as a circle, for example.
+Since the "FigureFermee" is an abstract class, we add the "abstract" keyword here.
+The class contains two methods we added another abstract one here.
+So we have the "surface" method we were talking about earlier on in our example to which we added the "abstract" keyword, and we could also imagine that we will have a "perimetre" method which would return the perimeter of a closed figure and which we do not know how to define in a general way at the level of the closed figures, so it is also an abstract method.
+Remember that you can use, in an abstract class, an abstract method within a non-abstract method.
+So for example here, calculating the volume generated by the surface of the closed figure over a certain height passed as a parameter here would consist in calculating the product of the height and the value returned by the abstract method "surface".
+This is quite possible.
+So an abstract class, qualified by the keyword "abstract" at the beginning of its header:
+"abstract class something", is a class that cannot be instantiated and that contains at least one abstract method.
+This is why it is known as an abstract class, because we cannot create an instance of it
+So for example, if I wanted to write "FigureFermee" to declare an instance of a closed figure, e.g " fig = new ... " followed by a FigureFermee constructor,
+I would not be able to do this, the compiler would prevent me from doing so since "FigureFermee" is an abstract class, meaning that I cannot create an instance of it.
+And subclasses of an abstract class stay abstract as long as they haven't redefined all of its abstract methods.
+That is, they remain abstract as long as at least one inherited abstract class hasn't been defined.
+Let's take an example, the example of the game with its characters, where "Personnage" is an abstract class which contains an abstract method
+"afficher".
+"Guerrier" is a subclass of
+"Personnage".
+Imagine that "Guerrier" forgets to redefine the abstract method
+"afficher" from "Personnage".
+If I do the following: so, if I create a game and I try to add a new warrior to the game, if "Guerrier" has forgotten to redefine the abstract method from "Personnage" then "Guerrier" is also an abstract class and I will not be able to create an instance of it, of this abstract class "Personnage".
+If I try to do this, I will get the message:
+"Guerrier is abstract; cannot be instantiated".
+I cannot create an instance of the abstract class "Guerrier" which is still abstract since it did not redefine the "afficher" method.
+If I take a second example on the closed figures, let's imagine that we still have this abstract class "FigureFermee" with its abstract methods "surface" and ...
+"perimetre", which is also abstract, and suppose that we define a class like so, "Cercle" [TN: means "Circle"], inheriting from "FigureFermee".
+This "Cercle" class redefines the "surface" method here concretely, in a non-abstract way, for example, Pi times the radius squared and it also redefines the "perimetre" method concretely.
+It has thus redefined both abstract methods inherited from its abstract superclass
+"FigureFermee" and so this "Cercle" class is no longer an abstract class, we are able to create instances of "Cercle".
+This is now possible because the "Cercle" class is no longer abstract.
+However, let's imagine a "Polygone" class also inheriting from the "FigureFermee" class but which redefines only the perimeter, for example, supposing that we calculate the perimeter of a polygon as being the sum of the lengths of its sides.
+So we know perfectly well how to define this but we would not necessarily know how to define in a general way the surface of a polygon, and so the "Polygon" class would only redefine the abstract method "perimetre" but would not redefine the abstract method "surface".
+And so to "Polygone" class would remain an abstract class.
+I would not be able to create any instance of "Polygone".
+This is impossible because
+"Polygone" is an abstract class since it doesn't redefine the abstract method "surface".
+By the way, there is something missing here to make the code for "Polygone" correct -- do you know what it is?
+There, this concludes this episode on abstract methods and abstract classes.
+The next episode will focus on different aspects of polymorphism, constructors, the "Object" superclass, etc.

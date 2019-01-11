@@ -1,0 +1,65 @@
+In this video, we discuss snapshot isolation which is yet another formalism for achieving a notion of concurrency control.
+Before we go there, however, let's look at transaction support in standard SQL-92.
+Inside there, we actually have four different, so-called, isolation levels.
+Which you can actually pick and choose when you start a transaction.
+And they have names, they are called: read uncommitted, read committed, repeatable reads, and serializable.
+And they are subsequently stronger and stronger, up to serializable, which is meant to guarantee serializability in the way that we have defined it.
+They can be characterized, or classified by which anomalies they avoid, and you can see that the weakest, the uncommitted, avoids none of these three classic anomalies, dirty reads, unrepeatable reads, and phantom problem, while serializability, it does all of them.
+There is however a problem, in a sense that is, the classical standard defines, essentially, serializability via an implementation.
+Which is based on locking.
+That means if you choose to try to achieve another implementation using different techniques, you might be wrong.
+And this has actually happened in real, popular database systems.
+Particularly, snapshot isolation is a technique that is meant to achieve serializability, but actually does not.
+This was not always clear.
+However, it is actually used and implemented in major database systems like Oracle, 
+Microsoft SQL Server, and Postgres.
+So if you studied transaction in Oracle for example, and you set isolation level to serializable, you do no guarantee serializability.
+And there anomalies that can still happen.
+However, that is called serializable in these systems.
+There is actually a patch that somewhat gracefully allows us to modify snapshot isolation into something that actually guarantees serializability.
+And that has recently been implemented in Postgres.
+So nowadays, different from earlier versions, when you use Postgres, and you use serializable isolation level, you really guarantee serializability.
+By default.
+You can still turn it off, and get the old notion of serializability.
+So how does snapshot isolation work?
+Conceptually, a transaction works on a copy made by the transaction at start time.
+So in that sense, it is like multi-level concurrency control, conceptually, and it's like optimistic concurrency control.
+Of course, in practice, you don't want to implement copying of the entire database, by really copying it, but what you want to do is, you want to have a multi-version concurrency control style scheme where you only copy objects that are getting modified.
+And this method, of course, guarantees that reads in a transaction see a consistent version of the database.
+Namely, the consistent version of the database at the time the transaction started.
+By "consistency," I'm a bit sloppy, because, as I said, conceptually, we think of consistency only being guaranteed by serializability which is not guaranteed by snapshot isolation.
+So of course, in a sense, snapshot isolation can corrupt our database, and then we don't see, after, all the transactions that have been committed, and we start a new one, a consistent version of the database.
+But let's ignore this.
+Let's assume there are no transactions yet.
+The database is consistent by the field,
+And now we populate the database, and we only, in that transaction, see the database as copied, or as modified by us.
+Other modifications work on different copies, and don't affect what we see in our transaction.
+Now, committing is only allowed if there is no updates of this transaction that conflict with updates made since the start of the snapshot.
+That means by other transactions.
+And that can, of course, be verified by something like write sets, as in optimistic concurrency control.
+Now, unfortunately, this does not guarantee serializability, and here's a COUNT example.
+And this kind of COUNT example is called a write skew anomaly.
+So here we've got two transactions:
+T1 and T2.
+And T1 reads A, and T2 reads B.
+Then T1 writes B, and T2 writes A.
+These two transactions have no overlap in their write sets.
+That means the condition that is required by snapshot isolation is actually ensured, and these two transactions are allowed to commit.
+However, there is no equivalency of the schedule.
+That's a problem, of course.
+In a sense, snapshot isolation is related to optimistic concurrency control, in that, conceptually, snapshots are created at transaction start time, and there is an analysis phase.
+Which, a bit like in optimistic concurrency control, looks at what has happened, and then decides whether the transaction can actually commit or not.
+And if it commits, it conceptually writes, at the time of the commit, the data back into the database.
+From its copy.
+In a different way, different sense, it's also similar to multi-version concurrency control.
+And you can think of multi-version concurrency control as a way of implementing snapshot isolation.
+Or a weakened version of multi-version concurrency control where write-read conflicts are not properly caught, is someway that corresponds to snapshot isolation.
+But, of course, in snapshot isolation, we don't have to maintain a read and write time stamp, which is basically the reason, arguably, why one might say, you could use snapshot isolation.
+Another argument would be that people were not aware that snapshot isolation doesn't guarantee serializability, when they chose to implement it.
+So it's important to understand that snapshot isolation does not use locks a priori.
+So you mustn't equate concurrency control with locking in databases.
+There is techniques, and they absolutely don't use locking.
+However, that said, there is systems that use snapshot isolation, nevertheless, have locks for other reasons.
+For example, for supporting distributed database transactions.
+So it's important to understand snapshot isolation, because it has its pitfalls.
+It doesn't guarantee serializability, and it's actually, essentially, the dominating method in real-world database systems.

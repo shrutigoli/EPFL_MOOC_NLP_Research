@@ -1,0 +1,321 @@
+Welcome back,
+Nature, In Code.
+We are in Chapter 5, Lecture 5.
+We just finished the implementation of choosing Mating Partners.
+Now what we need to do is we need to implement
+The Production of Offspring. and we will do this, of course, the way it works in nature, which is by Mendelian inheritance.
+Alright, so here we are, back in our code.
+This was the pick Mating Partner function that we looked at in the last lecture.
+We implemented it here.
+And now, the only remaining function that is not implemented is this get_offspring function.
+So, this get_offspring function takes two individuals namely, the focal individual, the current individual, that lives on grid (i,ii), and the Mating Partner, that we just selected.
+And by the way, the way it is implemented at the moment is that, this can indeed be the same individual this would be called Selfing.
+It is not unusual actually in nature
+It should be relatively straightforward for you to change this in the pick_mating_partner function
+If you wanted to avoid the i, ii is relatively identical to j, jj.
+But we are not going to do that, because in terms of biology not much would change anyways.
+But we need to implement this get_offspring function now so that when we pass it to parent genotypes, we get an appropriate offspring genotype that we then put here on the temp_grid.
+So how do we do this?
+Well, the answer is Mendelian Inheritance.
+So, to understand
+Mendelian Inheritance, we have to go back
+150 years roughly to Austria and to a monk by the name of Mendel. who discovered
+The Laws of Genetic Inheritance.
+And the first law of Mendel states that the alleles segregate during deformation of gametes and each parent passes on one allele  to the offspring individual. and this, of course, is nothing new for us.
+We have assumed this all along but we are now making it more explicit in this lecture because we have to implement this explicitly in an individual based fashion.
+Okay, there are essentially six combinations six distinct combinations.
+And you could swap parent 1 and parent 2, if you wanted to it makes no difference.
+But the six combinations are the following.
+Either both are homo-zygotes of the same type.
+So, for example, A1A1 one parent, and A1A1 the other parent, or, A2A2 one parent and A2A2 the other parent.
+Or, one of them is a homo-zygote but the other is a hetero-zygote.
+So, we have here, for example
+A1A1 and the hetero-zygote, or A2A2, and the hetero-zygote.
+They could both be homo-zygotes but of different types.
+So, one is A1A1 and the other is A2A2.
+Or finally, they could both be hetero-zygotes.
+So, both are A1A2.
+And now, each of them will create the corresponding gametes and then pass on one of the alleles into the offspring.
+So, we get these different combinations.
+So if all of them, if both parents are A1A1 then obviously all the gametes are going to be A1A1.
+And then, there is a 100% probability that the offspring will be A1A1 as well.
+The same, of course, is true if they are both A2A2.
+All the offspring are going to be A2A2, 100%.
+Now, things get a bit more interesting if we do not have the exact same zygote genotype.
+For example, let us take a look at both having a homo-zygote genotype but the different one.
+So, in this case, one of the parents will only contribute with A1 alleles and the other will contribute only A2 alleles.
+So again, we actually get a 100% outcome.
+The offspring, they all have the same genotypes but now it is all the hetero-zygote.
+Now, what if, if one of them is a homo-zygote, for example A2A2 or A1A1, and the other is a hetero-zygote.
+Well, one of the parents, the one that is homo-zygote only contributes one of the alleles.
+But the other one contributes both.
+So, that means that in 50% of the cases, you get a corresponding homo-zygote.
+Here in this case it would be A1A1,
+And in 50% of the cases you get the hetero-zygote.
+So here, it is essentially the hetero-zygote individual that determines what the outcome will be.
+Same situation here.
+We have one individual only contributing A2 alleles and the other contributing the A2 and the A1 alleles.
+So, it really depends on this one.
+So, again,
+50% of the cases we get the homo-zygote.
+But, in 50% of the cases, we get
+ the corresponding hetero-zygote,
+A1A2.
+Perhaps, the most interesting case is if both are hetero-zygotes because then both will contribute both types of alleles
+A1A2 to the offspring.
+And as you can see here, in 25% of the cases, so if both happen to contribute A1 alleles, which happens in 50% of Parent 1 and 50% of Parent 2.
+So combined 25%, we get the homozygote A1A1.
+Same logic for A2A2.
+25% chance that this happens.
+And the rest, gets one type of allele from one parent but the other type of allele from the other parent but it is 50% probability that we get the hetero-zygote.
+So these are the possible outcomes, the probabilities, given these six possible combinations. and what we have to do is we have to implement these probabilities and given two parent genotypes, return the correct, but still, potentially randomly chosen genotype as an offspring in JavaScript.
+Alright, so now that we have this background knowledge we can implement this function here, get_offspring.
+So, we are going to do that right here.
+Ant this will need some space, so I am just going to roll up here and I am going to say, a function get_offspring.
+And this function has two parameters, namely Parent 1 and Parent 2.
+And, I will do quite a bit of typing here so I am going to make this a little simpler here and I am going to say P1 and P2.
+So, these just stand for the two parents.
+I should say Parent 1
+We said on the beginning, we should always type things, call things the way they are easy to understand.
+So, I think Parent 1 and Parent 2 are fine.
+But, nevertheless, actually what I am going to do is I am going to set up these local variables here
+P1, that I will set to Parent 1 and P2 set to Parent 2.
+So, these two lines now
+I just put so that I have to type a little less. which is important, because you do not want to spend too much time in front of your computer watching me type.
+But otherwise,
+I would not do this.
+Call variables the way they are supposed to be called.
+Alright, so.
+We have six combinations
+So basically, we just have to go through the six combinations and we have to ask ourselves given Parent 1 and Parent 2, which one of the six combinations are we in.
+And then, roll a dice, if it is necessary, and pick the appropriate genotype.
+So let us go ahead and do this.
+So, the first thing
+I am going to test here for example, the first case
+I am going to test here is, if both of the parents are A1A1.
+So, what we write here will simply be if P1 equals, and again, here we are doing equality test, so the double equal sign.
+"A1A1" and P2, so the other parent is also "A1A1".
+Be careful here that you do not enter any typos here.
+Okay, so if that is the case,
+We know no number drawing is necessary no dice throwing, because we know the offspring is going to be "A1A1".
+So, we can essentially terminate the function here and simply say, return "A1A1".
+So, if that is the case, we can simply write, return "A1A1"
+What does that mean? It means, well we are actually return A1A1 and also, the function will be terminated and all these other tests here below would not to be executed would not need to be tested because we have already found our combination
+And we are now going to essentially do this six times.
+So this is the first case.
+So, let us take a look at a more complicated case.
+The next one.
+I am going to assume that one of the parents is A1A1 and the other is the hetero-zygote,
+A1A2.
+Okay, so I am going to say, else if, {} this condition is true,
+I am going to do something.
+I am setting this up here already.
+Okay, so, what is the condition?
+One of them has to be A1A1 and the other has to be A1A2.
+Now, of course,
+I do not care which one is A1A1 and I do not care which one is A1A2, but I have to test for both cases.
+It could be, that P1 is A1A1 so Parent 1.
+And P2 is A1A2, or it could be the other way around.
+So I need to make sure
+I catch both of these cases.
+So here now we are going to combine the "and" operator with the "or" operator.
+Because the first is going to be
+P1 equaling A1A1,
+And P2 equalling A1A2.
+Now, if I only would test for this,
+I would miss the case where P2 is actually A1A1 and P1 is A1A2.
+And those were the exact same cases but I would not capture it here.
+So, what I need to do is I need to have second statement here.
+So I am going to put this here in parenthesis, and then I am going to copy this bit here,
+And I am going to say
+Or
+So now we use the double pipe symbol here
+And I am simply pasting this but I now swap P1 with P2.
+So I hope you can see how this works.
+If it is either this case, or this case, the only being that I swapped P1 with P2
+I did not need to do this here obviously, because they are identical.
+But here, they are not.
+So I need to test to both of these scenarios.
+So what do we need to do?
+We saw on the previous slide and in this case half of the time, the offspring is going to be A1A1 and half of the time, it is going to be A1A2.
+So what I am simply going to say here if Math_random, smaller than 0.5
+This is our fair coin.
+I will return "A1A1"
+Otherwise, 
+I will return "A1A2"
+Alright, so that is our second case.
+That was likely more complicated but again, it uses construct and ideas that you are all familiar with.
+We are simply now combining these in a single function.
+So this is going to be a fairly complex function but, hey, it Mendelian Inheritance.
+That is quite something.
+Alright, third case.
+What are we going to assume?
+We are going to assume that one of them is A1A1 and the other is now A2A2.
+So basically, we have the same situation as here.
+So we can copy that.
+We are going to copy that.
+Of course, make sure close to parenthesizes here.
+So now we want to make sure that one of them is A1A1 and the other is A2A2.
+So be sure to switch this here to A2A2.
+And again, because they are not the same, we need to test for the (inaudible) situation where P2 will be A1A1
+And P1 will be A2A2.
+So, again, switch here to 2.
+Alright, so if that is the case, then, what is going to happen?
+We have seen before, this is a very simple outcome because one of the parents is going to contribute A1 the other is going to contribute A2.
+So it is a guaranteed A1A2.
+So, return "A1A2".
+Alright, so, we have already implemented half of it.
+50%. Well Done!
+Let us take a look at the next example.
+Let us go for A1A2 and A1A2.
+So both of them are A1A2.
+So that is the most complicated case.
+So, how do we do this?
+Well, again, else if,
+Now what I am going to say here is, if P1 equals A1A2, and P2 equals A1A2.
+Now again, the same genotype.
+So I do not have to test for the (inaudible) situation. because it is exactly identical.
+But the outcome here is a bit more complicated because here we have three possible outcomes.
+From these two genotypes,
+we can generate all three possible genotypes.
+So this is the most diverse outcome here.
+25% We get the A1A1,
+25% we get the A1A2 and finally,50% of the time we get the hetero-zygote.
+But again, we already know how to do this using the set of number lines..
+..principle that we used previously when we set up the grid.
+So we can simply say,
+First of all, we are going to draw a random number.
+We are going to do this here and I am going to say
+Math_random
+I will actually tell you in a second why I do it like this.
+Okay, we are going to draw a random number and now we are going to test here if the random number is smaller than 0.25, then we are going to return the A1A1.
+So, in 25% of the cases, we are going to return A1A1.
+Else if, this random number happens to be a larger than 0.75,
+So this is 1 minus 0.25.
+And that would also happen in 25% of the cases.
+So in this case, we are going to return the other homo-zygote A2A2.
+And finally else, so none of those have happened in the remaining 50%.
+So else is simply going to return "A1A2".
+So, couple of observations.
+First of all, we have these if, else ifs here nested within another else if.
+So, that is, I think a first or something that has been rare.
+But you will see, you can do it like the "for" loops.
+You can nest these statements however complicated you would want to do this.
+And again, this is why the indentation is so important because you can very easily see which curly brackets belong to which statement.
+And the other thing you may have been asking yourself is, why did not I say if Math_random equals or smaller than 0.25 and the same here.
+Well, it is as we did up here.
+It is because we are testing multiple times.
+We are concretely testing twice, namely, here, this is a test.
+And this is a test.
+And we have to make sure we are testing with the same number.
+Because if we would just put
+Math_random here and here, these would actually be two different random numbers that would be a mistake.
+We have to test with the same number.
+Up here, it is not an issue because we are only having one test nd then the else.
+So it is fine if we do not store this in an intermediary variable.
+But down here, it would.
+This was the first case, and certainly the most complicated.
+The second last case would be that one of them is A2A2, and the other one is the hetero-zygote.
+So basically, it is the same situation as this one.
+Except, this one should be A2A2.
+So, we can copy this,
+I think that is fine.
+Let us copy this here and put it down here.
+And what we need to do here now, is we need to change the homo-zygote
+A1A1 to A2A2.
+We need to do this here and we need to do this here.
+And also, of course, the return value needs to be changed.
+Because we will either, in half of the cases, return the A2A2. or in the other half of the cases, the hetero-zygote
+And then, we have the sixth and the final case.
+So here, we could now essentially just say
+"else", I am going to be completely explicit.
+And I am going to say, just so that we know, what we are talking about here, else if both of them are A2A2.
+So else if, P1 equals A2A2, and P2 equals A2A2.
+And again, no need to check the (inaudible) situation because it is identical.
+They are both the same genotypes.
+In this case, of course, I would simply return an A2A2, because that is the only genotype that these parents can generate. 
+Alright so, this is it! 
+Mendelian Inheritance granted this is probably the longest function that we developed so far and will probably be the longest function but you can already see, with a bit of nice structuring and very straightforward logic, this is straightforward to implement.
+So now, let us see if this actually works and ensure that we have not done any typos,
+What I would like to do now is I would like to output the result now of this simulation.
+So what I am going to do if you scroll down here in the run_generation, we had these functions that we called here the pick_mating_partner, the_get_offspring and so on and then here,we have generation counter
+So it would be nice actually here to call a function that will print the data of the current generation.
+So, I am going to call this "print_data" print_data, and now of course,
+I have to implement this function and I am going to do this up here.
+So, function print_data
+Okay?
+Now what does this function need to do?
+Recall that we have these variables for the A1A1,
+A1A2 and A2A2 genotypes
+And we can now use these, reuse them rather, because already used them once, when we set things up.
+And so here, in "print_data" first thing I am going to do is I am going to reset those. to zero.
+A1A1, A1A2 and A2A2, all of them are going to be reset to zero.
+Do not put bar here, because that would mean you would create a local variable that is in the scope of this function
+We actually want to override the global variables here.
+And then we are going to iterate through the array, using nested for loop.
+So, for "i" equals zero,
+This is not very standard, you know this very well.
+"i" smaller than grid length,
+"i" equals "i+1"
+And then the exact same thing for the second dimension.
+I am just going to copy this, going to replace the "i" with "ii", here, here, here and here.
+And now I am simply going to check now the content, basically, of grid [i] [ii] which is now the new generation my genotypes.
+So, what I am simply going to do here
+I am going to say, if this grid here is A1A1, then, I am going to account up by 1.
+The A1A1 counter obviously.
+So, A1A1 equals A1A1 plus one.
+You can already see
+here quite nicely that I forgot to close curly brackets, and that is really the benifit this type of inundation.
+It would be extremely easy to miss if did not have that, but you can just see here.
+If you look at this, there is a gap here or something is not right.
+And you can immediately see, yup,
+I did forget to close this opening curly bracket here.
+Okay, let me do this before I continue.
+Alright, good!
+So, else if it happens to be we can for example, check for the A1A2.
+A1A2, okay?
+Then, of course,
+I am goung to up A1A2 counter by 1.
+So, A1A2 equals
+A1A2 plus one,
+And finally, else, this case,
+It needs to be an A2A2.
+No other choices.
+Very good!
+So now we has this function we calculate all of this,
+But what we are not counting, rather than calculating.
+We are not printing anything, so, of course, we should do that, so here, when I am done with the "for" loop,
+I am going to say, first of all, I need to know which generation we are in.
+So I am simply going to say
+"generation",
+I am going to use
+String Concatenation here using the generation counter and then maybe a go on, just to be nice.
+Good!
+And then, another console lock where I am actually outputing the data.
+So I am simply going to output
+A1A1, A1A2 and A2A2.
+Alright, so now we save this we got back to the browser, and we see if all of this worked.
+So here we are, in the browser.
+Here is still the (jnaudible). so we are going
+'to reload this and it worked!
+So, no mistakes, and what you can see here is that we do start.
+Again, roughly here, at Hardy Wineberck with 25%,
+But as you can see very quickly things seem to be changing quite a bit.
+For example, we have a lot of A1A1 here and not as much A1A2 anymore.
+So let us just reload this once again
+Yup!
+Kind of the same story.
+So we are losing a lot of the A1A2s, over gaining A1A1s and A2A2s
+So, let us reload this once again.
+Similar story.
+So, there seems to be a pattern here.
+Now, it is obviously very hard to just look at these values, and then say well,
+I think what is happening here is the following, no, we now need to visualize this.
+That is why we implemented a spatial model in the first place so that we can understand the process by also looking at this.
+And this is what we will do in the next lectures.
+We will now take this code, a generate a very nice visual representation of the dynamics here and we will do this in the next lecture.
+Alright, well done!
+You have essentially implemented a full spatial stochastic simulation of a Population Generic Process.
+Now, to put the icing on the cake, we are going visualize dynamic of all of this.
+It will look great and we will do this in the next lecture.
+So I will see you there.

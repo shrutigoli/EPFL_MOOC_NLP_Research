@@ -1,0 +1,1166 @@
+1
+00:00:21,927 --> 00:00:24,896
+Hello and welcome to this lesson
+which will focus on
+
+2
+00:00:25,096 --> 00:00:27,829
+geometric spatial queries,
+
+3
+00:00:28,029 --> 00:00:32,194
+a set of queries that is more
+specifically focused
+
+4
+00:00:32,414 --> 00:00:36,291
+on extracting information on the
+nature and geometric properties
+
+5
+00:00:36,503 --> 00:00:39,711
+of spatial objects stored in a database.
+
+6
+00:00:40,269 --> 00:00:43,868
+The objective of this 
+lesson is to explore
+
+7
+00:00:44,068 --> 00:00:48,293
+this world of SQL queries that
+seeks to extract geometric
+
+8
+00:00:48,493 --> 00:00:51,581
+characteristic properties from
+spatial objects stored
+
+9
+00:00:51,806 --> 00:00:54,488
+in a database, so that you are able to
+
+10
+00:00:54,688 --> 00:00:58,285
+retrieve information such
+as the coordinates of a point,
+
+11
+00:00:58,485 --> 00:01:03,208
+the perimeter or length of a line,
+the surface of a polygon
+
+12
+00:01:03,408 --> 00:01:07,346
+from spatial geometries hosted in
+a database.
+
+13
+00:01:07,546 --> 00:01:12,128
+<I> There is a large number of
+different geometric spatial queries </ i>
+
+14
+00:01:12,328 --> 00:01:17,041
+<I> with a wide variety of
+keywords that we cannot </ i>
+
+15
+00:01:17,241 --> 00:01:20,241
+<I> obviously all review
+so we will present you </ i>
+
+16
+00:01:20,441 --> 00:01:24,541
+<I> some situations,
+some typical queries </ i>
+
+17
+00:01:24,741 --> 00:01:27,246
+<I> which we consider particularly
+important. </ I>
+
+18
+00:01:27,446 --> 00:01:30,446
+<I> It's always a good idea
+to check out the sites </ i>
+
+19
+00:01:30,646 --> 00:01:33,646
+<I> of specialized softwares,
+in this case the SpatiaLite site </ i>
+
+20
+00:01:33,846 --> 00:01:35,375
+<I> and PostGIS site, </ i>
+
+21
+00:01:35,575 --> 00:01:38,850
+<I> to get a more complete idea </ i>
+
+22
+00:01:39,039 --> 00:01:42,139
+<I> of all the available 
+functionalities in terms </ i>
+
+23
+00:01:42,351 --> 00:01:43,713
+<I> of geometric spatial queries. </ I>
+
+24
+00:01:43,913 --> 00:01:47,236
+<I> In general, the syntax is
+pretty much the same </ i>
+
+25
+00:01:47,436 --> 00:01:50,436
+<I> in all cases with a
+particularity however </ i>
+
+26
+00:01:50,636 --> 00:01:53,719
+<I> in the PostGIS world which, when </ i>
+
+27
+00:01:53,944 --> 00:01:58,998
+<I> the query is on spatial
+objects, prefaces the keyword </ i>
+
+28
+00:01:59,198 --> 00:02:04,620
+<I>with the underlined letters ST, 
+ST for Spatial Type, </ i>
+
+29
+00:02:04,820 --> 00:02:09,258
+<I> which allows, in a SQL query,
+to clearly distinguish </ i>
+
+30
+00:02:09,458 --> 00:02:11,793
+<I> everything that is addressing
+spatial properties </ i>
+
+31
+00:02:11,993 --> 00:02:16,566
+<I> and that are specific to the
+PostGIS world versus PostgreSQL world </ i>
+
+32
+00:02:16,766 --> 00:02:19,230
+<I> on which PostGIS is built. </ I>
+
+33
+00:02:19,430 --> 00:02:23,673
+<I> But for the rest, the syntax
+is the same as in SpatiaLite </ i>
+
+34
+00:02:23,873 --> 00:02:25,923
+<I> with a few rare exceptions. </ I>
+
+35
+00:02:26,123 --> 00:02:29,660
+<I> In this lesson, we will 
+first talk about the queries </ i>
+
+36
+00:02:29,885 --> 00:02:33,013
+<I>that allow to select and
+to display geometries, </ i>
+
+37
+00:02:33,213 --> 00:02:40,925
+<I> display in a map, or to
+consult the spatial reference used, </ i>
+
+38
+00:02:41,162 --> 00:02:42,495
+<I> so the ESPG code. </ I>
+
+39
+00:02:42,695 --> 00:02:46,569
+<I> We will then see some
+syntax of SQL queries, </ i>
+
+40
+00:02:46,782 --> 00:02:49,384
+<I> of data conversion
+to transform geometries </ i>
+
+41
+00:02:49,609 --> 00:02:52,160
+<I> in text or binary format, </ i>
+
+42
+00:02:52,360 --> 00:02:56,497
+<I> queries that allow to extract,
+to consult the type of geometry </ i>
+
+43
+00:02:56,722 --> 00:03:00,701
+<I> with which we are dealing and
+finally we will see a series of queries </ i>
+
+44
+00:03:00,901 --> 00:03:03,754
+<I> that allow to retrieve the
+specific properties </ i>
+
+45
+00:03:03,954 --> 00:03:05,301
+<I>of geometries. </ I>
+
+46
+00:03:10,527 --> 00:03:15,348
+<I> The GEOMETRY keyword typically
+refers to the geometry attribute </ i>
+
+47
+00:03:15,548 --> 00:03:18,548
+<I> of a spatial data table, </ i>
+
+48
+00:03:18,748 --> 00:03:21,456
+<I> so the geometry of
+the spatial object </ i>
+
+49
+00:03:21,656 --> 00:03:24,506
+<I> and it is used in selection queries </ i>
+
+50
+00:03:24,706 --> 00:03:27,856
+<I> to display objects on a map. </ I>
+
+51
+00:03:28,056 --> 00:03:31,056
+<I> It can also be used to extract </ i>
+
+52
+00:03:31,256 --> 00:03:33,984
+<I> the reference of the 
+projection system used </ i>
+
+53
+00:03:34,184 --> 00:03:37,795
+<I> or a lot of other information
+that we will see later. </ I>
+
+54
+00:03:37,995 --> 00:03:41,227
+<I> The syntax is based
+simply on the SELECT, </ i>
+
+55
+00:03:41,427 --> 00:03:44,639
+<I> keyword, GEOMETRY, we
+select the geometries, </ i>
+
+56
+00:03:44,848 --> 00:03:47,510
+<I> FROM, the name of the
+table to indicate the table </ i>
+
+57
+00:03:47,760 --> 00:03:49,313
+<I> from which the geometries
+are extracted. </ I>
+
+58
+00:03:49,513 --> 00:03:51,905
+<I> Then, we can imagine
+conditional clauses </ i>
+
+59
+00:03:52,105 --> 00:03:54,717
+<I> which allow to sort, in
+the geometries, </ i>
+
+60
+00:03:54,930 --> 00:03:56,576
+<I> those that meet certain
+criteria. </ I>
+
+61
+00:03:56,776 --> 00:03:58,568
+<I> We will see an example later. </ I>
+
+62
+00:03:58,768 --> 00:04:03,658
+<I> The SRID keyword with
+the GEOMETRY keyword in brackets </ i>
+
+63
+00:04:03,858 --> 00:04:07,590
+<I> to extract the reference of
+the projection system used, </ i>
+
+64
+00:04:07,828 --> 00:04:10,328
+<I> in this case the ESPG code. </ I>
+
+65
+00:04:11,528 --> 00:04:15,252
+<I> An example of the
+application of these elements. </ I>
+
+66
+00:04:15,452 --> 00:04:18,452
+<I> First, when it comes to
+selecting objects, </ i>
+
+67
+00:04:18,652 --> 00:04:21,842
+<I> the easiest way is to use the
+integrated tool in QGIS </ i>
+
+68
+00:04:22,042 --> 00:04:28,418
+<I> with a selection module
+which uses </ i>
+
+69
+00:04:28,618 --> 00:04:34,241
+<I>the SQL language but the
+SELECT GEOMETRY FROM is hidden </ i>
+
+70
+00:04:34,441 --> 00:04:38,956
+<I> and we simply add the
+criterion in the SQL syntax, </ i>
+
+71
+00:04:39,156 --> 00:04:41,013
+<I> here the name that begins with d, </ i>
+
+72
+00:04:41,213 --> 00:04:44,213
+<I> and we select all the
+districts whose name begins with d. </ I>
+
+73
+00:04:47,613 --> 00:04:50,613
+<I> Second example, this
+time in the SpatiaLite module, </ i>
+
+74
+00:04:50,813 --> 00:04:53,542
+<I> again with a query in the
+districts table </ i>
+
+75
+00:04:53,742 --> 00:04:56,142
+<I> to select all districts of Mahé. </ I>
+
+76
+00:04:56,342 --> 00:04:59,178
+<I> To display the results of
+the query, </ i>
+
+77
+00:04:59,378 --> 00:05:02,945
+<I> they must be loaded
+as a new layer in QGIS, </ i>
+
+78
+00:05:03,145 --> 00:05:06,145
+<I> a layer whose name and field
+that contains </ i>
+
+79
+00:05:06,345 --> 00:05:07,875
+<I>the geometries must be defined. </ I>
+
+80
+00:05:12,650 --> 00:05:15,435
+<I> Finally, just as we did
+with the QGIS query, </ i>
+
+81
+00:05:15,635 --> 00:05:18,150
+<I> we can change the SpatiaLite request</ i>
+
+82
+00:05:18,350 --> 00:05:20,251
+<I> by introducing a conditional
+clause </ i>
+
+83
+00:05:20,451 --> 00:05:23,451
+<I> to limit the selection to districts
+whose name begins with d. </ I>
+
+84
+00:05:26,401 --> 00:05:28,759
+<I> And again, we have to define
+the result of the query </ i>
+
+85
+00:05:28,959 --> 00:05:31,537
+<I> as a new layer to display this
+selection of districts </ i>
+
+86
+00:05:31,737 --> 00:05:32,730
+<I> in the map. </ I>
+
+87
+00:05:38,855 --> 00:05:41,815
+<I> To retrieve the projection
+system of these objects, </ i>
+
+88
+00:05:42,015 --> 00:05:45,063
+<I> we eliminate the conditional
+part of the query </ i>
+
+89
+00:05:45,263 --> 00:05:51,886
+<I> and we add the SRID function
+that applies to geometries. </ I>
+
+90
+00:05:52,086 --> 00:05:56,178
+<I> By executing this query,
+we see that all our objects, </ i>
+
+91
+00:05:56,378 --> 00:06:00,477
+<I> or let's say a large part of our 
+objects, are in 32740 which is actually </ i>
+
+92
+00:06:00,677 --> 00:06:04,902
+<I> the UTM 40 South system </ i>
+
+93
+00:06:05,102 --> 00:06:08,828
+<I> and we see with the DISTINCT 
+keyword that the set of objects </ i>
+
+94
+00:06:09,028 --> 00:06:11,499
+<I> have this same reference system. </ I>
+
+95
+00:06:22,525 --> 00:06:25,525
+<I> The conversion functions, which
+also apply </ i>
+
+96
+00:06:25,725 --> 00:06:29,473
+<I> to the GEOMETRY attribute,
+that can transform </ i>
+
+97
+00:06:29,673 --> 00:06:34,220
+<I> a geometry into a text format 
+to make it readable </ i>
+
+98
+00:06:34,420 --> 00:06:37,420
+<I> or on the contrary, in
+binary format to store it </ i>
+
+99
+00:06:37,620 --> 00:06:38,554
+<I> so that it takes up 
+little space. </ I>
+
+100
+00:06:38,754 --> 00:06:44,319
+<I> These two functions are very
+useful to export / import </ i>
+
+101
+00:06:44,519 --> 00:06:47,515
+<I> datasets from one
+database to another </ i>
+
+102
+00:06:47,727 --> 00:06:49,467
+<I> and convert them in
+another storage format. </ I>
+
+103
+00:06:49,667 --> 00:06:52,176
+<I> The syntax is always fairly
+simple, </ i>
+
+104
+00:06:52,376 --> 00:06:54,624
+<I> the SELECT keyword,
+the AsText function </ i>
+
+105
+00:06:54,824 --> 00:06:58,645
+<I> with the geometry in brackets,
+FROM and the name of the table. </ I>
+
+106
+00:07:00,282 --> 00:07:02,814
+<I> To illustrate this operation,
+we take </ i>
+
+107
+00:07:03,014 --> 00:07:07,368
+<I> the QGIS SpatiaLite interface </ i>
+
+108
+00:07:07,568 --> 00:07:10,911
+<I> and we simply write this request </ i>
+
+109
+00:07:11,099 --> 00:07:15,724
+<I>of transformation of the
+hotel geometries into text </ i>
+
+110
+00:07:15,924 --> 00:07:20,243
+<I> and we give an alias
+to this column, </ i>
+
+111
+00:07:20,443 --> 00:07:24,108
+<I> we call it gg, so it comes
+from the hotel table </ i>
+
+112
+00:07:24,308 --> 00:07:28,191
+<I> and we see that our column gg
+contains a series of multipoints </ i>
+
+113
+00:07:28,391 --> 00:07:30,350
+<I> with the coordinates x y. </ I>
+
+114
+00:07:32,012 --> 00:07:35,844
+<I> We can create a table
+from these results, </ i>
+
+115
+00:07:36,044 --> 00:07:39,821
+<I> that we will call table 1,
+and we can add this table </ i>
+
+116
+00:07:40,021 --> 00:07:42,955
+<I> in the SpatiaLite database. </ I>
+
+117
+00:07:43,155 --> 00:07:47,797
+<I> We can consult the objects
+of this table. </ I>
+
+118
+00:07:47,997 --> 00:07:50,439
+<I> We see that we find our
+multipoints </ i>
+
+119
+00:07:50,639 --> 00:07:54,714
+<I> with a primary key that was
+added automatically. </ I>
+
+120
+00:07:58,677 --> 00:08:03,817
+<I> The equivalent function
+to transform the geometry </ i>
+
+121
+00:08:04,017 --> 00:08:10,233
+<I> into a binary number allows 
+to observe in fact </ i>
+
+122
+00:08:10,433 --> 00:08:13,433
+<I> that what we create 
+is a geometric object </ i>
+
+123
+00:08:13,633 --> 00:08:18,351
+<I> that we will be able 
+to use for maps. </ I>
+
+124
+00:08:20,989 --> 00:08:24,751
+<I> Let's suppose now that we have 
+obtained, imported this table </ i>
+
+125
+00:08:24,951 --> 00:08:29,460
+<I> that contains text geometries. </ I>
+
+126
+00:08:29,660 --> 00:08:32,660
+<I> We can use a GeomFromText
+function </ i>
+
+127
+00:08:32,860 --> 00:08:40,173
+<I> which allows to
+transform these text geometries </ i>
+
+128
+00:08:40,373 --> 00:08:43,678
+<I> into binary geometries, 
+so geometric objects </ i>
+
+129
+00:08:43,878 --> 00:08:47,622
+<I> that we will then be able 
+to use to display them in a map. </ I>
+
+130
+00:08:57,915 --> 00:09:00,654
+<I> A series of functions that
+now allows </ i>
+
+131
+00:09:00,854 --> 00:09:03,240
+<I> to recover the
+characteristics </ i>
+
+132
+00:09:03,440 --> 00:09:07,880
+<I> of spatial geometry, starting
+with the type of geometry, </ i>
+
+133
+00:09:08,080 --> 00:09:11,041
+<I> the number of points or the
+number of rings </ i>
+
+134
+00:09:11,241 --> 00:09:13,885
+<I> it can contain and its envelope </ i>
+
+135
+00:09:14,085 --> 00:09:18,258
+<I> so the bounding box,
+the rectangle that encompasses </ i>
+
+136
+00:09:18,458 --> 00:09:20,636
+<I>the geometry. </ I>
+
+137
+00:09:20,836 --> 00:09:23,351
+<I> The syntax is always of
+SELECT type, </ i>
+
+138
+00:09:23,551 --> 00:09:25,955
+<I> the function GeometryType
+on Envelope </ i>
+
+139
+00:09:26,155 --> 00:09:29,155
+<I> and the GEOMETRY 
+keyword in brackets, </ i>
+
+140
+00:09:29,355 --> 00:09:31,560
+<I> FROM and the name of the table. </ I>
+
+141
+00:09:32,797 --> 00:09:36,735
+<I> So we illustrate this type
+of queries </ i>
+
+142
+00:09:36,935 --> 00:09:40,826
+<I> with the function that allows
+to extract the type of geometry </ i>
+
+143
+00:09:41,026 --> 00:09:44,210
+<I> of a layer, in this case, we will
+focus on the district layer. </ I>
+
+144
+00:09:44,410 --> 00:09:47,247
+<I> and we see that the SQL
+syntax here is quite permissive </ i>
+
+145
+00:09:47,447 --> 00:09:51,114
+<I> since we can simply mention
+the GEOMETRY attribute, </ i>
+
+146
+00:09:51,314 --> 00:09:53,568
+<I> the name of the table,
+removing any ambiguity. </ I>
+
+147
+00:09:53,768 --> 00:09:58,198
+<I> With the DISTINCT keyword,
+we can check that </ i>
+
+148
+00:09:58,398 --> 00:10:00,307
+<I> the entire district
+layer is composed </ i>
+
+149
+00:10:00,507 --> 00:10:01,770
+<I> of multipolygons. </ I>
+
+150
+00:10:01,970 --> 00:10:08,371
+<I> If we now replace this extraction
+
+151
+00:10:08,596 --> 00:10:10,996
+<I>of geometry type by the
+Envelope function, </ i>
+
+152
+00:10:11,196 --> 00:10:14,196
+<I> we see that we create a
+series of geometric objects </ i>
+
+153
+00:10:14,396 --> 00:10:17,396
+<I> and to add these geometric objects
+to the map, we must </ i>
+
+154
+00:10:17,596 --> 00:10:21,046
+<I> make it a GEOMETRY column,
+define the table name </ i>
+
+155
+00:10:21,258 --> 00:10:23,796
+<I> in which we wish to
+store the thing, </ i>
+
+156
+00:10:23,996 --> 00:10:28,345
+<I> define the GEOMETRY field as
+containing the geometry </ i>
+
+157
+00:10:28,545 --> 00:10:30,613
+<I> and execute the query. </ I>
+
+158
+00:10:31,651 --> 00:10:35,259
+<I> So this query creates a layer
+called On Envelope </ i>
+
+159
+00:10:35,459 --> 00:10:39,108
+<I> and we find the envelopes that
+include the different districts </ i>
+
+160
+00:10:39,308 --> 00:10:41,494
+<I> of the island of Mahé here. </ I>
+
+161
+00:10:50,910 --> 00:10:55,080
+<I> Among the many functions
+that return specific </ i>
+
+162
+00:10:55,280 --> 00:10:57,559
+<I> properties of spatial geometries, </ i>
+
+163
+00:10:57,759 --> 00:11:00,759
+<I> we will start simply
+by those returning</ i>
+
+164
+00:11:00,959 --> 00:11:03,015
+<I> the coordinates xy of a point </ i>
+
+165
+00:11:03,215 --> 00:11:06,215
+<I> with a very simple syntax
+of SELECT X type </ i>
+
+166
+00:11:06,415 --> 00:11:10,342
+<I> in brackets, the geometry,
+comma Y, the geometry </ i>
+
+167
+00:11:10,542 --> 00:11:11,996
+<I> if we want to extract the
+two coordinates, </ i>
+
+168
+00:11:12,196 --> 00:11:13,710
+<I> FROM the name of the table. </ I>
+
+169
+00:11:15,610 --> 00:11:18,465
+<I> This syntax is illustrated
+by selecting </ i>
+
+170
+00:11:18,665 --> 00:11:24,653
+<I> the x and y coordinates
+of the Seychelles' hotels. </ i>
+
+171
+00:11:27,265 --> 00:11:29,947
+<I> So here again, simply the
+GEOMETRY keyword, </ i>
+
+172
+00:11:30,147 --> 00:11:32,707
+<I> the name of the table, removing
+any ambiguity. </ I>
+
+173
+00:11:32,907 --> 00:11:35,746
+<I> We see that the result
+of the Greek colony </ i>
+
+174
+00:11:35,946 --> 00:11:38,946
+<I> is in scientific notation
+and so we can use </ i>
+
+175
+00:11:39,146 --> 00:11:43,547
+<I> a CastTo function 
+towards an integer </ i>
+
+176
+00:11:43,747 --> 00:11:50,263
+<I> to transform this scientific
+notation into an integer number </ i>
+
+177
+00:11:50,463 --> 00:11:52,833
+<I> to make it more readable. </ I>
+
+178
+00:11:54,283 --> 00:11:58,161
+<I> Second series of functions
+that concern </ i>
+
+179
+00:11:58,361 --> 00:12:03,097
+<I> the polylines more with the extraction
+of the initial and the final points </ i>
+
+180
+00:12:03,297 --> 00:12:05,223
+<I> of the polyline, StartPoint,
+EndPoint, </ i>
+
+181
+00:12:05,423 --> 00:12:09,231
+<I> the length, Length and 
+a test to check </ i>
+
+182
+00:12:09,431 --> 00:12:12,975
+<I> if the polyline is open or
+closed </ i>
+
+183
+00:12:13,175 --> 00:12:15,144
+<I> and possibly a test to
+check if it is </ i>
+
+184
+00:12:15,344 --> 00:12:19,406
+<I> a ring or not,
+so if it is part of a polygon. </ I>
+
+185
+00:12:19,606 --> 00:12:22,606
+<I> The syntax is of
+SELECT type, the function </ i>
+
+186
+00:12:22,806 --> 00:12:24,919
+<I> in brackets the geometry,
+FROM the name of the table </ i>
+
+187
+00:12:25,119 --> 00:12:28,119
+<I> as usual with a particularity, </ i>
+
+188
+00:12:28,319 --> 00:12:31,319
+<I> the fact that the length function
+that returns the length </ i>
+
+189
+00:12:31,519 --> 00:12:37,171
+<I> of the polyline is preceded
+by a capital G in SpatiaLite </ i>
+
+190
+00:12:37,371 --> 00:12:40,227
+<I> for the simple reason that
+the LENGTH keyword </ i>
+
+191
+00:12:40,427 --> 00:12:44,569
+<I> is a reserved word of
+SpatiaLite and in QGIS, </ i>
+
+192
+00:12:44,769 --> 00:12:47,379
+<I> as I said at the beginning,
+this function </ i>
+
+193
+00:12:47,579 --> 00:12:49,664
+<I> is written ST for spatial type, </ i>
+
+194
+00:12:49,864 --> 00:12:52,864
+<I> underlined and then 
+the LENGTH keyword. </ I>
+
+195
+00:12:53,064 --> 00:12:58,022
+<I> As an example of this type of
+query, </ i>
+
+196
+00:12:58,222 --> 00:13:02,253
+<I> we will extract the length
+from the road sections </ i>
+
+197
+00:13:02,453 --> 00:13:05,149
+<I> of the Seychelles' road map. </ I>
+
+198
+00:13:05,349 --> 00:13:09,066
+<I> And we see that by
+executing this request, </ i>
+
+199
+00:13:09,266 --> 00:13:12,266
+<I> we obtain the length in meters </ i>
+
+200
+00:13:12,466 --> 00:13:14,469
+<I> of these road sections. </ I>
+
+201
+00:13:15,144 --> 00:13:18,331
+<I> Two functions which now
+concern more specifically </ i>
+
+202
+00:13:18,531 --> 00:13:20,846
+<I>the polygons, the Centroid
+function </ i>
+
+203
+00:13:21,046 --> 00:13:23,311
+<I> which returns the
+polygon barycenter, </ i>
+
+204
+00:13:23,511 --> 00:13:24,906
+<I> the center of gravity
+of the polygon, </ i>
+
+205
+00:13:25,106 --> 00:13:29,134
+<I> and the Area function
+that returns to its surface. </ I>
+
+206
+00:13:29,334 --> 00:13:31,594
+<I> The syntax is always the same
+with the SELECT keyword, </ i>
+
+207
+00:13:31,794 --> 00:13:33,547
+<I>the function, the geometry
+in brackets, </ i>
+
+208
+00:13:33,747 --> 00:13:36,108
+<I> the FROM keyword and
+the name of the table. </ I>
+
+209
+00:13:37,583 --> 00:13:40,304
+<I> So in our example here,
+we start by </ i>
+
+210
+00:13:40,504 --> 00:13:47,483
+<I> selecting, by extracting the surfaces
+of Seychelles' districts. </ I>
+
+211
+00:13:53,395 --> 00:13:59,273
+<I> That's it. So we have again
+a notation of scientific type. </ I>
+
+212
+00:13:59,473 --> 00:14:02,473
+<I> If we now focus on Centroid, </ i>
+
+213
+00:14:02,673 --> 00:14:06,103
+<I> we obrain geometric
+objects </ i>
+
+214
+00:14:06,303 --> 00:14:09,933
+<I> that we may want to
+represent on the map. </ I>
+
+215
+00:14:10,133 --> 00:14:14,363
+<I> So to do this, we must
+load the result as a layer </ i>
+
+216
+00:14:14,563 --> 00:14:19,643
+<I> in QGIS, define the
+geometry, the geometry field </ i>
+
+217
+00:14:19,843 --> 00:14:21,756
+<I> with the GEOMETRY keyword,
+give a name to the table </ i>
+
+218
+00:14:21,956 --> 00:14:24,756
+<I> and make sure that the
+geometry field is called GEOMETRY. </ I>
+
+219
+00:14:25,618 --> 00:14:29,058
+<I> By executing this request,
+we see that we create </ i>
+
+220
+00:14:29,258 --> 00:14:30,871
+<I> a layer called centroid. </ I>
+
+221
+00:14:31,081 --> 00:14:33,956
+<I> And if we display these
+centroid layers, </ i>
+
+222
+00:14:34,156 --> 00:14:35,940
+<I> we see that we have yellow
+dots that appear </ i>
+
+223
+00:14:36,140 --> 00:14:37,711
+<I> in the center of the
+Seychelles' districts. </ I>
+
+224
+00:14:49,344 --> 00:14:52,414
+There you go. In this lesson, we have seen
+
+225
+00:14:52,614 --> 00:14:57,884
+that we could use the query 
+integrated into QGIS 
+
+226
+00:14:58,084 --> 00:15:03,124
+to select spatial objects based
+on conditional queries
+
+227
+00:15:03,324 --> 00:15:05,947
+that use a SQL-like syntax.
+
+228
+00:15:06,147 --> 00:15:10,047
+And we also saw that we could use
+
+229
+00:15:10,235 --> 00:15:14,377
+the SQL functions either in SpatiaLite,
+we have not seen any example
+
+230
+00:15:14,577 --> 00:15:15,894
+in PostGIS but it's the same thing,
+
+231
+00:15:16,094 --> 00:15:21,315
+to extract properties or characteristics
+of geometries
+
+232
+00:15:21,515 --> 00:15:23,486
+which are stored in a database.
+
+233
+00:15:23,686 --> 00:15:27,340
+So, considering the selection 
+functions of geometric objects,
+
+234
+00:15:27,540 --> 00:15:31,727
+the functions which allow
+to extract the reference system used,
+
+235
+00:15:31,952 --> 00:15:33,425
+so the ESPG code,
+
+236
+00:15:33,625 --> 00:15:36,500
+from the format conversion functions
+
+237
+00:15:36,700 --> 00:15:40,041
+to text or to binary 
+to be able to transform,
+
+238
+00:15:40,241 --> 00:15:43,241
+to graphically retrieve spatial objects,
+
+239
+00:15:43,441 --> 00:15:47,657
+functions which allow
+to extract the proper characteristics
+
+240
+00:15:47,882 --> 00:15:50,645
+of geometries like their type,
+their envelope,
+
+241
+00:15:50,832 --> 00:15:52,340
+things like that and finally,
+
+242
+00:15:52,540 --> 00:15:54,765
+a series of functions that allow
+to extract
+
+243
+00:15:54,965 --> 00:15:57,965
+more numerical characteristics from
+space objects,
+
+244
+00:15:58,165 --> 00:16:00,881
+the coordinates x y, the length of a line
+
+245
+00:16:01,081 --> 00:16:03,447
+the surface of a point, etc.
+

@@ -1,0 +1,369 @@
+Transaction and abstraction for dealing with concurrency and systems.
+They're actually very simple and elegant and intuitive abstraction because they correspond to the notion of transactions as we're used to from the real world, from business transactions.
+So, if you go to a bookstore to buy a book, you will think of a transaction as: to choose your books, take the book and give money to the store.
+It means that there are at least two actions that happen: the moving of the book into your ownership, into your possession, and the movement of money into the possession of the store.
+And you want to handle these two actions atomically.
+That means, you would like to have both of them or none of them.
+Of course, as the buyer, if you give money; you want the book.
+And as a store, you want to get the money if you give the book.
+And not just one of the two.
+Also, if at the same time maybe, in the bookstore, there's another buyer who also wants to buy a book, maybe at a different checkout,
+I would think of that as a different transaction.
+We wouldn't want to have to confuse the two.
+We don't want to put them together; we can treat them separately, from the viewpoint of the buyers and to some extent, from the viewpoint of the book store.
+<i>Transactions are actually a notion that came out of database research,</i>
+<i>and they play a very important role in delivery systems.</i>
+<i>But they also play an important role in other context of systems,</i>
+<i>application service transaction
+ processing systems of all kinds,</i>
+<i>and also in the context of transaction memory.</i>
+<i>Which is an important notion in the context of programming languages</i>
+<i>and computer architecture.</i>
+<i>Transactions allow us to support the concurrent execution of user programs</i>
+<i>and they are essential for good database performance.</i>
+<i>Why is that the case?</i>
+<i>Well, one thing is that transactions might be quite long-running.</i>
+<i>For example there might be humans involved</i>
+<i>and the two steps of the transaction
+ that I talked about in the bookstore;</i>
+<i>they might take some time to happen because humans take their time</i>
+<i>and they are much slower than computers, right?</i>
+<i>So if such transaction takes a minute for example, you don't want to enter</i>
+<i>the system to be locked down, and only be able to deal</i>
+<i>with this one transaction, and not be able to serve any other transactions</i>
+<i>at the same time.</i>
+<i>Our computers are very fast, and we want to use that performance.</i>
+<i>So as I said, transactions are an abstraction....</i>
+<i>and they allow us to separate</i>
+<i>things that are relevant to the database system, for executing the transaction.</i>
+<i>For making this set of concurrent changes possible, while keeping other things</i>
+<i>separate that are not important.
+For example, an application program</i>
+<i>a frontant, a browser frontant for example, for a webstore, will be worrying about</i>
+<i>displaying things in all kinds of colors and putting text in all kinds of places,</i>
+<i>and that might not be important for getting the transaction right.</i>
+<i>But the delivery system has to know which book I want to buy, and how much money</i>
+<i>I am going to give for it, from which account, what my identity is etc.</i>
+<i>So, users submit transactions and can think of each transaction</i>
+<i>executing by itself, independent of any others.</i>
+<i>We don't have to know about other transactions.</i>
+<i>We can think of as a user, for the purpose of abstraction,</i>
+<i>that there is nothing else happening in the system at this point in time.</i>
+<i>We call this thing Isolation.</i>
+<i>Concurrency is then achieved by the database system,</i>
+<i>which has to interleave these actions,</i>
+<i>has to worry about how to make things work</i>
+<i>how to make this transaction become... get executed.</i>
+<i>And how to put as much work into
+ as little time as possible, ideally.</i>
+<i>Each transaction must be completed</i>
+<i>and leaves the database in a consistent state.</i>
+<i>Which means that if there was a notion of consistency,</i>
+<i>at the beginning of the transaction, before the transaction started,</i>
+<i>the database was in a state where were everything was correct</i>
+<i>nothing is wrong; nothing that
+I expect violates it.</i>
+<i>Then I want this property of everything being consistent and fine also to hold</i>
+<i>after the transaction has finished.</i>
+<i>In the consistent database system, we talk in particular</i>
+<i>about integrity constraints here.</i>
+<i>That means, constraints like-- there mustn't be two users</i>
+<i>with the same social security number.</i>
+<i>Things like that, right?</i>
+<i>These integrity constraints; they must at all points in time,</i>
+<i>conceptually hold true.</i>
+<i>Sometimes, there might be dependencies between different items that we change,</i>
+<i>so they have to change together to achieve consistency.</i>
+<i>For example, it might be that I have</i>
+<i>two different records in a delivery system</i>
+<i>that belong together and it's only possible if the other one exists as well.</i>
+<i>For example, I could create a new user only if there's at least one business</i>
+<i>[inaudible] that just bought something in my bookstore and at the same time,</i>
+<i>a business transaction is not possible without the user record.</i>
+<i>That means at a point in time when the user for the first time buys a book,</i>
+<i>we have to enter two records and the integrity constraints</i>
+<i>and the mutual dependency between the two records right--</i>
+<i>If one is there, the other one is almost always there and visa versa.</i>
+<i>It cannot be guaranteed at all points in time</i>
+<i>if you really enter record by record.</i>
+<i>But if I create a transaction that atomically creates both records together,</i>
+<i>then all I have to require is that the integrity constraints</i>
+<i>holds before the transaction starts and after it finishes.</i>
+<i>You know the constraint, well that always disappears off records.</i>
+<i>So this notion of satisfying all integrity constraints,</i>
+<i>posted on the system, formalized in the system</i>
+<i>corresponds to some of the consistency in database systems.</i>
+<i>In more generally more challenging module,</i>
+<i>we will think of consistency</i>
+<i>as a broader notion.</i>
+<i>But for the purpose of this transaction video today,</i>
+<i>we will restrict consistency to satisfying the integrity constraints.</i>
+<i>But beyond satisfying the integrity constraints post by some programmer</i>
+<i>to the database system, the database system doesn't have</i>
+<i>to understand the semantics of the data; it cannot really.</i>
+<i>And consistency doesn't concern itself with intuitive notions of what is right,</i>
+<i>that are not specified to the system.</i>
+<i>I've already mentioned the notion of atomicity in transactions.</i>
+<i>So, a transaction consists of a bag or actually a sequence of actions,</i>
+<i>operations that may change the state of the database.</i>
+<i>And in the end, I would like to execute all of the transactions or none of it.</i>
+<i>If it's for some reason, not possible to complete the transaction,</i>
+<i>or if a user chooses to cancel the transaction,</i>
+<i>there is this notion of aborting a transaction,</i>
+<i>and then the database has to get back into the state it was in at the beginning</i>
+<i>of the transaction, before any changes were made by this transaction.</i>
+<i>In general, you can imagine that this is not super easy to achieve,</i>
+<i>if there are many transactions working concurrently that might depend</i>
+<i>in some way, on each other, conceptually.</i>
+<i>So the notion of atomicity connects to the notion of committing</i>
+<i>or aborting a transaction.</i>
+<i>Committing means, in the end of all my actions</i>
+<i>I say, "Now indeed, I would like to make all of these changes persistent</i>
+<i>and I would like to enter the transaction that way."</i>
+<i>The alternative is to abort it and then all has to be undone.</i>
+<i>This notion of aborting can be implemented in different ways.</i>
+<i>One way is to have a, kind of, log that records all the actions</i>
+<i>so that we can undo them in someway.</i>
+<i>Maybe the pre and after images of the database.</i>
+<i>Another notion would be to work with a snapshot that copies the database;</i>
+<i>that can be thrown away if you choose not to commit to transaction.</i>
+A very famous notion is that of ACID transactions.
+You may have heard this already, it's actually very important in computer science.
+And ACID is an acronym standing for: atomicity, consistency, isolation and durability.
+So we have just discussed atomicity and we've discussed consistency; that was the notion of satisfying all the integrity constraints posed to the system.
+Isolation refers to, and I think 
+I mentioned this before as well...
+The idea that transactions were completely independent; they don't interfere with each other.
+Each transaction can be executed using a conception model-- that nothing else happens at the same time in the system.
+And finally, durability refers to the notion that things that we commit become durable and don't get lost.
+That means conceptually, if I commit a transaction, and I say "Finish it; store it."
+Then it mustn't go away; the data must remain stored.
+It mustn't, for example, crash suddenly and then the data is lost.
+Something that is committed, must be recorded so it'll stay for eternity.
+Keep in mind though, that another transaction may intentionally change things back to an old state.
+If it's a different transaction, then that's OK.
+This doesn't conflict with durability.
+If I've got a first transaction that increases my bank account by 100 Swiss Francs and the second that decreases it by 100 Swiss Francs, this is not in violation of durability.
+It would be a violation of durability, if after the first transaction which increased my bank account by 100, something bad happens and this change is lost and goes away.
+But if you intentionally change it in a separate transaction then that's not in violation of durability.
+<i>Here's an example of a transaction or actually a sketch of two transactions.</i>
+<i>So, we will use the notion of sketch rule or history to refer to a recording</i>
+<i>of multiple transactions possible that occur over a time frame.</i>
+<i>And usually, we'll write these transactions</i>
+<i>along a timeline from left to right.</i>
+<i>Transaction begins and then there might be sequence of actions that happen</i>
+<i>one after the other.</i>
+<i>And in the end, they end.</i>
+<i>In example that you see actually,
+I just say 'BEGIN and END'.</i>
+<i>If I don't say anything else, I assume by end that the transaction is committed.</i>
+[Inauduable]
+<i>Sometimes, it will say explicitly: commit or abort.</i>
+<i>So, here we see two transactions, the first one says well,</i>
+<i>take two bank balances for example, two account balances,</i>
+<i>and I increase and commence one, the first bank balance A by 100</i>
+<i>and I decrease the second B by 100.</i>
+<i>So the idea is, I actually make a bank transaction</i>
+<i>moving 100 of a currency from B to A.</i>
+<i>I've got a separate transaction that actually increases all the balances,</i>
+<i>that means, both A and B's balance by 6%.</i>
+<i>That means we multiply the current balance by 1.06,</i>
+<i>and assign that new value to the bank balances.</i>
+<i>So I can imagine this as two transactions
+ in a bank, in a banking system.</i>
+<i>The first one is a wire transfer, the second one is and interest payment</i>
+<i>on all the accounts.</i>
+<i>So, what could I mean by this?</i>
+<i>In a sense, these things
+ happen concurrently.</i>
+<i>If transaction T1 happens completely before T2, everything is probably clear.</i>
+<i>And if T2 happens completely before T1, everything is clear.</i>
+<i>Actually, it makes a difference though.</i>
+<i>Because if the bank balance of A initially is zero</i>
+<i>and we first increase by 100 and then pay interest, A will own 106.</i>
+<i>While, if we first pay interest and then get our increase,</i>
+<i>A will own 100 only.</i>
+<i>So the order of the transactions matters.</i>
+<i>And that order is going to be determined by the order in which transactions</i>
+<i>physically arrive in some sense.</i>
+<i>We're going to only require the semantics to be such that, we can think</i>
+<i>of transactions that have happened in some order</i>
+<i>not in the living.</i>
+<i>That's consistent with this notion of isolation and expectations</i>
+<i>that we have about transactions discussed so far.</i>
+<i>Let's consider some possible interleavings of these two</i>
+<i>transactions we've just seen.</i>
+<i>At the top of the slide, you see an interleaving</i>
+<i>were the first action of the first transaction, is followed</i>
+<i>by the first operation of second transaction, followed by the second</i>
+<i>operation to the first transaction and finally, the second operation</i>
+<i>of the second transaction.</i>
+<i>If you look at the first two actions in this schedule;</i>
+<i>they're both on object A on the first user's bank balance.</i>
+<i>And then the third and the fourth actions are only involving B.</i>
+<i>So in a sense, the first two actions don't interleave with this second set;</i>
+<i>the actions 3 and 4.</i>
+<i>And conceptually, I could reorder the second and the third actions</i>
+<i>in this schedule, to get a completely serial schedule,</i>
+<i>namely T1 completed before T2.</i>
+<i>That means, I could move the B=B-100 before the A=1.06 x A and it would have</i>
+<i>exactly the same meaning, the same semantics to the schedule.</i>
+<i>So this schedule is actually equivalent to a serial execution of T1 before T2.</i>
+<i>And that is what we think of as an acceptable execution</i>
+<i>of these set of transactions.</i>
+<i>And if you look at the second schedule
+ that you see on this slide,</i>
+<i>were we first have A=A+100, A=1.06 x A</i>
+<i>and then B=1.06 x B and then B=B-100.</i>
+<i>The interleaving of T2 nested into T1, is such that there is actually</i>
+<i>no execution that is serial and equivalent.</i>
+<i>So if you execute a T1 completely before T2,</i>
+<i>we would have a different semantics because then B would have had its money</i>
+<i>deducted before the interest was paid, which is different</i>
+<i>from what we see right now, were interest is paid before money is entirely deducted.</i>
+<i>So current schedule, as you see it here,</i>
+<i>is advantageous to be compared to one</i>
+<i>were T1 is executed before T2.</i>
+<i>And visa versa.</i>
+<i>If you would execute T2 entirely before T1,</i>
+<i>it would be unfair, so to say, in the other sense,</i>
+<i>compared to the schedule.</i>
+<i>So what we're saying is that, this schedule, the second schedule</i>
+<i>actually does not correspond to any serial execution of--</i>
+<i>It's not equivalent to any serial execution of these two transactions</i>
+<i>and we want to exclude such an interleaving.</i>
+<i>Because it doesn't correspond to our notion of isolation.</i>
+<i>This does not make sense if we think of this system</i>
+<i>executing everything one after the other,</i>
+<i>elimination the need for us to understand concurrency.</i>
+<i>Just for completeness right now, from the viewpoint of the database</i>
+<i>system, analyzing such schedules, we can actually extract away</i>
+<i>from the application code that
+[inaudiable] does certain things with A,</i>
+<i>and changes A in certain ways and changes B in certain ways,</i>
+<i>reading off values of B, etc.</i>
+<i>And we could only talk with reads and writes.</i>
+<i>So, we could say that this very first action: A=A+100 is actually a read of A</i>
+<i>followed by a write of A.</i>
+<i>What is written depends on the reading of A,</i>
+<i>so we cannot ignore what has been read.</i>
+<i>But how exactly it's written; that effect is that we actually</i>
+<i>increment it by 100.</i>
+<i>We don't need to know or worry about these ordering constraints.</i>
+<i>So in fact now, each of these four operations is or corresponds</i>
+<i>to a read of the old value and a write of the new value.</i>
+<i>And you can think of this schedule on the level of abstraction</i>
+<i>that we will really have to study later; its just a sequence of reads and writes</i>
+<i>in each transaction.</i>
+<i>So I've already kind of said this in this example,</i>
+<i>so we think of a serial schedule
+ as a schedule that doesn't have</i>
+<i>any interleavings.</i>
+<i>Each transaction is executed-- the transactions are executed</i>
+<i>one after the other.</i>
+<i>For example, T1 completely before T2 or T2 completely before T1.</i>
+<i>That's serial.</i>
+<i>Any interleaving were things</i>
+<i>are overlapping, is not a serial schedule.</i>
+<i>And if you go for two schedules as equivalent, if they lead to the same</i>
+<i>result no matter what the initial database state is,</i>
+<i>that means no matter what, they are all [inaudible] A and B,</i>
+<i>the result must be the same, and then the schedules are equivalent.</i>
+<i>And a serializable schedule is a schedule that is equivalent</i>
+<i>to a serial execution of the transactions.</i>
+<i>That means, it's equivalent to a serial schedule.</i>
+<i>It's a serializable schedule.</i>
+<i>And this is a very important notion because that is what we think of</i>
+<i>as an acceptable execution of transactions in concurrent systems.</i>
+<i>That means serializability allowing only serializable schedules</i>
+<i>is exactly what we want to, kind of, guarantee this notion of consistency</i>
+<i>of actually ACID's in a consistent databases.</i>
+<i>What can go wrong in non-serializable schedules?</i>
+<i>There's actually three major notions
+ of things going wrong;</i>
+<i>anomalies, that we should talk about.</i>
+<i>The first is what you call: Reading
+ Uncommitted Data or 'dirty reads'.</i>
+<i>We can also call them, 
+Write-Read Conflicts.</i>
+<i>So look at this example schedule here.</i>
+<i>We've got T1 writing A, followed by T2 reading A.</i>
+<i>Then T2 is committing and finally,
+T1, let's say, is aborting.</i>
+<i>That means that T1 made a change to the database,</i>
+<i>a temporary change to the database that it later undid.</i>
+<i>And T2 read this change and made decisions based on that change,</i>
+<i>wrote to the database state and committed this.</i>
+<i>That means, this commit depends on data that actually was not final,</i>
+<i>and thus, this read of A in T2 is a 'dirty read'.</i>
+<i>It's a read that shouldn't have happened in this way and thus the database</i>
+<i>is not in a consistent form anymore and it's corrupted.</i>
+<i>So this must not happen.</i>
+<i>The second form Read-Writes conflicts, unrepeatable reads.</i>
+<i>So, look at this example, so we have T1 reading A, T2 reading A then writing it</i>
+<i>then committing.</i>
+<i>And then we have T1 reading A again.</i>
+<i>So, T1 reads A twice, and it will in general read two different values,</i>
+<i>because in the meantime, between the first and the second read of T1,</i>
+<i>T2 has changed the value of A.</i>
+<i>And isolation basically governs that this must not happen.</i>
+<i>We should think of T1 happening
+ in complete isolation.</i>
+<i>We don't need to store the value of A locally for consistency.</i>
+<i>We can rely on the database to store it for us.</i>
+<i>And the semantics of A's transactions, requires that this is safe to do,</i>
+<i>that reading two values twice, if I have not written them in between</i>
+<i>in my transaction, has to lead to the same value.</i>
+<i>So these unrepeatable reads are of course bad</i>
+<i>and they won't be possible in serializable transactions.</i>
+<i>The third case is: Write-Write Conflicts, where we overwrite uncommitted data.</i>
+<i>So for example here, T1 writes A,</i>
+<i>then T2 write A and then writes B, commits</i>
+<i>and then T1 writes B and commits.</i>
+<i>So, in a sense, what T2 has done specifically, what it has done to B</i>
+<i>has been lost, it has been overwritten and durability in a sense,</i>
+<i>has been violated.</i>
+<i>At the same time, I cannot just say, "Well, this is OK,"</i>
+<i>because I could have executed T2 completely before T1</i>
+<i>leading to a serializable schedule because I'm actually writing</i>
+<i>A and T2 after I am writing A and T1.</i>
+<i>So this interleaving, nesting T2 intoT1, leads to a Write-Write Conflict</i>
+<i>and that's again, bad.</i>
+<i>And it would not happen in a serializable schedule.</i>
+<i>So finally, let's think again about what it means to abort a transaction.</i>
+<i>There's a few issues here.</i>
+<i>First of all, again if a transaction is aborted then all its actions</i>
+<i>have to be undone.</i>
+<i>That's required by atomicity.</i>
+<i>But not only that.</i>
+<i>If some other transaction reads what a transaction has written,</i>
+<i>then this transaction is getting aborted.</i>
+<i>That means, a transaction depends on values that are now</i>
+<i>getting undone by the abort.</i>
+<i>Then this other transaction that depends on those values, has to also be aborted.</i>
+<i>So this can lead to a cascade of aborts.</i>
+<i>A single abort can force other transactions to be aborted as well.</i>
+<i>And we have to be careful because</i>
+<i>we mustn't allow these other transactions</i>
+<i>get committed before the first transaction gets committed.</i>
+<i>Because if the first transaction gets aborted then you've got</i>
+<i>this dependencies which cannot be recovered from.</i>
+<i>And the database is permanently, so to say, corrupted.</i>
+<i>That mustn't happen.</i>
+<i>So we have to actually worry about in our concurrency control</i>
+<i>algorithms and protocols, not just about serializability</i>
+<i>but also about correctly
+ dealing with aborts.</i>
+In summary, transactions are a very nice and clean abstraction for dealing with concurrency.
+We've talked about the ACID properties of transactions: atomicity, consistency, isolation and durability.
+All of those, are important and there's good reason for them.
+Atomicity really makes the transaction work.
+It's not a single individual update but a sequence of things that belong together.
+Consistency means that you can have constraints on the validity of the data, integrity constraints, and they must be satisfied before and after transactions.
+Isolation means, you can really think of, as a program of database application for example, that there's nothing else happening, you don't have to worry about consistency.
+So you don't really have to be an expert systems engineer, for example, to be able to deal with a database system.
+You can program your application programs as if nothing else happens.
+And the database system is entirely responsible for ensuring that concurrency is dealt with properly.
+And transactions are the vehicle for doing this.
+And finally, durability is the, kind of, obvious thing that, things that you store and mean to store and say, "I really mean to store this,
+I commit," they mustn't get lost.

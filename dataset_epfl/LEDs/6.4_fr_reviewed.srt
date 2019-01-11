@@ -1,0 +1,545 @@
+1
+00:00:00,008 --> 00:00:05,346
+[AUDIO_VIDE]
+
+2
+00:00:05,346 --> 00:00:13,180
+[AUDIO_VIDE] Bonjour.
+
+3
+00:00:13,180 --> 00:00:15,060
+Le sujet d'aujourd'hui
+est un peu particulier.
+
+4
+00:00:16,660 --> 00:00:21,830
+Il a été motivé par le fait de
+pouvoir faire de jolies animations
+
+5
+00:00:21,830 --> 00:00:25,100
+dans de tout-petits micro contrôleurs.
+
+6
+00:00:25,100 --> 00:00:29,140
+Je vais montrer comment on peut mettre
+des instructions qu'on a inventées
+
+7
+00:00:29,140 --> 00:00:33,600
+dans un tableau, comment on peut
+interpréter ces instructions
+
+8
+00:00:33,600 --> 00:00:36,740
+pour qu'elles produisent un effet,
+et je vais également
+
+9
+00:00:36,740 --> 00:00:41,750
+montrer qu'on peut utiliser ce système
+pour de petits langages graphiques.
+
+10
+00:00:41,750 --> 00:00:46,180
+On sait que animer une enseigne à LED,
+ça n'est rien d'autre qu'une suite
+
+11
+00:00:46,180 --> 00:00:51,020
+d'opérations qui vont s'effectuer
+sur des LED ou des groupes de LED.
+
+12
+00:00:51,020 --> 00:00:54,360
+Dans le cas d'un afficheur matriciel,
+eh bien,
+
+13
+00:00:54,360 --> 00:00:56,890
+il s'agira d'envoyer des
+séquences graphiques.
+
+14
+00:00:58,190 --> 00:01:03,020
+Mais l'écriture dans le langage habituel,
+par exemple C,
+
+15
+00:01:03,020 --> 00:01:07,290
+de ces animations deviennent
+souvent assez compliquées,
+
+16
+00:01:07,290 --> 00:01:13,260
+assez longues,
+et aussi très souvent difficiles à lire.
+
+17
+00:01:13,260 --> 00:01:15,740
+Elles prennent passablement de place,
+en mémoire,
+
+18
+00:01:15,740 --> 00:01:20,920
+et il peut être intéressant
+d'inventer un langage.
+
+19
+00:01:22,360 --> 00:01:25,870
+L'idée, c'est de décrire les animations
+
+20
+00:01:25,870 --> 00:01:28,890
+dans ce langage par
+différentes instructions.
+
+21
+00:01:28,890 --> 00:01:32,390
+Prenons ici un programme,
+écrit en langage Arduino.
+
+22
+00:01:32,390 --> 00:01:38,460
+On a une boucle permanente
+et on fait alterner des,
+
+23
+00:01:38,460 --> 00:01:44,130
+digitalWrite, pour agir sur une
+LED particulière et des, delay.
+
+24
+00:01:44,130 --> 00:01:44,980
+On peut reconnaître, ici,
+
+25
+00:01:44,980 --> 00:01:49,700
+un chenillard, qui va allumer
+puis éteindre une série de LED.
+
+26
+00:01:51,310 --> 00:01:54,100
+La procédure, digitalWrite,
+prend huit octets.
+
+27
+00:01:55,110 --> 00:01:57,980
+Certes on peut faire un petit peu mieux
+pour ce qui est du, digitalWrite,
+
+28
+00:01:57,980 --> 00:02:03,190
+en utilisant l'accès direct au
+registre du micro contrôleur,
+
+29
+00:02:03,190 --> 00:02:05,320
+ici, quatre octets sur un MSP430.
+
+30
+00:02:06,830 --> 00:02:11,450
+Nous allons mettre des
+instructions dans un tableau.
+
+31
+00:02:11,450 --> 00:02:16,500
+Et ce tableau a été volontairement choisi,
+un tableau de huit bits.
+
+32
+00:02:16,500 --> 00:02:21,540
+On a la même animation,
+on agit sur une sortie, on attend,
+
+33
+00:02:21,540 --> 00:02:24,270
+on agit sur une sortie, on attend.
+
+34
+00:02:26,250 --> 00:02:29,500
+Mais ici,
+notre tableau ne fait que 33 octets.
+
+35
+00:02:29,500 --> 00:02:36,130
+On a, pour créer ce tableau,
+utilisé deux instructions,
+
+36
+00:02:36,130 --> 00:02:40,490
+la première, qui permet de mettre une
+intensité et on passe comme paramètres
+
+37
+00:02:40,490 --> 00:02:45,930
+l'intensité et la sortie concernée,
+sortie numéro zéro,
+
+38
+00:02:45,930 --> 00:02:50,380
+On, ou bien sortie numéro cinq, Off.
+
+39
+00:02:51,960 --> 00:03:00,300
+L'autre instruction, c'est attendre une
+certaine durée, attendre 10, attendre 30.
+
+40
+00:03:00,300 --> 00:03:07,260
+Il faudra choisir la bonne unité pour
+pouvoir utiliser au mieux le système.
+
+41
+00:03:07,260 --> 00:03:10,920
+Voici les définitions qui ont permis
+
+42
+00:03:10,920 --> 00:03:12,960
+de rendre possible la
+compilation de ce tableau.
+
+43
+00:03:14,340 --> 00:03:19,920
+On a défini le mot, On,
+avec le bit six, le mot,
+
+44
+00:03:19,920 --> 00:03:25,040
+Off, avec le bit six à zéro, on a défini,
+
+45
+00:03:25,040 --> 00:03:29,850
+sortie zéro, un, deux, trois, quatre,
+cinq, six, sept, par les valeurs zéro, un,
+
+46
+00:03:29,850 --> 00:03:34,530
+deux, trois quatre, cinq, six,
+sept, on a défini, attente,
+
+47
+00:03:35,800 --> 00:03:41,280
+par le bit numéro sept actif,
+et finalement,
+
+48
+00:03:41,280 --> 00:03:46,410
+une valeur qui ne contient que des uns,
+c'est ce qui codera l'instruction, Fin.
+
+49
+00:03:48,000 --> 00:03:50,980
+Voilà donc une description des
+instructions que nous avons,
+
+50
+00:03:50,980 --> 00:03:52,880
+elles sont codées donc sur huit bits.
+
+51
+00:03:54,230 --> 00:03:57,970
+Si ce premier bit,
+le bit numéro sept est à zéro,
+
+52
+00:03:57,970 --> 00:04:04,240
+on a l'instruction qui met une intensité
+sur une sortie avec l'intensité,
+
+53
+00:04:04,240 --> 00:04:10,140
+ici valeur binaire, sur le bit six,
+et le numéro de la sortie concernée.
+
+54
+00:04:10,140 --> 00:04:15,210
+Si par contre on a un, 1, sur le bit, deux
+puissance sept, alors on a une durée ici,
+
+55
+00:04:15,210 --> 00:04:19,550
+et cette durée est une
+durée sur sept bits.
+
+56
+00:04:19,550 --> 00:04:23,270
+C'est la raison pour laquelle on va
+plutôt l'exprimer en dixièmes de secondes
+
+57
+00:04:23,270 --> 00:04:27,260
+pour pouvoir avoir des durées qui
+varient de zéro à environ 13 secondes.
+
+58
+00:04:27,260 --> 00:04:29,880
+Et on voit que ça correspond bien aux
+
+59
+00:04:29,880 --> 00:04:31,465
+définitions que nous
+avions tout à l'heure.
+
+60
+00:04:31,465 --> 00:04:38,420
+Ici, le On,
+l'attente avec ce bit à 1, etc.
+
+61
+00:04:41,000 --> 00:04:46,980
+Il va falloir bien entendu écrire une
+procédure qui exécute une instruction.
+
+62
+00:04:48,460 --> 00:04:53,110
+Elle va, ici, aller chercher
+l'instruction dans le tableau programme
+
+63
+00:04:53,110 --> 00:04:55,450
+avec incrémentation de l'index.
+
+64
+00:04:56,520 --> 00:05:01,640
+On va tester s'il s'agit de l'instruction,
+Fin, et relancer le programme au début si
+
+65
+00:05:01,640 --> 00:05:07,410
+c'est le cas, sinon on va regarder
+s'il s'agit d'une attente, le bit,
+
+66
+00:05:07,410 --> 00:05:12,330
+deux à la puissance sept,
+et on va attendre le temps
+
+67
+00:05:13,520 --> 00:05:17,930
+en millisecondes multiplié
+par dix et récupéré dans
+
+68
+00:05:17,930 --> 00:05:22,590
+les sept bits de poids faibles de
+l'instruction donc avec le, Et logique.
+
+69
+00:05:23,770 --> 00:05:27,640
+S'il ne s'agit pas d'une attente,
+il s'agit donc d'une intensité.
+
+70
+00:05:27,640 --> 00:05:32,530
+Alors, en fonction de l'instruction
+qu'on trouve dans le bit numéro six,
+
+71
+00:05:32,530 --> 00:05:34,990
+on va allumer ou éteindre,
+
+72
+00:05:36,870 --> 00:05:42,290
+et on prendra dans
+l'instruction sur les six bits,
+
+73
+00:05:42,290 --> 00:05:47,060
+ici, le numéro de la sortie concernée.
+
+74
+00:05:48,560 --> 00:05:52,660
+Bien entendu, le langage que je viens
+de présenter est un peu simpliste.
+
+75
+00:05:52,660 --> 00:05:57,198
+Nous allons pouvoir faire des choses un
+petit peu plus sophistiquées, par exemple
+
+76
+00:05:57,198 --> 00:06:02,160
+utiliser la variation de
+l'intensité avec du PWM,
+
+77
+00:06:02,160 --> 00:06:07,990
+ou du BCM, pour pouvoir
+commander l'intensité des LED.
+
+78
+00:06:07,990 --> 00:06:12,040
+Nous pourrons aussi rendre les programmes
+plus simples et plus lisibles en
+
+79
+00:06:12,040 --> 00:06:16,770
+gérant des groupes de LED,
+et pas uniquement des LED isolées.
+
+80
+00:06:17,880 --> 00:06:22,770
+Nous pourrons aussi faire de
+la programmation en quelque
+
+81
+00:06:22,770 --> 00:06:26,960
+sorte en parallèle, d'avoir plusieurs
+programmes qui s'exécutent en même temps.
+
+82
+00:06:26,960 --> 00:06:28,590
+Ce système s'y prête parfaitement.
+
+83
+00:06:30,060 --> 00:06:33,995
+Je terminerai par la présentation d'un
+petit langage graphique que j'avais
+
+84
+00:06:33,995 --> 00:06:34,495
+imaginé.
+
+85
+00:06:34,495 --> 00:06:39,175
+Il s'agissait à l'époque de pouvoir
+réaliser dans un tout-petit
+
+86
+00:06:39,175 --> 00:06:42,925
+micro contrôleur avec deux K de mémoire
+
+87
+00:06:42,925 --> 00:06:46,975
+des animations sur un afficheur
+matriciel de 16 par 16 LED.
+
+88
+00:06:46,975 --> 00:06:51,060
+Et j'avais imaginé les
+instructions de huit bits avec,
+
+89
+00:06:51,060 --> 00:06:55,760
+typiquement, dessin d'une droite
+horizontale et on passait comme
+
+90
+00:06:55,760 --> 00:07:00,520
+paramètre sous forme de quatre
+bits la variation du x.
+
+91
+00:07:00,520 --> 00:07:04,140
+Donc ça permettait d'avoir une droite
+horizontale depuis le curseur.
+
+92
+00:07:04,140 --> 00:07:07,970
+Toutes les instructions
+utilisaient ce concept de curseur.
+
+93
+00:07:07,970 --> 00:07:10,150
+De même,
+on pouvait faire une droite verticale.
+
+94
+00:07:10,150 --> 00:07:12,285
+On pouvait faire
+l'équivalent d'une droite,
+
+95
+00:07:12,285 --> 00:07:15,895
+mais simplement en avançant
+le curseur en x ou en y.
+
+96
+00:07:15,895 --> 00:07:21,055
+Il y avait un système astucieux
+de répétition qui avait
+
+97
+00:07:21,055 --> 00:07:26,295
+la propriété de multiplier n
+fois l'instruction suivante,
+
+98
+00:07:27,615 --> 00:07:34,760
+et, associé avec le mécanisme de
+définition de sous-routine et d'appel
+
+99
+00:07:34,760 --> 00:07:40,730
+de sous-routine, on avait la possibilité
+de faire des sortes de boucles imbriquées.
+
+100
+00:07:40,730 --> 00:07:46,170
+Et finalement j'ai pu réaliser avec
+deux K de mémoire des animations
+
+101
+00:07:46,170 --> 00:07:51,230
+qui m'avaient pris plus de 10 K
+lorsque je les avaient écrites, en C.
+
+102
+00:07:52,740 --> 00:07:56,350
+On a ici la suite des instructions avec
+quelques instructions particulières,
+
+103
+00:07:56,350 --> 00:08:00,670
+par exemple effacer l'écran,
+et ici, le retour de sous-routine,
+
+104
+00:08:00,670 --> 00:08:04,020
+placer le curseur en position zéro zéro,
+
+105
+00:08:05,030 --> 00:08:08,390
+et quelques systèmes un petit peu plus
+sophistiqués qui avaient permis d'avoir,
+
+106
+00:08:08,390 --> 00:08:12,520
+quand même, des effets intéressants,
+par exemple ici,
+
+107
+00:08:12,520 --> 00:08:16,405
+la possibilité d'exécuter une procédure
+écrite alors finalement quand même, en C,
+
+108
+00:08:16,405 --> 00:08:19,985
+pour quelque chose de très particulier,
+et on voit qu'il restait même
+
+109
+00:08:19,985 --> 00:08:23,995
+quelques instructions libres
+pour enrichir encore ce langage.
+
+110
+00:08:23,995 --> 00:08:29,285
+Je pense que ceux qui ont déjà
+fait de l'assembleur ont trouvé de
+
+111
+00:08:29,285 --> 00:08:34,236
+nombreuses similitudes entre ces langages
+que nous avons inventés et l'assembleur,
+
+112
+00:08:34,236 --> 00:08:39,310
+et peut-être aurez-vous une fois le
+plaisir d'utiliser de telles techniques,
+
+113
+00:08:39,310 --> 00:08:45,610
+inventer un langage pour animer une
+enseigne ou un afficheur à LED.

@@ -1,0 +1,32 @@
+We are discussing Butler Lampson's name service, and the second design goal for the system is reliability.
+Whenever a user looks up a name, that should be successfully resolved even in the face of infrastructure problems.
+Let's see how that is achieved.
+So far, we have seen that, to its users, the name service exposes the view of a directory tree.
+Under the covers, however, things are quite different.
+Each directory is stored into multiple servers, and each server maintains its own copy of the directory contents.
+Now let's zoom into the internals of the SRC directory.
+In the previous slide,
+I implied that all copies of the same directory always have the same content.
+In reality this may not be the case, because different servers may see different updates.
+That is, different changes to the directory content.
+For example, suppose that at some point the three directory copies look like this.
+Then three updates occurred.
+Update A reached all servers.
+Update B reached only server gamma.
+And Update C reached servers alpha and gamma.
+So, it is possible that the directory copies become desynchronized.
+Which means that we need a mechanism to periodically resynchronize them.
+This mechanism is called a sweep.
+And it periodically reads all the new updates from directory copies and writes them back to all directory copies.
+Let us see this visually.
+The sweep arrives at server alpha, reads the blue and orange updates that have reached the server, then moves on to server beta, where there are no new updates to read.
+Then moves on to server gamma, where it reads the green update.
+Each sweep has a timestamp associated with it.
+In this example it is five.
+And every time it reads from a directory copy, it marks the directory copy with its timestamp.
+After reading all directory copies, the sweep circles back to the beginning, and writes to each server the updates that the server is missing.
+Every time the sweep writes the directory copy, it marks again that copy with its timestamp.
+So, reliability is achieved through redundancy.
+Each directory is copied into multiple servers, and it is enough for one of these servers to be reachable to enable successful name lookup.
+This requires a bit of extra care, we need to periodically resynchronize the different directory copies.
+That is because different servers see different updates, so we need a periodic sweep in order to bring all the different directory copies up to date.

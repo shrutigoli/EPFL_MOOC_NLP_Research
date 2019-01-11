@@ -1,0 +1,1340 @@
+1
+00:00:03,344 --> 00:00:04,654
+Welcome back.
+
+2
+00:00:04,654 --> 00:00:07,554
+We're still talking about virtualization
+and virtual machines,
+
+3
+00:00:07,554 --> 00:00:11,404
+but no longer about
+the nuts and bolts of building a VMM
+
+4
+00:00:11,884 --> 00:00:16,104
+or how to multiplex resources,
+but instead about
+
+5
+00:00:16,104 --> 00:00:19,604
+one of the fundamental problems 
+associated with virtualization,
+
+6
+00:00:19,604 --> 00:00:23,124
+which is the problem of resource
+management in a layer environment.
+
+7
+00:00:23,694 --> 00:00:25,844
+And this module is a case study.
+
+8
+00:00:25,844 --> 00:00:28,224
+We're going to go over
+some of the architecture
+
+9
+00:00:28,224 --> 00:00:30,884
+and some of the results
+of a system called DISCO.
+
+10
+00:00:30,884 --> 00:00:34,394
+This is a project I worked on
+in the late '90s at Stanford.
+
+11
+00:00:35,109 --> 00:00:38,389
+This was influential because it was
+one of the first papers to propose
+
+12
+00:00:38,389 --> 00:00:40,739
+the use of virtual machines
+in the modern era.
+
+13
+00:00:41,319 --> 00:00:43,729
+But if you actually
+look at DISCO's contribution,
+
+14
+00:00:43,729 --> 00:00:46,009
+and I don't suggest you read the paper,
+
+15
+00:00:46,009 --> 00:00:48,479
+you'll see that many of
+its contributions are actually
+
+16
+00:00:48,479 --> 00:00:50,129
+in the area of resource management.
+
+17
+00:00:50,129 --> 00:00:53,699
+How to efficiently manage resources
+in an environment that no longer
+
+18
+00:00:53,699 --> 00:00:57,699
+runs a single operating system
+but multiple operating system instances.
+
+19
+00:01:00,143 --> 00:01:03,323
+The approaches that were proposed
+in DISCO have found their way
+
+20
+00:01:03,323 --> 00:01:05,233
+into commercial projects.
+
+21
+00:01:05,613 --> 00:01:10,690
+In particular, ESX server uses 
+a memory resource management
+
+22
+00:01:10,690 --> 00:01:12,150
+technique or set of techniques
+
+23
+00:01:12,150 --> 00:01:15,840
+that are improvements
+upon the base approach
+
+24
+00:01:15,840 --> 00:01:17,210
+that was suggested in DISCO.
+
+25
+00:01:17,210 --> 00:01:19,690
+And that is the system
+that you will be reading about
+
+26
+00:01:19,690 --> 00:01:23,690
+in Carl Waldspurger's paper
+on memory resource management.
+
+27
+00:01:24,108 --> 00:01:27,128
+So let's go back to the late '90s
+and at the time,
+
+28
+00:01:27,128 --> 00:01:31,264
+one of the big areas of research
+in academia was in building
+
+29
+00:01:31,264 --> 00:01:33,974
+highly-scalable shared
+memory multiprocessors.
+
+30
+00:01:33,974 --> 00:01:37,444
+So the idea was to aggregate
+a very large number of resources together
+
+31
+00:01:37,444 --> 00:01:39,004
+both CPU and memory.
+
+32
+00:01:39,004 --> 00:01:41,787
+You had an interconnect
+to connect all
+
+33
+00:01:41,787 --> 00:01:44,110
+these processing elements together
+
+34
+00:01:44,110 --> 00:01:46,884
+and DISCO was actually 
+the piece of system software
+
+35
+00:01:46,884 --> 00:01:50,264
+running throughout the machine
+providing the abstraction of
+
+36
+00:01:50,264 --> 00:01:52,950
+virtual machines so that 
+you could actually
+
+37
+00:01:52,950 --> 00:01:55,186
+run a cluster of virtual machines
+
+38
+00:01:55,186 --> 00:01:59,014
+on these highly-scalable shared
+memory multiprocessors.
+
+39
+00:01:59,014 --> 00:02:01,884
+Now, there are a number
+of challenges associated with that
+
+40
+00:02:01,884 --> 00:02:03,944
+when it comes to memory
+resource management.
+
+41
+00:02:03,944 --> 00:02:08,104
+The first one was to avoid having
+unnecessary replication of memory.
+
+42
+00:02:08,104 --> 00:02:11,444
+Memory is a precious resource
+even on a scalable multiprocessor.
+
+43
+00:02:11,444 --> 00:02:13,084
+It certainly was at the time.
+
+44
+00:02:13,804 --> 00:02:18,124
+So it's important to avoid unnecessary
+replication of information.
+
+45
+00:02:18,654 --> 00:02:22,934
+You wanted to be able to take advantage
+of the tight coupling that is enabled by
+
+46
+00:02:22,934 --> 00:02:24,659
+the shared memory hardware.
+
+47
+00:02:25,179 --> 00:02:26,909
+And then there's a second
+class of optimization,
+
+48
+00:02:26,909 --> 00:02:29,839
+which I will not talk about,
+which is you want to ensure
+
+49
+00:02:29,839 --> 00:02:32,369
+that the memory that is used
+is whenever possible
+
+50
+00:02:32,369 --> 00:02:34,879
+local to the CPU 
+as opposed to remote.
+
+51
+00:02:34,879 --> 00:02:39,259
+So you want to optimize the locality
+from a ccNUMA perspective.
+
+52
+00:02:40,826 --> 00:02:44,506
+Now the mechanism that we're using here
+obviously is the fact that
+
+53
+00:02:44,506 --> 00:02:46,336
+there is an additional
+level of indirection.
+
+54
+00:02:46,336 --> 00:02:48,596
+You will recall from the previous
+module, this chart,
+
+55
+00:02:48,596 --> 00:02:52,226
+that talks about the relationship
+between virtual addressees,
+
+56
+00:02:52,226 --> 00:02:55,036
+guest-physical addressees
+and host-physical addressees
+
+57
+00:02:55,036 --> 00:02:58,766
+and the composed mapping
+being inserted into the TLB.
+
+58
+00:02:59,396 --> 00:03:04,736
+Now what's important about this is
+this obviously is one of the key
+
+59
+00:03:04,736 --> 00:03:08,356
+responsibilities of the VMM,
+is to manage these mappings correctly.
+
+60
+00:03:08,664 --> 00:03:11,674
+But it's also one of the 
+most important leverage points
+
+61
+00:03:11,674 --> 00:03:15,634
+because the VMM can actually change 
+any point in time the mapping
+
+62
+00:03:15,634 --> 00:03:18,604
+between guest-physical addressees 
+and host-physical addressees
+
+63
+00:03:18,604 --> 00:03:24,014
+without impacting the operation
+or the execution of the virtual machine.
+
+64
+00:03:24,014 --> 00:03:28,274
+And that is precisely the mechanism
+that we will use and take advantage of
+
+65
+00:03:28,274 --> 00:03:30,854
+in order to optimize for memory.
+
+66
+00:03:30,854 --> 00:03:34,824
+So again, classically, we take advantage
+of adding another level of indirection
+
+67
+00:03:34,824 --> 00:03:39,834
+into the system in order to optimize
+its performance and its execution.
+
+68
+00:03:40,799 --> 00:03:43,879
+Now memory is a
+particularly-known challenge
+
+69
+00:03:44,816 --> 00:03:48,456
+and in particular when 
+the memory is over-committed.
+
+70
+00:03:48,456 --> 00:03:52,726
+Of course, if you have enough
+host-physical memory to run the aggregate
+
+71
+00:03:52,726 --> 00:03:55,846
+of all virtual machines,
+things are not that complicated.
+
+72
+00:03:56,316 --> 00:03:59,696
+But things become very interesting
+if you actually have a collection
+
+73
+00:03:59,696 --> 00:04:04,636
+of virtual machines which in aggregate
+require more physical memory
+
+74
+00:04:04,654 --> 00:04:06,664
+than the host actually has.
+
+75
+00:04:09,126 --> 00:04:12,156
+Now this is a known problem.
+It's actually a known hard problem
+
+76
+00:04:12,656 --> 00:04:16,736
+and if you look at the literature
+of virtual machines on main-frames.
+
+77
+00:04:17,106 --> 00:04:20,676
+There is a well-known problem
+that was diagnosed way back
+
+78
+00:04:20,676 --> 00:04:25,015
+probably as early as the 1960s which
+is known as <i>The Double Swapping Problem</i>.
+
+79
+00:04:25,615 --> 00:04:27,985
+And so let's try to think about 
+what this actually means
+
+80
+00:04:27,985 --> 00:04:31,069
+because it's interesting to just 
+think about the complications
+
+81
+00:04:31,069 --> 00:04:33,313
+that arise in a layered system.
+
+82
+00:04:33,313 --> 00:04:37,348
+So, assume the virtual machine
+monitor is under memory pressure.
+
+83
+00:04:37,350 --> 00:04:40,480
+So, we're running out
+of host-physical memory
+
+84
+00:04:40,480 --> 00:04:43,690
+because the aggregate of the virtual
+machines requires
+
+85
+00:04:43,690 --> 00:04:45,960
+more memory than we actually have.
+
+86
+00:04:46,150 --> 00:04:49,320
+Now if you think about the VMM being
+an operating system,
+
+87
+00:04:49,320 --> 00:04:52,780
+the VMM can actually swap memory
+in and out onto disc.
+
+88
+00:04:53,060 --> 00:04:54,420
+And this is actually what it does.
+
+89
+00:04:54,420 --> 00:04:57,250
+The VMM has the ability to swap.
+
+90
+00:04:57,703 --> 00:05:01,323
+So let's assume the case where
+the VMM is under memory pressure
+
+91
+00:05:02,066 --> 00:05:04,936
+and swaps a page.
+Let's call this page X.
+
+92
+00:05:05,472 --> 00:05:09,472
+Later, let's assume that an operating
+system running in a virtual machine
+
+93
+00:05:10,522 --> 00:05:13,822
+becomes itself under memory pressure
+because each virtual machine
+
+94
+00:05:13,822 --> 00:05:16,712
+is configured with some amount
+of guest-physical memory.
+
+95
+00:05:17,046 --> 00:05:20,076
+So, the operating system
+also has the ability to swap
+
+96
+00:05:20,276 --> 00:05:23,776
+and it decides to swap that same page X.
+
+97
+00:05:23,776 --> 00:05:26,596
+Now it turns out that that page X
+is actually not in memory.
+
+98
+00:05:26,596 --> 00:05:29,116
+It's already on disc
+but the operating system
+
+99
+00:05:29,116 --> 00:05:32,446
+because it's a layered system
+does not know that the page is on disc.
+
+100
+00:05:32,446 --> 00:05:36,156
+And so in order to swap the page onto disc
+it first has to bring that page
+
+101
+00:05:36,170 --> 00:05:39,330
+in a very gratuitous way back from disc.
+
+102
+00:05:39,768 --> 00:05:43,628
+So if you actually think about
+the set of interactions that are going on
+
+103
+00:05:43,651 --> 00:05:47,311
+and the amount of traffic
+going to and from the disc,
+
+104
+00:05:47,329 --> 00:05:50,419
+you end up having to bring
+a page back from disc
+
+105
+00:05:50,419 --> 00:05:53,919
+onto memory-only to swap it
+back onto disc.
+
+106
+00:05:54,179 --> 00:05:56,539
+Obviously, this is grossly inefficient.
+
+107
+00:05:56,539 --> 00:06:00,309
+And this is a known notorious problem
+in mainframes.
+
+108
+00:06:00,717 --> 00:06:02,727
+Now the double swapping problem is hard.
+
+109
+00:06:02,727 --> 00:06:05,997
+You'll get an appreciation of it
+in reading Carl Waldspurger's paper.
+
+110
+00:06:06,437 --> 00:06:09,427
+But in DISCO, we actually focused
+on a first-order problem
+
+111
+00:06:10,188 --> 00:06:13,728
+which is that of the global use
+and efficient use of memory
+
+112
+00:06:13,728 --> 00:06:18,038
+in a workload that can be partitioned
+into multiple virtual machines.
+
+113
+00:06:18,568 --> 00:06:21,688
+So what we're seeing on the left
+is a configuration of that workload
+
+114
+00:06:21,688 --> 00:06:24,298
+with a number of processes,
+these are the orange boxes.
+
+115
+00:06:24,298 --> 00:06:28,618
+Running on top of a single operating
+system running on top of the hardware.
+
+116
+00:06:28,618 --> 00:06:31,968
+And we compare that with the behavior
+of that same workload
+
+117
+00:06:31,968 --> 00:06:34,998
+running on top of a virtual
+machine monitor
+
+118
+00:06:34,998 --> 00:06:37,608
+in a collection of virtual machines.
+
+119
+00:06:37,608 --> 00:06:41,338
+So the processes could be partitioned
+into the various virtual machines.
+
+120
+00:06:41,338 --> 00:06:43,548
+And we actually assume
+from the CPU perspective
+
+121
+00:06:43,548 --> 00:06:46,728
+that the workload can actually
+be partitioned in a relatively
+
+122
+00:06:46,728 --> 00:06:48,358
+straightforward manner.
+
+123
+00:06:48,358 --> 00:06:51,038
+But what we see here is that
+there's one data structure
+
+124
+00:06:51,038 --> 00:06:56,188
+that gets replicated in an unnecessary
+manner and that is the buffer cache.
+
+125
+00:06:56,188 --> 00:07:00,258
+And the buffer cache defines the set
+of memory resources
+
+126
+00:07:00,258 --> 00:07:04,828
+managed by the operating system
+which are the cache of the file system
+
+127
+00:07:04,828 --> 00:07:06,868
+pages that have been read from disc.
+
+128
+00:07:06,868 --> 00:07:09,708
+The picture on the left,
+there's only one buffer cache.
+
+129
+00:07:09,708 --> 00:07:12,648
+So there's only one copy of pages read
+from disc and memory.
+
+130
+00:07:12,648 --> 00:07:16,188
+Whereas, in the picture on the right
+you have four virtual machines,
+
+131
+00:07:16,188 --> 00:07:19,908
+four operating systems and therefore,
+four buffer caches,
+
+132
+00:07:19,908 --> 00:07:25,188
+which may each independently store
+in their memory the same resources.
+
+133
+00:07:25,188 --> 00:07:27,758
+And the buffer cache is actually
+a critically important
+
+134
+00:07:28,168 --> 00:07:31,288
+aspect of a workload
+and a computer system.
+
+135
+00:07:31,288 --> 00:07:33,968
+As a matter of fact,
+a significant fraction of the memory
+
+136
+00:07:33,968 --> 00:07:35,968
+is typically dedicated
+to the buffer cache.
+
+137
+00:07:36,338 --> 00:07:38,198
+And so the question that 
+we're asking in DISCO is,
+
+138
+00:07:38,198 --> 00:07:40,584
+how can we transparently 
+share the buffer caches
+
+139
+00:07:40,584 --> 00:07:42,560
+without having to involve the OS?
+
+140
+00:07:42,560 --> 00:07:45,278
+How do we basically get the same
+level of memory efficiency
+
+141
+00:07:45,278 --> 00:07:48,358
+when it comes to the buffer cache
+in both configurations?
+
+142
+00:07:49,448 --> 00:07:53,048
+Now the solution that we came up with
+is to transparently share
+
+143
+00:07:53,048 --> 00:07:55,198
+physical memory between virtual machines.
+
+144
+00:07:55,198 --> 00:07:57,698
+We leveraged on the fact that 
+there's an additional level of
+
+145
+00:07:57,698 --> 00:08:00,948
+indirection between
+your guest-physical
+
+146
+00:08:00,948 --> 00:08:02,708
+and host-physical memory.
+
+147
+00:08:02,708 --> 00:08:05,128
+And furthermore,
+we take advantage of the fact that
+
+148
+00:08:05,128 --> 00:08:09,468
+that relationship could either be
+a writable, read-write topomapping
+
+149
+00:08:09,468 --> 00:08:12,008
+or it could actually be
+a read-only relationship.
+
+150
+00:08:12,008 --> 00:08:16,938
+So you can transparently share two pages
+that can only be read by two different
+
+151
+00:08:16,956 --> 00:08:20,326
+virtual machines that are using
+the same physical resources.
+
+152
+00:08:21,151 --> 00:08:24,741
+Specifically we're using this technique
+in two instances in DISCO.
+
+153
+00:08:25,971 --> 00:08:30,501
+We interpose on DMA to disc traffic
+and we interpose on network traffic
+
+154
+00:08:30,501 --> 00:08:33,371
+in order to identify pages
+that are known to be identical
+
+155
+00:08:33,371 --> 00:08:38,091
+because of the relationship
+between these pages and the IO subsystem.
+
+156
+00:08:39,101 --> 00:08:44,111
+So let me first give you a perspective
+on how this works for discs.
+
+157
+00:08:44,562 --> 00:08:47,912
+What we see here is a picture of two
+virtual machines.
+
+158
+00:08:48,280 --> 00:08:51,580
+Both are reading and writing
+to their own disc but this disc
+
+159
+00:08:51,580 --> 00:08:56,400
+is actually structured as a hierarchy
+with a shared base disc
+
+160
+00:08:56,400 --> 00:08:59,880
+that is shared between multiple
+virtual machines and a Delta Disc
+
+161
+00:08:59,880 --> 00:09:02,670
+which contains the unique elements
+of each disc.
+
+162
+00:09:02,670 --> 00:09:05,220
+And each virtual machine
+has a unique Delta Disc
+
+163
+00:09:05,220 --> 00:09:07,900
+where you store the writes
+but each virtual machine
+
+164
+00:09:07,900 --> 00:09:10,270
+can transparently share
+some of the resources
+
+165
+00:09:10,270 --> 00:09:12,250
+of the underlying base disc.
+
+166
+00:09:13,403 --> 00:09:15,879
+So, let's take the case 
+where we have
+
+167
+00:09:15,879 --> 00:09:19,355
+end copies of a nearly 
+identical file system.
+
+168
+00:09:19,805 --> 00:09:21,943
+So most of the time,
+the operating system
+
+169
+00:09:21,943 --> 00:09:25,193
+will be reading from the base disc.
+
+170
+00:09:25,193 --> 00:09:28,383
+And whenever the operating system
+reads from the base disc
+
+171
+00:09:28,913 --> 00:09:33,833
+what DISCO does, is associate that page
+with a particular offset in the base disc.
+
+172
+00:09:34,493 --> 00:09:36,663
+And to then make that page read-only.
+
+173
+00:09:36,913 --> 00:09:40,363
+By doing that, you can actually avoid
+subsequent reads to the actual
+
+174
+00:09:40,833 --> 00:09:42,373
+IO subsystem because
+
+175
+00:09:42,813 --> 00:09:45,053
+the second virtual machine
+wants to read to the same page
+
+176
+00:09:45,053 --> 00:09:47,643
+we obviously look up the offset,
+see if it's in the map
+
+177
+00:09:47,643 --> 00:09:50,643
+and if that is the case, we simply
+can have the two virtual machines
+
+178
+00:09:50,643 --> 00:09:53,683
+point to the same location
+rather than having to go to disc.
+
+179
+00:09:53,683 --> 00:09:56,863
+So this actually saves IO
+and also saves memory.
+
+180
+00:09:57,893 --> 00:10:02,323
+Now whenever you transparently share,
+you need to be able to undo the mechanism
+
+181
+00:10:02,323 --> 00:10:04,093
+that enables the transparent sharing.
+
+182
+00:10:04,093 --> 00:10:07,913
+And that is what we in systems
+typically call copy-on-write.
+
+183
+00:10:08,223 --> 00:10:10,553
+Now there are two layers
+in which copy-on-write applies.
+
+184
+00:10:10,553 --> 00:10:14,533
+This is one of the very useful
+and generically useful techniques.
+
+185
+00:10:15,193 --> 00:10:17,893
+We apply copy-on-write
+to the memory subsystem.
+
+186
+00:10:17,893 --> 00:10:21,793
+So if a virtual machine actually decides
+to write to that page,
+
+187
+00:10:21,793 --> 00:10:25,403
+change the content of that page,
+obviously the other virtual machine
+
+188
+00:10:25,403 --> 00:10:29,523
+should not see the changes
+and so that triggers a page fault
+
+189
+00:10:29,523 --> 00:10:33,883
+because the mapping is read-only
+and then we allocate at this point
+
+190
+00:10:33,883 --> 00:10:37,593
+a new distinct page for the virtual
+machine that did the copying.
+
+191
+00:10:38,105 --> 00:10:40,695
+And then the second case
+where we have copy-on-write
+
+192
+00:10:40,695 --> 00:10:42,425
+is obviously to the disc itself.
+
+193
+00:10:42,425 --> 00:10:46,165
+If you issue a SCSI write command
+which means the virtual machine
+
+194
+00:10:46,165 --> 00:10:49,865
+wants to write to a particular offset
+or a particular sector on the disc,
+
+195
+00:10:49,865 --> 00:10:52,245
+then we store the changes
+in the Delta Disc
+
+196
+00:10:52,245 --> 00:10:56,565
+we keep the base disc unmodified
+and then subsequent IO to that location
+
+197
+00:10:56,565 --> 00:10:59,805
+in the disc will actually be served
+by the Delta Disc.
+
+198
+00:11:00,320 --> 00:11:02,850
+So a very simple technique
+you interpose on DMA
+
+199
+00:11:02,850 --> 00:11:06,270
+and through that you actually reduce
+the memory footprint
+
+200
+00:11:06,270 --> 00:11:09,940
+of virtual machines that have
+the same base file system,
+
+201
+00:11:09,940 --> 00:11:14,260
+which is the common use case is 
+you're running 22 copies of Windows,
+
+202
+00:11:14,260 --> 00:11:17,710
+and these 22 copies of Windows
+actually are all running the same
+
+203
+00:11:17,710 --> 00:11:20,890
+Windows based file system
+and therefore you can have a significant
+
+204
+00:11:20,890 --> 00:11:24,330
+degree of sharing in your environment.
+
+205
+00:11:25,226 --> 00:11:28,456
+Now the second mechanism
+that we use is the interposition
+
+206
+00:11:28,456 --> 00:11:31,616
+on networking and for that
+I want to give you just a little bit
+
+207
+00:11:31,616 --> 00:11:33,746
+of background because
+this is generically useful
+
+208
+00:11:33,746 --> 00:11:36,486
+on how virtual machines
+communicate with each other
+
+209
+00:11:36,486 --> 00:11:38,916
+and how they communicate
+with the rest of the world.
+
+210
+00:11:38,916 --> 00:11:40,796
+And the basic observation is very simple.
+
+211
+00:11:40,796 --> 00:11:44,346
+Which is modern operating systems
+all have a built-in networking stack.
+
+212
+00:11:44,562 --> 00:11:47,762
+And so DISCO actually doesn't try
+to have it's own networking stack.
+
+213
+00:11:47,762 --> 00:11:53,002
+Instead DISCO simply exports and emulates
+the abstraction of an Ethernet NIC
+
+214
+00:11:53,002 --> 00:11:57,722
+to each virtual machine and then
+DISCO implements the abstraction
+
+215
+00:11:57,722 --> 00:12:01,572
+of a software Ethernet switch
+that can forward Ethernet packets
+
+216
+00:12:01,572 --> 00:12:04,082
+between VM and with 
+the rest of the world.
+
+217
+00:12:04,082 --> 00:12:08,792
+And so virtual machines communicate
+totally and absolutely like real machines.
+
+218
+00:12:09,371 --> 00:12:12,031
+So DISCO's Ethernet switch
+does have a twist and that twist
+
+219
+00:12:12,031 --> 00:12:16,117
+is that it can remap the fraction
+of an Ethernet packet
+
+220
+00:12:16,117 --> 00:12:17,693
+that straddles an entire page.
+
+221
+00:12:17,693 --> 00:12:20,121
+We actually take advantage 
+of that not only to reduce
+
+222
+00:12:20,121 --> 00:12:23,551
+the amount of CPU cycles required
+to communicate between virtual machines
+
+223
+00:12:23,551 --> 00:12:25,561
+but also the amount of memory
+that is used.
+
+224
+00:12:25,561 --> 00:12:27,651
+In particular, we're using it
+in the context of
+
+225
+00:12:27,651 --> 00:12:31,411
+higher level networking protocol 
+such as NFS which allow clients
+
+226
+00:12:31,411 --> 00:12:34,551
+and servers to share 
+the same network file system.
+
+227
+00:12:34,774 --> 00:12:39,064
+So if you look at the picture on the left,
+what you see is the relationship
+
+228
+00:12:39,064 --> 00:12:42,124
+between an NFS server 
+and an NFS client.
+
+229
+00:12:42,124 --> 00:12:45,644
+And we're illustrating what happens
+when there is the reply
+
+230
+00:12:45,644 --> 00:12:48,204
+from a read request back to the client.
+
+231
+00:12:48,204 --> 00:12:50,824
+So the server sends and creates a packet.
+
+232
+00:12:51,214 --> 00:12:54,744
+The payload of that packet comes directly
+from the file system buffer cache
+
+233
+00:12:55,254 --> 00:12:58,854
+and DISCO's Ethernet switch is intelligent
+enough to remap that page
+
+234
+00:12:58,854 --> 00:13:00,624
+rather than to copy the content.
+
+235
+00:13:01,261 --> 00:13:04,291
+But this is only one half of the answer.
+
+236
+00:13:04,291 --> 00:13:07,191
+The second half of the answer is that
+the operating system
+
+237
+00:13:07,191 --> 00:13:11,781
+when it receives the packet
+tends to actually copy the content
+
+238
+00:13:11,781 --> 00:13:15,471
+from its intermediate location
+which is in the buffer that it received
+
+239
+00:13:15,471 --> 00:13:19,631
+into its final location which is
+in its file system buffer cache.
+
+240
+00:13:20,591 --> 00:13:23,581
+And so the normal implementation
+of an operating system
+
+241
+00:13:23,581 --> 00:13:26,031
+actually does a regular 
+call at that point.
+
+242
+00:13:26,312 --> 00:13:29,352
+We actually had to make a very small
+modification to IRIX
+
+243
+00:13:29,980 --> 00:13:31,670
+to change this call into a hypercall.
+
+244
+00:13:31,670 --> 00:13:36,670
+So we basically asked the hypervisor
+to do a copying using the memory
+
+245
+00:13:36,670 --> 00:13:39,370
+subsystem, a transparent copy
+using the memory subsystem
+
+246
+00:13:39,370 --> 00:13:42,990
+semantically equivalent but without
+requiring copying of data
+
+247
+00:13:43,530 --> 00:13:46,030
+rather than actually doing the copy
+byte by byte.
+
+248
+00:13:46,030 --> 00:13:48,530
+And when you put this together,
+you actually have a solution
+
+249
+00:13:48,530 --> 00:13:51,550
+in which you can transparently share
+your file system buffer cache
+
+250
+00:13:51,550 --> 00:13:54,750
+between the NFS client
+and the NFS server.
+
+251
+00:13:55,828 --> 00:13:58,338
+Now if you actually think about
+the problem that I described,
+
+252
+00:13:58,784 --> 00:14:02,584
+and you fast forward back until today,
+so 15 years later,
+
+253
+00:14:02,584 --> 00:14:06,584
+this problem is actually surprisingly
+as important as ever.
+
+254
+00:14:06,584 --> 00:14:10,394
+And that is because the size of the VM
+keeps increasing.
+
+255
+00:14:11,224 --> 00:14:14,134
+The density of virtual machines
+keep increasing.
+
+256
+00:14:14,844 --> 00:14:18,454
+When people are running desktops
+on servers, which is popular in some
+
+257
+00:14:18,454 --> 00:14:23,664
+use cases in the enterprise today,
+you often see 100, 200, 300
+
+258
+00:14:23,664 --> 00:14:27,204
+virtual machines running on 
+the same high-density server.
+
+259
+00:14:27,204 --> 00:14:31,204
+So you have a tremendous amount
+of density and sharing opportunities.
+
+260
+00:14:31,708 --> 00:14:35,168
+And the memory resource management
+is extremely important in the context
+
+261
+00:14:35,168 --> 00:14:38,128
+of migration of virtual machine
+because the memory
+
+262
+00:14:38,128 --> 00:14:41,318
+of the virtual machine is 
+the single largest resource
+
+263
+00:14:41,318 --> 00:14:43,858
+that needs to be shuffled around 
+over the network
+
+264
+00:14:43,858 --> 00:14:47,028
+and an efficient handle on
+the memory sharing opportunities
+
+265
+00:14:47,028 --> 00:14:50,548
+reduces the costs of migration
+in a significant manner.
+
+266
+00:14:51,210 --> 00:14:55,140
+Now the case study that I described,
+describes an early system
+
+267
+00:14:55,140 --> 00:14:57,350
+if anything the first system
+that actually tried
+
+268
+00:14:57,350 --> 00:14:58,872
+to transparently share memory.
+
+269
+00:14:58,872 --> 00:15:02,004
+It's preliminary and it's naive 
+in a number of ways.
+
+270
+00:15:02,644 --> 00:15:06,957
+It only works when you already know
+that the content is going to be the same
+
+271
+00:15:07,702 --> 00:15:09,962
+and also it does not solve
+some of the harder problems,
+
+272
+00:15:09,962 --> 00:15:12,052
+in particular, the double
+buffering problem.
+
+273
+00:15:12,533 --> 00:15:14,993
+Those are key improvements
+that you will hopefully
+
+274
+00:15:14,993 --> 00:15:18,843
+get an appreciation for
+in reading Carl Waldspurger's paper
+
+275
+00:15:18,843 --> 00:15:21,353
+which is on the reading list
+for this week.
+
+276
+00:15:21,353 --> 00:15:24,433
+And this wraps our module
+on memory resource management.
+
+277
+00:15:24,000 --> 00:15:26,940
+Thank you very much.

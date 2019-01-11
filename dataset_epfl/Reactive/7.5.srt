@@ -1,0 +1,1067 @@
+1
+00:00:01,160 --> 00:00:04,430
+An important aspect of the reactive
+programming is
+
+2
+00:00:04,430 --> 00:00:09,790
+the scalability, specifically that we
+favors scalability over performance.
+
+3
+00:00:10,790 --> 00:00:14,820
+The distinction I am making here is that
+performance focuses
+
+4
+00:00:14,820 --> 00:00:17,970
+on when the system is used by a single
+client.
+
+5
+00:00:19,310 --> 00:00:21,990
+Making the system faster in this case will
+
+6
+00:00:21,990 --> 00:00:26,500
+usually involve optimizing it for running
+on one CPU,
+
+7
+00:00:26,500 --> 00:00:29,640
+for example, which is as fast as possible.
+
+8
+00:00:29,640 --> 00:00:33,070
+But when multiple clients use the system,
+
+9
+00:00:33,070 --> 00:00:36,010
+these optimizations mean that there is a
+ceiling
+
+10
+00:00:36,010 --> 00:00:38,010
+which will be reached, and beyond a
+
+11
+00:00:38,010 --> 00:00:41,150
+certain point the system will not scale
+anymore.
+
+12
+00:00:41,150 --> 00:00:42,550
+It will not be able to process
+
+13
+00:00:42,550 --> 00:00:45,978
+the inputs received from these multiple
+clients anymore.
+
+14
+00:00:45,978 --> 00:00:51,730
+Sketching this graphically, I have here
+the
+
+15
+00:00:51,730 --> 00:00:57,650
+number of clients, and here the request
+per second.
+
+16
+00:00:57,650 --> 00:01:02,110
+And optimally this would be what clients
+want,
+
+17
+00:01:02,110 --> 00:01:06,410
+because every new clients adds just to the
+request
+
+18
+00:01:06,410 --> 00:01:08,890
+per second that the system can handle,
+which
+
+19
+00:01:08,890 --> 00:01:12,180
+means that the responds time will stay
+roughly constant.
+
+20
+00:01:19,410 --> 00:01:23,960
+In this case, let us say it looks like
+this.
+
+21
+00:01:23,960 --> 00:01:30,240
+Of course, a real system will have a
+maximum, say, here.
+
+22
+00:01:30,240 --> 00:01:36,740
+And that means that the real performance
+curve will look somewhat like this.
+
+23
+00:01:38,170 --> 00:01:41,600
+And what that translates to, in terms of
+response time,
+
+24
+00:01:44,250 --> 00:01:45,220
+is something like that.
+
+25
+00:01:48,140 --> 00:01:53,190
+So when I say, focus on scalability
+instead of performance, that
+
+26
+00:01:53,190 --> 00:01:57,430
+means moving this red line as far up as it
+is practical.
+
+27
+00:01:58,970 --> 00:02:04,720
+And this will make your system withstand a
+higher number of clients, without
+
+28
+00:02:04,720 --> 00:02:11,120
+compromising the service quality, as would
+happen in this case here.
+
+29
+00:02:11,120 --> 00:02:13,236
+You want to move the point,
+
+30
+00:02:13,236 --> 00:02:18,710
+where the response time explodes as far to
+the right as possible.
+
+31
+00:02:20,780 --> 00:02:24,760
+What does that mean in terms of
+implementing an actor system?
+
+32
+00:02:24,760 --> 00:02:30,230
+We learned that one actor can process only
+exactly one message at any given time.
+
+33
+00:02:30,230 --> 00:02:35,710
+It cannot do more work, just because there
+are more messages coming in.
+
+34
+00:02:35,710 --> 00:02:39,960
+You need to have multiple actors working
+on the incoming requests, in
+
+35
+00:02:39,960 --> 00:02:44,050
+parallel, in order to make the system with
+more requests per second.
+
+36
+00:02:45,550 --> 00:02:45,950
+One pattern
+
+37
+00:02:45,950 --> 00:02:48,320
+we have already seen in the link checker
+
+38
+00:02:48,320 --> 00:02:52,740
+example, is to start new actors for every
+request.
+
+39
+00:02:52,740 --> 00:02:58,980
+Another one is that you can have replicas
+of actors, which perform a certain
+
+40
+00:02:58,980 --> 00:03:05,020
+task, and if these actors are stateless,
+then these replicas can run concurrently.
+
+41
+00:03:05,020 --> 00:03:11,311
+Let's say you have an actor here, for
+example, calculating
+
+42
+00:03:11,311 --> 00:03:13,330
+mortgages.
+
+43
+00:03:13,330 --> 00:03:18,520
+And when a client requests, it sends a
+message, and then the mortgage service
+
+44
+00:03:18,520 --> 00:03:23,530
+will calculate the conditions, and reply
+back with an interest rate, for example.
+
+45
+00:03:25,200 --> 00:03:30,920
+Now if this calculation is moderately
+complex, then it will take some time, and
+
+46
+00:03:30,920 --> 00:03:36,740
+we could, for example, scale it out by
+having multiple workers
+
+47
+00:03:38,490 --> 00:03:42,040
+to perform the task.
+It is not necessary to have one per
+
+48
+00:03:42,040 --> 00:03:46,050
+request.
+It could be a pool of, say five or ten,
+
+49
+00:03:46,050 --> 00:03:53,620
+and then they can use at most five or ten
+CPUs completely for this purpose.
+
+50
+00:03:54,870 --> 00:03:57,010
+By not having one actor per request, it
+
+51
+00:03:57,010 --> 00:04:00,310
+is easy to limit the parallelism, which is
+allowed.
+
+52
+00:04:01,500 --> 00:04:03,586
+Since actor communication is,
+
+53
+00:04:03,586 --> 00:04:08,330
+conveniently, asynchronous message
+passing, the client here
+
+54
+00:04:08,330 --> 00:04:11,990
+does know whether the Mortgage Service
+does
+
+55
+00:04:11,990 --> 00:04:16,990
+the calculation itself, or whether it has
+farmed it out to any of the workers.
+
+56
+00:04:16,990 --> 00:04:22,030
+This means that asynchronous message
+passing gives us the possibility for
+
+57
+00:04:22,030 --> 00:04:27,400
+vertical scalability, which means using
+more CPUs in the same node.
+
+58
+00:04:29,610 --> 00:04:33,720
+The purpose of this mortgage service, in
+the last example, was
+
+59
+00:04:33,720 --> 00:04:38,180
+just to route the incoming requests to the
+pool of workers.
+
+60
+00:04:38,180 --> 00:04:40,650
+There are different schemes for doing
+that,
+
+61
+00:04:40,650 --> 00:04:42,520
+which we shall look at in the following.
+
+62
+00:04:44,100 --> 00:04:49,830
+These schemes can be grouped into stateful
+or stateless routing.
+
+63
+00:04:49,830 --> 00:04:54,060
+Stateful means that the routing algorithm
+itself needs to keep some state.
+
+64
+00:04:54,060 --> 00:04:54,800
+For example
+
+65
+00:04:54,800 --> 00:04:59,700
+round robin needs to keep a count.
+We will see what that means in detail.
+
+66
+00:05:01,330 --> 00:05:09,270
+And in general, stateless routing might be
+preferable, because that can even
+
+67
+00:05:09,270 --> 00:05:14,110
+happen, in parallel, by multiple routers,
+because they don't need to share anything.
+
+68
+00:05:16,120 --> 00:05:20,670
+The most easily understood routing scheme
+is the round robin one.
+
+69
+00:05:22,110 --> 00:05:25,530
+You have the router here, incoming
+messages,
+
+70
+00:05:25,530 --> 00:05:28,820
+and let's say we have three targets.
+
+71
+00:05:28,820 --> 00:05:33,610
+One, two, and three here.
+Then the first request will go here.
+
+72
+00:05:33,610 --> 00:05:37,740
+The second will go here.
+Third will go here, then it starts over.
+
+73
+00:05:37,740 --> 00:05:39,890
+Always one, two, three, one, two, three,
+one, two, three.
+
+74
+00:05:40,940 --> 00:05:41,900
+This means
+
+75
+00:05:41,900 --> 00:05:46,660
+that the distribution of messages to these
+routees here will
+
+76
+00:05:46,660 --> 00:05:51,950
+be quite close to equal at any given point
+in time.
+
+77
+00:05:51,950 --> 00:05:57,700
+But that also means that if, for example,
+actor one here experiences failure and the
+
+78
+00:05:57,700 --> 00:06:00,410
+restart takes a bit, then it will
+
+79
+00:06:00,410 --> 00:06:03,490
+still receive the same incoming rate of
+messages.
+
+80
+00:06:03,490 --> 00:06:07,340
+So, the mailbox of this one will get more
+full
+
+81
+00:06:07,340 --> 00:06:08,980
+than the other two.
+
+82
+00:06:08,980 --> 00:06:12,280
+And that means that messages which go to
+number one, which
+
+83
+00:06:12,280 --> 00:06:17,570
+is 1/3rd the incoming messages here will
+experience a higher processing
+
+84
+00:06:17,570 --> 00:06:21,730
+latency, because there is a mailbox in
+here, which the actor
+
+85
+00:06:21,730 --> 00:06:25,430
+needs to work off, in order to get to the
+current message.
+
+86
+00:06:26,980 --> 00:06:29,420
+This can be fixed, of course, by looking
+at
+
+87
+00:06:29,420 --> 00:06:32,530
+the mailbox size, and routing only to
+those which
+
+88
+00:06:32,530 --> 00:06:36,500
+have the lowest number of messages,
+currently.
+
+89
+00:06:36,500 --> 00:06:41,400
+This requires all the routees to be local
+so the message queue can be inspected.
+
+90
+00:06:42,500 --> 00:06:44,830
+It obviously does not work over the
+network.
+
+91
+00:06:46,430 --> 00:06:49,560
+And also, the cost of looking into the
+mailbox
+
+92
+00:06:49,560 --> 00:06:52,890
+and counting the messages in there, is
+rather high.
+
+93
+00:06:52,890 --> 00:06:58,030
+These data structures are concurrent and
+need to be properly synchronized.
+
+94
+00:06:58,030 --> 00:07:03,340
+And they're not as cheap to traverse as a
+normal collection is.
+
+95
+00:07:03,340 --> 00:07:07,830
+This means that this routing cost is
+rather high, and only worth
+
+96
+00:07:07,830 --> 00:07:12,000
+it if the job to be performed takes more
+time than that.
+
+97
+00:07:13,240 --> 00:07:17,920
+But in that case, the imbalances
+introduced between different processing
+
+98
+00:07:17,920 --> 00:07:23,720
+speeds of the actors are evened out by the
+algorithm, and the latency
+
+99
+00:07:23,720 --> 00:07:27,050
+which is experienced by clients, is more
+consistent.
+
+100
+00:07:29,850 --> 00:07:34,980
+Taking this model to the extreme means
+sharing a work queue between different
+
+101
+00:07:34,980 --> 00:07:40,580
+actors.
+So, what we have here is just
+
+102
+00:07:40,580 --> 00:07:46,080
+a queue for the messages, and then we have
+our routees here.
+
+103
+00:07:47,360 --> 00:07:51,420
+And they always process the oldest message
+in the queue.
+
+104
+00:07:51,420 --> 00:07:55,524
+And effectively everyone pulls
+
+105
+00:07:55,524 --> 00:07:58,540
+from there.
+Messages go in on top.
+
+106
+00:07:59,680 --> 00:08:03,410
+The most efficient implementation of this
+scheme is
+
+107
+00:08:03,410 --> 00:08:06,160
+that they really do share the same work
+queue.
+
+108
+00:08:06,160 --> 00:08:08,890
+There is an aka the balancing dispatcher
+for achieving
+
+109
+00:08:08,890 --> 00:08:13,490
+that, but that requires the routees to be
+local, again.
+
+110
+00:08:13,490 --> 00:08:17,390
+Of course this will give the most
+homogeneous latency which you can achieve.
+
+111
+00:08:19,140 --> 00:08:21,590
+So far, evening out imbalances
+
+112
+00:08:21,590 --> 00:08:26,900
+came with a rather high cost of routing
+itself, and, or the need for the routees
+
+113
+00:08:26,900 --> 00:08:32,540
+to be local.
+If we sample the imbalances, for example,
+
+114
+00:08:32,540 --> 00:08:37,480
+over time, it can be rather coarse.
+It doesn't need to happen per message.
+
+115
+00:08:37,480 --> 00:08:42,220
+It could be once per second, for example,
+or even less frequently.
+
+116
+00:08:42,220 --> 00:08:46,780
+Then we can gather this data and use them
+to steer
+
+117
+00:08:46,780 --> 00:08:51,850
+the routing weights.
+So if we have here, the incoming
+
+118
+00:08:51,850 --> 00:08:56,920
+message stream, and here this adaptive
+router and the routees.
+
+119
+00:08:59,930 --> 00:09:02,880
+The routees will periodically send back,
+
+120
+00:09:05,980 --> 00:09:10,760
+the feedback of, for example, how full
+their queue was at this second,
+
+121
+00:09:12,070 --> 00:09:17,580
+or what the CPU load is on that node.
+Because they could run on different nodes.
+
+122
+00:09:18,910 --> 00:09:25,530
+And then this one has an algorithm inside,
+which uses this information
+
+123
+00:09:25,530 --> 00:09:30,637
+to change the relative weights of where
+messages shall go.
+
+124
+00:09:30,637 --> 00:09:37,050
+For example, more frequently here, less
+frequently
+
+125
+00:09:37,050 --> 00:09:43,180
+here, if this node is currently under more
+load.
+
+126
+00:09:43,180 --> 00:09:47,130
+This can be a good compromise, but it
+requires the steering of
+
+127
+00:09:47,130 --> 00:09:49,810
+these weights to be done carefully,
+
+128
+00:09:49,810 --> 00:09:53,180
+because other wise you can introduce
+oscillations.
+
+129
+00:09:53,180 --> 00:09:55,700
+Or over-dampening, so that the reaction
+times
+
+130
+00:09:55,700 --> 00:09:57,800
+are longer than necessary.
+
+131
+00:09:57,800 --> 00:10:01,130
+And for that you need to look into
+feedback control theory.
+
+132
+00:10:02,730 --> 00:10:06,400
+The routing algorithms we looked at so far
+have all been state four.
+
+133
+00:10:07,600 --> 00:10:10,140
+The router itself needed to keep
+information.
+
+134
+00:10:10,140 --> 00:10:14,260
+For example, the round ro, robin needed a
+counter where the last message was sent.
+
+135
+00:10:15,270 --> 00:10:17,990
+This can lead to some routing overhead
+
+136
+00:10:17,990 --> 00:10:21,010
+because the decision depends on something
+which
+
+137
+00:10:21,010 --> 00:10:21,760
+is shared.
+
+138
+00:10:23,090 --> 00:10:26,070
+If you use random routing, for example,
+
+139
+00:10:26,070 --> 00:10:28,980
+then, in principle, no router is
+necessary.
+
+140
+00:10:35,570 --> 00:10:40,900
+We have the incoming message stream.
+And we have, our routees.
+
+141
+00:10:40,900 --> 00:10:41,400
+And
+
+142
+00:10:43,590 --> 00:10:50,460
+each sender of a message to this set of
+actors, randomizes, on its own,
+
+143
+00:10:52,690 --> 00:10:54,890
+where the actual message goes.
+
+144
+00:10:54,890 --> 00:10:56,270
+That means that there doesn't need to
+
+145
+00:10:56,270 --> 00:10:59,670
+be an intermediate actor here, which does
+anything.
+
+146
+00:11:01,120 --> 00:11:04,580
+This offers the lowest possible routing
+overhead.
+
+147
+00:11:04,580 --> 00:11:09,690
+The problem with it is that well the
+process is random.
+
+148
+00:11:09,690 --> 00:11:13,660
+So, there are also, there is the prob,
+probability that for
+
+149
+00:11:13,660 --> 00:11:18,250
+example, number one, might for a certain
+time window, get more messages
+
+150
+00:11:18,250 --> 00:11:23,230
+than two and three.
+Asymptotically, these will even out.
+
+151
+00:11:23,230 --> 00:11:27,050
+But in the real running program, it might
+be observable.
+
+152
+00:11:28,620 --> 00:11:33,070
+Another stateless routing scheme, is that
+of splitting up
+
+153
+00:11:33,070 --> 00:11:38,200
+the incoming message stream, consistently,
+according to some criteria.
+
+154
+00:11:39,360 --> 00:11:42,960
+So we have our routees again.
+
+155
+00:11:42,960 --> 00:11:43,460
+And
+
+156
+00:11:45,970 --> 00:11:46,770
+then, let's say,
+
+157
+00:11:48,940 --> 00:11:50,230
+we have the black part,
+
+158
+00:11:52,540 --> 00:11:53,250
+the red part,
+
+159
+00:11:56,120 --> 00:12:01,190
+and the green part of the message stream.
+And all messages which match
+
+160
+00:12:01,190 --> 00:12:06,560
+this green color, always go to routee
+number 3.
+
+161
+00:12:06,560 --> 00:12:09,830
+This means that there also does not mean
+
+162
+00:12:09,830 --> 00:12:13,220
+to be a central authority here during the
+routing.
+
+163
+00:12:13,220 --> 00:12:16,520
+But it also means that the sub stream need
+to
+
+164
+00:12:16,520 --> 00:12:20,610
+be chosen, such they are, that they are of
+equal weight.
+
+165
+00:12:20,610 --> 00:12:23,580
+Otherwise, it will lead to systematic
+inbalances
+
+166
+00:12:23,580 --> 00:12:27,210
+between the processing times for the three
+routees.
+
+167
+00:12:28,640 --> 00:12:30,860
+This scheme has another advantage.
+
+168
+00:12:30,860 --> 00:12:34,750
+Up to now, it was not really deterministic
+
+169
+00:12:34,750 --> 00:12:39,650
+which message comes to which node, or
+which routee.
+
+170
+00:12:39,650 --> 00:12:44,050
+So, one, two, and three, needed to be
+identical actors.
+
+171
+00:12:44,050 --> 00:12:46,780
+And if another
+
+172
+00:12:46,780 --> 00:12:48,880
+request comes in later, it will have no
+
+173
+00:12:48,880 --> 00:12:52,650
+correlation, or it cannot have any cannot
+require
+
+174
+00:12:52,650 --> 00:12:56,060
+any correlation with a, an earlier
+request, because
+
+175
+00:12:56,060 --> 00:12:59,680
+the state of these reactors is not shared.
+
+176
+00:13:02,520 --> 00:13:07,130
+Splitting up the message screen, according
+to some criterion allows us, to, for
+
+177
+00:13:07,130 --> 00:13:13,720
+example, have all requests pertaining to a
+certain user Go to this actor.
+
+178
+00:13:13,720 --> 00:13:19,960
+And if the user is the important state to
+be kept, then well, everything
+
+179
+00:13:19,960 --> 00:13:24,860
+perti, pertaining to my user, for example,
+always goes to routee number one.
+
+180
+00:13:24,860 --> 00:13:27,860
+And then, subsequent messages could have
+a,
+
+181
+00:13:27,860 --> 00:13:32,410
+common interest correlation because they
+all go
+
+182
+00:13:32,410 --> 00:13:36,980
+to the same target, always.
+And updates to my user for, example,
+
+183
+00:13:36,980 --> 00:13:41,420
+at number one, would be safe because later
+messages will see the updated state.
+
+184
+00:13:43,150 --> 00:13:48,360
+This means that consistent hashing routing
+can be used to replicate
+
+185
+00:13:48,360 --> 00:13:53,080
+stateful actors.
+This requires that the input stream
+
+186
+00:13:53,080 --> 00:13:56,350
+of messages can be split, in such a
+fashion,
+
+187
+00:13:56,350 --> 00:14:01,770
+that the state affected by these
+substreams is independent.
+
+188
+00:14:02,810 --> 00:14:07,650
+If a certain part of the state is shared
+between several actors,
+
+189
+00:14:07,650 --> 00:14:11,420
+we have seen that in a previous lecture,
+with this distributed store.
+
+190
+00:14:14,440 --> 00:14:21,400
+You have two actors here, A and B.
+
+191
+00:14:21,400 --> 00:14:24,060
+And if they share something, which shall
+be the
+
+192
+00:14:24,060 --> 00:14:27,530
+same, then they need to communicate, we
+have seen
+
+193
+00:14:27,530 --> 00:14:31,260
+that, and they need to exchange data in
+appropriate
+
+194
+00:14:31,260 --> 00:14:34,630
+data structures, so that they can achieve
+eventual consistency.
+
+195
+00:14:35,820 --> 00:14:39,780
+Here, replication is not used for
+scalability
+
+196
+00:14:39,780 --> 00:14:43,090
+so much, but it can also be used for fault
+tolerance.
+
+197
+00:14:43,090 --> 00:14:43,590
+And
+
+198
+00:14:46,030 --> 00:14:51,080
+while we are at that topic, it is quite
+easy to see that persistent
+
+199
+00:14:51,080 --> 00:14:56,100
+actors persistent stateful actors, can be
+replicated as well.
+
+200
+00:14:57,130 --> 00:14:59,760
+When something goes wrong, we just need to
+recover the
+
+201
+00:14:59,760 --> 00:15:03,340
+actor, and that could well happen at the
+different location.
+
+202
+00:15:03,340 --> 00:15:06,906
+For example, if the node where the actor
+was living.
+
+203
+00:15:06,906 --> 00:15:12,408
+Let's say
+
+204
+00:15:12,408 --> 00:15:16,800
+node A, we have our actor here.
+
+205
+00:15:18,160 --> 00:15:23,230
+If that node crashes and is not
+recoverable,
+
+206
+00:15:32,080 --> 00:15:37,060
+then on node B, we can just replay the
+state of actor A
+
+207
+00:15:39,080 --> 00:15:45,056
+and resurrect it.
+This will also require a certain
+
+208
+00:15:45,056 --> 00:15:51,210
+message router, which first sends messages
+
+209
+00:15:51,210 --> 00:15:56,960
+here, and then after the crash, switches
+to the new instance.
+
+210
+00:15:58,810 --> 00:16:03,360
+And if we are using event sourcing, we can
+even optimize this process.
+
+211
+00:16:03,360 --> 00:16:04,120
+This second
+
+212
+00:16:04,120 --> 00:16:10,480
+copy of A could be started right away, but
+it could be inactive and only,
+
+213
+00:16:10,480 --> 00:16:15,080
+replay the event stream which generate,
+which is generated by Ą.
+
+214
+00:16:15,080 --> 00:16:18,680
+So, the event store, and then recovery of
+A
+
+215
+00:16:18,680 --> 00:16:22,150
+in the event of failure takes very little
+time.
+
+216
+00:16:23,670 --> 00:16:26,500
+All the features seen so far, have been
+
+217
+00:16:26,500 --> 00:16:30,200
+made possible by the design of the actor
+model.
+
+218
+00:16:30,200 --> 00:16:35,310
+Asynchronous message passing gives us
+vertical scalability, so the
+
+219
+00:16:35,310 --> 00:16:41,620
+ability to run a process in parallel on
+the same node on multiple CPUs.
+
+220
+00:16:41,620 --> 00:16:46,670
+And location transparency, which means
+hiding everything behind actoreth
+
+221
+00:16:46,670 --> 00:16:51,310
+and remoting does not look different,
+enables horizontal scalability.
+
+222
+00:16:51,310 --> 00:16:55,520
+That means running the computation not on
+one node, but on a cluster
+
+223
+00:16:55,520 --> 00:16:57,520
+of potentially hundreds of nodes.
+

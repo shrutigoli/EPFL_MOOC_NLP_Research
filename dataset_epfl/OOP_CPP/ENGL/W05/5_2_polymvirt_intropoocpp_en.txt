@@ -1,0 +1,127 @@
+We have seen that if we want a heterogeneous container, that is, a set of polymorphic objects grouped in a same container, for example in a vector then, it was necessary, in order to have polymorphism, to have a set, a collection of pointers to these objects.
+And we recommended, up until now, that you use a vector of
+C++11 style smart pointers, an vector of unique pointers.
+In this episode, we'll take a look at how we could do this with C-style pointers and what it would imply.
+Remember, we had used the
+Jeu class in our example, containing a collection of characters that could be polymorphic.
+They could be warriors, thieves, magicians, etc.
+And so for this, we used a vector here, with pointers to our characters.
+In the previous version, we had used unique pointers; now, let's see what happens if we use C-style pointers since after all, the interface to add a character uses a C-style pointer.
+As a reminder, the usage was to have an instance of Jeu, and to call "jeu.ajouter_personnage"
+(TN: means "game.add_character"), with dynamic allocation of a warrior here, through "new Guerrier".
+This returns, of course, a pointer to a warrior, and this pointer to a Guerrier is compatible with a pointer to a Personnage, since a Guerrier is a Personnage; a pointer to a warrior is also a pointer to a character.
+So in this case, how can we write the two methods of the Jeu class with C-style pointers?
+Let's start with adding a character; the prototype hasn't changed.
+We take a parameter, "nouveau" which is a C-style pointer to a character, since this is the result of a call to new.
+And since we have decided to have a vector of C-style pointers to characters, there is nothing complicated here.
+We simply need to add
+"push_back" at the end of the vector of characters with the "nouveau" parameter that we received.
+As in the previous version, we can start by verifying that the pointer we have received is not null, that is, that it is a pointer to a real object.
+This version is a little simpler than the one with the unique pointers.
+Similarly, for the display, we can simply use a classical
+"for auto" loop since there is no issue, no problem with having several pointers to the same memory area as is the case with unique pointers.
+So here, there is nothing special to be done compared to unique pointers.
+I will let you compare both codes to see where the differences lie.
+We can see that in the unique pointer version, we had to add "unique_ptr" here instead of simply having a star.
+On the unique pointer side, we also had to add a "const" here to avoid having several pointers to the same area, unlike in the C-style pointer version.
+And finally, we had to add the conversion from a C-style pointer to a unique_ptr, which isn't necessary either in the
+C-style pointer version.
+Thus it seems that the C-style pointer version is simpler that the unique pointer version.
+So why did we recommend you use unique pointers?
+The problem with C-style pointers is that the programmer has to take steps to prevent various potential problems with their class.
+The first thing to think about when using pointers in a class
+-- such as here, when we add pointers to our heterogeneous container, in our game -- the first thing to think about is: when we have pointers in a class, we must think about the copy constructor and the destructor, as well as the assignment operator.
+Indeed, if we have pointers in a container, such as in our game here, where we have an vector of pointers to characters.
+The question to ask is: what does it mean to copy a game?
+Do we want to make a surface copy?
+If I have a game j2 here, which is a copy of j1, it will have a copy of the vector of characters, but if we only make a surface copy, if we only use the default copy constructor, then we will copy pointers.
+We will simply copy the various elements one after the other, copying only the pointers.
+This means that the game j2 will point to the same characters as the game j1.
+And this is usually undesirable, since we generally want both collections to have independent elements.
+Here in the example of the games, we would like to be able to play the first and second games separately, without the characters from one game influencing the characters from the other.
+This problem does not occur with unique pointers since with unique pointers, it is impossible to have multiple pointers to the same characters, and we would not be allowed to copy them.
+So copying is inherently forbidden with a game containing unique pointers.
+The compiler would indeed have forbidden this call to the copy constructor, which tries to makes copies of the unique pointers.
+So the program would have realized that there was a problem here.
+Moreover, with C-style pointers, it is important not to forget deallocation and especially the golden rule, that whoever allocates the memory, whoever calls "new", must also free the memory, that is, call "delete".
+Here is a reminder of how this worked; to add a character to the game, the character was created with a call to "new", so for example "new Magicien", with parameters for its constructor.
+So it is this one who makes this call here, who will have to handle destruction.
+In this case, there is no way of getting the pointer that was allocated, since this value wasn't saved, and we must provide a means to destroy the characters we have put into our collection.
+For example, with a "detruire_personnage" method (TN: means "destroy_character") where we would indicate the address of the character we wish to destroy; but this would suppose of course that the one making the allocation keeps a trace of their pointers to be able to use them here.
+We could also destroy a character by indicating which number, which index that character has, supposing that we had numbered, that we had access to the characters' numbers, we could destroy character number 2, etc.
+Or, we could provide a method that would destroy all the characters.
+That is up to you, depending on your design, depending on the heterogeneous container that you want to use.
+But in any case, you will have to think about providing methods allowing deallocation of allocated memory, to be able to free the pointers that are in your container.
+For example, if we had decided to provide a method to destroy all pointed-to objects stored in the collection, that would destroy all the characters pointed to in the game, then we would iterate like so, with a "for" loop, over all the characters, all the pointers in this "personnages" vector, and we would "delete" each of these pointers.
+Of course, in the end, we mustn't forget to empty the vector of its pointers to avoid keeping in memory the pointers to memory areas that have been freed.
+Here is another solution, if we wish to provide the method allowing the destruction of a character specified by their position, for example to destroy the second character, we would have the following situation:
+We have a game containing its vector of characters which are pointers to characters, warriors, thieves, magicians,...
+And suppose that we pass the parameter 1 here to this method, meaning that we want to delete the second character,
+-- character 0, character 1 : we want to destroy the second character -- so the first thing we would do if, of course, we are sure that this parameter here, "lequel", is smaller than " personnages.size() ".
+This could have been tested on the outside, before the call to "detruire_personnage", of course, if we cannot guarantee it, if it is not the case, we could always add a test here.
+And so if such a condition is guaranteed, the first thing we would do would be to "delete" this memory area, so " delete personnages [lequel]; " here, so "personnage[1]".
+We will call "delete" here on this memory area but of course, once we have done this, we will have to avoid keeping this address of an invalid memory area, so we will have to delete this pointer.
+So there, you have 3 solutions depending on what you want to do.
+All three solutions are quite applicable.
+It depends on how you want to manage your heterogeneous container: if we want to keep the same order and the same number of elements in our vector of characters, the same number of possible characters, but simply indicate that this character is dead, then at that point, what we could do is simply to say that we replace the invalid pointer by a null pointer, saying that this character was destroyed, represented by a null pointer,
+"nullptr".
+This would yield the following memory situation and so here we would indeed have an vector that continues to have 4 possible characters with a null pointer here to indicate that the character at position 1, the second character, no longer exists.
+This is a possible situation, but that implies that the one using this vector will make sure to test if the object does indeed exist before calling a method on it, for example.
+Another solution, when we destroy a character, is to say that at that moment, the number of characters in the game is decremented by 1, the size of the vector is reduced by 1, and so to actually delete this element.
+In that case, there are 2 possible solutions, an efficient solution which does not preserve order, but that is very efficient, that only deletes a single element, and a solution that preserves the order but that will be very expensive, since it will require copying all the elements following the element that we are destroying.
+Let's look at the first solution.
+The first solution simply consists in exchanging, with "utility"'s "swap" function, to exchange the pointer on which we have just called "delete" with the last pointer of the vector,
+" personnages.back ", remember, is the last element of the "personnages" vector, and so we will exchange these 2 elements, which will result in this.
+If we exchange both pointers, this element will now point here, and this element will point over there.
+We have exchanged these two pointers.
+Once this exchange has been done, then at that point, we can delete the last element of the vector since we now know that this last element is the pointer that we want to destroy.
+So with this "pop back", we will delete this last element.
+This means that after that we will only have 3 characters left and no trace of the address of this memory area that we have just freed.
+A third solution, depending on our needs, would be to delete this pointer, but to preserve the order, that is, to keep this pointer at the beginning, this one in second place, this one in third, and not by exchanging them like we did here, as we did earlier.
+By using "vector"'s "erase" method, we will delete -- I show you this with no further details -- the element at the position "lequel".
+And the reason this is so expensive is that this method will indeed delete this element, but it will copy all the following elements to move them, one after the other, in order to ensure that the vector stays contiguous in memory, with 3 elements.
+So this is how we could do it, one way or another, to make it possible to remove elements from the container.
+To summarize, C-style pointers in a heterogeneous container pose a problem for data integrity.
+In fact, there are 3 sides to this problem: the first, is to guarantee the lifetime of the data pointed to, the lifetime of our characters in the game, for at least as long as the game exists.
+We already spoke of this in the unique_ptr case.
+We talked about it in the previous episode.
+This is a point we find both with unique pointers and with C-style pointers.
+The second problem is the deallocation problem: we must guarantee that we will free the memory that we allocated, and with unique pointers, since they are smart pointers, there is nothing to do.
+So here, everything is alright.
+However, with C-style pointers, this is of course not automatic.
+So we must, as we have just discussed, provide a means to do so cleanly.
+Then, third problem, is sharing data between different collections.
+We already briefly discussed this earlier with copying, and I will come back to this in a moment.
+This is not a problem with unique_ptrs, as it is this unique aspect which prevents any sharing of data between different containers
+But this is not at all guaranteed by
+C-style pointers, and so we will have to handle this.
+Finally, let's take a closer look at this last point.
+To do so, I have chosen an example that seems a little more illustrative.
+Imagine that we have drawings that would be our heterogeneous containers.
+Drawings are sets of geometric figures.
+So we would have 2 classes, the "Figure" class which is an abstract class, and we can imagine having different figures such as rectangles, circles, etc., inheriting from it.
+So we would have a heterogeneous container of figures, which would be our drawing and would contain different figures, that would be polymorphic: rectangles, circles, etc.
+The question now is to know whether the contents of a drawing are personal or shared.
+So for example, if I imagine that I have several drawings, for example, drawing "d18", containing a set of pointers, of course, since we want figures to behave in a polymorphic way, pointers to figures, and so imagine that I have another drawing also with its collectio of pointers to figures.
+Suppose for example that one of these objects is a circle and that we decide to modify a property of this circle, for example to color this circle red.
+The question is, if I color this circle red, will it just be the circle of this drawing "d18" that will be colored in red, or will it also be circles for other drawings?
+For example, is this circle shared between drawings "d18" and "d4", in which case, if I modify it through one drawing, it will be modified for all.
+The answer to this sort of question depends of course on the context in which you are designing your heterogeneous containers
+It depends on the design of your heterogeneous containers but I really think that in the case of drawings, we don't want figures to be shared by several drawings but we want each drawing to have its own figures.
+A drawing has its circle, another drawing has another circle, which are different.
+In the case of the games we had taken as the first example,
+I also think that contents should not be shared.
+With whom would they be shared?
+I think that in that case, we only have a single game and we will avoid copying games.
+So if you want an example where we could imagine having collections that share their contents, it could also be a game, but a little more complex, where we would have different cameras that could each see the players of the game under different angles, and we could imagine that each camera has a collection of characters that it can see, like so.
+So for example, camera 1 could see monster 1 and player 2, and camera 2 could see both players.
+And this would give us the elements of the game that are shared by different collections.
+But this kind of design is much more advanced, and possibly more rare.
+In the examples we have given you, we certainly did not want to share the contents of the collections between different collections.
+We would want each collection to have its own characters, in the case of the game; its own figures, in the case of the drawings.
+So, we would have to guarantee, at the level of the program, using methods and functions, to guarantee that this is the case.
+Or, use unique_ptrs which prevent having several pointers to the same object.
+To conclude, we have recommended using unique pointers to make it easier to guarantee data integrity.
+In any case, be it with unique pointers or C-style pointers, you must think about the problem of the lifetime of the data pointed to by these collections, of the objects contained in these collections.
+But in the case of unique pointers, you don't have to worry about deallocation, thanks to the smart pointer aspect of C++11 pointers, or about sharing data between collections, thanks to the unique aspect of unique pointers.
+If you go for a C-style pointer implementation, then you will need to thing about these problems, and also solve them.

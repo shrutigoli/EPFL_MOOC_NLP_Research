@@ -1,0 +1,39 @@
+I just introduced the forward
+Euler's method.
+(u_(n+1)- u_n)/h = f(u_n, tn).
+Now I will present Euler's backward method, which is written : 
+(u_(n+1) - u_n)/h, as in the forward method and instead of f(u_n,tn) we write f(u_(n+1),t(n+1)).
+How do we get this method ?
+Well, we write the differential equation at time t(n+1,) so u'(t(n+1))= f(u(t(n+1)),t(n+1)) this time we use a backward finite difference formula, in other words we'll approach u'(t(n+1)) by (u(t(n+1))-u(t(n+1)-h))/h this must be equal to f(u(t(n+1)),t(n+1)) plus obviously a remainder of order 1 in h, since I used a backward finite difference formula.
+That was in chapter 2 of the course.
+Now, to get the scheme, 
+I simply replace u(t(n+1)), the exact solution at the time t(n+1), which I do not know, by u_(n+1).
+I replace u(tn) which I do not know, by u_n, and likewise here, f(u_(n+1),t(n+1)),
+I give up on the term in O(h) and get Euler's backward method.
+This scheme is an implicit scheme.
+What does this mean?
+Well, there is an implicit relation between u_(n+1) and u_n, so I cannot write u_(n+1) =... since u_(n+1) appears here and there,
+But I can write the method in the following way:
+I can write 
+(u_(n+1)-u_n)-h*f(u_(n+1),t(n+1)), this must be equal to 0, so if I denote this as g(u_(n+1)), it boils down to finding the 0 of the function g.
+So u_(n+1) is the zero of the function g.
+The function g which is defined for all x in â„� by g(x)=x, so I replace u_(n+1) by x, x-u_n, which is known, minus f(x,t(n+1)).
+And to find the zero of the function
+I will use 
+Newton's method, so I will need g': g'(x)=1, u_n is know, minus here df*dx at (x,t(n+1)).
+So Newton's method is written in the following way:
+The Newton method that let us from u_n which we know, to find u_(n+1), such that g(u_(n+1))=0.
+I start from u_n, which is the last value I computed.
+Then I do a loop m=0,1,2, etc ...
+It is the Newton's loop, so I let x_(m+1)=x_m-g(x_m), divided by g'(xm).
+So g(x_m) = x_m-u_n (which we know)
+-f(x_m,t(n+1))/g'(x_m), which is 1-df*dx at the point x_m and time t(n+1).
+To finish, I exit the loop when x(m+1)-x(m) is very small for example when less than 10^-8.
+In this case, I let u_(n+1) be the last computed value, that is, x_(m+1).
+So, see that to go from u_n to u_(n+1) I must do a loop, m=0,1,2,... but in practice, you know that Newton's method, if it converges, that is to say its starting point is close enough from the solution, converges quickly, at least when g'(u_(u+1)) is nonzero, il est dÃ©rivÃ© au dÃ©nominateur, donc converge rapidement, in practice after a few iterations, we will get the solution to our non linear system, in other words, u_(n+1).
+"Drawbacks of this method"
+We see that this method is implicit, so more difficult to implement.
+It is also more costly since I have to do some iteration, but not too many, in practice less than 10.
+The advantage of this method, compared to a forward
+Euler's method, which is explicit, is that this method will be stable, no matter what the time step h is.
+We now have to talk about stability of Euler's schemes.

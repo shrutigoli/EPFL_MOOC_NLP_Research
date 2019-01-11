@@ -1,0 +1,182 @@
+Welcome back: Nature, In Code. 
+We're in Chapter 3, lecture 14.
+In this lecture, we'll now implement these ideas that we just learned about the Effective Population Size due to, for example, bottlenecks in our Java Script code.
+So just to recap, what we have here is the population size which collapses into this type of bottleneck dynamic.
+So, this is time, this is the population size, a massive decline in population size and then the population size recovers.
+And we learned that this has the effect-- that the effective population size is going to be substantially smaller than the actual population size.
+And we also found a way to calculate this namely simply by taking the harmonic mean of however many population sizes or generations we have-- n over 1 over x1 plus 1 over x2 and so on, plus 1 over xn, and so the x's here being the population sizes over time.
+But this is simply the definition of the harmonic mean.
+So, concretely, how we're going to implement this in Java Script is as follows.
+What we're going to do is, we can take a population size, a normal population size over time of, you know, let's say 1,000.
+That's a number we worked with previously in the code.
+And then we're going to say every 10th generation we have this collapse, where the population collapses down to say 10 individuals, and then immediately after, one generation goes back up, and then the same pattern repeats over and over again.
+Every 10th generation the population collapses down to 10 individuals.
+Again, we just keep doing this and keep doing this.
+Every 10th generation the population collapses down to 10 individuals, and then immediately goes back up to 1,000 generations.
+So essentially, here we have nine generations at this population size and one generation at this population size, and again, nine generations at this population size and so on.
+Now we can already establish what the expectations would be, both knowing the effective population sizes, the harmonic mean, and not knowing it.
+If we wouldn't know it, we would simply take the mean overall these numbers, right?
+So we would simply take the mean of, you know,
+9 times a thousand populations-- a thousand individuals, excuse me, plus 1 time these 10 individuals divided by 10, and that of course is 9,010 divided by 10, that is 901 and so we-- you know, this pattern keeps repeating and repeating.
+So the average population size is 901.
+Now to question is what-- knowing that the effective population size indeed has to be calculated not like this, this would be the wrong expectation, but from the harmonic mean.
+What is the harmonic mean?
+Well, if you plug these numbers in here, so you'd have--
+You know, 10 over 1 over 1,000 plus 1 over 1,000 plus 1 over 1,000 nine times, and then plus 1 over 10, and you can do this in a calculator, you get something that's around 92 individuals.
+And I'm not gonna do that now,
+I'm confident that you can do this yourself.
+But if you take the harmonic mean of 9 times 1,000 and 1 times 10, the harmonic mean will be roughly 92 individuals.
+So again, a pretty dramatic, you know, mismatch here, we will see that the population behaves as if this was a population of 92 individuals, and not 901.
+And so we are now going to implement this in Java Script using our simulations.
+So, this is where we left off in the last time, when we looked at our code and we developed our genetic drift code, we had the population size here at 2000 and we ran the simulations for 20,000 generations, just to show that even when we have larger population sizes given enough time, they will eventually lose all genetic variation.
+So let's go back to the code here that created this.
+So this is our code and what I'm going to do here is,
+I'm going to set this back here, the population size to 1,000 individuals and the generations, in fact, to 100.
+And we want this to be, you know, a shortlist generation-- a shortlist simulations.
+By the way, there's one thing that bothers me here about this code.
+It's this number here.
+I don't like hard-coded numbers if it makes sense to avoid them.
+This is one where-- Let's see.
+This one defines the number of simulations that we're running.
+You know, sometimes you may want to run just one, maybe five, maybe ten, maybe a hundred.
+So I don't like this to be hard-coded here, let's replace this with a variable.
+Just, you know, just to clean up the code a little bit,
+I'm going to replace this 10 here with variable simulations, and then correspondingly, of course, appears somewhere I have to define this variable.
+I mean, I could also defined it down in the code somewhere, but I like to keep all my variables neatly in one place.
+So, I'm simply going to say 
+<i>simulations equals 10</i>.
+And nothing will change here but it's just now, you know, nicer, because I have some--
+I've removes one hard-coded value.
+And of course you may argue,
+"Well, okay, but we have all kinds of hard-coded values.
+I mean, are they all bad?
+No, they're not.
+I mean, it's really up to you how much flexibility you want to have in your code.
+Here, you know, for example, I would say,
+"Well, we're going to draw two N alleles every time," because we're going to stick with this deployed model for the rest of the course.
+So this is nothing that I ever will want to change and so it can remain hard-coded.
+It's really a question of what is it that you want to change eventually.
+Simulation-- The numbers of some simulations
+I'll probably eventually want to change, so I prefer to have this as a variable rather than a hard-coded value.
+Okay. So now, about population sizes and about effective population sizes.
+We just developed this intuition that if we have now a thousand-- a population size of 1,000 individuals and we change this to 10 every 10th generation, then we should have an effective population size of 92.
+But this is something that we think is true, and it's what I call the uninformed prediction.
+The uninformed prediction here would be to simply take the average, which we now know would lead to more something like 901.
+And so, the whole concept about showing you this and talking about the effective population sizes, that if we don't calculate this correctly, then our predictions will be very wrong.
+And what do I mean by this?
+Well, if we now simply were uninformed and we would think the average is just 901 individuals and that's, therefore, the effective population size, that would be quite wrong, because if we set this here to 901 and we save this, and we go back to the browser to take a look at this simulation, this is what it would look like, right?
+This is what the genetic drift will do to genetic variation of a population of 901 individuals over a hundred generations, and you can reload this a couple of times and you can see this is a fairly consistent pattern.
+A bit of diversions here among the simulations, but by and large, 
+I mean, certainly no-- none of the simulations here has lost all of their genetic variation, they have lost a little but it's, you know, still fairly small.
+Now, if we go back to the code and we look at the dynamics of a population that has 92 individuals, okay?
+So, we're simply going to set this to 92,
+I'll save this and we go back and reload this.
+This looks rather different. 
+It looks very different, in fact.
+You can see many times the populations will lose all genetic variation, or get very close to it, and it doesn't happen all the time but, you know, it happens very often.
+In any case, you can see that this pattern looks very different from the other pattern, right?
+This pattern-- So, take a look at this pattern, because I think that's what we'll roughly see, this is the population size of 92 individuals.
+This is the informed prediction if you know about harmonic mean.
+I'm just quickly going to set this back again to 901, so you can compare this, 
+901 looks like this, very, very different.
+So, let's go ahead now and implement effective population size and the bottlenecks.
+So, we set N here to 1,000 because that's how we begin, and now what we need to do is we need to do two things.
+The first thing is we need to ensure that we actually have a variable population size.
+And then, given that, we need to implement some function that calculates the effective population size overall.
+So, I'm actually going to begin with this, with calculating the effective population size because we can do this even when the population size remains constant.
+But I need to plan for the fact that I have variable population sizes.
+So I need to store all the values of the N's as they change over time somehow, so that at the end 
+I can then calculate correctly the affective population size given all these different N's in the simulations.
+So, if I need to store multiple values somewhere, we now know which tool to use for that, namely a race.
+So, I'm going to set up another array here that I'm going to call population sizes, okay?
+<i>population_sizes</i>
+I'm gonna initialize this as an empty array in the beginning.
+So, this is the array now where I'm going to store all the population sizes in each generation.
+So, where am I going to do this?
+Well, let's see.
+Where do I run each generation?
+Well, it's basically here, right, what I call the next generation function.
+That's when a new generation happens.
+So, just before I'm going to call this function,
+I'm gonna push the current population size into this array.
+So, I'm simply going to say population sizes push.
+So <i>.push</i> and then I'm going to push in this N value.
+Now again, at the moment, this N value actually never changes because we don't change it anywhere.
+We will in a bit, but in any case, whatever we have stored here now in N gets pushed into this population sizes array.
+So then, at the end of all of this,
+I have this array with all the population sizes, and now I can calculate the harmonic mean of this set of numbers.
+So, how do I do this? 
+Well, you know, this sounds like something that, you know, makes sense to encapsulate into a function.
+So, what I'm going to do here is,
+I'm going to calculate this effective population size.
+First of all, I'm going to define this variable here, <i>Ne,</i> and then I would like to say, you know what, calculate this for me in a function.
+I'm going to hand this function the array of all the population sizes and I'd like to get in return from the function this correct value for the effective population size, and then I'm going to store it into Ne.
+So, I'm going to call a function here that I, in fact, haven't yet defined, but I wil in a second, and I'm going to call this function
+<i>effective_population_size</i>.
+Haven't defined this yet, so this code wouldn't work, but I will do this in a second.
+Now, this function should take a set of values, and then correctly calculate the effective population size.
+So, I need to pass it, the set of values, and a set of values is simply here population size.
+Now okay, what would this function look like?
+How do I need to define this function?
+Okay, I'll do this up here.
+I'm going to call this function, as I said, effective population size.
+It's gonna take one argument, so I need to define here the parameter correspondingly,
+I'm going to call this <i>all_Ns</i> because that's what it is, it's all the population sizes, right?
+And here, in curly brackets now, 
+I can define the function body.
+So here's my task, and given a set of numbers in an array,
+I need to return the harmonic mean.
+We now know how to calculate the harmonic mean.
+We know it's a division of the total number of numbers that we have in this <i>all_Ns</i> and then divided by the sum of the universe of values.
+So we have a denominator.
+Denominator is very easy-- 
+To denominator we need to calculate, it's the sum of the universe of values.
+So, I'm going to do is first and I'm just going to define a variable here, <i>denominator</i> and I'm going to initialize this at zero.
+So, now what I would like to do is I would like to iterate over all the values here, all the elements in this array, and then at the inverse of all these elements to the denominator, thereby creating the sum.
+So, itirating over in an array.
+We now know how to do this, we use a <i>for</i> loop.
+So, <i>for [var i = 0;</i> and then we say, as a condition
+<i>i &lt; all_Ns.length</i> because as you may recall, the length property here is-- is the value tells essentially how many elements there are in this array.
+So we can use this.
+And then of course, as always, <i>i = i+1</i>
+We need to increment here <i>i</i> otherwise we end up with an infinite loop.
+So, what do I need?
+I need these elements, so that the current element in each iteration is array name and then index <i>i</i>, i starting from 0 and going all the way to length -1 as we discussed in the array lecture.
+I would like the-- I said, 
+I need the inverse of that, so it's <i>1 / all_Ns[i]</i> and now, I said I need the sum of all these.
+So what I'm going to do is I'm simply going to say, denominator equal denominator plus-- plus this here,
+--and I'm going to put this in parentheses just for visual simplicity.
+And this is now creating the sum of all the universe of values here, simply taking the universe values, it's adding wont currently have a denominator and storing this new value in denominator.
+We've done this before, creating a sum with a loop, and then at the end here
+I have in the denominator the sum of all these universe values.
+And then I can very simply return this harmonic mean, so it's going to be:
+<i>all_Ns.length</i>.
+So, that's a number of elements we have in the array, and divide by the denominator.
+So, I'm just going to copy this here, denominator.
+And we don't care about precision, an inter-share value will be fine, some simply going to raft here into math round.
+Okay, a math round of this division it's going to be sufficiently precise.
+So this is now this function that calculates the effective population size population size, given a set, in this case here in array of these population sizes over time.
+So just one thing.
+In parentheses you may have realized and correctly pointed out while watching this, that I am now doing this for the entire set of simulations.
+I'm not setting up a 2-dimensional array where we're calculating the effective population size for each of these simulations independently.
+We could of course do this, but because it will be the exact same number for each simulation,
+I'm just adding all of the Ns up over all the simulations, then I'm correspondingly dividing by-- so I'm taking this into account,
+But, you know, this doesn't matter.
+You could-- 
+If you want to, you could calculate this independently for each simulation using a 2-dimensional array, but it won't be necessary because it's going to be the same number for every simulation, but that's just in parentheses.
+Now that we have this, let's see if this actually works..
+We're not changing the Ns at the moment, we haven't really implemented the bottlenecks.
+But we have everything set up so that we could do this and let's just see if this works.
+So down here, in the legend
+I'm not going to show N. 
+I'm actually now going to show Ne.
+And here the label then would correctly have to be effective population size.
+And I'm just going to abbreviate this for space issues.
+So let's save this and go back and see if this actually worked.
+So let's go back to the browser, reload this. Yes, indeed this works
+So we have 1,000 as the effective population size which is correct, because we'll never change the population size.
+It is a constant 1,000 and the harmonic mean of, however many numbers of thousands will always be exactly one thousand.
+Good, so that works, great job.
+So what we can now do is to actually implement the bottlenecks.
+We'll do this in the next lecture.
+I'll see you there.

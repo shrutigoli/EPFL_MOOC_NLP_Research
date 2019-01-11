@@ -1,0 +1,610 @@
+1
+00:00:06,503 --> 00:00:09,678
+Of course, visually inspecting
+these choices can be useful
+
+2
+00:00:09,859 --> 00:00:13,297
+but if we want to automate this,
+we can make use of the eFEL
+
+3
+00:00:13,511 --> 00:00:15,136
+the e-feature
+extraction library
+
+4
+00:00:15,322 --> 00:00:19,360
+to analyze the traces that
+were returned to us.
+
+5
+00:00:19,550 --> 00:00:22,550
+For example, this library
+can return to us the number
+
+6
+00:00:22,750 --> 00:00:26,087
+of spikes in a trace,
+the height of these spikes, etc.
+
+7
+00:00:28,126 --> 00:00:30,726
+So first we take the parameters
+we've defined before,
+
+8
+00:00:30,921 --> 00:00:34,271
+default parents, and again,
+we run our protocol.
+
+9
+00:00:35,540 --> 00:00:39,190
+Then we put our traces into
+the two different variables
+
+10
+00:00:39,406 --> 00:00:44,181
+so we have the time of step two,
+and the voltage of step two
+
+11
+00:00:44,874 --> 00:00:47,349
+and we create a specific dictionary.
+
+12
+00:00:47,556 --> 00:00:50,481
+This is something that is
+predefined by the eFEL
+
+13
+00:00:50,694 --> 00:00:52,969
+so we basically put the voltage in
+
+14
+00:00:53,148 --> 00:00:56,961
+the variable V, T,
+stim_start, stim_end
+
+15
+00:00:57,151 --> 00:00:59,951
+show the times of
+the beginning of the stimulus
+
+16
+00:01:00,148 --> 00:01:02,573
+and the end of the stimulus.
+
+17
+00:01:03,643 --> 00:01:07,180
+Then we import the eFEL and
+we give this trace to the function
+
+18
+00:01:07,383 --> 00:01:08,858
+get featured values.
+
+19
+00:01:09,056 --> 00:01:12,056
+And we specify which
+features we want to evaluate.
+
+20
+00:01:12,274 --> 00:01:15,612
+So in this case "Spikecount"
+"AP_width" and "AP_amplitude".
+
+21
+00:01:16,810 --> 00:01:19,535
+So now we can print the values
+that eFEL returned 
+
+22
+00:01:19,743 --> 00:01:22,680
+so the spike count AP_width
+the AP_amplitude, and you see that
+
+23
+00:01:22,864 --> 00:01:25,814
+it says that there's five spikes
+in the trace, which is correct
+
+24
+00:01:25,990 --> 00:01:29,252
+so there are five spikes in step two
+and it also shows us
+
+25
+00:01:29,438 --> 00:01:32,250
+the width and the amplitude of these
+
+26
+00:01:32,453 --> 00:01:35,453
+five spikes in millivolts
+and milliseconds,
+
+27
+00:01:35,934 --> 00:01:38,421
+Now we will pass this
+on to the BluePyOpt.
+
+28
+00:01:38,600 --> 00:01:41,038
+BluePyOpt has a class e-features
+
+29
+00:01:41,211 --> 00:01:42,736
+which basically wraps
+around the eFEL
+
+30
+00:01:42,934 --> 00:01:46,272
+and will calculate
+the requested features for us.
+
+31
+00:01:47,328 --> 00:01:49,640
+In this case,
+let's use the "Spikecount"
+
+32
+00:01:49,843 --> 00:01:54,368
+feature as a target, and let's ask
+for four spikes in the first trace
+
+33
+00:01:54,584 --> 00:01:57,584
+and six spikes in the second.
+
+34
+00:01:59,022 --> 00:02:01,934
+Different features can be
+combined to get them into objectives
+
+35
+00:02:02,131 --> 00:02:04,469
+that will be used by
+the optimization algorithm.
+
+36
+00:02:04,681 --> 00:02:07,681
+In this case we allocate
+one objective per feature.
+
+37
+00:02:09,127 --> 00:02:12,252
+So this code here will
+create these eFEL features
+
+38
+00:02:12,457 --> 00:02:16,145
+and will ask for four
+spikes in the first step
+
+39
+00:02:16,363 --> 00:02:19,363
+six spikes in the second step.
+
+40
+00:02:19,778 --> 00:02:20,966
+So with all the information
+
+41
+00:02:21,152 --> 00:02:23,627
+that we have now we can
+create a cell evaluator.
+
+42
+00:02:23,857 --> 00:02:28,657
+So basically, the cell evaluator
+uses a score calculator
+
+43
+00:02:29,012 --> 00:02:30,662
+which is based on
+the objectives
+
+44
+00:02:30,823 --> 00:02:33,236
+we have defined in
+the previous section.
+
+45
+00:02:33,474 --> 00:02:34,824
+We can combine
+all of this together
+
+46
+00:02:35,022 --> 00:02:36,847
+in the constructor of
+the cell evaluator.
+
+47
+00:02:37,067 --> 00:02:39,667
+So we have our model,
+we have our parameter names
+
+48
+00:02:39,914 --> 00:02:42,677
+we have our protocols,
+and we have our score calculator
+
+49
+00:02:42,975 --> 00:02:45,975
+an also an object that
+points to our simulator.
+
+50
+00:02:47,518 --> 00:02:50,518
+So now, let's use our
+cell evaluator we created.
+
+51
+00:02:50,694 --> 00:02:53,769
+We just call this function on
+the cell evaluator with
+
+52
+00:02:53,950 --> 00:02:56,013
+a set of parameters.
+
+53
+00:02:56,960 --> 00:02:59,047
+The function will return
+a dictionary that
+
+54
+00:02:59,252 --> 00:03:02,902
+shows for which feature
+we have reached score.
+
+55
+00:03:03,125 --> 00:03:08,350
+So for an example,  the spike count
+in the first step has a score of 15
+
+56
+00:03:08,578 --> 00:03:13,340
+the spike count in the second
+step has a score of 3.3.
+
+57
+00:03:14,265 --> 00:03:16,815
+This score is calculated based on
+
+58
+00:03:17,028 --> 00:03:19,090
+the target mean
+and standard deviation
+
+59
+00:03:19,276 --> 00:03:22,714
+you have specified in
+the e-features before.
+
+60
+00:03:23,861 --> 00:03:26,861
+The lower the score,
+the better the model.
+
+61
+00:03:28,549 --> 00:03:32,137
+As you might've seen in exercise one
+it's not always trivial to find
+
+62
+00:03:32,327 --> 00:03:34,815
+the parameter value set
+that matches the objectives.
+
+63
+00:03:35,021 --> 00:03:38,446
+Let's now use the BluePyOpt
+parameter optimization algorithm
+
+64
+00:03:38,632 --> 00:03:42,607
+to find a set of parameter values
+that generates perfect score of zero
+
+65
+00:03:42,811 --> 00:03:44,436
+on both traces.
+
+66
+00:03:44,611 --> 00:03:48,698
+Let us specify that we want to have
+an offspring size of ten individuals
+
+67
+00:03:49,257 --> 00:03:52,870
+this means that every population
+will have twenty individuals
+
+68
+00:03:53,119 --> 00:03:55,682
+ten parents, and ten offspring.
+
+69
+00:03:55,940 --> 00:04:00,127
+So we basically define
+an IBED optimization object.
+
+70
+00:04:01,010 --> 00:04:02,822
+Now the optimization algorithm can
+
+71
+00:04:03,010 --> 00:04:06,010
+be run for a certain
+number of generations
+
+72
+00:04:06,706 --> 00:04:10,131
+and you can do this by
+calling the run function
+
+73
+00:04:10,391 --> 00:04:14,341
+and you say how many
+generations you want to run maximum.
+
+74
+00:04:14,991 --> 00:04:18,666
+I just want to warn you that
+this cell here if you executed it
+
+75
+00:04:18,861 --> 00:04:21,061
+it will take some time to run.
+
+76
+00:04:21,255 --> 00:04:24,005
+An order of a couple of minutes.
+
+77
+00:04:24,204 --> 00:04:28,291
+In the meantime this number here,
+the twenty seven will be replaced
+
+78
+00:04:28,502 --> 00:04:30,914
+by an asterix (*).
+
+79
+00:04:31,138 --> 00:04:34,138
+The optimization will
+return as four objects.
+
+80
+00:04:34,495 --> 00:04:37,495
+The final population after
+the ten generations,
+
+81
+00:04:37,711 --> 00:04:40,711
+a hall of fame which shows
+the best individuals
+
+82
+00:04:40,946 --> 00:04:45,096
+found during the optimization,
+a log with some statistics
+
+83
+00:04:45,335 --> 00:04:48,635
+and a history that
+shows the different
+
+84
+00:04:48,886 --> 00:04:52,449
+populations that
+were evaluated.
+
+85
+00:04:54,430 --> 00:04:57,855
+The final population object
+contains a list of tuples
+
+86
+00:04:58,047 --> 00:05:01,610
+with each tuple representing
+the two parameters of the model.
+
+87
+00:05:01,809 --> 00:05:03,984
+Here you see a print-out
+of this optimization.
+
+88
+00:05:04,154 --> 00:05:07,267
+So we basically have
+the best model here
+
+89
+00:05:07,633 --> 00:05:18,821
+has a parameter of 0.11 for GNABAR
+and around 0.028 for GKBAR.
+
+90
+00:05:19,178 --> 00:05:22,503
+So we retrieve the best model
+from the hall of fame
+
+91
+00:05:22,696 --> 00:05:24,583
+an now we can evaluate this model.
+
+92
+00:05:24,776 --> 00:05:28,838
+So basically, these are just
+two numbers that we can
+
+93
+00:05:29,038 --> 00:05:32,713
+transform using this "param_dict"
+function to a dictionary
+
+94
+00:05:32,905 --> 00:05:36,105
+this is clear and it
+shows us the value
+
+95
+00:05:36,283 --> 00:05:38,770
+of the GKBAR and
+the value for GNABAR.
+
+96
+00:05:39,007 --> 00:05:40,869
+As you can see,
+the evaluation returns
+
+97
+00:05:41,094 --> 00:05:43,069
+the same values as
+the fitness values provided
+
+98
+00:05:43,300 --> 00:05:45,087
+buy the optimization output.
+
+99
+00:05:45,318 --> 00:05:48,318
+We can have a look at
+the responses now.
+
+100
+00:05:48,873 --> 00:05:52,185
+So we basically run the model,
+and it provides us with parameter
+
+101
+00:05:52,363 --> 00:05:55,363
+values the best individual.
+
+102
+00:05:56,266 --> 00:05:58,316
+And we print the score.
+
+103
+00:05:58,530 --> 00:06:02,343
+So you see that you actually get
+a model that fires six times in
+
+104
+00:06:02,526 --> 00:06:05,526
+the second step, and four times
+in the first step
+
+105
+00:06:05,713 --> 00:06:09,101
+and because of this,
+it has a score of zero and zero
+
+106
+00:06:09,298 --> 00:06:12,861
+on both objectives.
+
+107
+00:06:13,425 --> 00:06:14,513
+Let's have a look at
+
+108
+00:06:14,683 --> 00:06:17,021
+the optimization
+algorithm statistics.
+
+109
+00:06:17,219 --> 00:06:19,069
+WE can plot the minimal score.
+
+110
+00:06:19,268 --> 00:06:21,118
+In this case, the score will be
+
+111
+00:06:21,307 --> 00:06:22,682
+the sum of all
+the separate objectives
+
+112
+00:06:22,865 --> 00:06:27,778
+so the two objectives we have
+in every generation.
+
+113
+00:06:28,023 --> 00:06:32,010
+So you see that in the beginning
+the algorithm started with
+
+114
+00:06:32,217 --> 00:06:37,767
+with some individual that was
+pretty bad but when the generations
+
+115
+00:06:37,950 --> 00:06:42,775
+progressed after seven generations,
+we got an individual with a score
+
+116
+00:06:42,950 --> 00:06:44,550
+of zero.
+
+117
+00:06:46,084 --> 00:06:50,796
+So to close this tutorial we have
+a little second exercise for you.
+
+118
+00:06:51,011 --> 00:06:56,911
+So bellow here you see a copy
+of all of the above statements.
+
+119
+00:06:57,742 --> 00:07:02,304
+For every variable added
+an underscore X for "exercise"
+
+120
+00:07:02,508 --> 00:07:06,533
+as a suffix so that we don't clash
+with any of the definitions
+
+121
+00:07:06,751 --> 00:07:08,826
+of the code above.
+
+122
+00:07:09,046 --> 00:07:11,046
+You should change the code in a way
+
+123
+00:07:11,223 --> 00:07:14,711
+so that instead of
+the Spikecount feature
+
+124
+00:07:14,920 --> 00:07:18,820
+the AP_width feature
+is used as a target
+
+125
+00:07:19,015 --> 00:07:21,677
+and it should have
+a value of 1.3 in step one
+
+126
+00:07:21,861 --> 00:07:24,861
+and 1.6 in step two.
+
+127
+00:07:25,104 --> 00:07:27,892
+Please, send us back the scores
+of the best individual found
+
+128
+00:07:28,099 --> 00:07:31,061
+by your algorithm.
+

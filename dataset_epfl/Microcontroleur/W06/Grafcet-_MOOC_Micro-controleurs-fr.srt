@@ -1,0 +1,1195 @@
+1
+00:00:04,287 --> 00:00:05,502
+Bonjour !
+
+2
+00:00:06,277 --> 00:00:09,277
+Il est clair que les microcontrôleurs 
+se prêtent à merveille 
+
+3
+00:00:09,411 --> 00:00:11,743
+à réaliser des tâches d'automatisme.
+
+4
+00:00:12,175 --> 00:00:13,689
+Or dans le monde francophone
+
+5
+00:00:13,814 --> 00:00:17,063
+quand on parle d'automatisme, 
+on parle toujours de Grafcet.
+
+6
+00:00:17,735 --> 00:00:19,800
+Et alors, souvent mes étudiants 
+me disent :
+
+7
+00:00:19,925 --> 00:00:22,800
+" Ah ! Si je veux faire un Grafcet, 
+alors je dois acheter
+
+8
+00:00:22,975 --> 00:00:24,710
+un automate programmable."
+
+9
+00:00:24,908 --> 00:00:25,983
+Et bien pas du tout !
+
+10
+00:00:26,133 --> 00:00:29,358
+Les Grafcet, c'est tout à fait 
+aussi possible de les programmer,
+
+11
+00:00:29,695 --> 00:00:31,824
+et c'est ce que nous allons faire 
+aujourd'hui.
+
+12
+00:00:32,223 --> 00:00:35,261
+Alors, je ne vais pas refaire 
+la théorie des Grafcet,
+
+13
+00:00:35,337 --> 00:00:37,062
+ce serait trop long.
+
+14
+00:00:37,137 --> 00:00:39,025
+Je vais juste donner quelques rappels
+
+15
+00:00:39,114 --> 00:00:41,651
+qui nous seront utiles 
+pour ce que nous avons à faire.
+
+16
+00:00:42,129 --> 00:00:44,654
+Ensuite nous regarderons donc 
+comment programmer
+
+17
+00:00:44,754 --> 00:00:46,894
+en C un Grafcet ?
+
+18
+00:00:47,298 --> 00:00:48,879
+Et bien sûr, nous l'appliquerons
+
+19
+00:00:48,979 --> 00:00:52,531
+à l'exemple que nous voyons 
+pour la quatrième fois,
+
+20
+00:00:52,841 --> 00:00:55,035
+le fameux exemple de la perceuse
+
+21
+00:00:55,219 --> 00:00:57,243
+qui descend et qui monte.
+
+22
+00:00:58,833 --> 00:01:00,401
+Alors vous reconnaissez ici
+
+23
+00:01:00,813 --> 00:01:02,965
+un exemple de Grafcet.
+
+24
+00:01:03,501 --> 00:01:06,320
+Par rapport au graphe d'états 
+que nous avons utilisé,
+
+25
+00:01:06,420 --> 00:01:08,275
+il y a un certain nombre de différences
+
+26
+00:01:09,114 --> 00:01:10,761
+qui sont des détails :
+
+27
+00:01:11,143 --> 00:01:13,616
+Les étapes des Grafcet,
+
+28
+00:01:13,879 --> 00:01:15,553
+c'est ce qu'on appelait des étapes :
+
+29
+00:01:16,300 --> 00:01:17,540
+L'étape initiale,
+
+30
+00:01:18,002 --> 00:01:20,242
+les étapes initiales, 
+on va voir pourquoi.
+
+31
+00:01:20,703 --> 00:01:23,703
+Les transitions, c'est la même chose 
+que dans les graphes d'états.
+
+32
+00:01:24,166 --> 00:01:26,771
+On parle de réceptivité,
+
+33
+00:01:27,179 --> 00:01:29,054
+ça correspond à la condition
+
+34
+00:01:29,552 --> 00:01:31,138
+liée à une transition.
+
+35
+00:01:32,746 --> 00:01:35,921
+On peut avoir des divergences en OU,
+
+36
+00:01:36,182 --> 00:01:37,616
+c'est le cas ici.
+
+37
+00:01:38,267 --> 00:01:40,441
+C'est la même chose 
+que dans les graphes d'états.
+
+38
+00:01:40,575 --> 00:01:42,369
+Depuis cette étape, on peut
+
+39
+00:01:42,894 --> 00:01:44,478
+arriver à celle-là
+
+40
+00:01:44,804 --> 00:01:46,851
+ou arriver à celle-là
+
+41
+00:01:47,139 --> 00:01:49,509
+selon que cette transition 
+
+42
+00:01:49,647 --> 00:01:52,584
+ou cette transition va être franchie.
+
+43
+00:01:53,305 --> 00:01:54,439
+Par contre, 
+
+44
+00:01:54,781 --> 00:01:56,801
+les divergences en ET
+
+45
+00:01:57,336 --> 00:02:00,236
+sont quelques choses qui n'existent 
+pas dans les graphes d'états.
+
+46
+00:02:00,499 --> 00:02:03,337
+Ici, si cette condition
+
+47
+00:02:03,422 --> 00:02:06,047
+si cette transition est franchie, 
+
+48
+00:02:06,122 --> 00:02:08,397
+on va activer à la fois
+
+49
+00:02:08,852 --> 00:02:10,116
+cette étape
+
+50
+00:02:10,696 --> 00:02:12,193
+et cette étape.
+
+51
+00:02:12,770 --> 00:02:14,299
+Ce qui signifie qu'on peut avoir
+
+52
+00:02:14,547 --> 00:02:16,476
+deux ou plusieurs étapes
+
+53
+00:02:16,818 --> 00:02:19,073
+actives au même moment.
+
+54
+00:02:19,286 --> 00:02:21,125
+Alors que dans un graphe d'états, 
+on avait toujours
+
+55
+00:02:21,245 --> 00:02:22,583
+un et un seul état
+
+56
+00:02:22,695 --> 00:02:24,683
+actif à un moment donné.
+
+57
+00:02:25,167 --> 00:02:27,867
+Cette généralisation 
+est extrêmement intéressante, 
+
+58
+00:02:28,020 --> 00:02:29,532
+extrêmement puissante, 
+
+59
+00:02:29,737 --> 00:02:31,686
+c'est en quelque sorte le multitâche
+
+60
+00:02:32,200 --> 00:02:33,675
+de l'automatisme.
+
+61
+00:02:34,995 --> 00:02:38,170
+Alors commençons l'écriture 
+de notre programme en C :
+
+62
+00:02:38,986 --> 00:02:39,938
+On va définir
+
+63
+00:02:40,216 --> 00:02:41,814
+le nombre d'étapes
+
+64
+00:02:42,108 --> 00:02:45,608
+qu'on aura dans notre Grafcet 
+ou le nombre maximum,
+
+65
+00:02:46,123 --> 00:02:49,186
+le nombre de transitions 
+qui vont apparaître
+
+66
+00:02:49,380 --> 00:02:53,105
+de telle manière qu'on puisse 
+créer un tableau qui s'appelle Etapes
+
+67
+00:02:53,438 --> 00:02:56,051
+et un deuxième tableau 
+qui s'appelle Transitions.
+
+68
+00:02:56,489 --> 00:02:59,327
+En fait, ces 2 tableaux vont contenir
+
+69
+00:02:59,792 --> 00:03:01,392
+des valeurs booléennes
+
+70
+00:03:01,561 --> 00:03:04,186
+donc considérées comme Vrai 
+ou comme Faux.
+
+71
+00:03:04,449 --> 00:03:06,811
+Si une étape est active,
+
+72
+00:03:07,288 --> 00:03:09,750
+la valeur correspondante sera vraie.
+
+73
+00:03:10,575 --> 00:03:11,820
+Si elle est inactive, 
+
+74
+00:03:11,920 --> 00:03:13,882
+elle sera fausse donc égale à 0.
+
+75
+00:03:14,516 --> 00:03:16,000
+La même chose pour les transitions
+
+76
+00:03:16,280 --> 00:03:19,205
+Si une transition est franchissable
+
+77
+00:03:19,579 --> 00:03:22,579
+alors la valeur qui se trouve 
+dans ce tableau
+
+78
+00:03:23,012 --> 00:03:25,462
+va être vraie.
+
+79
+00:03:26,984 --> 00:03:28,346
+Comme dans tous les programmes, 
+
+80
+00:03:28,491 --> 00:03:32,141
+on aura une procédure d'initialisation 
+des entrées et sorties.
+
+81
+00:03:32,515 --> 00:03:33,795
+Je ne vais pas entrer dans les détails,
+
+82
+00:03:33,889 --> 00:03:37,039
+ça va évidemment dépendre 
+du processeur utilisé.
+
+83
+00:03:38,073 --> 00:03:40,723
+Nous avons une procédure ici 
+qui permet de lire
+
+84
+00:03:40,994 --> 00:03:43,994
+les entrées, l'ensemble des entrées.
+
+85
+00:03:44,565 --> 00:03:47,565
+L'idée c'est à un moment donné, 
+
+86
+00:03:48,070 --> 00:03:49,270
+de faire la lecture
+
+87
+00:03:50,073 --> 00:03:53,423
+de toutes les entrées, 
+une et une seule fois.
+
+88
+00:03:53,987 --> 00:03:54,865
+Ensuite,
+
+89
+00:03:55,070 --> 00:03:58,233
+on va pouvoir regarder 
+des conditions logiques
+
+90
+00:03:58,449 --> 00:03:59,949
+sur ces entrées
+
+91
+00:04:00,246 --> 00:04:03,796
+dont dépendront les transitions.
+
+92
+00:04:04,269 --> 00:04:06,130
+Mais si on faisait plusieurs lectures,
+
+93
+00:04:06,255 --> 00:04:07,655
+on pourrait avoir des incohérences
+
+94
+00:04:07,746 --> 00:04:10,846
+donc c'est extrêmement important 
+d'avoir une variable
+
+95
+00:04:10,996 --> 00:04:12,484
+qui va contenir
+
+96
+00:04:13,333 --> 00:04:15,070
+la valeur de l'entrée
+
+97
+00:04:15,428 --> 00:04:18,428
+lue au début de la procédure.
+
+98
+00:04:18,840 --> 00:04:21,665
+Je regarde tout de suite 
+le programme principal :
+
+99
+00:04:22,602 --> 00:04:24,786
+Initialisation des entrées - sorties.
+
+100
+00:04:26,162 --> 00:04:27,900
+Initialisation des étapes :
+
+101
+00:04:28,199 --> 00:04:31,312
+elles vont toutes être inactives
+
+102
+00:04:31,943 --> 00:04:35,355
+sauf la ou les étapes,
+
+103
+00:04:35,524 --> 00:04:37,149
+ici peut-être la première,
+
+104
+00:04:37,597 --> 00:04:39,522
+qui va être activée.
+
+105
+00:04:40,192 --> 00:04:41,593
+Mais je vous rappelle,  
+il pourrait y avoir 
+
+106
+00:04:41,693 --> 00:04:43,880
+plusieurs étapes initiales.
+
+107
+00:04:44,344 --> 00:04:46,515
+Le principe du Grafcet 
+permet d'avoir plusieurs
+
+108
+00:04:46,628 --> 00:04:48,978
+étapes actives en même temps.
+
+109
+00:04:49,899 --> 00:04:52,611
+Ensuite, on a une boucle infinie
+
+110
+00:04:52,819 --> 00:04:55,332
+qui va répéter ces procédures.
+
+111
+00:04:56,364 --> 00:04:59,114
+Première chose : j'affecte les sorties.
+
+112
+00:04:59,475 --> 00:05:01,225
+Comme la première fois, j'ai déjà
+
+113
+00:05:01,445 --> 00:05:02,870
+au moins une étape active.
+
+114
+00:05:03,425 --> 00:05:05,850
+Je peux, en fonction
+
+115
+00:05:06,137 --> 00:05:09,137
+des étapes actives de là où
+des étapes actives,
+
+116
+00:05:09,360 --> 00:05:11,410
+affecter les sorties correctement.
+
+117
+00:05:11,509 --> 00:05:12,721
+Je vous rappelle que
+
+118
+00:05:12,841 --> 00:05:15,041
+les valeurs des sorties 
+ne dépendent que
+
+119
+00:05:15,452 --> 00:05:18,114
+de l'étape ou des étapes actives.
+
+120
+00:05:18,853 --> 00:05:19,965
+Ensuite,
+
+121
+00:05:20,056 --> 00:05:24,019
+on va exécuter cette procédure 
+qui lie les entrées
+
+122
+00:05:24,252 --> 00:05:27,440
+et qui mémorise dans des variables 
+ces valeurs des entrées.
+
+123
+00:05:27,858 --> 00:05:29,771
+Et ensuite, on va successivement, 
+
+124
+00:05:30,218 --> 00:05:32,005
+calculer les transitions :
+
+125
+00:05:32,395 --> 00:05:34,678
+sont-elles franchissables ?
+
+126
+00:05:34,842 --> 00:05:37,942
+Ensuite, on va désactiver les étapes
+
+127
+00:05:38,974 --> 00:05:40,562
+pour lesquelles une transition
+
+128
+00:05:41,032 --> 00:05:42,345
+franchissable
+
+129
+00:05:42,994 --> 00:05:44,962
+justifie de la désactiver
+
+130
+00:05:45,490 --> 00:05:47,877
+et activer les étapes
+
+131
+00:05:48,509 --> 00:05:51,321
+qui sont le résultat 
+du passage de transition.
+
+132
+00:05:52,086 --> 00:05:55,086
+C'est le principe même du Grafcet,
+
+133
+00:05:55,300 --> 00:05:57,651
+c'est les règles 
+d'évolution du Grafcet.
+
+134
+00:05:57,764 --> 00:06:00,789
+Vous retrouvez ce principe 
+dans toutes les...
+
+135
+00:06:00,948 --> 00:06:03,886
+dans tous les documents 
+qui décrivent ce qu'est un Grafcet.
+
+136
+00:06:05,525 --> 00:06:08,525
+Alors, je reviens aux détails 
+sur ces quelques procédures.
+
+137
+00:06:09,266 --> 00:06:11,670
+Celle qui calcule les transitions,
+
+138
+00:06:11,903 --> 00:06:15,392
+il va falloir regarder 
+pour une transition donnée,
+
+139
+00:06:16,456 --> 00:06:19,188
+de quelle étape elle dépend ? 
+
+140
+00:06:19,338 --> 00:06:20,889
+A quelle étape, elle est connectée 
+
+141
+00:06:21,543 --> 00:06:23,793
+en haut, en dessus, en amont ?
+
+142
+00:06:24,222 --> 00:06:27,010
+Il faut appliquer la réceptivité,
+
+143
+00:06:27,316 --> 00:06:30,591
+on doit faire le ET logique 
+de ces 2 conditions
+
+144
+00:06:31,201 --> 00:06:35,764
+et on mémorise si cette transition 
+est franchissable.
+
+145
+00:06:37,307 --> 00:06:39,002
+Ensuite pour la désactivation,
+
+146
+00:06:39,267 --> 00:06:41,467
+de nouveau, il va falloir regarder
+
+147
+00:06:41,746 --> 00:06:42,826
+le Grafcet
+
+148
+00:06:43,135 --> 00:06:46,844
+et regarder que si cette transition
+
+149
+00:06:47,169 --> 00:06:49,082
+est franchissable alors
+
+150
+00:06:49,482 --> 00:06:52,925
+telle étape doit être désactivée.
+
+151
+00:06:53,309 --> 00:06:54,741
+Et de la même manière, 
+
+152
+00:06:55,216 --> 00:06:58,603
+si cette transition est franchissable,
+
+153
+00:06:58,981 --> 00:07:02,614
+telle étape, quelle étape suivante 
+doit être activée ?
+
+154
+00:07:04,323 --> 00:07:07,353
+Et finalement, affecter les sorties
+
+155
+00:07:07,578 --> 00:07:10,053
+en fonction de l'étape qui est active.
+
+156
+00:07:10,267 --> 00:07:11,325
+Si cette étape,
+
+157
+00:07:11,500 --> 00:07:13,062
+et on le fera pour les suivantes aussi
+
+158
+00:07:13,152 --> 00:07:14,189
+est active, 
+
+159
+00:07:14,412 --> 00:07:15,546
+alors on écrit
+
+160
+00:07:15,746 --> 00:07:17,254
+les valeurs de sorties
+
+161
+00:07:17,529 --> 00:07:19,468
+selon la définition de l'étape.
+
+162
+00:07:21,933 --> 00:07:25,288
+Peut-être un exemple, 
+où on facilitera la compréhension.
+
+163
+00:07:27,074 --> 00:07:28,715
+Notre perceuse,
+
+164
+00:07:29,128 --> 00:07:30,725
+j'espère que vous vous en souvenez,
+
+165
+00:07:31,298 --> 00:07:34,298
+nous l'avions décrite 
+par un graphe d'états :
+
+166
+00:07:34,612 --> 00:07:37,787
+arrêt, descente, montée, 
+
+167
+00:07:38,343 --> 00:07:40,068
+trois transitions.
+
+168
+00:07:41,025 --> 00:07:44,200
+Dessinons un Grafcet 
+parfaitement équivalent :
+
+169
+00:07:46,884 --> 00:07:50,428
+arrêt, descente, montée.
+
+170
+00:07:51,538 --> 00:07:55,056
+Les transitions 
+avec les réceptivités Start ,
+
+171
+00:07:55,731 --> 00:07:57,765
+bas et haut.
+
+172
+00:07:58,119 --> 00:08:00,682
+Et pour chacune des étapes, 
+les valeurs de sortie :
+
+173
+00:08:01,149 --> 00:08:03,744
+toutes les valeurs sont à 0, 
+c'est ce qu'on avait là
+
+174
+00:08:04,160 --> 00:08:06,689
+Avance est activée, 
+c'est ce qu'on a là.
+
+175
+00:08:06,852 --> 00:08:09,689
+Recule est activée, 
+c'est ce qu'on a là.
+
+176
+00:08:11,244 --> 00:08:14,931
+Alors regardons comment nous pouvons 
+écrire ce programme pour la perceuse.
+
+177
+00:08:16,576 --> 00:08:19,726
+ Nos variables : étapes et transitions,
+
+178
+00:08:21,378 --> 00:08:24,378
+le nom des étapes
+
+179
+00:08:24,729 --> 00:08:28,045
+qui seront aussi 
+les indices avec l'enum,
+
+180
+00:08:29,198 --> 00:08:30,945
+les variables dans lesquels
+
+181
+00:08:31,570 --> 00:08:34,270
+les entrées seront mémorisées,
+
+182
+00:08:34,457 --> 00:08:36,224
+c'est justement dans cette procédure
+
+183
+00:08:36,412 --> 00:08:38,396
+que ces variables sont lus.
+
+184
+00:08:38,914 --> 00:08:40,600
+Pour le calcul des transitions :
+
+185
+00:08:41,075 --> 00:08:43,938
+pour chacune des transitions,  
+on va regarder
+
+186
+00:08:44,673 --> 00:08:47,160
+quelle est l'étape précédente ?
+
+187
+00:08:47,627 --> 00:08:50,120
+Quelle est la réceptivité ?
+
+188
+00:08:50,620 --> 00:08:52,463
+On fait le ET logique
+
+189
+00:08:52,646 --> 00:08:54,260
+et on mémorise la valeur.
+
+190
+00:08:55,357 --> 00:08:57,655
+Ici, l'arrêt
+
+191
+00:08:58,813 --> 00:09:00,474
+ça correspond au Start.
+
+192
+00:09:00,637 --> 00:09:02,293
+Quand on est en descente,
+
+193
+00:09:02,670 --> 00:09:04,290
+c'est Bas qu'on va attendre.
+
+194
+00:09:04,427 --> 00:09:05,675
+Quand on est en montée,
+
+195
+00:09:06,025 --> 00:09:07,702
+c'est Haut qu'on va attendre.
+
+196
+00:09:08,947 --> 00:09:11,672
+On va pouvoir ensuite 
+désactiver les étapes
+
+197
+00:09:11,995 --> 00:09:13,736
+qui seront franchissables.
+
+198
+00:09:13,858 --> 00:09:16,908
+Si cette transition est franchissable,
+
+199
+00:09:17,586 --> 00:09:18,620
+alors
+
+200
+00:09:19,309 --> 00:09:22,925
+l'étape précédente est désactivée,
+
+201
+00:09:23,915 --> 00:09:26,427
+de la même manière 
+pour les autres transitions.
+
+202
+00:09:27,322 --> 00:09:29,172
+De même, on va activer
+
+203
+00:09:29,560 --> 00:09:31,393
+les étapes qui doivent l'être
+
+204
+00:09:31,580 --> 00:09:34,207
+toujours en fonction de la transition.
+
+205
+00:09:34,792 --> 00:09:37,792
+Et ici, on va passer 
+en descente, en montée
+
+206
+00:09:38,131 --> 00:09:39,698
+et à l'arrêt.
+
+207
+00:09:39,894 --> 00:09:42,338
+Et finalement la procédure AffecteSorties
+
+208
+00:09:42,594 --> 00:09:44,358
+va simplement tenir compte
+
+209
+00:09:44,483 --> 00:09:46,155
+des différentes valeurs.
+
+210
+00:09:46,511 --> 00:09:50,686
+Je dois écrire la valeur Avance
+
+211
+00:09:51,688 --> 00:09:53,056
+en descente 
+
+212
+00:09:53,309 --> 00:09:55,797
+et la valeur Recule en montée.
+
+213
+00:09:57,244 --> 00:09:58,859
+On a finalement le programme principal
+
+214
+00:09:58,972 --> 00:10:01,167
+qui a la même allure 
+que ce qu'on avait toute à l'heure.
+
+215
+00:10:01,890 --> 00:10:03,458
+L'initialisation,
+
+216
+00:10:03,954 --> 00:10:07,538
+la mise à 0, 
+l'inactivation de toutes les étapes,
+
+217
+00:10:07,779 --> 00:10:10,220
+l'activation de la première étape
+
+218
+00:10:10,345 --> 00:10:12,797
+et cette boucle qui en permanence
+
+219
+00:10:13,197 --> 00:10:15,224
+exécute ces procédures :
+
+220
+00:10:15,976 --> 00:10:19,101
+affecter les sorties, 
+lire les entrées, 
+
+221
+00:10:19,522 --> 00:10:21,382
+calculer les transitions,
+
+222
+00:10:21,638 --> 00:10:24,231
+désactiver les étapes 
+qui ont été franchies,
+
+223
+00:10:24,511 --> 00:10:26,692
+activer les étapes suivantes.
+
+224
+00:10:27,696 --> 00:10:30,264
+Alors, vous allez peut-être me dire 
+c'est bien compliqué
+
+225
+00:10:30,352 --> 00:10:31,802
+pour ce programme de la perceuse
+
+226
+00:10:31,943 --> 00:10:34,943
+qu'on avait réussi à écrire 
+de manière infiniment plus simple.
+
+227
+00:10:35,583 --> 00:10:37,892
+Certes, pour un Grafcet simple,
+
+228
+00:10:38,185 --> 00:10:39,355
+c'est trop compliqué
+
+229
+00:10:39,693 --> 00:10:41,671
+Et pour un Grafcet compliqué,
+
+230
+00:10:41,837 --> 00:10:43,718
+ça va être beaucoup plus simple,
+
+231
+00:10:44,158 --> 00:10:47,158
+parce que la méthode, 
+elle est systématique.
+
+232
+00:10:48,029 --> 00:10:49,602
+On s'occupe des étapes,
+
+233
+00:10:49,727 --> 00:10:51,439
+on s'occupe des transitions,
+
+234
+00:10:51,638 --> 00:10:53,186
+on s'occupe des entrées,
+
+235
+00:10:53,298 --> 00:10:54,420
+on s'occupe des sorties.
+
+236
+00:10:54,612 --> 00:10:55,934
+Une fois qu'on a tout fait, 
+
+237
+00:10:56,268 --> 00:10:58,234
+ça fonctionne du premier coup
+
+238
+00:10:58,484 --> 00:10:59,752
+si on n'a pas fait de fautes.
+
+239
+00:11:00,990 --> 00:11:02,356
+Il est souvent nécessaire
+
+240
+00:11:02,444 --> 00:11:05,115
+d'ajouter des temporisations
+
+241
+00:11:05,228 --> 00:11:06,586
+dans les Grafcet.
+
+242
+00:11:07,504 --> 00:11:10,248
+Et notre système s'y prête 
+parfaitement bien.
+
+243
+00:11:10,688 --> 00:11:12,940
+Il va suffire d'ajouter un délai
+
+244
+00:11:13,406 --> 00:11:14,706
+dans la boucle principale. 
+
+245
+00:11:14,856 --> 00:11:16,285
+Vous vous souvenez, on l'a déjà fait
+
+246
+00:11:16,392 --> 00:11:17,992
+à plusieurs reprises.
+
+247
+00:11:18,466 --> 00:11:21,466
+Par exemple, 1/100ème de secondes.
+
+248
+00:11:22,016 --> 00:11:23,028
+Et ensuite,
+
+249
+00:11:23,236 --> 00:11:25,656
+dans la boucle principale 
+pour chaque Timer
+
+250
+00:11:26,037 --> 00:11:28,573
+qui aura été initialisé au début à 0,
+
+251
+00:11:28,771 --> 00:11:29,754
+on écrira
+
+252
+00:11:29,991 --> 00:11:32,754
+si le Timer est supérieur à 0
+
+253
+00:11:33,150 --> 00:11:35,143
+alors on le décrémente.
+
+254
+00:11:35,488 --> 00:11:38,488
+Alors il faut bien comprendre 
+qu'au moment où on entre par exemple
+
+255
+00:11:38,911 --> 00:11:40,690
+dans une étape
+
+256
+00:11:41,127 --> 00:11:42,512
+qui nécessite un Timer,
+
+257
+00:11:42,637 --> 00:11:45,512
+on initialise le Timer 
+avec la bonne valeur
+
+258
+00:11:45,803 --> 00:11:47,072
+et il suffira ensuite 
+
+259
+00:11:47,359 --> 00:11:49,654
+de tester s'il est égal à 0
+
+260
+00:11:49,841 --> 00:11:53,171
+pour savoir si le temps en question 
+a été écoulé.
+
+261
+00:11:54,443 --> 00:11:56,201
+Lorsqu'on a plusieurs Timers,
+
+262
+00:11:56,288 --> 00:11:57,800
+on procèdera de la même manière 
+
+263
+00:11:57,968 --> 00:12:00,093
+avec un tableau de Timers
+
+264
+00:12:00,197 --> 00:12:02,484
+qu'on initialise à 0
+
+265
+00:12:02,730 --> 00:12:05,061
+pour le nombre de Timers qu'on a prévu
+
+266
+00:12:05,770 --> 00:12:07,185
+Et dans la boucle principale,
+
+267
+00:12:07,373 --> 00:12:09,356
+de nouveau pour chaque Timers,
+
+268
+00:12:09,481 --> 00:12:12,193
+on va tester s'ils est supérieur à 0
+
+269
+00:12:12,365 --> 00:12:15,143
+et on va le décrémenter si c'est le cas.
+
+270
+00:12:15,422 --> 00:12:17,820
+Voilà ici le Delay, l'attente
+
+271
+00:12:18,158 --> 00:12:20,420
+de 1/100ème de secondes 
+de la boucle principale.
+
+272
+00:12:20,780 --> 00:12:23,434
+Et par exemple, 
+pour le calcul d'une transition,
+
+273
+00:12:23,608 --> 00:12:28,444
+on pourra ajouter 
+if Timer numéro 3 est égal à 0
+
+274
+00:12:28,861 --> 00:12:31,399
+alors on va faire telle ou telle chose.
+
+275
+00:12:32,278 --> 00:12:34,554
+Alors je tenais à vous montrer 
+qu'il est possible
+
+276
+00:12:34,666 --> 00:12:37,285
+de programmer des Grafcet 
+avec un microcontrôleur.
+
+277
+00:12:37,547 --> 00:12:39,922
+Avec l'habitude, 
+ce n'est pas compliqué
+
+278
+00:12:40,112 --> 00:12:42,069
+et c'est parfois, 
+beaucoup moins coûteux
+
+279
+00:12:42,263 --> 00:12:44,724
+que d'acheter un automate programmable.
+

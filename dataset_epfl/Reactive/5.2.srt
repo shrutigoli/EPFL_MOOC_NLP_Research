@@ -1,0 +1,885 @@
+1
+00:00:00,940 --> 00:00:05,850
+Now it is high time that we go in media
+space and look at what actors really are.
+
+2
+00:00:07,480 --> 00:00:10,650
+Actors represent objects and the actor
+model
+
+3
+00:00:10,650 --> 00:00:15,160
+describes how these objects interact, and
+this is
+
+4
+00:00:15,160 --> 00:00:18,980
+all inspired by how we humans organize
+
+5
+00:00:18,980 --> 00:00:21,799
+and it especially respects the laws of
+physics.
+
+6
+00:00:23,440 --> 00:00:24,470
+What do I mean by this?
+
+7
+00:00:26,610 --> 00:00:28,360
+Let us say that we have a person here
+
+8
+00:00:30,520 --> 00:00:34,270
+without a watch who wants to know the
+current time.
+
+9
+00:00:36,210 --> 00:00:38,129
+Over here, is another person.
+
+10
+00:00:41,140 --> 00:00:41,780
+With a watch.
+
+11
+00:00:43,130 --> 00:00:48,780
+Now the first person will ask the
+question, what is the time?
+
+12
+00:00:48,780 --> 00:00:48,781
+.
+
+13
+00:00:48,781 --> 00:00:56,755
+And the second person might just answer,
+it's 12:43.
+
+14
+00:00:58,290 --> 00:01:02,660
+This is a simple exchange between two
+humans and we all have done
+
+15
+00:01:02,660 --> 00:01:07,030
+something like that before so I hope
+everybody can relate to this example.
+
+16
+00:01:07,030 --> 00:01:09,890
+But there's more than is visible at the
+surface.
+
+17
+00:01:09,890 --> 00:01:14,540
+First of all we take note that, we
+
+18
+00:01:14,540 --> 00:01:19,210
+transmit information by speaking and
+hearing the words.
+
+19
+00:01:20,920 --> 00:01:24,910
+That means the first person sends a
+message to the second person.
+
+20
+00:01:26,710 --> 00:01:28,430
+The second person then thinks a little
+bit,
+
+21
+00:01:28,430 --> 00:01:31,480
+looks at the watch and replies with
+another message,
+
+22
+00:01:32,750 --> 00:01:35,140
+traveling back, on waves of sound.
+
+23
+00:01:37,070 --> 00:01:41,820
+The two fundamental qualities here are,
+first of all, it is based purely on
+
+24
+00:01:41,820 --> 00:01:46,940
+messages, and second, messages take time
+to travel from one object to the other.
+
+25
+00:01:48,060 --> 00:01:50,750
+It is helpful to think of actors not
+
+26
+00:01:50,750 --> 00:01:53,850
+as these abstract objects on which you
+call methods.
+
+27
+00:01:54,890 --> 00:01:58,210
+But instead to visualize them just like
+persons
+
+28
+00:01:58,210 --> 00:01:59,580
+who talk with each other.
+
+29
+00:02:01,560 --> 00:02:05,090
+One thing also to note is that when we
+humans talk, we
+
+30
+00:02:05,090 --> 00:02:10,090
+do not reach into each other's brains, for
+example, by mind reading.
+
+31
+00:02:10,090 --> 00:02:14,759
+we rely only on messages, and that is a
+very fundamental part of actors.
+
+32
+00:02:17,575 --> 00:02:20,200
+More formally, an actor as defined by
+Hewitt,
+
+33
+00:02:20,200 --> 00:02:23,450
+Bishop, and Steiger is an object with an
+identity.
+
+34
+00:02:24,600 --> 00:02:27,520
+We know that from the second week of this
+course.
+
+35
+00:02:29,040 --> 00:02:31,860
+And it has also a behavior, which we also
+
+36
+00:02:31,860 --> 00:02:36,900
+already have encountered, and it only
+interacts using message passing.
+
+37
+00:02:36,900 --> 00:02:39,620
+Which is still compatible with the normal
+
+38
+00:02:39,620 --> 00:02:43,010
+object definition, what is special about
+actors is
+
+39
+00:02:43,010 --> 00:02:46,280
+that their message passing is always
+asynchronous.
+
+40
+00:02:47,570 --> 00:02:51,930
+Let me illustrate what that means using
+another small drawing.
+
+41
+00:02:51,930 --> 00:02:57,610
+We have an actor here, let's call it Actor
+A.
+
+42
+00:03:00,000 --> 00:03:09,010
+And this wants to send a message to actor
+B.
+
+43
+00:03:09,010 --> 00:03:12,740
+Actor A will send the message and then it
+can
+
+44
+00:03:12,740 --> 00:03:16,930
+just continue doing whatever it wants to
+do after that, without
+
+45
+00:03:16,930 --> 00:03:20,160
+having to wait for the message to travel
+to B And
+
+46
+00:03:20,160 --> 00:03:25,020
+it will be processed by B, especially the
+processing happens in
+
+47
+00:03:25,020 --> 00:03:28,240
+a different context, at a different, later
+time as
+
+48
+00:03:28,240 --> 00:03:31,220
+determined by the system where the actors
+run in.
+
+49
+00:03:31,220 --> 00:03:33,800
+This is the most important property of
+actors.
+
+50
+00:03:35,630 --> 00:03:43,520
+For this, we use the actor traits in Akka.
+The actor type, defines one abstract
+
+51
+00:03:43,520 --> 00:03:49,200
+method which is called receive and this
+receive returns something of type receive.
+
+52
+00:03:50,400 --> 00:03:54,700
+Receive is a partial function from Any to
+Unit and
+
+53
+00:03:54,700 --> 00:03:58,510
+it describes the response of the actor to
+a message.
+
+54
+00:03:58,510 --> 00:04:01,910
+Any message could come in, hence Any, and
+the actor
+
+55
+00:04:01,910 --> 00:04:04,420
+can do a lot of things, but in the end,
+
+56
+00:04:04,420 --> 00:04:07,590
+it does not return anything to its caller,
+because the
+
+57
+00:04:07,590 --> 00:04:11,400
+caller is long gone due to the
+asynchronous message passing.
+
+58
+00:04:14,710 --> 00:04:19,450
+We implement the Actor trait here in a
+simple class called Counter.
+
+59
+00:04:19,450 --> 00:04:24,570
+This one has one Field count and it has a
+behavior.
+
+60
+00:04:24,570 --> 00:04:26,750
+It must implement the receive method in
+the
+
+61
+00:04:26,750 --> 00:04:30,800
+Actor trait and that must return a partial
+function.
+
+62
+00:04:30,800 --> 00:04:33,630
+That's the partial function literal here
+with one
+
+63
+00:04:33,630 --> 00:04:37,560
+case statement and it matches the incoming
+message.
+
+64
+00:04:37,560 --> 00:04:39,790
+So if we get a message with
+
+65
+00:04:39,790 --> 00:04:44,180
+a string incr then we want to increment
+the counter.
+
+66
+00:04:44,180 --> 00:04:50,070
+Which we do here, on the right.
+This object is a pretty boring actor,
+
+67
+00:04:50,070 --> 00:04:55,620
+actually, because we can only send it the
+string and we never get any answer back.
+
+68
+00:04:55,620 --> 00:04:59,330
+And we cannot determine what the counter
+actually is.
+
+69
+00:04:59,330 --> 00:05:01,870
+Therefore this object does not exhibit
+stateful behavior.
+
+70
+00:05:04,750 --> 00:05:07,520
+If we want to make it stateful we want to
+enable other
+
+71
+00:05:07,520 --> 00:05:10,880
+actors to find out about what the value of
+the counter is.
+
+72
+00:05:14,400 --> 00:05:18,820
+And therefore actors can send messages to
+addresses they know.
+
+73
+00:05:18,820 --> 00:05:22,540
+Addresses in Akka are modeled by the
+ActorRef Type.
+
+74
+00:05:23,680 --> 00:05:29,570
+So, the addition here is, we add another
+case, and if we get a tuple
+
+75
+00:05:29,570 --> 00:05:34,580
+with the string get, and something with
+type ActorRef, which we call
+
+76
+00:05:34,580 --> 00:05:39,820
+customer, then we can send to the
+customer, the count
+
+77
+00:05:39,820 --> 00:05:40,379
+as a message.
+
+78
+00:05:41,820 --> 00:05:44,430
+This is the exclamation mark operator
+which is used
+
+79
+00:05:44,430 --> 00:05:48,560
+to send messages and it is pronounced tell
+in Akka.
+
+80
+00:05:48,560 --> 00:05:50,060
+So customer tell count.
+
+81
+00:05:54,100 --> 00:05:56,505
+In order to understand what is really
+happening behind the
+
+82
+00:05:56,505 --> 00:06:00,080
+scenes let me show you more parts of the
+actor trait.
+
+83
+00:06:01,480 --> 00:06:04,550
+Each actor knows its own address.
+
+84
+00:06:04,550 --> 00:06:08,850
+It's an ActorRef called self.
+And it is implicitly available.
+
+85
+00:06:11,100 --> 00:06:19,390
+ActorRef is an abstract clause which has a
+method called tell or exclamation mark.
+
+86
+00:06:19,390 --> 00:06:21,490
+And if you use the exclamation mark that
+is
+
+87
+00:06:21,490 --> 00:06:23,870
+the nice Scala syntax, tell is more for
+Java.
+
+88
+00:06:25,100 --> 00:06:27,000
+This takes an implicit argument.
+
+89
+00:06:28,300 --> 00:06:32,230
+The implicit argument of of type ActorRef
+is picked up from the surroundings.
+
+90
+00:06:32,230 --> 00:06:36,290
+So if you use the tell operator within an
+Actor it will implicitly
+
+91
+00:06:36,290 --> 00:06:40,680
+pick up the sender as being the self
+reference of that actor.
+
+92
+00:06:42,380 --> 00:06:50,300
+Within the receiving Actor, this value is
+available as sender, which gives back
+
+93
+00:06:50,300 --> 00:06:54,820
+the actor ref, which has sent the message
+which is currently being processed.
+
+94
+00:06:56,890 --> 00:07:00,410
+Passing the sender reference along with
+the message to the receiving
+
+95
+00:07:00,410 --> 00:07:06,070
+actor needs to be done explicitly in other
+actor implementations like erlang.
+
+96
+00:07:06,070 --> 00:07:09,860
+But since it is such a common pattern, we
+devoted this
+
+97
+00:07:09,860 --> 00:07:14,560
+one name in the actor to this purpose and
+do it automatically.
+
+98
+00:07:16,730 --> 00:07:23,290
+Using this new power we can make the
+counter actor look a bit nicer so we just
+
+99
+00:07:23,290 --> 00:07:26,680
+use the messages here and the sender is
+
+100
+00:07:26,680 --> 00:07:29,369
+automatically picked up to which the reply
+is sent.
+
+101
+00:07:32,050 --> 00:07:35,350
+An actor can do more things than just send
+messages.
+
+102
+00:07:35,350 --> 00:07:39,440
+It can create other actors, and it can
+change its behavior.
+
+103
+00:07:39,440 --> 00:07:43,520
+To access these functions, we need to know
+about the actor's context.
+
+104
+00:07:44,640 --> 00:07:47,570
+The actor type itself only has the receive
+method,
+
+105
+00:07:47,570 --> 00:07:52,310
+so it only describes the behavior of the
+actor.
+
+106
+00:07:52,310 --> 00:07:56,720
+The execution machinery is provided by the
+actor context.
+
+107
+00:07:56,720 --> 00:07:57,260
+Here you see
+
+108
+00:07:57,260 --> 00:08:01,900
+an excerpt of the methods available on the
+actor context.
+
+109
+00:08:01,900 --> 00:08:04,860
+These two are called become and unbecome.
+
+110
+00:08:04,860 --> 00:08:09,960
+Each actor has a stack of behaviors and
+the top most one is always the acted one.
+
+111
+00:08:11,150 --> 00:08:16,740
+The default mode of become is to replace
+the top of the stack with a new behavior
+
+112
+00:08:16,740 --> 00:08:21,690
+but you can also use it to push an
+un-become to pop the top behavior.
+
+113
+00:08:21,690 --> 00:08:24,290
+You have access
+
+114
+00:08:24,290 --> 00:08:29,620
+to the context within the actor by just
+saying context.
+
+115
+00:08:29,620 --> 00:08:30,860
+Now let's see this in action.
+
+116
+00:08:32,180 --> 00:08:38,000
+We can reformulate our counter actor into
+one which does not have a bar.
+
+117
+00:08:39,040 --> 00:08:42,780
+It will be a stateful object without a,
+explicit variable.
+
+118
+00:08:45,350 --> 00:08:48,890
+First, we need to define a method, which
+gives us a behavior.
+
+119
+00:08:50,070 --> 00:08:54,350
+This method takes an argument, what the
+state of the counter currently is.
+
+120
+00:08:56,230 --> 00:09:01,130
+We start out with the counter at zero, the
+behavior counter of zero.
+
+121
+00:09:01,130 --> 00:09:06,100
+If we get an incr message here, we change
+our behavior
+
+122
+00:09:06,100 --> 00:09:10,980
+to be that of a counter of n plus 1.
+
+123
+00:09:10,980 --> 00:09:13,535
+N first is 0 so it will be a counter 1.
+
+124
+00:09:15,600 --> 00:09:18,760
+Within this counter behavior, at anytime
+we can get a
+
+125
+00:09:18,760 --> 00:09:23,210
+get request, where we just reply with the
+current counters value.
+
+126
+00:09:25,250 --> 00:09:28,710
+You can see here that this looks a bit
+
+127
+00:09:28,710 --> 00:09:33,560
+like a tail-recursive function, because we
+call it inside
+
+128
+00:09:33,560 --> 00:09:40,410
+itself, but it is asynchronous, because
+context.become evaluates what
+
+129
+00:09:40,410 --> 00:09:43,140
+is given here only when the next message
+is processed.
+
+130
+00:09:45,630 --> 00:09:48,050
+This is functionally equivalent to the
+previous version
+
+131
+00:09:48,050 --> 00:09:50,470
+of the counter, but it has some
+advantages.
+
+132
+00:09:50,470 --> 00:09:53,500
+First of all, there is only one place
+where the state is
+
+133
+00:09:53,500 --> 00:09:57,660
+changed, and that is the call to become,
+and this is very explicit.
+
+134
+00:09:58,890 --> 00:10:03,180
+The other is that the state is scoped to
+the current behavior, so
+
+135
+00:10:03,180 --> 00:10:08,170
+there is no variable which we can leave
+somewhere in an unknown state.
+
+136
+00:10:08,170 --> 00:10:09,790
+We always have the current state here.
+
+137
+00:10:12,500 --> 00:10:18,050
+The last thing, one can fundamentally do
+with actors, is to create and stop them.
+
+138
+00:10:19,520 --> 00:10:21,680
+The actor context has methods for that.
+
+139
+00:10:21,680 --> 00:10:26,560
+First, actor of, which takes props, that
+is a description on how
+
+140
+00:10:26,560 --> 00:10:30,545
+to create an actor, and a name, and it
+returns an ActorRef.
+
+141
+00:10:32,000 --> 00:10:35,270
+Also, each actor can stop other actors.
+
+142
+00:10:37,870 --> 00:10:41,990
+One thing to note here is that actors are
+always created by actors.
+
+143
+00:10:43,450 --> 00:10:47,260
+This means that they naturally form a
+hierarchy because
+
+144
+00:10:47,260 --> 00:10:50,030
+an actor is created by exactly one other
+actor.
+
+145
+00:10:51,600 --> 00:10:54,940
+We will see that hierarchy and another one
+in the following weeks.
+
+146
+00:10:57,910 --> 00:11:02,280
+And another thing to note is that stop
+here is often applied to
+
+147
+00:11:02,280 --> 00:11:07,120
+the self reference, which means that the
+actor decides that it wants to terminate.
+
+148
+00:11:09,030 --> 00:11:11,810
+Let us try this all out in a runnable
+application.
+
+149
+00:11:13,270 --> 00:11:17,170
+Of course an application is also modeled
+as an actor in this model.
+
+150
+00:11:17,170 --> 00:11:18,310
+So we call it main.
+
+151
+00:11:19,340 --> 00:11:23,000
+This is an actor, and it uses context
+actorOf to
+
+152
+00:11:23,000 --> 00:11:24,780
+create a counter.
+
+153
+00:11:24,780 --> 00:11:27,590
+We can say, Props Counter to create
+
+154
+00:11:27,590 --> 00:11:31,230
+an actor which does not take constructor
+arguments.
+
+155
+00:11:31,230 --> 00:11:32,220
+And as all good things.
+
+156
+00:11:33,610 --> 00:11:36,330
+It needs a name, we name it counter in
+this case.
+
+157
+00:11:38,150 --> 00:11:41,675
+Then we send messages to this counter, in
+this case we
+
+158
+00:11:41,675 --> 00:11:45,740
+send it incr three times and then we send
+it get.
+
+159
+00:11:46,770 --> 00:11:48,320
+Remember that sending
+
+160
+00:11:48,320 --> 00:11:53,510
+with the tel operator within an actor will
+pick up the self reference as the sender.
+
+161
+00:11:54,570 --> 00:11:58,790
+And since the counter will reply, we will
+receive it in this actor.
+
+162
+00:12:00,210 --> 00:12:05,330
+Here in our behavior, we receive the
+count, which is of type int.
+
+163
+00:12:05,330 --> 00:12:09,100
+We will print it out and then stop
+ourselves.
+
+164
+00:12:11,900 --> 00:12:15,340
+I have loaded the counter actor code into
+Eclipse.
+
+165
+00:12:15,340 --> 00:12:18,840
+Adding the appropriate input of the actor
+trait
+
+166
+00:12:18,840 --> 00:12:21,380
+and with the implementation that you have
+already seen.
+
+167
+00:12:23,730 --> 00:12:27,100
+The same for the main class which needs
+the props in addition.
+
+168
+00:12:28,740 --> 00:12:31,530
+In order to run this we need to tell
+Eclipse how to
+
+169
+00:12:31,530 --> 00:12:35,590
+run actor applications because it
+currently does not know about that yet.
+
+170
+00:12:37,150 --> 00:12:39,530
+So we create a run configuration.
+
+171
+00:12:39,530 --> 00:12:40,730
+I have one prepared here.
+
+172
+00:12:41,980 --> 00:12:45,660
+It uses the main class akka.Main which
+
+173
+00:12:45,660 --> 00:12:48,800
+expects as its first argument, the class
+name,
+
+174
+00:12:48,800 --> 00:12:52,860
+the full class name of the actor class
+which is to be instantitated.
+
+175
+00:12:54,000 --> 00:12:55,090
+Then, if we run this.
+
+176
+00:12:59,210 --> 00:13:04,060
+We will see that the count was three.
+This printout was done by this
+
+177
+00:13:04,060 --> 00:13:09,300
+line, so we, we received the count from
+the counter
+
+178
+00:13:09,300 --> 00:13:14,229
+actor, and we received three because we
+incremented the counter three times.
+
+179
+00:13:16,340 --> 00:13:18,990
+We could, for example, delete one of those
+lines.
+
+180
+00:13:20,630 --> 00:13:21,710
+And run the program again.
+
+181
+00:13:23,990 --> 00:13:25,710
+And then the count is two.
+
+182
+00:13:25,710 --> 00:13:29,650
+Now we have seen all the basic things that
+actors can do.
+
+183
+00:13:29,650 --> 00:13:34,650
+When they receive a message, they can send
+messages, create actors.
+
+184
+00:13:34,650 --> 00:13:37,630
+And they can change their behavior for the
+next message,
+
+185
+00:13:37,630 --> 00:13:40,400
+and this all, this is the actor model of
+computation.
+

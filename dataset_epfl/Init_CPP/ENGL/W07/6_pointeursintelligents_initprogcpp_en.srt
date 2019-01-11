@@ -1,0 +1,986 @@
+1
+00:00:02,912 --> 00:00:05,872
+The pointers we have studied up
+until now are good old
+
+2
+00:00:05,872 --> 00:00:08,602
+"C-style" pointers, which are without
+a doubt the most versatile
+
+3
+00:00:08,602 --> 00:00:10,592
+and most powerful, but also the
+most dangerous pointers.
+
+4
+00:00:10,592 --> 00:00:13,820
+Indeed, as we have seen, their use
+requires a lot of discipline.
+
+5
+00:00:13,820 --> 00:00:16,550
+Everything that is allocated by the
+programmer as memory that is pointed to
+
+6
+00:00:16,550 --> 00:00:20,030
+by these pointers must systematically be
+deallocated by the programmer.
+
+7
+00:00:20,030 --> 00:00:22,320
+And this discipline is sometimes
+hard to respect
+
+8
+00:00:22,320 --> 00:00:23,870
+systematically.
+
+9
+00:00:24,312 --> 00:00:26,902
+If we want to allocate memory 
+dynamically, as of C++11,
+
+10
+00:00:26,902 --> 00:00:30,902
+we can use pointers that are somewhat
+more comfortable to use
+
+11
+00:00:30,902 --> 00:00:34,482
+and which require less precautions
+of the programmer.
+
+12
+00:00:34,482 --> 00:00:37,512
+These are so-called smart pointers,
+and I will briefly
+
+13
+00:00:37,512 --> 00:00:38,802
+present them now.
+
+14
+00:00:40,345 --> 00:00:43,175
+"Smart pointers"
+
+15
+00:00:43,175 --> 00:00:46,715
+can be used
+
+16
+00:00:46,715 --> 00:00:48,515
+by including the memory library.
+
+17
+00:00:48,515 --> 00:00:52,515
+They have the advantage of deleting
+themselves when appropriate.
+
+18
+00:00:52,515 --> 00:00:56,215
+This means that they manage deallocation
+of their associated memory themselves.
+
+19
+00:00:56,215 --> 00:00:57,885
+The programmer
+
+20
+00:00:57,885 --> 00:01:01,365
+does not need to worry about freeing
+memory anymore, which
+
+21
+00:01:01,365 --> 00:01:05,365
+avoids problems related to forgetting the
+<i>delete</i> statement
+
+22
+00:01:05,365 --> 00:01:06,865
+as with C-style pointers.
+
+23
+00:01:08,184 --> 00:01:11,784
+The memory management of smart
+pointers uses
+
+24
+00:01:11,784 --> 00:01:15,784
+so-called garbage-collecting techniques.
+
+25
+00:01:16,844 --> 00:01:19,794
+There are 3 kinds of smart pointers
+in C++11.
+
+26
+00:01:19,794 --> 00:01:23,044
+<i>unique_ptr, shared_ptr</i> and <i>weak_ptr</i>.
+
+27
+00:01:23,121 --> 00:01:26,741
+The difference between these
+pointer types is essentially
+
+28
+00:01:26,741 --> 00:01:30,541
+related to the number of pointers
+of a given type that are able
+
+29
+00:01:30,541 --> 00:01:31,851
+to reference a same memory area.
+
+30
+00:01:31,851 --> 00:01:36,031
+For example, in the case of <i>unique_ptr</i>s, 
+
+31
+00:01:36,031 --> 00:01:39,541
+only one <i>unique_ptr</i> can point towards
+a given dynamically allocated memory area
+
+32
+00:01:39,541 --> 00:01:40,581
+such as this one.
+
+33
+00:01:40,632 --> 00:01:44,512
+The situation where we would have a
+second <i>unique_ptr</i> pointing to the same
+
+34
+00:01:44,512 --> 00:01:47,452
+dynamically allocated memory area
+is not possible.
+
+35
+00:01:48,343 --> 00:01:52,343
+On the contrary, with <i>shared_ptr</i> and <i>weak_ptr</i>,
+one can have several pointers
+
+36
+00:01:53,522 --> 00:01:57,522
+that point to the same dynamically
+allocated memory area.
+
+37
+00:01:57,522 --> 00:02:02,082
+The difference between <i>shared</i> and <i>weak_ptr</i>
+will be explained briefly
+
+38
+00:02:02,082 --> 00:02:02,872
+soon.
+
+39
+00:02:03,698 --> 00:02:06,508
+C-style pointers can do everything.
+For example,
+
+40
+00:02:06,508 --> 00:02:10,628
+in some situations, it is possible
+for two different pointers
+
+41
+00:02:10,628 --> 00:02:14,038
+to reference, to point to the same
+memory area.
+
+42
+00:02:14,038 --> 00:02:16,728
+This means that the programmer
+must show discipline,
+
+43
+00:02:16,728 --> 00:02:17,588
+and be very careful.
+
+44
+00:02:17,588 --> 00:02:21,588
+Imagine for example that in one part of
+the program, I call <i>delete p2</i>
+
+45
+00:02:22,596 --> 00:02:26,936
+This will deallocate the memory area
+pointed to by p2,
+
+46
+00:02:26,936 --> 00:02:29,696
+which is also pointed to
+by p1.
+
+47
+00:02:29,696 --> 00:02:32,796
+So it is up to the programmer to
+be sufficiently careful
+
+48
+00:02:32,796 --> 00:02:36,796
+to guarantee that freeing memory in
+one place will not have any
+
+49
+00:02:36,796 --> 00:02:39,346
+ill effects on another part
+of the program.
+
+50
+00:02:40,689 --> 00:02:44,689
+If we want to avoid this kind of problems
+and if we know in advance that
+
+51
+00:02:44,689 --> 00:02:48,279
+there will be no need for several pointers
+to reference, to own
+
+52
+00:02:48,279 --> 00:02:52,849
+a same memory area, then we should
+use the C++11 notion of
+
+53
+00:02:52,849 --> 00:02:54,009
+unique_ptr.
+
+54
+00:02:54,009 --> 00:02:57,579
+We saw that these pointers are such that
+only one single
+
+55
+00:02:57,579 --> 00:03:01,579
+unique_ptr can reference a given
+dynamically-allocated memory area.
+
+56
+00:03:01,579 --> 00:03:05,839
+So the situation where two unique_ptrs
+reference the same area
+
+57
+00:03:05,839 --> 00:03:08,889
+is not possible; the situation we discussed
+earlier
+
+58
+00:03:08,889 --> 00:03:10,059
+is not possible with these.
+
+59
+00:03:10,059 --> 00:03:13,299
+This will avoid confusions such as
+the ones we described.
+
+60
+00:03:13,299 --> 00:03:17,109
+A fairly logical consequence that follows,
+given that one and
+
+61
+00:03:17,109 --> 00:03:21,109
+only one unique_ptr can reference
+a given memory area, is that
+
+62
+00:03:21,109 --> 00:03:24,309
+unique_ptrs cannot be copied.
+
+63
+00:03:25,188 --> 00:03:29,188
+Basically, in C++11, if I want to declare,
+to initialize a unique_ptr,
+
+64
+00:03:29,188 --> 00:03:31,698
+then I will have to use the following
+syntax.
+
+65
+00:03:31,698 --> 00:03:35,858
+So, unique_ptr. I must indicate what type
+of memory area the
+
+66
+00:03:35,858 --> 00:03:37,458
+unique_ptr can point to.
+
+67
+00:03:37,458 --> 00:03:41,458
+So here I declare a new unique_ptr that
+can point to an integer, and
+
+68
+00:03:41,458 --> 00:03:43,068
+of course I give it a name.
+
+69
+00:03:43,068 --> 00:03:46,508
+To initialize it, since it is a pointer, I
+need an address
+
+70
+00:03:46,508 --> 00:03:50,508
+and so I can initialize it with the
+address of a dynamically allocated object.
+
+71
+00:03:50,991 --> 00:03:55,311
+This is something I know how to do for
+an integer for example, via
+
+72
+00:03:55,311 --> 00:03:56,681
+this kind of statement.
+
+73
+00:03:57,212 --> 00:03:58,292
+Now if I try
+
+74
+00:04:00,529 --> 00:04:01,889
+to create a copy
+
+75
+00:04:04,031 --> 00:04:08,031
+of this unique_ptr, by declaring a pointer
+p1 and by copying the value
+
+76
+00:04:08,031 --> 00:04:11,371
+of p2, this is illegal in C++11.
+
+77
+00:04:11,371 --> 00:04:15,101
+This is to guarantee that there
+cannot be two unique_ptr-type
+
+78
+00:04:15,101 --> 00:04:18,891
+pointers pointing to the same dynamically-
+allocated memory area.
+
+79
+00:04:20,364 --> 00:04:23,994
+Thus, unique_ptrs cannot be
+copied, but they can be
+
+80
+00:04:23,994 --> 00:04:27,204
+moved, that is, passed on farther.
+
+81
+00:04:27,204 --> 00:04:31,204
+C++11 implements this with the so-called
+move semantic.
+
+82
+00:04:31,204 --> 00:04:34,804
+This concept goes beyond the scope
+of this lecture, but I will
+
+83
+00:04:34,804 --> 00:04:36,794
+briefly outline it later.
+
+84
+00:04:37,397 --> 00:04:40,587
+So, about the syntax: to establish the
+syntax, let's look at a small example
+
+85
+00:04:40,587 --> 00:04:42,977
+of declaration and initialization of
+a unique_ptr.
+
+86
+00:04:42,977 --> 00:04:46,977
+Here, I declare a unique_ptr px,
+which can point to an integer.
+
+87
+00:04:47,250 --> 00:04:51,170
+A unique_ptr is a pointer like any other
+in the sense that it will contain
+
+88
+00:04:51,170 --> 00:04:55,060
+an address; here, it contains the address
+of a dynamically-allocated memory area
+
+89
+00:04:55,060 --> 00:04:56,760
+for an integer.
+
+90
+00:04:57,409 --> 00:05:01,409
+Aside from that, unique_ptrs will be
+used like any other pointer
+
+91
+00:05:01,409 --> 00:05:02,619
+we have discussed up until now.
+
+92
+00:05:02,619 --> 00:05:05,999
+For example, we can access the content
+pointed to by the unique_ptr
+
+93
+00:05:05,999 --> 00:05:09,249
+by using the star operator, as we did with
+
+94
+00:05:09,249 --> 00:05:11,009
+C-style pointers.
+
+95
+00:05:11,758 --> 00:05:15,478
+We can of course also declare a vector,
+a dynamic array
+
+96
+00:05:15,478 --> 00:05:16,628
+of unique_ptrs.
+
+97
+00:05:16,628 --> 00:05:20,098
+Here is an example of a dynamic array
+named noms (TN: nom means "names")
+
+98
+00:05:20,098 --> 00:05:24,938
+and whose elements are unique_ptrs
+capable of pointing to
+
+99
+00:05:24,938 --> 00:05:27,128
+memory areas with a character array type.
+
+100
+00:05:27,128 --> 00:05:30,678
+When we initialize this vector,
+we make use of
+
+101
+00:05:30,678 --> 00:05:33,838
+dynamic allocation to get to the
+following situation
+
+102
+00:05:33,838 --> 00:05:38,148
+So, our <i>noms</i> array contains two
+elements, two cells, each of which
+
+103
+00:05:38,148 --> 00:05:39,718
+contains the address of a
+
+104
+00:05:41,417 --> 00:05:43,537
+dynamically-allocated object.
+
+105
+00:05:45,154 --> 00:05:50,714
+The first element contains the address
+of a dynamically allocated area
+
+106
+00:05:50,714 --> 00:05:55,274
+containing the character array "Pierre",
+and the second element of the vector
+
+107
+00:05:55,274 --> 00:05:59,274
+contains the address of a dynamically-
+allocated memory area containing the
+
+108
+00:05:59,274 --> 00:06:00,414
+character array "Paul".
+
+109
+00:06:02,731 --> 00:06:04,821
+So here, each element of the array
+
+110
+00:06:06,142 --> 00:06:11,642
+points uniquely to a character array
+thanks to the concept of
+
+111
+00:06:11,642 --> 00:06:12,782
+unique_ptr.
+
+112
+00:06:14,022 --> 00:06:16,862
+Last example to illustrate among others
+the concept of moving
+
+113
+00:06:16,862 --> 00:06:18,532
+versus copying.
+
+114
+00:06:18,729 --> 00:06:22,729
+Here, imagine that in a program, we have a
+Personne type
+
+115
+00:06:22,729 --> 00:06:26,359
+which is for example a structure
+representing the concept of a person
+
+116
+00:06:26,359 --> 00:06:28,849
+and one of whose fields would be, for
+example, the name of the person,
+
+117
+00:06:28,849 --> 00:06:30,519
+with a character array type.
+
+118
+00:06:30,519 --> 00:06:34,519
+Through the <i>naissance</i> (TN: means
+"birth") function, we want to create a new object
+
+119
+00:06:34,519 --> 00:06:38,519
+of type Personne, and to return the address
+of this object, stored in
+
+120
+00:06:38,519 --> 00:06:39,559
+a unique_ptr.
+
+121
+00:06:39,838 --> 00:06:44,478
+The line of code that handles creation
+of this object is as follows.
+
+122
+00:06:44,478 --> 00:06:47,758
+Creation of the object is done
+using dynamic allocation.
+
+123
+00:06:47,758 --> 00:06:50,542
+We dynamically create an object
+of type Personne.
+
+124
+00:06:50,758 --> 00:06:55,388
+The address of this object is stored
+in the bb variable which is of type
+
+125
+00:06:55,388 --> 00:06:56,748
+unique_ptr-to-Personne.
+
+126
+00:06:56,748 --> 00:07:01,338
+So let's imagine that afterwards, we
+make the necessary initializations
+
+127
+00:07:01,338 --> 00:07:06,258
+for the bb variable, for example by
+giving the name of the data structure
+
+128
+00:07:06,961 --> 00:07:10,961
+with the name passed on to the function,
+and then we supply to the outside world
+
+129
+00:07:11,850 --> 00:07:15,320
+the address of the object that we
+have just created.
+
+130
+00:07:15,320 --> 00:07:18,270
+So we end up in this situation.
+
+131
+00:07:18,270 --> 00:07:24,290
+We have a bb variable which contains the
+address of a dynamically-allocated object
+
+132
+00:07:24,290 --> 00:07:30,880
+of type Personne, so the type that is stored
+is Personne.
+
+133
+00:07:32,121 --> 00:07:36,121
+Now, let's place ourselves in the context
+of use of this "naissance" function.
+
+134
+00:07:36,121 --> 00:07:40,621
+Here, I declare a variable adresse_quidam
+(TN: means "address_individual") of
+
+135
+00:07:40,621 --> 00:07:44,911
+type unique_ptr-to-Personne, and
+I initialize it using the
+
+136
+00:07:44,911 --> 00:07:49,871
+unique_ptr returned by the call to
+the "naissance" function.
+
+137
+00:07:50,899 --> 00:07:54,899
+So here, we could imagine that we are
+in this situation,
+
+138
+00:07:54,899 --> 00:07:56,269
+where the variable bb
+
+139
+00:07:58,765 --> 00:08:04,785
+contains the address of a Personne, a
+person whose name is Pierre.
+
+140
+00:08:04,785 --> 00:08:08,285
+And here, we can imagine that what
+we are doing in reality is
+
+141
+00:08:08,285 --> 00:08:10,945
+copying to value of bb
+
+142
+00:08:13,418 --> 00:08:18,088
+to another variable of type
+unique_ptr which would be named
+
+143
+00:08:18,088 --> 00:08:19,248
+adresse_quidam.
+
+144
+00:08:20,685 --> 00:08:24,375
+So this might well appear to be a copy,
+but in reality what is happening
+
+145
+00:08:24,375 --> 00:08:28,375
+is a move, meaning that the value
+which was stored
+
+146
+00:08:28,375 --> 00:08:34,475
+in bb is moved to the new variable,
+adresse_quidam
+
+147
+00:08:35,631 --> 00:08:38,791
+and that the variable bb is no
+longer usable as-is,
+
+148
+00:08:38,791 --> 00:08:42,791
+i.e that we still have only one single
+object pointing
+
+149
+00:08:44,076 --> 00:08:50,106
+to the personne object and that
+we have not broken the fact that
+
+150
+00:08:50,106 --> 00:08:51,896
+only one unique_ptr can point to
+a given object.
+
+151
+00:08:51,896 --> 00:08:57,056
+So here, we implicitly used what is known
+in C++11 as the move semantic.
+
+152
+00:08:57,056 --> 00:09:00,616
+What happens in this particular context
+is not a copy, but
+
+153
+00:09:00,616 --> 00:09:01,656
+a move.
+
+154
+00:09:04,084 --> 00:09:08,084
+C++11 knows, indeed, that at this step
+we are effecting a move
+
+155
+00:09:08,084 --> 00:09:13,154
+and not a copy because the value that
+we are assigning to the object of type
+
+156
+00:09:13,154 --> 00:09:18,864
+unique_ptr is in reality transient data
+originating from a function call.
+
+157
+00:09:18,864 --> 00:09:22,864
+It is this transient data originating from
+this function call which is assigned
+
+158
+00:09:22,864 --> 00:09:27,614
+to the unique_ptr, and in this case,
+we know that a move was
+
+159
+00:09:27,614 --> 00:09:29,964
+made, and not a copy.
+
+160
+00:09:32,512 --> 00:09:35,712
+Unique_ptrs are smart pointers,
+meaning that the
+
+161
+00:09:35,712 --> 00:09:39,362
+memory which was associated to them
+is freed automatically, we do not
+
+162
+00:09:39,362 --> 00:09:40,632
+need to worry about it.
+
+163
+00:09:40,632 --> 00:09:44,632
+If however, we wanted to free this
+memory explicitly,
+
+164
+00:09:44,632 --> 00:09:47,972
+it is also possible to do so, i.e to call
+delete ourselves,
+
+165
+00:09:47,972 --> 00:09:52,472
+and so in this case, we would use a
+instruction that is specific to these pointers,
+
+166
+00:09:52,472 --> 00:09:54,182
+the reset statement.
+
+167
+00:09:54,182 --> 00:09:57,862
+At that moment, call ptr.reset(), which
+
+168
+00:09:57,862 --> 00:10:02,072
+will result in freeing the memory
+associated to this pointer
+
+169
+00:10:02,072 --> 00:10:06,072
+and assigning the nullptr value
+to the smart pointer ptr. 
+
+170
+00:10:06,659 --> 00:10:10,489
+Unique_ptrs are very secure; we have
+just seen that they guarantee that
+
+171
+00:10:10,489 --> 00:10:14,659
+each pointer is unique in pointing to a given
+memory area and so, this
+
+172
+00:10:14,659 --> 00:10:17,779
+guarantees a very secure use. This means
+that it is recommended to use them
+
+173
+00:10:17,779 --> 00:10:19,789
+in any situation possible.
+
+174
+00:10:19,789 --> 00:10:22,749
+However, they obviously will not
+cover every need
+
+175
+00:10:22,749 --> 00:10:26,649
+and in some cases, it is completely
+inevitable to guarantee that two
+
+176
+00:10:26,649 --> 00:10:30,649
+different code fragments point to,
+use, the same memory area.
+
+177
+00:10:30,649 --> 00:10:34,359
+In those cases, one will need other
+types of smart pointers,
+
+178
+00:10:34,359 --> 00:10:36,499
+such as shared_ptr for example.
+
+179
+00:10:36,499 --> 00:10:44,429
+A shared_ptr is such that several of
+them can point to the same
+
+180
+00:10:44,429 --> 00:10:45,509
+memory area.
+
+181
+00:10:45,509 --> 00:10:48,679
+Here we can imagine the situation
+where we have
+
+182
+00:10:49,789 --> 00:10:53,169
+a code fragment "code1"
+and a code fragment "code2" 
+
+183
+00:10:53,169 --> 00:10:56,819
+which both point, via a pointer of type
+shared_ptr, to the same
+
+184
+00:10:56,819 --> 00:10:59,259
+dynamically-allocated memory area
+which is this one.
+
+185
+00:11:00,913 --> 00:11:04,913
+Technically, for it to be possible to
+automatically free a memory area
+
+186
+00:11:04,913 --> 00:11:08,913
+referenced by shared_ptrs, it is
+necessary to keep track of the
+
+187
+00:11:08,913 --> 00:11:13,553
+different code fragments,
+which point to this memory area.
+
+188
+00:11:13,553 --> 00:11:16,413
+Thus, we can only deallocate this area
+automatically once
+
+189
+00:11:16,413 --> 00:11:18,203
+no-one uses it anymore.
+
+190
+00:11:18,203 --> 00:11:21,743
+And there can be cyclic dependence
+situations where we cannot
+
+191
+00:11:21,743 --> 00:11:26,343
+manage to free the memory correctly
+when we use shared_ptrs.
+
+192
+00:11:26,343 --> 00:11:30,343
+In those cases, we will have to also
+use weak_ptrs which will
+
+193
+00:11:30,343 --> 00:11:34,343
+allow us to break these cycles brought
+about by the shared_ptrs.
+
+194
+00:11:35,448 --> 00:11:39,848
+This is of course highly advanced
+compared to the contents of this lecture.
+
+195
+00:11:40,094 --> 00:11:43,874
+The essential message I wanted to pass on
+is that these sort of tools exist,
+
+196
+00:11:43,874 --> 00:11:46,924
+without necessarily going into detail
+about there use.
+
+197
+00:11:46,924 --> 00:11:50,924
+What is important to remember
+is that if, in a simple situation,
+
+198
+00:11:50,924 --> 00:11:54,924
+we wish to use smart pointers and
+we do not need
+
+199
+00:11:54,924 --> 00:11:58,454
+several pointers to be able to point to
+the same memory area,
+
+200
+00:11:58,454 --> 00:12:03,944
+the preferred solution is definitely
+unique_ptrs, which are secure and
+
+201
+00:12:03,944 --> 00:12:06,964
+hassle-free compared to other types
+
+202
+00:12:06,964 --> 00:12:08,354
+of smart pointers.
+
+203
+00:12:09,961 --> 00:12:13,171
+Pointers are a wide topic, and there
+is still a lot to say,
+
+204
+00:12:13,171 --> 00:12:15,011
+especially about smart pointers.
+
+205
+00:12:15,011 --> 00:12:17,821
+We have simply presented these
+briefly so that you know
+
+206
+00:12:17,821 --> 00:12:18,851
+that they exist.
+
+207
+00:12:18,851 --> 00:12:21,661
+For most cases, we focused
+on understanding
+
+208
+00:12:21,661 --> 00:12:24,471
+classic, C-style pointers,
+which you will get to encounter
+
+209
+00:12:24,471 --> 00:12:27,341
+very frequently in the literature.

@@ -1,0 +1,98 @@
+In this episode, we will discuss how polymorphism can be a very good complement to abstraction, allowing us to better specify classes at the most abstract level.
+We will introduce the notion of "abstract classes" and "pure virtual methods".
+But let's start by presenting the problem that these pure virtual methods address.
+At the highest level in a hierarchy, we don't necessarily know how to define a method, even though we know it will exist in all the subclasses.
+For example, if I imagine a very general class representing any closed geometric shape, then at that point, in this class, it will be quite hard to define how to calculate the surface area of a closed, nondescript geometric shape.
+This is certainly something that is hard to define, we wouldn't really know how to do it.
+However, we know that for all closed figures, for example circles, which are closed figures, we know that for each specific closed figure we should be able to define a 
+"surface area" method.
+So, we can imagine that all closed figures will have a surface method, even if we don't know how to define it at the most abstract level.
+Yet, to push it further, we can even imagine that this surface method will be used at the highest level, for example to calculate the volume occupied over a certain height by this surface
+In this case, the volume occupied by this geometric figure,
+-- depending on this height -- would be defined as the product of the height multiplied by the surface area of the closed figure
+So we could even call this method even if we don't quite know how to define it.
+At the highest level, it would be defined for all the actual examples of closed figures.
+The correct way to do this, to introduce a method that we know must exist, but that we don't necessarily know how to define at the level of a superclass, is to introduce the method as a "pure virtual method".
+Let's illustrate this concept of pure virtual methods with another example and return to our game with characters, where we had warriors, who are characters, magicians, who are characters, robbers,...
+The class "Jeu" (TN: means "Game") would of course contain several characters: we decided to put them here in a vector of characters.
+And to have polymorphism, we have an vector of pointers-to-characters
+(TN: "Personnage" means "Character"), this specific aspect of arrays of pointers to a class will be detailed in a future episode on heterogeneous collections.
+Here, we simply have our vector of characters, and imagine that in the game, we wish to display the whole set of characters.
+So we would write a loop which iterates over the set of characters, which iterates over this "persos" vector, and for each of these characters, we would display that character.
+In this syntax here, "un_perso" is the variable that iterates over our vector of characters, so it a pointer-to-Personnage.
+And since we have a pointer, we use this syntax here to call the afficher method of the object pointed to by un_perso.
+So here, we would indeed display each of the characters, one character in the set of stored characters, here in the "persos" data-member of the game.
+The problem is how to display a generic character.
+We don't know how to display a generic character.
+We certainly know how to display a warrior, a magician or a thief, so each of the specific subclasses knows how to be displayed; however, at the general level of a character, we don't necessarily know how to display it.
+But we know that we need to do so, here at the very general level of the game, we know we will have to display the characters.
+So, how do we do so?
+Of course, if we do nothing in the "Personnage" class, if we do not define any "afficher" method in "Personnage", then the "afficher" method in Jeu would not compile since here, we call the "afficher" method of a character and the compiler would not know what to do, it would give us an error.
+So we should be able to write this at the global level of the game, we must introduce an "afficher" method in the "Personnage" class.
+Moreover, we would like to impose to each of the subclasses, warriors, magicians, to be displayed with their own "afficher" method, to have a specific method, and that it is this specific method which should be called in the general call here at the level of the game.
+Essentially, we want to force the presence of a specific method at the class level, and we want this method to be polymorphic.
+So this method has to be "virtual" and exist at the character level.
+But how do we do this if we don't know
+-- suppose that we don't know how to display a generic character.
+What's more, how do we force subclasses to override this
+"afficher" method?
+First solution for the first problem: how to define the display for a generic character.
+We could have some arbitrarily-defined method, for example, suppose that here, we arbitrarily define that the display for a generic character is no display at all.
+This solution is a very bad idea, because, first, it is a bad model of reality as characters do not appear as nothing, so it doesn't correspond to anything, the display is incorrect.
+And what's more, the display would be incorrect if a subclass forgot to override this method; in that case, we would have characters that would not be displayed, phantom characters, which could be a problem for the game.
+Moreover, this solution does not address the second problem, it does not force the subclasses to define their own "afficher" method.
+The only good solution is to indicate that the "afficher" method must exist and must be defined in each of the subclasses.
+This is known as a "pure virtual method".
+I hope this second example has allowed you to understand the need for these pure virtual methods in defining general, abstract superclasses.
+Now, let's see how all of this is actually written in C++.
+A pure virtual method, also known as an "abstract method", is used to force subclasses to override the inherited virtual method.
+To define a pure virtual method, an abstract method, we simply add "= 0" at the end of its prototype.
+For example, if in the "Personnage" class we had written the virtual method
+"afficher"
+-- the "afficher" method does not modify a character -- and at the end of its prototype, instead of just having a semicolon, we also added "= 0".
+Then this would define a pure virtual method, an abstract method.
+Generally, a pure virtual method is only partly specified, meaning that there is usually no definition but only a prototype in the class in which it was introduced.
+This is not a strict requirement, but it is often the case.
+Here for example, we would not define the "afficher" method for a generic character; we expect that each subclass will define its own "afficher" method specific to warriors, magicians, thieves,...
+If I go back to the other example, the one with the closed figures, we would have a "surface" method, which would be a pure virtual method, so here we would add "= 0" to the end of its prototype, that we could still use,
+We are allowed to call pure virtual methods. we can for instace define a "volume" method which we have not defined as virtual as there is no reason for a subclass to override this volume method, which takes a height and calculates the volume occupied as the product of the height and the result of the call to the surface method, where the surface method will be the one belonging to the instance on which it is called.
+Because as we will see, a class containing a pure virtual method, such as FigureFermee, cannot be instantiated and so we will never call the surface method directly on a FigureFermee object.
+However we can imagine subclasses such as rectangles or circles who know how to calculate their surface area.
+So we will call the circle's method if it is a circle, or the rectangle's method if it is a rectangle -- that is the polymorphic aspect, enabled by this "virtual" keyword.
+Here, we call the surface method through a pointer, indeed, remember that this is exactly the same as writing
+"this -> surface", as we might easily forget, and so here, polymorphism is used since we make the call through a pointer, even if it is not explicitly written, and the method is virtual.
+Another pure virtual method that we could define at the level of the FigureFermee class is the concept of the perimeter.
+The method would return the perimeter of a closed figure, and we don't necessarily know how to define this generally either at the level of the very generic, abstract class describing closed figures.
+But we could imagine being able to define this properly in subclasses.
+We will return to this example shortly.
+A class containing a pure virtual method such as this one is known as an abstract class.
+It is indeed an abstract class because if a class contains a pure virtual method, then it cannot be instantiated.
+We cannot create instances of this class.
+For example, we cannot declare a variable of type "Personne", and of course any subclass that inherits from an abstract superclass remains abstract as long as it doesn't provide definitions for the pure virtual functions they inherited.
+In other words, as long as they haven't removed the "= 0" from the prototypes of their override of the pure virtual method inherited from the superclass.
+Let's take a look at this through an example, our example of a game with characters, where a warrior is a character, and has inherited a pure virtual method, an "afficher" method defined as pure virtual in the "Personnage" class.
+If we do not redefine this "afficher" method in the "Guerrier" class, then this "Guerrier" subclass is thus also an abstract class since it has inherited a pure virtual method that it did not override, and that hence remains pure virtual.
+So if we try to add a warrior like this, to add an instance of the Guerrier class to the game the we will get a compilation error saying that I cannot create objects, instances of the abstract class Guerrier, since the virtual method "afficher" in "Guerrier" is a pure virtual method.
+Let's complete our second example on geometric shapes.
+We have these closed figures which have two pure virtual methods: one for the perimeter and one for the surface.
+Let's imagine that we have a Cercle class which inherits from FigureFermee as well as a Polygone subclass which also inherits from FigureFermee.
+In the Cercle subclass, we override the surface method.
+The surface of a circle is pi times the radius squared.
+The Cercle class would have a member variable for the radius.
+And we also override the perimeter, defining it as 2 times pi times the radius.
+So the Cercle class defines the surface and perimeter properly.
+The Cercle class has thus overridden both pure virtual methods without keeping them pure virtual, without adding the "= 0" here, so the Cercle class no longer has any abstract methods and we can now create instances of this class.
+There is no problem in defining an instance of "Cercle".
+On the other hand, we have the
+Polygone class. Let's say that a polygon is defined as a vector of sides.
+This polygon class would override the perimeter method, without making it abstract, removing the abstract aspect of perimetre.
+It overrides this perimetre method, but the Polygone class does not override the surface method.
+We think it is too complicated to have a formula here to define the surface area of a polygon in a general way and so we do not define the surface method in the Polygone class.
+So Polygone remains an abstract class: we cannot declare instances of Polygone.
+It is impossible because in the
+Polygone class, there is a pure virtual method left which is the surface method inherited from FigureFermee
+And since the Polygone class still has a pure virtual method, it is an abstract class and we cannot create instances of it.
+There, this example concludes this episode on pure virtual methods and abstract classes.
+The next episode will focus on heterogeneous containers, vectors in which we put the pointers to characters for example, in our game.
+We will go over all of this in detail in the next episode.
+And then we will discuss additional aspects related to that topic in a final, optional episode.

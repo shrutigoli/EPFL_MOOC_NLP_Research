@@ -1,0 +1,656 @@
+1
+00:00:00,650 --> 00:00:03,540
+Alright.
+Schedulers Part Two.
+
+2
+00:00:03,540 --> 00:00:08,490
+But before we go there, let's do a little
+quiz to see if we still
+
+3
+00:00:08,490 --> 00:00:14,250
+remember the Rx contract.
+So, here is a very simple example.
+
+4
+00:00:14,250 --> 00:00:17,136
+We create an observable using observable
+create.
+
+5
+00:00:17,136 --> 00:00:18,060
+We call onNext.
+
+6
+00:00:18,060 --> 00:00:20,980
+We call onCompleted.
+
+7
+00:00:20,980 --> 00:00:23,040
+We call onNext again, and we return
+
+8
+00:00:23,040 --> 00:00:25,710
+the empty subscription, and then we
+subscribe to
+
+9
+00:00:25,710 --> 00:00:28,950
+this with println.
+What is the output of this code?
+
+10
+00:00:29,990 --> 00:00:31,820
+A, B, C, D, or E?
+
+11
+00:00:34,610 --> 00:00:40,060
+Well, the answer is obviously D.
+And why is that?
+
+12
+00:00:40,060 --> 00:00:42,140
+Well, we call onNext.
+
+13
+00:00:42,140 --> 00:00:48,830
+But once we've called onCompleted, the
+magic in observable create will make
+
+14
+00:00:48,830 --> 00:00:54,140
+sure that nothing else here is going on.
+So this is what the output is.
+
+15
+00:00:56,800 --> 00:00:58,780
+Our goal, in this lecture, is to
+
+16
+00:00:58,780 --> 00:01:02,910
+really understand how the recursive
+scheduler works.
+
+17
+00:01:02,910 --> 00:01:07,660
+So, we're going to blow our mantle stack
+by going deep recursive.
+
+18
+00:01:07,660 --> 00:01:12,470
+Just to remind ourselves, here was the
+definition of ticks.
+
+19
+00:01:12,470 --> 00:01:14,900
+What we were doing is, we had our
+observer.
+
+20
+00:01:14,900 --> 00:01:18,460
+We were calling OnNext and recurse to
+ourselves.
+
+21
+00:01:18,460 --> 00:01:21,360
+And, we created this infinite stream here.
+
+22
+00:01:21,360 --> 00:01:21,840
+What we're going
+
+23
+00:01:21,840 --> 00:01:24,870
+to do now is we're going to go step by
+step.
+
+24
+00:01:24,870 --> 00:01:30,640
+Unfolding the code, to make sure that we
+really understand that this thing actually
+
+25
+00:01:30,640 --> 00:01:34,270
+recursively schedules itself, and that we
+understand
+
+26
+00:01:34,270 --> 00:01:36,770
+at what point we can cancel this.
+
+27
+00:01:39,220 --> 00:01:42,690
+In the next step, we're going to use our
+rule for observable
+
+28
+00:01:42,690 --> 00:01:49,190
+don't create by substituting the observer
+here in the body of the function.
+
+29
+00:01:49,190 --> 00:01:53,520
+So everywhere where o appears in the body,
+we will replace it by observer.
+
+30
+00:01:53,520 --> 00:01:54,580
+So that's this place.
+
+31
+00:01:54,580 --> 00:01:56,880
+So what we see here is that everything is
+the same
+
+32
+00:01:56,880 --> 00:02:02,630
+here except where the observer was, we now
+substitute the observer.
+
+33
+00:02:02,630 --> 00:02:04,590
+What we don't show here is the magic,
+
+34
+00:02:04,590 --> 00:02:07,040
+because we now all understand the magic,
+
+35
+00:02:07,040 --> 00:02:09,280
+and that would only clutter our
+development here.
+
+36
+00:02:11,740 --> 00:02:13,810
+The first thing that we are going to do
+now
+
+37
+00:02:13,810 --> 00:02:16,560
+is to make this code look a little bit
+better.
+
+38
+00:02:16,560 --> 00:02:18,300
+It's, like, all kind of, you know, messed
+up here.
+
+39
+00:02:18,300 --> 00:02:22,090
+So let's put it all on one line, that we
+can see what's going on.
+
+40
+00:02:22,090 --> 00:02:25,560
+After we've done the create step, what we
+end
+
+41
+00:02:25,560 --> 00:02:28,630
+up with is a call to schedule, with some
+work.
+
+42
+00:02:31,710 --> 00:02:35,380
+Now, remember what our definition of
+schedule was.
+
+43
+00:02:35,380 --> 00:02:36,530
+It's just here.
+
+44
+00:02:36,530 --> 00:02:38,850
+So what we're going to do now is we're
+going
+
+45
+00:02:38,850 --> 00:02:44,460
+to substitute this definition of schedule
+in our previous example.
+
+46
+00:02:47,300 --> 00:02:49,490
+This following step looks a little bit
+
+47
+00:02:49,490 --> 00:02:52,390
+complicated, but it's really not that
+hard.
+
+48
+00:02:52,390 --> 00:02:54,460
+What we are going to do is we're going to
+
+49
+00:02:54,460 --> 00:02:58,480
+take this part here, the work that's here
+in bold.
+
+50
+00:02:58,480 --> 00:03:01,410
+And we're going to substitute that in the
+definition
+
+51
+00:03:01,410 --> 00:03:03,890
+of schedule that we saw in the previous
+slide.
+
+52
+00:03:03,890 --> 00:03:07,730
+So when we do that, well, the definition
+of schedule is pretty large.
+
+53
+00:03:07,730 --> 00:03:12,530
+But where we, what we end up with here is
+that the work is right here.
+
+54
+00:03:12,530 --> 00:03:16,290
+And it's applied to loop as we have seen.
+
+55
+00:03:16,290 --> 00:03:18,814
+And in the next step what we will do is
+we'll
+
+56
+00:03:18,814 --> 00:03:20,270
+[INAUDIBLE]
+
+57
+00:03:20,270 --> 00:03:25,000
+this application and substitute loop in
+here, because now we see our function
+
+58
+00:03:25,000 --> 00:03:29,410
+applied to an argument and we know that we
+can evaluate that, right there.
+
+59
+00:03:31,020 --> 00:03:35,440
+Remember when we talk about continuations,
+well the continuation here is the self.
+
+60
+00:03:35,440 --> 00:03:39,400
+So this is the argument that we pass to
+
+61
+00:03:39,400 --> 00:03:42,560
+this work, where here you see it goes to
+continuation.
+
+62
+00:03:42,560 --> 00:03:46,030
+And what we see is that the continuation
+is this loop, and
+
+63
+00:03:46,030 --> 00:03:48,750
+in the next step we will substitute loop
+
+64
+00:03:48,750 --> 00:03:51,915
+for the continuation In the body of this
+long
+
+65
+00:03:51,915 --> 00:03:52,000
+[UNKNOWN]
+
+66
+00:03:52,000 --> 00:03:52,500
+here.
+
+67
+00:03:54,330 --> 00:03:58,860
+When we do that, we end up with this nice
+and simple expression here.
+
+68
+00:04:01,760 --> 00:04:06,040
+Okay, let's rearrange the code here.
+Now it looks all beautiful.
+
+69
+00:04:06,040 --> 00:04:11,980
+The next thing that we're going to do is
+to take this definition and move that out.
+
+70
+00:04:11,980 --> 00:04:17,290
+Because, you know, once all the variables
+are bound we don't want to have
+
+71
+00:04:17,290 --> 00:04:21,270
+this in our codes all the time because it
+just clutters up the go to.
+
+72
+00:04:21,270 --> 00:04:23,420
+What we're going to do is we're going to
+lift that out.
+
+73
+00:04:25,730 --> 00:04:28,360
+So, when we lift that out it looks as
+follows.
+
+74
+00:04:29,520 --> 00:04:34,040
+We have the loop outside this, and we're
+left with this
+
+75
+00:04:34,040 --> 00:04:38,940
+simple code, here, and the definition of
+loop is nicely lifted out.
+
+76
+00:04:38,940 --> 00:04:41,940
+All the variables are bound, so we don't
+have to worry about that.
+
+77
+00:04:41,940 --> 00:04:46,960
+We can now concentrate just on unfolding
+our simple code, down here.
+
+78
+00:04:49,890 --> 00:04:53,970
+If we rearrange again a little bit, put
+everything on a single line, we see
+
+79
+00:04:53,970 --> 00:05:00,030
+that we end up with a call to schedule of
+the second overload of schedule.
+
+80
+00:05:00,030 --> 00:05:01,900
+That takes the scheduler and then you
+
+81
+00:05:01,900 --> 00:05:04,600
+know, calls loop, and returns to
+subscription.
+
+82
+00:05:07,000 --> 00:05:11,620
+When we call this schedule function, what
+will happen is that it will at some point
+
+83
+00:05:11,620 --> 00:05:18,790
+run the work inside that body, which wants
+loop followed by subscription.
+
+84
+00:05:18,790 --> 00:05:23,160
+Well, let's unfold loop, because we have
+the definition right there.
+
+85
+00:05:25,180 --> 00:05:28,810
+If we unfold the definition of loop, we
+see that we
+
+86
+00:05:28,810 --> 00:05:34,260
+have this call, and then we still need to
+return to subscription.
+
+87
+00:05:35,540 --> 00:05:37,720
+The first thing that this thing does it is
+will assign
+
+88
+00:05:40,330 --> 00:05:43,840
+a subscription of the scheduling of the
+loop into the
+
+89
+00:05:43,840 --> 00:05:47,660
+scheduler to our subscription that we pass
+to the outside.
+
+90
+00:05:50,480 --> 00:05:54,723
+So, when we do that, we will see that we
+overwrite
+
+91
+00:05:54,723 --> 00:05:59,350
+the subscription now with the work that
+we're scheduling in the scheduler.
+
+92
+00:05:59,350 --> 00:06:02,080
+And this is exactly the situation that we
+wanted to end
+
+93
+00:06:02,080 --> 00:06:05,280
+up with, because what we're doing now is
+we're handing off
+
+94
+00:06:05,280 --> 00:06:10,790
+this subscription to the caller of our
+text function,
+
+95
+00:06:10,790 --> 00:06:15,520
+and it points to the work that's scheduled
+in the scheduler, and guess what
+
+96
+00:06:15,520 --> 00:06:22,930
+the first thing is that it's going to do?
+It's going to call OnNext.
+
+97
+00:06:22,930 --> 00:06:26,030
+Let's run the computation, and let's see
+what it produces.
+
+98
+00:06:26,030 --> 00:06:31,580
+So, here's the output of the observer that
+we're going to see.
+
+99
+00:06:31,580 --> 00:06:35,530
+And the first thing as we see here is
+going to call OnNext.
+
+100
+00:06:35,530 --> 00:06:37,960
+So this is the first value that we see on
+
+101
+00:06:37,960 --> 00:06:40,770
+the output Once we do that we have sent
+the tick
+
+102
+00:06:40,770 --> 00:06:44,090
+to the observer, this thing disappears and
+we end up with loop.
+
+103
+00:06:45,850 --> 00:06:46,530
+Guess what?
+
+104
+00:06:46,530 --> 00:06:52,300
+We're going to substitute now loop for its
+definition, and see what happens next.
+
+105
+00:06:52,300 --> 00:06:56,360
+When we unfold loop, we end up with a
+subscription.
+
+106
+00:06:56,360 --> 00:07:00,110
+That has scheduled work, which will update
+the subscription
+
+107
+00:07:00,110 --> 00:07:05,190
+with a schedule of observer OnNext with a
+loop.
+
+108
+00:07:05,190 --> 00:07:06,870
+Well, that looks familiar.
+
+109
+00:07:06,870 --> 00:07:10,760
+So now, we are back again at where we
+were.
+
+110
+00:07:10,760 --> 00:07:13,190
+We have already send out one thing.
+
+111
+00:07:13,190 --> 00:07:18,150
+This guy will send out next thing, and
+we'll loop again et cetera, et cetera, et
+
+112
+00:07:18,150 --> 00:07:23,200
+cetera, until we call unsubscribe on this
+guy,
+
+113
+00:07:23,200 --> 00:07:26,170
+in which case, this thing will not be
+rescheduled.
+
+114
+00:07:29,790 --> 00:07:31,230
+Great.
+
+115
+00:07:31,230 --> 00:07:34,560
+Now that we know how our new observable
+create
+
+116
+00:07:34,560 --> 00:07:38,240
+works, let's create just an infinite
+stream of text.
+
+117
+00:07:38,240 --> 00:07:43,350
+We can start to write more interesting
+applications of this.
+
+118
+00:07:43,350 --> 00:07:46,970
+First of all, let's define a new function,
+range.
+
+119
+00:07:46,970 --> 00:07:51,860
+Range takes two values, a start value and
+a count.
+
+120
+00:07:51,860 --> 00:07:55,030
+And what it's going to do, it's going to
+create an observable
+
+121
+00:07:55,030 --> 00:08:01,030
+stream that starts at start and contains
+count values.
+
+122
+00:08:01,030 --> 00:08:08,082
+So, for example, if I say range (1,5),
+what
+
+123
+00:08:08,082 --> 00:08:14,950
+will that produce?
+Well, it will produce the
+
+124
+00:08:17,150 --> 00:08:19,600
+values 1, 2, 3, 4, 5.
+Right, there's 1, 2, 3, 4, 5 values.
+
+125
+00:08:20,850 --> 00:08:26,990
+How does this work?
+Well, we call as always observable create.
+
+126
+00:08:26,990 --> 00:08:31,880
+We allocate a little bit of mutable state.
+And now on
+
+127
+00:08:31,880 --> 00:08:36,910
+our recursive scheduler, which we get from
+the implicit context.
+
+128
+00:08:36,910 --> 00:08:42,620
+We subscribe to that, and then if the
+count is still greater than,
+
+129
+00:08:42,620 --> 00:08:45,990
+you know, the number of values that we
+have already sent out.
+
+130
+00:08:45,990 --> 00:08:52,720
+We send out start plus i, we update our
+mutable state, and, if we're done, we
+
+131
+00:08:52,720 --> 00:08:57,700
+call onCompleted, and the magic in
+Observable create
+
+132
+00:08:57,700 --> 00:09:01,220
+will make sure that our subscription is
+unsubscribed.
+
+133
+00:09:01,220 --> 00:09:03,980
+And no more values will appear on the
+output string.
+
+134
+00:09:05,410 --> 00:09:07,360
+Here's how we use range,
+
+135
+00:09:07,360 --> 00:09:09,800
+let's go range from 1 to 10.
+
+136
+00:09:09,800 --> 00:09:12,870
+Subscribe to it with print line, and guess
+what?
+
+137
+00:09:12,870 --> 00:09:19,100
+It nicely prints the values of 1 up to 10.
+And then terminates, as we expect.
+

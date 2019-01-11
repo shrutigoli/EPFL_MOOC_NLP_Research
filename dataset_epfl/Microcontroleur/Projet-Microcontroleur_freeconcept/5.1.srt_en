@@ -1,0 +1,800 @@
+1
+00:00:04,490 --> 00:00:05,012
+Hello.
+
+2
+00:00:05,012 --> 00:00:07,970
+There are a lot of interesting things
+inside a
+
+3
+00:00:07,970 --> 00:00:12,100
+microcontroller, added to the
+memory and the arithmetic unit.
+
+4
+00:00:12,100 --> 00:00:17,300
+Today we are going to talk about
+the timers that allow us to count,
+
+5
+00:00:17,300 --> 00:00:22,420
+compare durations and record
+the moment of an event.
+
+6
+00:00:22,420 --> 00:00:25,621
+So how does a timer work?
+
+7
+00:00:25,621 --> 00:00:29,734
+You have, at the base, a counter,
+a binary counter as
+
+8
+00:00:29,734 --> 00:00:30,770
+we have already seen.
+
+9
+00:00:30,770 --> 00:00:34,747
+This counter must advance at
+a certain speed.
+
+10
+00:00:34,747 --> 00:00:39,185
+This speed will come from a small unit
+with a
+
+11
+00:00:39,185 --> 00:00:44,725
+switch, which allow to choose
+an external signal.
+
+12
+00:00:44,725 --> 00:00:48,550
+It would allow you to count external
+events.
+
+13
+00:00:48,550 --> 00:00:55,390
+But usually, we use the internal
+clock that can be pre-programmed
+
+14
+00:00:55,390 --> 00:00:59,710
+to advance this counter to the
+
+15
+00:00:59,710 --> 00:01:04,150
+maximum speed, or to the clock
+frequency divided by eight, or
+
+16
+00:01:04,150 --> 00:01:08,560
+by 1024, and so on. So, in a timer,
+there are
+
+17
+00:01:08,560 --> 00:01:14,280
+control registers, called TCCR,
+Timer Control
+
+18
+00:01:14,280 --> 00:01:20,723
+Register, and since there are two of
+these eight-bit registers, to define
+
+19
+00:01:20,723 --> 00:01:26,430
+all the bits required for the different
+modes, they are called one and two.
+
+20
+00:01:26,430 --> 00:01:31,250
+And then there are still three
+timers that can be called
+
+21
+00:01:31,250 --> 00:01:36,170
+A, B, C or one, two, three
+depending on the manufacturer.
+
+22
+00:01:36,170 --> 00:01:38,645
+Then the timer will count.
+
+23
+00:01:38,645 --> 00:01:44,990
+If it is an eight bit timer, well, it will
+count up to 256 and start again.
+
+24
+00:01:44,990 --> 00:01:45,870
+And what
+
+25
+00:01:45,870 --> 00:01:51,085
+interest us witht the Timers, is to know,
+when they reach at the maximum value,
+
+26
+00:01:51,085 --> 00:01:56,170
+they activate a flip-flop called
+timer overflow,
+
+27
+00:01:56,170 --> 00:02:01,318
+TOV, and this value will
+
+28
+00:02:01,318 --> 00:02:06,294
+help us, to know that the timer
+has reached at
+
+29
+00:02:06,294 --> 00:02:11,470
+its maximum value, and we will not
+
+30
+00:02:11,470 --> 00:02:16,255
+spend time to read the value of the
+counter; we can do it, of course.
+
+31
+00:02:16,255 --> 00:02:20,085
+It will be connected on the bus
+of the microcontroller.
+
+32
+00:02:20,085 --> 00:02:24,785
+But this flag, semaphore TOV,
+will allow us
+
+33
+00:02:24,785 --> 00:02:28,173
+to take a decision on what time
+we continue.
+
+34
+00:02:28,173 --> 00:02:31,651
+So what happens is that we have
+TOV which has,
+
+35
+00:02:31,651 --> 00:02:36,623
+which is activated, and then we
+can very well decide not
+
+36
+00:02:36,623 --> 00:02:42,276
+to start again from the value
+of zero, but to start from a
+
+37
+00:02:42,276 --> 00:02:47,514
+value that we will define that
+makes the time to
+
+38
+00:02:47,514 --> 00:02:53,330
+arrive until the action of the TOV
+will be shorter.
+
+39
+00:02:53,330 --> 00:02:58,165
+So we will be able to measure durations
+
+40
+00:02:58,165 --> 00:03:02,301
+by saying, well, I'd like to have the next
+
+41
+00:03:02,301 --> 00:03:07,040
+TOV in so many milliseconds.
+I initialize this value, and I
+
+42
+00:03:07,040 --> 00:03:13,140
+watch now, TOV, to know when
+the time is up.
+
+43
+00:03:13,140 --> 00:03:17,753
+So, of course, we must reset the zero the
+
+44
+00:03:17,753 --> 00:03:21,990
+TOV, every time the next cycle
+is prepared.
+
+45
+00:03:21,990 --> 00:03:24,774
+It can be done automatically.
+
+46
+00:03:24,774 --> 00:03:27,842
+Therefore, each manufacturer
+of microcontrollers
+
+47
+00:03:27,842 --> 00:03:32,366
+documents this behavior and
+it differs slightly from
+
+48
+00:03:32,366 --> 00:03:36,622
+one manufacturer to another. Another
+feature of the timers, with
+
+49
+00:03:36,622 --> 00:03:42,220
+in additional control, called
+output comparison register,
+
+50
+00:03:42,220 --> 00:03:47,368
+it is to be able to compare
+the value that is
+
+51
+00:03:47,368 --> 00:03:53,006
+evolving with a fixed value,
+and to activate another
+
+52
+00:03:53,006 --> 00:03:58,268
+flag, timer output compare
+according to this value.
+
+53
+00:03:58,268 --> 00:04:03,103
+So you have the timer that
+is increasing, and when
+
+54
+00:04:03,103 --> 00:04:08,070
+you have the equality with the
+OCR register,
+
+55
+00:04:08,070 --> 00:04:13,535
+well, you have the TOC signal
+that is activated.
+
+56
+00:04:13,535 --> 00:04:18,645
+The timer continues, when
+it reaches the maximum value,
+
+57
+00:04:18,645 --> 00:04:23,687
+the TOV is activated. And typically,
+we can imagine a
+
+58
+00:04:23,687 --> 00:04:29,295
+small logic here, that will activate
+the signal
+
+59
+00:04:29,295 --> 00:04:34,471
+to, when we have the TOC,
+deactivate it when we have the
+
+60
+00:04:34,471 --> 00:04:39,620
+TOV, and we have just generated PWM,
+which will be explained again later.
+
+61
+00:04:39,620 --> 00:04:43,885
+Pulses of a certain length that can be
+
+62
+00:04:43,885 --> 00:04:48,846
+modified, which are repeated
+according to bits of
+
+63
+00:04:48,846 --> 00:04:54,153
+control which are there, since sometimes
+we can be interested in the TOC
+
+64
+00:04:54,153 --> 00:04:59,180
+alone, the TOV, the PWM, the other features
+
+65
+00:04:59,180 --> 00:05:04,364
+that a little logic will mention.
+It is still possible to
+
+66
+00:05:04,364 --> 00:05:09,240
+improve things, by putting
+two OCR registers with two
+
+67
+00:05:09,240 --> 00:05:15,030
+comparators of type TOC, and then allowing
+
+68
+00:05:15,030 --> 00:05:19,660
+even more interesting signal generations.
+
+69
+00:05:19,660 --> 00:05:23,575
+So, another functionality is to have
+
+70
+00:05:23,575 --> 00:05:26,680
+a register that will memorize a moment.
+
+71
+00:05:26,680 --> 00:05:30,120
+There may be something interesting on
+
+72
+00:05:30,120 --> 00:05:34,610
+a pine that will photograph,
+in the background,
+
+73
+00:05:34,610 --> 00:05:39,215
+the value of the counter,
+and we will know
+
+74
+00:05:39,215 --> 00:05:44,327
+when we had a transition on this pine,
+passage
+
+75
+00:05:44,327 --> 00:05:49,213
+from zero to one, passage from
+one to zero change again.
+
+76
+00:05:49,213 --> 00:05:54,479
+It is in control registers that
+we can define
+
+77
+00:05:54,479 --> 00:05:59,944
+the logical behavior that exists
+between the pine and then
+
+78
+00:05:59,944 --> 00:06:02,790
+the transfer action.
+
+79
+00:06:02,790 --> 00:06:07,830
+And at the time of this transfer action,
+you have
+
+80
+00:06:07,830 --> 00:06:13,010
+a TIC flip-flop, timer input capture flag,
+
+81
+00:06:13,010 --> 00:06:17,685
+which will allow your software
+to know that the event
+
+82
+00:06:17,685 --> 00:06:22,360
+occurred and that you will
+be able to watch its duration.
+
+83
+00:06:22,360 --> 00:06:25,110
+Therefore, to measure a pulse duration
+
+84
+00:06:25,110 --> 00:06:30,550
+well, there is a given moment,
+when my impulse starts,
+
+85
+00:06:30,550 --> 00:06:35,850
+here. I put the counter-timer at zero.
+
+86
+00:06:35,850 --> 00:06:40,760
+That counter-timer increases
+and when the pin is activated,
+
+87
+00:06:40,760 --> 00:06:45,624
+well, you memorize this value, you
+
+88
+00:06:45,624 --> 00:06:50,792
+activate the flag, and you can
+process this information.
+
+89
+00:06:50,792 --> 00:06:54,140
+So here, we have in the main lines,
+the three
+
+90
+00:06:54,140 --> 00:06:57,964
+basic features, in the basically, timers.
+
+91
+00:06:57,964 --> 00:07:04,208
+And what we just explained
+is that the simple case,
+
+92
+00:07:04,208 --> 00:07:09,300
+you have this flag that is activated
+and you have to monitor by programming.
+
+93
+00:07:09,300 --> 00:07:13,729
+And of course, keep watching the
+
+94
+00:07:13,729 --> 00:07:15,863
+flag TOV is something that takes
+
+95
+00:07:15,863 --> 00:07:18,242
+a lot of time in your program.
+
+96
+00:07:18,242 --> 00:07:20,410
+So we will find another mechanism.
+
+97
+00:07:20,410 --> 00:07:24,618
+This mechanism is the interruption, which
+will be discussed in more detail, and
+
+98
+00:07:24,618 --> 00:07:29,516
+to give you a first idea of ​​the
+advantage of this technique, and
+
+99
+00:07:29,516 --> 00:07:36,027
+well, we go, therefore, with a little logic
+and additional bits,
+
+100
+00:07:36,027 --> 00:07:41,769
+generate a signal inside the
+processor that will force the call
+
+101
+00:07:41,769 --> 00:07:47,100
+of a procedure that will do the job; we
+
+102
+00:07:47,100 --> 00:07:52,600
+would have done it so in the main
+program by monitoring this TOV flag.
+
+103
+00:07:52,600 --> 00:07:58,990
+So, the interruptions, we must
+activate them.
+
+104
+00:07:58,990 --> 00:08:02,320
+So we do not always want them,
+and there is a
+
+105
+00:08:02,320 --> 00:08:07,868
+AND gate with general interrupt
+enable that will allow interrupts.
+
+106
+00:08:07,868 --> 00:08:10,949
+They can come from different places.
+
+107
+00:08:10,949 --> 00:08:16,552
+So here it is the TOV that
+we will activate with a
+
+108
+00:08:16,552 --> 00:08:22,236
+TO interrupt enable, and if
+these two doors are activated,
+
+109
+00:08:22,236 --> 00:08:27,139
+at the time the TOV passes
+to one, you have this interruption.
+
+110
+00:08:27,139 --> 00:08:33,160
+So, from the programming point of view,
+you have a setup in which
+
+111
+00:08:33,160 --> 00:08:39,839
+you have to fill all those registers
+which will define the behavior.
+
+112
+00:08:39,839 --> 00:08:43,518
+So there, the manufacturer's
+documentation, euh, makes
+
+113
+00:08:43,518 --> 00:08:47,705
+several pages and you
+must, ah, get used to the
+
+114
+00:08:47,705 --> 00:08:52,892
+reading and follow the explanation,
+uh, that justifies all those little
+
+115
+00:08:52,892 --> 00:08:57,803
+bits to put, uh, in those registers.
+
+116
+00:08:57,803 --> 00:09:02,670
+You have a function, ah, in, in the case
+
+117
+00:09:02,670 --> 00:09:07,425
+of Arduino, it is written sei
+to activate,
+
+118
+00:09:07,425 --> 00:09:12,679
+the interruption, and the
+interrupt routine is
+
+119
+00:09:12,679 --> 00:09:18,734
+also prepared by Arduino and
+to this form, in the case of,
+
+120
+00:09:18,734 --> 00:09:24,090
+ATMega 368, for example.
+
+121
+00:09:24,090 --> 00:09:28,360
+At the time when there was an
+interruption, we went back to that
+
+122
+00:09:28,360 --> 00:09:34,300
+routine, the TOV was automatically reset,
+
+123
+00:09:34,300 --> 00:09:39,410
+and what are we doing? We will put
+
+124
+00:09:39,410 --> 00:09:45,060
+in the counter, a value that is 62.
+
+125
+00:09:45,060 --> 00:09:48,887
+This is calculated, according
+to the pre-divider,
+
+126
+00:09:48,887 --> 00:09:58,240
+according to the processor frequency
+to have a duration of 100 microseconds.
+
+127
+00:09:58,240 --> 00:10:02,660
+That will be the time to find the
+next TOV.
+
+128
+00:10:02,660 --> 00:10:06,444
+And now, every 100 microseconds,
+
+129
+00:10:06,444 --> 00:10:09,750
+well, we'll be able to decide what
+we're doing.
+
+130
+00:10:09,750 --> 00:10:13,750
+We can add timers, we can add servos.
+
+131
+00:10:13,750 --> 00:10:16,730
+You can put loops that are not
+
+132
+00:10:16,730 --> 00:10:21,310
+loops of expectations, which are
+counting loops to say,
+
+133
+00:10:21,310 --> 00:10:23,760
+well, it's not every 100 microseconds
+that I
+
+134
+00:10:23,760 --> 00:10:28,387
+want something, it's every
+1000 times 100 microseconds.
+
+135
+00:10:28,387 --> 00:10:33,394
+Which means that every tenth
+of a second, well, I can
+
+136
+00:10:33,394 --> 00:10:38,648
+do something by simply putting
+a counter, by deciding, here,
+
+137
+00:10:38,648 --> 00:10:43,805
+the counter, uh, will trigger
+an action every four
+
+138
+00:10:43,805 --> 00:10:48,390
+milliseconds, for example, to act
+on an engine, and so on.
+
+139
+00:10:48,390 --> 00:10:51,400
+So there we feel that there is a very high
+
+140
+00:10:51,400 --> 00:10:54,930
+efficiency of these routines
+of interruptions
+
+141
+00:10:54,930 --> 00:10:57,930
+and we will talk about it in detail.
+
+142
+00:10:57,930 --> 00:11:03,800
+At Arduino level, for example,
+you have three timers: the
+
+143
+00:11:03,800 --> 00:11:09,526
+zero timer that is eight bits is used to
+
+144
+00:11:09,526 --> 00:11:15,335
+measure times, ah, you have millis,
+you have micros
+
+145
+00:11:15,335 --> 00:11:19,078
+that is, it is actually a counter
+that starts from
+
+146
+00:11:19,078 --> 00:11:23,494
+zero, that is, which is updated
+by the interrupt.
+
+147
+00:11:23,494 --> 00:11:28,858
+Delay is blocking, but it is
+still managed by a timer.
+
+148
+00:11:28,858 --> 00:11:31,109
+The timer one is 16 bits.
+
+149
+00:11:31,109 --> 00:11:36,540
+The two timers we just used are
+eight bits.
+
+150
+00:11:36,540 --> 00:11:42,268
+Uh, these two timers have
+PWM channels, as we mentioned.
+
+151
+00:11:42,268 --> 00:11:49,214
+But the analogWrite function, uh, offers
+more timers, since in fact, whenever
+
+152
+00:11:49,214 --> 00:11:54,110
+you have an interruption, you can,
+in the interrupt routine,
+
+153
+00:11:54,110 --> 00:11:58,765
+do many things, and even manage
+several PWMs per
+
+154
+00:11:58,765 --> 00:12:04,230
+software and not directly by timer circuitry.
+
+155
+00:12:04,230 --> 00:12:08,429
+In the two timer, you have a tone
+function that
+
+156
+00:12:08,429 --> 00:12:11,705
+will block the timer, since
+this tone function is
+
+157
+00:12:11,705 --> 00:12:14,473
+what allows to make music, to, to make
+
+158
+00:12:14,473 --> 00:12:19,791
+a frequency, or simply give you,
+the value of the frequency
+
+159
+00:12:19,791 --> 00:12:24,255
+in the proceedings. So we
+have seen how to use these
+
+160
+00:12:24,255 --> 00:12:29,168
+timers inside the processor,
+with the possibility to count
+
+161
+00:12:29,168 --> 00:12:34,226
+durations, with the possibility
+of comparing,
+
+162
+00:12:34,226 --> 00:12:39,388
+to have a repetitive signal,
+it is the output comparison.
+
+163
+00:12:39,388 --> 00:12:44,875
+To be able to photograph, in the background,
+the counter to know the duration of,
+
+164
+00:12:44,875 --> 00:12:50,790
+an event, and this implies at
+
+165
+00:12:50,790 --> 00:12:56,670
+the level of the processor, to handle
+a relatively large number
+
+166
+00:12:56,670 --> 00:12:59,000
+of bits, flags, and manage them
+
+167
+00:12:59,000 --> 00:13:02,620
+correctly by reading about ten
+pages of documentation.
+
+168
+00:13:02,620 --> 00:13:06,022
+Fortunately, some have done the work for
+
+169
+00:13:06,022 --> 00:13:10,366
+you and provide you with
+library that facilitates
+
+170
+00:13:10,366 --> 00:13:13,320
+programming.
+

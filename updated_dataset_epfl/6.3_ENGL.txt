@@ -1,0 +1,94 @@
+Still talking about redundancy and fault tolerance, but this time moving away from the principle discussion to that of metrics.
+It's important to first have a good handle on the principles so that you have a mental map of the concepts that are in play, but then you need to have an equally strong handle on the metrics in order to quantitatively evaluate the system at hand.
+And in the case of redundancy and fault tolerance, the principle metric that we talk about is availability.
+Now since fault tolerance is about building reliable systems from unreliable components, we need to have those metrics of unreliability.
+And those metrics apply at all layers, the components or the faults may be frequent and the availability poor, and the fault tolerance systems themselves which hopefully show better metric.
+Now this is important first a metric is availability itself.
+The second key concept is that of availabilities complement, and that is called the downtime.
+Now the downtime is the ratio between two other metrics of a system.
+The denominator is the mean time in between failures and for the purpose of the fault time and design methodology, you first want to improve the mean time between failures.
+For example, redundant power supplies allow you to take the MTBF of the power supply module from being a significant source of faults in a computer system, to a completely insignificant source of faults in a computer system.
+But improving the MTBF alone is not sufficient to ensure availability.
+Rather, one must also consider the time it takes to recover from an unrecoverable fault.
+And that is where the mean time to repair or MTTR comes in as the nominator in this equation.
+Now the MTTR varies widely and is generally not only a function of technology.
+If your cellphone goes under a truck, the MTTR is the time it takes you to go to Swisscom or Orange at the store and get another cellphone.
+Now if your cellphone unfortunately goes under a truck on a Saturday night, your MTTR is 36 hours, since the stores are closed on Sundays in Switzerland.
+Now if your SIM card somehow survives the catastrophe, and you have an older phone at home, then your MTTR might be shorter.
+And here in this case, by now the old phone plays the role of the spare, and as we'll see in systems a notion of having a spare and even a hot spare is critical to reducing the MTTR.
+Now of course when you're talking about metrics of availability, you have to talk about the nines.
+3 nines, 4 nines, 
+5 nines, 6 nines,
+I'm sure you've heard about the nines.
+So let's first define what this means and later what this implies.
+Take 5 nines, often desired as the target operation level for critical services.
+Now what 5 nines of availability means, it means that on average, you can allow for either five minutes of downtime a year or one hour of downtime per decade.
+Well, that's not a lot of room when you put all the assumptions on the table, and of course all assumptions must be put on the table, dealing with the failures in hardware and software, but also failures in the environment, even things such as software upgrades that are expected during the lifetime of the product.
+So as a matter of fact, for server applications,
+5 nines of availability generally requires that you have a solution that straddles multiple, physical data centers separated by substantial distance.
+On top of that, you need to monitor the per of those systems through strict procedures and human processes.
+And the traditional assumption, was that such a solution had to to be built exclusively out of enterprise grade components, although this assumption is being revisited with the advent of cloud based application paradigms.
+It's also important to think about the time dimension here.
+A decade is a reasonable length of time to bound the useful life of a mission critical application.
+And so it makes sense to think about the overall downtime budget at the timescale of a decade, and many, many, many things will occur to the service during that time period, including many component failures and many software upgrades, like...
+Now let's expand on the metric just a bit.
+We've already introduced a notion of the MTTR, that is the mean time to repair.
+Now this is something that is also known as the recovery time objective, when applied to data protection.
+Now depending on the type of fault in the type of module, the MTTR can actually be quite long.
+Now the MTBF is actually the sum of the time to repair and the time between failures.
+So in other words, the time to repair actually shows up both in the nominator and the denominator of the downtime equation.
+I can't stress enough how important this ends up being, having an impact on systems design in the end.
+Unfortunately, it's often overlooked.
+Now the MTBF itself is a funny metric.
+First, it's the mean of the median of a distribution that is nearly always non-uniform, and that is when you're lucky, and sometimes correlated with other failures when you're an unlucky person.
+Now the best example for this are hard disk drives.
+High quality disk drives are sometime quoted with MTTF of 200 years.
+Wow, that's impressive, none of us would live long enough to deal with that.
+Now although this sounds impressive, it's a lot less impressive when you have 10,000 disk drives in your data centers and one fails, on average, every week.
+Now in addition to the failure rates of many components, disk drives, flash drives, power supplies, batteries, are subject to what is known as the bathtub curve.
+Now there are three critical portions in the bathtub curve.
+First, on the length, there's a period in time that has a significant amount of what is called infant mortality, and that is the early phase of the system being in operation.
+It is often indicated by having a higher than usual failure rate.
+After that, there is a somewhat constant failure rate during the normal life of the component.
+And at the other end of the bathtub, there is often the observation of having an increased failure rate towards the end of the useful life of the component, and by useful life, this is something that is measured in years, rarely in decades and absolutely never in centuries, even for systems that have an 
+MTBF quoted as being 200 years.
+And to build available systems, you have to take into account the fact that at some point, the system will fail.
+Well how important is the bathtub curve in practice in systems design?
+Well the answer is it's fundamental and I want to share with you a real world data point from a company called Backblaze that offers backup as a service to consumers.
+Now the data comes from 2012, but I doubt it's changed since.
+And they had, at the time, a pretty large installation with roughly 40PB of capacity under management, and that translates to about 20,000 drives which are all packed in these custom built, red storage boxes you see on the picture.
+And you can put about 
+45 such drives per box.
+Now the system is obviously designed to handle faults, as matter of fact, durability of the data is fundamental since this is a backup service, and to ensure that, they're leveraging the coding algorithms of RAID 6 to deal with failures.
+And specifically it's organized as 
+RAID 6 sets of 15 drives each so that you can lose two drives out of 15 and still have the ability to recover data.
+So I want to talk about two examples from this data point.
+First is the MTTR and then the bathtub curve itself.
+Now this may come out as a shock, but the MTTR, which is measured as the time it takes to recreate the redundancy of RAID 6, so full protection, is about three days.
+Now during that time, the service is available, the data is available, but the durability is no longer as guaranteed.
+It's not three seconds, it's not three hours, but three days.
+Why? Well RAID 6 does coding over the entire disk set.
+So 15 x 3 TB, which is 45 TB of I/Os required to recreate the redundancy.
+And when you do the math, three days works out to about 200 MB of sustained sequential I/O per second.
+Now onto the bathtub curve.
+Not only do the engineers at Backblaze notice the bathtub curve, but they spontaneously use the term when discussing failure rates, even though I'm not sure whether they read about it during they're academic training.
+Now the good news in their case, is that infant mortality is short.
+It's just a few days.
+And after a few days of sustained I/O burn-in tasks, you can effectively eliminate all of the disk drives out the of system that are a subject to infant mortality.
+Well then comes the bad news.
+The bad news is that the best drives fail at 2% per anumm.
+So forget that 200 year MTTF.
+A 50 year MTTF is what you can actually expect in practice for sustained operation.
+The worst is about 7% by the way, so there's a big difference between manufacturers.
+With that failure rate, the operational team must replace about two drives a day, and since the MTTR is about three days, that's why you understand why 
+RAID 6 is necessary and RAID 5 would not be adequate.
+And then the last data point to the bathtub curve is that the company started in 2008, so it got to be about four years old, and they start to see an increase in the failure rate of the older drives which are nearing the end of their useful life.
+So even though you may have an 
+MTTF measured in decades, four years might be all that you can actually expect out of the useful life of the components such as a mechanical drive that is being used on a sustained basis.
+So here you have it.
+Our real world data point on the bathtub curve, and the moral of the story is to make sure that you regularly backup your own data.
+Time to wrap up this quick module on metrics, and to be fair, we didn't really go in-depth at all, into metrics.
+I only brought them up in the context of redundancy and fault tolerance so that you have a basic sense of what they mean while evaluating the principles.
+Now what did we cover?
+Well metrics are important, the mean is even-- is both the central data point that you use to compare, quantitatively, components, as well as the most meaningless metric when you're actually studying the components in detail.
+And then the last point to keep in mind, is the importance of repair in availability and in fault tolerance systems.

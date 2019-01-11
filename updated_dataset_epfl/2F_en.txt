@@ -1,0 +1,112 @@
+Welcome!
+Welcome to the Plasma Physics course of EPFL.
+In the past modules we've shown how the Vlasov equation can be derived.
+We have pointed out that some analytical progress is possible.
+In some particular cases we've focused our attention on the two-stream instability.
+Unfortunately, it's very difficult to progress analytically in most of the cases and plasma physicists have to turn themselves towards the use of numerical methods in order to solve the Vlasov equation and approach the dynamics of plasma.
+The goal of the present module is to give you a short introduction to numerical methods that are used for solving the Vlasov equation.
+The first thing that I will do
+Is that I will tell you why simulating plasma is so complicated, and it's basically because of the wide range of spatial and temporal scales that are involved by the plasma.
+Second thing that I will do is to introduce a numerical method, the <i>PIC</i> method, the <i>Particle In Cell</i>, that is used to solve the Vlasov equation.
+Let's draw a time arrow through which we will represent the times scales that are present in a fusion reactor.
+I will look at them in seconds.
+There will be phenomena on very short time scales,
+10â�»Â¹â�°, 10â�»â�¸ seconds.
+And phenomena that occurs on very much longer time scales.
+The fastest phenomena present is the electron cyclotron motion.
+It occurs on a time scale that is smaller than10â�»Â¹â�° seconds.
+The second phenomenon that is observed is the ion cyclotron motion.
+It occurs on a time scale of the order of 10â�»â�· seconds.
+Then, in all these devices to confine plasma for fusion purposes, there is turbulence present, and microturbulence occurs on a time scale of 10â�»â�µ seconds.
+There are global instabilities that occur on a time scale of the order of 10â�»â�´ to 10â�»Â³ seconds: these are
+<i>fast global instabilities</i>.
+There are the so-called
+<i>slow global instabilities</i> on a fraction of a second.
+The energy confinement time in this kind of devices is of the order of the second.
+Then there are phenomena that occur on even longer time scale, for example, the gas equilibration with the vessel walls.
+A wide range of phenomena therefore, that occur on time scales that are separated by ten to twelve or even more orders of magnitude.
+All non-linearly coupled and interacting.
+And similarly, we have also the--
+I won't go into the details, but we have also a wide range of spatial scales involved.
+Representing all these phenomena at the same time is extremely challenging for computational purposes.
+This is why plasma physics is at the forefront of the development and the exploitation of numerical techniques.
+Despite the complexity of the phenomena that plasma physicists have to deal with, significant progress has been made in the field thanks to the use of numerical simulations, and thanks to the computational power that is increasingly available.
+For example, here is the result of one of the state of the art simulations that are done in plasma physics.
+A kinetic simulation of turbulence in the core of a tokamak device.
+This simulation has been run on one of the fastest computers in the world.
+It's been done by using 10,000 processors and in total, more than a million
+CPU hours have been devoted to obtain the result that we are looking at here.
+I believe that I have given you an idea of why simulating plasma dynamics is so challenging.
+Now, let me finally go to the point of our module, that is:
+What are the numerical method that can be actually used to solve the Vlasov equation?
+Let me say that there are different techniques.
+On the one hand, we can discretize on a grid that the six-dimensional phase space and advance the Vlasov equation in time.
+This is possible, but it's not typically the scheme that is used to approach numerically the Vlasov equation.
+The numerical method that is typically used is the so-called PIC,
+Particle in Cell method, and now
+I will tell you the ideas behind this method.
+I first start by recalling the Vlasov equation, which states that the variation of the distribution function is due to the streaming velocity in configuration space and in the velocity space.
+This equation can be interpreted as we have seen it in the previous lecture by saying that along the trajectory of particles, that is, in phase space, given by dr/dt= v, and dv/dt = q/m (E + v Ã— B), f is constant, in other words, that df/dt=0.
+How can we represent this in phase space?
+We can project the six-dimensional phase space on the two dimensions of this screen.
+Here will be the spatial coordinate, here will be the velocity coordinate.
+And if we consider a particle starting with a specific velocity and specific spatial location, at time t=0 and we follow the trajectory of this particle as a function of time, the distribution function f will be constant as we move along this trajectory.
+The PIC method is based on this consideration.
+PIC means Particle In Cell method.
+The method is based on representing the distribution function at initial time t = tâ‚€ as the sum of a large number of functions that we will call fÎ± that depend on the spatial coordinate and the velocity coordinate, where these fÎ± have the propertiy of having compact support, therefore they are equal to zero everywhere except in a region of the phase space and they are symmetric with respect to rÎ±0 and vÎ±0.
+These fÎ±'s, -we will see the reason soon-, are also called <i>superparticles</i>.
+What does it mean?
+If we look at the projection of the phase space, we will see that these fÎ±'s are everywhere... they are a compact support, therefore they are everywhere zero except for that small domain, and they are symmetric, and therefore they are centered around the rÎ±0 position and vÎ±0 velocity.
+We introduce the integral IÎ±(fÎ±) of the superparticle function as the integral over the full phase space, so dr dv of fÎ±
+[ IÎ± = âˆ¬ dr dv fÎ± ] and then we will impose that at all times f is still given by the superposition of these superparticles which are centered at a position rÎ±(t) and vÎ±(t) that varies in time.
+In particular, we require that, these rÎ±(t) and rÎ±(t) satisfy the following equations, which resemble very much the equation of motion that we've just written for particles.
+Except for these EÎ± and BÎ± terms that have to be defined.
+And we define them according to an integral that weights the electric field according to where the position of these superparticles is in phase space.
+And analogously for the magnetic field, imposing the initial conditions ...
+Then, we have that, if we evaluate the convective derivative d/dt fÎ±(r-rÎ±(t), v-vÎ±(t)) as rÎ±(t) and vÎ±(t) follow this equation, then we will have that this will be approximately equal to zero, which means that f, defined as the sum over all superparticles is a solution of Vlasov.
+In other terms, how does the PIC code,
+Particle In Cell method work?
+One has to find the , the rÎ±(t) and vÎ±(t) that satisfy the equation of motion that I've written, starting with the following initial condition which means, basically, to follow a certain trajectory and then, once you have found the rÎ±(t) and vÎ±(t), you can evaluate the fÎ±'s that are here, sum them up, and what you obtain is an approximation of the distribution function at all times.
+So how does the PIC method work in practice?
+We will focus on a one-dimensional system and we will look at electrostatic limit.
+If we know the charge present in a system, then by solving the Poisson equation, we can estimate electrostatic potential.
+Once we know the electrostatic potential, we can deduce the electric field as minus the derivative of Î¦ with respect to x.
+Now, to solve the Poisson equation numerically, we have to discretize space, and we will introduce a grid where we will discretize x with x0, x1, x2, etc. xj-1, xj, xj+1, etc. and similarly for time, it will be discretized with t0, t1, t2,... ti-1, ti, ti+1 with a grid spacing Î”x that is constant and therefore equal to xj+1- xj, and similarly for time.
+The charge density it will be evaluated on the points of this grid. and will be denoted as Ï�ji. and this will be the charge density at location xj and time ti.
+We will proceed similarly for the electric field and for the electrostatic potential.
+At this point on this grid we need to discretize the derivatives and we will have that dÎ¦/dx at position j is approximately equal to the finite difference between Î¦ evaluated at point j+1 and Î¦ at point j-1 divided by 2 Î”x and by combining similar expressions from first order derivative, we will have that for second order derivative at position j, a good approximation will be provided by ( Î¦j+1 - 2 Î¦j + Î¦j -1) / Î”xÂ²
+Therefore, coming back to our Poisson equation we will have that 
+( Î¦ij+1 - 2 Î¦ij + Î¦ij -1) / Î”xÂ² is equal -Ï�ij/Îµâ‚€ and then similarly for the electric field, this will be given by -1/ (2 Î”x)
+The difference between electrostatic potential at position j+1 and j-1.
+Once we have evaluated the electric field, we have to evaluate the electric field acting on a superparticle.
+For this we will assume that the electric field is equal to Ej for x j-1/2 < x < xj+1/2.
+What that does, xj+1/2 mean?
+It's the point in between xj and xj+1 and as we have just seen, the electric field acting on superparticle Î±, which is defined as EÎ±,
+EÎ± = âˆ¬ E fÎ± dx dv can be rightly evaluated if we assume that fÎ± f alpha is equal to the product of two Dirac functions centered around xÎ± and vÎ±.
+[ fÎ± = Î´(x-xÎ±) Î´(v-vÎ±) ]
+This fÎ±, which is the simplest that can be used in a PIC method, hass the properties that we have just listed.
+It has a compact support: it's equal to zero, except for a finite region of the phase space and it is symmetric with respect to xÎ± and vÎ±.
+With these definitions, one obtains that EÎ± is equal to Ej, being the distance between xj that is considered here and xÎ±, less than or equal to Î”x/2.
+Therefore, here we can have the electric field acting on superparticles by knowing that the expression that we have already derived here, Eij, will give us EiÎ±.
+At this point we have everything to solve Newton equations for each superparticle. dxÎ±/dt = vÎ±, and dvÎ±/dt = (qÎ±/mÎ±) EÎ±.
+To do that we discretize the time derivative as we have done for the spatial derivative and we will have that the difference between xÎ± at [time] i+1 minus xÎ± at [time] i, divided by Î”t is equal to vÎ±, considered at time i+1/2 , and with a similar law we will evaluate the advancement of the velocity.
+With these equations we can advance the 
+[super]particles velocities and positions.
+And by advancing the [super]particles velocities and positions, we can assign the charge to the grid, to the spatial grid that we are considering.
+In order to evaluate the charge in each cell, which will allow us to solve the Poisson equation, we will notice that Ï�ij will be given by (1/Î”x) [times] the charge contained inside each cell, which will be given by the integral of the distribution function that we have approximated as the sum over all the superparticles, which have all charge qÎ± and this integrated over the velocity, direction, and the grid and spatial direction from xj-1/2 to xj+1/2.
+This is in other terms equal to (1/Î”x) [times] sum over all the [super]particles that belong to this j cell qÎ±.
+And let's write it explicitly: summing over these Î± that belong to j, we mean summing over superparticles such that their position is in between xj-1/2 and xj+1/2, from which we can close our system by assigning Ï�ij, as we have seen, sum over all [super]particles that belong to the j cell.
+So here is how the PIC method works in practice.
+We start by giving an initial condition where all the particles' position are known from which we can evaluate the charge distribution, by solving the Poisson equation, we evaluate the electrostatic potential, and from this, we have the electric field.
+From the electric field, evaluated on the grid, we estimate the electric field acting on a superparticle, and once we know the electric field acting on a superparticle we can solve the Newton equation for each one of the superparticles through which we are discretizing our distribution function, and here is the Newton equation that we can solve to advance at the next [time] step the position of the particles and once we go to the next step in position, we can evaluate the new distribution of charge, assign the charges to the grid, and go on by evaluating the Poisson equation at the new time step, and so on.
+By advancing this system in time, we can actually look at the evolution of the distribution function, of the electric field, and the electrostatic potential in time and space.
+In the exercise of this series of lectures will be actually focused on a Particle In Cell, PIC simulation of a one-dimensional system in the electrostatic limit where we will see two counterstreaming beams of electrons that interact between each other.
+So here we get to the summary slide of the present lecture that has been devoted to the simulation in plasma physics.
+We have given a very short introduction of how models are approached numerically.
+The first thing that I have done is explain why it is so challenging to do numerical simulations of plasmas.
+It's because of the wide range of spatial temporal scales at which phenomena occur in plasmas.
+Then I briefly talked about different simulation approaches to focus then on the
+Particle In Cell method, the PIC method that is used in plasma physics to solve the Vlasov equation.
+Let me just point out that the PIC method is not only used in plasma physics.
+It's used in a variety of fields, starting from fluid mechanics to the study of dynamics of stars in galaxies, to the study of semiconductors.
+This is a fairly general method and we went into the details to explain how this works in practice in the simplest case of one-dimensional plasma in the electrostatic limit.

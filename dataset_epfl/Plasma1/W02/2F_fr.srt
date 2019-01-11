@@ -1,0 +1,1328 @@
+﻿1
+00:00:05,851 --> 00:00:07,097
+Bienvenue!
+
+2
+00:00:07,097 --> 00:00:10,004
+Bienvenue au cours de la
+Physique des Plasmas de l'EPFL.
+
+3
+00:00:10,821 --> 00:00:16,439
+Dans les précédents modules nous avons montré 
+comment déduire l'équation de Vlasov.
+
+4
+00:00:16,788 --> 00:00:21,472
+Nous avons souligné qu'un certain
+progrès analytique était possible.
+
+5
+00:00:21,869 --> 00:00:24,817
+Dans certains cas particuliers
+nous avons concentré notre attention
+
+6
+00:00:24,817 --> 00:00:26,677
+sur l'instabilité double faisceaux.
+
+7
+00:00:27,157 --> 00:00:34,643
+Malheureusement, c'est très difficile de
+ progresser analytiquement dans la plupart 
+
+8
+00:00:35,028 --> 00:00:38,838
+des cas et les physiciens du plasma
+sont forcés de se tourner
+
+9
+00:00:38,838 --> 00:00:41,537
+vers l'utilisation de méthodes numériques
+
+10
+00:00:41,537 --> 00:00:46,407
+afin de résoudre l'équation de Vlasov
+et d'aborder les dynamiques du plasma.
+
+11
+00:00:47,656 --> 00:00:52,466
+L'objectif de ce présent module
+est de vous donner une courte présentation
+
+12
+00:00:52,466 --> 00:00:58,515
+des méthodes numériques qui sont utilisées
+pour résoudre l'équation de Vlasov.
+
+13
+00:00:58,906 --> 00:01:01,877
+La première chose que je vais faire
+c'est de vous dire pourquoi
+
+14
+00:01:01,877 --> 00:01:04,516
+la simulation du plasma est si complexe,
+
+15
+00:01:04,516 --> 00:01:07,592
+et c'est essentiellement dû à
+une large gamme
+
+16
+00:01:07,592 --> 00:01:11,944
+d'échelles spatiales et temporelles
+impliquées par le plasma.
+
+17
+00:01:12,561 --> 00:01:18,645
+La seconde chose que je vais faire
+sera de présenter une méthode numérique,
+
+18
+00:01:18,900 --> 00:01:20,904
+la <i>PIC</i> méthode, la <i>Particules-en-cellule</i>,
+
+19
+00:01:21,228 --> 00:01:24,519
+qui est utilisée pour résoudre 
+l'équation de Vlasov.
+
+20
+00:01:26,303 --> 00:01:31,338
+Traçons une ligne du temps
+grâce à laquelle nous représenterons
+
+21
+00:01:31,338 --> 00:01:37,333
+les échelles temporelles qui sont présentes
+dans un réacteur à fusion.
+
+22
+00:01:40,476 --> 00:01:42,952
+Je vais en parler en termes de secondes.
+
+23
+00:01:44,168 --> 00:01:47,739
+Il y aura des phénomènes
+sur des échelles de temps très réduites,
+
+24
+00:01:48,155 --> 00:01:51,579
+10⁻¹⁰, 10⁻⁸ secondes.
+
+25
+00:01:54,876 --> 00:02:00,255
+et des phénomènes qui ont lieu
+sur des échelles de temps très longues.
+
+26
+00:02:01,691 --> 00:02:06,899
+Les phénomènes les plus rapides sont 
+les mouvements cyclotroniques des électrons.
+
+27
+00:02:08,799 --> 00:02:14,928
+Cela se produit sur une échelle de temps qui
+est plus petite que 10⁻¹⁰ secondes.
+
+28
+00:02:17,585 --> 00:02:21,446
+Le second phénomène qui est observé
+
+29
+00:02:21,446 --> 00:02:24,295
+est le mouvement cyclotronique des ions.
+
+30
+00:02:25,469 --> 00:02:30,063
+Cela se produit sur une échelle de temps
+de l'ordre de 10⁻⁷ secondes.
+
+31
+00:02:31,511 --> 00:02:36,749
+Ensuite, dans tous ces dispositifs pour
+ confiner le plasma à des fins de fusion,
+
+32
+00:02:36,749 --> 00:02:40,330
+il existe une turbulence,
+et une microturbulence se produit
+
+33
+00:02:40,330 --> 00:02:44,410
+sur une échelle de temps de 10⁻⁵ secondes.
+
+34
+00:02:46,384 --> 00:02:49,380
+il existe des instabilités globales
+
+35
+00:02:49,712 --> 00:02:56,329
+qui se produisent sur une échelle de temps
+de l'ordre de 10⁻⁴ à 10⁻³ secondes:
+
+36
+00:02:56,687 --> 00:02:59,420
+il existe des
+<i>instabilités globales rapides </i>.
+
+37
+00:03:00,529 --> 00:03:04,634
+Il y a ce que l'on appelle des
+<i>instabilités globales lentes</i>
+
+38
+00:03:05,221 --> 00:03:07,516
+sur une fraction de seconde.
+
+39
+00:03:08,217 --> 00:03:12,835
+Le temps de confinement d'énergie
+dans ce type de systèmes
+
+40
+00:03:12,835 --> 00:03:15,492
+est de l'ordre de la seconde.
+
+41
+00:03:17,300 --> 00:03:21,102
+Ensuite il y a des phénomènes qui se produisent
+sur une échelle de temps encore plus longue,
+
+42
+00:03:21,102 --> 00:03:26,002
+par exemple, l'équilibrage du gaz
+avec les parois du réceptacle.
+
+43
+00:03:27,454 --> 00:03:32,012
+Donc, toute une série de phénomènes
+se produit sur des échelles de temps
+
+44
+00:03:32,012 --> 00:03:37,299
+séparées de 10 à 12 ordres de grandeur
+voire plus.
+
+45
+00:03:37,670 --> 00:03:41,804
+Tous sont non-linéaires, 
+couplés et en interaction.
+
+46
+00:03:43,610 --> 00:03:47,004
+Et de la même manière, nous avons--
+je n'entrerai pas dans les détails,
+
+47
+00:03:47,004 --> 00:03:51,430
+mais nous avons aussi toute une série
+d'échelles spatiales qui interviennent.
+
+48
+00:03:52,210 --> 00:03:57,530
+Représenter de tous ces phénomènes
+en même temps s'avère très difficile
+
+49
+00:03:57,530 --> 00:04:00,643
+pour des raisons computationnelles.
+
+50
+00:04:02,189 --> 00:04:07,510
+C'est pourquoi la physique des plasmas
+est à l'avant-garde du développement
+
+51
+00:04:07,510 --> 00:04:09,996
+et de l'exploitation
+des techniques numériques.
+
+52
+00:04:11,810 --> 00:04:19,187
+Malgré la complexité des phénomènes
+que les physiciens du plasma doivent gérer,
+
+53
+00:04:19,412 --> 00:04:23,070
+des progrès significatifs
+ont été faits dans ce domaine
+
+54
+00:04:23,070 --> 00:04:26,943
+grâce à l'utilisation
+des simulations numériques
+
+55
+00:04:26,943 --> 00:04:31,624
+et à la puissance de calcul informatique
+de plus en plus accessible.
+
+56
+00:04:33,404 --> 00:04:38,644
+Par exemple, voici le résultat d'une
+des simulations de pointe
+
+57
+00:04:38,644 --> 00:04:40,807
+faites en physique des plasmas.
+
+58
+00:04:40,807 --> 00:04:45,170
+Une simulation cinétique de turbulence
+au coeur d'un tokamak.
+
+59
+00:04:45,842 --> 00:04:50,922
+Cette simulation a été calculée sur l'un
+des ordinateurs les plus rapides du monde.
+
+60
+00:04:51,076 --> 00:04:55,431
+Cela a été fait en utilisant 10,000 processeurs
+
+61
+00:04:55,431 --> 00:05:00,955
+et en tout, plus d'un million
+d'heures d'UC ont été consacrées
+
+62
+00:05:00,955 --> 00:05:05,097
+à obtenir le résultat
+que nous regardons ici.
+
+63
+00:05:07,281 --> 00:05:11,360
+Je pense vous avoir donné une idée de la raison
+ pour laquelle la simulation de la dynamique
+
+64
+00:05:11,360 --> 00:05:13,254
+des plasmas est tellement complexe.
+
+65
+00:05:13,254 --> 00:05:19,709
+Passons maintenant à ce qui nous intéresse
+pour ce cours, c'est à dire:
+
+66
+00:05:19,709 --> 00:05:23,230
+Quelles sont les méthodes numériques
+qui peuvent être utilisées
+
+67
+00:05:23,230 --> 00:05:25,862
+pour résoudre l'équation de Vlasov?
+
+68
+00:05:25,862 --> 00:05:28,414
+Je vais vous parler
+des différentes techniques.
+
+69
+00:05:29,140 --> 00:05:32,208
+D'un côté,
+nous pouvons discrétiser sur une grille
+
+70
+00:05:32,208 --> 00:05:37,226
+un espace de phase à six dimensions et faire
+progresser l'équation de Vlasov dans le temps.
+
+71
+00:05:38,136 --> 00:05:43,620
+C'est possible, mais ce n'est pas un schéma
+habituellement utilisé
+
+72
+00:05:43,620 --> 00:05:46,325
+pour aborder numériquement
+l'équation de Vlasov.
+
+73
+00:05:46,325 --> 00:05:48,652
+La méthode numérique
+qui est habituellement utilisée
+
+74
+00:05:48,652 --> 00:05:52,790
+est celle qu'on appelle PIC, la méthode
+des particules en cellule, et maintenant
+
+75
+00:05:52,790 --> 00:05:56,184
+je vais vous parler des idées
+que cette méthode sous-tend.
+
+76
+00:05:57,942 --> 00:06:01,238
+Je vais commencer d'abord par revenir
+sur l'équation de Vlasov,
+
+77
+00:06:07,899 --> 00:06:11,187
+qui établit que la variation
+de la fonction de distribution
+
+78
+00:06:11,187 --> 00:06:13,348
+est due à la vitesse de diffusion
+
+79
+00:06:13,380 --> 00:06:16,488
+dans l'espace de configuration
+et dans l'espace de vitesse.
+
+80
+00:06:18,448 --> 00:06:22,511
+Cette équation peut être interprétée,
+comme nous l'avons vu dans le précédent cours,
+
+81
+00:06:22,511 --> 00:06:26,810
+en disant que le long de
+la trajectoire des particules,
+
+82
+00:06:30,461 --> 00:06:37,360
+c'est à dire, dans l'espace
+ de phase, donné par dr/dt= v,
+
+83
+00:06:38,229 --> 00:06:43,069
+et dv/dt = q/m (E + v × B),
+
+84
+00:06:45,359 --> 00:06:47,088
+f est constant,
+
+85
+00:06:49,180 --> 00:06:54,277
+autrement dit, que df/dt=0.
+
+86
+00:06:56,973 --> 00:06:59,732
+Comment peut-on représenter 
+ceci dans l'espace de phase?
+
+87
+00:06:59,732 --> 00:07:02,958
+Nous pouvons projeter
+l'espace de phase à six dimensions
+
+88
+00:07:02,958 --> 00:07:06,638
+sur cet écran bidimensionnel.
+
+89
+00:07:07,515 --> 00:07:11,265
+Ici il y aura les coordonnées spatiales,
+
+90
+00:07:11,495 --> 00:07:15,018
+là il y aura
+les coordonnées de la vitesse.
+
+91
+00:07:16,354 --> 00:07:21,677
+Et si nous considérons une particule
+commençant avec une vitesse spécifique et une
+
+92
+00:07:21,677 --> 00:07:27,910
+position spatiale spécifique, au temps t=0
+
+93
+00:07:27,910 --> 00:07:31,913
+et que nous suivons
+la trajectoire de cette particule
+
+94
+00:07:32,084 --> 00:07:33,992
+en fonction de temps,
+
+95
+00:07:33,992 --> 00:07:39,302
+la fonction de distribution f
+sera constante
+
+96
+00:07:39,302 --> 00:07:42,376
+au fur et à mesure que l'on avance
+sur la trajectoire.
+
+97
+00:07:43,378 --> 00:07:47,227
+La méthode PIC est basée
+sur ce principe.
+
+98
+00:07:48,954 --> 00:07:53,113
+Le terme PIC signifie la méthode
+des Particules-En-Cellule.
+
+99
+00:07:58,840 --> 00:08:01,251
+La méthode est basée sur la représentation
+
+100
+00:08:01,251 --> 00:08:05,777
+de la fonction de distribution
+avec comme temps initial t = t₀
+
+101
+00:08:06,523 --> 00:08:14,307
+comme somme d'un grand nombre de fonctions
+
+102
+00:08:14,307 --> 00:08:16,821
+que nous appellerons fα
+
+103
+00:08:18,157 --> 00:08:24,002
+qui dépend des coordonnées spatiales
+et des coordonnées de la vitesse.
+
+104
+00:08:24,002 --> 00:08:31,398
+où ces fonctions fα ont comme propriété
+d'avoir un support compact,
+
+105
+00:08:33,795 --> 00:08:35,924
+par conséquent elles sont égales à zéro
+
+106
+00:08:36,130 --> 00:08:39,765
+partout sauf
+dans la région de l'espace de phase
+
+107
+00:08:41,671 --> 00:08:48,704
+et elles sont symétriques en fonction
+de rα0 et de vα0.
+
+108
+00:08:50,984 --> 00:08:55,153
+Ces fonctions fα, -nous verrons
+la raison ci-après-,
+
+109
+00:08:55,153 --> 00:08:57,735
+sont ainsi appelées <i>superparticules</i>.
+
+110
+00:09:00,531 --> 00:09:02,761
+Qu'est-ce que ça veut dire?
+
+111
+00:09:06,131 --> 00:09:10,982
+Si nous regardons la projection
+dans l'espace de phase,
+
+112
+00:09:10,982 --> 00:09:14,816
+nous verrons que ces fonctions
+fα sont partout...
+
+113
+00:09:15,039 --> 00:09:19,071
+Elles ont un support compact,
+par conséquent elles sont zéro partout
+
+114
+00:09:19,071 --> 00:09:22,601
+sauf pour les petites domaines,
+
+115
+00:09:24,160 --> 00:09:26,985
+et elles sont symétriques,
+
+116
+00:09:27,253 --> 00:09:33,825
+et donc elles sont centrées autour
+de la position de rα0 et de la vitesse vα0.
+
+117
+00:09:34,257 --> 00:09:41,738
+Nous introduisons l'intégrale Iα(fα)
+
+118
+00:09:41,963 --> 00:09:49,981
+de la fonction des superparticules comme 
+l'intégrale de l'ensemble de l'espace de phase,
+
+119
+00:09:50,494 --> 00:09:55,986
+donc dr dv de fα
+[ Iα = ∬ dr dv fα ]
+
+120
+00:09:58,052 --> 00:10:00,729
+et ensuite nous allons imposer
+à chaque fois que
+
+121
+00:10:00,729 --> 00:10:10,366
+f est donnée par la superposition
+de ces superparticules
+
+122
+00:10:20,906 --> 00:10:26,168
+qui sont centrées sur les positions
+rα(t) et vα(t) qui varient dans le temps.
+
+123
+00:10:28,698 --> 00:10:35,127
+En particulier, nous exigeons que
+ces rα(t) et rα(t)
+
+124
+00:10:35,127 --> 00:10:37,931
+satisfassent les équations suivantes,
+
+125
+00:10:47,013 --> 00:10:51,097
+qui ressemblent beaucoup
+à une équation de mouvement
+
+126
+00:10:51,097 --> 00:10:54,072
+que nous venions juste d'écrire
+pour les particules.
+
+127
+00:10:55,908 --> 00:10:58,745
+Sauf pour ces termes Eα et Bα
+
+128
+00:10:58,745 --> 00:11:02,367
+qui doivent être définis.
+Et nous les définirons
+
+129
+00:11:10,243 --> 00:11:14,590
+en fonction d'une intégrale
+qui pondère le champ électrique
+
+130
+00:11:14,656 --> 00:11:22,021
+en fonction de la position
+de ces particules dans l'espace de phase.
+
+131
+00:11:25,471 --> 00:11:29,261
+Et par analogie, pour le champ magnétique,
+
+132
+00:11:34,338 --> 00:11:36,423
+en imposant les conditions initiales...
+
+133
+00:11:50,098 --> 00:11:58,429
+Ensuite, nous obtenons ça, si nous calculons
+la dérivée convective
+
+134
+00:11:59,012 --> 00:12:08,914
+d/dt fα(r-rα(t), v-vα(t)) comme rα(t)
+et vα(t) suit cette équation,
+
+135
+00:12:08,999 --> 00:12:12,590
+ensuite nous avons cela qui sera
+approximativement égal à zéro,
+
+136
+00:12:12,590 --> 00:12:20,210
+ce qui signifie que f, définie
+comme la somme de toutes les superparticules
+
+137
+00:12:20,210 --> 00:12:22,422
+est une solution de Vlasov.
+
+138
+00:12:26,799 --> 00:12:32,288
+Autrement dit, comment fonctionne le code PIC,
+la méthode des Particules-En-Cellule?
+
+139
+00:12:32,806 --> 00:12:37,140
+D'abord on doit trouver
+
+140
+00:12:37,140 --> 00:12:43,088
+rα(t) et vα(t) qui satisfont
+l'équation de mouvement que j'ai écrite,
+
+141
+00:12:43,271 --> 00:12:46,371
+en commençant par la
+condition initiale suivante
+
+142
+00:12:46,371 --> 00:12:50,986
+qui implique de suivre
+une certaine trajectoire
+
+143
+00:12:52,316 --> 00:12:56,552
+et ensuite, une fois que vous avez trouvé
+rα(t) et vα(t),
+
+144
+00:12:56,552 --> 00:13:01,293
+vous pouvez évaluer
+fα qui est ici,
+
+145
+00:13:01,293 --> 00:13:04,980
+les additionner,
+et ce que vous obtenez
+
+146
+00:13:04,980 --> 00:13:10,641
+est une estimation
+de la fonction de distribution à tout temps.
+
+147
+00:13:11,950 --> 00:13:15,003
+Donc comment fonctionne la méthode PIC
+en pratique?
+
+148
+00:13:15,003 --> 00:13:19,224
+Nous allons nous concentrer 
+sur le système unidimensionnel
+
+149
+00:13:19,224 --> 00:13:23,578
+et nous regarderons la limite électrostatique.
+
+150
+00:13:23,578 --> 00:13:26,885
+Si nous connaissons la charge 
+présente dans un système,
+
+151
+00:13:26,885 --> 00:13:31,835
+ensuite en résolvant l'équation de Poisson,
+
+152
+00:13:33,417 --> 00:13:36,600
+vous pouvez évaluer 
+le potentiel électrostatique.
+
+153
+00:13:38,173 --> 00:13:40,750
+Une fois la valeur du
+potentiel électrostatique connue
+
+154
+00:13:40,753 --> 00:13:47,616
+nous pouvons déduire le champ électrique comme:
+moins la dérivée de Φ en fonction de x.
+
+155
+00:13:47,983 --> 00:13:51,024
+Maintenant, pour résoudre l'équation de Poisson
+numériquement,
+
+156
+00:13:51,024 --> 00:13:53,745
+nous devons discrétiser l'espace,
+
+157
+00:13:58,343 --> 00:14:01,033
+et nous introduirons une grille
+
+158
+00:14:01,033 --> 00:14:08,783
+où nous discrétiserons
+x avec x0, x1, x2, etc.
+
+159
+00:14:08,783 --> 00:14:15,255
+xj-1, xj, xj+1, etc.
+
+160
+00:14:15,412 --> 00:14:19,293
+et pareil pour le temps,
+il sera discrétisé
+
+161
+00:14:19,293 --> 00:14:44,429
+avec t0, t1, t2,... ti-1, ti, ti+1
+avec un espacement de grille Δx
+
+162
+00:14:45,242 --> 00:14:52,452
+qui est constant
+et donc égal à xj+1- xj,
+
+163
+00:14:53,377 --> 00:14:56,026
+et pareil pour le temps.
+
+164
+00:15:00,914 --> 00:15:05,564
+La densité de charge sera évaluée
+sur les points de cette grille.
+
+165
+00:15:07,845 --> 00:15:11,293
+et sera désignée comme ρji.
+
+166
+00:15:12,112 --> 00:15:17,886
+et ce sera la densité de charge
+pour une position xj et un temps ti.
+
+167
+00:15:18,223 --> 00:15:21,222
+Nous procéderons de la même manière
+pour le champ électrique
+
+168
+00:15:21,222 --> 00:15:23,740
+et pour le potentiel électrostatique.
+
+169
+00:15:26,529 --> 00:15:30,908
+A ce moment-là sur la grille nous avons besoin
+de discrétiser les dérivées
+
+170
+00:15:33,654 --> 00:15:38,133
+et nous aurons
+dΦ/dx à la position j
+
+171
+00:15:39,276 --> 00:15:42,059
+qui est approximativement égale
+aux différences finies
+
+172
+00:15:42,059 --> 00:15:47,963
+entre Φ évalué au point j+1
+
+173
+00:15:48,181 --> 00:15:54,752
+et Φ au point j-1 divisé par 2 Δx
+
+174
+00:15:54,752 --> 00:16:01,827
+et en combinant des formules similaires
+provenant de dérivées de premier ordre,
+
+175
+00:16:01,827 --> 00:16:07,845
+nous aurons pour les dérivées de second
+ordre à la position j,
+
+176
+00:16:07,845 --> 00:16:24,455
+une bonne estimation qui sera fournie
+par ( Φj+1 - 2 Φj + Φj -1) / Δx²
+
+177
+00:16:25,593 --> 00:16:28,078
+Par conséquent, en retournant
+à notre équation de Poisson
+
+178
+00:16:28,078 --> 00:16:44,225
+nous aurons
+( Φij+1 - 2 Φij + Φij -1) / Δx²
+
+179
+00:16:45,422 --> 00:16:51,930
+qui est égal à -ρij/ε₀
+
+180
+00:16:51,930 --> 00:16:55,394
+et donc pareil
+pour le champ électrique,
+
+181
+00:16:55,531 --> 00:17:00,245
+ce qui sera donné par -1/ (2 Δx)
+
+182
+00:17:02,772 --> 00:17:05,185
+c'est la différence
+dans le potentiel électrostatique
+
+183
+00:17:05,185 --> 00:17:10,291
+entre les positions j+1 et j-1.
+
+184
+00:17:12,205 --> 00:17:14,709
+Une fois le champ électrique évalué,
+
+185
+00:17:14,709 --> 00:17:19,188
+nous devons évaluer le champ électrique
+agissant sur une superparticule.
+
+186
+00:17:22,453 --> 00:17:29,025
+Pour cela nous supposerons que
+le champ électrique est égal à Ej
+
+187
+00:17:30,169 --> 00:17:40,800
+pour x j-1/2 < x < xj+1/2.
+
+188
+00:17:41,051 --> 00:17:44,037
+Que signifie xj+1/2 ?
+
+189
+00:17:44,320 --> 00:17:50,495
+C'est le point entre xj et xj+1
+
+190
+00:17:53,531 --> 00:17:56,322
+et comme nous l'avons juste vu,
+le champ électrique
+
+191
+00:17:56,322 --> 00:18:02,645
+agissant sur une superparticule α,
+qui est définie comme Eα,
+
+192
+00:18:04,297 --> 00:18:11,696
+Eα = ∬ E fα dx dv
+
+193
+00:18:11,765 --> 00:18:15,947
+peut justement
+être évalué si nous supposons
+
+194
+00:18:17,567 --> 00:18:26,721
+que fα f alpha est égal au produit
+de deux fonctions de Dirac
+
+195
+00:18:27,593 --> 00:18:30,940
+centrées autour de xα et vα.
+[ fα = δ(x-xα) δ(v-vα) ]
+
+196
+00:18:35,621 --> 00:18:39,651
+Ce fα, qui est la fonction la plus simple
+que l'on puisse utiliser dans une méthode PIC,
+
+197
+00:18:39,651 --> 00:18:42,876
+possède les propriétés
+que nous venons juste d'énumérer.
+
+198
+00:18:42,876 --> 00:18:45,184
+Elle a un support compact:
+
+199
+00:18:45,184 --> 00:18:50,083
+c'est égal à zéro, sauf pour une
+zone finie de l'espace de phase
+
+200
+00:18:50,468 --> 00:18:55,626
+et c'est symétrique en fonction
+de xα et vα.
+
+201
+00:18:56,654 --> 00:19:03,225
+Avec ces définitions, d'abord on obtient
+que Eα est égal à Ej,
+
+202
+00:19:05,385 --> 00:19:12,269
+étant la distance entre xj
+qui est considéré ici et xα,
+
+203
+00:19:13,577 --> 00:19:18,689
+moins que ou égal à Δx/2.
+
+204
+00:19:20,039 --> 00:19:23,500
+Par conséquent, ici nous pouvons avoir
+le champ électrique
+
+205
+00:19:23,500 --> 00:19:25,729
+agissant sur les superparticules
+
+206
+00:19:25,729 --> 00:19:34,602
+en sachant que la formule
+que nous avons déjà déduite ici, Eij,
+
+207
+00:19:34,602 --> 00:19:37,454
+nous donnera Eiα.
+
+208
+00:19:38,561 --> 00:19:41,559
+A ce point nous avons tout ce qu'il faut
+pour résoudre les équations de Newton
+
+209
+00:19:41,559 --> 00:19:44,598
+pour chaque superparticule.
+
+210
+00:19:45,162 --> 00:19:50,648
+dxα/dt = vα,
+
+211
+00:19:50,648 --> 00:19:59,290
+et
+dvα/dt = (qα/mα) Eα.
+
+212
+00:20:01,063 --> 00:20:05,283
+Pour cela nous discrétisons
+la dérivée de temps
+
+213
+00:20:05,283 --> 00:20:08,064
+comme nous l'avons fait
+pour la dérivée spatiale
+
+214
+00:20:08,064 --> 00:20:15,099
+et nous aurons la différence
+entre xα au [temps] i+1
+
+215
+00:20:15,551 --> 00:20:22,166
+moins xα au [temps] i, divisé par Δt
+qui est égal à vα,
+
+216
+00:20:22,618 --> 00:20:27,391
+considéré au temps i+1/2,
+
+217
+00:20:27,391 --> 00:20:34,837
+et avec une loi similaire nous évaluerons
+le progrès de la vitesse.
+
+218
+00:20:43,240 --> 00:20:46,160
+Avec ces équations nous 
+voyons la progression des 
+
+219
+00:20:46,306 --> 00:20:48,893
+vitesses et des positions des [super]particules.
+
+220
+00:20:49,610 --> 00:20:52,933
+Et en avançant les vitesses
+et les positions des superparticules,
+
+221
+00:20:52,933 --> 00:20:56,882
+nous pouvons attribuer la charge à la grille,
+
+222
+00:20:57,055 --> 00:20:59,634
+à la grille spatiale
+que nous examinons.
+
+223
+00:21:04,740 --> 00:21:09,977
+Dans le but d'évaluer
+la charge dans chaque cellule,
+
+224
+00:21:09,977 --> 00:21:13,302
+qui nous permettra
+de résoudre l'équation de Poisson,
+
+225
+00:21:13,302 --> 00:21:20,752
+nous soulignerons que ρij sera donné
+par (1/Δx) [fois]
+
+226
+00:21:20,752 --> 00:21:25,373
+la charge contenue à
+ l'intérieur de chaque cellule,
+
+227
+00:21:25,373 --> 00:21:29,652
+qui sera donnée par l'intégrale
+de la fonction de distribution
+
+228
+00:21:29,652 --> 00:21:35,769
+que nous avons estimée comme la somme
+de toutes les superparticules,
+
+229
+00:21:35,769 --> 00:21:38,393
+qui ont toutes la charge qα
+
+230
+00:21:38,612 --> 00:21:46,138
+et c'est intégré sur la vitesse,
+la direction, et la grille
+
+231
+00:21:46,342 --> 00:21:56,227
+et la direction spatiale
+de xj-1/2 à xj+1/2.
+
+232
+00:21:58,366 --> 00:22:02,791
+Autrement dit, c'est égal à
+(1/Δx) [fois]
+
+233
+00:22:02,791 --> 00:22:09,331
+la somme de toutes les [super]particules
+qui appartiennent à cette cellule j qα.
+
+234
+00:22:10,648 --> 00:22:16,532
+Je vais l'écrire explicitement: en
+additionnant tous ces α qui appartiennent à j,
+
+235
+00:22:16,532 --> 00:22:20,304
+je veux dire en additionnant
+les superparticules
+
+236
+00:22:20,304 --> 00:22:31,095
+de telle sorte que leur position
+soit entre xj-1/2 et xj+1/2,
+
+237
+00:22:33,433 --> 00:22:37,475
+à partir de laquelle nous
+pouvons clore notre système
+
+238
+00:22:37,805 --> 00:22:40,890
+en attribuant ρij, comme nous l'avons vu,
+
+239
+00:22:41,140 --> 00:22:46,787
+en additionnant toutes les [super]particules
+qui appartiennent à la cellule j.
+
+240
+00:22:48,143 --> 00:22:53,346
+Donc, voici comment la méthode PIC
+fonctionne en pratique.
+
+241
+00:22:53,346 --> 00:22:59,096
+Commençons en donnant une condition initiale
+ où la position de toutes les particules
+
+242
+00:22:59,096 --> 00:23:03,246
+ est connue à partir de laquelle nous pouvons
+ évaluer la distribution de la charge,
+
+243
+00:23:03,246 --> 00:23:08,051
+en résolvant l'équation de Poisson,
+nous évaluons le potentiel électrostatique,
+
+244
+00:23:08,051 --> 00:23:11,309
+et de cela, nous obtenons le champ électrique.
+
+245
+00:23:11,309 --> 00:23:14,559
+A partir du champ électrique,
+évalué sur la grille,
+
+246
+00:23:14,559 --> 00:23:19,522
+nous estimons le champ électrique
+agissant sur une superparticule,
+
+247
+00:23:19,522 --> 00:23:22,989
+et une fois que nous connaissons le champ
+électrique agissant sur une superparticule
+
+248
+00:23:22,989 --> 00:23:27,085
+nous pouvons résoudre l'équation de Newton
+pour chacune des superparticules
+
+249
+00:23:27,085 --> 00:23:32,067
+pour lesquelles nous discrétisons
+notre fonction de distribution,
+
+250
+00:23:32,067 --> 00:23:35,876
+et voici l'équation de Newton
+que nous pouvons résoudre
+
+251
+00:23:35,876 --> 00:23:40,539
+pour avancer à la prochaine intervalle de [temps]
+la position des particules
+
+252
+00:23:40,539 --> 00:23:44,023
+et une fois arrivé
+à la prochaine étape, en position,
+
+253
+00:23:44,023 --> 00:23:48,507
+nous pouvons évaluer
+la nouvelle distribution de la charge,
+
+254
+00:23:48,507 --> 00:23:54,647
+attribuer des charges à la grille, et
+continuer en évaluant l'équation de Poisson
+
+255
+00:23:54,647 --> 00:23:57,164
+à la nouvelle intervalle de temps, etc.
+
+256
+00:23:58,935 --> 00:24:01,124
+En faisant progresser le système dans le temps,
+
+257
+00:24:01,124 --> 00:24:05,374
+nous pouvons en fait voir l'évolution
+de la fonction de distribution,
+
+258
+00:24:05,557 --> 00:24:09,923
+du champ électrique, et du potentiel
+électrostatique dans le temps et dans l'espace.
+
+259
+00:24:11,974 --> 00:24:15,014
+Dans la partie exercices de nos cours
+
+260
+00:24:15,014 --> 00:24:20,106
+on se concentrera sur une simulation
+PIC - Particules-En-Cellule,
+
+261
+00:24:20,106 --> 00:24:25,178
+d'un système unidimensionnel
+dans la limite électrostatique
+
+262
+00:24:25,178 --> 00:24:29,812
+où nous verrons deux
+faisceaux d'électrons à contre-courant
+
+263
+00:24:29,812 --> 00:24:33,994
+qui interagissent entre eux.
+
+264
+00:24:35,841 --> 00:24:40,916
+Donc, ici on arrive au résumé
+du présent cours
+
+265
+00:24:41,108 --> 00:24:45,214
+qui a été consacré
+à la simulation dans la physique des plasmas.
+
+266
+00:24:45,361 --> 00:24:52,256
+Nous avons donné une très courte introduction
+d'approche numérique des modèles.
+
+267
+00:24:52,256 --> 00:24:55,977
+La première chose
+que j'ai faite c'est d'expliquer
+
+268
+00:24:55,977 --> 00:25:00,585
+pourquoi c'est tellement difficile de faire
+les simulations numériques de plasmas.
+
+269
+00:25:00,585 --> 00:25:04,617
+C'est à cause du grand nombre
+d'échelles temporelles et spatiales
+
+270
+00:25:04,617 --> 00:25:08,481
+auxquelles les phénomènes
+se produisent dans les plasmas.
+
+271
+00:25:08,481 --> 00:25:12,265
+Ensuite, j'ai parlé brièvement
+des différentes approches de simulations
+
+272
+00:25:12,265 --> 00:25:16,856
+et je me suis concentré ensuite sur la méthode
+"Particules-En-Cellule", la méthode PIC
+
+273
+00:25:16,856 --> 00:25:20,471
+qui est utilisée dans la physique des plasmas
+pour résoudre l'équation de Vlasov.
+
+274
+00:25:21,081 --> 00:25:26,898
+Soulignons que la méthode PIC n'est pas 
+juste utilisée dans la physique des plasmas.
+
+275
+00:25:26,898 --> 00:25:32,768
+C'est utilisé dans différents domaines,
+de la mécanique des fluides
+
+276
+00:25:32,768 --> 00:25:37,931
+à l'étude de la dynamique
+des étoiles dans les galaxies,
+
+277
+00:25:37,931 --> 00:25:40,829
+à l'étude des semiconducteurs.
+
+278
+00:25:40,829 --> 00:25:45,203
+C'est une méthode assez générale
+et nous sommes entrés dans les détails
+
+279
+00:25:45,203 --> 00:25:48,301
+pour expliquer comment 
+cela fonctionne en pratique
+
+280
+00:25:48,301 --> 00:25:52,236
+dans le cas le plus simple
+d'un plasma unidimensionnel
+
+281
+00:25:52,236 --> 00:25:54,469
+dans la limite électrostatique.
+

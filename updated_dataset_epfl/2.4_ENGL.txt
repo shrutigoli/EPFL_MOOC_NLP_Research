@@ -1,0 +1,162 @@
+Hello again, I'm still Ed Bugnion.
+This is still POCS.
+This is still layering.
+This is actually the fourth module on the layering section, the final module, and right now we're going to talk about networking.
+Actually we're not going to talk about networking, because that is a controversial topic of its own, but we're going to talk about networking layers, because that itself is a controversial topic of its own, and this is about the layering principle.
+So, let's get started.
+And to get started, we're going to first talk about something you're most likely familiar with at some level, which is the OSI model.
+So, let me give you the scoop.
+The OSI model is obsolete, and should not be referenced, and yet we all do that in our everyday language.
+As a matter of fact, I'm going to make references to the OSI model in this module because it's very difficult to talk about networking without referencing some elements of that model.
+And yet, the model is obsolete, and should not be used.
+So bear with me with the contradiction.
+So, for example, we have an intuition as to what layer two might mean, what layer three might mean, or even what layer seven might mean.
+You actually can commercially buy products such as layer seven load balancers, because from a marketing perspective, it's sexier to call something a layer seven load balancer than simply an http proxy.
+In reality, they're generally often one and the same thing.
+And if you're even luckier, you may have heard one day of the layer eight model.
+Of course, if somebody talks to you about the layer eight model, that person is implicitly assuming that you: a. know that there are seven layers in the OSI model and not eight, and that the layer eight model refers to the invisible political layer that drives all bad decisions in a company.
+But, after this caveat, the OSI model is not, strictly speaking, completely bad.
+It did serve a purpose, and one purpose that it did serve is it helped the networking industry organize itself to standardize various aspects of the system in a modular fashion, in a layered fashion.
+And so, let's go through an example that actually worked reasonably well, and maps reasonably well.
+And the example
+I'm going to use is Ethernet.
+So, Ethernet is not a standard.
+As a matter of fact, it's the combination of multiple standards.
+In order to have any Ethernet stack, you need multiple Ethernet standards to work together.
+The most important standard is 802.1, which defines a frame format, the MAC address, the namespace, the semantics for unicast and multicast.
+And that standard is generally mapped with a layer two model in the OSI model.
+And as another example, the central standard for Ethernet switching is 802.1D, and that is also a layer two model.
+Now, the IEEE also standardized the lower layers of the networking stack; that's why you need the combination of IEEE standards to have an Ethernet solution that is done by other working groups, such as 802.3 for wired links or 802.11 for WiFi, and you combine these two things and you end up having an Ethernet solution.
+So this is all pretty good, right?
+In the way the model--
+I don't know to what extent it had a direct influence, but certainly the model the industry aligned and used, the terminology of the model at the lower levels of the system.
+But this breaks down, and specifically this breaks down at the upper layers, and that is largely because today, the winning design in networking, at the upper layers, is the result of a community effort, not the result of a competitive effort among industry competitors.
+Of course, the winning design
+I'm referring to is the Internet, and the community is IETF.
+And there's a very different set of perspectives and philosophies if something emerges from industry rather, when something emerges from a community.
+And to emphasize this, I found this interesting quote in an RFC, called "Layering considered harmful."
+And this is worth just reading so that you get a sense of what I mean.
+So this RFC states:
+They even state a corollary, which is pretty funny to read.
+Alright, so I rest my case on this.
+But the point is that OSI had many strict layers, and IETF was about architectural elegance and about striking a balance.
+Now in the textbook, we actually don't have a seven-layer model, we don't have necessarily an IETF model.
+We actually are using a simpler, three-layer model.
+Now, the authors themselves are sometimes questioning whether this is the right model, but this actually has a lot of merit.
+It's very good to help think about how and where things land in the context of a layered networking design.
+And certainly, three is probably the lower bound.
+Everybody will agree that three is the minimal number of layers that you need in order to build any form of a network system.
+And so what are those three layers?
+Well, the lower layer is the link layer, and it has a single function, which is to carry frames on links, maybe between a NIC and a switch, or between a radio and an access point, or potentially between links between two switches.
+But this is only the link layer; it doesn't worry about where things should go, it doesn't worry about where things should be routed, or it doesn't worry about what the hosts are going to do with the data once they receive it.
+It's only responsible to carry links.
+At the layer above, the network layer is only responsible to carry packets between links.
+And the way you do that is you route connecting links together according to the network's current view of the network topology.
+This is a hard problem.
+And importantly, the network layer is designed to be distributed and resilient.
+You have protocols that, basically, deal with the issue of reconciling the actual current network topology with the network layer's view of the networking topology.
+In particular, this is hard when things like routers will fail and links would go down.
+So there's a lot of complexity in that layer, but the good news is it relies on a simple abstraction of the lower layer.
+You can actually use different link layer technologies in different parts of the network in a transparent fashion, and you expose a simple interface or abstraction, to the end-to-end layer.
+And the end-to-end layer, which is implemented in the hosts, is largely, at least in this model, a set of RPCs between hosts.
+You send and receive messages via the network layer without having to worry about the topology of the network, and obviously without having to worry about the link level technologies that are used below.
+So here again there's a significant amount of complexity in the end-to-end layer, but it can rely on a simple abstraction offered by the network: simply the ability to send a packet to its destination by giving it some kind of address associated with the destination.
+Now the three-layer model is somewhat simplistic; maybe a little too simplistic to capture the reality of the system.
+And actually, the authors themselves describe this end-to-end layer as serving three different functions: presentation, transport, and session management.
+So these three functions are not different layers; they are all part of the end-to-end layer.
+And then another note is that they basically restrict their view of the networking stack to the very basic capabilities that could be offered by a networking stack, when in reality, the domain of networking actually grows up with layers built on top of those very basic end host capabilities.
+So I just want to make a side note so that people don't get confused.
+When I talk here about the end-to-end layer,
+I actually do not talk about the end-to-end principle.
+There's a relationship between the two.
+The end-to-end principle is applied broadly and in many areas, and it's about pushing complexity to the applications because they know best.
+The end-to-end layer is performing a well-defined function within the three-layer networking model of the textbook, and it uses the end-to-end principle specifically to simplify the implementation of the networking layer.
+So in the case of the networking stack, the network's end-to-end layer applies the end-to-end principle by handling all host-specific issues within the host, and TCP is the canonical example for an implementation of that.
+And then the transport layer handles both the congestion management and the flow control, freeing the network and the link layer from having to worry about these two considerations at all.
+And this is a simplified view of the core principle behind layering and networking.
+As a matter of fact, it's a pretty good proxy of deployments in networking.
+Now of course, as you would expect, there are nuances, complications, and applications.
+So I'm going to first talk about one complication, and then two interesting applications of this model.
+The first complication is that there's an unfortunate difference between the architectural beauty of standards, and the implementation in reality in products that you buy.
+And this actually applies broadly, but it actually applies in a pretty clear way in the networking domain.
+Standards bodies are very good at focusing on a particular area.
+Both IETF and IEEE have work groups with well-defined charters.
+They solve one problem, and then these problems can be layered together from a layering perspective in order to form a complete solution stack.
+But in reality, the people that are building products actually tend to build products that use different functions from different layers into a single set-- single-function device that serves multiple purposes.
+And sometimes this is not a problem, does not create operational complexity; if anything, simplifies the operational model.
+And sometimes it actually can create some substantial complexity by introducing a great degree of flexibility in the implementation.
+So let me give you an example that actually works reasonably well, that you probably all have at home: some kind of a home router, that may look somewhat like this.
+If you actually look at it under the covers, this involves a whole set of different networking standards operating at different layers.
+At the link layer, we have 802.11 WiFi, and various sub-versions of it.
+We also have, since you have some wired ports, you also have some 1GbE or 100 megabit Ethernet standards that specify the links.
+Now, this device is also a layer two Ethernet bridge, and so it basically incorporates all of the layer two switching standards between the radios and the wired ports.
+And this device is also a router, and that is because you need to NAT in order to connect to the Internet, to have a single -- since you have a single, externally-routable IP address.
+And so this is typically a higher-level function that is implemented within that same device, and then, although this one doesn't do it in particular, but other devices routinely also incorporate DSL modem capabilities into the same product.
+So this is a case where you have product integration using different standards in a way that is actually simplifying the operational model.
+But there are many counterexamples, and actually data center networking is a good counterexample, where people have actually implemented into a single device products that have multiple different functionality from different standards at different layers and can be configured into arbitrary, complex ways.
+And so let me give you an example.
+This picture shows a leading, probably the best, highest density data center switch you can buy in the market today, and these are some of the specs.
+And if you actually read through the specs, what you see is these are all Ethernet-related standards, right?
+We talk about link rates,
+10 gigs, 40 gigs, 100 gigs, and we specifically talk about Ethernet, and certainly "E", the capital "E" stands for Ethernet in this context.
+Now in reality, this is not an Ethernet switch.
+This is a router, or this could be a switch, or this could be a combination of the two.
+And as a matter of a fact you can configure your solution to be some combination hybrid between layer two switching and layer three routing -- and again,
+I'm using the OSI terms that actually we should not be using but people use them anyway -- into a solution.
+Now, those combinations tend to dramatically increase the level of complexity you have in the network.
+It's what people call the god boxes of networking.
+You can do many, many things with them, but it's extremely difficult to reason about them into engineering, because we've effectively subsumed so many different functions in it that is intended to be distinct, into the same system.
+And it's very difficult for people to reason through some of the possible interactions between the different layers.
+Now that we've done this detour in product reality, let's go back to the sound principles, and specifically the sound principles of the Saltzer/Kaashoek textbook and this three-layer model of networking.
+And that model actually allows for a number of interesting use cases.
+And the first one I want to go through is relatively simple, but very important.
+It's the concept of what they call map composition, which basically is an application of the layered model where rather than having one end-to-end implementation, one network implementation, and one link implementation, either the network or the link implementation actually uses two independent layers, one mapping directly onto the other.
+And so map composition could either apply at the link layer, or it could apply at the networking layer.
+The mechanisms used to implement them, by the way, are not exactly the same.
+Let me give you just a very simple example.
+You can map one link technology onto another link technology.
+This was done, for example, for AppleTalk, which was a legacy networking technology by Apple, which was then mapped on a link-by-link basis, on a packet-by-packet basis, onto Ethernet networks.
+Now this was over a decade ago.
+More recently, and something I'm intimately familiar with, we were able to map Fibre Channel, which was a proprietary, or at least a specialized networking technology used in the storage world, and we were able to map Fibre Channel frames onto Ethernet frames.
+That is done by combining an encapsulation mechanism, as well as flow control on the link, link-level flow control, at the Ethernet layer, which enabled this map composition, link to link.
+The other examples are network-to-network map composition.
+So again, you have within the networking layer two different layers, one relying on the other.
+One example which is commonly used is the mapping of IP subnet onto Ethernet broadcast domains.
+So even though I'm saying Ethernet here, this is clearly a networking layer within the three-layer model from the stack, from the book, and an IP subnet can be officially mapped onto an Ethernet broadcast domain, specifically so that you can efficiently implement a thing like IP multicast on top of that.
+Another example of map composition is the ability to compose two different networks that are each autonomous, and to have them peer with each other in order to allow communication, in a transparent fashion, between any host on either side of the network.
+That is what we call bridging between autonomous systems, and that is the fundamental principle behind the Internet.
+And this is a form of map composition, because you have a-- within the networking layer you have an autonomous layer which is responsible for routing within the autonomous system, and you have an external layer which is responsible for peering between autonomous systems and making, and appropriately routing the packets across these two layers.
+The other application, from the textbook, of the three-layer model is, in my opinion, a little bit more interesting and intellectually challenging, and it is the notion of recursive composition.
+So let me first read the definition.
+Now obviously, the concept itself is recursive, so that the link layer of the first network, which rests on the end-to-end layer of the second network.
+Now the link layer of the second network itself can obviously rest on the end-to-end layer of a third network and you can create your Russian dolls as deep as you need for your particular application.
+So this is a way to think about the application of that model.
+It's specific to communication systems, specifically specific to this three-layer model, but allows for a recursive composition.
+It has many applications, things that we use on an ongoing basis.
+Both dial-up and DSL are cases of recursive composition because the link layer of the first network, which is what we think of our access to our gateway device from our home router to the access gateway, it actually rests on an end-to-end protocol implemented between the two DSL modems: the DSL modem and the DSLAM aggregator.
+And so you have a case where one's link is somebody else's end-to-end network.
+This can also be used in peer-to-peer networks, where the link between two nodes in a peer-to-peer network actually rests on, obviously, the end-to-end layer implemented by the operating system, typcially TCP or UDP sockets that allow you to communicate between end hosts.
+That end-to-end layer exposes an abstraction that is used as a link in a peer-to-peer network.
+The notion of these peer-to-peer networks leads to the concept of overlays.
+Overlays are becoming very popular right now with software-defined networks in which you can create the abstraction of a network, maybe a layer two or a layer three network that is actually implemented as an overlay on top of an existing physical network.
+That has many applications, in particular for multitenancy and cloud applications.
+And it's also being used for Voice over IP and it's also being used by VPNs.
+Now this is actually such an interesting and such an important topic that one of the papers that you'll be reading next week-- this week, sorry-- is around an overlay network.
+As a matter of fact, it's one of the first overlay networks that was proposed within the systems community.
+And one of the interesting aspects of this paper is that it is to be put in the context of the scale of the Internet, and the number of advertised autonomous systems within the Internet.
+And this is a chart that actually plots the growth of the Internet, not in terms of end hosts, but in terms of autonomous systems.
+Now, the paper that you're reading is pretty old because it was the first paper in overlay networks, trying to add resiliency to the Internet.
+It was published at SOSP in 2001, so it's well over a decade old.
+At the time, the Internet was small.
+And so, when you read the paper and as you read the paper, ask yourself the question: are the use cases that are presented in this paper more applicable today, with the rise of the number of autonomous systems?
+Or are they less applicable today, and if so, why?
+So this is something to think about as you're reading this paper.
+So, let's summarize what we've covered in this module.
+We talked about the importance of judicious layering.
+There are two extremes, and from philosophy perspective, the OSI model and the IETF model.
+Then we actually went in-depth, and I encourage you to read the portion of the texbook that covers it, the three-layer model of the Saltzer/Kaashoek texbook.
+We did a detour to talk about architecture and the difference between architecture and implementation.
+And then we talked about two applications of the model, in particular recursive composition, which you will be exposed to in the paper you're reading.
+And this wraps it up for this week.
+Thank you very much.
+Enjoy the papers.

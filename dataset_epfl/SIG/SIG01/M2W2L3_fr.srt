@@ -1,0 +1,1602 @@
+1
+00:00:21,499 --> 00:00:23,349
+Nous poursuivons donc
+dans cette leçon
+
+2
+00:00:23,549 --> 00:00:25,887
+notre découverte de la richesse
+
+3
+00:00:26,087 --> 00:00:27,975
+et des subtilités du langage SQL
+
+4
+00:00:28,175 --> 00:00:31,350
+en abordant la question 
+de l'agrégation et du tri
+
+5
+00:00:31,550 --> 00:00:34,199
+à savoir la manière d'extraire
+
+6
+00:00:35,124 --> 00:00:36,987
+des informations synthétiques
+
+7
+00:00:37,187 --> 00:00:39,349
+d'un ensemble
+ou d'un sous-ensemble de données,
+
+8
+00:00:39,812 --> 00:00:41,887
+de les regrouper, de les filtrer
+
+9
+00:00:42,087 --> 00:00:43,362
+et de les trier.
+
+10
+00:00:43,849 --> 00:00:46,149
+L'objectif de la leçon est donc
+
+11
+00:00:46,349 --> 00:00:48,499
+de comprendre
+la logique d'agrégation
+
+12
+00:00:48,699 --> 00:00:51,524
+et la manière de trier
+les résultats d'une requête
+
+13
+00:00:51,724 --> 00:00:53,112
+de sorte que vous puissiez
+
+14
+00:00:53,299 --> 00:00:56,274
+par la suite écrire
+des requêtes d'agrégation et de tri.
+
+15
+00:00:56,799 --> 00:01:00,162
+Nous aborderons donc successivement
+les fonctions d'agrégation,
+
+16
+00:01:00,837 --> 00:01:02,574
+la notion de regroupement,
+
+17
+00:01:03,412 --> 00:01:05,274
+l'agrégation conditionnelle
+
+18
+00:01:05,774 --> 00:01:06,949
+et finalement,
+
+19
+00:01:07,149 --> 00:01:10,062
+les éléments de tri
+et de limitation des résultats.
+
+20
+00:01:16,037 --> 00:01:18,424
+En revenant à notre tableau
+de synthèse
+
+21
+00:01:18,624 --> 00:01:21,912
+de la syntaxe de base
+du langage SQL,
+
+22
+00:01:22,387 --> 00:01:26,049
+on retrouve les clauses d'agrégation
+qui nous intéressent ici
+
+23
+00:01:26,237 --> 00:01:29,124
+avec les mots-clés
+GROUP BY et HAVING.
+
+24
+00:01:30,162 --> 00:01:33,462
+Mais nous commencerons d'abord
+par les fonctions d'agrégation
+
+25
+00:01:33,662 --> 00:01:36,149
+qui permettent d'effectuer
+des opérations statistiques
+
+26
+00:01:36,349 --> 00:01:39,462
+sur un ensemble ou un sous-ensemble
+d'enregistrements
+
+27
+00:01:39,962 --> 00:01:42,262
+avec une syntaxe de type...
+
+28
+00:01:43,124 --> 00:01:44,462
+le mot-clé SELECT,
+
+29
+00:01:44,649 --> 00:01:46,674
+le mot-clé de la fonction
+
+30
+00:01:46,874 --> 00:01:50,087
+avec le nom d'attribut
+sur lequel porte la fonction
+
+31
+00:01:50,624 --> 00:01:53,399
+et puis ensuite la clause FROM
+et le nom de la table.
+
+32
+00:01:53,599 --> 00:01:56,924
+Et ces fonctions sont de divers
+types, notamment la somme,
+
+33
+00:01:57,912 --> 00:02:00,162
+le comptage du nombre d'éléments,
+
+34
+00:02:00,362 --> 00:02:02,699
+la moyenne,
+le minimum et le maximum.
+
+35
+00:02:03,012 --> 00:02:04,499
+La fonction COUNT,
+
+36
+00:02:04,699 --> 00:02:07,162
+avec un attribut ou l'astérisque
+comme argument,
+
+37
+00:02:07,362 --> 00:02:09,574
+donne donc le nombre
+d'éléments de la table
+
+38
+00:02:09,774 --> 00:02:11,749
+alors qu'en ajoutant
+la fonction DISTINCT,
+
+39
+00:02:11,924 --> 00:02:13,162
+on obtient le nombre de valeurs
+
+40
+00:02:13,362 --> 00:02:15,400
+que peut prendre
+l'attribut utilisé en argument.
+
+41
+00:02:17,050 --> 00:02:20,137
+Un exemple de l'application
+de ces fonctions d'agrégation
+
+42
+00:02:20,962 --> 00:02:23,337
+dans SpatiaLite avec
+
+43
+00:02:24,224 --> 00:02:27,924
+le nombre de chambres
+de la table des hôtels
+
+44
+00:02:28,924 --> 00:02:32,224
+et l'on souhaiterait avoir en fait
+un tableau qui nous donne
+
+45
+00:02:33,262 --> 00:02:35,562
+l'ensemble des chambres
+présentes dans l'île
+
+46
+00:02:35,749 --> 00:02:37,149
+donc 2'518 chambres.
+
+47
+00:02:39,074 --> 00:02:42,149
+On aimerait aussi
+pouvoir compter en fait
+
+48
+00:02:44,649 --> 00:02:47,074
+la colonne STATUT de cet hôtel,
+on voit qu'il y a
+
+49
+00:02:47,274 --> 00:02:51,212
+124 statuts qui correspondent
+aux 124 hôtels existants
+
+50
+00:02:51,699 --> 00:02:54,087
+et avec le mot-clé DISTINCT,
+
+51
+00:02:54,287 --> 00:02:56,437
+on va pouvoir regrouper
+
+52
+00:02:56,637 --> 00:02:58,787
+en fait les différents statuts
+
+53
+00:02:58,987 --> 00:03:01,899
+qui sont au nombre de 7 au total.
+
+54
+00:03:04,587 --> 00:03:07,599
+Un autre exemple d'utilisation
+de ces fonctions d'agrégation,
+
+55
+00:03:08,074 --> 00:03:10,799
+avec le calcul du nombre moyen
+de lits des hôtels
+
+56
+00:03:11,537 --> 00:03:14,749
+obtenu en divisant le total
+des lits par le nombre d'hôtels.
+
+57
+00:03:15,449 --> 00:03:17,387
+A noter que l'on obtiendrait
+le même résultat
+
+58
+00:03:17,587 --> 00:03:20,599
+en utilisant directement
+la fonction d'agrégation moyenne
+
+59
+00:03:20,787 --> 00:03:22,012
+ou AVG.
+
+60
+00:03:23,799 --> 00:03:26,099
+On obtient donc
+un nombre moyen de 38.
+
+61
+00:03:26,924 --> 00:03:29,887
+Si on veut avoir dans SpatiaLite
+cette valeur au nombre réel,
+
+62
+00:03:30,087 --> 00:03:32,874
+il faut transformer la somme
+qui est en entier en un réel
+
+63
+00:03:33,074 --> 00:03:34,837
+ce qui se fait avec la fonction CAST
+
+64
+00:03:35,037 --> 00:03:36,787
+portant sur la variable "élément"
+
+65
+00:03:36,987 --> 00:03:38,837
+et suivie du suffixe "as float".
+
+66
+00:03:45,262 --> 00:03:47,899
+Le maximum, le nombre maximum
+
+67
+00:03:48,099 --> 00:03:50,312
+de lits d'un hôtel est obtenu
+
+68
+00:03:50,512 --> 00:03:51,799
+avec cette fonction max,
+
+69
+00:03:52,662 --> 00:03:54,649
+donc 464.
+
+70
+00:03:55,199 --> 00:03:58,724
+Et puis ce qui peut nous intéresser
+c'est de voir lequel de ces hôtels a
+
+71
+00:03:58,924 --> 00:04:01,674
+ce maximum de lits donc
+on peut ajouter 
+
+72
+00:04:02,424 --> 00:04:04,299
+dans SpatiaLite
+
+73
+00:04:04,499 --> 00:04:06,662
+le champ NOM
+comme résultat de la requête
+
+74
+00:04:06,862 --> 00:04:08,662
+et on voit que
+c'est le Berjaya B. Vallon.
+
+75
+00:04:08,862 --> 00:04:11,662
+Il faut noter que cet ajout du nom
+n'est pas un standard SQL
+
+76
+00:04:11,862 --> 00:04:14,525
+et provoquera une erreur
+avec la plupart des SGBD.
+
+77
+00:04:14,725 --> 00:04:16,975
+Nous verrons plus tard
+la syntaxe SQL correcte
+
+78
+00:04:17,175 --> 00:04:18,887
+pour obtenir ce type de résultat.
+
+79
+00:04:19,825 --> 00:04:22,950
+Même exemple,
+même situation pour 
+
+80
+00:04:23,150 --> 00:04:24,450
+pgAdmin
+
+81
+00:04:24,650 --> 00:04:27,650
+où on utilise le constructeur
+graphique mais on ne va pas très loin
+
+82
+00:04:27,850 --> 00:04:28,675
+parce que
+
+83
+00:04:29,800 --> 00:04:32,425
+les fonctions d'agrégation
+doivent être écrites
+
+84
+00:04:32,600 --> 00:04:35,062
+dans l'éditeur SQL
+un peu de la même manière
+
+85
+00:04:35,262 --> 00:04:37,837
+que dans SpatiaLite.
+
+86
+00:04:39,512 --> 00:04:43,125
+Donc, on a vu le cas de la somme
+des chambres.
+
+87
+00:04:43,812 --> 00:04:46,825
+Maintenant, le comptage des statuts
+
+88
+00:04:47,387 --> 00:04:51,162
+contre de nouveaux les 124 statuts
+correspondant aux 124 hôtels
+
+89
+00:04:51,350 --> 00:04:53,725
+et avec le mot clé DISTINCT,
+
+90
+00:04:54,300 --> 00:04:57,587
+on obtient de nouveaux
+les 7 types de statuts
+
+91
+00:04:58,875 --> 00:05:02,000
+caractérisant les hôtels des îles.
+
+92
+00:05:03,612 --> 00:05:05,550
+De la même manière que précédemment,
+
+93
+00:05:05,750 --> 00:05:06,562
+on peut
+
+94
+00:05:06,950 --> 00:05:09,262
+utiliser ces fonctions d'agrégation
+
+95
+00:05:09,537 --> 00:05:12,262
+pour composer un calcul
+donc ici la
+
+96
+00:05:12,887 --> 00:05:16,325
+la somme des lits de l'hôtel
+rapportée au nombre d'hôtels
+
+97
+00:05:16,525 --> 00:05:18,275
+pour obtenir en fait
+
+98
+00:05:18,475 --> 00:05:19,825
+la moyenne
+
+99
+00:05:20,750 --> 00:05:22,850
+des hôtels des îles.
+
+100
+00:05:23,050 --> 00:05:26,637
+Et là on voit qu'avec Postgres
+on obtient directement un résultat
+
+101
+00:05:26,837 --> 00:05:29,787
+en nombre réel
+et non pas en nombre entier.
+
+102
+00:05:31,262 --> 00:05:33,875
+On peut ici également utiliser
+la fonction max
+
+103
+00:05:34,075 --> 00:05:36,987
+pour obtenir le nombre de lits
+du plus grand hôtel des Seychelles.
+
+104
+00:05:38,637 --> 00:05:40,650
+Et nous verrons par la suite,
+
+105
+00:05:40,850 --> 00:05:42,937
+lorsqu'on parlera de
+requête emboîtée,
+
+106
+00:05:43,137 --> 00:05:46,075
+comment il faut traiter
+ce type d'interrogation.
+
+107
+00:05:47,200 --> 00:05:49,200
+Le même exemple encore
+
+108
+00:05:49,400 --> 00:05:52,025
+avec le logiciel Navicat,
+
+109
+00:05:52,762 --> 00:05:54,850
+on ajoute de nouveau graphiquement
+
+110
+00:05:55,775 --> 00:05:57,975
+les éléments et puis ici
+
+111
+00:05:59,487 --> 00:06:01,175
+la requête peut être composée
+
+112
+00:06:01,375 --> 00:06:04,037
+dans l'interface graphique,
+donc on peut ajouter la somme,
+
+113
+00:06:04,825 --> 00:06:09,025
+ajouter la rubrique de comptage,
+changer l'attribut.
+
+114
+00:06:09,825 --> 00:06:12,725
+On trouve les 124 statuts
+
+115
+00:06:12,925 --> 00:06:14,150
+des 124 hôtels.
+
+116
+00:06:14,350 --> 00:06:17,187
+Par contre, pour ajouter
+le mot-clé DISTINCT, on doit passer
+
+117
+00:06:17,387 --> 00:06:18,687
+également dans ce cas-là
+
+118
+00:06:18,887 --> 00:06:20,662
+dans l'éditeur SQL
+
+119
+00:06:20,862 --> 00:06:22,887
+pour écrire
+
+120
+00:06:23,812 --> 00:06:26,662
+à pied ce mot-clé.
+
+121
+00:06:29,550 --> 00:06:31,675
+En revenant dans l'éditeur,
+
+122
+00:06:31,862 --> 00:06:33,087
+on peut
+
+123
+00:06:33,725 --> 00:06:37,050
+cette fois remplacer
+le statut par les lits
+
+124
+00:06:37,350 --> 00:06:39,637
+et puis et finalement
+c'est plus simple
+
+125
+00:06:39,837 --> 00:06:42,837
+d'écrire cette requête un peu
+compliquée et qui fait le calcul
+
+126
+00:06:43,037 --> 00:06:44,275
+de la moyenne
+
+127
+00:06:45,575 --> 00:06:48,812
+dans l'éditeur plutôt que
+dans l'interface graphique.
+
+128
+00:06:49,012 --> 00:06:50,611
+Et ici à nouveau,
+on trouve le résultat.
+
+129
+00:06:50,799 --> 00:06:52,774
+Alors c'est parce que
+c'est Postgres qui est derrière
+
+130
+00:06:52,949 --> 00:06:54,799
+directement en nombre réel.
+
+131
+00:07:06,186 --> 00:07:08,637
+Le principe de la clause GROUP BY
+
+132
+00:07:08,837 --> 00:07:11,974
+est de permettre le regroupement
+de plusieurs résultats
+
+133
+00:07:12,299 --> 00:07:15,424
+et d'appliquer une fonction
+d'agrégation sur ce groupe.
+
+134
+00:07:15,724 --> 00:07:17,549
+La syntaxe de base
+
+135
+00:07:17,886 --> 00:07:19,812
+comprend donc le mot-clé SELECT
+
+136
+00:07:20,012 --> 00:07:22,062
+avec les attributs
+que l'on souhaite voir
+
+137
+00:07:22,262 --> 00:07:23,662
+dans le résultat
+
+138
+00:07:23,862 --> 00:07:26,162
+avec éventuellement une fonction
+
+139
+00:07:26,362 --> 00:07:28,512
+qui est exercée sur l'un ou l'autre
+de ces attributs.
+
+140
+00:07:29,512 --> 00:07:32,287
+Le mot-clé FROM
+avec la table d'origine
+
+141
+00:07:33,187 --> 00:07:34,512
+qui est interrogée
+
+142
+00:07:34,712 --> 00:07:37,524
+et puis le mot-clé GROUP BY
+suivi de l'attribut
+
+143
+00:07:37,724 --> 00:07:40,262
+qui va être utilisé
+pour le regroupement.
+
+144
+00:07:42,487 --> 00:07:46,087
+Nous prenons à nouveau un exemple
+avec le constructeur de requête SQL 
+
+145
+00:07:46,599 --> 00:07:49,287
+SpatiaLite intégré à QGIS.
+
+146
+00:07:50,424 --> 00:07:52,274
+Donc, on écrit une requête
+
+147
+00:07:52,474 --> 00:07:54,637
+où l'on cherche à obtenir en fait
+
+148
+00:07:55,724 --> 00:07:57,574
+l'ensemble
+
+149
+00:07:57,774 --> 00:08:00,624
+de chambres d'hôtel
+disponibles par district.
+
+150
+00:08:00,937 --> 00:08:02,937
+Donc, cette requête
+comprend donc comme
+
+151
+00:08:03,137 --> 00:08:05,112
+champ résultant le nom de districts
+
+152
+00:08:05,312 --> 00:08:08,312
+et la somme effectuée sur
+
+153
+00:08:08,512 --> 00:08:10,212
+le nombre de chambres des hôtels
+
+154
+00:08:11,037 --> 00:08:14,674
+provenant de la table DISTRICTS
+et de la table HOTELS
+
+155
+00:08:14,874 --> 00:08:18,499
+avec une jointure comme on l'a vu
+tout à l'heure entre ces 2 tables,
+
+156
+00:08:18,699 --> 00:08:21,699
+entre l'identifiant de districts
+de la table HOTELS
+
+157
+00:08:21,899 --> 00:08:25,624
+et l'identifiant, ce même identifiant
+dans la table DISTRICTS même.
+
+158
+00:08:27,362 --> 00:08:30,674
+A cela, il faut ajouter maintenant
+une clause de regroupement
+
+159
+00:08:30,999 --> 00:08:32,274
+puisque
+
+160
+00:08:32,474 --> 00:08:33,824
+les nombres...
+
+161
+00:08:34,262 --> 00:08:37,137
+le nombre de chambres d'hôtel
+est lié à chaque nom de district
+
+162
+00:08:37,324 --> 00:08:38,099
+et qu'il faut,
+
+163
+00:08:38,299 --> 00:08:41,474
+pour les différents hôtels et les différents
+districts, regrouper ces éléments.
+
+164
+00:08:41,674 --> 00:08:43,512
+Et on trouve
+une vingtaine de résultats
+
+165
+00:08:43,712 --> 00:08:46,587
+puisqu'il y a 5 districts
+qui n'ont pas d'hôtels.
+
+166
+00:08:47,149 --> 00:08:49,787
+Même chose dans le cas de pgAdmin,
+
+167
+00:08:49,987 --> 00:08:52,287
+où on construit cette fois
+la requête graphiquement
+
+168
+00:08:52,487 --> 00:08:54,474
+avec les tables DISTRICTS
+et les tables HOTELS. 
+
+169
+00:08:55,374 --> 00:08:56,461
+La jointure,
+
+170
+00:08:56,661 --> 00:08:59,199
+les 2 champs que l'on aimerait avoir
+dans le résultat
+
+171
+00:08:59,399 --> 00:09:00,311
+et on...
+
+172
+00:09:00,511 --> 00:09:03,961
+on doit compléter
+la requête dans l'éditeur
+
+173
+00:09:05,437 --> 00:09:06,624
+textuel
+
+174
+00:09:06,824 --> 00:09:08,336
+en ajoutant
+
+175
+00:09:08,649 --> 00:09:10,524
+la somme sur les chambres d'hôtel
+
+176
+00:09:10,686 --> 00:09:11,936
+et en ajoutant
+
+177
+00:09:12,424 --> 00:09:14,036
+la clause de groupement,
+
+178
+00:09:15,086 --> 00:09:17,086
+le GROUP BY qui porte donc sur 
+
+179
+00:09:17,286 --> 00:09:19,286
+les noms des districts
+puisqu'on va regrouper
+
+180
+00:09:19,611 --> 00:09:22,199
+les chambres par district.
+
+181
+00:09:26,124 --> 00:09:28,736
+Et l'on voit que l'on obtient
+de nouveau également
+
+182
+00:09:28,936 --> 00:09:30,924
+les 20 mêmes résultats
+que tout à l'heure.
+
+183
+00:09:31,911 --> 00:09:35,399
+Dans Navicat, les choses se passent
+un petit peu de la même manière.
+
+184
+00:09:36,186 --> 00:09:37,674
+On ajoute dans
+
+185
+00:09:38,099 --> 00:09:40,411
+le constructeur graphique 
+les tables,
+
+186
+00:09:40,611 --> 00:09:41,436
+on fait la jointure,
+
+187
+00:09:41,636 --> 00:09:44,249
+on sélectionne les champs
+que l'on souhaite voir apparaître
+
+188
+00:09:44,449 --> 00:09:45,374
+dans le résultat
+
+189
+00:09:46,124 --> 00:09:49,524
+et puis, on peut cette fois
+dans l'éditeur SQL intégré,
+
+190
+00:09:49,724 --> 00:09:52,974
+sélectionner directement
+la fonction d'agrégation
+
+191
+00:09:53,386 --> 00:09:56,749
+et puis on voit qu'automatiquement,
+le groupement a été ajouté,
+
+192
+00:09:56,949 --> 00:09:58,986
+on obtient les mêmes 20 résultats.
+
+193
+00:10:08,124 --> 00:10:10,974
+La clause HAVING est
+similaire à la clause WHERE
+
+194
+00:10:11,174 --> 00:10:13,212
+mais permet de filtrer des résultats
+
+195
+00:10:13,412 --> 00:10:14,986
+à l'aide de fonctions d'agrégation,
+
+196
+00:10:15,186 --> 00:10:18,761
+raison pour laquelle on parle
+cette fois d'agrégation conditionnelle.
+
+197
+00:10:19,424 --> 00:10:21,049
+Sur le plan de la syntaxe,
+
+198
+00:10:21,887 --> 00:10:24,849
+la syntaxe de base comprend
+toujours le mot-clé SELECT,
+
+199
+00:10:25,049 --> 00:10:26,961
+la liste des attributs
+
+200
+00:10:27,161 --> 00:10:28,886
+que l'on souhaite grouper,
+
+201
+00:10:29,824 --> 00:10:32,524
+que l'on souhaite avoir
+dans la table résultante
+
+202
+00:10:32,724 --> 00:10:35,399
+avec éventuellement une fonction
+sur l'un de ces attributs.
+
+203
+00:10:35,824 --> 00:10:37,886
+Le FROM avec la table d'origine,
+
+204
+00:10:38,086 --> 00:10:41,837
+la clause de groupement
+avec l'attribut ou les attributs
+
+205
+00:10:42,037 --> 00:10:44,449
+qui interviennent
+dans cette clause de groupement
+
+206
+00:10:44,649 --> 00:10:47,337
+et finalement une fonction de filtre
+
+207
+00:10:47,937 --> 00:10:50,049
+basée sur le mot-clé HAVING
+
+208
+00:10:50,249 --> 00:10:52,399
+qui associe en fait une fonction
+
+209
+00:10:52,599 --> 00:10:55,599
+attributaire, un opérateur
+et un critère.
+
+210
+00:10:56,749 --> 00:10:58,761
+Alors, on va voir tout de suite
+comment ça se passe
+
+211
+00:10:58,961 --> 00:11:01,349
+avec le même exemple
+que tout à l'heure
+
+212
+00:11:01,512 --> 00:11:02,899
+où on a cette requête
+
+213
+00:11:03,099 --> 00:11:05,111
+qui permet de réunir les
+
+214
+00:11:05,874 --> 00:11:07,949
+nombres de chambres par district
+
+215
+00:11:08,161 --> 00:11:10,636
+mais on va simplement
+filtrer ce résultat
+
+216
+00:11:10,836 --> 00:11:12,149
+pour avoir
+
+217
+00:11:12,511 --> 00:11:14,549
+l'ensemble des districts
+
+218
+00:11:14,736 --> 00:11:17,586
+dans lesquels ce nombre de chambres
+
+219
+00:11:17,786 --> 00:11:20,424
+est supérieur à 100.
+
+220
+00:11:21,224 --> 00:11:25,136
+Et on voit qu'on a 8 districts
+qui ont davantage de chambres,
+
+221
+00:11:25,386 --> 00:11:26,961
+qui ont plus de 100 chambres.
+
+222
+00:11:27,774 --> 00:11:29,986
+La même chose
+en reprenant la requête
+
+223
+00:11:30,186 --> 00:11:32,224
+qu'on avait tout à l'heure
+dans le cas de
+
+224
+00:11:32,424 --> 00:11:34,724
+PostgreSQL avec la même manière,
+
+225
+00:11:34,924 --> 00:11:37,924
+on est obligé d'utiliser
+l'éditeur SQL
+
+226
+00:11:38,986 --> 00:11:41,211
+pour ajouter
+
+227
+00:11:41,411 --> 00:11:42,924
+cette clause de filtre.
+
+228
+00:11:43,936 --> 00:11:47,311
+Le constructeur graphique n'étant
+dans ce cas d'aucune utilité.
+
+229
+00:11:47,624 --> 00:11:50,474
+Et à nouveau, on trouve
+les mêmes 8 résultats.
+
+230
+00:11:52,786 --> 00:11:55,949
+Finalement, dans le cas de Navicat,
+
+231
+00:11:56,136 --> 00:11:58,174
+on repart également de la requête
+précédente
+
+232
+00:11:58,374 --> 00:12:00,924
+et on voit qu'on a
+dans l'éditeur intégré
+
+233
+00:12:01,124 --> 00:12:03,436
+la possibilité de construire
+
+234
+00:12:03,636 --> 00:12:06,636
+graphiquement cette requête,
+
+235
+00:12:08,174 --> 00:12:10,674
+ce qui facilite
+un tout petit peu la vie
+
+236
+00:12:10,874 --> 00:12:13,549
+par rapport à un éditeur
+SQL standard.
+
+237
+00:12:14,861 --> 00:12:16,961
+Et dans le résultat,
+on retrouve à nouveau
+
+238
+00:12:17,161 --> 00:12:19,761
+ces 8 hôtels,
+ces 8 districts pardon.
+
+239
+00:12:29,024 --> 00:12:30,911
+Les clauses de tri et de limitation
+
+240
+00:12:31,111 --> 00:12:33,749
+font donc également
+partie de la série des
+
+241
+00:12:33,949 --> 00:12:36,949
+éléments syntaxiques de base
+du langage SQL
+
+242
+00:12:37,474 --> 00:12:40,486
+avec les mots-clés
+ORDER BY et LIMIT.
+
+243
+00:12:42,011 --> 00:12:43,824
+ORDER BY est donc une clause SQL
+
+244
+00:12:44,024 --> 00:12:46,474
+qui permet de trier les lignes
+dans un résultat
+
+245
+00:12:46,674 --> 00:12:47,974
+sur une ou plusieurs colonnes
+
+246
+00:12:48,174 --> 00:12:50,249
+par ordre ascendant ou descendant.
+
+247
+00:12:50,999 --> 00:12:52,411
+La syntaxe de base
+
+248
+00:12:52,611 --> 00:12:54,636
+est la suivante : donc le mot-clé
+
+249
+00:12:54,899 --> 00:12:58,811
+SELECT, les attributs que l'on souhaite
+voir apparaître dans le résultat,
+
+250
+00:12:59,899 --> 00:13:02,361
+la clause FROM
+avec le nom de la table
+
+251
+00:13:02,561 --> 00:13:04,424
+qui héberge ces attributs
+
+252
+00:13:04,624 --> 00:13:06,686
+et puis la clause de tri
+
+253
+00:13:06,886 --> 00:13:08,986
+ORDER BY avec 
+
+254
+00:13:09,186 --> 00:13:12,236
+successivement les différents
+attributs qui vont être utilisés
+
+255
+00:13:12,436 --> 00:13:13,499
+comme clé de tri
+
+256
+00:13:13,699 --> 00:13:16,186
+avec l'attribut numéro 1
+
+257
+00:13:16,386 --> 00:13:17,711
+en ordre descendant,
+
+258
+00:13:17,911 --> 00:13:20,574
+l'attribut numéro 2
+en ordre ascendant
+
+259
+00:13:20,774 --> 00:13:21,949
+etc.
+
+260
+00:13:22,149 --> 00:13:23,573
+Par défaut,
+
+261
+00:13:23,773 --> 00:13:26,648
+si rien n'est précisé,
+l'ordre de tri sera ascendant
+
+262
+00:13:26,848 --> 00:13:27,773
+mais il est souvent
+
+263
+00:13:27,973 --> 00:13:31,161
+préférable de préciser
+l'ordre de tri pour éliminer
+
+264
+00:13:31,836 --> 00:13:33,636
+toute ambiguïté
+
+265
+00:13:33,836 --> 00:13:37,536
+et surtout faciliter
+la lecture de la requête.
+
+266
+00:13:38,336 --> 00:13:40,861
+Le mot-clé LIMIT
+permet de spécifier le nombre
+
+267
+00:13:41,061 --> 00:13:43,111
+de résultats
+que l'on souhaite obtenir
+
+268
+00:13:43,311 --> 00:13:46,849
+et le mot-clé OFFSET
+permet de définir un décalage
+
+269
+00:13:47,599 --> 00:13:49,649
+dans la table RESULTATS
+
+270
+00:13:49,849 --> 00:13:53,449
+pour rechercher ce nombre limite
+maximum de résultats.
+
+271
+00:13:53,799 --> 00:13:55,661
+La syntaxe est donc du type
+
+272
+00:13:55,861 --> 00:13:58,149
+SELECT nom d'attribut,
+FROM nom de table,
+
+273
+00:13:58,624 --> 00:14:00,324
+LIMIT le nombre de lignes
+
+274
+00:14:00,524 --> 00:14:02,936
+et éventuellement OFFSET
+le nombre de lignes.
+
+275
+00:14:04,611 --> 00:14:07,211
+En appliquant ces idées
+dans le cas de la
+
+276
+00:14:07,411 --> 00:14:08,986
+base de données SpatiaLite,
+
+277
+00:14:09,186 --> 00:14:11,761
+on écrit donc
+une requête SELECT avec
+
+278
+00:14:12,511 --> 00:14:15,636
+plusieurs attributs,
+le nom des hôtels,
+
+279
+00:14:15,836 --> 00:14:18,286
+le nombre de lits.
+
+280
+00:14:20,724 --> 00:14:22,286
+Et c'est tout en fait.
+
+281
+00:14:23,911 --> 00:14:26,511
+La clause FROM
+avec le nom de la table
+
+282
+00:14:27,936 --> 00:14:29,286
+et puis
+
+283
+00:14:29,836 --> 00:14:32,011
+une requête de tri
+
+284
+00:14:32,723 --> 00:14:34,873
+ORDER BY et on va trier
+
+285
+00:14:35,073 --> 00:14:36,611
+par nombre de lits
+
+286
+00:14:37,598 --> 00:14:39,048
+décroissant.
+
+287
+00:14:39,498 --> 00:14:42,536
+Donc, on ajoute le champ LITS
+
+288
+00:14:44,074 --> 00:14:46,848
+avec le mot-clé DECROISSANT
+
+289
+00:14:47,048 --> 00:14:49,561
+et puis un deuxième
+critère de tri qui va être
+
+290
+00:14:49,761 --> 00:14:51,436
+simplement le nom des hôtels
+
+291
+00:14:51,623 --> 00:14:53,573
+par ordre alphabétique croissant.
+
+292
+00:14:54,636 --> 00:14:56,048
+Donc, on retrouve donc
+
+293
+00:14:56,248 --> 00:14:58,773
+le plus grand des hôtels 
+en tête et puis des...
+
+294
+00:14:59,661 --> 00:15:02,186
+au sein de chaque classe
+de nombre de lits
+
+295
+00:15:02,386 --> 00:15:03,298
+un tri
+
+296
+00:15:03,823 --> 00:15:05,848
+alphabétique des hôtels.
+
+297
+00:15:07,711 --> 00:15:09,336
+On peut limiter maintenant
+
+298
+00:15:09,536 --> 00:15:11,798
+ce résultat et se dire 
+qu'on s'intéresse qu'aux
+
+299
+00:15:11,998 --> 00:15:13,286
+5 premières valeurs.
+
+300
+00:15:13,486 --> 00:15:15,198
+Donc, on a les 5 plus grands
+
+301
+00:15:16,236 --> 00:15:18,398
+et dans chaque catégorie
+par ordre alphabétique
+
+302
+00:15:18,898 --> 00:15:21,548
+et éventuellement décaler
+
+303
+00:15:21,748 --> 00:15:23,898
+cette sélection de 5 de 15 lignes
+
+304
+00:15:24,098 --> 00:15:27,136
+et on atterrit un peu au début
+
+305
+00:15:27,336 --> 00:15:29,698
+avec une série d'hôtels dans les
+
+306
+00:15:29,898 --> 00:15:31,211
+60 lignes.
+
+307
+00:15:32,711 --> 00:15:35,386
+Même opération
+dans l'environnement pgAdmin
+
+308
+00:15:35,586 --> 00:15:37,348
+pour la base des données Postgres
+
+309
+00:15:37,548 --> 00:15:39,548
+où l'on sélectionne graphiquement
+
+310
+00:15:40,411 --> 00:15:41,423
+les champs
+
+311
+00:15:41,623 --> 00:15:44,248
+et l'on peut composer
+dans l'onglet ad hoc,
+
+312
+00:15:44,448 --> 00:15:45,798
+graphiquement aussi,
+
+313
+00:15:46,373 --> 00:15:48,648
+la requête de tri.
+
+314
+00:15:49,773 --> 00:15:53,823
+On obtient bien le même résultat
+avec les hôtels triés par 
+
+315
+00:15:54,023 --> 00:15:55,348
+nombre de lits puis
+
+316
+00:15:55,548 --> 00:15:57,273
+par noms
+
+317
+00:15:57,473 --> 00:15:59,586
+et l'on peut ajouter alors cette fois
+
+318
+00:15:59,836 --> 00:16:02,361
+dans l'éditeur SQL
+
+319
+00:16:02,561 --> 00:16:04,523
+la limite de 5
+
+320
+00:16:04,723 --> 00:16:06,898
+donc on voit très bien 
+
+321
+00:16:07,098 --> 00:16:09,511
+les 5 mêmes hôtels que tout à l'heure
+
+322
+00:16:09,886 --> 00:16:11,861
+et l'OFFSET éventuel
+
+323
+00:16:12,061 --> 00:16:14,223
+ici de 15 lignes comme tout à l'heure.
+
+324
+00:16:21,911 --> 00:16:23,411
+Dernier exemple,
+
+325
+00:16:23,611 --> 00:16:26,611
+avec Navicat où l'on compose de nouveau
+
+326
+00:16:26,811 --> 00:16:29,011
+graphiquement la requête avec le nom,
+
+327
+00:16:29,211 --> 00:16:31,261
+de l'hôtel et les lits,
+
+328
+00:16:31,461 --> 00:16:32,723
+et puis dans
+
+329
+00:16:32,923 --> 00:16:35,723
+l'éditeur graphique du SQL on peut
+
+330
+00:16:36,148 --> 00:16:37,536
+ajouter les champs
+
+331
+00:16:38,573 --> 00:16:39,573
+de tri,
+
+332
+00:16:40,211 --> 00:16:41,936
+définir le type de tri ,
+
+333
+00:16:42,711 --> 00:16:45,623
+ici les lits en ordre descendant,
+donc des lits en nombre descendant
+
+334
+00:16:45,823 --> 00:16:47,686
+et les hôtels en ordre alphabétique.
+
+335
+00:16:47,886 --> 00:16:50,523
+Le résultat correspond bien
+à ce que l'on attendait
+
+336
+00:16:50,723 --> 00:16:51,761
+et pour ce qui est de
+
+337
+00:16:51,961 --> 00:16:54,236
+LIMIT et OFFSET, ça se passe
+de la même manière que
+
+338
+00:16:54,436 --> 00:16:55,661
+dans pgAdmin III.
+
+339
+00:17:04,873 --> 00:17:06,973
+Nous avons donc vu dans cette leçon
+
+340
+00:17:07,486 --> 00:17:10,823
+les principales fonctions
+d'agrégation qui permettent
+
+341
+00:17:11,136 --> 00:17:14,023
+d'effectuer des calculs 
+statistiques sur des
+
+342
+00:17:14,223 --> 00:17:16,148
+ensembles ou sous-ensembles
+
+343
+00:17:17,111 --> 00:17:18,248
+de données.
+
+344
+00:17:18,448 --> 00:17:19,886
+Nous avons vu que
+
+345
+00:17:20,086 --> 00:17:23,086
+ces fonctions d'agrégation
+pouvaient être utilisées
+
+346
+00:17:23,361 --> 00:17:25,636
+avec des clauses de groupement
+
+347
+00:17:25,811 --> 00:17:27,473
+pour extraire
+
+348
+00:17:27,673 --> 00:17:30,785
+des ensembles de valeurs
+statistiques par groupe de données
+
+349
+00:17:30,985 --> 00:17:33,148
+dans des requêtes spécifiques
+
+350
+00:17:33,348 --> 00:17:36,960
+et que ces requêtes de groupement
+peuvent être filtrées
+
+351
+00:17:37,160 --> 00:17:39,848
+à l'aide de requêtes de type HAVING
+
+352
+00:17:40,048 --> 00:17:42,285
+pour extraire
+
+353
+00:17:42,485 --> 00:17:45,485
+les parties, les éléments 
+les plus pertinents
+
+354
+00:17:45,785 --> 00:17:47,560
+de ces résultats.
+
+355
+00:17:47,760 --> 00:17:51,272
+Nous avons également vu comment
+utiliser les fonctions de tri
+
+356
+00:17:51,472 --> 00:17:53,771
+des résultats
+avec le mot-clé ORDER BY
+
+357
+00:17:53,971 --> 00:17:56,971
+et puis comment utiliser
+les fonctions de limitation
+
+358
+00:17:57,847 --> 00:17:59,509
+du nombre d'objets
+
+359
+00:17:59,709 --> 00:18:01,896
+que l'on souhaite voir apparaître
+dans un résultat.
+

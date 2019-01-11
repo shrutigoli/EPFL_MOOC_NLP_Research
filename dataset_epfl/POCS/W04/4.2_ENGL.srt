@@ -1,0 +1,2050 @@
+1
+00:00:04,204 --> 00:00:06,696
+Well next we're going
+to talk about <i>locality</i>
+
+2
+00:00:06,968 --> 00:00:09,747
+in the context of <i>data structure</i>
+and <i>data structures</i>.
+
+3
+00:00:09,747 --> 00:00:12,397
+We will not be very concrete
+about <i>data structures</i>
+
+4
+00:00:12,444 --> 00:00:15,116
+talking about specific 
+tree data structures for example.
+
+5
+00:00:15,403 --> 00:00:18,863
+We will talk in general about <i>arrays</i>, 
+about <i>trees</i> and about <i>graphs</i>
+
+6
+00:00:19,425 --> 00:00:24,852
+and what implications these kinds
+of data, have on <i>locality</i>.
+
+7
+00:00:26,041 --> 00:00:29,198
+We're going to assume 
+that there is basically
+
+8
+00:00:30,078 --> 00:00:35,067
+a single linearly local memory.
+
+9
+00:00:35,381 --> 00:00:38,432
+That means, there's only, you know, 
+in a single dimension,
+
+10
+00:00:38,588 --> 00:00:40,472
+there are ediation data elements.
+
+11
+00:00:41,434 --> 00:00:43,790
+Now let's look at an array;
+any dimensional array.
+
+12
+00:00:44,033 --> 00:00:45,125
+Let's say a two dimensional array.
+
+13
+00:00:45,125 --> 00:00:46,552
+A matrix, for example.
+
+14
+00:00:47,730 --> 00:00:51,067
+If we have such a matrix we stored 
+in a linear memory,
+
+15
+00:00:51,067 --> 00:00:54,618
+then we would actually have
+to shred up this two dimensional array
+
+16
+00:00:54,618 --> 00:00:57,037
+into a sequence of several linear pieces.
+
+17
+00:00:57,533 --> 00:01:00,757
+So for example, in the matrix 
+on the right here, we can shred it up
+
+18
+00:01:00,757 --> 00:01:02,910
+column by column 
+and concatanate the columns
+
+19
+00:01:02,910 --> 00:01:05,720
+and store it so that it enters 
+a matrix as a linear array.
+
+20
+00:01:05,733 --> 00:01:07,779
+Or you could do it,
+row by row, for example.
+
+21
+00:01:09,542 --> 00:01:12,908
+If we do computations on this array,
+we will have to worry about
+
+22
+00:01:12,925 --> 00:01:16,619
+whether my looping order
+matches my representation order.
+
+23
+00:01:17,095 --> 00:01:21,634
+So for example, if I have stored
+my array, one column after the other,
+
+24
+00:01:22,713 --> 00:01:26,645
+I could do two ways to loop
+all the elements of this array.
+
+25
+00:01:27,206 --> 00:01:28,930
+The first would be, that a loop,
+
+26
+00:01:28,930 --> 00:01:33,458
+let's say of an index "I" first 
+and then of an index "J" or "Aij"
+
+27
+00:01:33,837 --> 00:01:37,187
+that means for each column
+
+28
+00:01:38,957 --> 00:01:42,270
+I loop over each row,
+over each element.
+
+29
+00:01:43,377 --> 00:01:46,238
+The second choice would be
+to do the other way around.
+
+30
+00:01:46,529 --> 00:01:50,390
+For each row, I iterate
+over all the columns.
+
+31
+00:01:50,730 --> 00:01:54,896
+And given that we've decided to store
+column by column,
+
+32
+00:01:54,896 --> 00:01:58,623
+the first way to do this is vastly
+more efficient then the second.
+
+33
+00:01:58,623 --> 00:02:03,184
+Because the first basically does overall 
+a single linear scan over
+
+34
+00:02:03,184 --> 00:02:08,582
+the entire linearist version of the array 
+while the second choice makes
+
+35
+00:02:08,582 --> 00:02:11,297
+a huge number of random accesses, right?
+
+36
+00:02:11,393 --> 00:02:14,212
+One random access basically for 
+every element in the array.
+
+37
+00:02:15,573 --> 00:02:19,811
+So we would have to get performance
+well done here.
+
+38
+00:02:20,345 --> 00:02:24,640
+We would have to align our storage 
+layout with the use cases, or visa versa.
+
+39
+00:02:25,409 --> 00:02:27,452
+That means if I have the ability
+
+40
+00:02:27,452 --> 00:02:30,605
+to reorder my loops, I could do this 
+automatically to adapt myself
+
+41
+00:02:30,605 --> 00:02:31,763
+to the storage layout.
+
+42
+00:02:31,876 --> 00:02:33,765
+That's something that is actually 
+happening in compilers
+
+43
+00:02:33,765 --> 00:02:37,054
+that use loop reordering 
+to get good performance.
+
+44
+00:02:37,998 --> 00:02:43,071
+Visa versa, if I know a workload, 
+a set of use cases,
+
+45
+00:02:43,157 --> 00:02:45,916
+a set of different kinds of algorithms 
+that I want to run,
+
+46
+00:02:46,172 --> 00:02:49,847
+I could potentially optimize 
+my storage structures for these.
+
+47
+00:02:50,212 --> 00:02:52,653
+And that's something that is
+important in databases.
+
+48
+00:02:53,173 --> 00:02:57,969
+So, concerns about sorting, nesting, 
+and grouping as we're doing it here,
+
+49
+00:02:57,969 --> 00:03:02,731
+co-clustering. All these concern database
+systems that relate to such data stuctures
+
+50
+00:03:02,731 --> 00:03:04,269
+and their arrays and relations.
+
+51
+00:03:05,075 --> 00:03:08,958
+One thing that is particularly important 
+in this context is this consideration
+
+52
+00:03:08,958 --> 00:03:12,066
+of row versus column-stores 
+and columnar representations.
+
+53
+00:03:12,066 --> 00:03:15,422
+We've basically just discussed this 
+but there is more to say about it.
+
+54
+00:03:15,422 --> 00:03:18,644
+In the context of databases
+specifically in data warehousing
+
+55
+00:03:18,644 --> 00:03:22,322
+and analytical databases 
+there is now a big battle
+
+56
+00:03:22,322 --> 00:03:26,174
+that basically has been won by the column-
+stores, between row and column-stores.
+
+57
+00:03:26,246 --> 00:03:30,428
+And it can be argued that column-stores, 
+those that actually take relations
+
+58
+00:03:30,428 --> 00:03:33,779
+and shred them up column by column 
+and store the columns individually.
+
+59
+00:03:33,932 --> 00:03:37,989
+they are better suited for many 
+analytical tasks than classical row stores
+
+60
+00:03:37,989 --> 00:03:41,324
+where either relations 
+are stored in pages,
+
+61
+00:03:41,338 --> 00:03:43,583
+and each page consists of 
+a sequence of tuples.
+
+62
+00:03:43,814 --> 00:03:44,853
+And why is that?
+
+63
+00:03:45,035 --> 00:03:49,314
+Because many analytical queries 
+use relations that have many columns
+
+64
+00:03:49,314 --> 00:03:52,031
+and many such queries use only 
+some of the relations.
+
+65
+00:03:52,597 --> 00:03:55,750
+That means I've got a choice 
+to use row-store,
+
+66
+00:03:55,750 --> 00:03:58,774
+and I would have to fetch 
+all of the tuples in entirety.
+
+67
+00:03:58,971 --> 00:04:02,544
+And then always throw away stuff 
+that I don't need in each of these tuples.
+
+68
+00:04:02,544 --> 00:04:05,618
+Or I could store them column by column.
+Then I would only fetch those columns
+
+69
+00:04:05,618 --> 00:04:09,117
+that I care about and combine those 
+into those projected relations,
+
+70
+00:04:09,117 --> 00:04:12,873
+hese partial relations that are
+necessary to actually add to the query.
+
+71
+00:04:13,259 --> 00:04:16,838
+Also if I store column by column, 
+I can use compression
+
+72
+00:04:16,838 --> 00:04:18,632
+on this more effectively.
+
+73
+00:04:18,687 --> 00:04:21,270
+That means if for example, 
+I have a column that stores
+
+74
+00:04:21,270 --> 00:04:25,910
+telephone numbers then 
+if I compress only these columns,
+
+75
+00:04:25,910 --> 00:04:30,493
+all the telephone numbers together,
+I will be able to reach much better
+
+76
+00:04:30,493 --> 00:04:37,238
+compression rates then if I store 
+and compress an entire address table
+
+77
+00:04:37,238 --> 00:04:41,406
+with street addresses, personal names 
+and identifiers, but also phone numbers,
+
+78
+00:04:41,406 --> 00:04:43,205
+for example together, tuple by tuple.
+
+79
+00:04:43,599 --> 00:04:46,069
+Because then the phone 
+numbers are not local
+
+80
+00:04:46,069 --> 00:04:48,874
+next to each other
+and I need a much smarter,
+
+81
+00:04:48,874 --> 00:04:51,513
+more intelligent compressions
+algorithm or I will need something
+
+82
+00:04:51,513 --> 00:04:52,626
+much more general.
+
+83
+00:04:52,653 --> 00:04:55,950
+If I have only phone numbers 
+I will have only ten digits maybe,
+
+84
+00:04:55,950 --> 00:04:59,057
+right, that I have to compress 
+and I can use better compression schemes
+
+85
+00:04:59,057 --> 00:05:00,193
+that are more succinct.
+
+86
+00:05:00,193 --> 00:05:02,900
+That means there will be less to read 
+and write from and to disk
+
+87
+00:05:02,900 --> 00:05:05,567
+and I will be faster overall 
+because the disks are slow.
+
+88
+00:05:06,857 --> 00:05:11,008
+But this is a concern that is not just 
+true and relevant in databases,
+
+89
+00:05:11,008 --> 00:05:13,668
+even for example look at option on 
+the programming language
+
+90
+00:05:13,668 --> 00:05:17,323
+specifically about the Java 
+virtual machine then the same applies.
+
+91
+00:05:17,613 --> 00:05:20,516
+Actually column representations 
+are much more efficient
+
+92
+00:05:20,516 --> 00:05:22,646
+row representations 
+of (inaudible) relations.
+
+93
+00:05:22,646 --> 00:05:24,693
+So take an example of 
+a row representation
+
+94
+00:05:24,693 --> 00:05:27,671
+where you've got an array of structures 
+and each struct
+
+95
+00:05:27,671 --> 00:05:28,648
+has two integers inside.
+
+96
+00:05:28,861 --> 00:05:31,264
+So it's basically two tuples, right?
+
+97
+00:05:31,582 --> 00:05:34,578
+So you can think of this as an option 
+on the representation
+
+98
+00:05:34,578 --> 00:05:37,144
+of a relational database table.
+
+99
+00:05:37,144 --> 00:05:40,572
+Now I could do this or I could use 
+a pivoted column representation
+
+100
+00:05:40,572 --> 00:05:44,221
+where I've got a struct,
+a pair of two integers arrays.
+
+101
+00:05:44,852 --> 00:05:48,661
+And I can store the same data in there 
+and I can relink this data
+
+102
+00:05:48,661 --> 00:05:49,829
+by the array index.
+
+103
+00:05:50,797 --> 00:05:54,865
+Now these relations are equivalent
+but actually the second,
+
+104
+00:05:54,865 --> 00:05:56,438
+the column representation 
+is vastly more efficient.
+
+105
+00:05:57,159 --> 00:05:58,233
+So why is that?
+
+106
+00:05:58,233 --> 00:06:02,546
+Well if you think of what happens inside 
+Java you'll see that in the first case
+
+107
+00:06:02,546 --> 00:06:06,241
+you're producing linearly many objects, 
+while in the second you only
+
+108
+00:06:06,241 --> 00:06:07,898
+produce constantly many.
+
+109
+00:06:08,179 --> 00:06:11,652
+Simply because each of the structs
+in the first case is going to be an object.
+
+110
+00:06:12,772 --> 00:06:18,548
+And this means that in practice 
+at runtime we will create and destroy
+
+111
+00:06:18,548 --> 00:06:21,354
+vast amounts of objects 
+and of course this pollutes
+
+112
+00:06:21,354 --> 00:06:22,734
+the entire memory hierarchy.
+
+113
+00:06:22,949 --> 00:06:26,991
+You're going to see this in the caches 
+as well and if you make a deep analysis
+
+114
+00:06:26,991 --> 00:06:30,677
+of what your program does you will see 
+a surprising number of object creations
+
+115
+00:06:30,677 --> 00:06:34,189
+and destructions that you wouldn't 
+potentially expect, just temporarily.
+
+116
+00:06:34,402 --> 00:06:37,251
+Actually a column representation 
+can be much more efficient
+
+117
+00:06:37,251 --> 00:06:40,301
+in this context then a row representation 
+even in the context
+
+118
+00:06:40,301 --> 00:06:42,389
+of let's say the Java virtual machine.
+
+119
+00:06:46,023 --> 00:06:47,647
+Now let's look at <i>trees</i>.
+
+120
+00:06:47,968 --> 00:06:51,121
+Let's take an example of a binary tree, 
+but a Belan's binary tree.
+
+121
+00:06:51,856 --> 00:06:54,768
+So such a tree on each level 
+has twice as many nodes
+
+122
+00:06:54,768 --> 00:06:56,611
+as on the level above.
+
+123
+00:06:56,829 --> 00:07:00,539
+So in a sense, as you go downwards 
+the tree grows exponentially fast.
+
+124
+00:07:00,932 --> 00:07:05,060
+And there is no way to store 
+the data of this tree in a linear memory
+
+125
+00:07:05,430 --> 00:07:07,499
+or even a finite dimensional memory.
+
+126
+00:07:07,784 --> 00:07:10,838
+So that the parent-child relation 
+remains close and preserved.
+
+127
+00:07:10,838 --> 00:07:13,027
+That means parents are stored 
+close to their children.
+
+128
+00:07:13,027 --> 00:07:16,150
+No matter how you present the tree 
+you're going to have to tear this apart
+
+129
+00:07:16,150 --> 00:07:18,705
+and there will be non local child-parent pairs.
+
+130
+00:07:18,705 --> 00:07:21,652
+That means going from parent to child 
+would be a big jump.
+
+131
+00:07:23,111 --> 00:07:28,401
+That means we are basically, so to say, 
+hopelessly lost in the context of trees.
+
+132
+00:07:29,973 --> 00:07:32,505
+What we can do, however, is we can 
+keep siblings local
+
+133
+00:07:32,505 --> 00:07:34,430
+by let's say a <i>breadth-first enumeration</i>.
+
+134
+00:07:34,608 --> 00:07:37,650
+And even if you take 
+a <i>depth-first enumeration</i>
+
+135
+00:07:37,650 --> 00:07:39,536
+to store your data, you know, linearly.
+
+136
+00:07:40,743 --> 00:07:43,583
+It remains essentially local 
+because the lowest level
+
+137
+00:07:43,583 --> 00:07:46,608
+dominates the overall size,
+the lowest level is as big as the rest.
+
+138
+00:07:47,332 --> 00:07:50,792
+So if you care about the lowest level 
+you can read it sequentially,
+
+139
+00:07:50,792 --> 00:07:52,975
+you have just
+an overhead of effectors too.
+
+140
+00:07:53,895 --> 00:07:56,272
+And that ultimately is the 
+basis of tree indexing.
+
+141
+00:07:56,481 --> 00:07:59,580
+Let's say in databases
+but in general in data structures.
+
+142
+00:08:00,299 --> 00:08:03,017
+So let's look at these tree indexes 
+a bit more in detail.
+
+143
+00:08:04,126 --> 00:08:08,228
+So the leaf level of a balanced tree 
+is essentially local
+
+144
+00:08:08,228 --> 00:08:11,165
+in reasonable representations
+we've already said that.
+
+145
+00:08:11,875 --> 00:08:15,440
+And that's the idea of a primary, 
+let's say B tree index
+
+146
+00:08:15,440 --> 00:08:17,129
+in a database management system.
+
+147
+00:08:17,278 --> 00:08:20,938
+We can align the leaf level 
+with the sort order the data files.
+
+148
+00:08:20,938 --> 00:08:23,506
+So we assume the index is separate 
+from the actual stored data.
+
+149
+00:08:23,519 --> 00:08:26,148
+Of course we could store the data 
+in the B tree index itself
+
+150
+00:08:26,148 --> 00:08:28,358
+but let's assume we don't do this 
+because we want to have
+
+151
+00:08:28,358 --> 00:08:30,158
+many indexes on the same data.
+
+152
+00:08:30,614 --> 00:08:34,181
+So we store the actual data 
+in a Heap file, in some sort order.
+
+153
+00:08:34,860 --> 00:08:39,760
+And if we have just one index 
+and that index gives us sorted access,
+
+154
+00:08:39,760 --> 00:08:43,804
+you can efficiently find data elements 
+and then let's say we can scan
+
+155
+00:08:43,804 --> 00:08:48,302
+from an item we found from there
+to the right sequentially
+
+156
+00:08:48,302 --> 00:08:51,943
+and find elements that are next large 
+in the sort order of that tree index.
+
+157
+00:08:52,475 --> 00:08:56,555
+And that way we can officially 
+do range indexes--range lookups.
+
+158
+00:08:56,884 --> 00:08:59,168
+If I want to do a search 
+for a range of values,
+
+159
+00:08:59,509 --> 00:09:02,645
+for which I've got an index structure, 
+I don't have to find each value
+
+160
+00:09:02,645 --> 00:09:04,178
+in that range individually
+
+161
+00:09:04,178 --> 00:09:06,385
+I go to the first value 
+and then I read to the write
+
+162
+00:09:06,385 --> 00:09:08,704
+until I find a value 
+that is out of the range.
+
+163
+00:09:09,489 --> 00:09:13,767
+Now the problem is, that's well known 
+in the context of databases,
+
+164
+00:09:14,138 --> 00:09:19,113
+I can have at most one such index 
+that is aligned with the sorting order
+
+165
+00:09:19,113 --> 00:09:23,969
+of the data structure in general, 
+of the actual data file.
+
+166
+00:09:24,327 --> 00:09:27,118
+If I have a second that uses 
+a different sorting criterium
+
+167
+00:09:27,118 --> 00:09:29,701
+they cannot be both aligned
+if they're sorted.
+
+168
+00:09:29,961 --> 00:09:33,698
+That means one of those different
+data structures will require completely
+
+169
+00:09:33,698 --> 00:09:36,531
+random access to the data
+which will be very inefficient.
+
+170
+00:09:36,983 --> 00:09:40,376
+Now in general if you go down
+from the root to find our elements,
+
+171
+00:09:40,376 --> 00:09:43,066
+always compare. Do we take the left
+or the right side
+
+172
+00:09:43,066 --> 00:09:46,221
+of the children, of each node?
+
+173
+00:09:46,443 --> 00:09:48,253
+We're going to do random access.
+
+174
+00:09:49,098 --> 00:09:53,254
+Overall as we down we will do
+logarithmicly many steps of random access
+
+175
+00:09:53,254 --> 00:09:54,401
+to get to our data.
+
+176
+00:09:54,401 --> 00:09:57,297
+And then if we want to fetch 
+many items in the primary index
+
+177
+00:09:57,297 --> 00:10:00,529
+that is aligned in sort order
+with the data file, we can then scan on
+
+178
+00:10:00,529 --> 00:10:02,732
+and get all the items out until 
+there is an item
+
+179
+00:10:02,732 --> 00:10:04,094
+that we don't want anymore.
+
+180
+00:10:04,308 --> 00:10:07,279
+But if it's the secondary index, 
+the one that is not aligned,
+
+181
+00:10:07,279 --> 00:10:08,413
+it's not like this.
+
+182
+00:10:08,959 --> 00:10:11,220
+So here's an example 
+on the right hand side.
+
+183
+00:10:11,414 --> 00:10:15,258
+So you see that we've got a data file 
+with binary tuples
+
+184
+00:10:15,258 --> 00:10:20,473
+and the tree above the data file
+
+185
+00:10:20,473 --> 00:10:24,388
+as shown is indexing the first column
+
+186
+00:10:24,388 --> 00:10:29,213
+of this relation and the data file 
+is ordered by that first column.
+
+187
+00:10:29,440 --> 00:10:32,673
+That means if for example, 
+I want to find all my values
+
+188
+00:10:32,673 --> 00:10:37,631
+from five to 14, I use the B tree index 
+to find value five and then I scan
+
+189
+00:10:37,631 --> 00:10:41,208
+on the data file until I find 
+the value 14 or above, and then I stop.
+
+190
+00:10:41,553 --> 00:10:43,865
+On the other hand I've got 
+a second B tree index
+
+191
+00:10:43,865 --> 00:10:45,966
+shown below the data file in this example.
+
+192
+00:10:46,568 --> 00:10:50,505
+And that index on the second value 
+as you see at the bottom level,
+
+193
+00:10:50,505 --> 00:10:52,252
+these pointers that connect
+
+194
+00:10:52,252 --> 00:10:56,191
+the leaves of the B tree 
+with the actual data file.
+
+195
+00:10:56,191 --> 00:10:59,443
+It's completely out of order, 
+lots of crossing, it's random access.
+
+196
+00:10:59,647 --> 00:11:03,219
+That means of course that if I want 
+to do a range lookup
+
+197
+00:11:03,219 --> 00:11:04,438
+it will be very inefficient.
+
+198
+00:11:04,439 --> 00:11:06,800
+I will have to find each value 
+individually and have to jump around
+
+199
+00:11:06,800 --> 00:11:07,687
+and jump around.
+
+200
+00:11:07,687 --> 00:11:09,294
+And that's going to be terrible.
+
+201
+00:11:09,294 --> 00:11:12,369
+So in that case it's probably better 
+to just scan the entire data file
+
+202
+00:11:12,369 --> 00:11:15,864
+and just take the values that actually 
+match the selection condition.
+
+203
+00:11:18,557 --> 00:11:21,498
+But even the primary index 
+is not that greatly useful
+
+204
+00:11:21,498 --> 00:11:23,365
+because if you think about this 
+you could just as well
+
+205
+00:11:23,365 --> 00:11:27,754
+do a binary search on the actual data file
+to get the same effect
+
+206
+00:11:27,754 --> 00:11:30,294
+as looking it up in the binary tree.
+
+207
+00:11:34,379 --> 00:11:36,354
+Now let's look into graphs.
+
+208
+00:11:36,357 --> 00:11:38,359
+So we have to distinguish 
+a number of types of graphs,
+
+209
+00:11:38,359 --> 00:11:40,299
+graphs that have different properties.
+
+210
+00:11:40,299 --> 00:11:42,791
+Well first there are the graphs 
+whose edge relations
+
+211
+00:11:42,791 --> 00:11:44,477
+are really having a local representation.
+
+212
+00:11:44,478 --> 00:11:46,283
+And there is really not 
+some interesting graphs here.
+
+213
+00:11:46,506 --> 00:11:48,202
+We've got chains, right?
+
+214
+00:11:48,202 --> 00:11:50,139
+Or even trees and we've 
+discussed this before,
+
+215
+00:11:50,139 --> 00:11:51,984
+they're not interesting in general.
+
+216
+00:11:52,223 --> 00:11:55,264
+And then there are the graphs 
+that have relatively small cuts.
+
+217
+00:11:55,647 --> 00:11:57,500
+What does this mean?
+I mean by that,
+
+218
+00:11:57,681 --> 00:12:01,075
+I've got the representation of the graph 
+and I can cut the representation
+
+219
+00:12:01,075 --> 00:12:07,235
+into pieces so that in each piece 
+there are some nodes and lots of edges
+
+220
+00:12:07,235 --> 00:12:10,070
+and there's only very few edges 
+that cross in the pieces
+
+221
+00:12:10,070 --> 00:12:12,010
+between two nodes and different pieces.
+
+222
+00:12:12,027 --> 00:12:15,627
+Those edges I also have to record 
+because in general, they matter.
+
+223
+00:12:18,225 --> 00:12:22,021
+These graphs with small cuts 
+they can be essentially processed,
+
+224
+00:12:22,021 --> 00:12:23,850
+more or less by 
+embarrassing parallelism,
+
+225
+00:12:23,850 --> 00:12:26,512
+piece by piece and then I have to worry 
+about edges that connect them.
+
+226
+00:12:26,519 --> 00:12:30,116
+It depends, of course, on the algorithmic
+problem that I'm trying to solve,
+
+227
+00:12:30,116 --> 00:12:33,334
+whether that's that simple but in general 
+small cuts are good.
+
+228
+00:12:34,469 --> 00:12:38,710
+And these small cuts exist in certain
+resource-constrained graphs.
+
+229
+00:12:39,302 --> 00:12:43,262
+Let's, for example, talk about planar
+or almost planars embeddings
+
+230
+00:12:43,262 --> 00:12:45,685
+into a 2D surface.
+What do we mean by this?
+
+231
+00:12:45,685 --> 00:12:49,317
+Just imagine a map of the world, 
+for example.
+
+232
+00:12:49,664 --> 00:12:55,470
+And I've got a graph and I can project 
+the nodes of that graph to positions
+
+233
+00:12:55,470 --> 00:12:58,629
+in the map so that 
+no edges cross each other.
+
+234
+00:12:59,426 --> 00:13:01,651
+So that would be a planar embedding.
+
+235
+00:13:01,789 --> 00:13:05,177
+And almost planar is if there are 
+only a few edges crossing each other.
+
+236
+00:13:05,744 --> 00:13:11,141
+Now a <i>road network</i>, where I think of 
+roads never tunneling under each other,
+
+237
+00:13:11,141 --> 00:13:12,553
+there are no bridges.
+
+238
+00:13:12,553 --> 00:13:15,197
+I always think of roads being connected 
+where there is a bridge,
+
+239
+00:13:15,197 --> 00:13:17,168
+they would be planar graphs.
+
+240
+00:13:17,460 --> 00:13:21,171
+So from a certain view point on a high
+level, if you look at maps of a country,
+
+241
+00:13:21,186 --> 00:13:23,578
+road maps of a country, 
+these are planar graphs.
+
+242
+00:13:25,184 --> 00:13:29,445
+So these are not trees but they have 
+a relatively low degree of cyclicity.
+
+243
+00:13:30,076 --> 00:13:32,853
+They have few redundant, non-local links.
+
+244
+00:13:33,424 --> 00:13:37,138
+So for example, in a road network, 
+roads take space. I cannot look
+
+245
+00:13:37,138 --> 00:13:43,963
+at any particular line on that map 
+and say an arbitrary number of roads
+
+246
+00:13:43,963 --> 00:13:46,755
+could cross this line of a certain length.
+
+247
+00:13:47,399 --> 00:13:50,493
+Because roads have a certain 
+width. It doesn't make sense
+
+248
+00:13:50,493 --> 00:13:53,694
+to put roads higher 
+than a certain density
+
+249
+00:13:53,694 --> 00:13:55,516
+into the map because 
+people couldn't use them,
+
+250
+00:13:55,516 --> 00:13:57,200
+it would be expensive, 
+there would be no space
+
+251
+00:13:57,200 --> 00:13:59,574
+in the country left for 
+other things than roads.
+
+252
+00:13:59,704 --> 00:14:04,265
+If you look at physical internetworks, 
+there you have to deal with
+
+253
+00:14:04,265 --> 00:14:06,223
+line costs and routing complexity, etc.
+
+254
+00:14:06,883 --> 00:14:10,139
+It doesn't make sense or it would 
+just be extremely expensive
+
+255
+00:14:10,139 --> 00:14:13,118
+if we have linearly many in 
+the number of nodes
+
+256
+00:14:13,118 --> 00:14:16,589
+in the internetwork, deep sea lines 
+between Europe and US.
+
+257
+00:14:17,215 --> 00:14:19,201
+There are relatively few 
+and they hopefully
+
+258
+00:14:19,201 --> 00:14:20,783
+have good enough bandwidth.
+
+259
+00:14:21,320 --> 00:14:24,882
+But if you make cuts, there are small cuts
+between these areas.
+
+260
+00:14:26,157 --> 00:14:31,788
+Although the graph is not a tree, 
+it has relatively few cycles
+
+261
+00:14:31,788 --> 00:14:33,759
+actually compared to its size.
+
+262
+00:14:34,422 --> 00:14:36,370
+And if you think about it 
+the human brain
+
+263
+00:14:36,370 --> 00:14:39,802
+connecting neurons, in a sense 
+it's such a graph in practice
+
+264
+00:14:39,802 --> 00:14:41,611
+because there are physical constrains.
+
+265
+00:14:41,611 --> 00:14:45,688
+We cannot have infinitely many 
+connections between neurons
+
+266
+00:14:45,688 --> 00:14:49,413
+in a finite amount of area or space.
+
+267
+00:14:50,818 --> 00:14:54,424
+But then there are all other graphs 
+and they are locality a nightmare.
+
+268
+00:14:54,513 --> 00:14:56,582
+And there are many many 
+interesting examples,
+
+269
+00:14:56,582 --> 00:14:58,894
+Internet communication patterns.
+Differently from the
+
+270
+00:14:58,894 --> 00:15:01,727
+Internet networking infrastructure 
+there are the communication patterns.
+
+271
+00:15:01,727 --> 00:15:03,158
+Who connects to whom.
+
+272
+00:15:03,158 --> 00:15:05,311
+And these graphs don't have 
+these small cuts
+
+273
+00:15:05,311 --> 00:15:07,169
+or social networks in general.
+
+274
+00:15:07,592 --> 00:15:11,061
+Of course Internet communication 
+patterns you can think of social networks.
+
+275
+00:15:11,061 --> 00:15:12,395
+Or the brain in practice.
+
+276
+00:15:12,834 --> 00:15:14,674
+And there are many other examples.
+
+277
+00:15:18,339 --> 00:15:22,215
+To talk about these other graphs, 
+the bad graphs,
+
+278
+00:15:22,383 --> 00:15:24,393
+let's talk a bit about random graphs.
+
+279
+00:15:24,393 --> 00:15:25,782
+So what is a random graph?
+
+280
+00:15:25,782 --> 00:15:30,698
+We've got a set of nodes, initially 
+without any edges and then I randomly,
+
+281
+00:15:30,935 --> 00:15:33,344
+I toss some coins and choose 
+some pair of node
+
+282
+00:15:33,344 --> 00:15:34,550
+and make an edge between them.
+
+283
+00:15:35,896 --> 00:15:38,363
+So if a randomly add edges, 
+completely randomly
+
+284
+00:15:38,363 --> 00:15:40,423
+until I get more and more edges,
+
+285
+00:15:41,121 --> 00:15:43,369
+there are some predictable 
+structs to these graphs.
+
+286
+00:15:43,369 --> 00:15:44,793
+The first thing that is 
+worth mentioning is
+
+287
+00:15:44,793 --> 00:15:48,568
+as I reach a certain edge to node ratio, 
+which is about one,
+
+288
+00:15:49,336 --> 00:15:51,685
+essentially, all the graph gets connected.
+
+289
+00:15:52,548 --> 00:15:58,603
+It becomes very unlike these big
+disconnected components because there are
+
+290
+00:15:58,603 --> 00:16:02,451
+so many nodes in each of these components
+that probably at least two of them
+
+291
+00:16:02,451 --> 00:16:03,755
+are connected somewhere.
+
+292
+00:16:04,059 --> 00:16:08,059
+So we get these monster components, 
+that's well understood.
+
+293
+00:16:09,254 --> 00:16:12,996
+Such graphs always tend to have 
+a low degree of separation.
+
+294
+00:16:12,996 --> 00:16:14,662
+That's the small world phenomenon.
+
+295
+00:16:14,791 --> 00:16:16,195
+And they have no small cuts.
+
+296
+00:16:16,545 --> 00:16:21,866
+That means as we said before, 
+if you try to take the graph,
+
+297
+00:16:21,866 --> 00:16:25,223
+the set of nodes and partition into two 
+equal sized sets of nodes
+
+298
+00:16:26,363 --> 00:16:28,335
+there is no way to do this.
+
+299
+00:16:28,481 --> 00:16:30,992
+Such that, there are very few, 
+let's say, constantly
+
+300
+00:16:30,992 --> 00:16:34,087
+or sup-linearly many edges 
+between these two sets of nodes.
+
+301
+00:16:35,777 --> 00:16:39,303
+And the interesting thing is that's 
+already true when the graph is sparse.
+
+302
+00:16:39,581 --> 00:16:42,270
+Which means that the 
+edge to node ratio is just linear.
+
+303
+00:16:42,910 --> 00:16:45,206
+Of course the edge to node ratio 
+could be up to quadratic
+
+304
+00:16:45,206 --> 00:16:48,167
+but already for linear edge to node 
+ratios for random graphs
+
+305
+00:16:49,057 --> 00:16:51,068
+we have to since there are no small cuts.
+
+306
+00:16:51,650 --> 00:16:53,868
+And that's of course bad because 
+embarrassing parallelism
+
+307
+00:16:53,868 --> 00:16:56,353
+is not possible in general anymore.
+
+308
+00:16:58,474 --> 00:17:01,269
+So if we talk about real-world graphs 
+and networks and we're excluding
+
+309
+00:17:01,269 --> 00:17:03,670
+those resource constraint graphs 
+that we've talked about before,
+
+310
+00:17:03,675 --> 00:17:05,925
+road-networks, the physically 
+internetwork, etc.
+
+311
+00:17:06,247 --> 00:17:09,244
+Then arguably we could say 
+essentially all the other graphs
+
+312
+00:17:09,244 --> 00:17:12,835
+and networks are of that kind,
+they behave like random graphs
+
+313
+00:17:12,835 --> 00:17:14,694
+and they have these nasty properties.
+
+314
+00:17:18,292 --> 00:17:21,474
+So one thing that is known to say 
+a bit more about random--
+
+315
+00:17:21,474 --> 00:17:26,398
+about graphs as they happen 
+in reality that are actually random-like,
+
+316
+00:17:26,896 --> 00:17:30,138
+there are alternative characterizations, 
+that are actually very robust
+
+317
+00:17:30,138 --> 00:17:32,064
+and interchangeable for here, for this.
+
+318
+00:17:32,064 --> 00:17:37,450
+So take for example a random graph 
+in which you add neighbors
+
+319
+00:17:37,450 --> 00:17:42,390
+such that there is a power law, 
+in the sense shift distribution.
+
+320
+00:17:42,390 --> 00:17:46,643
+There are logarithmically few nodes 
+which have exponentially many links.
+
+321
+00:17:47,525 --> 00:17:50,253
+And then there's degrees, 
+more and more nodes
+
+322
+00:17:50,253 --> 00:17:51,830
+that have fewer and fewer links.
+
+323
+00:17:52,064 --> 00:17:53,887
+That's called a <i>power law graph</i>.
+
+324
+00:17:54,199 --> 00:17:57,727
+Another thing is typical social networks, 
+where they've got this "rich get richer"
+
+325
+00:17:57,727 --> 00:18:01,067
+phenomenon.
+Popular people get even more friends.
+
+326
+00:18:02,243 --> 00:18:04,704
+In a sense you could say 
+it's a random graph again
+
+327
+00:18:04,704 --> 00:18:09,435
+where you enter edges and node 
+is more likely to get another edge,
+
+328
+00:18:09,435 --> 00:18:11,623
+yet another edge, even though
+it already has many edges
+
+329
+00:18:11,623 --> 00:18:13,369
+connecting it to other nodes.
+
+330
+00:18:14,184 --> 00:18:16,630
+So that's the "rich get richer" 
+phenomenon.
+
+331
+00:18:16,630 --> 00:18:19,045
+And you see this very often 
+in social networks of all kinds.
+
+332
+00:18:19,943 --> 00:18:22,888
+Or these so called <i>small world graphs</i>
+which have only these
+
+333
+00:18:22,888 --> 00:18:26,417
+"k degrees of separation" famously 
+has been observed that
+
+334
+00:18:26,417 --> 00:18:30,992
+probably there is about 
+six degrees of separation in the world.
+
+335
+00:18:31,145 --> 00:18:37,617
+So that over a sequence of six people, 
+I know any person in the world.
+
+336
+00:18:38,040 --> 00:18:40,864
+So I've got a friend, who has a friend, 
+who has a friend, etc. six times
+
+337
+00:18:40,864 --> 00:18:43,573
+I connect to anybody in 
+the world about like this.
+
+338
+00:18:43,573 --> 00:18:46,653
+So this has studied in more detail, 
+for example in Facebook where you
+
+339
+00:18:46,653 --> 00:18:49,426
+can formally study this
+with a real graph, people have observed
+
+340
+00:18:49,426 --> 00:18:51,842
+that degree of separation 
+is about five point something.
+
+341
+00:18:52,164 --> 00:18:54,514
+And probably decreases with time.
+
+342
+00:18:54,993 --> 00:18:57,459
+Now the important thing is to say there
+are three different characterizations
+
+343
+00:18:57,459 --> 00:18:58,869
+that are actually equivalent.
+
+344
+00:18:58,894 --> 00:19:03,620
+An important thing again is you have 
+this property, no small cuts
+
+345
+00:19:03,620 --> 00:19:05,828
+and that's really true for
+all sparse graphs.
+
+346
+00:19:05,845 --> 00:19:09,051
+All these graphs have this
+problem that essentially--
+
+347
+00:19:09,327 --> 00:19:13,015
+if you do have this random component, 
+there's a lot of noise of natural,
+
+348
+00:19:13,015 --> 00:19:14,878
+real world phenomenon here.
+
+349
+00:19:14,878 --> 00:19:18,957
+They behave like random graphs 
+and there is a way of deterministically
+
+350
+00:19:18,957 --> 00:19:22,116
+constructing such graphs.
+Graphs that have no small cuts
+
+351
+00:19:22,116 --> 00:19:25,680
+and they are sparse, there are only 
+linearly many edges and number of nodes.
+
+352
+00:19:25,863 --> 00:19:28,235
+And this construction is actually
+surprisingly difficult given that
+
+353
+00:19:28,235 --> 00:19:30,096
+if you do it randomly you'll also get this graph.
+
+354
+00:19:30,096 --> 00:19:32,094
+But it's possible. And these are 
+called expanding graphs,
+
+355
+00:19:32,106 --> 00:19:34,385
+they play an important role
+in theoretical computer science,
+
+356
+00:19:34,385 --> 00:19:37,629
+for the derandomization of randomized 
+algorithms for example.
+
+357
+00:19:41,005 --> 00:19:44,959
+Now as we said <i>non-resource 
+bounded real graphs</i> have no small cuts.
+
+358
+00:19:45,308 --> 00:19:47,170
+I've told you what that is.
+
+359
+00:19:47,759 --> 00:19:50,190
+That means they cannot be 
+partitioned effectively
+
+360
+00:19:50,190 --> 00:19:53,097
+to handle regions independently 
+without requiring lots of
+
+361
+00:19:53,097 --> 00:19:54,249
+communication between regions.
+
+362
+00:19:54,882 --> 00:19:57,841
+So it's essentially impossible
+to paralyze graph analytics
+
+363
+00:19:57,841 --> 00:20:00,856
+effectively on such real graphs 
+that we see everywhere.
+
+364
+00:20:00,856 --> 00:20:03,194
+In those contexts in particular 
+where you want to do graph analytics
+
+365
+00:20:03,194 --> 00:20:07,167
+like let's say in large social networks,
+Facebook, Google, etc.
+
+366
+00:20:08,660 --> 00:20:12,122
+Well it's impossible in a sense 
+to do it practically well
+
+367
+00:20:12,122 --> 00:20:14,525
+but everybody still does it 
+because we need it.
+
+368
+00:20:14,525 --> 00:20:17,204
+And there are these system like 
+[Pragle] and Giraffe and so on,
+
+369
+00:20:17,204 --> 00:20:19,719
+that do that and they have 
+horrible performance
+
+370
+00:20:19,719 --> 00:20:20,994
+if you think about it.
+
+371
+00:20:20,994 --> 00:20:22,921
+It's really the worst case scenario 
+from the viewpoint of locality.
+
+372
+00:20:22,921 --> 00:20:26,133
+Every node has to talk to every node 
+in every computation step, more or less.
+
+373
+00:20:28,179 --> 00:20:29,923
+People do it because they have to.
+
+374
+00:20:30,668 --> 00:20:33,969
+And in a sense, in the worst case 
+there's nothing you can do about it.
+
+375
+00:20:33,969 --> 00:20:36,267
+Of course you can assume 
+that certain algorithmic problems
+
+376
+00:20:36,267 --> 00:20:38,806
+have a deep-seated property 
+that you could exploit
+
+377
+00:20:38,806 --> 00:20:40,707
+if you find it, to make things better.
+
+378
+00:20:40,707 --> 00:20:42,859
+But in general, that's the situation.
+
+379
+00:20:43,568 --> 00:20:46,211
+On the other hand, if you talk about 
+a <i>small world phenomenon</i>
+
+380
+00:20:46,211 --> 00:20:47,324
+that we have mentioned.
+
+381
+00:20:47,324 --> 00:20:49,462
+It says something about 
+locality in a sense.
+
+382
+00:20:49,462 --> 00:20:52,490
+It says that there are short paths 
+within any two nodes,
+
+383
+00:20:52,490 --> 00:20:54,540
+which is of course relevant for routing.
+
+384
+00:20:54,540 --> 00:20:58,253
+It does not mean that communication 
+is spatially local.
+
+385
+00:20:58,670 --> 00:21:03,185
+In the internetwork there are long paths, 
+there's right area for connections, etc.
+
+386
+00:21:03,788 --> 00:21:07,181
+But it's local if you only count
+the hops, not the time it takes
+
+387
+00:21:07,181 --> 00:21:08,395
+to move between hops.
+
+388
+00:21:08,588 --> 00:21:09,915
+And that's also relevant.
+
+389
+00:21:09,915 --> 00:21:12,799
+If for example, time cost of communication 
+is somewhat dominated
+
+390
+00:21:12,799 --> 00:21:15,090
+by the routing for example.
+
+391
+00:21:15,792 --> 00:21:18,513
+Which we hope is not so often the case.
+
+392
+00:21:18,513 --> 00:21:20,438
+Well then that's what matters to you.
+
+393
+00:21:21,095 --> 00:21:24,053
+What we're saying here is still 
+that there is this notion of
+
+394
+00:21:24,053 --> 00:21:27,296
+the <i>small world phenomenon</i>
+that has been studied
+
+395
+00:21:27,296 --> 00:21:30,065
+in many different contexts 
+and it can explored
+
+396
+00:21:30,065 --> 00:21:31,644
+in many different ways.
+
+397
+00:21:31,644 --> 00:21:34,406
+For example, in sociology there is 
+the famous theory of "weak ties"
+
+398
+00:21:34,406 --> 00:21:37,611
+by Granovetter, which is one of 
+the most cited papers in sociology,
+
+399
+00:21:37,611 --> 00:21:39,381
+if not the most cited actually.
+
+400
+00:21:39,381 --> 00:21:44,090
+And it basically says that if you've got
+such a graph,
+
+401
+00:21:44,090 --> 00:21:46,459
+a social network,
+
+402
+00:21:46,459 --> 00:21:50,210
+and you've got close neighbors 
+and more distant neighbors.
+
+403
+00:21:50,210 --> 00:21:52,475
+For example, you're best friends, 
+you're drinking buddies
+
+404
+00:21:52,475 --> 00:21:55,234
+that you see every evening 
+and you compare those
+
+405
+00:21:55,234 --> 00:21:58,107
+to those kind of long 
+distance connections.
+
+406
+00:21:58,107 --> 00:22:00,219
+For example, your lawyer 
+that you don't see very often,
+
+407
+00:22:00,219 --> 00:22:02,036
+who has very different friends, etc.
+
+408
+00:22:02,202 --> 00:22:05,482
+Then for learning something new, 
+for getting new connections
+
+409
+00:22:05,482 --> 00:22:11,538
+over a great distance these weak ties, 
+these infrequent connections,
+
+410
+00:22:11,538 --> 00:22:14,201
+the lawyer for example, 
+is much more useful
+
+411
+00:22:14,201 --> 00:22:16,292
+than your best friends.
+
+412
+00:22:16,292 --> 00:22:18,600
+In the sense, you cannot learn 
+anything from your best friends
+
+413
+00:22:18,600 --> 00:22:21,112
+because your best friends 
+they behave equally to you.
+
+414
+00:22:21,112 --> 00:22:23,568
+They have the same taste, 
+they have the same favorite movies, etc.
+
+415
+00:22:23,568 --> 00:22:26,655
+But if you want to, for example, 
+quickly get to somebody
+
+416
+00:22:26,655 --> 00:22:30,360
+you don't know via a short chain 
+to someone in China let's say,
+
+417
+00:22:30,360 --> 00:22:34,067
+then this distant connection 
+is much more useful
+
+418
+00:22:34,067 --> 00:22:35,398
+than the close connection.
+
+419
+00:22:35,398 --> 00:22:37,662
+That's ultimately also 
+interestingly used in routing.
+
+420
+00:22:37,662 --> 00:22:41,463
+If you want to move somewhere 
+far away you will try to use
+
+421
+00:22:41,463 --> 00:22:43,838
+the right, hopefully, long distance 
+connection rather than
+
+422
+00:22:43,838 --> 00:22:45,607
+move around locally in your network.
+
+423
+00:22:45,607 --> 00:22:47,348
+That's ineffective.
+
+424
+00:22:48,819 --> 00:22:51,729
+So to summarize we've talked 
+about data structures.
+
+425
+00:22:51,729 --> 00:22:55,011
+We've talked about arrays, 
+relations, graphs, and trees.
+
+426
+00:22:55,288 --> 00:22:58,454
+And we have sturdied how locality 
+effects them and what we can say
+
+427
+00:22:58,454 --> 00:23:02,036
+about optimizing locality
+in all kinds of algorithmic techniques.
+
+428
+00:23:02,911 --> 00:23:05,816
+This of course, underlies 
+programming in general.
+
+429
+00:23:05,816 --> 00:23:07,908
+It underlies databases.
+It underlies networks
+
+430
+00:23:07,908 --> 00:23:09,273
+and there's a lot more to be said.
+
+431
+00:23:09,273 --> 00:23:11,171
+This was a high level overview.
+
+432
+00:23:11,171 --> 00:23:14,251
+And there is much more that you can see 
+in concrete examples.

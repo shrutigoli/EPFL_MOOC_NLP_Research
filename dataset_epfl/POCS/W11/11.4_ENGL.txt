@@ -1,0 +1,76 @@
+Now when you think about the web you typically think about very high throughput, millions of concurrent transactions and search queries being processed by thousands of computers.
+And you intuitively can think about throughput as being the leading metric.
+And indeed the DQ constant that we saw in the previous module is a throughput metric. It basically states that you can either have more queries per second or larger queries but that the product of the two is a constant and is a function of your infrastructure.
+Now in reality latency matters a great deal.
+And we'll actually see why it matters a great deal and why achieving low latency is hard.
+And particularly one key point is that increasing the DQ constant of a site will not necessarily translate into a low latency for the queries that are being served.
+Now there are a number of reasons for this,
+And the first reason is that the architecture of giant scale services has actually evolved noticeably since the basic model was proposed over a decade ago.
+What we see are two pictures; on the left is the basic model as proposed in 2001 and on the right is an illustration of a more realistic deployment, at least as of 2009.
+Now in the simple model on the left, the load manager directs the load among the various servers which processes them.
+Now assuming the DQ principle, the latency of a rubber crest would therefore increase as the selected server reaches some level of saturation but if the servers are not overloaded then the latency can remain relatively low.
+Now the reality is much more complex and the picture on the right illustrates that each webpage is actually the result of multiple distribution and aggregation steps among multiple tiers of the data center.
+At each layer there is a fan-out to multiple servers of the lower layer, followed by an aggregation of the results into a single answer which is then propagated back to the layer above.
+Of course each server serves multiple machines from the tier above, so there's a fan-in request, which can create contention.
+This has a severe implication which is known as the tail latency effect.
+Now the notion of tail latency simply states that the latency of a service is determined by the slowest fan-out component, and Jeff Dean and Louis Barroso who happened to be two of the most senior scientists at Google illustrated this in a recent CACM paper.
+And their graph is a synthetic analytical model.
+Assume that you have a fan-out involving N servers, and that the response will be a high latency with some probability.
+On the X-axis is the number of servers, and the three curves corresponds to the scenario where one in a 100, one in 1000, or one in 10,000 requests are slow, and the Y-axis is the probability that any aggregate request would be slow.
+In other words, that at least one of the N requesting servers responds slowly.
+So let's first consider the case where N servers are involved and one over N is the probability of a slow response, while the resulting probability of a slow service is 63%, and that occurs with 100 servers at a probability of 100; that's the blue line, and 1000 servers, the probability of 1000.
+Now the green curve shows the situation where the service is really well implemented and the probability of a service response is extremely small.
+It's one in 10,000.
+Unfortunately what we see is that this still has a significant overall impact if the service depends on a relatively small number of servers.
+Now this is bad.
+It's bad if the service is the customer facing web request because a fraction of the web transaction would be slow.
+But it's actually a lot worse and totally unacceptable if this is a middle layer service since the upper tier would then behave like the blue curve.
+So if we have something that is engineered like the green curve at the layer below but depends on a large number of servers, we effectively have the behavior and effect of the blue curve at the layer above.
+Now the importance of tail latency has been known for awhile.
+And one of the first major systems that formalize and focused on this was Dynamo which was published at SOSP.
+The observation that human patience is limited and that it ebbs on customers tend to be very impatient when making purchases, and so a slow site means less revenue.
+So the engineers that designed Dynamo and the core of the Amazon site shifted their focus from measuring throughput in yield to measuring 99.9 latency of the service request time.
+Now the figure on the right, which is taken from the paper, measures both the average and the 99.9 latency of the distribution of the Dynamo storage service.
+Note that the graph is on a log scale, we see that their system delivers a response in the ten to 30 millisecond on average, and those are the two curves below.
+But it can take over 100 milliseconds at the 99.9 percentile which happens for one in every 1000 queries.
+So it turns out that achieving low latency at the 99.9 percentile is hard for a number of reasons.
+We've already talked about the long tail, which occurs when we have a lot of fan-out.
+And we'll also talk about incasting.
+But first let's close back on this long tail question.
+The figure on the right shows that there is one order of magnitude difference between the average latency and the 99.9 percentile.
+By definition one in 1000 requests are above the 99.9 percentile latency.
+And keep in mind that 
+Dynamo is a key value store in that the upper layer applications typically fan-out multiple requests to a key value storage to build a webpage.
+So we use a simple model on the left of the long tail to reason about the impact of end user latency.
+With one in 1000 off by one order of magnitude we can approximate the overall performance by looking at the red line of the graph.
+Now if the long tail problem was not enough, there is another very pesky issue that could impact the latency of a high fan-out application.
+And that issue is known as the TCP incast problem and the corresponding throughput collapse that can occur.
+On the picture on this figure, imagine that the upper layer server is on the right and issues a fan-out request to a number of servers on the left.
+Each of the fan-out servers must then reply the response back to the requester, and if all senders attempt to communicate at the same time congestion will occur in the network between and specifically on the link between the senders and the receiver.
+There is a bottleneck.
+That bottleneck leads to what is known as the TCP incast problem.
+Now since there's a shared link, there can and will be congestion on the link, but as we know networking systems are designed to handle congestion.
+Switches have buffers that can absorb instantaneous congestion and TCP manages congestion by reacting to dropped packets and reducing the size of the sliding window accordingly.
+Now unfortunately this is precisely what happens when TCP incasting is measured and observed as shown on the picture on the right.
+As the number of senders increase, the amount of useful traffic received by the receiver actually goes down to a tiny fraction of the link capacity.
+So this is what we mean by throughput collapse.
+We're not talking about percentages of capacity that is lost, we're talking about orders of magnitude of capacity that can be lost as a result of this incasting problem.
+So obviously a very bad thing and actually one that is reminiscent of congestion collapse that was observed in the 1980s on the Internet and led to some of the adaptive algorithms that have been critical additions to TCP.
+So today the study of TCP incasting in data centers is an area of active research and development, and something to keep in mind when thinking about the scale-ability of high fan-out applications.
+Now let's see if we can put this together.
+This week you'll be reading a paper on Thialfi which is
+Google's massively scale-able notification service.
+A very nice paper based on strong principles that describe a system that is designed to serve notifications to millions of online users.
+So obviously scale-ability is a first order of consideration of the design.
+You'll actually note from the figure on the right that the paper evaluates the latency of the service as a function of the number of online users, and their evaluation shows that the medium latency for such a service to be 600 milliseconds.
+Those are the blue squares.
+So they're pretty much a constant as the number of clients scale.
+This is actually a very impressive result at a massive scale.
+So keep that in mind when you're reading the paper, this did not happen by accident, but achieving a predictable low latency for massively scale-able service was only possible because it was a first order consideration from the beginning of the design process.
+Time to wrap up this module on latency for Internet scale systems.
+Latency is important.
+It's important to measure- not just to measure the average or the mean, but actually to measure the distribution captured in the 99.9 percentile and in general capture any jitter associated with the latency of individual requests.
+There's been a relentless pursuit to measure latency, there's also a relentless pursuit to engineer systems that add scale, and can deliver predictable low latency and low latency jitter applications for all of the various tiers of the data center systems that we have today.
+We saw that there are a number of really hard issues: the notion of the long tail and the tail out scale problem makes it very difficult to have a multilayer system that operates with predictable low latency.
+We saw that there are not just issues around application design, there's also issues associated with the network layer in the context of the 
+TCP incasting problem.

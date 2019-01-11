@@ -1,0 +1,1200 @@
+1
+00:00:04,269 --> 00:00:05,716
+In the previous episodes,
+
+2
+00:00:05,716 --> 00:00:08,366
+we presented the general problem
+of the case study
+
+3
+00:00:08,371 --> 00:00:09,962
+we are now working on,
+
+4
+00:00:09,962 --> 00:00:12,762
+which is to model watches with
+different mechanisms
+
+5
+00:00:12,762 --> 00:00:14,152
+ and different accessories.
+
+6
+00:00:14,191 --> 00:00:16,398
+Then, we covered the more
+specific problem
+
+7
+00:00:16,398 --> 00:00:18,840
+of overloading the output operator
+
+8
+00:00:18,840 --> 00:00:21,540
+and how to handle polymorphic output.
+
+9
+00:00:21,540 --> 00:00:23,700
+We also completed the "Produit" class.
+
+10
+00:00:23,916 --> 00:00:26,084
+In this video, we will focus on
+
+11
+00:00:26,084 --> 00:00:29,433
+overloading another operator, for
+example the "+=" operator.
+
+12
+00:00:29,433 --> 00:00:31,266
+Then, we will build a first, real
+
+13
+00:00:31,266 --> 00:00:33,316
+operational version of the program.
+
+14
+00:00:33,647 --> 00:00:36,522
+Let's start by adding
+the "+=" operator
+
+15
+00:00:36,522 --> 00:00:38,362
+to the "Montre" class
+(TN: "montre"means "watch"),
+
+16
+00:00:38,364 --> 00:00:40,694
+which, remember, inherits from "Produit"
+
+17
+00:00:40,854 --> 00:00:44,576
+and has a mechanism, more
+specifically a pointer
+
+18
+00:00:44,576 --> 00:00:46,636
+to a mechanism, for polymorphism,
+
+19
+00:00:46,661 --> 00:00:52,491
+and a dynamic array of pointers
+to accessories
+
+20
+00:00:52,495 --> 00:00:54,925
+which we have called "accessoires" here.
+
+21
+00:00:54,931 --> 00:01:00,051
+The idea is to be able to add elements
+to this dynamic array
+
+22
+00:01:00,065 --> 00:01:03,835
+by doing, for example for "montre", an
+instance of the "Montre" class,
+
+23
+00:01:03,853 --> 00:01:07,384
+" montre += new Bracelet (...); ",
+
+24
+00:01:07,384 --> 00:01:11,213
+where, as you will recall, "Bracelet" is
+a subclass of "Accessoire".
+
+25
+00:01:11,213 --> 00:01:16,633
+So we would like this to add a new
+pointer to a "Bracelet"
+
+26
+00:01:16,660 --> 00:01:20,200
+into the collection of pointers
+to "Accessoires".
+
+27
+00:01:20,208 --> 00:01:22,853
+Since a "Bracelet" is an "Accessoire",
+
+28
+00:01:23,923 --> 00:01:29,403
+a pointer to a "Bracelet" can be put into
+a pointer to an "Accessoire".
+
+29
+00:01:29,445 --> 00:01:32,075
+That's the idea for this "+=" operator.
+
+30
+00:01:32,496 --> 00:01:35,676
+The prototype of this operator
+will look like this:
+
+31
+00:01:35,681 --> 00:01:38,403
+we won't use its return value,
+
+32
+00:01:38,403 --> 00:01:40,911
+as we will never write things like
+
+33
+00:01:40,911 --> 00:01:44,591
+" z = (montre += new "Bracelet" (...)); ".
+
+34
+00:01:44,607 --> 00:01:46,929
+So here, we have a "void" return type.
+
+35
+00:01:46,929 --> 00:01:49,919
+This is the "+=" operator for the "Montre" class
+
+36
+00:01:49,944 --> 00:01:53,414
+and the operator must take
+
+37
+00:01:53,425 --> 00:01:56,646
+a pointer to an "Accessoire",
+
+38
+00:01:56,646 --> 00:01:59,086
+so here, "new" will return a
+C-style pointer,
+
+39
+00:01:59,123 --> 00:02:03,052
+and we want to view it as a pointer
+to an "Accessoire".
+
+40
+00:02:03,052 --> 00:02:06,495
+So here, in a very general way, it will
+be a pointer to an "Accessoire".
+
+41
+00:02:06,495 --> 00:02:09,810
+Here, we added a bracelet, but we could
+add a clasp,
+
+42
+00:02:09,810 --> 00:02:13,760
+a body, or any other subclass of 
+"Accessoire".
+
+43
+00:02:14,330 --> 00:02:16,700
+Now, let's see how we can write
+its definition.
+
+44
+00:02:16,713 --> 00:02:20,533
+This pointer to an "Accessoire",
+"p_accessoire", that we received,
+
+45
+00:02:20,533 --> 00:02:24,667
+we simply want to add it to the
+dynamic array of accessories
+
+46
+00:02:24,667 --> 00:02:27,488
+stored in the watch.
+
+47
+00:02:27,488 --> 00:02:32,003
+So we will simply call "push_back"
+with this pointer,
+
+48
+00:02:32,003 --> 00:02:35,288
+but here, since we received
+a C-style pointer,
+
+49
+00:02:35,288 --> 00:02:38,336
+we will transform this
+C-style pointer
+
+50
+00:02:38,336 --> 00:02:39,956
+to a "unique_ptr".
+
+51
+00:02:39,960 --> 00:02:44,820
+So here, we create a "unique_ptr"
+which converts this C-style pointer,
+
+52
+00:02:44,838 --> 00:02:46,058
+"p_accessoire",
+
+53
+00:02:46,074 --> 00:02:50,599
+and we add it to the end, we "push_back"
+on the "accessoires" vector,
+
+54
+00:02:50,599 --> 00:02:54,099
+in which all the accessories of
+the watch are stored.
+
+55
+00:02:55,028 --> 00:02:57,436
+That's it for this very simple
+overload
+
+56
+00:02:57,436 --> 00:03:00,125
+of the "+=" operator, which
+now provides us with
+
+57
+00:03:00,125 --> 00:03:04,895
+a very compact syntax to add accessories
+to a watch.
+
+58
+00:03:05,272 --> 00:03:07,688
+Now, let's try to write a first
+operational
+
+59
+00:03:07,688 --> 00:03:09,338
+version of the program.
+
+60
+00:03:09,340 --> 00:03:12,220
+Let's try to finalize what we have
+written up till now;
+
+61
+00:03:12,349 --> 00:03:15,571
+and for now, let's not add
+any mechanism
+
+62
+00:03:15,571 --> 00:03:17,566
+or copy any watches.
+
+63
+00:03:17,566 --> 00:03:21,436
+We will leave these two aspects for
+the next two episodes.
+
+64
+00:03:21,741 --> 00:03:24,911
+To be able to finalize the program as
+we have written it up till now,
+
+65
+00:03:24,911 --> 00:03:27,681
+we would need a few more concrete
+accessories
+
+66
+00:03:27,681 --> 00:03:29,891
+and we would have to finish the
+"Montre" class
+
+67
+00:03:29,900 --> 00:03:32,340
+which is yet not quite operational.
+
+68
+00:03:32,342 --> 00:03:36,320
+And of course, we must use all this
+in a typical "main".
+
+69
+00:03:36,320 --> 00:03:38,760
+We will go over all of these points
+one after the other,
+
+70
+00:03:38,765 --> 00:03:41,311
+starting with a few more accessories.
+
+71
+00:03:41,311 --> 00:03:46,551
+Remember that we have an "Accessoire"
+class, which is a product,
+
+72
+00:03:46,555 --> 00:03:51,335
+and let's say for example that 
+accessories need
+
+73
+00:03:51,344 --> 00:03:53,874
+a name to describe them.
+
+74
+00:03:53,931 --> 00:03:57,806
+To do so, let's say we have a name
+that will not change
+
+75
+00:03:57,806 --> 00:04:01,386
+once it has been set by
+the constructor.
+
+76
+00:04:01,797 --> 00:04:05,087
+And we will add a constructor to the
+"Accessoire" class
+
+77
+00:04:05,365 --> 00:04:09,375
+which will take a name to refer to
+the accessory.
+
+78
+00:04:09,460 --> 00:04:13,590
+And let's not forget that any product can
+be sold and thus has a price,
+
+79
+00:04:13,610 --> 00:04:16,088
+and so it will take a second
+parameter
+
+80
+00:04:16,088 --> 00:04:20,568
+to initialize the price of the product.
+
+81
+00:04:21,361 --> 00:04:24,889
+The initialization list in the
+constructor for "Accessoire"
+
+82
+00:04:24,889 --> 00:04:29,519
+will start by calling the constructor for
+the "Produit" superclass
+
+83
+00:04:29,527 --> 00:04:33,747
+passing it the second parameter
+we received for the base value.
+
+84
+00:04:33,943 --> 00:04:39,263
+Then, we will initialize the "nom" member 
+(TN: means "name") with the name we received.
+
+85
+00:04:39,289 --> 00:04:43,757
+That's it for the constructor we decided
+to give to all the accessories.
+
+86
+00:04:43,757 --> 00:04:47,333
+Now, let's decide on a way of displaying
+the accessories
+
+87
+00:04:47,333 --> 00:04:50,852
+since, remember, all products can be
+displayed
+
+88
+00:04:50,852 --> 00:04:52,462
+in a polymorphic way.
+
+89
+00:04:52,468 --> 00:04:55,698
+So we will overload the "afficher" method
+
+90
+00:04:55,702 --> 00:04:58,272
+that was inherited from "Produit".
+
+91
+00:04:58,279 --> 00:05:02,969
+We override it by adding
+the "override" keyword.
+
+92
+00:05:02,980 --> 00:05:07,150
+And let's say that the output will
+be their name and price.
+
+93
+00:05:07,158 --> 00:05:09,648
+So we will simply display the name,
+
+94
+00:05:09,656 --> 00:05:11,406
+then indicate how much it costs.
+
+95
+00:05:11,421 --> 00:05:15,531
+And we already know how to display
+the price by directly calling
+
+96
+00:05:15,545 --> 00:05:19,065
+the afficher method from the
+"Produit" superclass.
+
+97
+00:05:19,076 --> 00:05:21,756
+Here, we use the scope resolution
+operator
+
+98
+00:05:21,767 --> 00:05:25,754
+to access the afficher method inherited
+from the "Produit" superclass.
+
+99
+00:05:25,754 --> 00:05:29,564
+Because of course, if we simply write
+"afficher" without this,
+
+100
+00:05:29,577 --> 00:05:32,959
+we will call the "afficher" method
+from the current class
+
+101
+00:05:32,959 --> 00:05:36,969
+and we would have infinite recursion here,
+where "afficher" would call itself.
+
+102
+00:05:36,973 --> 00:05:40,433
+And so, in the "afficher" method of the
+"Accessoire" class,
+
+103
+00:05:40,443 --> 00:05:43,688
+to call the "afficher" method inherited
+from the "Produit" superclass,
+
+104
+00:05:43,688 --> 00:05:46,958
+we need to unhide this
+"afficher" method.
+
+105
+00:05:47,645 --> 00:05:50,876
+Next, since we expect a polymorphic
+behavior
+
+106
+00:05:50,876 --> 00:05:52,356
+with virtual methods,
+
+107
+00:05:52,356 --> 00:05:56,287
+we don't forget to add the
+polymorphic destructor,
+
+108
+00:05:56,287 --> 00:05:57,597
+the virtual destructor,
+
+109
+00:05:57,603 --> 00:06:00,673
+in the class for which we want
+polymorphic behavior.
+
+110
+00:06:00,702 --> 00:06:03,132
+This way, if subclasses inherit from it,
+
+111
+00:06:03,132 --> 00:06:04,982
+as will be the case with accessories,
+
+112
+00:06:04,982 --> 00:06:08,892
+which need to have destructors
+with specific behaviors,
+
+113
+00:06:08,893 --> 00:06:13,719
+then their own destructor will indeed
+be called in a polymorphic way
+
+114
+00:06:13,719 --> 00:06:16,579
+-- and not the destructor
+for the "Accessoire" class.
+
+115
+00:06:17,251 --> 00:06:20,268
+Finally, let's say that the price of
+accessories
+
+116
+00:06:20,268 --> 00:06:23,756
+is the same price as a normal product,
+
+117
+00:06:23,756 --> 00:06:26,399
+that is, a very general product
+as we had designed it
+
+118
+00:06:26,399 --> 00:06:27,999
+right at the top of the hierarchy.
+
+119
+00:06:28,011 --> 00:06:31,021
+At that point, we don't have anything
+to do
+
+120
+00:06:31,042 --> 00:06:34,197
+since the "prix" method
+that we inherited
+
+121
+00:06:34,197 --> 00:06:36,527
+from the "Produit" class is
+enough here
+
+122
+00:06:36,527 --> 00:06:40,557
+and we don't need to override
+it in the "Accessoire" class.
+
+123
+00:06:40,800 --> 00:06:43,352
+So here, we have completely functional
+
+124
+00:06:43,352 --> 00:06:46,762
+"Accessoire" class which corresponds
+to what we wanted.
+
+125
+00:06:46,859 --> 00:06:49,179
+Now, let's define a few
+accessories,
+
+126
+00:06:49,185 --> 00:06:53,005
+for example a "Bracelet". A "Bracelet"
+is an "Accessoire",
+
+127
+00:06:53,005 --> 00:06:55,935
+so here, we will have an
+inheritance link.
+
+128
+00:06:56,000 --> 00:07:00,220
+At the accessory level, let's say
+that their name
+
+129
+00:07:00,225 --> 00:07:02,565
+-- remember that accessories
+have a name, so
+
+130
+00:07:02,565 --> 00:07:05,036
+all accessories will inherit this
+name --
+
+131
+00:07:05,036 --> 00:07:07,992
+let's say that we want each accessory
+
+132
+00:07:07,992 --> 00:07:11,289
+to have a name that marks
+what they are.
+
+133
+00:07:11,289 --> 00:07:14,189
+For example, the name of a "Bracelet"
+will start with "bracelet"
+
+134
+00:07:14,189 --> 00:07:16,829
+the name of a clasp will start
+with "fermoir" (TN: means "clasp").
+
+135
+00:07:16,957 --> 00:07:19,597
+We will force this in the constructor.
+
+136
+00:07:19,769 --> 00:07:22,839
+For example, for the "Bracelet" subclass
+of the "Accessoire" class,
+
+137
+00:07:22,842 --> 00:07:28,652
+we will take a name, which will be the
+complement that we add after "bracelet",
+
+138
+00:07:28,657 --> 00:07:31,757
+for example "en cuir"
+(TN: means "made of leather")
+
+139
+00:07:32,864 --> 00:07:36,334
+so that the complete name becomes
+"bracelet en cuir" (TN: "leather strap").
+
+140
+00:07:36,805 --> 00:07:39,485
+And as a second parameter, the price,
+
+141
+00:07:40,072 --> 00:07:43,782
+which we also pass to the 
+superclass's constructor
+
+142
+00:07:43,786 --> 00:07:46,406
+in the initialization list.
+
+143
+00:07:46,435 --> 00:07:48,585
+And all of these classes can
+potentially have
+
+144
+00:07:48,597 --> 00:07:50,548
+polymorphic subclasses,
+
+145
+00:07:50,548 --> 00:07:52,788
+so let's not forget the virtual destructor.
+
+146
+00:07:53,032 --> 00:07:56,652
+Similarly, we could define a "Fermoir" class
+(TN: means "Clasp") inheriting from "Accessoire"
+
+147
+00:07:56,703 --> 00:07:58,459
+in which we define a constructor
+
+148
+00:07:58,459 --> 00:08:01,339
+taking a complement to the "fermoir"
+name and a price,
+
+149
+00:08:01,358 --> 00:08:04,528
+to be able to call the constructor of
+the "Accessoire" superclass.
+
+150
+00:08:04,538 --> 00:08:07,207
+The complete name will thus be
+"fermoir" with this complement
+
+151
+00:08:07,207 --> 00:08:08,714
+that we received as the first parameter,
+
+152
+00:08:08,714 --> 00:08:12,194
+and as the second parameter, the
+price that we received,
+
+153
+00:08:12,441 --> 00:08:14,521
+and as always, a virtual destructor.
+
+154
+00:08:15,265 --> 00:08:18,085
+There, we have finished with
+the accessories.
+
+155
+00:08:18,085 --> 00:08:21,015
+Now let's try to also make the
+"Montre" class usable
+
+156
+00:08:21,032 --> 00:08:23,392
+without mechanisms and without
+copying
+
+157
+00:08:23,405 --> 00:08:25,365
+which we will leave to the side
+for now.
+
+158
+00:08:25,613 --> 00:08:29,639
+At this stage, we have completely defined
+the contents of the "Montre" class,
+
+159
+00:08:29,639 --> 00:08:31,589
+we have prevented copying,
+
+160
+00:08:31,592 --> 00:08:35,118
+and we have added the "+=" operator
+
+161
+00:08:35,118 --> 00:08:38,788
+allowing us to add accessories
+to our watches.
+
+162
+00:08:38,965 --> 00:08:43,905
+To make this class operational, we must
+add at least one constructor
+
+163
+00:08:43,907 --> 00:08:47,642
+since we have modified the
+constructor here,
+
+164
+00:08:47,642 --> 00:08:51,762
+the default constructor, provided
+by default, is no longer so.
+
+165
+00:08:51,762 --> 00:08:54,782
+We don't have the default
+constructor anymore,
+
+166
+00:08:54,782 --> 00:08:57,822
+so we must at least add it here.
+
+167
+00:08:57,851 --> 00:09:00,580
+Of course, the default constructor
+will do nothing
+
+168
+00:09:00,580 --> 00:09:03,490
+to initialize the mechanisms,
+
+169
+00:09:03,490 --> 00:09:06,657
+and so at this point we will
+simply comment this out,
+
+170
+00:09:06,657 --> 00:09:10,417
+to avoid any problem with using
+a pointer
+
+171
+00:09:10,417 --> 00:09:12,076
+that would not be initialized --
+
+172
+00:09:12,076 --> 00:09:14,555
+we will simply comment out
+this line.
+
+173
+00:09:14,555 --> 00:09:17,065
+Regarding the vector of pointers
+to accessories,
+
+174
+00:09:17,071 --> 00:09:21,366
+the default constructor
+
+175
+00:09:21,366 --> 00:09:22,901
+will create an empty vector
+
+176
+00:09:22,901 --> 00:09:24,761
+and so here, there is no problem.
+
+177
+00:09:24,778 --> 00:09:29,548
+We will be able to fill this vector using our
+"+=" operator.
+
+178
+00:09:29,559 --> 00:09:32,999
+So the default constructor
+suits us, as long as we
+
+179
+00:09:33,003 --> 00:09:34,638
+don't have this pointer
+
+180
+00:09:34,638 --> 00:09:36,459
+so we will comment it out for now
+
+181
+00:09:36,459 --> 00:09:39,069
+and come back to it in a subsequent
+episode.
+
+182
+00:09:39,078 --> 00:09:41,198
+That's it for creating watches.
+
+183
+00:09:41,199 --> 00:09:43,953
+Now, let's decide how to
+compute the price of watches,
+
+184
+00:09:43,953 --> 00:09:48,183
+and let's say that it is the sum of
+the prices of its accessories.
+
+185
+00:09:48,195 --> 00:09:51,235
+For that, we will override the
+"prix" method,
+
+186
+00:09:51,254 --> 00:09:54,493
+we override this "virtual prix" method
+
+187
+00:09:54,493 --> 00:09:56,463
+inherited from the "Produit" superclass.
+
+188
+00:09:56,655 --> 00:10:02,901
+We will decide that at first, the
+price of a watch is its base value,
+
+189
+00:10:02,901 --> 00:10:07,251
+that we fetch through the original
+"prix" method,
+
+190
+00:10:07,252 --> 00:10:09,522
+inherited from the "Produit" superclass.
+
+191
+00:10:10,119 --> 00:10:13,699
+Then we will add, to this
+base value, 
+
+192
+00:10:13,707 --> 00:10:17,206
+the sum of prices of the
+different accessories.
+
+193
+00:10:17,206 --> 00:10:20,486
+To do so, we go through the
+list of accessories
+
+194
+00:10:20,498 --> 00:10:24,948
+-- remember that to iterate over an
+array of "unique_ptr"s,
+
+195
+00:10:24,964 --> 00:10:29,224
+it is crucial to use this syntax, to use
+references -
+
+196
+00:10:29,424 --> 00:10:34,947
+here, fetching the price will not modify
+the instances we iterate over,
+
+197
+00:10:34,947 --> 00:10:37,717
+so we will use a constant reference
+
+198
+00:10:37,870 --> 00:10:41,027
+Here, we will write a loop that iterates
+with a constant reference
+
+199
+00:10:41,027 --> 00:10:45,547
+over the "unique_ptr"s of this dynamic
+array of accessories.
+
+200
+00:10:45,547 --> 00:10:50,865
+And we add to the price, that we
+had originally initialized,
+
+201
+00:10:50,868 --> 00:10:54,538
+the price each time, that is, the
+result of the call to the "prix" method
+
+202
+00:10:54,558 --> 00:10:57,911
+of the object pointed to by
+"p_acc" here,
+
+203
+00:10:57,911 --> 00:11:00,696
+so the object pointed to via
+this pointer.
+
+204
+00:11:00,696 --> 00:11:03,777
+This is how we write the call to the
+"prix" method
+
+205
+00:11:03,777 --> 00:11:06,427
+for something that is a pointer
+to an object
+
+206
+00:11:06,435 --> 00:11:08,475
+providing such a method.
+
+207
+00:11:08,513 --> 00:11:12,483
+And finally, we return the
+price that we have just computed.
+
+208
+00:11:13,142 --> 00:11:16,523
+Finally, let's decide how we
+want to display the watches,
+
+209
+00:11:16,523 --> 00:11:19,412
+and let's say for example that
+we want a message to say
+
+210
+00:11:19,412 --> 00:11:24,662
+that a watch is made of:
+the list of its various accessories, ...
+
+211
+00:11:24,662 --> 00:11:28,687
+And at the end, we display
+the total price of the watch.
+
+212
+00:11:28,687 --> 00:11:33,551
+And so here, we will also override
+the virtual "afficher" method
+
+213
+00:11:33,551 --> 00:11:36,701
+inherited from the "Produit" superclass.
+
+214
+00:11:36,711 --> 00:11:40,231
+And remember that here we are
+overriding it,
+
+215
+00:11:40,341 --> 00:11:44,171
+starting by displaying:
+"A watch is composed of",
+
+216
+00:11:44,191 --> 00:11:49,729
+then by iterating over the vector of
+accessories of the watch,
+
+217
+00:11:49,729 --> 00:11:52,686
+and for each accessory, we display
+this little star
+
+218
+00:11:52,686 --> 00:11:57,206
+then we display the current accessory.
+
+219
+00:11:57,454 --> 00:11:58,764
+Question here:
+
+220
+00:11:58,764 --> 00:12:00,349
+are we allowed to write this?
+
+221
+00:12:00,349 --> 00:12:01,759
+Will this compile?
+
+222
+00:12:01,759 --> 00:12:05,327
+Have we overloaded the output
+operator for this?
+
+223
+00:12:07,553 --> 00:12:09,302
+Yes, it is correct and it compiles.
+
+224
+00:12:09,302 --> 00:12:13,067
+And finally, we end by displaying
+the message "total price"
+
+225
+00:12:13,067 --> 00:12:16,670
+and calling the watch's "prix" method,
+
+226
+00:12:16,670 --> 00:12:20,350
+which will compute the total price,
+as we have just seen.
+
+227
+00:12:21,900 --> 00:12:24,003
+Finally, to have an executable program,
+
+228
+00:12:24,003 --> 00:12:27,483
+we need a "main", which we will
+use here to test
+
+229
+00:12:27,485 --> 00:12:30,239
+the implementation of the objects
+we have just created.
+
+230
+00:12:30,659 --> 00:12:33,570
+For this, we will declare a "Montre"
+in the "main".
+
+231
+00:12:33,570 --> 00:12:35,100
+We can easily do this
+
+232
+00:12:35,100 --> 00:12:38,385
+since we have a default constructor now.
+
+233
+00:12:38,391 --> 00:12:44,121
+Then, we add various accessories
+to the watch, like so.
+
+234
+00:12:44,148 --> 00:12:49,748
+Each of the accessories has a constructor
+with its name or the complement to the name,
+
+235
+00:12:49,751 --> 00:12:51,279
+and its price
+
+236
+00:12:51,279 --> 00:12:53,769
+So here, we add for example
+4 accessories,
+
+237
+00:12:53,788 --> 00:12:58,248
+and finally we output a message to
+display the watch here,
+
+238
+00:12:58,357 --> 00:13:01,467
+with the output operator we saw
+earlier.
+
+239
+00:13:01,474 --> 00:13:03,784
+This output operator, as we
+have just discussed,
+
+240
+00:13:03,805 --> 00:13:05,954
+will call the "prix" method.
+
+241
+00:13:05,954 --> 00:13:09,284
+The execution of this program will thus
+yield the following result:
+
+242
+00:13:09,300 --> 00:13:11,467
+first, we will display the message
+"Montre m : ",
+
+243
+00:13:11,467 --> 00:13:15,196
+then we will enter the overload of
+the operator for "Produit",
+
+244
+00:13:15,196 --> 00:13:17,992
+but with a call to the polymorphic
+afficher method
+
+245
+00:13:17,992 --> 00:13:18,860
+for "Montre",
+
+246
+00:13:18,860 --> 00:13:21,910
+which will thus display:
+"Une montre composée de: "
+
+247
+00:13:21,912 --> 00:13:24,442
+then a loop over its various
+acessories,
+
+248
+00:13:24,451 --> 00:13:28,271
+and finally will display the
+total price,
+
+249
+00:13:28,292 --> 00:13:31,162
+the sum of prices of its accessories.
+
+250
+00:13:31,217 --> 00:13:32,443
+For those who would like it,
+
+251
+00:13:32,443 --> 00:13:35,113
+all of the code is available on the
+course website
+
+252
+00:13:35,429 --> 00:13:38,669
+This concludes the presentation
+of this first operational
+
+253
+00:13:38,679 --> 00:13:40,349
+version of our code.
+
+254
+00:13:40,359 --> 00:13:43,769
+There are still two chapters to cover in
+the next two episodes:
+
+255
+00:13:43,987 --> 00:13:47,524
+first, all of these mechanisms,
+with multiple inheritance,
+
+256
+00:13:47,524 --> 00:13:50,208
+and then the concept of copying
+a watch,
+
+257
+00:13:50,208 --> 00:13:53,988
+how to make a deep copy of the various
+"Accessoires" of a "Montre".

@@ -1,0 +1,1549 @@
+1
+00:00:00,000 --> 00:00:02,295
+Hello.
+
+2
+00:00:02,295 --> 00:00:09,917
+We have already talked about LED and
+displaying by means of a shift register.
+
+3
+00:00:09,917 --> 00:00:12,477
+Today, we are going to see
+a few more circuits
+
+4
+00:00:12,477 --> 00:00:16,409
+complex circuits, also to display
+in 2 dimensions and in color.
+
+5
+00:00:16,409 --> 00:00:19,660
+But let's start with a little bit
+of physiology.
+
+6
+00:00:19,660 --> 00:00:25,100
+Our eye is not linear at all,
+while all the light sensors
+
+7
+00:00:25,100 --> 00:00:30,550
+we are going to use, and
+the light emitters, are linear.
+
+8
+00:00:30,550 --> 00:00:33,990
+Thus, typically, a light-emitting diode you
+
+9
+00:00:33,990 --> 00:00:37,520
+can program it with analogWrite
+
+10
+00:00:37,520 --> 00:00:40,193
+", to make here a small
+
+11
+00:00:40,193 --> 00:00:45,050
+program in which you increase
+the intensity, gradually.
+
+12
+00:00:45,050 --> 00:00:50,405
+Every 300 milliseconds you
+increase the intensity by 32,
+
+13
+00:00:50,405 --> 00:00:55,395
+which means that in 8 steps
+you will have switched from 0 to
+
+14
+00:00:55,395 --> 00:01:00,776
+the maximum intensity.
+By running this program, you
+
+15
+00:01:00,776 --> 00:01:05,970
+will get the impression that very
+quickly, you have the maximum intensity
+
+16
+00:01:05,970 --> 00:01:10,855
+of the LED, since our vision
+is not linear at all.
+
+17
+00:01:10,855 --> 00:01:15,740
+So what I propose is to go
+through a conversion table,
+
+18
+00:01:15,740 --> 00:01:20,400
+which is logarithmic since
+our eye is logarithmic.
+
+19
+00:01:20,400 --> 00:01:25,316
+The PWM for values ​​from 1 to
+
+20
+00:01:25,316 --> 00:01:30,468
+7, since we will simplify by doing
+only 7 steps.
+
+21
+00:01:30,468 --> 00:01:35,668
+The PWM for 1, it will be far
+from being the tenth, the
+
+22
+00:01:35,668 --> 00:01:42,280
+eighth, which would be, 32,
+we will put the value 10, etc ...
+
+23
+00:01:42,280 --> 00:01:44,903
+Then, of course, it's a
+
+24
+00:01:44,903 --> 00:01:48,045
+logarithmic curve, we can
+get out of the floating point.
+
+25
+00:01:48,045 --> 00:01:50,742
+Apply calculation facilities of
+
+26
+00:01:50,742 --> 00:01:55,646
+the arithmetic library of Arduino
+would be absurd.
+
+27
+00:01:55,646 --> 00:02:01,332
+You define these points in a table,
+and now,
+
+28
+00:02:01,332 --> 00:02:07,091
+instead of doing "analogWrite"
+with the value multiplied by 32,
+
+29
+00:02:07,091 --> 00:02:13,790
+you will look for the value
+to display in the table.
+
+30
+00:02:13,790 --> 00:02:19,305
+We will compare these 2 solutions,
+by making a small experiment
+
+31
+00:02:19,305 --> 00:02:24,820
+and by wiring 2 LEDs side by side,
+which will run these 2 programs.
+
+32
+00:02:24,820 --> 00:02:31,270
+You see on the video the 8 steps
+that advance every 300 milliseconds.
+
+33
+00:02:31,270 --> 00:02:37,661
+Then the rhythm accelerates and finally,
+you have the blinking in the
+
+34
+00:02:37,661 --> 00:02:42,570
+background, with intensity increase,
+decrease in intensity,
+
+35
+00:02:42,570 --> 00:02:45,123
+and that is what we must judge now.
+
+36
+00:02:45,123 --> 00:02:47,814
+Is it worth
+
+37
+00:02:47,814 --> 00:02:53,770
+going through a table to have a better
+subjective impression of this display linearity?
+
+38
+00:02:53,770 --> 00:02:56,980
+I return again on this image,
+
+39
+00:02:56,980 --> 00:03:01,810
+since if you are observers, you have
+seen that I have it, the values ​​I put,
+
+40
+00:03:01,810 --> 00:03:07,825
+here, are not the ones I had
+planned in my initial calculation.
+
+41
+00:03:07,825 --> 00:03:11,213
+Actually, I have decreased the values, I
+
+42
+00:03:11,213 --> 00:03:14,152
+moved the curve, closer, here, to
+
+43
+00:03:14,152 --> 00:03:17,032
+the vertical bar, to have a
+
+44
+00:03:17,032 --> 00:03:22,417
+better fell when the intensities are low.
+
+45
+00:03:22,417 --> 00:03:23,120
+Good.
+
+46
+00:03:23,120 --> 00:03:27,450
+So now, let's get back to the shift
+register, which you've already seen.
+
+47
+00:03:27,450 --> 00:03:32,241
+We want to display 8 LEDs, that
+
+48
+00:03:32,241 --> 00:03:37,200
+we will wire, preferably like this.
+You need a
+
+49
+00:03:37,200 --> 00:03:42,296
+shift register and a parallel register,
+which will
+
+50
+00:03:42,296 --> 00:03:47,452
+store the information to prevent
+that from changing on
+
+51
+00:03:47,452 --> 00:03:49,989
+the LEDs during the shift, which,
+
+52
+00:03:49,989 --> 00:03:53,110
+in some simplified solutions,
+may be acceptable,
+
+53
+00:03:53,110 --> 00:03:55,090
+but the price difference between the
+
+54
+00:03:55,090 --> 00:03:58,920
+2 circuits certainly does not
+justify these simplifications.
+
+55
+00:03:58,920 --> 00:04:05,460
+So Arduino tells you, it's very easy,
+you have to activate the signal "load".
+
+56
+00:04:05,460 --> 00:04:08,879
+And then, to transfer 8 bits, you have a
+
+57
+00:04:08,879 --> 00:04:12,490
+primitive called "shiftOut", you must give
+
+58
+00:04:12,490 --> 00:04:17,556
+the number of the "pin" "data", the
+number of the "pin" "clock", a 0 which
+
+59
+00:04:17,556 --> 00:04:22,738
+means that you will shift right,
+and then the pattern that
+
+60
+00:04:22,738 --> 00:04:28,408
+you are going to take in a register,
+and then shift
+
+61
+00:04:28,408 --> 00:04:33,430
+gradually into the shift register.
+
+62
+00:04:33,430 --> 00:04:37,840
+So you can write this routine
+directly by saying, "digitalWrite
+
+63
+00:04:37,840 --> 00:04:43,702
+", The" load ". And then we will
+do 8 times the test of
+
+64
+00:04:43,702 --> 00:04:49,665
+the pattern we had there,
+since we take in a shift register.
+
+65
+00:04:49,665 --> 00:04:54,570
+We will test the least
+significant bit, pattern R 1,
+
+66
+00:04:54,570 --> 00:04:58,625
+and then we will copy it to the "data".
+
+67
+00:04:58,625 --> 00:05:02,680
+If this bit is 0, well, we will put a 0.
+
+68
+00:05:02,680 --> 00:05:07,760
+And then, now, we'll prepare
+the next move by shifting
+
+69
+00:05:07,760 --> 00:05:12,470
+this register, writing the "clock",
+gives us a pulse
+
+70
+00:05:12,470 --> 00:05:17,008
+on the clock, C k equals 1,
+C k equals 0, repeat
+
+71
+00:05:17,008 --> 00:05:21,030
+8 times and complete the cycle
+with a "digitalWrite".
+
+72
+00:05:21,030 --> 00:05:24,550
+So, what's the advantage?
+
+73
+00:05:24,550 --> 00:05:28,012
+Apparently, not very clear. If you
+
+74
+00:05:28,012 --> 00:05:31,051
+want to do C, then, there, I
+
+75
+00:05:31,051 --> 00:05:34,044
+even give you the complete
+program to make C.
+
+76
+00:05:34,044 --> 00:05:37,550
+So we forget the "digitalWrite"
+and others.
+
+77
+00:05:37,550 --> 00:05:44,200
+We work with the port and the bits,
+the bit numbers on these ports.
+
+78
+00:05:44,200 --> 00:05:50,624
+It is very clear "Led On", "Led Off",
+"Clock On", "Clock Off".
+
+79
+00:05:50,624 --> 00:05:53,036
+And, we do a "setup"
+
+80
+00:05:53,036 --> 00:05:57,530
+with the bits that will intervene
+at the output.
+
+81
+00:05:57,530 --> 00:06:03,125
+A pattern is prepared to send it
+to the LEDs.
+
+82
+00:06:03,125 --> 00:06:05,465
+And then now, we disable the "load"
+
+83
+00:06:05,465 --> 00:06:08,720
+so that the information does not
+cross during the offset.
+
+84
+00:06:08,720 --> 00:06:17,700
+And then, from 0 to 8, we leave the pattern
+as just now, with the same mask.
+
+85
+00:06:17,700 --> 00:06:18,650
+We shift,
+
+86
+00:06:18,650 --> 00:06:21,370
+and then we give the clock blows
+so we have,
+
+87
+00:06:21,370 --> 00:06:26,510
+compared to the previous example,
+we simply changed the notations.
+
+88
+00:06:26,510 --> 00:06:28,353
+But, we are here in C.
+
+89
+00:06:28,353 --> 00:06:32,390
+Is there any other benefit to making C?
+
+90
+00:06:32,390 --> 00:06:38,500
+Well, let's look at the space
+used in memory: 1000, 1000,
+
+91
+00:06:38,500 --> 00:06:43,645
+708. I use the Arduino compiler which,
+
+92
+00:06:43,645 --> 00:06:49,070
+at least, will place 600 bytes to start
+
+93
+00:06:49,070 --> 00:06:53,330
+the "setup" and other facilities.
+
+94
+00:06:53,330 --> 00:06:55,670
+So you see that from the terms of
+
+95
+00:06:55,670 --> 00:07:01,190
+memory size, it is significantly shorter,
+we are close to the assembler.
+
+96
+00:07:01,190 --> 00:07:04,622
+When you write "shiftOut, data,
+clock" etc ...,
+
+97
+00:07:04,622 --> 00:07:09,500
+at the time of execution,
+the procedure must go to look:
+
+98
+00:07:09,500 --> 00:07:13,710
+this is number 5. Where is it?
+
+99
+00:07:13,710 --> 00:07:16,206
+On which port? In what bit?
+
+100
+00:07:16,206 --> 00:07:19,498
+Etc ... The 0, you're going
+to have a choice to say
+
+101
+00:07:19,498 --> 00:07:22,740
+either I shift right, or I shift left.
+
+102
+00:07:22,740 --> 00:07:27,390
+And there is hardly anything but the
+motive that is transferred as it is.
+
+103
+00:07:27,390 --> 00:07:30,925
+Now, if we look at the execution time, well
+
+104
+00:07:30,925 --> 00:07:34,578
+there too, the duration is 100
+microseconds, decreases to
+
+105
+00:07:34,578 --> 00:07:40,226
+18 microseconds, and even less,
+by choosing other instructions
+
+106
+00:07:40,226 --> 00:07:45,730
+closer to the assembler,
+which can still be significant.
+
+107
+00:07:45,730 --> 00:07:50,875
+Last advantage, if now we want to shift 16
+
+108
+00:07:50,875 --> 00:07:53,685
+bits and not 8, here you have to do
+
+109
+00:07:53,685 --> 00:07:56,320
+a micmac with the 16-bit pattern to
+
+110
+00:07:56,320 --> 00:07:59,745
+take 8 bits, send them, take the second
+
+111
+00:07:59,745 --> 00:08:01,580
+Half of 8 bits, send them.
+
+112
+00:08:01,580 --> 00:08:05,995
+Here you only have to change
+the number of offsets.
+
+113
+00:08:05,995 --> 00:08:08,503
+There too naturally, you can put
+
+114
+00:08:08,503 --> 00:08:11,434
+16, you can put 32, more obviously,
+
+115
+00:08:11,434 --> 00:08:14,540
+there is no longer any kind of data
+that makes your life easier.
+
+116
+00:08:14,540 --> 00:08:19,973
+Well, here's for this little review.
+Another element, which
+
+117
+00:08:19,973 --> 00:08:25,160
+can mislead you, sometimes.
+When you have a parallel
+
+118
+00:08:25,160 --> 00:08:30,256
+register, it can be unloaded by a
+
+119
+00:08:30,256 --> 00:08:35,870
+transition and it's like a
+shift register, in fact.
+
+120
+00:08:35,870 --> 00:08:41,267
+And then it can also be loaded
+statically, and we talk about
+
+121
+00:08:41,267 --> 00:08:47,030
+transparent register as long as "load"
+is at 1, the information goes through.
+
+122
+00:08:47,030 --> 00:08:49,901
+So if you change the information,
+
+123
+00:08:49,901 --> 00:08:54,372
+it will immediately go to the other
+side, whereas here it is
+
+124
+00:08:54,372 --> 00:08:59,120
+only at a moment of the clock
+that the copy will be made.
+
+125
+00:08:59,120 --> 00:09:01,364
+So, on top of that, obviously, the
+
+126
+00:09:01,364 --> 00:09:04,532
+manufacturers, sometimes,
+they decide to work with
+
+127
+00:09:04,532 --> 00:09:08,950
+a small circle, here it is not on the rising flank,
+but it will be on thedownhill flank.
+
+128
+00:09:08,950 --> 00:09:11,575
+Here, there may also be a small round and
+
+129
+00:09:11,575 --> 00:09:15,018
+then they can decide to call it "Strobe"
+and
+
+130
+00:09:15,018 --> 00:09:20,750
+not very well know the difference
+between "load", transparent, etc ...
+
+131
+00:09:20,750 --> 00:09:23,747
+Ok, so you have to adapt when you receive
+
+132
+00:09:23,747 --> 00:09:28,070
+a circuit like, for example,
+this Toshiba circuit, but
+
+133
+00:09:28,070 --> 00:09:34,660
+There are many copies with small
+differences, in 8 bits or in 16 bits.
+
+134
+00:09:34,660 --> 00:09:36,360
+This one to 16 bits.
+
+135
+00:09:36,360 --> 00:09:40,300
+What these circuits have of
+interesting is that,
+
+136
+00:09:40,300 --> 00:09:44,760
+in output, you have current sources.
+
+137
+00:09:44,760 --> 00:09:51,650
+So these transistors, with a
+adapted electronics, allow you
+
+138
+00:09:51,650 --> 00:09:58,120
+to put a single resistor that will
+set the current in all LEDs.
+
+139
+00:09:58,120 --> 00:10:02,588
+So we were winning in the wiring, and if
+
+140
+00:10:02,588 --> 00:10:05,314
+suddenly you decide that it would
+be nice to have more intensity,
+
+141
+00:10:05,314 --> 00:10:08,289
+well, you have only one resistance
+to change,
+
+142
+00:10:08,289 --> 00:10:11,500
+Which could still be predicted
+by software.
+
+143
+00:10:11,500 --> 00:10:14,092
+So, in the circuit, you have in addition
+
+144
+00:10:14,092 --> 00:10:18,350
+to this an input enable that allows
+the output.
+
+145
+00:10:18,350 --> 00:10:21,897
+That can make it possible to
+
+146
+00:10:21,897 --> 00:10:25,527
+put circuits in parallel to do some tricks.
+
+147
+00:10:25,527 --> 00:10:30,355
+You have, of course, the parallel
+output register, with a signal
+
+148
+00:10:30,355 --> 00:10:34,565
+called latch, which is called, here,
+strobe and to
+
+149
+00:10:34,565 --> 00:10:38,550
+know the effect of this signal,
+
+150
+00:10:38,550 --> 00:10:42,320
+the only solution is to go
+look at the state diagram.
+
+151
+00:10:42,320 --> 00:10:49,210
+Then, for the shift register,
+you have clock and data.
+
+152
+00:10:49,210 --> 00:10:55,494
+You see that the data must be
+stable on the rising edge of the clock,
+
+153
+00:10:55,494 --> 00:11:00,461
+and then now you see that
+the signal they call latch bar is
+
+154
+00:11:00,461 --> 00:11:03,770
+a positive pulse at the end of the
+
+155
+00:11:03,770 --> 00:11:08,930
+loading to transfer the
+information to the register.
+
+156
+00:11:08,930 --> 00:11:12,330
+That pulse can continue until
+
+157
+00:11:12,330 --> 00:11:16,140
+you resend, resume sending clock.
+
+158
+00:11:16,140 --> 00:11:21,705
+So with this circuit, and quite
+naturally, you very easily
+
+159
+00:11:21,705 --> 00:11:27,350
+make  multiplexed display,
+by ordering the lines with
+
+160
+00:11:27,350 --> 00:11:33,006
+transistors, as we have already
+seen, with a single resistor
+
+161
+00:11:33,006 --> 00:11:38,644
+for all this LED panel, since we
+will select one line after  the other.
+
+162
+00:11:38,644 --> 00:11:41,496
+If you want to display something,
+well, you
+
+163
+00:11:41,496 --> 00:11:46,898
+will go to the 16-bit mode, here,
+send it to
+
+164
+00:11:46,898 --> 00:11:52,480
+the register by selecting the top line.
+
+165
+00:11:52,480 --> 00:11:57,266
+It is good to have a correspondence
+between the drawing and
+
+166
+00:11:57,266 --> 00:11:59,818
+the table, but it's quite arbitrary.
+
+167
+00:11:59,818 --> 00:12:02,430
+We could say, well, that's
+
+168
+00:12:02,430 --> 00:12:05,673
+the first line that corresponds
+to the diodes
+
+169
+00:12:05,673 --> 00:12:09,528
+in my drawing which will perhaps
+correspond to the diodes which are
+
+170
+00:12:09,528 --> 00:12:12,920
+on the top, just return 180 degrees.
+
+171
+00:12:12,920 --> 00:12:15,618
+The top becomes low,
+so everything is, what
+
+172
+00:12:15,618 --> 00:12:20,230
+is important is to know
+exactly what we are doing.
+
+173
+00:12:20,230 --> 00:12:23,915
+And then, well, with the procedure
+that we saw earlier, effective,
+
+174
+00:12:23,915 --> 00:12:29,832
+well, you've done one, a shift procedure,
+and then you sweep that table.
+
+175
+00:12:29,832 --> 00:12:32,360
+So it's trivial.
+
+176
+00:12:32,360 --> 00:12:37,178
+So now what will be interesting
+is to make a little bit of color.
+
+177
+00:12:37,178 --> 00:12:38,300
+You have
+
+178
+00:12:38,300 --> 00:12:43,130
+RGB diodes, which are three
+diodes on the same housing,
+
+179
+00:12:43,130 --> 00:12:49,450
+possibly, in a small SMD box of
+five millimeters of side.
+
+180
+00:12:49,450 --> 00:12:52,390
+And the question is how
+
+181
+00:12:52,390 --> 00:12:55,614
+to wiring these diodes on shift registers.
+
+182
+00:12:55,614 --> 00:12:58,826
+There is, for the moment, no alternative
+
+183
+00:12:58,826 --> 00:13:03,420
+than to connect the eight bits,
+either by saying,
+
+184
+00:13:03,420 --> 00:13:08,910
+well, RGB RGB, I can put
+two diodes on eight bits.
+
+185
+00:13:08,910 --> 00:13:12,651
+If I have 16 bits,
+it's barely more effective.
+
+186
+00:13:12,651 --> 00:13:17,790
+I will have a position that is lost
+since I can put five
+
+187
+00:13:17,790 --> 00:13:23,235
+LED, five times three, that makes 15.
+I can
+
+188
+00:13:23,235 --> 00:13:28,270
+alternate them like that, or like that,
+from the point of view of wiring,
+
+189
+00:13:28,270 --> 00:13:34,800
+And that is the physical organization.
+So now, at the memory level,
+
+190
+00:13:34,800 --> 00:13:40,077
+you have every advantage to use
+a different representation in general.
+
+191
+00:13:40,077 --> 00:13:45,899
+Take, for example, staying with
+16-bit modes, for a five out of cube
+
+192
+00:13:45,899 --> 00:13:53,364
+well, take all the reds in one mode,
+all greens
+
+193
+00:13:53,364 --> 00:13:57,152
+and blues in other modes,
+in other tables, in
+
+194
+00:13:57,152 --> 00:14:01,534
+fact, and it will make it easier for you,
+in the background, the
+
+195
+00:14:01,534 --> 00:14:09,224
+drawing of objects that are entirely
+red, entirely green and that can
+
+196
+00:14:09,224 --> 00:14:15,387
+be superimposed by first sending
+red information, green information.
+
+197
+00:14:15,387 --> 00:14:17,470
+So we're all or nothing.
+
+198
+00:14:17,470 --> 00:14:18,779
+We can make
+
+199
+00:14:18,779 --> 00:14:26,024
+PWM quite efficient on all these bits,
+there are very pretty solutions.
+
+200
+00:14:26,024 --> 00:14:29,562
+But, technology has solved this problem,
+there
+
+201
+00:14:29,562 --> 00:14:31,980
+are many applications that need
+
+202
+00:14:31,980 --> 00:14:33,964
+light-emitting diodes and there are many
+
+203
+00:14:33,964 --> 00:14:37,020
+circuits that have been
+developed for this purpose.
+
+204
+00:14:37,020 --> 00:14:39,420
+You've all seen advertising for these
+
+205
+00:14:39,420 --> 00:14:44,148
+light strips which are made,
+in fact, by combining
+
+206
+00:14:44,148 --> 00:14:46,977
+iintegrated circuits with a diode.
+
+207
+00:14:46,977 --> 00:14:51,510
+Sometimes there are several diodes
+and then it needs a 12 volt power supply.
+
+208
+00:14:51,510 --> 00:14:55,580
+Here, well, it could be powered by
+
+209
+00:14:55,580 --> 00:14:59,136
+Ffive volt, and the circuit inside,
+
+210
+00:14:59,136 --> 00:15:02,155
+is very interesting, because, it is
+
+211
+00:15:02,155 --> 00:15:07,372
+formed by the traditional shift
+register, the parallel register.
+
+212
+00:15:07,372 --> 00:15:09,451
+But here it is much more
+
+213
+00:15:09,451 --> 00:15:14,290
+complicated since you have
+the counters that, as in a
+
+214
+00:15:14,290 --> 00:15:19,620
+timer, allow to make PWM.
+So the eight-bit values
+
+215
+00:15:19,620 --> 00:15:24,560
+you send to each color element are
+
+216
+00:15:24,560 --> 00:15:29,600
+values, that Arduino says AnalogWrite,
+what
+
+217
+00:15:29,600 --> 00:15:34,950
+awful, which are proportional values
+​​between
+
+218
+00:15:34,950 --> 00:15:40,485
+zero and 256, since we have eight bits.
+Then,
+
+219
+00:15:40,485 --> 00:15:45,457
+these integrated circuits can be cascaded.
+
+220
+00:15:45,457 --> 00:15:50,714
+You enter the data, the clock,
+you come out with a data, a clock
+
+221
+00:15:50,714 --> 00:15:56,082
+which is even amplified, so
+you can make very long strips.
+
+222
+00:15:56,082 --> 00:15:59,621
+And you will tell me, but where is
+the load?
+
+223
+00:15:59,621 --> 00:16:00,548
+We need
+
+224
+00:16:00,548 --> 00:16:04,608
+a load, here to load the parallel
+register.
+
+225
+00:16:04,608 --> 00:16:09,464
+Well, it's done by a small logic
+that counts the 24 bits, and
+
+226
+00:16:09,464 --> 00:16:14,373
+then, who notices that you have
+
+227
+00:16:14,373 --> 00:16:19,525
+stopped sending clock pulses for a few
+
+228
+00:16:19,525 --> 00:16:25,115
+hundreds of microseconds,
+I believe, the time is quite short.
+
+229
+00:16:25,115 --> 00:16:26,011
+So obviously,
+
+230
+00:16:26,011 --> 00:16:28,475
+When you are interested in refreshing,
+you'll
+
+231
+00:16:28,475 --> 00:16:30,939
+Send them, clocks at full speed, as
+
+232
+00:16:30,939 --> 00:16:34,945
+quickly as possible, and then
+pause for
+
+233
+00:16:34,945 --> 00:16:40,490
+100 milliseconds to say that
+the transmission is complete.
+
+234
+00:16:40,490 --> 00:16:44,690
+At that point, after 100 milliseconds,
+well, there will
+
+235
+00:16:44,690 --> 00:16:46,865
+be loading and you will be able to
+
+236
+00:16:46,865 --> 00:16:50,110
+resume sending other PWM values.
+
+237
+00:16:50,110 --> 00:16:50,518
+So,
+
+238
+00:16:50,518 --> 00:16:53,578
+contrary to the previous solution
+where it was necessary
+
+239
+00:16:53,578 --> 00:16:57,795
+each time to load the registers
+to change the intensity,
+
+240
+00:16:57,795 --> 00:17:00,399
+here, once you have defined your
+
+241
+00:17:00,399 --> 00:17:05,180
+colors in the band, and well,
+it's programmed.
+
+242
+00:17:05,180 --> 00:17:08,204
+So these bands sell, of course,
+
+243
+00:17:08,204 --> 00:17:10,397
+With a library, with a small
+
+244
+00:17:10,397 --> 00:17:13,820
+box and buttons and, and
+you learned nothing at all.
+
+245
+00:17:13,820 --> 00:17:15,600
+But it's very easy
+
+246
+00:17:15,600 --> 00:17:19,427
+to program, and to do exactly what you
+
+247
+00:17:19,427 --> 00:17:23,500
+want, and that is, you find the
+documentation in different places.
+
+248
+00:17:23,500 --> 00:17:29,095
+The representation in memory,
+there, depends on your
+
+249
+00:17:29,095 --> 00:17:35,505
+application. You have
+three eight-bit PWM values,
+
+250
+00:17:35,505 --> 00:17:40,780
+you can say, and well here, every
+pixel, since it's only one LED,
+
+251
+00:17:40,780 --> 00:17:44,750
+I put it in a 32-bit register,
+
+252
+00:17:44,750 --> 00:17:47,229
+so much for the eight bits that are lost.
+
+253
+00:17:47,229 --> 00:17:52,900
+And then now, well, I can,
+fill my tables to display.
+
+254
+00:17:52,900 --> 00:17:59,727
+I can, in this table, that will be
+transmitted by an adequate routine
+
+255
+00:17:59,727 --> 00:18:06,410
+towards the display, and well, I can
+come to calculate color changes,
+
+256
+00:18:06,410 --> 00:18:12,610
+to make progressive changes
+or to make motives, chases, etc ...
+
+257
+00:18:12,610 --> 00:18:16,831
+And of course, another presentation
+is to say, but I prefer
+
+258
+00:18:16,831 --> 00:18:21,493
+to work with the colors separately,
+and then I have tables with the
+
+259
+00:18:21,493 --> 00:18:27,050
+different colors, and when sending
+the 24 bits to the display,
+
+260
+00:18:27,050 --> 00:18:31,424
+well, I'll take eight bits
+pointed in the red table,
+
+261
+00:18:31,424 --> 00:18:36,770
+eight bits corresponding in the
+green table, eight bits in the blue table.
+
+262
+00:18:36,770 --> 00:18:39,189
+Well, now, if we want to go further,
+
+263
+00:18:39,189 --> 00:18:41,962
+well, we have to work in two dimensions.
+
+264
+00:18:41,962 --> 00:18:46,584
+And for that, you have, a whole
+choice of circuits that develops.
+
+265
+00:18:46,584 --> 00:18:51,670
+The technology allows them to be
+realized at very reasonable costs,
+
+266
+00:18:51,670 --> 00:18:57,028
+A few tens of euros. It is
+not necessarily technology
+
+267
+00:18:57,028 --> 00:19:00,859
+OLED, it can be liquid crystal
+display technologies.
+
+268
+00:19:00,859 --> 00:19:06,168
+But you see that this module
+that has 96 out of 64
+
+269
+00:19:06,168 --> 00:19:11,796
+pixels, obviously it's smaller
+than the same amount
+
+270
+00:19:11,796 --> 00:19:17,108
+of light-emitting diodes, but,
+it allows, to display texts,
+
+271
+00:19:17,108 --> 00:19:22,894
+display graphics and train to work
+
+272
+00:19:22,894 --> 00:19:26,390
+with what you have, in fact,
+on your shelves.
+
+273
+00:19:26,390 --> 00:19:30,062
+These are just simply circuits
+a little
+
+274
+00:19:30,062 --> 00:19:35,570
+bigger that are, now, on all
+the shelves, phones and the like.
+
+275
+00:19:35,570 --> 00:19:40,903
+The circuit behind this display
+on the other side of the
+
+276
+00:19:40,903 --> 00:19:47,921
+printed circuit, so, here is its block diagram.
+Let us just note that there is an
+
+277
+00:19:47,921 --> 00:19:53,435
+interface to the microcontroller.
+This interface, well, there are even
+
+278
+00:19:53,435 --> 00:19:58,834
+different modes here, it has been
+programmed to have SPI
+
+279
+00:19:58,834 --> 00:20:04,220
+eh, the three clock, clock, data, load.
+
+280
+00:20:04,220 --> 00:20:08,250
+That is, the informations we get in there
+
+281
+00:20:08,250 --> 00:20:12,958
+are processed by a specialized
+microcontroller,
+
+282
+00:20:12,958 --> 00:20:16,296
+with lots of mods, and you have the
+
+283
+00:20:16,296 --> 00:20:22,678
+selection, in the background of
+rows and columns.
+
+284
+00:20:22,678 --> 00:20:27,605
+This circuit has 300, 400 output legs
+
+285
+00:20:27,605 --> 00:20:32,756
+Which are connected by printed
+circuits with
+
+286
+00:20:32,756 --> 00:20:37,830
+really, extremely thin and
+extremely tight conductors.
+
+287
+00:20:37,830 --> 00:20:43,730
+The manufacturer offers you
+primitives, because it is clear that,
+
+288
+00:20:43,730 --> 00:20:49,464
+if your program is to draw astraight
+line, like this one, those who
+
+289
+00:20:49,464 --> 00:20:54,465
+did the dolphin exercises realized,
+the number of operations
+
+290
+00:20:54,465 --> 00:20:59,829
+that we must arrive for ah, calculate
+the following positions and display it uh.
+
+291
+00:20:59,829 --> 00:21:03,501
+So at the level of all these circuits
+on your graphics tablets
+
+292
+00:21:03,501 --> 00:21:08,755
+too, there are uh, a graphic accelerator
+and to
+
+293
+00:21:08,755 --> 00:21:13,658
+draw a point, ben you have to send
+the coordinates of this point, to draw
+
+294
+00:21:13,658 --> 00:21:16,529
+a segment, you must give the
+
+295
+00:21:16,529 --> 00:21:20,975
+coordinates of the ends, to draw
+a character,
+
+296
+00:21:20,975 --> 00:21:25,830
+ben you have to give the coordinate
+of a reference point and the character.
+
+297
+00:21:25,830 --> 00:21:28,730
+And each time you also have
+
+298
+00:21:28,730 --> 00:21:32,568
+a color encoding that must be prepared.
+
+299
+00:21:32,568 --> 00:21:37,320
+There you see that the 16 bits
+were used with a bit more bits
+
+300
+00:21:37,320 --> 00:21:39,770
+for the, one more bit for the
+
+301
+00:21:39,770 --> 00:21:44,580
+green, to improve the color contrast
+probably.
+
+302
+00:21:44,580 --> 00:21:49,280
+So this kind of application is easy
+to program.
+
+303
+00:21:49,280 --> 00:21:54,133
+It is pestfalls because it takes
+a lot of time to modify
+
+304
+00:21:54,133 --> 00:21:57,600
+the coordinates, to adjust
+the elegance of the drawing.
+
+305
+00:21:57,600 --> 00:22:01,900
+It is easy to program because if there
+is a
+
+306
+00:22:01,900 --> 00:22:04,297
+programming error, you realise it right
+
+307
+00:22:04,297 --> 00:22:06,200
+away then you see what segment was
+
+308
+00:22:06,200 --> 00:22:10,265
+badly drawn, what character
+was wrongly chosen, wrongly placed.
+
+309
+00:22:10,265 --> 00:22:13,801
+So uh, you're going to spend a lot of
+
+310
+00:22:13,801 --> 00:22:17,370
+time but you will get nice results.
+
+311
+00:22:17,370 --> 00:22:19,557
+Well, we've just seen a lot
+
+312
+00:22:19,557 --> 00:22:24,465
+of things, especially that it's
+easy to go through
+
+313
+00:22:24,465 --> 00:22:29,310
+conversion tables to transform
+linear phenomena
+
+314
+00:22:29,310 --> 00:22:34,630
+into something non-linear
+
+315
+00:22:34,630 --> 00:22:40,080
+Which better corresponds to
+our physiological sensitivity,
+
+316
+00:22:40,080 --> 00:22:44,646
+which better corresponds to the
+capacities, of displacement, speed
+
+317
+00:22:44,646 --> 00:22:45,498
+of a robot.
+
+318
+00:22:45,498 --> 00:22:48,550
+There are really many applications that
+
+319
+00:22:48,550 --> 00:22:53,370
+are resolve with tables rather
+than calculations.
+
+320
+00:22:53,370 --> 00:22:57,778
+It has also been seen that the
+unpacking register
+
+321
+00:22:57,778 --> 00:23:02,890
+is the basic element for all
+displays in fact.
+
+322
+00:23:02,890 --> 00:23:05,890
+What if we can program with
+
+323
+00:23:05,890 --> 00:23:10,039
+extremely different speeds depending
+on whether we use
+
+324
+00:23:10,039 --> 00:23:15,480
+libraries or as we get closer
+to the processor.
+
+325
+00:23:15,480 --> 00:23:20,883
+We have seen that there are integrated
+circuits which facilitate the
+
+326
+00:23:20,883 --> 00:23:27,220
+LED control, current setting uh, wiring.
+
+327
+00:23:27,220 --> 00:23:30,916
+And where it becomes very interesting,
+it is that we
+
+328
+00:23:30,916 --> 00:23:35,718
+find in these PWM channels that
+directly allow
+
+329
+00:23:35,718 --> 00:23:38,716
+to have color intensities by having
+
+330
+00:23:38,716 --> 00:23:42,690
+naturally balanced all the
+necessary information in series.
+
+331
+00:23:42,690 --> 00:23:48,819
+And that, at the level of
+two-dimensional displays, OLEDs or
+
+332
+00:23:48,819 --> 00:23:55,205
+LCD displays, there is a possibility to, to inform
+
+333
+00:23:55,205 --> 00:24:00,964
+the user of parameters, curves, all kinds
+
+334
+00:24:00,964 --> 00:24:09,880
+of applications that are, indeed,
+quite spectacular to program.
+

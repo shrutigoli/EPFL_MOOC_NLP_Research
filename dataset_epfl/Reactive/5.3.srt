@@ -1,0 +1,1679 @@
+1
+00:00:01,290 --> 00:00:03,760
+Actors live and breathe in messages.
+
+2
+00:00:03,760 --> 00:00:07,630
+So now we will take a look at how exactly
+messages are exchanged between them.
+
+3
+00:00:10,680 --> 00:00:14,430
+The most important property of actors is,
+that access
+
+4
+00:00:14,430 --> 00:00:17,890
+to their state is only possible by
+exchanging messages.
+
+5
+00:00:18,940 --> 00:00:22,620
+There's no way to directly access the
+current behavior of an actor.
+
+6
+00:00:24,170 --> 00:00:31,230
+Messages can be sent to known addresses,
+and in Akka those are typed as ActorRef.
+
+7
+00:00:32,670 --> 00:00:35,690
+Every actor knows its own address, which
+is
+
+8
+00:00:35,690 --> 00:00:40,150
+very useful when sending messages to other
+actors and telling them where to
+
+9
+00:00:40,150 --> 00:00:44,860
+reply to, but it can also be useful to
+send a message to self.
+
+10
+00:00:47,200 --> 00:00:50,530
+The second possibility is creating an
+actor, which
+
+11
+00:00:50,530 --> 00:00:53,790
+will return the address of the new actor.
+
+12
+00:00:53,790 --> 00:00:56,037
+Most notably it will only return the
+address,
+
+13
+00:00:56,037 --> 00:01:00,410
+so the ActorRef, and not the actor
+instance.
+
+14
+00:01:00,410 --> 00:01:03,110
+It is not possible to call methods
+
+15
+00:01:03,110 --> 00:01:05,950
+on this newly created actor, besides
+sending messages.
+
+16
+00:01:08,450 --> 00:01:14,330
+The third way is that addresses can be
+sent between actors within messages.
+
+17
+00:01:16,620 --> 00:01:23,210
+The most prominent example of this is the
+automatic capturing of the sender in Akka.
+
+18
+00:01:26,350 --> 00:01:29,350
+The other important part of how actors
+
+19
+00:01:29,350 --> 00:01:32,880
+work is that they are completely,
+independently executed.
+
+20
+00:01:34,070 --> 00:01:37,800
+Every actor performs its calculations
+completely locally,
+
+21
+00:01:37,800 --> 00:01:40,260
+they are not shared directly with other
+actors.
+
+22
+00:01:41,450 --> 00:01:44,028
+The only way to share them is by sending
+messages.
+
+23
+00:01:44,028 --> 00:01:47,250
+There is no notion of a global
+synchronization between
+
+24
+00:01:47,250 --> 00:01:52,160
+the steps actors do because they all run
+fully concurrently.
+
+25
+00:01:53,398 --> 00:01:56,170
+And message parsing is the only way in
+which they
+
+26
+00:01:56,170 --> 00:02:00,190
+interact and the way messages are sent is
+completely one way.
+
+27
+00:02:01,530 --> 00:02:05,870
+When an actor sends a message to another
+it continues on its way and
+
+28
+00:02:05,870 --> 00:02:09,000
+is completely oblivious to whether the
+other
+
+29
+00:02:09,000 --> 00:02:11,490
+actor will receive or process the message.
+
+30
+00:02:11,490 --> 00:02:13,180
+It does not wait for its completion.
+
+31
+00:02:14,880 --> 00:02:18,900
+This means that actors are completely
+incapsulated and
+
+32
+00:02:18,900 --> 00:02:20,200
+isolated from each other.
+
+33
+00:02:21,400 --> 00:02:24,100
+One could also say that actors are
+
+34
+00:02:24,100 --> 00:02:27,560
+the most encapsulated form of object
+orientation.
+
+35
+00:02:30,470 --> 00:02:34,980
+We have seen how actors interact, as seen
+from the outside.
+
+36
+00:02:34,980 --> 00:02:39,070
+On the inside, an actor is effectively
+single-threaded.
+
+37
+00:02:39,070 --> 00:02:43,360
+It will receive its messages, one after
+the other.
+
+38
+00:02:43,360 --> 00:02:46,960
+And, for each, it will invoke its
+behavior, possibly
+
+39
+00:02:46,960 --> 00:02:50,520
+change the behavior for the next message
+and move on.
+
+40
+00:02:50,520 --> 00:02:55,980
+But, it is important to note that
+processing one message is the
+
+41
+00:02:55,980 --> 00:02:57,470
+atomic unit of execution.
+
+42
+00:02:59,340 --> 00:03:04,500
+Everything an actor does while processing
+a message cannot be interrupted
+
+43
+00:03:04,500 --> 00:03:10,200
+or interleaved with processing another
+message; they are strictly sequential.
+
+44
+00:03:10,200 --> 00:03:15,570
+This, has the same benefits of making all
+methods synchronized, as
+
+45
+00:03:15,570 --> 00:03:21,140
+shown in the first part of this lecture,
+but without the
+
+46
+00:03:21,140 --> 00:03:24,430
+disadvantage of blocking.
+
+47
+00:03:24,430 --> 00:03:29,940
+Blocking is replaced by simply enqueueing
+messages, for later execution.
+
+48
+00:03:29,940 --> 00:03:34,280
+Now let us apply these principles to the,
+our well-known bank account example.
+
+49
+00:03:36,640 --> 00:03:41,450
+This bank account will, of course, be an
+actor and it will receive messages.
+
+50
+00:03:41,450 --> 00:03:45,680
+It is good practice to declare all the
+possible message types expected
+
+51
+00:03:45,680 --> 00:03:50,680
+by the actor, and also returned and reply,
+in its companion object.
+
+52
+00:03:50,680 --> 00:03:52,860
+We have therefore here, the object bank
+
+53
+00:03:52,860 --> 00:03:56,310
+account, and in that, we have case
+classes.
+
+54
+00:03:56,310 --> 00:04:02,450
+One for depositing some amount, I'm using
+big integer here,
+
+55
+00:04:02,450 --> 00:04:07,690
+to avoid problems with overflow, just
+because someone might
+
+56
+00:04:07,690 --> 00:04:10,380
+have more than two billion Swiss Francs in
+one account.
+
+57
+00:04:11,760 --> 00:04:15,620
+And of course we need the amount to
+deposit to be positive.
+
+58
+00:04:15,620 --> 00:04:17,940
+Require is a library function which will
+simply
+
+59
+00:04:17,940 --> 00:04:20,970
+throw an exception if the condition does
+not hold.
+
+60
+00:04:22,220 --> 00:04:25,280
+This means that a deposit object which
+
+61
+00:04:25,280 --> 00:04:28,010
+has been instantiated will always have a
+positive
+
+62
+00:04:28,010 --> 00:04:29,680
+amount in it.
+
+63
+00:04:29,680 --> 00:04:35,950
+The same for withdrawals we have another
+case class, which gives the amount.
+
+64
+00:04:35,950 --> 00:04:40,280
+And then, our actor will have to respond
+to requests so
+
+65
+00:04:40,280 --> 00:04:43,880
+that we can detect that it actually has
+performed the work.
+
+66
+00:04:43,880 --> 00:04:48,170
+And for that we have the positive, Done,
+and negative Failed reply.
+
+67
+00:04:50,820 --> 00:04:52,649
+Now let us look at the actor itself.
+
+68
+00:04:53,950 --> 00:04:56,240
+First, of course, we extend the Actor
+traits.
+
+69
+00:04:56,240 --> 00:05:00,960
+Then we import all these message types,
+which we have defined.
+
+70
+00:05:00,960 --> 00:05:04,370
+And the actor starts out with a balance of
+zero.
+
+71
+00:05:05,650 --> 00:05:08,640
+Then it will handle messages as they are
+received.
+
+72
+00:05:08,640 --> 00:05:13,940
+We can receive a deposit, in this case, we
+increase the balance by the amount.
+
+73
+00:05:13,940 --> 00:05:17,160
+And reply with a positive acknowledgement.
+
+74
+00:05:18,680 --> 00:05:22,660
+If a withdraw message arrives, we need to
+check
+
+75
+00:05:22,660 --> 00:05:26,090
+that there is actually sufficient funds in
+the account.
+
+76
+00:05:26,090 --> 00:05:31,190
+If that is the case, then we deduct the
+amount from the balance, and send
+
+77
+00:05:31,190 --> 00:05:36,190
+back a positive reply, in all other cases
+we reply with a failure.
+
+78
+00:05:39,260 --> 00:05:43,220
+This actor is equivalent to the bank
+account object defined earlier,
+
+79
+00:05:44,520 --> 00:05:47,370
+but including synchronization, because the
+code
+
+80
+00:05:47,370 --> 00:05:50,800
+in here will be completely serialized.
+
+81
+00:05:50,800 --> 00:05:55,940
+One message entering this behavior cannot
+interfere with another
+
+82
+00:05:55,940 --> 00:06:02,110
+one because the other one will be forced
+to wait its turn in the processing.
+
+83
+00:06:02,110 --> 00:06:04,760
+That is the very convenient,
+
+84
+00:06:04,760 --> 00:06:08,050
+the most convenient feature of actors when
+working with them.
+
+85
+00:06:12,510 --> 00:06:14,340
+In order to transfer money between these
+
+86
+00:06:14,340 --> 00:06:18,610
+accounts we need several actors to
+collaborate.
+
+87
+00:06:18,610 --> 00:06:22,530
+And actors collaborate basically in the
+same way that humans do.
+
+88
+00:06:24,070 --> 00:06:26,490
+Let me first make a small detour here,
+
+89
+00:06:28,670 --> 00:06:33,750
+let us say we have an account Which we
+call Alice, here.
+
+90
+00:06:33,750 --> 00:06:38,150
+And we'll have another account, which we
+call Bob.
+
+91
+00:06:41,460 --> 00:06:42,940
+Now we want to transfer money.
+
+92
+00:06:49,080 --> 00:06:52,420
+We could include the code to perform the
+transfer in
+
+93
+00:06:52,420 --> 00:06:56,760
+the bank account itself, but that would
+mix up the logic.
+
+94
+00:06:56,760 --> 00:07:01,230
+The bank account should not have to know
+how exactly a transfer is done.
+
+95
+00:07:01,230 --> 00:07:03,470
+This is why we introduce another actor,
+
+96
+00:07:07,170 --> 00:07:13,260
+let's call him Tom.
+Who will be our model of the activity to
+
+97
+00:07:13,260 --> 00:07:20,840
+transfer some money.
+Tom will first send a message to Alice to
+
+98
+00:07:24,120 --> 00:07:28,330
+withdraw the money from Alice and Alice
+
+99
+00:07:28,330 --> 00:07:33,280
+will eventually reply, hopefully with a
+success.
+
+100
+00:07:35,430 --> 00:07:38,190
+In case of failure, Tom will just abort
+the transaction.
+
+101
+00:07:39,900 --> 00:07:42,460
+Then Tom will send to Bob,
+
+102
+00:07:48,640 --> 00:07:49,360
+a deposit.
+
+103
+00:07:51,350 --> 00:07:56,800
+And eventually Bob will reply, yes all is
+done.
+
+104
+00:07:56,800 --> 00:08:01,600
+And at that point the transfer has
+completed, the transaction has been done
+
+105
+00:08:01,600 --> 00:08:07,870
+and Tom can shut itself down, possibly
+informing whoever wanted to know about it.
+
+106
+00:08:10,510 --> 00:08:11,950
+How does this look like in code?
+
+107
+00:08:13,590 --> 00:08:18,970
+Well, we need another actor, we call it
+WireTransfer, and
+
+108
+00:08:18,970 --> 00:08:23,700
+this one will also accept some messages,
+again, in the companion object we have the
+
+109
+00:08:23,700 --> 00:08:29,530
+Transfer case class, from is a bank
+account, but we only know the address.
+
+110
+00:08:29,530 --> 00:08:32,920
+To is an address to another bank account
+and
+
+111
+00:08:32,920 --> 00:08:36,700
+amount is the amount of money which shall
+be transferred.
+
+112
+00:08:36,700 --> 00:08:43,500
+This actor also can signal success and
+failure and it is good to keep the message
+
+113
+00:08:43,500 --> 00:08:45,990
+set used by one actor local to it
+
+114
+00:08:45,990 --> 00:08:49,150
+and to keep different actors separate from
+each other.
+
+115
+00:08:50,970 --> 00:08:55,210
+Transferring money proceeds in several
+steps as we have seen in the picture.
+
+116
+00:08:55,210 --> 00:08:58,988
+First of all, when we create a
+WireTransfer
+
+117
+00:08:58,988 --> 00:09:01,610
+actor it will start out with an initial
+behavior.
+
+118
+00:09:02,700 --> 00:09:07,480
+It accepts only message type Transfer.
+And this Transfer
+
+119
+00:09:07,480 --> 00:09:12,120
+tells it from whom, to whom, how much
+shall be transferred.
+
+120
+00:09:13,840 --> 00:09:18,650
+So the from actor gets a message to
+withdraw amount and
+
+121
+00:09:18,650 --> 00:09:23,140
+then this actor changes its behavior to
+await the
+
+122
+00:09:23,140 --> 00:09:27,770
+result of this withdraw activity and as
+
+123
+00:09:27,770 --> 00:09:30,920
+you suspend its execution.
+
+124
+00:09:30,920 --> 00:09:34,040
+It will not consume any CPU resources it
+will
+
+125
+00:09:34,040 --> 00:09:37,380
+not run unless a message is actually sent
+to it.
+
+126
+00:09:39,440 --> 00:09:44,060
+The behavior which we install for the
+second step, awaitWithdraw, needs to know
+
+127
+00:09:45,180 --> 00:09:51,260
+the account to which the money shall be
+transfered, which amount that was.
+
+128
+00:09:51,260 --> 00:09:57,230
+And also who sent the transfer command to
+send back the acknowledgement at the end.
+
+129
+00:10:00,000 --> 00:10:03,990
+The behavior in the second step is defined
+here.
+
+130
+00:10:03,990 --> 00:10:09,310
+We await the result of the withdraw
+operation and the, a bank account
+
+131
+00:10:09,310 --> 00:10:13,880
+might reply with a done, in which we, in
+which case we proceed.
+
+132
+00:10:13,880 --> 00:10:20,200
+We send a deposit to the recipient
+account, and then we change behavior
+
+133
+00:10:20,200 --> 00:10:25,130
+to await the result of that operation.
+If the withdrawal from
+
+134
+00:10:25,130 --> 00:10:29,790
+the originating account actually failed,
+which means that there were insufficient
+
+135
+00:10:29,790 --> 00:10:34,550
+funds, then we need to tell the client
+which requested the transfer.
+
+136
+00:10:34,550 --> 00:10:37,290
+And we need to stop this transaction.
+
+137
+00:10:39,200 --> 00:10:45,470
+In the last step, if the withdrawal was
+successful, we await
+
+138
+00:10:45,470 --> 00:10:50,960
+the BankAccount.Done, from the account
+which was supposed to receive the deposit.
+
+139
+00:10:50,960 --> 00:10:55,440
+Once we get it, we confirm that the
+transaction has been successful.
+
+140
+00:10:55,440 --> 00:10:57,460
+To the or, original client.
+
+141
+00:10:57,460 --> 00:10:59,400
+And stop this transaction.
+
+142
+00:11:03,190 --> 00:11:06,570
+Perhaps it is instructive to see this all
+in action.
+
+143
+00:11:06,570 --> 00:11:12,350
+I have again, put the code which was
+presented so far into an Eclipse project.
+
+144
+00:11:12,350 --> 00:11:16,509
+Here we see the bank account with
+well-known messages.
+
+145
+00:11:17,580 --> 00:11:22,770
+And here we have the actor itself, and
+I've added a debugging feature here.
+
+146
+00:11:22,770 --> 00:11:27,490
+I've said LoggingReceive around the
+behavior.
+
+147
+00:11:27,490 --> 00:11:28,380
+We will see what that
+
+148
+00:11:28,380 --> 00:11:34,300
+means shortly, it is imported here from
+the Akka event package.
+
+149
+00:11:36,440 --> 00:11:39,910
+Similarly, we have the wire transfer actor
+
+150
+00:11:42,510 --> 00:11:44,190
+which has also been treated in the
+
+151
+00:11:44,190 --> 00:11:47,050
+same way with logging receives in all
+behaviors.
+
+152
+00:11:50,400 --> 00:11:54,100
+The last part is an actual main program
+which runs all of this.
+
+153
+00:11:56,190 --> 00:11:58,670
+Again, this is an actor like in the last
+example.
+
+154
+00:12:00,340 --> 00:12:03,360
+And we create two accounts, account A and
+
+155
+00:12:03,360 --> 00:12:06,750
+account B, both bank accounts with
+different names.
+
+156
+00:12:08,710 --> 00:12:15,420
+Then we send to account A a deposit of 100
+Swiss Francs, for example, and
+
+157
+00:12:15,420 --> 00:12:18,370
+in the initial behavior, we await
+confirmation
+
+158
+00:12:18,370 --> 00:12:21,210
+from this bank account that the deposit
+has
+
+159
+00:12:21,210 --> 00:12:25,330
+been received.
+Then we start a transfer of 50 Swiss
+
+160
+00:12:25,330 --> 00:12:29,810
+Francs.
+Transfer is a method which first creates a
+
+161
+00:12:29,810 --> 00:12:35,250
+transaction actor, this WireTransfer
+called transfer, then it
+
+162
+00:12:35,250 --> 00:12:40,970
+sends to this transaction the command to
+Transfer from account A
+
+163
+00:12:40,970 --> 00:12:46,520
+to account B, the given amount.
+And then it changes the behavior of this
+
+164
+00:12:46,520 --> 00:12:49,060
+actor to wait for the confirmation.
+
+165
+00:12:49,060 --> 00:12:53,260
+Once it is received, we declare success
+and stop the program.
+
+166
+00:12:55,110 --> 00:12:58,620
+Again, I have prepared a run configuration
+for this
+
+167
+00:13:01,530 --> 00:13:03,029
+with the akka Main class.
+
+168
+00:13:05,570 --> 00:13:10,340
+And as argument, the main class the, the
+actor class to be run.
+
+169
+00:13:11,470 --> 00:13:13,300
+I have set here a debug option,
+
+170
+00:13:13,300 --> 00:13:18,610
+Dakka actor debug receive equals on, this
+activates
+
+171
+00:13:18,610 --> 00:13:20,860
+all the logging receive blocks, so that
+they
+
+172
+00:13:20,860 --> 00:13:23,770
+tell us when which message is being
+processed.
+
+173
+00:13:23,770 --> 00:13:26,060
+It is done so at log level debug.
+
+174
+00:13:29,330 --> 00:13:30,080
+Now running it,
+
+175
+00:13:32,580 --> 00:13:34,060
+produces a lot of output.
+
+176
+00:13:40,010 --> 00:13:42,870
+Here we can follow the progress of the
+program.
+
+177
+00:13:42,870 --> 00:13:46,780
+First, the account receives the deposit of
+
+178
+00:13:46,780 --> 00:13:50,670
+100, then the application receives the
+confirmation.
+
+179
+00:13:51,950 --> 00:13:57,070
+Next we instantiate the transfer and tell
+it to transfer from account A
+
+180
+00:13:59,140 --> 00:14:01,133
+to account B, amount 50.
+
+181
+00:14:03,650 --> 00:14:07,770
+Account A will then receive the withdraw
+message and
+
+182
+00:14:07,770 --> 00:14:12,640
+reply to the transfer with the successful
+acknowledgement.
+
+183
+00:14:12,640 --> 00:14:18,800
+Then Account B will receive the deposit,
+and again, reply successfully.
+
+184
+00:14:18,800 --> 00:14:25,060
+At the end, we receive a Done message.
+At which point the application terminates.
+
+185
+00:14:30,158 --> 00:14:33,820
+If we now try to transfer more than that's
+in the account
+
+186
+00:14:36,190 --> 00:14:37,600
+and run again,
+
+187
+00:14:42,730 --> 00:14:47,830
+we will see less output.
+First, again, we deposit 100, and that was
+
+188
+00:14:47,830 --> 00:14:53,970
+successful, then the transfer starts,
+withdraw 150, which fails.
+
+189
+00:14:53,970 --> 00:14:58,680
+Then we see received unhandled message
+failed, and nothing more happens.
+
+190
+00:15:01,020 --> 00:15:05,850
+This is because in this behavior here, we
+do not handle this case, and we do not
+
+191
+00:15:05,850 --> 00:15:10,990
+stop the application.
+So I will quickly insert
+
+192
+00:15:10,990 --> 00:15:15,970
+this case and when re-running it we
+
+193
+00:15:15,970 --> 00:15:21,282
+see again that it, now it receives the
+
+194
+00:15:21,282 --> 00:15:27,092
+handled message failed and it terminates
+
+195
+00:15:27,092 --> 00:15:29,770
+the application.
+
+196
+00:15:33,000 --> 00:15:37,430
+To recap what we have done, we have
+modeled accounts as actors
+
+197
+00:15:37,430 --> 00:15:41,980
+which were Alice and Bob, account A and B,
+in our sample.
+
+198
+00:15:41,980 --> 00:15:44,290
+We have modeled the activity of
+transferring money
+
+199
+00:15:44,290 --> 00:15:47,410
+from one account to the other as an actor.
+
+200
+00:15:47,410 --> 00:15:52,630
+Which was named Tom here, and then we saw
+how the messages flow, to complete the
+
+201
+00:15:52,630 --> 00:15:58,090
+task which are supposed to be done.
+Actors interact only using messages,
+
+202
+00:15:58,090 --> 00:15:58,980
+as we have seen.
+
+203
+00:16:00,180 --> 00:16:03,505
+But messages can also be viewed like
+letters.
+
+204
+00:16:04,950 --> 00:16:08,910
+We have seen that actors interact only by
+sending messages.
+
+205
+00:16:08,910 --> 00:16:12,425
+But sending messages is something which
+requires one more thought.
+
+206
+00:16:13,790 --> 00:16:17,480
+Whenever you send it, you can never be
+completely sure that
+
+207
+00:16:17,480 --> 00:16:23,110
+it will be received as all communication
+is always a little
+
+208
+00:16:23,110 --> 00:16:24,090
+bit unreliable.
+
+209
+00:16:25,380 --> 00:16:28,960
+The same is true for synchronous method
+calls.
+
+210
+00:16:28,960 --> 00:16:33,190
+Which are also messages in a sense,
+because for example,
+
+211
+00:16:33,190 --> 00:16:37,070
+the computer might crash while trying to
+invoke a method.
+
+212
+00:16:37,070 --> 00:16:40,656
+You could say then that the message was
+not delivered.
+
+213
+00:16:40,656 --> 00:16:48,136
+if you invoke network transfers for
+example, send messages across
+
+214
+00:16:48,136 --> 00:16:53,050
+a TCP/IP connection, then obviously, the
+chances
+
+215
+00:16:53,050 --> 00:16:55,730
+of messages being lost is higher, but
+
+216
+00:16:55,730 --> 00:16:57,910
+nevertheless, you need to always deal with
+
+217
+00:16:57,910 --> 00:17:01,120
+the fact that communication is inherently
+unreliable.
+
+218
+00:17:03,330 --> 00:17:09,100
+This is something we know from daily life,
+so we can also employ the protocols.
+
+219
+00:17:09,100 --> 00:17:10,110
+Which we have developed.
+
+220
+00:17:12,130 --> 00:17:17,370
+Say we have a person here, and this person
+wants this other person over here,
+
+221
+00:17:19,190 --> 00:17:24,014
+to perform a certain task.
+Let's just say it says,
+
+222
+00:17:24,014 --> 00:17:29,126
+something like please do.
+
+223
+00:17:31,350 --> 00:17:32,730
+Whatever it is that shall be done.
+
+224
+00:17:34,140 --> 00:17:36,790
+What we typically do is, we do not race
+
+225
+00:17:36,790 --> 00:17:40,380
+past the other person's office and shout
+in, please do.
+
+226
+00:17:40,380 --> 00:17:44,290
+Because then we don't know whether the
+command was actually heard.
+
+227
+00:17:44,290 --> 00:17:47,600
+What we typically do is we wait for a
+confirmation.
+
+228
+00:17:47,600 --> 00:17:53,560
+Now the other person, which was listening,
+was hearing that this person said, please
+
+229
+00:17:53,560 --> 00:18:00,260
+do, might respond okay.
+
+230
+00:18:00,260 --> 00:18:02,690
+This gives confirmation that the message
+was actually
+
+231
+00:18:02,690 --> 00:18:07,310
+delivered and then both can happily go
+away.
+
+232
+00:18:07,310 --> 00:18:10,830
+But what happens if, for example, a big
+noise occurs.
+
+233
+00:18:10,830 --> 00:18:15,750
+That shadows this okay phrase, so this
+person doesn't hear it.
+
+234
+00:18:17,060 --> 00:18:20,620
+Well, we humans are pretty adaptive, so
+this one will ask
+
+235
+00:18:25,950 --> 00:18:26,580
+have you heard?
+
+236
+00:18:28,390 --> 00:18:30,629
+And this can go on until the process is
+complete.
+
+237
+00:18:32,950 --> 00:18:37,890
+We can take this as inspiration for how to
+construct actor systems, which perform
+
+238
+00:18:37,890 --> 00:18:43,980
+tasks reliably, although the communication
+they employ is unreliable to begin with.
+
+239
+00:18:47,110 --> 00:18:51,589
+Successful delivery of messages requires
+that eventually, we will succeed.
+
+240
+00:18:52,800 --> 00:18:59,590
+In the example with the two persons it
+requires that both are perseverent enough
+
+241
+00:18:59,590 --> 00:19:02,250
+to come back to the process and
+
+242
+00:19:02,250 --> 00:19:06,250
+keep talking until the confirmation is
+conveyed.
+
+243
+00:19:07,870 --> 00:19:08,820
+In more formal terms.
+
+244
+00:19:10,140 --> 00:19:12,435
+Delivery of a message requires the
+eventual
+
+245
+00:19:12,435 --> 00:19:16,220
+availability of a communication channel
+and of the recipient.
+
+246
+00:19:18,140 --> 00:19:21,530
+We can classify the kind of effort we go
+
+247
+00:19:21,530 --> 00:19:25,660
+to and the resulting delivery guarantees
+in three ways.
+
+248
+00:19:27,110 --> 00:19:30,250
+The first one is if you just send a
+
+249
+00:19:30,250 --> 00:19:34,890
+message once, then it will either arrive
+or not.
+
+250
+00:19:34,890 --> 00:19:38,570
+Hence, it will be delivered zero or one
+times.
+
+251
+00:19:38,570 --> 00:19:40,740
+This is called at-most-once delivery.
+
+252
+00:19:42,480 --> 00:19:47,189
+If we keep resending a message until we
+receive an acknowledgement.
+
+253
+00:19:48,450 --> 00:19:52,150
+That means, we will resend it until it has
+
+254
+00:19:52,150 --> 00:19:54,930
+been processed, so it will be received at
+least once.
+
+255
+00:19:56,400 --> 00:19:59,570
+But up to an infinite number of times.
+
+256
+00:19:59,570 --> 00:20:02,900
+Because the acknowledgement itself might
+be lost.
+
+257
+00:20:02,900 --> 00:20:04,060
+And we will keep resending
+
+258
+00:20:04,060 --> 00:20:09,150
+it until that is also successful.
+If we keep state at the
+
+259
+00:20:09,150 --> 00:20:14,220
+receiver, to make sure that only the first
+received message is
+
+260
+00:20:14,220 --> 00:20:19,400
+processed, then you can ensure that the
+message is processed exactly once.
+
+261
+00:20:21,030 --> 00:20:23,410
+This is the most costly of the three
+options.
+
+262
+00:20:24,520 --> 00:20:28,740
+The first option can be done without
+keeping any state in sender or receiver.
+
+263
+00:20:29,990 --> 00:20:33,630
+The second choice requires that the sender
+needs to keep the
+
+264
+00:20:33,630 --> 00:20:37,110
+message to buffer it, in order to be able
+to resend.
+
+265
+00:20:38,420 --> 00:20:42,690
+And the third choice, additionally
+requires the receiver to
+
+266
+00:20:42,690 --> 00:20:46,110
+keep track of which messages have already
+been processed.
+
+267
+00:20:48,450 --> 00:20:53,760
+The good thing about messages is that
+making them explicitly,
+
+268
+00:20:53,760 --> 00:20:58,970
+supports reliability quite well.
+First of all, messages can be persistent.
+
+269
+00:21:00,330 --> 00:21:05,110
+You can take a copy of a message and store
+it in some persistent storage.
+
+270
+00:21:05,110 --> 00:21:08,140
+You can not do the same thing with a local
+method
+
+271
+00:21:08,140 --> 00:21:13,590
+invocation for example because that is an
+ephemeral act you have one
+
+272
+00:21:13,590 --> 00:21:18,270
+object invoking a method and the context
+in which this happens might go away.
+
+273
+00:21:18,270 --> 00:21:21,530
+A message on the other hand from one
+sender
+
+274
+00:21:21,530 --> 00:21:24,439
+to one receiver is something which you can
+persist.
+
+275
+00:21:25,760 --> 00:21:32,340
+If you include a unique relation ID in the
+message, you can enable the exactly
+
+276
+00:21:32,340 --> 00:21:35,720
+once semantics by allowing the recipient
+to
+
+277
+00:21:35,720 --> 00:21:39,110
+find out whether it has already received
+this,
+
+278
+00:21:39,110 --> 00:21:40,099
+this unique message.
+
+279
+00:21:41,160 --> 00:21:45,050
+And finally, delivery can be retried until
+successful.
+
+280
+00:21:45,050 --> 00:21:47,650
+If the messages were persisted then
+retries
+
+281
+00:21:47,650 --> 00:21:51,280
+can even be restarted after a catastrophic
+failure.
+
+282
+00:21:51,280 --> 00:21:55,910
+For example, if all the computers were
+down due to a power outage.
+
+283
+00:21:57,200 --> 00:22:00,859
+Then once the power comes back up,
+delivery can restart.
+
+284
+00:22:02,290 --> 00:22:04,730
+But one thing to note, it is not
+
+285
+00:22:04,730 --> 00:22:08,760
+enough to deliver a message to a
+recipient.
+
+286
+00:22:08,760 --> 00:22:11,170
+If you do not get a reply from that
+recipient,
+
+287
+00:22:11,170 --> 00:22:14,290
+you can never be sure whether it has
+processed it.
+
+288
+00:22:14,290 --> 00:22:17,830
+That means, that all of these semantics
+discussed
+
+289
+00:22:17,830 --> 00:22:21,800
+only work if you include a business level
+acknowledgement.
+
+290
+00:22:21,800 --> 00:22:25,540
+That means that the actor which shall
+process the message
+
+291
+00:22:25,540 --> 00:22:30,460
+actually needs to say, I have gone this
+specific task.
+
+292
+00:22:30,460 --> 00:22:33,200
+It is not enough for the framer to say,
+
+293
+00:22:33,200 --> 00:22:36,080
+I have put this task into the recipient's
+mailbox.
+
+294
+00:22:38,490 --> 00:22:44,050
+How do we apply these principles in our
+bank account transfer example?
+
+295
+00:22:44,050 --> 00:22:47,530
+We can make the wire transfer reliable by
+logging all
+
+296
+00:22:47,530 --> 00:22:51,520
+its activities to persistant storage so
+that it has a memory.
+
+297
+00:22:53,410 --> 00:22:58,200
+Then each transfer needs to have a unique
+ID by which it can be
+
+298
+00:22:58,200 --> 00:23:03,910
+identified in the Withdraw message and in
+the Deposit message so that
+
+299
+00:23:03,910 --> 00:23:07,860
+the bank account actors do not perform
+Withdraw or
+
+300
+00:23:07,860 --> 00:23:11,530
+Deposit more than once if resends should
+be necessary.
+
+301
+00:23:12,940 --> 00:23:17,190
+And for that, they need to store these IDs
+with their state.
+
+302
+00:23:19,230 --> 00:23:23,940
+The details of how to do this, I leave as
+an exercise for the viewer.
+
+303
+00:23:25,980 --> 00:23:30,770
+The last topic in this section, is about
+message ordering.
+
+304
+00:23:30,770 --> 00:23:34,390
+When you send multiple messages in your
+system.
+
+305
+00:23:34,390 --> 00:23:36,850
+In which order do the actors process them?
+
+306
+00:23:39,010 --> 00:23:41,040
+An example.
+Let us say,
+
+307
+00:23:43,660 --> 00:23:50,565
+we have an actor Alice and as usual,
+accompanied by Bob
+
+308
+00:23:50,565 --> 00:23:56,140
+and Charlie.
+
+309
+00:23:56,140 --> 00:24:01,420
+As, Alice sends a message to Charlie.
+
+310
+00:24:03,430 --> 00:24:05,000
+So far so good.
+
+311
+00:24:05,000 --> 00:24:08,380
+But if in the same, at the same message
+processing turn,
+
+312
+00:24:09,640 --> 00:24:14,470
+Alice also sends a message to Bob, which
+one gets processed first?
+
+313
+00:24:15,580 --> 00:24:16,880
+You don't know.
+
+314
+00:24:16,880 --> 00:24:19,960
+Conceptually they are processed completely
+concurrently.
+
+315
+00:24:19,960 --> 00:24:22,930
+You cannot tell in which order they are
+processed.
+
+316
+00:24:25,790 --> 00:24:31,490
+Now, if this message to Bob would contain
+a reference to Charlie,
+
+317
+00:24:31,490 --> 00:24:37,780
+so an actor refer it, then Bob, might, in
+response to this message, also send a
+
+318
+00:24:37,780 --> 00:24:41,900
+message to Charlie, but since we do not
+know in which order they are processed,
+
+319
+00:24:42,930 --> 00:24:48,560
+this message from Bob to Charlie might
+actually arrive before the one from Alice.
+
+320
+00:24:49,960 --> 00:24:50,920
+In the original actor
+
+321
+00:24:50,920 --> 00:24:52,980
+model, those were all the rules.
+
+322
+00:24:54,410 --> 00:24:57,490
+Message ordering is not prescribed by the
+model.
+
+323
+00:24:58,610 --> 00:25:01,020
+In Akka, there is one addition.
+
+324
+00:25:01,020 --> 00:25:06,110
+If Alice sends another message to Charlie,
+then the message
+
+325
+00:25:06,110 --> 00:25:11,050
+of, the order of these two messages, will
+be the same at the
+
+326
+00:25:11,050 --> 00:25:16,110
+receiving side as on the sending side.
+Either of these messages
+
+327
+00:25:16,110 --> 00:25:17,780
+could be lost, of course.
+
+328
+00:25:17,780 --> 00:25:20,150
+But they will not be delivered out of
+order.
+
+329
+00:25:21,540 --> 00:25:25,060
+There are other, more sophisticated
+systems.
+
+330
+00:25:25,060 --> 00:25:28,400
+for example, the e programming language.
+
+331
+00:25:28,400 --> 00:25:34,110
+Where causality goes a bit further.
+So if Alice sends a message to Charlie.
+
+332
+00:25:35,560 --> 00:25:38,150
+Then in Alice's view, Charlie has already
+
+333
+00:25:38,150 --> 00:25:42,250
+processed the message for all intents and
+purposes.
+
+334
+00:25:42,250 --> 00:25:48,330
+So if it sends Charlie's reference to Bob,
+then if Bob subsequently
+
+335
+00:25:48,330 --> 00:25:54,740
+sends to Charlie, this should not be able
+to arrive before the message from Alice.
+
+336
+00:25:54,740 --> 00:25:57,660
+This guarantee is rather expensive to
+realize but
+
+337
+00:25:57,660 --> 00:26:00,120
+E has also a different focus than Akka.
+
+338
+00:26:02,360 --> 00:26:07,350
+The philosophy of Akka is to provide the
+minimum level of guarantee which make
+
+339
+00:26:07,350 --> 00:26:11,120
+the programmer's life easy but still allow
+
+340
+00:26:11,120 --> 00:26:13,640
+our implementation to be very fast and
+efficient.
+
+341
+00:26:15,170 --> 00:26:20,520
+Therefore we chose not to implement the
+full causality,
+
+342
+00:26:20,520 --> 00:26:25,210
+just the ordering between a single sender
+and receiver pair.
+
+343
+00:26:27,930 --> 00:26:32,190
+In summary, actors are fully encapsulated,
+independent agents
+
+344
+00:26:32,190 --> 00:26:36,490
+of computation, which run fully isolated
+from each other.
+
+345
+00:26:36,490 --> 00:26:39,470
+And the only way they interact is by
+passing messages.
+
+346
+00:26:41,190 --> 00:26:47,210
+Making message parsing explicit also
+exposes the possibility of message loss.
+
+347
+00:26:47,210 --> 00:26:53,280
+But it also allows you to explicitly treat
+reliability in your programming model.
+
+348
+00:26:54,470 --> 00:27:00,370
+Lastly, the order in which messages are
+processed is mostly undefined,
+
+349
+00:27:00,370 --> 00:27:04,850
+but we have seen how to deal with that in
+our wire transfer actor, if you have one
+
+350
+00:27:04,850 --> 00:27:09,880
+actor which coordinates a certain session
+between other actors.
+
+351
+00:27:09,880 --> 00:27:15,670
+Then this one dictates the order
+
+352
+00:27:15,670 --> 00:27:20,384
+in which
+
+353
+00:27:20,384 --> 00:27:28,453
+things happen.
+

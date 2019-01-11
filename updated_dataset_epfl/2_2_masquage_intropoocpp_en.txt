@@ -1,0 +1,70 @@
+In certain cases, members defined in a superclass do not satisfy the needs of a subclass sufficiently.
+Redefinition and shadowing are 2 concepts that can be useful in such situations.
+In the last episode we took the example of a hierarchy of characters in a game based on the hypothesis that all characters had the same way of meeting another person.
+Each character, when meeting another would, for example, greet him.
+Suppose now that this way of implementing the method 'rencontrer' (= 'meet') works for most classes, but not all.
+We could imagine for example a warrior as being a bit more belligerent as others, and when he comes across another character, well, instead of greeting the other cordially, he attacks him.
+Thus we are in a situation where we could consider implementing the method 'rencontrer' in two different manners, one for peaceful characters, who would greet other characters, and another for warlike characters, that would greet people with a blow of their weapon.
+What would be of our initial class hierarchy?
+Would we have to redesign the whole structure?
+Happily the answer is no.
+You just need to modify the method 'rencontrer' in the subclass 'guerrier'.
+We will change the class hierarchy in the following manner: we will keep the general method 'rencontrer' which is satisfactory for most of the classes in the superclass 'Personnage' but in the class 'Guerrier' we will specialize the method by redefining it in a more satisfactory manner for the subclass in question.
+In the case of our example, let's imagine that the class 'Guerrier' had a method here by a method 'frapper' (='hit')
+[Silence] that would be called
+[Silence] by the method 'rencontrer'.
+The method 'rencontrer' will then be defined at 2 levels of the hierarchy
+Once in the superclass 'Personnage', and once in the subclass
+'Guerrier'.
+We call it 'shadowing', because henceforth, for an object of type 'Guerrier' the specialized method has priority.
+We say that it 'shadows' or hides the more general method called by default if there are no specialized methods.
+For example, if in a program, I work with an object of type 'Magicien'
+[Silence] and that I apply the method 'rencontrer',
+[Silence] because the method 'rencontrer' wasn't redefined in 'Magicien', the inherited method, the 'rencontrer' from 'Personnage' will be used.
+So here, this method will be the general, default method.
+However, if now I want to apply the method 'rencontrer' to an object of type
+'Guerrier',
+[Silence] well, since a specialized method was redefined in this class, this method will impose itself in this case.
+So we say that this method will hide the general, inherited method.
+In programming, in general,
+'shadowing' occurs when an identifier hides another.
+In the case of class hierarchy, we speak of 'shadowing' when the same attribute or method name is used at several hierarchy levels.
+For our example, the same method header is found at several hierarchy levels.
+Shadowing is little-used and not recommended for attributes.
+It causes confusion, which means concretely this: with a superclass A, for example, from which inherits a subclass b, a shadowing of attributes simply means that in the class A, there is an attribute named 'a' but that in the class B, an attribute 'a' is also declared.
+If we use an attribute 'a' inside a method of the class B, than it is this attribute that we'll use.
+And we say that this attribute, has shadowed the attribute higher up in A.
+So, an object B disposes of
+2 attributes: one that is specific, called 'a', and one inherited from
+A, also called 'a' hence the confusion.
+So, the fact that we have the same type here, doesn't change anything, it suffices to have a same attribute name for masking to take place.
+Evidently this situation for attributes should be avoided.
+However, as we saw in the previous example where the method 'rencontrer' was redefined in the subclass 'Guerrier' well, the redefinition of methods, is quite common and quite practical: it allows classes to adapt to specific situations according to their hierarchy.
+To summarize, in a class hierarchy, masking a method consists of defining in a subclass a method of the same name as one already defined in a superclass.
+In jargon, we say that the inherited method is the the general method, which is available to by default all subclasses that do not mask it.
+The method that hides the inherited one is the specialized method that caters to the specific needs of the subclass in which it is defined.
+As previously evoked, for an object of type 'Guerrier', it is always the specialized method that is called here.
+So, if we define an object of type 'Guerrier', and we invoke the method
+'rencontrer' on this object, and it is not the the method 'rencontrer' of 'Personnage' that is called, but the specialized method.
+We only apply the normal scope resolution rules, for a scope that is closest.
+An object of type 'Guerrier' disposes of 2 of these methods: the specialized method and the general method.
+It can be useful in certain circumstances to invoke this general method, the one that was inherited, even if we have redefined it lower down in the hierarchy.
+So how do we deal with this?
+For example, imagine that we want to give our warrior a few good manners, and that he greets someone he meets before attacking him, or inversely.
+This means that the warrior starts by meeting the character just as any other person in the hierarchy, by greeting him, before applying more specific actions.
+The code that allows a character to greet another is already incorporated in the general method
+'rencontrer' (TN: 'rencontrer' = to meet), that is to say, the 'rencontrer' from 'Personnage'.
+It is unnecessary to duplicate this code in the specific 'rencontrer' of 'Guerrier'.
+What is to be done then, is that in the specialized method, it is possible to call a general method higher up, and then to apply specific actions.
+To access the shadowed member of a given object, we use a special syntax with a scope resolution operator (::).
+For example, if in the specialized method 'rencontrer' of the subclass 'Guerrier',
+I want to call 'rencontrer' as defined in the superclass
+'Personnage', well, in the method I will say:
+"I call the method 'rencontrer' of the class Personnage."
+And I make the link between the name of the method and the name of the class to which the method belongs with the scope resolution operator.
+So here, the specialized method rencontrer calls the hidden, general method with this special notation.
+Then, it follows up with a certain number of specific actions.
+This is very useful, because it avoids duplicating the code for all the actions undertaken in the general method.
+We have here, in this example, thanks to a masked method, made our warrior a bit more polite by greeting his victims before attacking them, without having to write the code.
+That is all for this episode.
+In the next video, we will look at construction and destruction in inheritance.

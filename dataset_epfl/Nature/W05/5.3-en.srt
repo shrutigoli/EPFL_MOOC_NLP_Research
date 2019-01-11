@@ -1,0 +1,883 @@
+1
+00:00:03,435 --> 00:00:06,735
+Welcome back. Nature in Code.
+We're in Chapter 5, Lecture 3.
+
+2
+00:00:07,025 --> 00:00:09,625
+In this lecture we're going to 
+implement the function 
+
+3
+00:00:09,809 --> 00:00:12,897
+that get's called in each generation
+so this is where all 
+
+4
+00:00:13,120 --> 00:00:16,482
+the interesting things happen;
+reproduction, finding 
+
+5
+00:00:16,674 --> 00:00:21,624
+a mating partner and so on.
+As we do this, we'll come across 
+
+6
+00:00:21,824 --> 00:00:27,024
+a very common pitfall in individual-
+based models as this one
+
+7
+00:00:27,194 --> 00:00:30,557
+and of course we'll find a way
+around it so let's do it.
+
+8
+00:00:30,742 --> 00:00:34,517
+Alright, this is our code. We have
+the init_grid function.
+
+9
+00:00:34,710 --> 00:00:40,147
+It initialises the grid, sets 1 of 3
+genotypes on each cell 
+
+10
+00:00:40,317 --> 00:00:43,367
+in the grid. This works well. 
+We tested this.
+
+11
+00:00:43,798 --> 00:00:48,473
+Now, what do we have to do after the
+init_grid? Well now it's time
+
+12
+00:00:48,689 --> 00:00:52,139
+to run the generations.
+What I'm going to do is, I'm going
+
+13
+00:00:52,352 --> 00:00:56,065
+to setup a loop and then call a
+function 'run_generation'.
+
+14
+00:00:56,259 --> 00:01:00,984
+I'm going to say 
+for (var i = 0;. Then I'm going 
+
+15
+00:01:01,178 --> 00:01:04,840
+to say i is smaller than 100 and I'm
+obviously going to change this
+
+16
+00:01:05,039 --> 00:01:08,326
+later on. As you know, I don't like
+these hard coded values here
+
+17
+00:01:08,770 --> 00:01:12,395
+but for the time being that's good 
+enough. We'll change it later.
+
+18
+00:01:12,614 --> 00:01:18,489
+Then i = i + 1 to prevent infinate
+loops. Here we'd like to call this
+
+19
+00:01:18,681 --> 00:01:24,319
+function run_generation and
+somewhere of course, we have to
+
+20
+00:01:24,525 --> 00:01:28,100
+impliment this function. I'm going
+to do this here: 
+
+21
+00:01:28,293 --> 00:01:36,755
+function run_generation().
+What does this function need to do?
+
+22
+00:01:37,447 --> 00:01:39,797
+Well, this function needs to do
+a couple of things.
+
+23
+00:01:40,034 --> 00:01:43,034
+What we need to do is, we need to go
+through each individual
+
+24
+00:01:43,591 --> 00:01:47,929
+or through each cell, take a look at
+the individual in that cell,
+
+25
+00:01:48,134 --> 00:01:51,134
+choose a mating partner
+for that individual, 
+
+26
+00:01:52,139 --> 00:01:56,326
+generate  the correct offspring
+given the options and 
+
+27
+00:01:56,520 --> 00:02:00,320
+then ultimately replace the parent-
+generation with
+
+28
+00:02:00,527 --> 00:02:03,977
+the offspring generation.
+We'll do all of these things
+
+29
+00:02:04,255 --> 00:02:08,943
+in the near future.
+Now, the first thing though that
+
+30
+00:02:09,109 --> 00:02:12,771
+I want to mention is a potential
+pitfall we may run into with
+
+31
+00:02:12,958 --> 00:02:16,483
+these individual-based models.
+Here's what I mean:
+
+32
+00:02:16,677 --> 00:02:21,140
+Here's a problem. Imagine this is
+your grid and we're going now 
+
+33
+00:02:21,337 --> 00:02:24,925
+through each of these cells using
+our double for loop.
+
+34
+00:02:25,699 --> 00:02:30,561
+Let's zoom in on a situation here. 
+Let's say we're at this cell here
+
+35
+00:02:30,745 --> 00:02:36,045
+right now and this is the individual
+that lives on this grid.
+
+36
+00:02:37,988 --> 00:02:46,238
+We have a mating distance of say 1.
+Our mating distance here is 1
+
+37
+00:02:46,436 --> 00:02:51,549
+so the mating neighborhood
+is this area here.
+
+38
+00:02:54,994 --> 00:03:00,919
+Let's say we have now 
+chosen by random choice,
+
+39
+00:03:01,098 --> 00:03:04,598
+this individual here as
+a mating partner
+
+40
+00:03:04,885 --> 00:03:09,960
+These 2 are now going to mate and
+they're going to create 
+
+41
+00:03:10,144 --> 00:03:13,582
+an offspring individual.
+What are we now going to do
+
+42
+00:03:13,769 --> 00:03:17,070
+with this offspring individual?
+Well, the first intuition
+
+43
+00:03:17,268 --> 00:03:21,230
+may be to simply replace this parent
+individual with the offspring
+
+44
+00:03:21,432 --> 00:03:25,007
+individual which is what we're 
+ultimately planning to do, right?
+
+45
+00:03:25,214 --> 00:03:28,401
+This is the next generation so the
+parents just mated
+
+46
+00:03:28,588 --> 00:03:33,863
+The offspring will replace the
+parent. However, if you did it
+
+47
+00:03:34,028 --> 00:03:37,303
+like this you would introduce
+quite a substantial
+
+48
+00:03:37,498 --> 00:03:42,336
+but tricky error which is the
+following: Let's say we move on
+
+49
+00:03:42,651 --> 00:03:45,651
+to the next cell. Now we're
+considering this cell here; this
+
+50
+00:03:45,849 --> 00:03:51,224
+individual over here.
+It's mating range would be this
+
+51
+00:03:51,404 --> 00:03:58,641
+space here. Correspondingly,
+let's now say just by
+
+52
+00:03:58,946 --> 00:04:03,346
+random chance we pick this
+individual over here as a mating
+
+53
+00:04:03,534 --> 00:04:07,397
+partner because it is in this
+individual's mating range.
+
+54
+00:04:08,086 --> 00:04:14,336
+These 2 would mate and now I hope
+you can see the big problem here.
+
+55
+00:04:14,966 --> 00:04:19,629
+This is potentially a big problem
+because what effectively happens
+
+56
+00:04:19,833 --> 00:04:26,695
+here is that you have an individual
+from the current parent-generation
+
+57
+00:04:26,894 --> 00:04:31,031
+mating with a next generation
+individual because
+
+58
+00:04:31,219 --> 00:04:34,157
+replaced the parent here with the
+offspring individual
+
+59
+00:04:34,349 --> 00:04:40,411
+already. That's the real problem if
+you do this. It's that individuals
+
+60
+00:04:40,602 --> 00:04:44,327
+in this generation will be able to
+mate with individuals
+
+61
+00:04:44,556 --> 00:04:47,556
+in the next generation.
+Of course that can't be.
+
+62
+00:04:48,979 --> 00:04:55,566
+The solution here is to not
+immediately replace the parent
+
+63
+00:04:55,768 --> 00:04:59,818
+individuals as you go through each
+parent-individual here one by one
+
+64
+00:04:59,996 --> 00:05:05,096
+but you actually put the offspring
+onto a temp grid.
+
+65
+00:05:06,212 --> 00:05:10,237
+You could have this temp grid which
+is simply a grid now with 
+
+66
+00:05:10,435 --> 00:05:14,585
+the same dimensions; so assume these
+would simply be the same
+
+67
+00:05:14,764 --> 00:05:18,652
+dimension. Okay, a grid with the
+same dimensions. This is your
+
+68
+00:05:18,829 --> 00:05:23,092
+temp grid here. This is where you're
+going to put the offspring
+
+69
+00:05:23,259 --> 00:05:26,259
+in the corresponding locations so
+say these 2 individuals
+
+70
+00:05:26,415 --> 00:05:32,528
+mate you calculate or you generate
+the offspring and rather
+
+71
+00:05:32,719 --> 00:05:35,781
+than replacing the parent individual
+here immediately,
+
+72
+00:05:35,960 --> 00:05:40,310
+you're now going to put this on the
+temp grid on the correct cell.
+
+73
+00:05:41,645 --> 00:05:46,383
+When it's this individual's turn and
+it picks this cell to mate
+
+74
+00:05:46,565 --> 00:05:51,603
+then it will still mate with the
+parent so with the same
+
+75
+00:05:51,808 --> 00:05:54,808
+generation individual over here 
+and not with a next
+
+76
+00:05:55,082 --> 00:05:58,082
+generation individual.
+Then, when you've done all this,
+
+77
+00:05:58,257 --> 00:06:01,207
+when you've gone through each of 
+the individuals and you've 
+
+78
+00:06:01,665 --> 00:06:04,728
+created all the offspring
+individuals then you will have a 
+
+79
+00:06:04,907 --> 00:06:08,982
+full temp grid here with all the
+offspring individuals and
+
+80
+00:06:09,550 --> 00:06:12,388
+then you can go ahead and
+replace all the individuals
+
+81
+00:06:12,558 --> 00:06:16,220
+on the grid so the parent generation
+with the ones you have
+
+82
+00:06:16,691 --> 00:06:19,691
+in the temp grid and you do this
+each generation.
+
+83
+00:06:20,581 --> 00:06:24,056
+Like this, you would avoid this
+potential pitfall where you
+
+84
+00:06:24,470 --> 00:06:29,595
+have individuals from different
+generations mating with each other.
+
+85
+00:06:29,842 --> 00:06:32,679
+Alright so with this knowledge
+in hand let's implement the 
+
+86
+00:06:32,859 --> 00:06:38,021
+run_generation function.
+Like I said, we need a temp grid
+
+87
+00:06:38,192 --> 00:06:41,305
+and this is something we only
+need in this function. The rest of
+
+88
+00:06:41,482 --> 00:06:43,482
+the simulation doesn't
+need to know about 
+
+89
+00:06:43,658 --> 00:06:46,233
+this at all but here in
+run_generation we need this
+
+90
+00:06:46,408 --> 00:06:52,107
+I'm going to setup here a temp grid
+that is also a 2 dimensional array.
+
+91
+00:06:52,769 --> 00:06:56,182
+I'm going to initialize this here
+simply as an empty array.
+
+92
+00:06:56,524 --> 00:07:01,736
+Now I'm going to go through each
+cell in the grid so I'm going
+
+93
+00:07:01,983 --> 00:07:07,332
+to have a 2 dimensional grid, well
+my grid is a 2 dimensional array
+
+94
+00:07:07,601 --> 00:07:17,201
+so I need this double nested for
+loop so for (var i = 0;and then
+
+95
+00:07:17,417 --> 00:07:22,554
+i is smaller than grid_length
+because that's fixed and of course
+
+96
+00:07:22,764 --> 00:07:31,338
+i = i + 1) and I'm going to put
+the next one right away here.
+
+97
+00:07:31,541 --> 00:07:47,128
+for (var ii = 0; again ii is smaller
+than grid_length; and ii = ii + 1).
+
+98
+00:07:47,815 --> 00:07:54,152
+Now we have a way to iterate over
+our 2 dimensional array that is grid.
+
+99
+00:07:54,318 --> 00:07:59,580
+Good. Now what do we need to do?
+Well, first of all as we're
+
+100
+00:07:59,765 --> 00:08:03,665
+iterating over our grid, we can
+use this iteration, 
+
+101
+00:08:03,873 --> 00:08:07,860
+this doubly nested loop
+as we actually have done it here
+
+102
+00:08:08,031 --> 00:08:12,419
+where we setup the grid in the first
+place using this line here 
+
+103
+00:08:12,595 --> 00:08:17,469
+and we can do the exact same thing.
+Here, after the first loop,
+
+104
+00:08:17,650 --> 00:08:24,337
+we're simply going to say
+temp_grid [i] = []
+
+105
+00:08:24,949 --> 00:08:29,549
+Now we've essentially setup
+the temp grid in the exact same way
+
+106
+00:08:29,726 --> 00:08:35,638
+as we've setup the grid up here in
+the init_grid function; 
+
+107
+00:08:35,815 --> 00:08:38,590
+at least initialized. It doesn't
+have any values but that's
+
+108
+00:08:38,777 --> 00:08:40,089
+going to come now.
+
+109
+00:08:40,800 --> 00:08:47,525
+Now I'm here and so at grid [i][ii]
+I have my current individual on this
+
+110
+00:08:47,702 --> 00:08:52,427
+current cell that I'm on. Now, the
+first thing that I'd like to do is
+
+111
+00:08:52,613 --> 00:08:55,488
+I'd like to pick a mating partner
+for this individual.
+
+112
+00:08:55,767 --> 00:09:01,830
+I'm going to say here
+var mating_partner =
+
+113
+00:09:02,164 --> 00:09:06,264
+Now how am I going to choose this
+mating partner? Well, again,
+
+114
+00:09:06,438 --> 00:09:10,588
+this seems like something that we
+should probably hand over
+
+115
+00:09:10,776 --> 00:09:14,126
+to a function. I'm going to call
+the function; I will have to 
+
+116
+00:09:14,332 --> 00:09:17,269
+define this but the idea is that I
+have this function which
+
+117
+00:09:17,440 --> 00:09:20,440
+I'm going to call
+pick_mating_partner
+
+118
+00:09:20,656 --> 00:09:23,656
+and what I'm going to do is, I'm
+simply going to pass it the 
+
+119
+00:09:24,025 --> 00:09:28,700
+co-ordinates as arguments; the co-
+ordinates where I am
+
+120
+00:09:28,908 --> 00:09:33,883
+currently on the grid namely a
+position (i, ii) in the array
+
+121
+00:09:35,077 --> 00:09:38,715
+then this function should
+take care of all the rest.
+
+122
+00:09:38,915 --> 00:09:42,078
+It should pick a mating partner
+given it's location, given the
+
+123
+00:09:42,254 --> 00:09:46,304
+mating distance and so on.
+I'm just sort of outsourcing this
+
+124
+00:09:46,469 --> 00:09:49,106
+to this function which we'll have
+to implement later
+
+125
+00:09:49,309 --> 00:09:52,321
+and then it will return
+a mating partner.
+
+126
+00:09:52,592 --> 00:09:56,542
+Now that I have a mating partner
+in principle, what I need
+
+127
+00:09:56,729 --> 00:09:59,467
+to do is, I now need to
+produce offspring.
+
+128
+00:09:59,647 --> 00:10:02,835
+This is mendelian inheritance
+so I can't just pick
+
+129
+00:10:03,026 --> 00:10:06,689
+a random offspring. The offspring
+will very much depend on
+
+130
+00:10:06,859 --> 00:10:11,684
+the 2 genotypes that we have here.
+What I'm going to do is, I'm again
+
+131
+00:10:11,868 --> 00:10:15,105
+ going to outsource this problem.
+I'm going to call a function
+
+132
+00:10:15,325 --> 00:10:20,000
+'get offspring' so get_offspring();
+and then what I'm going to do is, 
+
+133
+00:10:20,164 --> 00:10:26,089
+I'm essentially going to pass these
+2 genotypes of the parents
+
+134
+00:10:26,302 --> 00:10:30,552
+as arguments. The first one is
+of course simply what we have at
+
+135
+00:10:30,735 --> 00:10:33,972
+grid[i][ii]
+
+136
+00:10:34,139 --> 00:10:38,489
+and the second one is this mating
+partner that we just selected;
+
+137
+00:10:38,898 --> 00:10:45,373
+mating_partner. I'm going to hand
+these 2 genotypes, I'm going to pass
+
+138
+00:10:45,584 --> 00:10:48,384
+them to this function. We'll
+have to implement this and 
+
+139
+00:10:48,576 --> 00:10:52,651
+then this function will return
+an offspring genotype.
+
+140
+00:10:52,898 --> 00:10:57,723
+Now again, it would be wrong to do
+it like this; to say whatever
+
+141
+00:10:57,883 --> 00:11:02,583
+this returns, I'm going to put this
+here on grid[i][ii]. 
+
+142
+00:11:02,778 --> 00:11:07,303
+I'm essentially going to replace the
+parent right away with the 
+
+143
+00:11:07,488 --> 00:11:10,538
+get_offspring for the reasons
+we just talked about. This doesn't
+
+144
+00:11:10,804 --> 00:11:13,804
+need to be stored into 
+the grid to replace the parent
+
+145
+00:11:14,152 --> 00:11:18,327
+right away but that's exactly where
+the temp grid comes in.
+
+146
+00:11:18,517 --> 00:11:21,029
+I'm going to store this now
+in this temp grid at the
+
+147
+00:11:21,229 --> 00:11:24,917
+corresponding position. That's
+where the offspring lives
+
+148
+00:11:25,341 --> 00:11:28,341
+for the time being. Then
+after this loop here;
+
+149
+00:11:28,571 --> 00:11:33,459
+this double loop has iterated,
+now the temp grid is full
+
+150
+00:11:33,662 --> 00:11:37,087
+with the offspring so now we can
+go ahead and basically just
+
+151
+00:11:37,267 --> 00:11:41,517
+replace the grid with whatever
+we have on temp grid.
+
+152
+00:11:42,204 --> 00:11:45,816
+I'm again going to setup a double
+loop so I'm just going to copy this
+
+153
+00:11:45,978 --> 00:11:51,603
+now. First iteration here and
+then of course parentheses 
+
+154
+00:11:51,896 --> 00:12:03,184
+and second; this one.
+I'm now again going over the grid
+
+155
+00:12:03,377 --> 00:12:08,377
+and I'm saying, you know what?
+I'm going to now write the values
+
+156
+00:12:08,560 --> 00:12:14,785
+into grid[i][ii] that i'm reading
+from temp_grid[i][ii].
+
+157
+00:12:15,297 --> 00:12:20,272
+That's one straightforward way to
+copy the values from one
+
+158
+00:12:20,470 --> 00:12:25,095
+2 dimensional array into the other
+2 dimensional array
+
+159
+00:12:25,299 --> 00:12:29,674
+replacing it cell by cell. I'm
+simply iterating again over
+
+160
+00:12:29,854 --> 00:12:33,267
+the grid and I'm going to say okay,
+whatever you have at temp_grid
+
+161
+00:12:33,443 --> 00:12:38,518
+at these positions, [i] and [ii],
+please put them into
+
+162
+00:12:38,701 --> 00:12:42,264
+grid [i] and [ii] and
+thereby here in
+
+163
+00:12:42,434 --> 00:12:46,822
+exactly this line of code replacing
+the parent generation.
+
+164
+00:12:48,026 --> 00:12:51,001
+That's pretty much it. Then when I'm
+done I also want to make sure
+
+165
+00:12:51,166 --> 00:12:53,991
+I keep track of the generations so
+as you know, we have this
+
+166
+00:12:54,171 --> 00:12:58,846
+generation_counter variable.
+We're going to up this by 1.
+
+167
+00:12:59,028 --> 00:13:09,865
+generation_counter = 
+generation_counter + 1
+
+168
+00:13:10,139 --> 00:13:13,251
+Now we're going to save this but 
+we can't test ityet because
+
+169
+00:13:13,770 --> 00:13:16,770
+this code will not be executed; 
+the browser would balk at us,
+
+170
+00:13:17,923 --> 00:13:21,211
+justifiably so because we're 
+calling here a function 
+
+171
+00:13:21,743 --> 00:13:24,393
+pick_mating_partner that
+we haven't defined yet.
+
+172
+00:13:24,563 --> 00:13:27,638
+We're also calling function here,
+get_offspring that we haven't
+
+173
+00:13:27,810 --> 00:13:31,547
+defined yet. We're going to do
+that in the future.
+
+174
+00:13:31,830 --> 00:13:34,892
+Okay, the run_generation function
+is implemented but of course
+
+175
+00:13:35,063 --> 00:13:37,526
+we just outsourced many
+of the problems to these 
+
+176
+00:13:37,681 --> 00:13:40,719
+2 other functions. Now we now 
+need to implement that.
+
+177
+00:13:40,906 --> 00:13:42,769
+We'll do that in the
+next lectures.
+

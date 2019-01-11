@@ -1,0 +1,165 @@
+In this episode, we will go over the details of one of the important applications of polymorphism, known as
+"heterogeneous containers"
+Up to now, we have seen that inheritance and virtual methods allow us to define generic functions accessible to all instances of a class hierarchy
+This is polymorphism.
+We learned that if we want to use functions or methods in a polymorphic way, that is, apply these functions to objects in a polymorphic way, then these objects must be passed by reference.
+What if we have a set of objects, a collection of objects (a.k.a. an "container") belonging to a hierarchy which we wish to be able to manipulate in a polymorphic way?
+This is known as a "heterogeneous container".
+Meaning that each object stored in the container, in the set can have slightly different, specific behavior.
+Let's illustrate this with the example of our game with the characters.
+We had a Personnage class with a certain number of members and specific methods, and different subclasses: thieves, magicians, warriors etc, who were all characters.
+We wanted to put them in a game that would contain several characters.
+So we would have a collection of characters, but we want each character to behave according to their real nature.
+A warrior will behave as a warrior, a thief as a thief, etc.
+So this collection will be "heterogeneous".
+How do we define the game in this case?
+We could define the game like this, of course: having a specific container for each of the subclasses, that is, having a container for all of the warriors one for the magicians, etc.
+Then we could display all of the warriors through a method allowing to display the warriors, display all the magicians through another specific method, etc.
+We could add a warrior to the game, or add a magician, a thief, etc.
+This solution is possible and in some cases, it will be necessary to differentiate between the subclasses and to have specific containers for each of the subclasses.
+They will not be heterogeneous containers.
+There would be as many specific containers as subclasses.
+That solution is quite possible, but we could imagine a different solution.
+It depends on the context, on the needs of the program, where we could imagine managing all the characters in a global way, to manage them generically in a container of characters.
+These characters would have their own specificities, so we would have a heterogeneous container.
+In that case, we would define the "Jeu" class like this
+We would have a collection of characters, in the form of a vector which would group all our characters.
+We would only have one
+"afficher" method that would display all of the characters.
+And we would have a generic method here,
+"ajouter_personnage" which would allow us to add a generic character to the collection.
+In this context, we would want each of the characters to have their own behavior and so if
+"personnage[i]" is a warrior, then the method "personnage[i].afficher" would call the afficher method of the warrior subclass.
+We would want to have a polymorphic behavior for the characters stored in the game.
+Unfortunately, the code we have present up til now does not allow polymorphic behavior. Indeed, here we have a vector of characters and we access the characters directly without passing through a reference or a pointer.
+However, remember that polymorphic behavior is only possible with virtual methods, as well as either pointers or references.
+Which one should we use here?
+I'll remind you of a general piece of advice concerning pointers and references:
+Use references whenever you can, and pointers when you must.
+Here, the idea would be to use a set of references.
+Unfortunately, we cannot put references in a vector nor in any standard C++ container.
+The technical reasons for this are beyond the scope of this course.
+We are forced to use pointers here.
+So we will change the implementation of our Jeu class to have a vector of pointers to characters.
+To have polymorphic behavior for our characters, we will have an vector of pointers-to-Personnage.
+The question we could ask ourselves here is, do we want to use
+"C-style" pointers or "smart pointers",
+C++11 pointers?
+So here is an alternative, a C++11 version.
+We recommend you use this second approach.
+We will detail the reasons for this choice in a extra, optional episode which will follow this episode.
+If you follow our su"ggestion and use "smart pointers in the C++11 style, you will define a vector of unique pointers to Personnage.
+To use unique pointers, remember to include the <i>memory</i> library.
+For those who would like reminders on pointers, we have uploaded all of the courses that we gave on pointers from our previous MOOC, Introduction to Programming.
+I encourage you to review these courses if necessary.
+So here, we could use either solution.
+In any case, note that it is pointers that will be stored in this container.
+The "personnage" vector here is a vector of pointers, and no longer of instances directly.
+This will have some influence on the design and execution of the game, since the instances are now outside of the Jeu instance.
+In Jeu, we only have pointers to the instances.
+How do we continue developing our Jeu class and adding these methods for displaying or adding characters, for example?
+The easiest is to first look at how we will use this game, this instance of Jeu.
+So, we would declare a game, an instance of Jeu, and imagine that we want to add a character.
+But we have to add a pointer.
+The easiest is to add a pointer allocated dynamically with a "new".
+For example here, we create a new warrior,
+"new Guerrier", which will return a new pointer to a warrior.
+So in memory, we would have the following situation: a <i>Jeu</i> which has a set of pointers.
+At first, it is completely empty.
+Then, we create a warrior in memory and the "new" would return a pointer to this warrior that we would store in our container.
+So the prototypes for our methods would be: here, a "ajouter_personnage" (TN: means
+"add_character") method that would take a pointer to Personnage.
+This is what it receives, as new returns a C-style pointer to a Personnage.
+Then the afficher method which doesn't pose any problems, which displays all the characters.
+So we would have the usual prototype for this display method.
+Now, let's see how we can define these methods.
+Let's start with the method that adds a character.
+Its prototype takes a C-style pointer to a character to allow a call as we have just seen.
+We start, to be safe, by checking that we have indeed received, through the "nouveau" (TN: means "new") pointer here a pointer to a real Personnage instance.
+So we check that the pointer is not null.
+Then we add it to the character container.
+Remember that we decided to implement the character container as a vector of unique_ptr's to Personnage.
+So we simply add it with a "push_back"
+The C-style pointer, "nouveau", returned by the call to "new" will be transformed to a unique_ptr.
+Because new returns a C-style pointer and we have decided to implement our pointers as 
+C++11-style "smart pointers", we will transform this C-style pointer here into a unique_ptr.
+Let's go over the previous call in detail,
+" jeu.ajouter_personnage (new Guerrier) ".
+We call the constructor with parameters for Guerrier's constructor. It will do the following: first, it will execute new Guerrier, which will create a new warrior in memory.
+New will return a pointer to this allocated memory area.
+This pointer will be passed to the ajouter_personnage method and be called "nouveau".
+This pointer is not null.
+So we arrive here in the Jeu class and do a push_back.
+Suppose that this vector was initially empty.
+So we execute this push_back which will add an element to our vector in which we will add the result of the transformation of this C-style pointer to a unique_ptr pointing to the memory area allocated by the new statement.
+Now, let's talk about the "afficher" method.
+Suppose that each character has its own afficher method which is polymorphic.
+So we simply need to do this, to loop over all of the characters stored in the vector of pointers to characters, and to call the afficher method through this pointer. This is exactly why we have pointers, to have a polymorphic behavior.
+However, this code does not compile.
+Indeed, our "Personnages" collection is a vector of unique_ptrs, of unique pointers.
+There cannot be more than one pointer to a given memory area.
+In memory, we have something like this: a vector of unique_ptrs pointing to characters.
+When we write the for loop, when we write the for loop like this, it happens the the "quidam" variable is another variable that will take the value of each of the elements of the personnages vector, one after the other.
+So quidam is a pointer that will point to the same area as the various pointers to our characters, one after the other, as they are stored in the vector.
+So for example, the first step, which is to say that quidam equals this pointer, means that two pointers are equal, they point to the same area.
+This is impossible, due to the fact that we have unique_ptrs here.
+We can only have one pointer per memory area.
+So this solution is unacceptable.
+To do this, we need a reference to the stored objects, a reference to the unique pointers.
+That is quite possible.
+So the correct for loop is written like this:
+"for auto reference", of course here we will not modify anything, as the display method is const, so we can use a "const reference".
+So "for auto const reference"; quidam is now a constant reference to the elements of the personnages vector.
+That is, a constant reference to unique_ptrs.
+This is a subtlety of unique pointers.
+Now, let's see how we can use our
+Jeu class.
+Here, we would declare a game and add characters to it by calling the ajouter_personnage method and creating them dynamically with new.
+We have a new warrior here, with parameters for its constructor.
+Then we add a new magician, a new thief, perhaps another new warrior, etc.
+When we want to display the game, we simply call jeu.afficher.
+But this innocent Jeu class nevertheless hides a potential danger.
+What happens if one of the objects we added to the collection,
+-- or rather, whose address we added to the collection -- what if one of these objects were to disappear?
+In that case, we would still have a pointer to that object in the vector despite this object being destroyed, and this could cause big problems.
+For everything to work correctly, it is absolutely necessary for all of the elements that are pointed to to last at least as long as their pointers.
+So in this example, all of the characters in the game must exist at least as long as the game.
+And it is up to the programmer to ensure that with good design.
+So, it is up to the programmer not to make this kind of mistakes.
+For example, imagine a slightly naive programmer who wants to create a function to create and add a magician into the game
+This function would modify the game, and take a reference to the game and it would create a magician here, passing parameters to its constructor and then, it would call the ajouter_personnage.
+And since we must pass pointers to add characters, it passes the address of this magician here
+And so in the main, we would have the game.
+We call this "creer_magician" function.
+We pass the game by reference to add a magician to it.
+Then we display the game
+The problem is that this creer_magicien function adds a new magician which is a local variable.
+It is important never to do this sort of thing, never to add local variables.
+This local variable will cease to exit:
+"mago" here will cease to exist as soon as we exit the function.
+So here, we will have added a pointer to a magician via a reference, but this magician will no longer exist as soon as we exit the function that created it.
+So, from this semicolon here, we should never try to access this magician.
+We should not try to display it anymore.
+So here, we know what will happen, we will display a magician that potentially does not exist anymore.
+I say potentially because on some machines, as this code is relatively short, nothing bad may actually happen.
+But if you imagine several lines of code with several manipulations between this function call and this display here, then it is virtually certain that you will get a nonsense result.
+So, never do such a thing!
+Never take the address of a local variable, never use the address of a local variable like this
+The correct way to do this, to solve this sort of problem is to use what is called dynamic allocation and to guarantee that the allocated memory area will be preserved for at least as long as its container.
+So for example, here, the creer_magicien method which takes a game by reference, would add to this game a dynamically-allocated magician as we have done up til now.
+This new will trigger a dynamic allocation and the memory area will exist as long as we don't call delete.
+In the case of a container where we manage pointers through unique_ptrs, we don't even need to call delete.
+The memory will be freed automatically by the unique_ptr as soon as it is no longer used.
+This is one of the advantages of unique pointers.
+This is why we recommend you use these "smart pointers", these unique pointers at first.
+You will not need to bother about freeing memory, so you will not risk accidentally freeing memory while it is being used.
+However, the pointer will automatically be freed as soon as we no longer use this memory area.
+Now, the second aspect, the unique aspect.
+The smart aspect of the pointer handles deallocation, and the unique aspect prevents having multiple references to the same area.
+As we saw in the example of the for loop, this introduces a few constraints.
+But it is a big advantage to have only one pointer to a certain object. That way, the object truly belongs to the container to which it is supposed to belong.
+There are no other places in the program pointing to this object and that could modify it.
+These are the reasons why we recommend you use, at first, unique_ptrs
+Now, we could also use
+C-style pointers.
+If you wish to learn about this, we have produced another episode, an optional one, which will detail this solution and should thus shed more light on the advantages of unique_ptrs.

@@ -1,0 +1,1847 @@
+1
+00:00:05,435 --> 00:00:07,618
+Bonjour, on va parler des différents types
+
+2
+00:00:07,618 --> 00:00:10,870
+d'interfaces série qui existent autour du
+microprocesseur.
+
+3
+00:00:10,870 --> 00:00:14,593
+Ces interfaces permettent de communiquer
+avec des circuits
+
+4
+00:00:14,593 --> 00:00:18,490
+extérieurs, des cartes, par exemple les
+shields Arduino.
+
+5
+00:00:18,490 --> 00:00:21,601
+Vous achetez une carte, vous chargez la
+librairie, si ça ne
+
+6
+00:00:21,601 --> 00:00:25,715
+marche pas bien, vous essayez de trouver
+l'information dans des forums.
+
+7
+00:00:25,715 --> 00:00:30,690
+Vous trouvez des très bons livres qui
+décrivent, avec un peu plus de détails,
+
+8
+00:00:30,690 --> 00:00:35,580
+comment interfacer ces cartes et
+comprendre un peu leurs librairies.
+
+9
+00:00:35,580 --> 00:00:40,520
+Nous allons nous concentrer sur le
+principe de ces interfaces.
+
+10
+00:00:40,520 --> 00:00:45,885
+UART, SPI, I2C et les
+
+11
+00:00:45,885 --> 00:00:51,170
+commandes RC5, One-wire entre quatre et un
+fil,
+
+12
+00:00:51,170 --> 00:00:56,249
+il y a un certain nombre de solutions qui
+sont intéressantes à comprendre
+
+13
+00:00:56,249 --> 00:00:59,650
+et pas si difficiles à programmer pour la
+plupart.
+
+14
+00:00:59,650 --> 00:01:05,930
+Si on commence avec le UART, le grand
+principe est de
+
+15
+00:01:05,930 --> 00:01:12,830
+transmettre les bits en série avec une
+horloge qui les synchronise.
+
+16
+00:01:12,830 --> 00:01:16,232
+Et la difficulté de toutes ces interfaces
+série,
+
+17
+00:01:16,232 --> 00:01:19,900
+c'est de savoir quand ça commence, quand
+ça finit.
+
+18
+00:01:19,900 --> 00:01:21,590
+Le principe des
+
+19
+00:01:21,590 --> 00:01:27,573
+UART, Universal Asynchronous
+Receiver/Transmitter,
+
+20
+00:01:27,573 --> 00:01:32,545
+c'est d'avoir un start bit, la ligne est
+au repos à l'état
+
+21
+00:01:32,545 --> 00:01:37,422
+1, et au moment où elle passe à 0 pour une
+période
+
+22
+00:01:37,422 --> 00:01:42,277
+d'horloge, et bien, le récepteur est
+informé qu'un
+
+23
+00:01:42,277 --> 00:01:46,808
+nouveau message arrive, il n'a qu'à
+receptionner les 8 bits
+
+24
+00:01:46,808 --> 00:01:52,224
+dans un registre à décallage ou à travers
+un bit d'un port et
+
+25
+00:01:52,224 --> 00:01:57,550
+l'instruction supérieur supérieur hein,
+qui permet de décaller.
+
+26
+00:01:57,550 --> 00:02:04,418
+Et, pour savoir que les 8 bits sont
+arrivés, un stop bit dans le fond génère
+
+27
+00:02:04,418 --> 00:02:11,923
+un espace avant un éventuel redémarrage
+immédiat avec
+
+28
+00:02:11,923 --> 00:02:12,660
+un stop bit.
+
+29
+00:02:12,660 --> 00:02:17,700
+Mais on n'est pas obligé de redémarrer
+immédiatement, d'où le terme asynchronous.
+
+30
+00:02:17,700 --> 00:02:21,900
+D'autres schémas série dont on ne va pas
+parler permettent
+
+31
+00:02:21,900 --> 00:02:27,472
+de compactifier un petit peu plus
+l'information avec différentes astuces.
+
+32
+00:02:27,472 --> 00:02:31,984
+Donc voilà le grand principe, un start
+bit, un stop bit, et,
+
+33
+00:02:31,984 --> 00:02:37,284
+du côté du récepteur, et bien au moment où
+vous avez le start
+
+34
+00:02:37,284 --> 00:02:42,755
+bit euh, qui suit un silence suffisamment
+long ou qui suit un stop
+
+35
+00:02:42,755 --> 00:02:48,060
+bit qui a été reconnu, et bien vous
+attendez une demi-période
+
+36
+00:02:48,060 --> 00:02:52,540
+en utilisant un oscillateur qui a la même
+fréquence.
+
+37
+00:02:52,540 --> 00:02:56,150
+Et puis en suite, toutes les périodes,
+vous
+
+38
+00:02:56,150 --> 00:03:00,828
+échantillonez la valeur et puis vous la
+récupérez.
+
+39
+00:03:00,828 --> 00:03:03,032
+Alors l'oscillateur
+
+40
+00:03:03,032 --> 00:03:08,314
+à la réception peut admettre une certaine
+erreur dans le fond.
+
+41
+00:03:08,314 --> 00:03:12,168
+Il va y avoir un décallage mais tant que
+ce décallage
+
+42
+00:03:12,168 --> 00:03:16,770
+est inférieur à une demi-période, ça ne
+pose pas de problème.
+
+43
+00:03:16,770 --> 00:03:21,015
+Alors maintenant qu'on a des quartz et des
+oscillateurs très précis partout,
+
+44
+00:03:21,015 --> 00:03:25,260
+on n'a plus du tout besoin de se
+préoccuper de ce décallage éventuel.
+
+45
+00:03:25,260 --> 00:03:28,334
+Les valeurs usuelles pour ce motif
+
+46
+00:03:28,334 --> 00:03:33,976
+qui est transmis, c'est 8 bits de données,
+historiquement, il y a une
+
+47
+00:03:33,976 --> 00:03:39,930
+première version il y a plus d'un siècle
+avec seulement 5 bits, un stop bit, pas
+
+48
+00:03:39,930 --> 00:03:47,240
+de parité, alors on n'a pas le temps d'en
+parler, et 9600 bits par seconde,
+
+49
+00:03:47,240 --> 00:03:50,572
+cette fréquence qu'on exprime en bits par
+
+50
+00:03:50,572 --> 00:03:53,731
+seconde, parfois en Bauds, bien que le
+terme
+
+51
+00:03:53,731 --> 00:04:00,230
+ne soit pas correct, elle a été
+normalisée, les tout anciens modems
+
+52
+00:04:00,230 --> 00:04:02,813
+acoustiques sur les téléphones
+travaillaient à
+
+53
+00:04:02,813 --> 00:04:06,365
+300 bits par seconde, Arduino et beaucoup
+
+54
+00:04:06,365 --> 00:04:13,505
+d'applications fonctionnent parfaitement
+bien à 9600 avec des interfaces
+
+55
+00:04:13,505 --> 00:04:19,280
+qui ont été bien calibrés du point de vue
+du timing on peut atteindre jusqu'à 115
+
+56
+00:04:19,280 --> 00:04:24,520
+200 bits par seconde.
+Alors vous avez un microcontrôleur.
+
+57
+00:04:24,520 --> 00:04:28,668
+Il dispose, presque tous disposent des
+signaux Tx
+
+58
+00:04:28,668 --> 00:04:33,450
+et Rx compatibles avec ce qu'on vient de
+voir.
+
+59
+00:04:33,450 --> 00:04:39,374
+Vous pouvez transmettre à un périphérique
+ou à un autre microcontrôleur,
+
+60
+00:04:39,374 --> 00:04:44,060
+l'interface se prête extrêmement bien à
+des communications entre microcontrôleurs.
+
+61
+00:04:44,060 --> 00:04:49,231
+Et la difficulté traditionnelle, c'est que
+vous avez un
+
+62
+00:04:49,231 --> 00:04:54,649
+signal qui sort du microcontrôleur, qui
+s'appelle Tx, qui arrive de l'autre
+
+63
+00:04:54,649 --> 00:04:59,814
+côté, qui doit s'appeler Rx, à quel moment
+est-ce qu'il
+
+64
+00:04:59,814 --> 00:05:04,300
+change de nom, quel est le nom des pins à
+donner à un connecteur intermédiaire?
+
+65
+00:05:04,300 --> 00:05:06,637
+C'est souvent une source d'erreur puisque
+les
+
+66
+00:05:06,637 --> 00:05:09,440
+gens n'ont pas très bien compris cette
+fonctionnalité.
+
+67
+00:05:09,440 --> 00:05:15,068
+De même pour le Rx, Tx, vous avez compris
+et naturellement, il y a toujours une
+
+68
+00:05:15,068 --> 00:05:19,642
+référence de potentiel entre les unités
+que l'on
+
+69
+00:05:19,642 --> 00:05:24,110
+interconnecte avec un bus ou avec un
+autre.
+
+70
+00:05:24,110 --> 00:05:29,712
+Si vous voulez vous relier avec USB, le
+protocole est assez complexe, et cela a
+
+71
+00:05:29,712 --> 00:05:35,490
+mis un certain temps avant que les
+microcontrôleurs contiennent
+
+72
+00:05:35,490 --> 00:05:39,606
+les signaux pour commander USB,
+
+73
+00:05:39,606 --> 00:05:43,350
+il y a tout un petit paquet de logique à
+mettre à l'intérieur du processeur, qui
+
+74
+00:05:43,350 --> 00:05:47,570
+utilise beaucoup de transistors.
+Donc ce que vous voyez encore sur beaucoup
+
+75
+00:05:47,570 --> 00:05:55,361
+de cartes Arduino, c'est un circuit FTDI
+qui fait l'interface
+
+76
+00:05:55,361 --> 00:06:01,340
+entre les signaux Tx, Rx et USB.
+
+77
+00:06:01,340 --> 00:06:07,106
+Alors maintenant si vous voulez vous
+connecter avec un PC, on a déjà vu les
+
+78
+00:06:07,106 --> 00:06:14,112
+possibilités avec le terminal, il y a des
+possibilités plus performantes qui
+
+79
+00:06:14,112 --> 00:06:18,047
+sont offertes, par exemple avec
+processing.org
+
+80
+00:06:18,047 --> 00:06:21,035
+qui vous permet de faire une visualisation
+
+81
+00:06:21,035 --> 00:06:23,824
+graphique sur l'écran du PC de données
+
+82
+00:06:23,824 --> 00:06:27,700
+que vous avez préparées sur votre
+microcontrôleur.
+
+83
+00:06:27,700 --> 00:06:32,550
+Deux mots sur le RS232, qui est en fait la
+source historique
+
+84
+00:06:32,550 --> 00:06:37,732
+de cet UART, c'était prévu pour
+
+85
+00:06:37,732 --> 00:06:42,865
+transmettre sur une certaine distance avec
+des tensions de plus ou moins
+
+86
+00:06:42,865 --> 00:06:48,440
+12V, le signal est simplement inversé par
+l'amplificateur
+
+87
+00:06:48,440 --> 00:06:52,834
+12V.
+Le RS232 original contenait,
+
+88
+00:06:52,834 --> 00:06:58,175
+contient des lignes de contrôle pour un
+modem, c'est un
+
+89
+00:06:58,175 --> 00:07:03,800
+connecteur à 25 pattes qui, souvent, a des
+versions
+
+90
+00:07:03,800 --> 00:07:08,406
+réduites à 9 pattes sur les anciens PC.
+Bien, ce
+
+91
+00:07:08,406 --> 00:07:13,485
+protocole qu'on vient de voir, vous
+transmettez
+
+92
+00:07:13,485 --> 00:07:17,956
+et vous n'êtes pas sûrs qu'il y avait
+quelqu'un
+
+93
+00:07:17,956 --> 00:07:20,640
+à l'autre bout pour recevoir le message.
+
+94
+00:07:20,640 --> 00:07:27,050
+Donc c'est ce qu'on appelle un protocole,
+en aglais, Send and pray, envoyer
+
+95
+00:07:27,050 --> 00:07:32,601
+et prier pour que ça arrive et j'aimerais
+le comparer avec un autre
+
+96
+00:07:32,601 --> 00:07:35,260
+protocole, qui évidemment est plus
+intéressant,
+
+97
+00:07:35,260 --> 00:07:37,606
+qui s'appelle Handshake, il n'y a pas
+
+98
+00:07:37,606 --> 00:07:43,222
+de traduction française, c'est la poignée
+de main qui fait que lorsque vous
+
+99
+00:07:43,222 --> 00:07:49,020
+avez transmis à votre périphérique, et
+bien vous savez
+
+100
+00:07:49,020 --> 00:07:52,020
+qu'il est bien là et qu'il va vous
+répondre.
+
+101
+00:07:52,020 --> 00:07:57,322
+Alors un exemple ancien dont on trouve des
+résidus encore
+
+102
+00:07:57,322 --> 00:08:02,510
+dans certains processeurs c'est
+l'interface parallèle
+
+103
+00:08:02,510 --> 00:08:06,172
+de Centronics, qui est un fabricant
+d'imprimantes qui
+
+104
+00:08:06,172 --> 00:08:08,440
+a eu beaucoup de succès il y a 20
+
+105
+00:08:08,440 --> 00:08:15,800
+ou 30 ans, vous envoyez 8 bits en
+parallèle et avec ces 8 bits en parallèle,
+
+106
+00:08:15,800 --> 00:08:22,584
+vous avez un signal Strobe qui va vous
+dire : l'information est présente.
+
+107
+00:08:22,584 --> 00:08:27,288
+Vous avez préparé vos 8 bits et vous avez
+un signal Stobe qui peut être
+
+108
+00:08:27,288 --> 00:08:29,644
+positif, qui peut être négatif, qui en
+fait
+
+109
+00:08:29,644 --> 00:08:32,270
+à l'époque, je crois, est un signal
+statique.
+
+110
+00:08:32,270 --> 00:08:33,680
+Donc le récepteur
+
+111
+00:08:33,680 --> 00:08:37,534
+peut prendre cette information et
+maintenant il
+
+112
+00:08:37,534 --> 00:08:40,710
+va vous répondre avec un signal qui
+s'appelle
+
+113
+00:08:40,710 --> 00:08:44,292
+Aknowledge, le temps se déroule
+horizontalement, et
+
+114
+00:08:44,292 --> 00:08:48,120
+comme ça, vous savez que le caractère a
+
+115
+00:08:48,120 --> 00:08:53,276
+été reçu, ici, ça va activer un flag dans
+le périphérique pour dire : c'est arrivé,
+
+116
+00:08:53,276 --> 00:08:58,534
+il faut s'occuper du data, ici, ça va
+activer un flag, un fagnon, dans le,
+
+117
+00:08:58,534 --> 00:09:03,610
+le maître pour lui dire : tu peux envoyer
+le caractère suivant.
+
+118
+00:09:03,610 --> 00:09:09,565
+Donc là, on n'a pas de contrainte de
+timing
+
+119
+00:09:09,565 --> 00:09:13,387
+et ce bus Centronics avait aussi, à
+l'époque on n'avait
+
+120
+00:09:13,387 --> 00:09:17,834
+pas peur des gros connecteurs, c'était un
+énorme connecteur
+
+121
+00:09:17,834 --> 00:09:22,566
+de 38 pins avec des signaux de contôle
+pour l'imprimante.
+
+122
+00:09:22,566 --> 00:09:24,446
+Un type de transmission
+
+123
+00:09:24,446 --> 00:09:30,139
+qu'on va retrouver dans différentes
+formes, c'est
+
+124
+00:09:30,139 --> 00:09:35,635
+le SPI, Serial Peripheral Interface.
+Vous
+
+125
+00:09:35,635 --> 00:09:40,593
+avez un maître qui envoie une impulsion
+
+126
+00:09:40,593 --> 00:09:45,174
+d'horloge avec les données associées,
+comme dans le
+
+127
+00:09:45,174 --> 00:09:49,912
+cas de l'UART, mais les horloges démarrent
+au moment
+
+128
+00:09:49,912 --> 00:09:55,410
+où vous avez de l'information à envoyer.
+
+129
+00:09:55,410 --> 00:09:59,758
+Dans l'état de repos, le clock est à
+l'état 1, dans
+
+130
+00:09:59,758 --> 00:10:04,282
+certains cas à l'état 0, les données sont
+quelconques et il faut
+
+131
+00:10:04,282 --> 00:10:10,230
+maintenant bien savoir à quel moment vous
+allez modifier les données,
+
+132
+00:10:10,230 --> 00:10:15,915
+échantillonner ces données, ici c'est avec
+un flanc montant, et puis ensuite,
+
+133
+00:10:15,915 --> 00:10:19,720
+continuer la transmission de 8 bits.
+
+134
+00:10:19,720 --> 00:10:24,962
+Alors peu de choses sont précisées, il y
+avait, à propos de ce, de cette
+
+135
+00:10:24,962 --> 00:10:29,994
+façon de transmission, donc il faut chaque
+fois bien se renseigner : quel est
+
+136
+00:10:29,994 --> 00:10:34,950
+l'état de repos du clock, quel est le
+front actif?
+
+137
+00:10:34,950 --> 00:10:37,722
+Alors, en même temps que vous transmettez
+
+138
+00:10:37,722 --> 00:10:41,990
+vers l'esclave, vous pouvez récupérer de
+l'information
+
+139
+00:10:41,990 --> 00:10:45,984
+de l'esclave et là, remarquez la clarté de
+ces noms,
+
+140
+00:10:45,984 --> 00:10:51,096
+pour une fois, MOSI, mircoprocesseur out,
+vous savez que cette
+
+141
+00:10:51,096 --> 00:10:56,040
+pin, sur le maître, c'est du out pour le
+microprocesseur,
+
+142
+00:10:56,040 --> 00:11:00,815
+slave in, vous savez sur l'esclave que
+c'est une entrée.
+
+143
+00:11:00,815 --> 00:11:06,750
+Et en sens inverse, MISO, microprocesseur
+in, slave out.
+
+144
+00:11:06,750 --> 00:11:12,337
+Alors là aussi, il faut savoir à quel
+moment l'esclave
+
+145
+00:11:12,337 --> 00:11:17,196
+va transmettre les données par rapport au
+maître, donc
+
+146
+00:11:17,196 --> 00:11:20,480
+là j'ai pris l'option où c'est au niveau
+de
+
+147
+00:11:20,480 --> 00:11:25,970
+l'esclave, le flanc montant aussi qui va
+déclencher le décallage.
+
+148
+00:11:25,970 --> 00:11:31,933
+Donc vous allez trouver le bit 0 et vous
+remarquez que c'est décallé, ce qui,
+
+149
+00:11:31,933 --> 00:11:36,612
+dans certains cas, peut poser certains
+problèmes au moment de la lecture où soit
+
+150
+00:11:36,612 --> 00:11:41,660
+vous lisez trop vite, soit vous lisez trop
+tard et vous perdez le dernier bit.
+
+151
+00:11:41,660 --> 00:11:45,830
+Donc là il faut bien analyser ces
+diagrammes d'état.
+
+152
+00:11:45,830 --> 00:11:48,911
+Maintenant, on avait vu qu'on a besoin
+d'un
+
+153
+00:11:48,911 --> 00:11:51,645
+start bit, qu'on a besoin du stop bit.
+
+154
+00:11:51,645 --> 00:11:57,460
+Ici, il est réalisé avec une ligne
+supplémentaire qui s'appelle Slave select.
+
+155
+00:11:57,460 --> 00:12:04,316
+Au moment de la transmission, on active ce
+signal qui veut dire
+
+156
+00:12:04,316 --> 00:12:11,390
+: une information arrive, et puis le stop
+bit, ici, l'information est arrivée.
+
+157
+00:12:11,390 --> 00:12:16,580
+Un autre interface beaucoup plus
+astucieux, c'est l'I2C.
+
+158
+00:12:16,580 --> 00:12:18,233
+Alors avec I2C, il y a
+
+159
+00:12:18,233 --> 00:12:23,200
+une convention absolue maintenant alors
+concernant l'horloge,
+
+160
+00:12:23,200 --> 00:12:28,500
+qui s'appelle SCL, Serial Clock, c'est que
+les données
+
+161
+00:12:28,500 --> 00:12:34,020
+sont échantillonnées par un flanc montant
+et les données
+
+162
+00:12:34,020 --> 00:12:39,670
+de doivent pas changer pendant la durée de
+l'horloge.
+
+163
+00:12:39,670 --> 00:12:43,410
+Donc vous avez une impulsion positive de
+l'horloge
+
+164
+00:12:43,410 --> 00:12:47,700
+et les données doivent être stables
+pendant cette période.
+
+165
+00:12:47,700 --> 00:12:48,340
+Ceci nous
+
+166
+00:12:48,340 --> 00:12:53,850
+permet de faire une astuce qui est de dire
+: mais si les données ne changent
+
+167
+00:12:53,850 --> 00:12:58,788
+pas quand l'horloge est à 1, on peut
+décider que si les
+
+168
+00:12:58,788 --> 00:13:03,910
+données changent, c'est une information
+différente.
+
+169
+00:13:03,910 --> 00:13:09,490
+Donc, ici, au début du message, l'horloge
+est à 1
+
+170
+00:13:09,490 --> 00:13:13,390
+et le fait que les données passent de
+l'état 1
+
+171
+00:13:13,390 --> 00:13:18,309
+à l'état 0, au repos la ligne est à l'état
+1, on
+
+172
+00:13:18,309 --> 00:13:23,302
+a ici un start, l'équivalent du start bit.
+Et de
+
+173
+00:13:23,302 --> 00:13:28,251
+la même façon, on va trouver un stop bit
+ici
+
+174
+00:13:28,251 --> 00:13:32,960
+en remettant le signal à 1.
+Alors il peut être
+
+175
+00:13:32,960 --> 00:13:38,418
+nécessaire évidemment de, pendant que
+l'horloge
+
+176
+00:13:38,418 --> 00:13:43,248
+est à 0, de bien remettre ici le signal à
+0 pour
+
+177
+00:13:43,248 --> 00:13:47,958
+qu'il ait son effet.
+Un peu plus en détail le début de la
+
+178
+00:13:47,958 --> 00:13:53,760
+séquence, vous avez le start bit, vous
+avez les données
+
+179
+00:13:53,760 --> 00:13:58,960
+qui sont stables ici, pendant que
+l'horloge
+
+180
+00:13:58,960 --> 00:14:03,892
+est à 1, vous transmettez 8 bits, et là il
+y a une jolie
+
+181
+00:14:03,892 --> 00:14:08,671
+astuce qui est de dire : je vais
+transmettre un
+
+182
+00:14:08,671 --> 00:14:14,046
+neuvième bit en donnant la parole à
+l'esclave.
+
+183
+00:14:14,046 --> 00:14:19,016
+Ce qui veut dire que le maître, ici,
+arrête d'envoyer de
+
+184
+00:14:19,016 --> 00:14:24,408
+l'information et l'esclave peut intervenir
+pour
+
+185
+00:14:24,408 --> 00:14:30,027
+imposer un 0 sur la ligne ou, au
+contraire,
+
+186
+00:14:30,027 --> 00:14:34,780
+ne pas imposer une action, ce qui peut
+être considéré
+
+187
+00:14:34,780 --> 00:14:39,732
+comme catastrophique ou contraire, une
+simplification dans
+
+188
+00:14:39,732 --> 00:14:44,697
+l'interface où on n'avait pas besoin de
+ce, de ce Handshake, de cette
+
+189
+00:14:44,697 --> 00:14:49,844
+synchronisation des échanges.
+Alors là, on a en
+
+190
+00:14:49,844 --> 00:14:55,191
+fait le signal avant l'amplificateur de
+sortie
+
+191
+00:14:55,191 --> 00:14:56,181
+du maître.
+
+192
+00:14:56,181 --> 00:15:01,390
+Là, on a le signal avant l'amplificateur
+de sortie de l'esclave.
+
+193
+00:15:01,390 --> 00:15:04,130
+Comment est-ce que c'est combiné au niveau
+du bus?
+
+194
+00:15:04,130 --> 00:15:09,053
+Alors, on a, SCSI est vraiment un bus avec
+
+195
+00:15:09,053 --> 00:15:14,619
+certaines parentés avec les bus des
+microcontrôleurs, bus internes.
+
+196
+00:15:14,619 --> 00:15:18,650
+Vous avez un maître, vous avez des
+esclaves.
+
+197
+00:15:18,650 --> 00:15:20,262
+Je n'ai pas mis
+
+198
+00:15:20,262 --> 00:15:26,209
+de noms parce que on a une belle symétrie
+sur ce bus et dans le protocole qui
+
+199
+00:15:26,209 --> 00:15:32,200
+fait qu'il faut, naturellement, un maître
+pour coordonner les échanges
+
+200
+00:15:32,200 --> 00:15:37,745
+mais ce maître peut très bien donner la
+parole à un esclave
+
+201
+00:15:37,745 --> 00:15:43,290
+en lui disant : dorénavant, c'est toi qui
+est le maître, moi je serai l'esclave.
+
+202
+00:15:43,290 --> 00:15:45,448
+Ça se produit dans les sociétés
+
+203
+00:15:45,448 --> 00:15:49,319
+humaines aussi.
+Alors une différence importante par
+
+204
+00:15:49,319 --> 00:15:54,797
+rapport aux bus des microcontrôleurs, dans
+un bus de microcontrôleur, vous
+
+205
+00:15:54,797 --> 00:16:00,565
+avez l'état 0, vous avez l'état 1 quand
+c'est programmé en sortie,
+
+206
+00:16:00,565 --> 00:16:05,850
+vous avez l'état flottant quand l'entrée
+d'un microcontrôleur
+
+207
+00:16:05,850 --> 00:16:10,896
+est en entrée et au niveau de ce bus avec
+les
+
+208
+00:16:10,896 --> 00:16:15,784
+signaux clock, data, le 0 sera
+
+209
+00:16:15,784 --> 00:16:20,481
+l'élément actif, le 1 est
+
+210
+00:16:20,481 --> 00:16:25,246
+exclu, le 1 sera forcé par des
+
+211
+00:16:25,246 --> 00:16:30,530
+pull-ups et ça veut dire que si vous avez
+une pull-up qui impose l'état 1,
+
+212
+00:16:30,530 --> 00:16:36,022
+n'importe quelle unité peut imposer un 0
+sans se
+
+213
+00:16:36,022 --> 00:16:41,900
+trouver en court-circuit avec une autre
+unité qui chercherait à mettre un 1.
+
+214
+00:16:41,900 --> 00:16:45,442
+Donc ce grand principe de ce qu'on appelle
+collecteur
+
+215
+00:16:45,442 --> 00:16:48,910
+ouvert, mais on ne vous l'a pas présenté
+comme ça.
+
+216
+00:16:48,910 --> 00:16:54,973
+Donc on va travailler entre l'état 0 et
+l'état flottant et, au
+
+217
+00:16:54,973 --> 00:17:01,310
+lieu d'écrire sur le bus des 0 et des 1,
+on va préparer un 0 dans
+
+218
+00:17:01,310 --> 00:17:08,042
+le port de sortie et puis programmer état
+so, avec le registre
+
+219
+00:17:08,042 --> 00:17:14,686
+de direction qui a différents noms suivant
+les processeurs, on va programmer ici
+
+220
+00:17:14,686 --> 00:17:20,468
+direction sortie et on aura 0 sur la
+sortie puisqu'on l'a préparé
+
+221
+00:17:20,468 --> 00:17:26,228
+dans le port et puis direction entrée et
+c'est soit un état 1,
+
+222
+00:17:26,228 --> 00:17:32,950
+soit une possibilité de lire de
+l'information qui vient d'une autre unité.
+
+223
+00:17:32,950 --> 00:17:38,626
+Alors la programmation est un petit peu
+plus délicate à cause de ça mais quand on
+
+224
+00:17:38,626 --> 00:17:44,910
+a bien compris, on définit des modules qui
+correspondent
+
+225
+00:17:44,910 --> 00:17:51,098
+à ces différentes fonctions start bit,
+stop bit, data euh,
+
+226
+00:17:51,098 --> 00:17:52,570
+aknowledge.
+
+227
+00:17:52,570 --> 00:17:57,673
+Mais je vous conseille quand même
+d'utiliser des librairies qui sont bien
+
+228
+00:17:57,673 --> 00:18:00,442
+faites et qui correspondent aux besoins
+
+229
+00:18:00,442 --> 00:18:03,760
+du périphérique parce que j'ai expliqué
+comment
+
+230
+00:18:03,760 --> 00:18:08,649
+transmettre 8 bits mais en fait on va
+transmettre des messages avec des
+
+231
+00:18:08,649 --> 00:18:11,720
+adresses, avec des répétitions de données
+
+232
+00:18:11,720 --> 00:18:16,560
+et ceci dépend beaucoup des périphériques
+utilisés
+
+233
+00:18:16,560 --> 00:18:19,370
+des circuits intégrés qui ont été
+connectés.
+
+234
+00:18:19,370 --> 00:18:23,330
+Bien, quelque chose de bien connu aussi,
+
+235
+00:18:23,330 --> 00:18:28,510
+c'est les, la télécommande infrarouge, ou
+les transmissions
+
+236
+00:18:28,510 --> 00:18:33,510
+radios, où là en fait, il y a l'équivalent
+que d'un seul fil pour transmettre.
+
+237
+00:18:33,510 --> 00:18:41,728
+Alors avec les circuits de télécommandes
+infrarouges, vous avez
+
+238
+00:18:41,728 --> 00:18:46,432
+une diode infrarouge sur laquelle vous
+envoyez des trains
+
+239
+00:18:46,432 --> 00:18:51,340
+d'impulsions à 40 kH.
+Et la durée de ces trains est de
+
+240
+00:18:51,340 --> 00:18:56,469
+l'ordre de la milliseconde et des circuits
+spéciaux, il ne faut
+
+241
+00:18:56,469 --> 00:19:01,702
+pas en utiliser d'autres, ils sont faciles
+à obtenir vous permettent
+
+242
+00:19:01,702 --> 00:19:06,844
+d'intégrer, dans le fond, cette séquence
+avec un
+
+243
+00:19:06,844 --> 00:19:12,437
+certain retard et de aussi fournir un
+signal, actif à 0
+
+244
+00:19:12,437 --> 00:19:18,150
+en général, qui correspond à ce train
+d'impulsions avec un léger retard.
+
+245
+00:19:18,150 --> 00:19:21,678
+L'intérêt de ces circuits, c'est que non
+seulement ils
+
+246
+00:19:21,678 --> 00:19:25,550
+intègrent, mais ils ont aussi un contrôle
+automatique de gain.
+
+247
+00:19:25,550 --> 00:19:27,448
+Qu'est-ce que ça veut dire?
+
+248
+00:19:27,448 --> 00:19:32,508
+Ça veut dire que si le signal est faible,
+et bien il y a une amplification
+
+249
+00:19:32,508 --> 00:19:38,562
+plus importante et ça permet de couvrir
+des distances beaucoup plus, un petit peu
+
+250
+00:19:38,562 --> 00:19:42,234
+plus grandes puisque, évidemment,
+l'intensité du signal,
+
+251
+00:19:42,234 --> 00:19:44,820
+ici, diminue avec le carré de la distance.
+
+252
+00:19:44,820 --> 00:19:51,770
+Alors évidemment, si vous êtes loin, le
+contrôle automatique de gain augmente
+
+253
+00:19:51,770 --> 00:19:56,890
+la sensibilité au maximum et vous allez
+plus facilement capter des parasites.
+
+254
+00:19:56,890 --> 00:19:57,898
+Alors dans
+
+255
+00:19:57,898 --> 00:20:05,262
+les télécommandes commerciales, on trouve
+beaucoup le code RC5 Qui a ce type.
+
+256
+00:20:05,262 --> 00:20:09,430
+On n'a plus qu’un fil pour transmettre des
+1 et des 0.
+
+257
+00:20:09,430 --> 00:20:15,050
+Donc on va jouer sur la longueur des
+impulsions ou sur le déphasage.
+
+258
+00:20:15,050 --> 00:20:19,045
+Là, toutes les fois que vous avez un flanc
+descendant,
+
+259
+00:20:19,045 --> 00:20:22,583
+c’est un 0, toutes les fois que c’est un
+flanc montant,
+
+260
+00:20:22,583 --> 00:20:23,375
+c’est un 1.
+
+261
+00:20:23,375 --> 00:20:27,490
+Donc tout cela donne des communications
+dites sans fil, mais, pour
+
+262
+00:20:27,490 --> 00:20:32,265
+nous il y a un canal de transmission, une
+ligne de transmission.
+
+263
+00:20:32,265 --> 00:20:38,046
+Eh bien, on rencontre des protocoles plus
+ou moins, on
+
+264
+00:20:38,046 --> 00:20:43,140
+rencontre des formes d’ondes plus ou moins
+astucieuses dont on ne va pas parler.
+
+265
+00:20:43,140 --> 00:20:46,533
+Alors, chaque impulsion, ici,
+
+266
+00:20:46,533 --> 00:20:52,408
+correspond en fait à un train de 32
+impulsions, bon il y en aura
+
+267
+00:20:52,408 --> 00:20:57,920
+2 fois plus ici.
+Et, c’est ce que j’avais représenté là.
+
+268
+00:20:57,920 --> 00:21:01,337
+Alors il y a quelque chose qui devrait
+vous faire sourire dans
+
+269
+00:21:01,337 --> 00:21:07,530
+cette figure : 1 virgule 7, 7, 8
+millisecondes de largeur d’impulsion.
+
+270
+00:21:07,530 --> 00:21:11,828
+Celui qui a écrit ça est certainement pas
+ingénieur, on ne peut
+
+271
+00:21:11,828 --> 00:21:17,272
+pas, en physique, sauf dans des cas,
+vraiment en investissant
+
+272
+00:21:17,272 --> 00:21:22,280
+beaucoup d'énergie, arriver à des
+précisions pareilles, moins de 1
+
+273
+00:21:22,280 --> 00:21:27,240
+pour 1000 et du point de vue
+programmation, c’est clair
+
+274
+00:21:27,240 --> 00:21:31,450
+que vous ne pourrez jamais, jamais
+respecter des temps pareils.
+
+275
+00:21:31,450 --> 00:21:37,910
+C’est absurde de donner des valeurs aussi
+précises
+
+276
+00:21:37,910 --> 00:21:43,160
+et c’est inutile de donner une valeur
+précise,
+
+277
+00:21:43,160 --> 00:21:47,860
+ce qu’on veut c’est avoir une fourchette
+de valeurs.
+
+278
+00:21:47,860 --> 00:21:51,682
+Vous allez devoir programmer cette durée,
+et
+
+279
+00:21:51,682 --> 00:21:54,426
+puis, étant donné la durée de la boucle,
+
+280
+00:21:54,426 --> 00:21:57,680
+la durée des instructions, la vitesse du
+processeur,
+
+281
+00:21:57,680 --> 00:22:02,490
+vous aurez le choix entre 1,7 et 1,8,
+
+282
+00:22:02,490 --> 00:22:07,246
+peut-être un petit peu plus de précision.
+Ce qu’il nous faut,
+
+283
+00:22:07,246 --> 00:22:12,271
+ici, c’est avoir la fourchette, dire le
+code que vous
+
+284
+00:22:12,271 --> 00:22:16,979
+transmettez sera décodé ou sera décodable
+
+285
+00:22:16,979 --> 00:22:22,178
+correctement si le temps est compris entre
+
+286
+00:22:22,178 --> 00:22:27,670
+1,5 et 1,9.
+Évidemment, plus la fourchette est large,
+
+287
+00:22:27,670 --> 00:22:32,565
+plus le système sera tolérant aux
+changements de température et à
+
+288
+00:22:32,565 --> 00:22:38,032
+d’autres conditions de fabrication.
+Et c’est vraiment quelque
+
+289
+00:22:38,032 --> 00:22:42,840
+chose que beaucoup de fabricants n’ont pas
+compris.
+
+290
+00:22:42,840 --> 00:22:46,816
+Donc, évidemment, ben, une fois que vous
+avez les, le minimum et le maximum, ben
+
+291
+00:22:46,816 --> 00:22:48,720
+c’est facile de savoir, en vérifiant à
+
+292
+00:22:48,720 --> 00:22:53,144
+l’oscilloscope, si vous êtes bien centrés
+par rapport
+
+293
+00:22:53,144 --> 00:22:57,255
+à la gamme et mieux vous êtes centrés,
+mieux
+
+294
+00:22:57,255 --> 00:23:02,460
+vous aurez de marge en cas d’un fond
+d’incertitude.
+
+295
+00:23:03,500 --> 00:23:07,875
+Alors, pour revenir à ce code RC5, vous
+avez
+
+296
+00:23:07,875 --> 00:23:12,250
+3 bits de synchronisation, je dirais, bits
+de départ.
+
+297
+00:23:12,250 --> 00:23:18,209
+Ensuite, vous avez ce qu’ils appellent «
+system bits », c’est en
+
+298
+00:23:18,209 --> 00:23:23,527
+fait une adresse, c’est des encodages.
+Et puis vous avez vraiment,
+
+299
+00:23:23,527 --> 00:23:28,830
+ici, la commande.
+Alors, pour un fabricant donné,
+
+300
+00:23:28,830 --> 00:23:33,612
+ben, il va définir ces temps, il va
+appeler ça RC5 mais il va
+
+301
+00:23:33,612 --> 00:23:38,588
+définir des temps à son idée, il va
+définir des
+
+302
+00:23:38,588 --> 00:23:43,444
+bits de départ à son idée, il va définir
+des
+
+303
+00:23:43,444 --> 00:23:51,730
+codes et des commandes qui dépendront des
+instruments qu’il a mis en production.
+
+304
+00:23:51,730 --> 00:23:54,597
+Évidemment, il s’arrange d’être
+incompatible avec
+
+305
+00:23:54,597 --> 00:23:57,178
+la concurrence, puisqu’il faudrait pas que
+sa
+
+306
+00:23:57,178 --> 00:23:59,446
+télécommande commande, dans le fond, un
+
+307
+00:23:59,446 --> 00:24:03,280
+appareil concurrent, ce que l’utilisateur
+n’apprécierait pas.
+
+308
+00:24:03,280 --> 00:24:08,523
+Donc, voilà, je ne vous encourage pas à
+croire que c’est
+
+309
+00:24:08,523 --> 00:24:13,394
+facile d’utiliser une télécommande que
+vous n’utilisez
+
+310
+00:24:13,394 --> 00:24:17,286
+pas pour programmer votre robot ou autre
+chose.
+
+311
+00:24:17,286 --> 00:24:20,785
+Sans oscilloscope, vous aurez de la peine
+à savoir
+
+312
+00:24:20,785 --> 00:24:24,680
+exactement quel est le code utilisé, en,
+sachant que c’est
+
+313
+00:24:24,680 --> 00:24:28,954
+des structures comme ça, en pressant les
+boutons, on arrive
+
+314
+00:24:28,954 --> 00:24:33,896
+à repérer en général cette partie-là qui
+contient la commande
+
+315
+00:24:33,896 --> 00:24:36,933
+et passer sur le reste de l’information et
+
+316
+00:24:36,933 --> 00:24:40,510
+arriver à décoder correctement ce qui nous
+intéresse.
+
+317
+00:24:40,510 --> 00:24:44,584
+Bien, un dernière interface, maintenant,
+qui
+
+318
+00:24:44,584 --> 00:24:48,250
+a, lui, véritablement, dit un seul fil.
+
+319
+00:24:48,250 --> 00:24:53,707
+Mais en fait, un seul fil ne suffit pas,
+il faut toujours une
+
+320
+00:24:53,707 --> 00:24:58,881
+masse et puis il faut une alimentation
+pour alimenter les esclaves,
+
+321
+00:24:58,881 --> 00:24:59,370
+ici.
+
+322
+00:24:59,370 --> 00:25:03,551
+Et ce principe qui a été proposé par
+Dallas,
+
+323
+00:25:03,551 --> 00:25:08,815
+qui s’appelle « 1-wire » et a peut-être
+d'autres noms.
+
+324
+00:25:08,815 --> 00:25:13,500
+Vous avez un maître qui fait tout, qui va
+interroger les unités.
+
+325
+00:25:13,500 --> 00:25:18,945
+Et comment est-ce que ça fonctionne?
+Et bien le principe, pour
+
+326
+00:25:18,945 --> 00:25:24,544
+envoyer les bits, c’est de dire si j’ai un
+0, par exemple,
+
+327
+00:25:24,544 --> 00:25:30,790
+j’envoie une impulsion courte, si j’ai un
+1, j’envoie une impulsion longue.
+
+328
+00:25:30,790 --> 00:25:37,770
+Je mets suffisamment de silence entre eux
+deux pour pouvoir générer ces signaux.
+
+329
+00:25:37,770 --> 00:25:43,727
+Vous voyez, ici, que c’est une valeur de 6
+microsecondes, ça se laisse tout à fait
+
+330
+00:25:43,727 --> 00:25:47,469
+gérer avec des routines c'est de bas
+niveau,
+
+331
+00:25:47,469 --> 00:25:49,899
+il ne faut pas utiliser un « digital
+
+332
+00:25:49,899 --> 00:25:52,940
+right » qui lui prend 10 microsecondes.
+
+333
+00:25:52,940 --> 00:25:56,416
+Mais si vous utilisez directement les
+instructions
+
+334
+00:25:56,416 --> 00:25:58,944
+et bien c’est facile de respecter ces
+
+335
+00:25:58,944 --> 00:26:02,877
+timings et naturellement, il faut un
+oscilloscope
+
+336
+00:26:02,877 --> 00:26:06,340
+ou d’autres trucs pour vérifier les temps.
+
+337
+00:26:06,340 --> 00:26:10,570
+Alors maintenant, en réception, là, c’est
+un petit
+
+338
+00:26:10,570 --> 00:26:15,378
+peu plus astucieux, puisque c’est toujours
+le maître
+
+339
+00:26:15,378 --> 00:26:19,500
+qui commande et le maître va faire comme
+s’il
+
+340
+00:26:19,500 --> 00:26:23,500
+envoyait un 1, ici, en partant de l’idée
+que
+
+341
+00:26:23,500 --> 00:26:27,950
+c’était un 1 mais ensuite, il va se mettre
+à l’écoute.
+
+342
+00:26:27,950 --> 00:26:34,294
+Et l’esclave qui a repéré cette sélection
+va
+
+343
+00:26:34,294 --> 00:26:41,077
+dire, ben, voilà au bout de 6
+millisecondes, le maître va se déconnecter
+
+344
+00:26:41,077 --> 00:26:46,660
+donc moi, dans cette milliseconde, je vais
+m’activer
+
+345
+00:26:46,660 --> 00:26:51,640
+en sortie et si c’est un 1, je ne
+
+346
+00:26:51,640 --> 00:26:56,600
+fais rien, si c’est un 0, je maintiens
+
+347
+00:26:56,600 --> 00:27:01,538
+le signal pendant assez longtemps, pour
+que le
+
+348
+00:27:01,538 --> 00:27:06,225
+maître puisse l’observer.
+Donc, voilà, alors, au bout
+
+349
+00:27:06,225 --> 00:27:11,540
+de 15 microsecondes, ben, le maître va
+observer ce signal, ça peut
+
+350
+00:27:11,540 --> 00:27:17,112
+varier entre 10 et 20, ça pourrait même
+varier, apparemment, jusqu'à 60, puisque
+
+351
+00:27:17,112 --> 00:27:24,450
+l’esclave va maintenir son information
+pendant 60 microsecondes en tout,
+
+352
+00:27:24,450 --> 00:27:30,702
+et puis ensuite, garantir dans le fond que
+ça remonte à 1 en 10 microsecondes.
+
+353
+00:27:30,702 --> 00:27:31,440
+Donc voilà
+
+354
+00:27:31,440 --> 00:27:36,690
+un joli petit exercice de programmation,
+que vous risquez de retrouver.
+
+355
+00:27:36,690 --> 00:27:40,440
+Alors encore une chose à propos du nombre
+de fils.
+
+356
+00:27:40,440 --> 00:27:46,110
+Eh bien, étant donné que le signal,
+
+357
+00:27:46,110 --> 00:27:51,231
+ici, est à 1, on impose ce 1 avec une
+
+358
+00:27:51,231 --> 00:27:56,594
+pull-up, là, parce que, au moment où le
+maître se met à l’écoute, les esclaves
+
+359
+00:27:56,594 --> 00:28:02,390
+doivent transmettre leur information et je
+crois qu’en général,
+
+360
+00:28:02,390 --> 00:28:05,290
+il y a une pull-up, là, elle est peut-être
+pas
+
+361
+00:28:05,290 --> 00:28:09,000
+indispensable, oui, elle est indispensable
+pour éviter un court-circuit dans
+
+362
+00:28:09,000 --> 00:28:13,420
+cette zone-là, où il y a inversion de la
+direction.
+
+363
+00:28:13,420 --> 00:28:17,838
+Bien, puisqu’on a un 1 en permanence, ici,
+enfin,
+
+364
+00:28:17,838 --> 00:28:22,684
+la majorité du temps, on peut charger un
+condensateur
+
+365
+00:28:22,684 --> 00:28:27,866
+avec cet état 1 à travers une diode et
+obtenir l’alimentation du
+
+366
+00:28:27,866 --> 00:28:33,240
+circuit, à travers cette petite
+alimentation,
+
+367
+00:28:33,240 --> 00:28:38,846
+même pas régulée mais les circuits sont
+très tolérants
+
+368
+00:28:38,846 --> 00:28:41,260
+à des variations de tensions entre 3 et 5
+volts.
+
+369
+00:28:41,260 --> 00:28:47,794
+Donc voilà, on a pu réaliser un bus à 2
+fils sur lequel on peut
+
+370
+00:28:47,794 --> 00:28:54,500
+accrocher toute une série de circuits,
+vendus par Dallas et d’autres fabricants,
+
+371
+00:28:54,500 --> 00:28:57,854
+qui permettent de mesurer des
+températures,
+
+372
+00:28:57,854 --> 00:29:01,570
+de stocker de l’information et cetera.
+
+373
+00:29:01,570 --> 00:29:05,890
+Et c’est évidemment très avantageux en
+domotique.
+
+374
+00:29:05,890 --> 00:29:09,000
+Vous partez avec 2 fils, à travers,
+
+375
+00:29:09,000 --> 00:29:14,150
+à travers votre maison et vous récupérez
+l’information.
+
+376
+00:29:14,150 --> 00:29:18,974
+C’est lent, mais ça n’a pas d’importance
+pour mesurer des températures et
+
+377
+00:29:18,974 --> 00:29:23,350
+surveiller des portes qui vont mettre en
+tout 15 secondes pour s’ouvrir.
+
+378
+00:29:23,350 --> 00:29:28,722
+Bien, alors, voilà, on a pu voir et
+comprendre plusieurs interfaces série, se
+
+379
+00:29:28,722 --> 00:29:33,921
+rendre compte que c’est très important de
+bien réfléchir aux
+
+380
+00:29:33,921 --> 00:29:39,149
+impulsions d’horloge, à la stabilité des
+données, et deviner qu’il y a, là,
+
+381
+00:29:39,149 --> 00:29:43,912
+derrière, une masse d’applications,
+beaucoup de circuits intégrés qui
+
+382
+00:29:43,912 --> 00:29:50,160
+permettent de faire des choses très
+intéressantes avec un microcontrôleur.

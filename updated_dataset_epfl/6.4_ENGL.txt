@@ -1,0 +1,102 @@
+Welcome back!
+In this module, we'll talk about a class of systems that apply redundancy in order to achieve
+"good enough" levels of availability, without necessarily being viewed as fault tolerant.
+So, if you remember our discussion of tandem in the nonstop operating system and the use of process pairs, we saw a systematic discipline, in which we applied redundancy both in hardware and between applications in order to create a fault tolerant system
+Now that level of availability is required for a certain class of application, but it's not necessarily necessary for all possible class of applications.
+As a matter of fact, you can actually create a spectrum and define the operating point of various systems based on their use.
+And this is sort of an illustrated view of that spectrum from the lowest levels of required availability to the highest possible levels of fault tolerance.
+And the tandem example actually falls most closely into the category that today we would call carrier-grade, or at least that the networking industry would call carrier-grade today.
+And that is a term that describes systems that have no single point of failure and upgrade themselves without service interruption and can recover from failures quickly, including software failures.
+Now the tandem servers were often used to create fault tolerant transaction processing systems and used process pairs.
+And today's carrier-grade routers have very similar design patterns to ensure that they never fail and they never lose a networking state in the case of component failures.
+But there are actually very different design points.
+Now, first there are systems that are not just fault tolerant, but additionally what we call dependable.
+And these are the systems that our lives depend on.
+Not our digital lives, but our actual lives.
+And that actually suit different sets of assumptions, unlike the Telecon model, which must live on forever, dependable systems often have a built-in concept of a maintenance window, rather than the concept of in-server serviceability.
+So, for example, after the airplane lands, you have a convenient time in which you can upgrade systems.
+You don't have to worry about doing a software upgrade while the airplane is actually flying.
+However, obviously none of the control systems on the airplane should ever fail, under normal circumstance during the flight, and the process pair methodology or the end way modular programming is often necessary in order to capture all the possible failure models of that particular system.
+Now at the other extreme of the spectrum is what we would call a customer-grade design.
+There the availability is often determined and dominated by external factors.
+Take a cellphone, for example,
+I used before.
+The operational assumption is that it will be subject to temperature variations, humidity, bacteria, downloads of dubious applications, frequent synchronization over USB ports, a high probability of theft or loss, and the possibility that it gets run over by a truck.
+And you think about it, cellphone designs have worked out many of these assumptions into their model, but when it comes to faults and repair, the customer-grade design point makes absolutely no amends.
+It should work, and if it does not, just get another one.
+Now, of course this is not acceptable for enterprise-grade designs, products that are sold to companies.
+And here, the computer hardware is designed around the notion of components that are, whenever possible, field replaceable units.
+Now this means that the customer can directly exchange a faulty hardware component such as a disc drive, a fan, or a power supply.
+And this approach dramatically reduces the mean time to repair of the computer system, and therefore improves the availability.
+Now, generally these field-replaceable units are deployed themselves in a redundant fashion.
+Disc drives already together, fans and power supplies have enough spare capacity to deal with the failure of at least one of their components.
+And again, this improves the MTTF of the system.
+Now this module focuses on the main design principles to ensure enterprise-grade availability.
+And particularly with a focus on the software layer that can be deployed on the hardware of enterprise-grade servers.
+Now, to put this further into perspective, let's compare the MTTR of different design points.
+In previous modules, we actually looked at two extremes of the spectrum end way module redundancy, as used in digital design can repair itself extremely fast.
+Sometimes nanosecond fast.
+At the other extreme of the spectrum, we saw that RAID 6 can take multiple days when using SATA drives.
+And then in discussing tandem, we saw that process pairs can recover from software failures and hardware failures in milliseconds.
+Now, the high availability design point, which is the focus of this module is another systematic way to achieve fault tolerance.
+It has a much higher MTTR than fault tolerance.
+Often measured in minutes, sometimes hours, but it can actually be deployed in a very simple, and much simpler matter, than the full fault-tolerance discipline, which makes it interesting.
+Now, the basic idea is pretty simple.
+To create a high-availability cluster, you need two independent systems with a logically-shared storage subsystem.
+Now, between the two servers, you have a heartbeat mechanism, and the heartbeat mechanism is used to detect whether the other server is up or down and to communicate.
+And the logically-shared disc is where the shared state that is used by the application is actually stored.
+So, so far this is actually nearly identical from the fault tolerance transaction processing system, the way the tandem engineers designed it.
+The difference is in a sweeping simplification of the design, which is to separate all durable state, which is presumed to be consistently written on disc, from the transient state of the application.
+So, the durable state is on disc, and the transient state is only within the application very specifically only within the active application of the pair.
+So, whereas the fault tolerant design aims to keep a transient state of the two processes in correspondence at all time, the high-availability design only monitors the pair for help.
+And when a fault is detected, whether hardware fault or software fault, the hot spare takes over and reinitializes the transaction system, or the application, from the durable state, that is, from disc.
+So, in practice that means that the hot spare must recover the state stored on disc as if the system simply had crashed and was rebooting on the same machine.
+In this case, the MTTR is dominated by the application recovery time.
+For example, in the case of a database management system, this is the time to apply the redo log and the undo log onto the database file.
+Now, in the previous example, we used two servers and two software stocks to create a high-availability cluster.
+Now it turns out that the same methodology can also be applied to a single stack without having to configure a separate operating system image, an application image, as the backup.
+And this is possible when you use virtual machines to create the cluster.
+Now, in this model, a pool of servers are running virtual machines.
+And when one server fails, all of its virtual machines automatically restart elsewhere on the cluster.
+This clustering algorithm involves the various hypervisor instances, but each of the virtual machines simply restarts on a different node without knowing that anything changed.
+Now, of course, this works because the virtual machines are stored on a shared storage device and the state of the virtual machine is fully-encapsulated and portable.
+And again, as in the previous example, we're making the simplifying assumption that the disc subsystem itself is always up.
+And that it is a logically-shared, accessible component.
+In other words, so far we've been concentrating on server failures.
+Now, of course, we know that this can be a problem too.
+That's actually not a limitation.
+Simply because you can easily combine clustering, which guarantees the availability of servers, with replication of the storage subsystem itself.
+And here's actually an example of how you would deploy financial trading systems today in real life.
+This is actually a very hard and constrained problem since the system must ensure high availability, must be resilient to any possible component failure, software failure, and, in addition, must deal with the case where the entire system fails, including the case where the entire building fails.
+And, of course, this issue became a front and center problem on September 11th in 2001.
+And since then the financial industry has more or less figured out a standard way to answer this problem, in part through regulation.
+It's no longer sufficient to keep the database in one storage array, but instead you need to have two identical copies that must be, at all times, kept in sync on two different storage arrays.
+And this is called the synchronous storage replication model between two storage arrays.
+It's actually a very stringent requirement since it requires the copy of each disc write must be written to both locations before the disc write is returned to the server with a successful completion message.
+In that model, by the way, the primary and the backup servers are also in the two locations, so the high-availability cluster actually stretches the two buildings in the same way that the storage cluster stretches two buildings.
+And while I go into details, distance matters a great deal here.
+It's not--
+It has to be sufficiently distant that a major disaster will not affect both locations.
+It has to also be sufficiently close to each other not to impact the latency of disc transactions.
+And then there's a bigger issue associated with partitioning, which is why these deployments are usually done on dedicated fiber-optic connections that are redundantly deployed between the two data centers.
+And in this picture, by the way, which I found on some commercial presentation, even shows a third copy of the data.
+This time only with asynchronous replication requirement.
+This is typically used for analytics as well as archiving purposes.
+Let's actually go back to our MTTR spectrum.
+We've just spent this module so far covering the high-availability point of the spectrum.
+And if you recall the sweeping simplification, of the basis of high-availability clustering is the separation between durable and transient state.
+This principle is that the system can recover from durable state alone and therefore, let's not keep any additional state to make recovery faster.
+Now, unfortunately this has a very significant implication on the MTTR.
+There's actually another point in the timeline spectrum, which is called
+Recovery-Oriented Computing.
+And the ground-breaking research result in Recovery-Oriented Computing are due to our own George Candea, and you'll actually read about this in the paper this week.
+So, the key observation behind
+Recovery-Oriented Computing is that MTTF is due to many things, hardware, software, environment, of which we can actually address many by simply throwing money at the problem.
+But software reliability remains a problem in particular it impacts the recovery time especially if you use the classic high-availability cluster methodology with its sweeping simplification.
+So, Recovery-Oriented Computing and the use of micro-reboots addresses this very specific topic and I hope you enjoy the paper this week.
+So, it's time to summarize.
+In this short module, we've covered the concept of building a high-availability cluster for solutions that need to be "good enough" for enterprise grade level availability.
+And that can be done with the hot spare, and a sweeping simplification to only focus on durable state.
+There's another sweeping simplification in this design, which I hope you appreciate, is that we have access to a shared logical disc between multiple points and that disc actually serves as the arbiter for the ownership of the disc, and to determine which the primary application actually is.
+We covered how different ways in which we can apply the cluster methodology, either by having two software stacks on two physical servers, or one software stack and a virtual machine running on a cluster of hypervisors.
+And then lastly, we've put this all in perspective on the MTTR time spectrum, introducing the concept of Recovery-Oriented Computing, which lands between fault tolerance and high-availability clusters.

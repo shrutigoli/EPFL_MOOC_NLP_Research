@@ -1,0 +1,1676 @@
+1
+00:00:05,239 --> 00:00:06,242
+Welcome back.
+
+2
+00:00:06,243 --> 00:00:09,231
+This is final module
+for this week on virtualization.
+
+3
+00:00:09,232 --> 00:00:10,658
+This is actually an optional module
+
+4
+00:00:10,659 --> 00:00:13,320
+so feel free to skip
+if you're short on time.
+
+5
+00:00:13,818 --> 00:00:14,931
+And this is a case study
+
+6
+00:00:14,932 --> 00:00:18,293
+on the original
+VMware Workstation product,
+
+7
+00:00:18,300 --> 00:00:21,762
+which is a system
+I worked on in '98 and '99.
+
+8
+00:00:21,763 --> 00:00:24,230
+Now, at the time we were not interested
+in publishing papers.
+
+9
+00:00:24,231 --> 00:00:26,740
+We were building a product
+for a commercial company.
+
+10
+00:00:26,741 --> 00:00:29,101
+And so, the paper was written in 2012,
+
+11
+00:00:29,102 --> 00:00:31,600
+so I had the chance
+to write this with a little bit
+
+12
+00:00:31,601 --> 00:00:33,236
+of the benefit of hindsight.
+
+13
+00:00:33,237 --> 00:00:36,515
+This paper is not on
+the mandatory reading list for this week.
+
+14
+00:00:36,825 --> 00:00:40,903
+But back in 1999,
+we had a number of challenges.
+
+15
+00:00:41,217 --> 00:00:43,097
+And the first challenge
+that we identified was
+
+16
+00:00:43,098 --> 00:00:47,396
+that the x86 architecture
+was actually not virtualizable.
+
+17
+00:00:47,910 --> 00:00:49,856
+So we learned in the previous modules
+
+18
+00:00:49,857 --> 00:00:52,763
+of the importance
+of Popek/Goldberg theorem.
+
+19
+00:00:53,159 --> 00:00:54,727
+And I also gave you
+a little bit of a sense
+
+20
+00:00:54,728 --> 00:00:56,468
+that people had forgotten
+about that theorem.
+
+21
+00:00:56,469 --> 00:00:58,441
+Indeed, when it came to
+the x86 architecture,
+
+22
+00:00:58,442 --> 00:01:00,392
+the 32-bit architecture at the time,
+
+23
+00:01:00,393 --> 00:01:02,054
+it was clearly not virtualizable.
+
+24
+00:01:02,055 --> 00:01:03,280
+There were 17 instructions
+
+25
+00:01:03,281 --> 00:01:07,009
+that grossly violated
+the Popek and Goldberg criteria.
+
+26
+00:01:07,009 --> 00:01:07,974
+And this was a problem.
+
+27
+00:01:07,975 --> 00:01:09,391
+This was not just a theoretical problem,
+
+28
+00:01:09,392 --> 00:01:11,706
+this was an actual
+pragmatic, practical problem
+
+29
+00:01:11,707 --> 00:01:14,227
+because our goal was to run
+on modified operating systems,
+
+30
+00:01:14,227 --> 00:01:15,200
+and in particular,
+
+31
+00:01:15,201 --> 00:01:18,955
+our first goal was to run
+Windows in virtual machines.
+
+32
+00:01:19,623 --> 00:01:21,574
+Now the second challenge
+that we identified was
+
+33
+00:01:21,575 --> 00:01:25,892
+that the x86 architecture
+is of daunting complexity
+
+34
+00:01:25,893 --> 00:01:27,043
+and for any one of you
+
+35
+00:01:27,044 --> 00:01:29,862
+who's actually dealt with
+x86 at the assembly level
+
+36
+00:01:29,863 --> 00:01:32,265
+you probably have a sense
+of what I'm talking about.
+
+37
+00:01:32,266 --> 00:01:35,225
+If you think about this
+from a systems perspective,
+
+38
+00:01:35,226 --> 00:01:37,455
+the reality gets even worse.
+
+39
+00:01:37,745 --> 00:01:42,561
+There is an unbounded combination
+of protections, segmentation,
+
+40
+00:01:42,562 --> 00:01:45,074
+paging, execution mode mechanism,
+
+41
+00:01:45,075 --> 00:01:47,886
+that overlap with very bizarre semantics.
+
+42
+00:01:47,887 --> 00:01:50,734
+The list is actually not something
+
+43
+00:01:50,735 --> 00:01:53,611
+that I can enumerate in my head.
+
+44
+00:01:53,612 --> 00:01:54,785
+And none of the modes,
+
+45
+00:01:54,786 --> 00:01:57,745
+except one minor 16-bit backward
+
+46
+00:01:57,746 --> 00:01:59,602
+compatibility mode called Virtual 8086
+
+47
+00:01:59,603 --> 00:02:03,547
+were virtualizable according
+to the Popek and Goldberg criteria.
+
+48
+00:02:03,997 --> 00:02:05,700
+But beyond that,
+there were additional challenges
+
+49
+00:02:05,700 --> 00:02:06,677
+that we identified.
+
+50
+00:02:06,677 --> 00:02:09,347
+We were trying to start a small company
+
+51
+00:02:09,747 --> 00:02:11,292
+and we were trying to introduce
+
+52
+00:02:11,293 --> 00:02:12,860
+the notion of running virtual machines
+
+53
+00:02:12,861 --> 00:02:15,802
+on x86 systems
+and we realized very quickly
+
+54
+00:02:15,803 --> 00:02:17,363
+that the diversity of peripherals
+
+55
+00:02:17,364 --> 00:02:20,726
+was going to be a very significant issue
+
+56
+00:02:20,727 --> 00:02:24,571
+because it's one thing
+to virtualize the x86 CPU.
+
+57
+00:02:24,572 --> 00:02:25,906
+It's one thing to use
+
+58
+00:02:25,907 --> 00:02:27,897
+Shadow page tables
+to virtualize memory
+
+59
+00:02:27,898 --> 00:02:30,697
+which are the two multiplexing
+techniques I've talked about.
+
+60
+00:02:30,698 --> 00:02:32,177
+But when you actually build
+the real products
+
+61
+00:02:32,178 --> 00:02:33,906
+you realize that you also need to do I/O
+
+62
+00:02:33,907 --> 00:02:36,337
+and you need to do I/O
+in a very broad sort of platform
+
+63
+00:02:36,338 --> 00:02:38,740
+so this can very quickly be challenging.
+
+64
+00:02:39,529 --> 00:02:41,927
+And finally we also recognized early on
+
+65
+00:02:41,928 --> 00:02:45,034
+that we needed to have
+a very simple user experience
+
+66
+00:02:45,035 --> 00:02:47,410
+so that people could actually
+test out the product
+
+67
+00:02:47,411 --> 00:02:49,335
+without actually having to
+reinstall their systems.
+
+68
+00:02:49,336 --> 00:02:51,273
+And all of these challenges,
+
+69
+00:02:51,274 --> 00:02:53,225
+these four main higher-order challenges,
+
+70
+00:02:53,226 --> 00:02:57,607
+all fed into critical design points
+of the emerald workstation.
+
+71
+00:02:57,625 --> 00:02:58,973
+And of those points,
+
+72
+00:02:58,974 --> 00:03:02,292
+I'm going to focus on
+two of these contributions.
+
+73
+00:03:02,827 --> 00:03:06,634
+The first one is the contribution
+
+74
+00:03:06,635 --> 00:03:09,989
+on how to create a type II
+Virtual Machine Monitor
+
+75
+00:03:09,990 --> 00:03:12,313
+that can run on top of an operating system
+
+76
+00:03:12,314 --> 00:03:14,255
+like Linux or Windows.
+
+77
+00:03:14,405 --> 00:03:18,256
+The type I vs. type II classification
+was originally designed
+
+78
+00:03:18,576 --> 00:03:21,196
+at a time when operating
+systems were running...
+
+79
+00:03:21,197 --> 00:03:23,008
+where the protection,
+the notion of protection
+
+80
+00:03:23,009 --> 00:03:25,939
+was actually different than it is today.
+
+81
+00:03:26,382 --> 00:03:27,788
+Now by building a type II system,
+
+82
+00:03:27,789 --> 00:03:29,296
+and by going after a type II system,
+
+83
+00:03:29,297 --> 00:03:30,339
+we actually, off the bat,
+
+84
+00:03:30,340 --> 00:03:32,733
+can address the issue of device diversity
+
+85
+00:03:32,734 --> 00:03:33,937
+and the user experience
+
+86
+00:03:33,938 --> 00:03:36,489
+simply because the host operating system
+
+87
+00:03:36,490 --> 00:03:38,643
+is in charge of device diversity
+
+88
+00:03:38,644 --> 00:03:41,681
+and the host operating system can present
+
+89
+00:03:41,682 --> 00:03:44,150
+the experience of,
+a simple experience of running
+
+90
+00:03:44,151 --> 00:03:47,536
+a virtual machine monitor
+as an application.
+
+91
+00:03:47,926 --> 00:03:49,143
+And then the second challenge
+that we faced
+
+92
+00:03:49,144 --> 00:03:51,489
+obviously was how to virtualize x86
+
+93
+00:03:51,779 --> 00:03:54,743
+in the context of
+these sets of instructions
+
+94
+00:03:54,744 --> 00:03:57,115
+that failed the Popek
+and Goldberg criteria.
+
+95
+00:03:57,445 --> 00:03:59,702
+So let's talk about these
+two contributions.
+
+96
+00:04:01,113 --> 00:04:03,901
+The first contribution is really aimed at
+
+97
+00:04:03,902 --> 00:04:07,174
+providing a simple user experience.
+
+98
+00:04:07,175 --> 00:04:09,939
+So we run as a type II hypervisor.
+
+99
+00:04:09,940 --> 00:04:12,639
+So, logically speaking,
+and from a learning perspective
+
+100
+00:04:12,640 --> 00:04:16,617
+the host operating system is
+in full control of virtualization layer,
+
+101
+00:04:16,618 --> 00:04:19,315
+which is the VMR software,
+runs as an application
+
+102
+00:04:19,317 --> 00:04:21,547
+on top of the host operating system.
+
+103
+00:04:22,207 --> 00:04:24,807
+And it is in full control
+of the virtual machines
+
+104
+00:04:24,808 --> 00:04:26,837
+so the guest operating system
+in the applications
+
+105
+00:04:26,838 --> 00:04:28,800
+run inside the virtual machine.
+
+106
+00:04:28,801 --> 00:04:30,376
+And then obviously, the application runs
+
+107
+00:04:30,377 --> 00:04:32,487
+under the control
+of the guest operating system.
+
+108
+00:04:32,488 --> 00:04:35,759
+So you have very nice
+Russian doll-type diagram here
+
+109
+00:04:35,760 --> 00:04:38,191
+that illustrates the layered relationship
+
+110
+00:04:38,192 --> 00:04:40,129
+between the different
+entities in the system.
+
+111
+00:04:40,130 --> 00:04:42,228
+Of course, the challenge is
+how do you actually build that
+
+112
+00:04:42,229 --> 00:04:44,649
+and how do you build that
+in a way that is fast.
+
+113
+00:04:46,069 --> 00:04:47,848
+So our solution to that
+challenge was actually
+
+114
+00:04:47,849 --> 00:04:50,783
+to break the VMware software
+into different components.
+
+115
+00:04:51,513 --> 00:04:52,611
+If you look at the picture right now,
+
+116
+00:04:52,612 --> 00:04:55,963
+what you see is the CPU,
+the host operating system,
+
+117
+00:04:55,964 --> 00:04:59,392
+and any arbitrary application
+running on top
+
+118
+00:04:59,393 --> 00:05:00,681
+of the host operating system
+
+119
+00:05:00,682 --> 00:05:03,529
+making system calls to
+that host operating system.
+
+120
+00:05:04,060 --> 00:05:06,318
+While VMware rather than being
+one piece of software
+
+121
+00:05:06,319 --> 00:05:08,785
+is actually broken up into
+multiple components
+
+122
+00:05:08,786 --> 00:05:11,297
+the user perceives the application
+
+123
+00:05:11,298 --> 00:05:13,630
+to be exclusively running
+as an application
+
+124
+00:05:13,631 --> 00:05:16,284
+on top of that same host operating system,
+
+125
+00:05:16,285 --> 00:05:19,282
+making system calls like
+any other application would.
+
+126
+00:05:19,531 --> 00:05:21,243
+But in reality that application
+
+127
+00:05:21,244 --> 00:05:24,844
+is really just a proxy for
+the Virtual Machine Monitor.
+
+128
+00:05:24,845 --> 00:05:27,289
+And the Virtual Machine Monitor
+runs in an environment
+
+129
+00:05:27,290 --> 00:05:29,450
+in which the host operating system
+
+130
+00:05:29,451 --> 00:05:32,305
+is actually no longer present in memory.
+
+131
+00:05:32,525 --> 00:05:35,337
+So we have an environment
+where we have two context:
+
+132
+00:05:35,338 --> 00:05:38,328
+the host context and the VMM context.
+
+133
+00:05:38,968 --> 00:05:41,810
+And we have the ability to switch
+between these two context.
+
+134
+00:05:41,811 --> 00:05:43,772
+We actually call that switch,
+"the world switch,"
+
+135
+00:05:43,773 --> 00:05:45,745
+because it's much more
+than a process switch.
+
+136
+00:05:45,746 --> 00:05:48,832
+It is a complete switch
+of the address spaces.
+
+137
+00:05:49,202 --> 00:05:52,125
+To the point that when
+you're running in the VMM context,
+
+138
+00:05:52,126 --> 00:05:54,196
+the host context is no longer present
+
+139
+00:05:54,197 --> 00:05:55,937
+in the address space of the CPU
+
+140
+00:05:55,938 --> 00:05:56,800
+and vice versa.
+
+141
+00:05:56,801 --> 00:05:57,965
+If you're running in the host context,
+
+142
+00:05:57,966 --> 00:06:00,374
+then the VMM is no longer [inaudible]
+
+143
+00:06:00,375 --> 00:06:03,826
+into the address space of the CPU.
+
+144
+00:06:04,022 --> 00:06:05,737
+Now, surprisingly, that implementation
+
+145
+00:06:05,738 --> 00:06:07,465
+can actually be extremely efficient.
+
+146
+00:06:07,466 --> 00:06:09,633
+You can switch between these context
+
+147
+00:06:09,634 --> 00:06:11,782
+with something that costs
+just a little bit more
+
+148
+00:06:11,783 --> 00:06:16,033
+than a normal context switch
+between two processes.
+
+149
+00:06:16,517 --> 00:06:18,365
+And by running into the VMM context
+
+150
+00:06:18,366 --> 00:06:20,136
+and effectively by throwing
+
+151
+00:06:20,137 --> 00:06:22,162
+the host operating system
+out of the system
+
+152
+00:06:22,163 --> 00:06:23,855
+at least for some amount of time,
+
+153
+00:06:23,856 --> 00:06:27,304
+then the VMM has the full flexibility
+to reconfigure the hardware
+
+154
+00:06:27,305 --> 00:06:29,897
+and meet exactly the requirements
+
+155
+00:06:29,898 --> 00:06:33,128
+that it needs in order
+to efficiently run a virtual machine.
+
+156
+00:06:33,318 --> 00:06:35,768
+And so the system goes back
+and forth between these two.
+
+157
+00:06:35,769 --> 00:06:37,852
+If you're interested
+there are details in the paper
+
+158
+00:06:37,853 --> 00:06:39,813
+as to when we actually go back and forth
+
+159
+00:06:39,814 --> 00:06:40,541
+between these two.
+
+160
+00:06:40,542 --> 00:06:44,725
+We do it whenever the VMM
+needs to make a request
+
+161
+00:06:44,726 --> 00:06:46,027
+on behalf of the virtual machine
+
+162
+00:06:46,028 --> 00:06:48,198
+that has access to a system resource,
+
+163
+00:06:48,199 --> 00:06:51,063
+like sending a network package
+or doing Disk I/O
+
+164
+00:06:51,064 --> 00:06:53,398
+in which case, that is done
+by the application,
+
+165
+00:06:53,399 --> 00:06:55,142
+the VMX application.
+
+166
+00:06:55,143 --> 00:06:57,215
+And also whenever
+there is an I/O interrupt,
+
+167
+00:06:57,216 --> 00:06:59,707
+we restore context from the VMM
+back to the host,
+
+168
+00:06:59,708 --> 00:07:02,160
+so that the operating system can handle
+
+169
+00:07:02,161 --> 00:07:03,689
+all device interrupts,
+
+170
+00:07:03,690 --> 00:07:07,819
+as if it was always
+in full control over the system.
+
+171
+00:07:07,896 --> 00:07:08,896
+And the magic trick to make
+
+172
+00:07:08,897 --> 00:07:11,360
+that happen is to have
+a little Kernel driver
+
+173
+00:07:11,361 --> 00:07:13,935
+that runs within the operating
+system that does this.
+
+174
+00:07:17,105 --> 00:07:18,327
+So this was the first challenge.
+
+175
+00:07:18,328 --> 00:07:19,527
+The second challenge is
+
+176
+00:07:19,528 --> 00:07:21,770
+the virtualization
+of the x86 architecture.
+
+177
+00:07:21,771 --> 00:07:25,923
+Now, because we now understand
+the Popek and Goldberg theorem,
+
+178
+00:07:25,924 --> 00:07:28,057
+we know that we cannot use
+the classic technique,
+
+179
+00:07:28,058 --> 00:07:31,210
+and the classic technique was simply
+to use "trap-and-emulate,"
+
+180
+00:07:31,211 --> 00:07:33,718
+and we know that this is not possible.
+
+181
+00:07:33,719 --> 00:07:36,486
+So, at the same time we also know
+
+182
+00:07:36,487 --> 00:07:39,687
+that we need to support
+binary compatibility.
+
+183
+00:07:39,688 --> 00:07:42,322
+So, the critical observation behind
+
+184
+00:07:42,323 --> 00:07:44,837
+the second contribution of VMware
+
+185
+00:07:44,838 --> 00:07:49,142
+is that most of these
+x86 sensitive instructions
+
+186
+00:07:49,143 --> 00:07:52,691
+are only sensitive
+when executing system software.
+
+187
+00:07:52,692 --> 00:07:54,877
+So, the instruction can be sensitive,
+
+188
+00:07:54,878 --> 00:07:58,042
+based on the level
+that it is expected to run at,
+
+189
+00:07:58,043 --> 00:08:01,164
+or it cannot be sensitive,
+in certain cases.
+
+190
+00:08:01,165 --> 00:08:02,653
+It turns out that most
+of these instructions
+
+191
+00:08:02,654 --> 00:08:04,871
+are sensitive when
+they're running in a kernel,
+
+192
+00:08:04,872 --> 00:08:05,788
+but they're not sensitive when
+
+193
+00:08:05,789 --> 00:08:08,136
+they're running in the application.
+
+194
+00:08:08,137 --> 00:08:09,710
+And when I say "kernel"
+and "the application"
+
+195
+00:08:09,711 --> 00:08:11,014
+and when I say "system software,"
+
+196
+00:08:11,015 --> 00:08:13,054
+we're using extremely loose definitions
+
+197
+00:08:13,055 --> 00:08:15,054
+of these terms up until now.
+
+198
+00:08:16,364 --> 00:08:18,083
+And so our high-level solution is to use
+
+199
+00:08:18,084 --> 00:08:19,584
+a combination of two techniques.
+
+200
+00:08:19,585 --> 00:08:22,491
+The first one is the well-known
+trap-and-emulate technique,
+
+201
+00:08:22,492 --> 00:08:24,799
+but we only use that
+whenever that is possible
+
+202
+00:08:24,800 --> 00:08:26,499
+and we specifically only use that
+
+203
+00:08:26,500 --> 00:08:29,954
+when these sensitive instructions
+are not sensitive.
+
+204
+00:08:29,955 --> 00:08:32,043
+For the current point in time.
+
+205
+00:08:32,413 --> 00:08:34,023
+And when that's not the case,
+
+206
+00:08:34,024 --> 00:08:36,149
+then we must rely on
+another technique,
+
+207
+00:08:36,150 --> 00:08:38,154
+which is the big hammer
+of computer systems,
+
+208
+00:08:38,155 --> 00:08:40,299
+which is the emulation layer.
+
+209
+00:08:40,299 --> 00:08:43,751
+So we use an emulation technique
+known as binary translation
+
+210
+00:08:43,751 --> 00:08:46,144
+to convert the original
+instruction stream,
+
+211
+00:08:46,145 --> 00:08:47,868
+which is an x86 instruction stream,
+
+212
+00:08:47,869 --> 00:08:51,363
+into a converted x86 instruction stream,
+
+213
+00:08:51,364 --> 00:08:55,013
+in which faithfully emulate
+the semantics of all instructions
+
+214
+00:08:55,014 --> 00:08:56,870
+including the sensitive one.
+
+215
+00:08:58,140 --> 00:08:59,821
+So I mentioned the term
+binary translation.
+
+216
+00:08:59,822 --> 00:09:02,798
+Let me just give you one slide
+on what I mean by that.
+
+217
+00:09:03,588 --> 00:09:05,245
+This is a technique in which
+
+218
+00:09:05,246 --> 00:09:08,577
+a dynamic compiler
+running as part of the VMM
+
+219
+00:09:09,437 --> 00:09:11,867
+converts a basic block
+of virtual machine instructions,
+
+220
+00:09:11,868 --> 00:09:14,399
+so this is an x86 instruction sequence,
+
+221
+00:09:14,400 --> 00:09:18,257
+and it converts it into
+another instruction sequence
+
+222
+00:09:18,258 --> 00:09:20,927
+that can be executed directly in the CPU
+in a way that is safe
+
+223
+00:09:20,928 --> 00:09:22,095
+and that faithfully emulates
+
+224
+00:09:22,096 --> 00:09:25,331
+the semantics of the architecture.
+
+225
+00:09:26,041 --> 00:09:28,151
+Now, compilation is expensive.
+
+226
+00:09:28,152 --> 00:09:29,385
+Translation is expensive,
+
+227
+00:09:29,386 --> 00:09:31,687
+so you want to minimize
+how often this is done.
+
+228
+00:09:31,688 --> 00:09:34,700
+So there's a large data structure
+called a translation cache,
+
+229
+00:09:34,701 --> 00:09:37,713
+which is a buffer that holds
+these translations,
+
+230
+00:09:37,843 --> 00:09:40,209
+and then there's a main,
+a high-level dispatch function,
+
+231
+00:09:40,210 --> 00:09:42,811
+which basically allows you
+to jump into the translation cache
+
+232
+00:09:42,812 --> 00:09:44,893
+and start executing instructions directly.
+
+233
+00:09:44,894 --> 00:09:46,872
+And then there are
+a large number of optimizations
+
+234
+00:09:46,873 --> 00:09:48,611
+that make it efficient
+in particularly the ability
+
+235
+00:09:48,612 --> 00:09:50,332
+to go directly from one basic block
+
+236
+00:09:50,333 --> 00:09:53,590
+to another basic block
+within the translation cache.
+
+237
+00:09:54,340 --> 00:09:56,509
+Now, the challenge in
+a binary translation system,
+
+238
+00:09:56,510 --> 00:09:58,241
+and these are systems that have been
+
+239
+00:09:58,242 --> 00:10:00,319
+prominently used for simulation purposes,
+
+240
+00:10:00,320 --> 00:10:02,937
+is they have something like
+a 5x to a 10x slowdown.
+
+241
+00:10:02,938 --> 00:10:05,160
+If you're familiar with
+the QEMU binary translator,
+
+242
+00:10:05,161 --> 00:10:07,297
+those are the type
+of performance numbers
+
+243
+00:10:07,298 --> 00:10:08,490
+that you should expect.
+
+244
+00:10:08,491 --> 00:10:11,859
+And obviously a 5x to 10x slowdown
+is completely incompatible
+
+245
+00:10:11,860 --> 00:10:14,101
+with a virtual machine monitor.
+
+246
+00:10:14,102 --> 00:10:17,537
+And so our solution to building
+an efficient binary translator
+
+247
+00:10:18,587 --> 00:10:21,340
+was to actually specifically
+configure the hardware
+
+248
+00:10:21,341 --> 00:10:25,388
+and use the hardware to avoid many
+of the software overheads
+
+249
+00:10:25,389 --> 00:10:27,767
+and in particular the result
+we were able to achieve
+
+250
+00:10:27,768 --> 00:10:29,801
+is one in which most
+of the instructions
+
+251
+00:10:29,802 --> 00:10:31,728
+are translated one-to-one.
+
+252
+00:10:31,729 --> 00:10:33,147
+So, in this example,
+
+253
+00:10:33,148 --> 00:10:35,785
+I have a basic block
+with three instructions.
+
+254
+00:10:35,786 --> 00:10:37,030
+The first two instructions,
+
+255
+00:10:37,031 --> 00:10:39,610
+which are representative
+of innocuous instructions
+
+256
+00:10:39,611 --> 00:10:41,568
+that simply manipulate memory,
+
+257
+00:10:41,569 --> 00:10:43,656
+had to be converted
+on a one-to-one basis.
+
+258
+00:10:43,657 --> 00:10:45,092
+And that is actually not
+
+259
+00:10:45,093 --> 00:10:48,713
+the traditional output
+of a binary translator
+
+260
+00:10:48,714 --> 00:10:51,396
+that is running a full system simulation
+
+261
+00:10:51,397 --> 00:10:52,965
+because it needs to do bounce checks
+
+262
+00:10:52,966 --> 00:10:55,092
+and indirections and other things.
+
+263
+00:10:55,093 --> 00:10:56,671
+Now, the reason we don't need
+to do bounce checks
+
+264
+00:10:56,672 --> 00:10:58,404
+is because we've configured the hardware
+
+265
+00:10:58,405 --> 00:11:00,751
+to do the bounce checks on our behalf.
+
+266
+00:11:02,031 --> 00:11:03,293
+Now there's a third instruction
+
+267
+00:11:03,294 --> 00:11:04,993
+that actually does require an expansion.
+
+268
+00:11:04,994 --> 00:11:07,813
+In this case, I took sort of
+a complicated example.
+
+269
+00:11:07,814 --> 00:11:10,129
+This is a registered indirect call
+
+270
+00:11:10,929 --> 00:11:15,495
+that expands into a stub,
+followed by a jump to another function
+
+271
+00:11:15,496 --> 00:11:17,590
+that actually will do the work.
+
+272
+00:11:17,591 --> 00:11:19,795
+Now, what you actually see in this stub
+
+273
+00:11:19,796 --> 00:11:22,938
+is a couple of instructions
+that use a specific register
+
+274
+00:11:22,939 --> 00:11:25,091
+and that register is called "gs,"
+
+275
+00:11:25,092 --> 00:11:27,318
+and it's a segment register.
+
+276
+00:11:27,319 --> 00:11:30,008
+And that segment register was reserved
+
+277
+00:11:30,009 --> 00:11:31,258
+by the binary translator
+
+278
+00:11:31,259 --> 00:11:33,265
+only to be used on behalf of the VMM.
+
+279
+00:11:33,266 --> 00:11:35,819
+So, the virtual machine cannot
+directly access that register
+
+280
+00:11:35,820 --> 00:11:38,950
+and that register gives
+you access to sort of memory
+
+281
+00:11:38,951 --> 00:11:41,221
+that is not otherwise available.
+
+282
+00:11:41,222 --> 00:11:44,057
+And that is the basic trick
+that allows us to operate
+
+283
+00:11:44,058 --> 00:11:46,886
+without any form of
+software fault isolation.
+
+284
+00:11:46,887 --> 00:11:49,679
+Now, sandboxing is
+when the virtual machine
+
+285
+00:11:49,680 --> 00:11:51,741
+uses normal segments,
+
+286
+00:11:52,181 --> 00:11:53,871
+these segments are truncated
+
+287
+00:11:53,872 --> 00:11:56,775
+so that they never overlap
+with the VMM portion.
+
+288
+00:11:56,776 --> 00:11:57,909
+And if there's any attempt
+
+289
+00:11:57,910 --> 00:11:59,883
+that we actually need to
+emulate that attempt.
+
+290
+00:11:59,884 --> 00:12:01,996
+Conversely, the binary translator has,
+
+291
+00:12:01,997 --> 00:12:03,364
+using this gs register,
+
+292
+00:12:03,365 --> 00:12:06,251
+the ability to access
+locations and memory
+
+293
+00:12:06,252 --> 00:12:09,291
+that are not otherwise available
+to regulate instruction.
+
+294
+00:12:09,292 --> 00:12:10,805
+So again, we use hardware in order
+
+295
+00:12:10,806 --> 00:12:13,187
+to make the binary translator efficient.
+
+296
+00:12:14,107 --> 00:12:16,858
+Now, having a trap-and-emulate system
+
+297
+00:12:16,859 --> 00:12:18,720
+and having a binary translator itself,
+
+298
+00:12:18,721 --> 00:12:21,364
+is actually not sufficient
+to the technical result.
+
+299
+00:12:21,365 --> 00:12:24,865
+The key technical result is
+actually a decision algorithm
+
+300
+00:12:24,866 --> 00:12:28,667
+which determines when
+direct execution is possible
+
+301
+00:12:28,668 --> 00:12:31,636
+and conversely when
+binary translation is necessary.
+
+302
+00:12:32,856 --> 00:12:35,069
+And that decision algorithm,
+
+303
+00:12:35,070 --> 00:12:36,446
+one of its interesting characteristics is
+
+304
+00:12:36,447 --> 00:12:38,714
+that it can execute in constant time.
+
+305
+00:12:38,715 --> 00:12:41,826
+It does not require any inspection
+of the instruction stream.
+
+306
+00:12:41,827 --> 00:12:44,972
+It's not a function of the
+architecturally-defined registers.
+
+307
+00:12:44,973 --> 00:12:48,700
+It's only a function of the
+system-defined register state
+
+308
+00:12:48,701 --> 00:12:51,566
+as well as the segment state
+of the system.
+
+309
+00:12:51,567 --> 00:12:53,556
+So for example,
+
+310
+00:12:53,557 --> 00:12:56,742
+if the virtual machine is in a state
+
+311
+00:12:56,743 --> 00:12:58,508
+where it runs in kernel mode,
+
+312
+00:12:58,509 --> 00:13:00,609
+or it it's in a state where
+it can disable interrupts,
+
+313
+00:13:00,610 --> 00:13:02,429
+then direct execution is not possible
+
+314
+00:13:02,430 --> 00:13:04,125
+because you could get to the point
+
+315
+00:13:04,126 --> 00:13:07,357
+where you could actually
+take over the entire system.
+
+316
+00:13:07,627 --> 00:13:10,107
+However, if you're running
+an application space
+
+317
+00:13:10,108 --> 00:13:11,638
+and if you're running in a mode
+
+318
+00:13:11,639 --> 00:13:13,935
+in which you cannot disable interrupts
+in application states,
+
+319
+00:13:13,936 --> 00:13:17,114
+which is true of 99.99% of applications
+
+320
+00:13:17,115 --> 00:13:18,933
+running on top
+of an operating system,
+
+321
+00:13:18,934 --> 00:13:21,651
+then you can actually use
+direct execution.
+
+322
+00:13:21,652 --> 00:13:23,662
+But that's only one of the many criteria.
+
+323
+00:13:23,663 --> 00:13:25,214
+There are other criteria.
+
+324
+00:13:25,215 --> 00:13:27,079
+For example, you have to be running
+in protected mode,
+
+325
+00:13:27,080 --> 00:13:28,964
+or have to be running in
+virtual 8086 mode,
+
+326
+00:13:28,965 --> 00:13:30,688
+there's some legacy modes in the systems
+
+327
+00:13:30,689 --> 00:13:32,637
+which were commonly used at the time
+
+328
+00:13:32,638 --> 00:13:33,882
+that are not virtualizable,
+
+329
+00:13:33,883 --> 00:13:36,095
+and whenever you're in one
+of those legacy modes
+
+330
+00:13:36,096 --> 00:13:39,931
+then you need to use
+binary translation at all times.
+
+331
+00:13:40,751 --> 00:13:42,816
+And in final, there's a
+final technical complication
+
+332
+00:13:42,817 --> 00:13:45,409
+which has to do with
+the reversibility of segments
+
+333
+00:13:45,410 --> 00:13:47,613
+which I will not go into.
+
+334
+00:13:47,743 --> 00:13:49,442
+So, if you put those together,
+
+335
+00:13:49,443 --> 00:13:52,145
+you actually end up
+with a decision algorithm,
+
+336
+00:13:52,146 --> 00:13:54,277
+a set of constraint problems,
+
+337
+00:13:54,717 --> 00:13:56,894
+and if all the constraints are met,
+
+338
+00:13:56,895 --> 00:13:58,860
+then direct execution is possible.
+
+339
+00:13:59,430 --> 00:14:01,927
+If any of the constraints are not met
+
+340
+00:14:01,928 --> 00:14:04,091
+then binary translation must be used.
+
+341
+00:14:04,092 --> 00:14:06,329
+And so the definition of system software
+
+342
+00:14:06,330 --> 00:14:11,478
+is actually, at least in our current
+terminology at the time,
+
+343
+00:14:11,479 --> 00:14:13,161
+the definition of
+system software was software
+
+344
+00:14:13,162 --> 00:14:15,289
+that actually required
+binary translation,
+
+345
+00:14:15,290 --> 00:14:18,054
+and conversely, application
+software was application
+
+346
+00:14:18,055 --> 00:14:19,705
+that actually could take advantage
+
+347
+00:14:19,706 --> 00:14:21,725
+of the direct execution techniques
+
+348
+00:14:21,726 --> 00:14:23,294
+and the trap-and-emulate techniques.
+
+349
+00:14:23,295 --> 00:14:24,850
+There are many details
+for that in the paper.
+
+350
+00:14:24,851 --> 00:14:27,144
+The good news is that those definitions
+
+351
+00:14:27,145 --> 00:14:29,770
+of system software versus
+application software
+
+352
+00:14:29,771 --> 00:14:32,881
+largely overlap with what
+we commonly understand
+
+353
+00:14:32,882 --> 00:14:35,453
+as applications
+and operating systems today
+
+354
+00:14:36,783 --> 00:14:39,208
+Now, the good news is that
+that level complexity
+
+355
+00:14:39,209 --> 00:14:40,746
+is no longer required today
+
+356
+00:14:40,747 --> 00:14:44,591
+and that is because in 2005
+AMD and Intel both introduced
+
+357
+00:14:44,592 --> 00:14:47,004
+hardware support for virtualization
+
+358
+00:14:47,005 --> 00:14:49,978
+So basically an extension
+of the architecture
+
+359
+00:14:49,979 --> 00:14:53,624
+that actually finally met
+the Popek and Goldberg criteria.
+
+360
+00:14:53,625 --> 00:14:55,982
+And the way this was done
+is by deduplicating
+
+361
+00:14:55,983 --> 00:14:58,901
+the four protection rings
+available in protection mode
+
+362
+00:14:58,902 --> 00:15:00,654
+of the architecture so that
+
+363
+00:15:00,655 --> 00:15:03,215
+you could actually run virtual machines
+
+364
+00:15:03,705 --> 00:15:07,808
+running the full 64-bit,
+x86 extended instructions
+
+365
+00:15:07,809 --> 00:15:10,118
+and architecture in virtual machine,
+
+366
+00:15:10,119 --> 00:15:12,168
+on top of a virtual machine monitor
+
+367
+00:15:12,169 --> 00:15:15,418
+that only used trap-and-emulate technique
+
+368
+00:15:15,419 --> 00:15:19,596
+and did not require
+extensive forms of binary translation.
+
+369
+00:15:20,646 --> 00:15:22,347
+And with that, this is the wrap
+
+370
+00:15:22,348 --> 00:15:25,218
+for both this module
+and this week on virtualization.
+
+371
+00:15:25,219 --> 00:15:26,776
+I look forward to discussion section.
+
+372
+00:15:26,777 --> 00:15:27,777
+Thank you.

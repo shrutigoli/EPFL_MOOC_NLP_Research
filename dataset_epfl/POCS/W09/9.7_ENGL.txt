@@ -1,0 +1,105 @@
+Now let's look at Prolog.
+Prolog channelizes Datalog.
+The most important channelization is that it supports function symbols.
+What does this mean?
+Well function symbols are a way of taking so-called terms, which are things that you can build on constants, variables, and functions symbols and build larger terms of them.
+So, here's an example, we've got a right hand side in this first rule that just looks like Datalog p(x), <i>x</i> is a variable, and if p(x) is true, then actually you can infer p of success of <i>x</i> and success now is a so-called function symbol.
+So succ(x) will build a new term, a new object, based on <i>x</i>, which is different from the other objects seen so far.
+Unless somebody else has computed succ(x).
+F corresponds a bit to the kind of binary relation success that we had before, but you need to explicitly give this translation/relation.
+Here you actually can kind of compute it, let's say.
+So the idea would be that using also this kind of [inaudible], that you could compute bottom-up, conceptually the P relation consisting of
+1, s(1), s(s(1)), s(s(s(1))), and so on ad infinitum.
+This is going to be non-deterministic computation if you like to think of it as bottom-up or fixed points relation and you cannot use that in Prolog, but you can do a proof-theoretic semantics where you say--
+Question: is this fact-- this goal provable?
+Well the answer's going to be yes, by applying twice is the first rule and once the second rule.
+So if you give a proof of how it could be inferred.
+So there is a proof-theoretic semantics.
+However, it gets a bit worse.
+There's is truly imperative details in the full standard, there is in particular, there's this so-called cut, which allows you to basically kind of cut below the search, and so on, heuristics on and for-- understanding that you really have to have a very precise, low-level model of how computation is done in Prolog.
+So Prolog is not declarative, it is however logic based and you can be very succinct.
+And it is a Turing-complete programming language.
+You can do anything you could do in C, in terms of expressive power.
+Is logic programming declarative?
+We already said that Datalog-- while the fixpoint, semantically, has an imperative flavor, but there is the declarative viewpoint, the model-theoretic semantics.
+Prolog doesn't have this, it's clearly not a declarative language, but is logic based, but it can be very succinct and it allows to abstract away from many things, and focus on the core of the computation.
+So here's an example, declarative networking.
+There is some important work there and research out that has been-- have some impact in both databases and networking, and the idea there is that you've got some length that's essentially something a bit like Datalog and the most important thing is that there is an ability to create, essentially using Prolog function symbols-- new timepoints, success is two timepoints basically.
+That way you can kind of model infinite protocols and infinite computations.
+And there is--
+I'm modelling that way 
+I'm going to simplify things,
+I'm not adding anymore new syntax than is absolutely necessary.
+You can think of these two standardized columns in each predicate, each relation, that model locations where some values is stored or received, and times for which they're first received.
+So at which they are present so to say.
+Here's an example.
+So in general, schemas look like that, there is a predicate there's some general application specific columns, and then there's a special destination column and a time column.
+And here's an example, it's kind of two examples-- think of this kind of "No U" words in a mailing list.
+Somebody says some-- makes an insult of the second guy, the second guy answers "No U" and the first answers "No U" and that leads to a kind of infinite repetition of "No U", where these guys kind of flood of "No U"s alternatively.
+So we can do this as follows.
+The rules at node1 would be that if node1 sees a "No U" at a certain timepoint, then it sends a "No U" message to node2 that will be received next time.
+So "No U" would be seen by node2 in the next timepoint, and at node2 it's the opposite, if it receives at some timepoint, <i>t</i>, and "No U" then it will send it to the next.
+So it will be in alternating timepoints, always a "No U" received at the other node.
+So there is-- if you can nicely compute, express protocols in a very succinct way, and for example there is, an example of what people have done, implemented distributed hash table, a redistributable hash table, in about 200 lines of such code, rather than tens of thousands of lines of code in C.
+So it can be very succinct and 
+Datalog-style syntax is convenient because you can emphasize on data and computation and the rules look simple locally, but overall, these 200 lines of code for the 
+DHT is not readable-- very succinct and very strange.
+Is it "declarative"?
+I would say no.
+There is no declarative semantics, no moderated semantics in particular.
+It has this Prolog stash, it's not really Datalog, despite what other people say.
+But it's an interesting language.
+Now let's look at nonmonotonic logics.
+We've defined Datalog as being--
+Datalog <i>rules</i> being first-order predicate logic minus negation or as the quantification, and adding recursion stat.
+So what is a nonmonotonic logic?
+Well, think about, first-order logic.
+It is actually nonmonotonic, but it's classical.
+So if you've got an input database, and you have to query a result for it, for a given formula with negation let's say, now if you add more tuples to the input, sadly it could be the query result becomes less because of the negation.
+Think about it, too, we had an example where students-- we've under-produced the students for which there doesn't exists a course that you have failed in.
+So I might get a resulting a student and now suddenly add a tuple, that they are failed in their course, suddenly there, a student has to go away from the result.
+So further logic with negation or quantification is nonmonotonic.
+Now Datalog is monotonic, if you add more stuff to the input, you always get at least as much as you had before in the result.
+Now it would be nice to have negation supported in Datalog because you might be able to express more, but can you get a decent, reasonable semantic somehow, that can understand for that.
+Well let's look at an example.
+Here I've got two rules, a program that has negation and recursion, it's propositional predicates here.
+I say if the ground isn't dry then it rains and if it doesn't rain then the ground is dry.
+Now, is both propositions being false a model, no because for either case, if one of them is false, then the other one must be true.
+This is two rules saying exactly this.
+So the empty set of propositions is not a model.
+Is a set where both Rains and GroundDry a model?
+Actually yes, why not?
+Because the bodies are not true, nothing contradicts it, but it's not a minimum model, because for example, just Rains and GroundDry being false, 
+Rains being true,
+GroundDry being false is actually a model.
+And GroundDry being false at-- so GroundDry being true and Rains being false is a model.
+So we've got these three models.
+And the problem is, there's two models that are-- have just one element in it, one position being true.
+There's not a unique minimum model.
+So we've got alternatives.
+Among minimal models, this model where both Rains and GroundDry is for-- it's not minimal in a sense, it seems to be redundant, but the other two are minimal, but they're different.
+So that is strange because we had before, the semantic where single solution is there and now this is basically a-- disjunctive semantics.
+Either that is a good model, a good minimum model, or the other one is a good minimum model because there's two minimum models and in the end not a unique, single one.
+So that is strange, but there is ways of defining it.
+Basically the way we decided.
+You can give semantics to nonmonotonic logics with recursion where you basically have multiple, alternative, correct minimal model solutions.
+And that leads us to what is called answer set programming.
+So we will be talking about sets of answers that is the desirable solution.
+And for that you can actually take such 
+Datalog with this additional negation and give it decent semantics and programming semantic where you have extreme high expressive power only for model checking, so to say.
+For query relation.
+Or you can actually conveniently, nicely, very succinctly express in P-complete problems.
+Here for example, I'll show you some kind of so-called negation with some kind of so-called negation in the head, or-- but this could also be modeled by using this double negation, as we have above here.
+I modeled free colorability.
+I'm saying, well, if it's a node, it must be labeled: red, blue or green.
+So <i>x</i> is a variable, and red, blue, and green are constants.
+And there is actually a constraint, the constraint is a body of an empty head.
+That means if the body becomes true, then the falsity is inferred, that means it destroys that model.
+It could do this in different ways as well, and then say it's not allowed that two neighboring edges have the same color.
+So this is a two-liner, a very declarative definition of free colorability and a P-complete problem.
+So by adding this negation together, it's extremely high power you have-- and this kind of alternative minimal model which is kind of weird and sounds undesirable, is actually a very good way of finding solutions to and P-complete problems where there might be exponential alternatives.
+And you see it is declarative.
+I would really-- would say that a classical textbook definition of free colorability is really whatever is just written down in two very short rules.
+So it's actually a very interesting solution for a space of complicated, potentially analytical queries that you can express.
+Of course, in general, it's very hard to evaluate these queries, but you can solve hard problems, there is no way around it and you can use such language to build a channels solver, for example, in P-complete problems for that.
+And that's an interesting-- another space for declarative languages.

@@ -1,0 +1,102 @@
+To conclude this case study on watches, we will focus on a particular problem, namely how to copy watches.
+We are not talking about counterfeiting, but introducing a new theme, interesting in programming, which is "deep copying".
+Let's define the problem concretely.
+You have a watch, and your friend wants the same one.
+We have learned all along this course that assignment in Java does not actually make a copy as such.
+If I write "montreToto = maMontre"
+I am simply assigning the reference to
+"maMontre" to the "montreToto" variable.
+So basically,
+"maMontre" and "montreToto" point to the same object in memory.
+This means that if a watch provides a method for setting the time, for example, then whenever I set a time on my watch,
+I will also modify Toto's time; a rather unexpected behavior, indeed!
+Therefore, we need a mechanism that will allow us to truly copy a watch.
+Let's try to see how we can implement this using a copy constructor.
+A watch is a relatively complex object that includes a core attribute of type Mecanisme and a list of accessories.
+So, when I declare an object of type "Montre", initialize it and add, for example, accessories like this,
+I end up with a memory situation which looks like this, where my variable 'm', of type "Montre", is a reference to an object of type "Montre", that has a "coeur" attribute (TN: means "core"), which is a reference to an object, for example of type "MecanismeDouble", and whose second attribute is a reference to a dynamic array containing references to accessories.
+When I build a watch by copying 'm', what situation do I want to end up in?
+If I simply copy "m" into "m2" by copying the different attributes one by one, then the "coeur" of "m2" will have the same value as the "coeur" of "m", which means that it will point to the same object in memory, and for the accessories of "m2",
+I will have a reference to the same array
+Here, we end up with a problem similar to the previous one, since the "m" and "m2" objects share the same array of accessories in memory: if we add an accessory to m's array, we will add it to m2's array as well.
+Similarly, setting the time on m's mechanism will set the time on m2's mechanism.
+To have two objects of type Montre that have the same values but that are totally independant, we must implement what is called a "deep copy".
+The situation in which we want to end up is rather the following: we want m2 to have its own "coeur" which would be identical... to that of m, but in a separate memory area, and a set of accessories which would also be its own and whose values would point towards identical objects that are nonetheless in their own memory area.
+This is what we call "deep copying".
+If we write a copy constructor for Montre that would simply assign to the core of the current instance the core of the copied object, and if we do the same thing for the accessories, we do what is called a "shallow copy" which, as we learned earlier will, as opposed to deep copy, simply allow both watches to share the same core and to share the same list of accessories; this way of doing things is not satisfactory
+[for our current situation].
+Here, we should really make a deep copy of each of the entities we mentioned earlier, meaning that we should assign to the core of the current instance a new mechanism built based on the copied core and we should build a new list of accessories where each accessory, added to the list, would be a copy of the corresponding accessory in the copied object.
+Here, we would iterate over the list of accessories of the copied object and we would create a copy of each of these accessories to be put into the new list.
+However, we have a problem here.
+Indeed, to get a copy of the core, since [the attribute] "coeur" is of type "Mecanisme", we used the copy constructor of the
+"Mecanisme" class.
+Actually,  "autre.coeur" might very well be a "MecanismeDouble".
+In such a case, it's indeed a "MecanismeDouble" that we want to obtain for "coeur".
+Can the copy constructor of "Mecanisme" produce a "MecanismeDouble"?
+The answer is no!
+Because, as we discussed in the corresponding lectures, constructors are inherently non-polymorphic.
+The copy constructor of the "Mecanisme" class will thus not be able to adapt to the actual type of the instance that it is trying to copy
+Thus it will only see the object to copy as a Mecanisme, and will only copy the part of it that is a Mecanisme
+So anything that is specific to
+MecanismeDouble will disappear.
+There will be no date and no alarm clock then.
+So, the question that arises is: how do we copy each element, be it an accessory or a mechanism, as such?
+Meaning that, if it is a
+MecanismeDouble, it will be copied as a MecanismeDouble.
+If it is a "Bracelet" (TN: means "Watchstrap"), it will be copied as a "Bracelet".
+So, how do we implement this polymorphic copy?
+To carry out a polymorphic copy, we cannot resort to copy constructors, as we have just seen, but we simply need to use a method that can, itself, be polymorphic.
+The idea would thus be to define a polymorphic copy method that would allow us to copy mechanisms and a polymorphic copy method allowing us to copy accessories.
+Let's see exactly how  we can write a polymorphic copy method, for accessories for example, and we will be able to apply the same thing to mechanisms, and this procedure will allow us to really implement deep copy, in a way that will allow us to obtain a copy of the object to be copied that is completely independant from this object.
+Finally, an aspect that I did not mention up til now but that is important is that when we write a copy constructor, it is crucial not to forget to call the copy constructor of the superclass
+Otherwise, if we forget this call, what will happen?
+Then, the default constructor for
+Montre's superclass, that is, for the "Produit" class, will be invoked
+This constructor will initialize the base value of the object to 0; which means that any watch that is made with a copy would have a base value of zero, which is not necessarily what we want.
+Now, let's see how we can code a polymorphic copy method for accessories
+An accessory as such is an abstract entity, we will not define a copy for accessories themselves, so we will simply define the copy method as an abstract method in the
+"Accessoire" class.
+In each concrete subclass of
+"Accessoire", we will have to define the copy concretely and the trick here is that the polymorphic copy method, in the subclass, can use the subclass's copy constructor to carry out the copy
+Suppose, here, that an object of type "Accessoire" is copied using the copy method, and that it happens that in reality, this object corresponds to a "Bracelet".
+The memory situation would be as follows: we have the object that we want to copy, which is a reference to an object of type "Bracelet"... which would have, for example, a base value, as well as a name... so when we call the copy method the current object is this object; since it is an object of type "Bracelet", we will look for the copy method in the
+"Bracelet" class, which will invoke the copy constructor of the "Bracelet" class.
+Here we copy a "Bracelet", so there is no problem in using the copy constructor to copy a "Bracelet".
+And this constructor will simply call the superclasses' constructors to initialize the name inherited from "Accessoire" and to initialize the value inherited from "Produit".
+This supposes that there is a copy constructor in the "Accessoire" class, which could be written like this for example: the copy constructor for the
+"Accessoire" class would take as argument... another accessory, of course!
+It would call the copy constructor of the superclass, which would be the copy constructor for the "Produit" class and it would copy the values that are specific to it... given that an accessory has an attribute that is the name.
+This supposes that in the superclass of "Accessoire", that is, in the "Produit" class, there is also a copy constructor.
+This one will simply copy the base value
+We would proceed in a similar fashion to define the polymorphic copy of "Mecanisme".
+Finally, a point that might have caught your attention is that if we examine the header of the copy method in the "Bracelet" subclass and its header in the "Accessoire" superclass, we realize that the return types are not exactly the same.
+That said, this is still an override of the copy method inherited from the superclass
+Why?
+Because the return types are compatible;
+"Bracelet" is a subclass of "Accessoire".
+Technically, this is known as a
+"covariant return type".
+To finish with this part on copying, let's go back to the constructor of the "Montre" class.
+We had originally programmed it to take a "Mecanisme" as a parameter and to assign this "Mecanisme" directly to the "coeur" of the "Montre".
+If the "Mecanisme" object can be modified, this can cause what is called an "encapsulation leakage".
+Imagine for example that we have an object of type "Mecanisme" that is properly initialized such as this for example.
+If we use this "Mecanisme" to create a "Montre" like so, then the "meca" variable and the "coeur" of the "Montre" reference the same object in memory.
+If the "meca" object can be modified, meaning that if there is a method that we can call on this object to modify it, imagine for example we have a method for setting the mechanism's time, then when I set the mechanism's time, I will also set the time for the core of the watch.
+Indeed, the "meca" variable has a reference to an object in memory that would be a "MecanismeDouble".
+'m', which is a watch, which is a reference to an object of type "Montre", and whose core would be the reference to the same object as the one pointed to by "meca".
+Suppose that at the moment the "Montre" object was created, the "meca" object had a time which was the following, and suppose that "Mecanisme" provide a setting method, meaning that it would be possible for example to set the time of the mechanism by using this sort of syntax, for example.
+Then this would mean that the time of the mechanism is modified, and this would mean that the watch's time would also be modified.
+It is important to always be mindful of this aspect when writing constructors that take objects as parameters, if these objects can be modified, unless we really want to share them, meaning that the sharing behavior is actually intended.
+We must think of assigning a copy of the object passed as a parameter to avoid undesirable side effects such as the fact that we can set the watch's time through an outside object here, which is indeed an encapsulation leakage.
+So here, typically, we would use the polymorphic copy of "Mecanisme" to get a "coeur" that is independent from the initial mechanism and to avoid this sort of side effect.
+Note that a similar problem arises with the "ajouter()" method which provides a way to add accessories to a watch.
+Indeed, if the "ajouter()" method receives a reference to an accessory as a parameter, here, accessories can be modified, for example, there would be a method for repairing accessories that would allow us to modify some of their values, then in this case, the same problem would arise and we would want to add to our set of accessories... a copy of the accessory that was passed as a parameter to make sure that our watch's accessories do not depend on an accessory provided from the outside and that can be modified.
+Finally, and you might have been wondering about that for a while, what about the "clone()" method inherited from the "Object" class that is supposed to copy objects?
+Actually, we could have called our polymorphic copy method
+"clone" instead of "copie".
+If we had called it "clone", we simply would have had to follow a few conventions such as the fact that classes that define or override the 
+"clone()" method should implement a specific interface which is the "Cloneable" interface.
+There are a number of other technical details associated to the use of "clones" according to Java conventions.
+We deliberately ignored these aspects partly because "clone" is far from being widely-accepted among developers,
+-- it is a controversial subject -- but mostly because we want to focus the discussion on the theme of deep copy itself, as you might see it in other programming languages.
+This concludes this case study, and thus this course.

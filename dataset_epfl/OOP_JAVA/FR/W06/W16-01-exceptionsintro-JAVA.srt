@@ -1,0 +1,1303 @@
+1
+00:00:04,070 --> 00:00:07,650
+La gestion des exceptions est un volet
+important de la programmation de base
+
+2
+00:00:07,650 --> 00:00:09,206
+qui va permettre
+de rendre les programmes
+
+3
+00:00:09,206 --> 00:00:10,512
+plus robustes plus résistants
+
+4
+00:00:10,512 --> 00:00:13,750
+face à des situations
+anormales ou des situations d'erreur ;
+
+5
+00:00:13,750 --> 00:00:16,379
+la gestion des exceptions n'est pas 
+à proprement parler
+
+6
+00:00:16,379 --> 00:00:20,640
+un concept de l'orienté-objet, néanmoins 
+en Java, sa mise en œuvre implique
+
+7
+00:00:20,640 --> 00:00:22,549
+l'utilisation de ces concepts.
+
+8
+00:00:22,919 --> 00:00:26,129
+Le but de cette séquence est de vous
+présenter les aspects fondamentaux
+
+9
+00:00:26,129 --> 00:00:28,669
+liés là la gestion des exceptions
+en Java.
+
+10
+00:00:28,759 --> 00:00:31,999
+Nous nous intéresserons dans ce volet
+à comment gérer des erreurs
+
+11
+00:00:31,999 --> 00:00:34,649
+ou des situations anormales 
+dans un programme.
+
+12
+00:00:34,649 --> 00:00:37,979
+Nous allons voir que les exceptions vont
+nous permettre d’anticiper
+
+13
+00:00:37,979 --> 00:00:40,159
+les erreurs ou les situations anormales
+
+14
+00:00:40,159 --> 00:00:43,340
+et d'y répondre de façon
+appropriée le cas échéant.
+
+15
+00:00:43,740 --> 00:00:47,359
+Commençons par illustrer l'utilité
+de cette notion des exceptions
+
+16
+00:00:47,359 --> 00:00:49,339
+au travers d'un petit exemple simple :
+
+17
+00:00:49,340 --> 00:00:53,840
+nous voulons écrire une fonction « f »
+qui calcule l'inverse d'un nombre donné.
+
+18
+00:00:53,840 --> 00:00:58,920
+Nous voulons que cette fonction gère le cas 
+où la valeur de la donnée entrante est 0
+
+19
+00:00:58,920 --> 00:01:02,070
+comme une situation anormale,
+une situation d'erreur
+
+20
+00:01:02,070 --> 00:01:05,909
+et nous nous posons la question 
+de comment gérer cette erreur
+
+21
+00:01:05,909 --> 00:01:07,659
+à proprement parler.
+
+22
+00:01:07,659 --> 00:01:08,890
+Première tentative,
+
+23
+00:01:08,890 --> 00:01:11,968
+on peut faire en sorte que lorsque la
+donnée entrante vaut 0
+
+24
+00:01:11,968 --> 00:01:14,140
+on retourne une valeur choisie à l'avance,
+
+25
+00:01:14,140 --> 00:01:17,950
+pour mimer le fait que le résultat serait
+proche de l'infini, on pourrait imaginer
+
+26
+00:01:17,950 --> 00:01:20,359
+de façon tout à fait arbitraire de
+retourner
+
+27
+00:01:20,359 --> 00:01:22,230
+le plus grand « double » possible ;
+
+28
+00:01:22,230 --> 00:01:26,389
+il existe d'autres valeurs prédéfinies
+en java « infinity » pour mimer l'infini
+
+29
+00:01:26,389 --> 00:01:29,559
+mais ce n'est pas ici le but
+de notre propos.
+
+30
+00:01:29,560 --> 00:01:32,769
+Cette façon de procéder est néanmoins
+loin d'être satisfaisante;
+
+31
+00:01:32,769 --> 00:01:36,610
+premièrement cela n'indique pas du tout
+à l'utilisateur potentiel
+
+32
+00:01:36,610 --> 00:01:41,290
+de la fonction « f » qu'il se trouve dans une
+situation d’erreur ou une situation anormale
+
+33
+00:01:41,290 --> 00:01:42,780
+lorsque 'x' est nul,
+
+34
+00:01:42,780 --> 00:01:46,180
+à nul moment cet utilisateur n'est
+averti de ce fait.
+
+35
+00:01:46,180 --> 00:01:48,800
+Le résultat retourné est forcément
+inexact
+
+36
+00:01:48,800 --> 00:01:52,870
+et l'utilisation de « f » implique une
+convention tout à fait arbitraire
+
+37
+00:01:52,870 --> 00:01:55,710
+qui n'est pas forcément connue 
+des autres programmeurs ;
+
+38
+00:01:55,709 --> 00:01:59,059
+typiquement le choix de cette valeur
+« retourner ».
+
+39
+00:01:59,060 --> 00:02:02,299
+Pour palier au manque d'informations 
+qu'a l'utilisateur de la fonction « f »
+
+40
+00:02:02,299 --> 00:02:04,150
+en cas de division par zéro
+
+41
+00:02:04,150 --> 00:02:08,258
+on peut imaginer de faire afficher à
+notre fonction « f » un message d'erreur ;
+
+42
+00:02:08,258 --> 00:02:12,408
+dans le cas où la donnée entrante 
+serait nulle, on ferait afficher à notre fonction
+
+43
+00:02:12,408 --> 00:02:14,938
+qu'il y a une situation d'érreur,
+une division par 0.
+
+44
+00:02:14,938 --> 00:02:16,810
+Cela ne résout pas tous les problèmes
+
+45
+00:02:16,810 --> 00:02:19,859
+de la version précédente puisque 
+nous avons toujours
+
+46
+00:02:19,859 --> 00:02:22,840
+le problème de quoi retourner 
+exactement en cas d'erreur.
+
+47
+00:02:22,840 --> 00:02:26,288
+Cette solution est aussi critiquable par
+le fait qu'elle génère ce qu'on appelle
+
+48
+00:02:26,288 --> 00:02:28,319
+des effets de bord,
+
+49
+00:02:28,319 --> 00:02:32,129
+c'est-à-dire que la fonction « f » dont 
+l'unique rôle est normalement de calculer
+
+50
+00:02:32,129 --> 00:02:35,609
+l'inverse d'un nombre, ce met tout à
+coup à produire des affichages
+
+51
+00:02:35,610 --> 00:02:38,970
+dans le terminal ce qui ne fait pas du tout
+partie de son rôle normal,
+
+52
+00:02:38,970 --> 00:02:42,860
+de plus on imaginez le cas où nous utiliserions
+« f » dans le cadre d'un programme graphique
+
+53
+00:02:42,860 --> 00:02:45,090
+nous ne voudrions pas q'une situation
+anormale
+
+54
+00:02:45,090 --> 00:02:47,000
+soit signalée par un message 
+sur le terminal
+
+55
+00:02:47,000 --> 00:02:50,579
+mais plutôt par l'ouverture d'une fenêtre
+d'alerte par exemple.
+
+56
+00:02:50,579 --> 00:02:52,319
+Enfin la fonction « f »
+
+57
+00:02:52,318 --> 00:02:55,779
+qui va être la partie du programme, qui
+détecte la situation d'erreur,
+
+58
+00:02:55,779 --> 00:02:59,359
+n'a pas forcément toutes les cartes en main
+pour gérer proprement
+
+59
+00:02:59,359 --> 00:03:00,640
+cette situation-là :
+
+60
+00:03:00,639 --> 00:03:02,549
+il se peut qu'une division par 0
+
+61
+00:03:02,550 --> 00:03:05,120
+soit quelque chose de très
+préjudiciable qui nécessite
+
+62
+00:03:05,120 --> 00:03:06,158
+d'arrêter le programme
+
+63
+00:03:06,158 --> 00:03:09,698
+il se peut aussi qu'une division par
+0 puisse être traitée d'une autre manière
+
+64
+00:03:09,698 --> 00:03:11,799
+dépendamment du contexte
+d'utilisation;
+
+65
+00:03:11,799 --> 00:03:15,149
+c'est plutôt la partie du programme 
+qui appelle la fonction « f »
+
+66
+00:03:15,149 --> 00:03:18,688
+qui est informée du contexte et qui va
+pouvoir apporter les réponses
+
+67
+00:03:18,688 --> 00:03:21,980
+appropriées au cas où
+on a une division par 0.
+
+68
+00:03:21,980 --> 00:03:25,809
+Une dernière possibilité enfin serait
+de réécrire à la fonction « f »
+
+69
+00:03:25,809 --> 00:03:29,439
+de sorte à ce qu'elle retourne
+plutôt un code d'erreur
+
+70
+00:03:29,438 --> 00:03:33,459
+indiquant si la division s'est bien
+passée ou s'est mal passée
+
+71
+00:03:33,459 --> 00:03:39,018
+et qu'elle restitue le résultat de la division 
+dans le cadre d'une utilisation normale
+
+72
+00:03:39,018 --> 00:03:42,028
+sans erreur au travers d'un paramètre.
+
+73
+00:03:42,028 --> 00:03:45,468
+Cette façon de procéder est meilleure
+que celles précédemment décrites,
+
+74
+00:03:45,468 --> 00:03:48,750
+dans la mesure où elle laisse à la fonction
+qui appelle « f »
+
+75
+00:03:48,750 --> 00:03:51,009
+le soin de décider quoi faire en cas
+d'erreur
+
+76
+00:03:51,009 --> 00:03:54,628
+ça n'est pas à la fonction « f » elle même
+de décider ce qu'il faut faire,
+
+77
+00:03:54,628 --> 00:03:57,969
+elle informe celui qui l'appelle
+du résultat de son exécution
+
+78
+00:03:57,969 --> 00:04:01,618
+et c'est à l'appelant de décider 
+quoi faire en cas d'erreur.
+
+79
+00:04:01,618 --> 00:04:04,778
+Avec cette façon de procéder
+l'utilisation de la méthode devient
+
+80
+00:04:04,778 --> 00:04:06,799
+cependant beaucoup moins intuitive
+
+81
+00:04:06,800 --> 00:04:08,230
+au lieu de simplement écrire
+
+82
+00:04:08,229 --> 00:04:10,048
+quelque chose comme ceci qui veut dire
+
+83
+00:04:10,049 --> 00:04:13,918
+stockons dans 'y' le résultat 
+de l'inversion de 'x'
+
+84
+00:04:13,918 --> 00:04:16,969
+calculé par la méthode « f » ,
+et bien il faudrait passer par
+
+85
+00:04:16,970 --> 00:04:18,749
+des tournures de ce style
+
+86
+00:04:18,749 --> 00:04:22,168
+qui impliquent donc de savoir que « f »
+retourne un code d'erreur
+
+87
+00:04:22,168 --> 00:04:26,209
+et que le résultat normal d'utilisation 
+est stocké dans le second paramètre
+
+88
+00:04:26,209 --> 00:04:28,119
+ce qui est clairement beaucoup 
+moins intuitif
+
+89
+00:04:28,119 --> 00:04:30,028
+que cette façon d'écrire les choses ;
+
+90
+00:04:30,028 --> 00:04:33,368
+de plus lorsque une méthode en appelle
+une autre qui à son tour en appelle
+
+91
+00:04:33,368 --> 00:04:37,009
+une autre et ainsi de suite, chaque appel
+peut potentiellement produire un code
+
+92
+00:04:37,009 --> 00:04:39,869
+d'erreur il faut donc à ce moment-là
+gérer la combinaison de tous
+
+93
+00:04:39,869 --> 00:04:44,550
+les codes d'erreurs possibles; cela devient
+rapidement très lourd à gérer.
+
+94
+00:04:44,550 --> 00:04:47,520
+Nous souhaitons donc à ce stade 
+disposer d'un mécanisme
+
+95
+00:04:47,520 --> 00:04:50,478
+qui permettrait de signaler 
+une situation d'erreur,
+
+96
+00:04:50,478 --> 00:04:53,218
+sans pour autant produire 
+des « effets de bords » indésirés
+
+97
+00:04:53,218 --> 00:04:56,748
+et aussi un mécanisme qui permettrait
+de gérer une erreur
+
+98
+00:04:56,748 --> 00:05:00,209
+à un autre endroit qu'à l'endroit
+où elle serait détectée ;
+
+99
+00:05:00,209 --> 00:05:02,900
+et ceci tout en gardant une souplesse
+d'utilisation,
+
+100
+00:05:02,900 --> 00:05:05,669
+une utilisation intuitive des différentes
+fonctionnalités
+
+101
+00:05:05,669 --> 00:05:07,628
+que l'on veut avoir dans le programme.
+
+102
+00:05:07,629 --> 00:05:10,499
+La gestion de ces exceptions répond
+précisément à ce besoin,
+
+103
+00:05:10,499 --> 00:05:14,768
+elle va nous permettre à l'endroit où l'on
+détecte l'erreur de déclencher une exception
+
+104
+00:05:14,768 --> 00:05:18,250
+et de la gérer à un autre endroit
+potentiellement dans le programme
+
+105
+00:05:18,250 --> 00:05:21,140
+et ce sans intégrer explicitement
+de codes d'erreur
+
+106
+00:05:21,140 --> 00:05:24,389
+dans les différentes fonctionnalités
+que l'on souhaite mettre en oeuvre.
+
+107
+00:05:24,389 --> 00:05:28,628
+Le mécanisme de gestion des exceptions
+va fonctionner selon le principe suivant
+
+108
+00:05:28,628 --> 00:05:31,620
+donc selon les trois points
+qui sont développés ici.
+
+109
+00:05:31,620 --> 00:05:34,800
+Lorsqu'une erreur ou une situation
+anormale est détectée
+
+110
+00:05:34,800 --> 00:05:36,120
+à un endroit du programme
+
+111
+00:05:36,120 --> 00:05:40,168
+eh bien il faut la signaler au reste du
+programme en lançant un objet
+
+112
+00:05:40,168 --> 00:05:43,759
+qui va contenir les informations utiles
+pour pouvoir éventuellement
+
+113
+00:05:43,759 --> 00:05:46,129
+traiter cette erreur ou cette
+situation anormale
+
+114
+00:05:46,129 --> 00:05:48,129
+ailleurs dans le programme.
+
+115
+00:05:48,129 --> 00:05:51,819
+Lancer ou déclencher une exception
+veut dire concrètement créer un objet
+
+116
+00:05:51,819 --> 00:05:55,028
+qui va devenir disponible
+pour le reste du programme.
+
+117
+00:05:55,028 --> 00:05:57,699
+Cet objet peut être attrapé,
+utilisé,
+
+118
+00:05:57,699 --> 00:06:02,129
+à un autre endroit du programme qui se 
+chargera de gérer la situation anormale.
+
+119
+00:06:02,129 --> 00:06:05,288
+Complètement ou éventuellement
+de façon partielle.
+
+120
+00:06:05,288 --> 00:06:09,058
+et finalement si l'objet lancé
+n'est jamais attrapé
+
+121
+00:06:09,059 --> 00:06:11,580
+alors ceci doit provoquer l'arrêt du
+programme
+
+122
+00:06:11,579 --> 00:06:15,788
+une erreur n'a pas été gérée et donc va
+provoquer l'arrêt du programme.
+
+123
+00:06:15,788 --> 00:06:18,538
+Illustrons ceci sur un exemple concret.
+
+124
+00:06:18,538 --> 00:06:21,800
+Imaginons par exemple que nous ayons
+un programme principal
+
+125
+00:06:21,800 --> 00:06:23,939
+qui travaille avec des températures;
+
+126
+00:06:23,939 --> 00:06:27,629
+des températures acquises au travers par
+exemple d'un appareil de mesure.
+
+127
+00:06:27,629 --> 00:06:32,090
+Ces températures sont stockées dans un
+tableau et ce programme a pour rôle
+
+128
+00:06:32,089 --> 00:06:36,969
+de dessiner un graphique de l'inverse
+de toutes les températures acquises.
+
+129
+00:06:36,969 --> 00:06:39,549
+imaginons que les températures 
+soient acquises
+
+130
+00:06:39,550 --> 00:06:42,790
+au travers d'un appareil de mesure
+qui n'est pas tout à fait fiable,
+
+131
+00:06:42,790 --> 00:06:45,189
+et que de temps en temps il ne soit
+pas capable de mesurer
+
+132
+00:06:45,189 --> 00:06:47,079
+correctement les températures en question
+
+133
+00:06:47,079 --> 00:06:49,050
+ce qui se traduirait
+par des valeurs nulles
+
+134
+00:06:49,050 --> 00:06:51,309
+dans notre tableau de température.
+
+135
+00:06:51,309 --> 00:06:55,370
+Le programme principal ici fait appel 
+pour réaliser ces traitements
+
+136
+00:06:55,370 --> 00:06:59,258
+à une autre fonctionnalité,
+« graphiqueInverse »,
+
+137
+00:06:59,258 --> 00:07:03,360
+qui va itérer sur l'ensemble
+des températures du tableau fournies
+
+138
+00:07:03,360 --> 00:07:06,590
+et qui ven afficher l'inverse.
+
+139
+00:07:09,210 --> 00:07:13,668
+Cette méthode fait donc appel à son tour
+à une autre méthode
+
+140
+00:07:13,668 --> 00:07:16,549
+calculant cette fois l'inverse
+d'un double.
+
+141
+00:07:16,550 --> 00:07:20,509
+La méthode inverse n'est pas du tout
+informée du contexte de son utilisation
+
+142
+00:07:20,509 --> 00:07:23,038
+elle ne sait pas concrètement 
+quoi faire,
+
+143
+00:07:23,038 --> 00:07:25,348
+si la valeur qui lui est fournie est 0
+
+144
+00:07:25,348 --> 00:07:28,209
+donc ce qui correspondrait à cette
+valeur dans le tableau
+
+145
+00:07:28,209 --> 00:07:29,120
+par contre
+
+146
+00:07:29,120 --> 00:07:33,120
+le programme principal sait dans
+quel contexte est appelée cette méthode
+
+147
+00:07:33,120 --> 00:07:36,268
+et c'est lui qui est à même
+de résoudre le problème
+
+148
+00:07:36,268 --> 00:07:37,589
+par exemple décider que
+
+149
+00:07:37,589 --> 00:07:40,562
+si le tableau de température n'a pas 
+pu être affiché correctement,
+
+150
+00:07:40,562 --> 00:07:43,245
+c'est que les températures 
+acquises sont corrompues
+
+151
+00:07:43,245 --> 00:07:45,218
+et qu'il faut les acquérir à nouveau.
+
+152
+00:07:45,218 --> 00:07:48,620
+L'idée derrière la gestion des exceptions
+est que la partie du programme
+
+153
+00:07:48,620 --> 00:07:50,819
+qui détecterait une situation anormale
+
+154
+00:07:50,819 --> 00:07:53,268
+sans pour autant savoir 
+la traiter localement
+
+155
+00:07:53,268 --> 00:07:56,711
+la signale au reste du
+programme en lançant
+
+156
+00:07:58,441 --> 00:08:00,664
+une exception,
+
+157
+00:08:05,434 --> 00:08:09,538
+donc il s'agit d'un objet particulier
+qui va être lancé au reste du programmme
+
+158
+00:08:09,538 --> 00:08:14,158
+si cet objet lancé n'est jamais rattrapé 
+par aucune des autres parties du programme,
+
+159
+00:08:14,160 --> 00:08:17,080
+le programme s'arrête :
+on n'a pas traité l'erreur,
+
+160
+00:08:17,079 --> 00:08:20,569
+mais on peut aussi bien sûr faire en
+sorte qu'une autre partie du programme
+
+161
+00:08:20,569 --> 00:08:22,569
+plus informée du contexte de l'erreur
+
+162
+00:08:22,569 --> 00:08:25,459
+rattrape cet objet et le traite de façon
+appropriée.
+
+163
+00:08:25,459 --> 00:08:30,098
+Le programme principal devrait alors 
+ici indiquer qu'il est réceptif
+
+164
+00:08:30,098 --> 00:08:32,929
+aux objets lancés qu'il est capable de
+les recevoir
+
+165
+00:08:32,929 --> 00:08:34,219
+et dans ce cas-là
+
+166
+00:08:34,220 --> 00:08:37,058
+il va pouvoir rattraper l'objet
+
+167
+00:08:40,758 --> 00:08:42,479
+et le traiter,
+
+168
+00:08:44,899 --> 00:08:50,779
+s'il a été été lancé bien sûr pendant
+l'exécution du bloc réceptifs aux erreurs.
+
+169
+00:08:50,779 --> 00:08:52,879
+Pour mettre en œuvre un tel processus
+
+170
+00:08:52,879 --> 00:08:55,669
+il faut pouvoir réaliser quatre tâches
+élémentaires.
+
+171
+00:08:55,669 --> 00:08:57,958
+La première est le
+signalement d'une erreur,
+
+172
+00:08:57,958 --> 00:09:00,308
+c'est ce que faisait notre méthode inverse
+
+173
+00:09:00,308 --> 00:09:05,088
+qui lançait un objet pour alerter le reste
+du programme d'une situation anormale.
+
+174
+00:09:05,088 --> 00:09:10,490
+Signaler une erreur était donc ce qui se
+passait à cette étape de notre exemple.
+
+175
+00:09:10,490 --> 00:09:14,879
+la seconde tâche est de marquer
+les endroits réceptifs aux erreurs,
+
+176
+00:09:14,879 --> 00:09:18,299
+c'est ce que faisait ici notre programme
+principal
+
+177
+00:09:18,299 --> 00:09:21,559
+pour indiquer qu'il est capable de
+rattraper et de traiter un objet
+
+178
+00:09:21,559 --> 00:09:23,959
+correspondant à une situation anormale;
+
+179
+00:09:23,960 --> 00:09:27,749
+à chaque endroit réceptif aux erreurs, 
+aux situations anormales,
+
+180
+00:09:27,749 --> 00:09:30,359
+il faut fournir un moyen 
+de gérer ces erreurs,
+
+181
+00:09:30,359 --> 00:09:33,339
+donc de rattraper proprement 
+l'objet et de le traiter;
+
+182
+00:09:33,340 --> 00:09:34,690
+dans notre exemple
+
+183
+00:09:34,690 --> 00:09:37,730
+à ce bloc réceptif aux
+erreurs est associé
+
+184
+00:09:37,730 --> 00:09:42,180
+un ensemble d'instructions capable de
+traiter de rattraper l'objet proprement.
+
+185
+00:09:42,179 --> 00:09:45,759
+Enfin dans certains cas il peut être
+nécessaire de faire le ménage
+
+186
+00:09:45,759 --> 00:09:48,489
+après un bloc réceptif aux erreurs
+c'est-à-dire par exemple
+
+187
+00:09:48,489 --> 00:09:50,809
+libérer un certain nombre de ressources
+
+188
+00:09:50,808 --> 00:09:53,410
+qui auraient été sollicitées mais pas
+proprement libérées
+
+189
+00:09:53,410 --> 00:09:55,860
+en raison d'une situation anormale.
+
+190
+00:09:55,860 --> 00:10:01,570
+A chacune de ces tâches va
+correspondre un mot-clé du langage Java.
+
+191
+00:10:01,570 --> 00:10:06,899
+Pour la tâche du signalement d'erreur,
+le mot-clé « throw »,
+
+192
+00:10:06,899 --> 00:10:14,389
+pour celle de marquer les endroits 
+réceptifs aux erreurs, « try »,
+
+193
+00:10:14,389 --> 00:10:18,159
+pour associer à un bloc réceptif 
+aux erreurs
+
+194
+00:10:18,159 --> 00:10:21,539
+un bloc de traitement de l'erreur,
+le mot-clé « catch »,
+
+195
+00:10:21,539 --> 00:10:23,149
+et enfin
+
+196
+00:10:23,149 --> 00:10:26,079
+pour faire le ménage,
+le mot-clé « finally ».
+
+197
+00:10:26,079 --> 00:10:29,259
+La description détaillée de
+l'utilisation de ces mots-clés
+
+198
+00:10:29,259 --> 00:10:32,230
+vous sera présenté dans
+la séquence vidéo suivante;
+
+199
+00:10:32,230 --> 00:10:33,920
+en clair
+
+200
+00:10:34,580 --> 00:10:37,950
+l'endroit du programme qui détecte
+l'erreur va lancer l'objet
+
+201
+00:10:37,950 --> 00:10:41,290
+en utilisant le mot-clé réservé « throw »,
+
+202
+00:10:41,289 --> 00:10:44,810
+nous verrons un peu plus loin qu'est ce
+qu'il va exactement lancer.
+
+203
+00:10:45,430 --> 00:10:48,789
+L'endroit réceptif aux objets lancés
+
+204
+00:10:48,789 --> 00:10:53,879
+doit être à signalé au
+moyen du mot réservé, « try »,
+
+205
+00:10:53,879 --> 00:10:58,349
+donc le bloc réceptif aux erreurs
+est indiqué au moyen de ce mot clé
+
+206
+00:10:58,350 --> 00:11:00,880
+et à chaque bloc réceptif aux erreurs
+
+207
+00:11:00,880 --> 00:11:04,263
+doit correspondre un bloc capable de traiter l'erreur
+
+208
+00:11:04,263 --> 00:11:08,296
+qui va être signalée au moyen du mot clé,
+« catch »,
+
+209
+00:11:08,296 --> 00:11:11,029
+dont nous verrons la syntaxe précise
+
+210
+00:11:11,029 --> 00:11:12,620
+dans les séquences suivantes.
+
+211
+00:11:12,620 --> 00:11:16,340
+Comme vous l'aurez sans doute constaté
+dans le cadre de notre petit exemple,
+
+212
+00:11:16,340 --> 00:11:19,110
+le signalement des erreurs
+au travers du mot clé, « throw »,
+
+213
+00:11:19,110 --> 00:11:22,629
+et leur gestion au travers des blocs
+« try » et « catch »,
+
+214
+00:11:22,629 --> 00:11:26,220
+sont le plus souvent à des endroits
+bien séparés dans le code.
+
+215
+00:11:26,220 --> 00:11:29,720
+C'est ce qui fait d'ailleurs l'intérêt
+principal de la gestion des exceptions
+
+216
+00:11:29,720 --> 00:11:30,949
+dans notre exemple
+
+217
+00:11:30,948 --> 00:11:33,069
+le « throw » était dans la méthode inverse,
+
+218
+00:11:33,070 --> 00:11:36,990
+les blocs « try » et « catch » étaient
+dans le programme principal.
+
+219
+00:11:36,990 --> 00:11:39,969
+Nous verrons dans les séquences
+qui suivent qu'à chaque « try »
+
+220
+00:11:39,969 --> 00:11:43,392
+doit correspondre un « catch »,
+ou un certain nombre de « catch »
+
+221
+00:11:43,392 --> 00:11:45,155
+qui lui sont associés.
+
+222
+00:11:45,155 --> 00:11:48,620
+pour résumer une exception est donc un
+moyen de signaler un évènement
+
+223
+00:11:48,620 --> 00:11:52,218
+qui nécessite une attention
+particulière dans le programme,
+
+224
+00:11:52,218 --> 00:11:54,518
+cet événement peut-être une erreur grave
+
+225
+00:11:54,518 --> 00:11:56,259
+qui nécessite d'arrêter le programme,
+
+226
+00:11:56,259 --> 00:12:00,349
+mais ça peut être aussi simplement 
+une situation inhabituelle
+
+227
+00:12:00,349 --> 00:12:02,860
+qu'il faudra traiter de façon appropriée.
+
+228
+00:12:02,860 --> 00:12:05,919
+C'était le cas dans notre exemple
+précédent où une division par zéro
+
+229
+00:12:05,919 --> 00:12:08,556
+correspondait à une situation inhabituelle,
+
+230
+00:12:08,556 --> 00:12:11,103
+un ensemble de mesure qu'il
+faudrait reprendre par exemple,
+
+231
+00:12:11,103 --> 00:12:13,400
+et qui ne correspond pas
+à une situation dramatique
+
+232
+00:12:13,400 --> 00:12:15,260
+nécessitant d'arrêter le programme.
+
+233
+00:12:15,259 --> 00:12:18,060
+La gestion des exceptions va
+donc permettre d'améliorer
+
+234
+00:12:18,060 --> 00:12:21,589
+la robustesse des programmes et va
+permettre de séparer le code
+
+235
+00:12:21,589 --> 00:12:23,730
+qui est dédié au traitement des erreurs
+
+236
+00:12:23,730 --> 00:12:25,819
+du code qui réalise
+les autres traitements
+
+237
+00:12:25,819 --> 00:12:28,850
+qui se passent habituellement
+sans situation anormale.
+
+238
+00:12:28,850 --> 00:12:32,249
+La gestion des exceptions va
+également fournir un moyen
+
+239
+00:12:32,249 --> 00:12:34,769
+de forcer une réponse
+à des erreurs particulières,
+
+240
+00:12:34,769 --> 00:12:36,039
+comme par exemple ici
+
+241
+00:12:36,039 --> 00:12:39,500
+une situation inhabituelle qu'il
+faudrait gérer de façon appropriée.
+
+242
+00:12:39,500 --> 00:12:42,639
+Par opposition à la solution
+présentée en début de séquence
+
+243
+00:12:42,639 --> 00:12:44,870
+où l'on traitait les situations anormales
+
+244
+00:12:44,870 --> 00:12:48,930
+en faisant en sorte que les fonctions
+ou méthodes retournent des codes d'erreurs,
+
+245
+00:12:48,930 --> 00:12:52,359
+la gestion des exceptions offre
+un certain nombre d'avantages;
+
+246
+00:12:52,840 --> 00:12:55,260
+l'un des plus importants est
+une écriture plus facile,
+
+247
+00:12:55,260 --> 00:12:56,819
+plus intuitive, plus lisible,
+
+248
+00:12:56,819 --> 00:12:59,548
+par exemple, notre méthode
+calculant l'inverse
+
+249
+00:12:59,548 --> 00:13:03,268
+peut continuer à être utilisée 
+de façon très naturelle,
+
+250
+00:13:03,269 --> 00:13:05,330
+il n'est pas nécessaire
+
+251
+00:13:05,330 --> 00:13:08,690
+d'en polluer l'écriture
+en ajoutant
+
+252
+00:13:08,690 --> 00:13:12,330
+d'autres paramètres uniquement dédiés
+à la gestion des erreurs.
+
+253
+00:13:13,710 --> 00:13:17,109
+la propagation de l'exception
+à des niveaux supérieurs d'appel
+
+254
+00:13:17,109 --> 00:13:18,949
+va se faire de façon automatique,
+
+255
+00:13:18,949 --> 00:13:22,552
+il n'est pas nécessaire que chaque 
+niveau intermédiaire d'appel
+
+256
+00:13:22,552 --> 00:13:24,595
+se charge du traitement de l'erreur;
+
+257
+00:13:24,595 --> 00:13:27,789
+par exemple si l'exception lancée
+par la méthode inverse
+
+258
+00:13:27,789 --> 00:13:31,560
+n'est pas rattrapée par la méthode
+appelante directe « graphiqueInverse »,
+
+259
+00:13:31,560 --> 00:13:33,893
+l'objet va être automatiquement
+
+260
+00:13:33,893 --> 00:13:36,246
+relancé au niveau supérieur,
+
+261
+00:13:36,246 --> 00:13:39,730
+qui pourra éventuellement les traiter
+comme si le programme principal.
+
+262
+00:13:39,730 --> 00:13:43,149
+Une erreur peut donc désormais se
+produire à n'importe quel niveau d'appel
+
+263
+00:13:43,149 --> 00:13:46,510
+tout en restant reportée pour le reste
+du programme.
+
+264
+00:13:46,970 --> 00:13:48,210
+Comme nous venons de le voir
+
+265
+00:13:48,210 --> 00:13:51,079
+la gestion des exceptions présente
+donc de nombreux avantages
+
+266
+00:13:51,079 --> 00:13:52,578
+pour traiter des situations d'erreurs
+
+267
+00:13:52,578 --> 00:13:55,079
+des situations anormales
+dans un programme.
+
+268
+00:13:55,080 --> 00:13:58,028
+Les mécanismes sous-jacents
+ont cependant un certain coût,
+
+269
+00:13:58,028 --> 00:14:00,970
+et il en résulte une
+consigne méthodologique
+
+270
+00:14:00,970 --> 00:14:03,510
+que nous aurons l'occasion de rediscuter
+dans les séquences suivantes,
+
+271
+00:14:03,510 --> 00:14:05,060
+et qui est la suivante :
+
+272
+00:14:05,059 --> 00:14:07,280
+Si une erreur peut être gérée localement
+
+273
+00:14:07,280 --> 00:14:10,019
+c'est-à-dire qu'on est complètement 
+informé à un endroit donné
+
+274
+00:14:10,019 --> 00:14:11,948
+sur la façon de résoudre l'erreur,
+
+275
+00:14:11,948 --> 00:14:14,419
+alors il faut le faire localement,
+tout de suite,
+
+276
+00:14:14,419 --> 00:14:17,069
+et ne pas utiliser
+le mécanisme des exceptions.

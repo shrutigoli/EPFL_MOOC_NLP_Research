@@ -1,0 +1,129 @@
+In the previous episodes, we presented the general problem of the case study we are now working on, which is to model watches with different mechanisms
+ and different accessories.
+Then, we covered the more specific problem of overloading the output operator and how to handle polymorphic output.
+We also completed the "Produit" class.
+In this video, we will focus on overloading another operator, for example the "+=" operator.
+Then, we will build a first, real operational version of the program.
+Let's start by adding the "+=" operator to the "Montre" class
+(TN: "montre"means "watch"), which, remember, inherits from "Produit" and has a mechanism, more specifically a pointer to a mechanism, for polymorphism, and a dynamic array of pointers to accessories which we have called "accessoires" here.
+The idea is to be able to add elements to this dynamic array by doing, for example for "montre", an instance of the "Montre" class,
+" montre += new Bracelet (...); ", where, as you will recall, "Bracelet" is a subclass of "Accessoire".
+So we would like this to add a new pointer to a "Bracelet" into the collection of pointers to "Accessoires".
+Since a "Bracelet" is an "Accessoire", a pointer to a "Bracelet" can be put into a pointer to an "Accessoire".
+That's the idea for this "+=" operator.
+The prototype of this operator will look like this: we won't use its return value, as we will never write things like
+" z = (montre += new "Bracelet" (...)); ".
+So here, we have a "void" return type.
+This is the "+=" operator for the "Montre" class and the operator must take a pointer to an "Accessoire", so here, "new" will return a
+C-style pointer, and we want to view it as a pointer to an "Accessoire".
+So here, in a very general way, it will be a pointer to an "Accessoire".
+Here, we added a bracelet, but we could add a clasp, a body, or any other subclass of 
+"Accessoire".
+Now, let's see how we can write its definition.
+This pointer to an "Accessoire",
+"p_accessoire", that we received, we simply want to add it to the dynamic array of accessories stored in the watch.
+So we will simply call "push_back" with this pointer, but here, since we received a C-style pointer, we will transform this
+C-style pointer to a "unique_ptr".
+So here, we create a "unique_ptr" which converts this C-style pointer,
+"p_accessoire", and we add it to the end, we "push_back" on the "accessoires" vector, in which all the accessories of the watch are stored.
+That's it for this very simple overload of the "+=" operator, which now provides us with a very compact syntax to add accessories to a watch.
+Now, let's try to write a first operational version of the program.
+Let's try to finalize what we have written up till now; and for now, let's not add any mechanism or copy any watches.
+We will leave these two aspects for the next two episodes.
+To be able to finalize the program as we have written it up till now, we would need a few more concrete accessories and we would have to finish the
+"Montre" class which is yet not quite operational.
+And of course, we must use all this in a typical "main".
+We will go over all of these points one after the other, starting with a few more accessories.
+Remember that we have an "Accessoire" class, which is a product, and let's say for example that accessories need a name to describe them.
+To do so, let's say we have a name that will not change once it has been set by the constructor.
+And we will add a constructor to the
+"Accessoire" class which will take a name to refer to the accessory.
+And let's not forget that any product can be sold and thus has a price, and so it will take a second parameter to initialize the price of the product.
+The initialization list in the constructor for "Accessoire" will start by calling the constructor for the "Produit" superclass passing it the second parameter we received for the base value.
+Then, we will initialize the "nom" member 
+(TN: means "name") with the name we received.
+That's it for the constructor we decided to give to all the accessories.
+Now, let's decide on a way of displaying the accessories since, remember, all products can be displayed in a polymorphic way.
+So we will overload the "afficher" method that was inherited from "Produit".
+We override it by adding the "override" keyword.
+And let's say that the output will be their name and price.
+So we will simply display the name, then indicate how much it costs.
+And we already know how to display the price by directly calling the afficher method from the
+"Produit" superclass.
+Here, we use the scope resolution operator to access the afficher method inherited from the "Produit" superclass.
+Because of course, if we simply write
+"afficher" without this, we will call the "afficher" method from the current class and we would have infinite recursion here, where "afficher" would call itself.
+And so, in the "afficher" method of the
+"Accessoire" class, to call the "afficher" method inherited from the "Produit" superclass, we need to unhide this
+"afficher" method.
+Next, since we expect a polymorphic behavior with virtual methods, we don't forget to add the polymorphic destructor, the virtual destructor, in the class for which we want polymorphic behavior.
+This way, if subclasses inherit from it, as will be the case with accessories, which need to have destructors with specific behaviors, then their own destructor will indeed be called in a polymorphic way
+-- and not the destructor for the "Accessoire" class.
+Finally, let's say that the price of accessories is the same price as a normal product, that is, a very general product as we had designed it right at the top of the hierarchy.
+At that point, we don't have anything to do since the "prix" method that we inherited from the "Produit" class is enough here and we don't need to override it in the "Accessoire" class.
+So here, we have completely functional
+"Accessoire" class which corresponds to what we wanted.
+Now, let's define a few accessories, for example a "Bracelet". A "Bracelet" is an "Accessoire", so here, we will have an inheritance link.
+At the accessory level, let's say that their name
+-- remember that accessories have a name, so all accessories will inherit this name -- let's say that we want each accessory to have a name that marks what they are.
+For example, the name of a "Bracelet" will start with "bracelet" the name of a clasp will start with "fermoir" (TN: means "clasp").
+We will force this in the constructor.
+For example, for the "Bracelet" subclass of the "Accessoire" class, we will take a name, which will be the complement that we add after "bracelet", for example "en cuir" so that the complete name becomes
+"bracelet en cuir" (TN: "leather strap").
+And as a second parameter, the price, which we also pass to the superclass's constructor in the initialization list.
+And all of these classes can potentially have polymorphic subclasses, so let's not forget the virtual destructor.
+Similarly, we could define a "Fermoir" class
+(TN: means "Clasp") inheriting from "Accessoire" in which we define a constructor taking a complement to the "fermoir" name and a price, to be able to call the constructor of the "Accessoire" superclass.
+The complete name will thus be
+"fermoir" with this complement that we received as the first parameter, and as the second parameter, the price that we received, and as always, a virtual destructor.
+There, we have finished with the accessories.
+Now let's try to also make the
+"Montre" class usable without mechanisms and without copying which we will leave to the side for now.
+At this stage, we have completely defined the contents of the "Montre" class, we have prevented copying, and we have added the "+=" operator allowing us to add accessories to our watches.
+To make this class operational, we must add at least one constructor since we have modified the constructor here, the default constructor, provided by default, is no longer so.
+We don't have the default constructor anymore, so we must at least add it here.
+Of course, the default constructor will do nothing to initialize the mechanisms, and so at this point we will simply comment this out, to avoid any problem with using a pointer that would not be initialized -- we will simply comment out this line.
+Regarding the vector of pointers to accessories, the default constructor will create an empty vector and so here, there is no problem.
+We will be able to fill this vector using our
+"+=" operator.
+So the default constructor suits us, as long as we don't have this pointer so we will comment it out for now and come back to it in a subsequent episode.
+That's it for creating watches.
+Now, let's decide how to compute the price of watches, and let's say that it is the sum of the prices of its accessories.
+For that, we will override the
+"prix" method, we override this "virtual prix" method inherited from the "Produit" superclass.
+We will decide that at first, the price of a watch is its base value, that we fetch through the original
+"prix" method, inherited from the "Produit" superclass.
+Then we will add, to this base value, the sum of prices of the different accessories.
+To do so, we go through the list of accessories
+-- remember that to iterate over an array of "unique_ptr"s, it is crucial to use this syntax, to use references - here, fetching the price will not modify the instances we iterate over, so we will use a constant reference
+Here, we will write a loop that iterates with a constant reference over the "unique_ptr"s of this dynamic array of accessories.
+And we add to the price, that we had originally initialized, the price each time, that is, the result of the call to the "prix" method of the object pointed to by
+"p_acc" here, so the object pointed to via this pointer.
+This is how we write the call to the
+"prix" method for something that is a pointer to an object providing such a method.
+And finally, we return the price that we have just computed.
+Finally, let's decide how we want to display the watches, and let's say for example that we want a message to say that a watch is made of: the list of its various accessories, ...
+And at the end, we display the total price of the watch.
+And so here, we will also override the virtual "afficher" method inherited from the "Produit" superclass.
+And remember that here we are overriding it, starting by displaying:
+"A watch is composed of", then by iterating over the vector of accessories of the watch, and for each accessory, we display this little star then we display the current accessory.
+Question here: are we allowed to write this?
+Will this compile?
+Have we overloaded the output operator for this?
+Yes, it is correct and it compiles.
+And finally, we end by displaying the message "total price" and calling the watch's "prix" method, which will compute the total price, as we have just seen.
+Finally, to have an executable program, we need a "main", which we will use here to test the implementation of the objects we have just created.
+For this, we will declare a "Montre" in the "main".
+We can easily do this since we have a default constructor now.
+Then, we add various accessories to the watch, like so.
+Each of the accessories has a constructor with its name or the complement to the name, and its price
+So here, we add for example
+4 accessories, and finally we output a message to display the watch here, with the output operator we saw earlier.
+This output operator, as we have just discussed, will call the "prix" method.
+The execution of this program will thus yield the following result: first, we will display the message
+"Montre m : ", then we will enter the overload of the operator for "Produit", but with a call to the polymorphic afficher method for "Montre", which will thus display:
+"Une montre composÃ©e de: " then a loop over its various acessories, and finally will display the total price, the sum of prices of its accessories.
+For those who would like it, all of the code is available on the course website
+This concludes the presentation of this first operational version of our code.
+There are still two chapters to cover in the next two episodes: first, all of these mechanisms, with multiple inheritance, and then the concept of copying a watch, how to make a deep copy of the various
+"Accessoires" of a "Montre".

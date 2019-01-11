@@ -1,0 +1,1668 @@
+1
+00:00:04,845 --> 00:00:06,566
+Hi. Welcome to POCS.
+
+2
+00:00:06,566 --> 00:00:08,144
+My name is Ed Bugnion.
+
+3
+00:00:08,144 --> 00:00:09,284
+Now this week in POCS,
+
+4
+00:00:09,284 --> 00:00:11,172
+we'll be studying layering.
+
+5
+00:00:11,172 --> 00:00:14,455
+The layering in computer systems
+is a deceptively simple concept.
+
+6
+00:00:14,455 --> 00:00:17,579
+And that's because we all
+have an intuition as to what a layer is.
+
+7
+00:00:17,579 --> 00:00:19,992
+We all learn in our classes 
+the difference between
+
+8
+00:00:19,992 --> 00:00:22,065
+applications and operating systems,
+
+9
+00:00:22,065 --> 00:00:24,300
+or how file systems are layered
+on top of disks.
+
+10
+00:00:24,300 --> 00:00:25,970
+Now we're actually going to revisit
+
+11
+00:00:25,970 --> 00:00:27,995
+all these concepts in the various modules.
+
+12
+00:00:27,995 --> 00:00:31,541
+But more importantly, we're going to
+look at the principle behind layering.
+
+13
+00:00:31,541 --> 00:00:34,660
+Because there are actually a fair number
+of nuances and subtleties
+
+14
+00:00:34,660 --> 00:00:37,181
+behind this deceptively simple concept.
+
+15
+00:00:37,181 --> 00:00:40,745
+So the lecture this week is broken up into
+four distinct modules.
+
+16
+00:00:40,745 --> 00:00:43,932
+First, I'm going to go over
+the concepts themselves in the abstract
+
+17
+00:00:43,932 --> 00:00:46,962
+We're going to learn
+about layers, stacks, buses.
+
+18
+00:00:47,632 --> 00:00:51,915
+Then we'll go in depth
+into two important stacks
+
+19
+00:00:51,915 --> 00:00:54,745
+that each consist of multiple layers:
+
+20
+00:00:54,745 --> 00:00:57,437
+the compute stack
+and the information stack.
+
+21
+00:00:57,737 --> 00:01:01,268
+Then we'll talk about another way
+in which you can layer a system together.
+
+22
+00:01:01,268 --> 00:01:03,597
+Which is by having clients talk to servers
+
+23
+00:01:03,597 --> 00:01:06,138
+and form a relationship
+in the client/server model.
+
+24
+00:01:06,628 --> 00:01:12,318
+And then we'll wrap up this module
+with a session on the various layers
+
+25
+00:01:12,318 --> 00:01:13,783
+of the networking stack.
+
+26
+00:01:13,783 --> 00:01:15,311
+So let's get started.
+
+27
+00:01:15,801 --> 00:01:19,982
+Well, first, layering builds on the notion
+of modularity abstraction in naming.
+
+28
+00:01:19,982 --> 00:01:23,614
+We've covered modularity and abstraction
+in the previous lecture,
+
+29
+00:01:23,614 --> 00:01:26,872
+and you'll actually learn about naming
+and going depth in naming
+
+30
+00:01:26,872 --> 00:01:28,237
+in a subsequent lecture.
+
+31
+00:01:28,237 --> 00:01:31,815
+But here we're just using these concepts
+to formalize the notion of a layer.
+
+32
+00:01:32,015 --> 00:01:34,022
+So a layer is a piece
+of a computer system.
+
+33
+00:01:34,022 --> 00:01:36,874
+Could be a hardware component,
+could be a software component,
+
+34
+00:01:36,874 --> 00:01:39,323
+but it generally 
+has the following characteristics:
+
+35
+00:01:39,323 --> 00:01:43,350
+first, it exports
+a well-defined abstraction.
+
+36
+00:01:43,350 --> 00:01:47,142
+By well-defined we mean something
+that is defined in one particular domain.
+
+37
+00:01:47,142 --> 00:01:50,880
+For example, a file system, a database,
+or a disk are examples
+
+38
+00:01:50,880 --> 00:01:53,129
+of such an abstraction.
+
+39
+00:01:53,129 --> 00:01:55,566
+But a link list is not a layer.
+
+40
+00:01:55,566 --> 00:01:58,294
+It's just a module or library,
+it's a piece of code.
+
+41
+00:01:58,294 --> 00:02:00,831
+It serves a function,
+but it is not a layer
+
+42
+00:02:00,831 --> 00:02:02,863
+in the context of computer systems.
+
+43
+00:02:03,983 --> 00:02:07,528
+The second is, a layer typically
+relies on a single lower layer.
+
+44
+00:02:07,528 --> 00:02:10,101
+Now there are exceptions to that rule,
+but, in general,
+
+45
+00:02:10,101 --> 00:02:12,293
+layers are organized as a stack
+
+46
+00:02:12,293 --> 00:02:15,128
+with each layer relying on
+a single lower layer.
+
+47
+00:02:15,128 --> 00:02:19,131
+For example the file system layer
+is built on top of the block layer.
+
+48
+00:02:19,131 --> 00:02:23,112
+Now the block layer itself can have
+multiple distinct implementations.
+
+49
+00:02:23,112 --> 00:02:26,004
+And there's a runtime binding
+between a file system
+
+50
+00:02:26,004 --> 00:02:27,800
+and the underlying block layer.
+
+51
+00:02:27,800 --> 00:02:31,264
+But for every instance of a stack,
+there is a hierarchy
+
+52
+00:02:31,264 --> 00:02:34,890
+with the file system being layered
+on top of one instance of the block layer.
+
+53
+00:02:36,030 --> 00:02:38,523
+And the third defining
+characteristic of a layer
+
+54
+00:02:38,523 --> 00:02:41,680
+is that it generally manages a distinct
+and well-defined namespace.
+
+55
+00:02:41,680 --> 00:02:44,462
+As I mentioned, we'll be spending
+an entire week on naming,
+
+56
+00:02:44,462 --> 00:02:46,193
+so I won't dwell on this here.
+
+57
+00:02:46,193 --> 00:02:49,337
+But just think of it
+as the access mechanism to the objects
+
+58
+00:02:49,337 --> 00:02:51,387
+that are exposed by the abstractions.
+
+59
+00:02:51,847 --> 00:02:54,898
+So a classic example,
+the namespace of the file system layer is,
+
+60
+00:02:54,898 --> 00:02:58,597
+as you would expect,
+the set of directories and file names.
+
+61
+00:02:58,837 --> 00:03:00,890
+The name space 
+of the virtual address space
+
+62
+00:03:00,890 --> 00:03:04,916
+consists of 64-bit values that
+can be dereferenced by the processor.
+
+63
+00:03:04,916 --> 00:03:06,882
+And so on, and so on.
+
+64
+00:03:07,622 --> 00:03:09,957
+So our first example
+comes from the compute stack.
+
+65
+00:03:09,957 --> 00:03:12,970
+Take, for example, a JVM emulator.
+
+66
+00:03:12,970 --> 00:03:16,295
+It provides a distinct layer
+implemented in software.
+
+67
+00:03:16,295 --> 00:03:19,660
+And that layer allows Java applications 
+to run on the machine.
+
+68
+00:03:20,450 --> 00:03:24,392
+Now the JVM itself
+runs directly on the hardware ISA.
+
+69
+00:03:24,392 --> 00:03:27,907
+And in this example the hardware ISA
+is an X86 CPU.
+
+70
+00:03:29,317 --> 00:03:31,888
+Of course the X86 CPU is a distinct layer.
+
+71
+00:03:31,888 --> 00:03:34,345
+This one is implemented entirely
+in hardware.
+
+72
+00:03:34,345 --> 00:03:36,887
+It's a piece of silicon
+with a well-defined interface,
+
+73
+00:03:36,887 --> 00:03:39,614
+the instruction set architecture
+of the X86 processor.
+
+74
+00:03:40,304 --> 00:03:42,373
+That CPU manages the namespace.
+
+75
+00:03:42,603 --> 00:03:44,839
+Which is the architectural state
+of the machine.
+
+76
+00:03:44,839 --> 00:03:47,412
+The registers, the memory,
+and the interrupt subsystem.
+
+77
+00:03:47,772 --> 00:03:52,414
+And at the same time, the X86 processor
+hides all the implementation details
+
+78
+00:03:52,414 --> 00:03:55,615
+of the processor from the layers
+running on top of it.
+
+79
+00:03:55,615 --> 00:03:58,974
+For example, an X86 CPU
+has an out-of-order execution engine,
+
+80
+00:03:58,974 --> 00:04:00,176
+it has a cache hierarchy,
+
+81
+00:04:00,176 --> 00:04:03,741
+but all of that is abstracted from
+the layers that are running on top of it.
+
+82
+00:04:03,741 --> 00:04:06,563
+So you have a hardware layer,
+and you have a software layer.
+
+83
+00:04:06,563 --> 00:04:08,984
+And they're layered on top of each other.
+
+84
+00:04:09,734 --> 00:04:11,213
+When we study system software,
+
+85
+00:04:11,213 --> 00:04:13,509
+the processor instruction set architecture
+
+86
+00:04:13,509 --> 00:04:15,704
+is typically the lowest layer
+that we study.
+
+87
+00:04:15,704 --> 00:04:17,810
+However, when we study
+computer architecture,
+
+88
+00:04:17,810 --> 00:04:20,911
+the processor is further broken down
+into architectural components
+
+89
+00:04:20,911 --> 00:04:23,671
+that play a direct role
+in the performance of the software.
+
+90
+00:04:23,671 --> 00:04:26,715
+And below them, into micro-architectural
+implementation elements.
+
+91
+00:04:28,765 --> 00:04:31,148
+Now, onto our second example.
+
+92
+00:04:31,148 --> 00:04:33,988
+And actually file systems
+are the canonical example
+
+93
+00:04:33,988 --> 00:04:35,861
+often used to discuss layering.
+
+94
+00:04:36,361 --> 00:04:39,120
+And that's because
+the file system abstraction itself,
+
+95
+00:04:39,120 --> 00:04:41,838
+as well as the implementation
+of file systems on disks,
+
+96
+00:04:41,838 --> 00:04:44,121
+are two good examples of layered systems.
+
+97
+00:04:45,201 --> 00:04:48,094
+Now a file system also meets
+the general criteria of a layer.
+
+98
+00:04:48,094 --> 00:04:49,959
+There's a well-defined API,
+
+99
+00:04:49,959 --> 00:04:51,751
+there are well-defined abstractions,
+
+100
+00:04:51,751 --> 00:04:53,039
+things like files.
+
+101
+00:04:53,039 --> 00:04:54,572
+There's a well-defined namespace
+
+102
+00:04:54,572 --> 00:04:55,929
+with files and directories.
+
+103
+00:04:55,929 --> 00:04:58,154
+And we take
+all these abstractions for granted.
+
+104
+00:04:58,154 --> 00:05:01,732
+But keep in mind that systems had to
+evolve to the point where we are today.
+
+105
+00:05:02,322 --> 00:05:03,892
+Mainframe systems, for example,
+
+106
+00:05:03,892 --> 00:05:06,275
+had records and exposed blocks directly.
+
+107
+00:05:07,215 --> 00:05:08,947
+In slightly more recent time,
+
+108
+00:05:08,947 --> 00:05:13,666
+digital VMS operating systems
+had a built-in versioning system
+
+109
+00:05:13,666 --> 00:05:16,300
+that exposed directly
+the different versions of a file
+
+110
+00:05:16,300 --> 00:05:18,674
+into the namespace of the file system.
+
+111
+00:05:19,394 --> 00:05:22,444
+Turns out that that feature
+proved not to be sufficiently useful
+
+112
+00:05:22,444 --> 00:05:25,548
+so it doesn't exist anymore today
+in current operating systems.
+
+113
+00:05:26,468 --> 00:05:30,099
+So although we take layers for granted,
+they often take a while to gel
+
+114
+00:05:30,099 --> 00:05:32,429
+and to evolve into the state
+where they are today.
+
+115
+00:05:32,429 --> 00:05:36,088
+And our one key point here is that
+we're talking about the file system layer,
+
+116
+00:05:36,088 --> 00:05:39,993
+not about any particular
+specific file system.
+
+117
+00:05:40,443 --> 00:05:44,759
+And specifically not on any particular
+layout of the file system on disk.
+
+118
+00:05:45,149 --> 00:05:49,124
+So, for example, if all the most files
+in the namespace are stored on disk,
+
+119
+00:05:49,124 --> 00:05:50,827
+that's not always the case.
+
+120
+00:05:50,827 --> 00:05:52,765
+And that's because the file system layer
+
+121
+00:05:52,765 --> 00:05:55,560
+is not built directly
+on some storage abstraction,
+
+122
+00:05:55,560 --> 00:05:57,482
+but rather on some intermediate layer,
+
+123
+00:05:57,482 --> 00:05:59,187
+which is called VFS in Unix,
+
+124
+00:05:59,187 --> 00:06:02,724
+which provides extensively
+by connecting drivers into the namespace.
+
+125
+00:06:02,724 --> 00:06:05,231
+We'll actually revisit this
+in the next section.
+
+126
+00:06:07,351 --> 00:06:10,549
+So let's expand actually on the difference
+between file system layer
+
+127
+00:06:10,549 --> 00:06:12,925
+and individual file systems.
+
+128
+00:06:13,585 --> 00:06:16,204
+As I mentioned, the POSIX API
+has a single namespace,
+
+129
+00:06:17,174 --> 00:06:20,144
+but the use of mount points
+allows multiple file system drivers
+
+130
+00:06:20,144 --> 00:06:21,629
+to coexist.
+
+131
+00:06:21,629 --> 00:06:25,074
+And each materialize 
+a portion of the namespace.
+
+132
+00:06:25,074 --> 00:06:27,539
+Now, internally within the kernel,
+
+133
+00:06:27,539 --> 00:06:29,998
+these drivers register themselves
+into the VFS link.
+
+134
+00:06:30,568 --> 00:06:34,113
+And that's a different layer
+that is internal to the OS,
+
+135
+00:06:34,113 --> 00:06:37,176
+and the way they register
+into the VFS layer is via callbacks.
+
+136
+00:06:37,176 --> 00:06:41,755
+If you actually recall George's lecture
+on modularity and abstraction,
+
+137
+00:06:42,275 --> 00:06:45,548
+George showed that the source code
+of the debugfs file system driver
+
+138
+00:06:45,548 --> 00:06:46,982
+it's kind of a coincidence,
+
+139
+00:06:46,982 --> 00:06:49,709
+but is shows precisely how
+the debugfs file system driver,
+
+140
+00:06:49,709 --> 00:06:51,658
+connects into the VFS layer.
+
+141
+00:06:53,118 --> 00:06:55,293
+So each file system driver
+is a layer itself,
+
+142
+00:06:55,293 --> 00:06:57,986
+and each one of them
+relies on a lower layer.
+
+143
+00:06:58,686 --> 00:07:00,763
+And now the example that you see on screen
+
+144
+00:07:00,763 --> 00:07:05,900
+is a dump of the mount table
+of a completely vanilla Linux system.
+
+145
+00:07:05,900 --> 00:07:10,253
+What we see is that the ext3 driver
+relies on a block layer as its lower layer
+
+146
+00:07:10,253 --> 00:07:13,127
+but we also see that there
+are other file systems
+
+147
+00:07:13,127 --> 00:07:17,117
+such as tmpfs that implement
+a shared memory abstraction
+
+148
+00:07:17,117 --> 00:07:20,626
+that does not rely on an underlying
+actual block device.
+
+149
+00:07:21,456 --> 00:07:24,845
+We also see that /proc and /sys
+are two file systems
+
+150
+00:07:24,845 --> 00:07:29,877
+that expose the internal structure
+of Linux as a file system to applications.
+
+151
+00:07:30,337 --> 00:07:34,532
+But the key point here is not
+in the details of tmpfs, proc, or sysfs,
+
+152
+00:07:34,532 --> 00:07:37,051
+it's that all these things
+are file systems.
+
+153
+00:07:37,701 --> 00:07:40,317
+And they all respond
+to the file system operation,
+
+154
+00:07:41,057 --> 00:07:42,807
+the same file system operations.
+
+155
+00:07:42,807 --> 00:07:48,347
+And they all can be stacked together
+as part of a file system stack.
+
+156
+00:07:51,047 --> 00:07:53,934
+Now in the previous example,
+we showed how a virtual layer,
+
+157
+00:07:54,884 --> 00:07:57,883
+similar to an abstract class
+in object-oriented programming,
+
+158
+00:07:57,883 --> 00:07:59,886
+enables extensibility in systems.
+
+159
+00:08:00,586 --> 00:08:03,036
+Now here we're introducing
+another technique,
+
+160
+00:08:03,486 --> 00:08:05,595
+which uses layering to reduce modularity.
+
+161
+00:08:06,465 --> 00:08:09,447
+Now the idea here is to avoid
+having point-to-point
+
+162
+00:08:09,447 --> 00:08:13,216
+connections between a collection
+of unrelated modules.
+
+163
+00:08:13,736 --> 00:08:16,983
+As this approach is not scale,
+it makes it very difficult to organize
+
+164
+00:08:16,983 --> 00:08:18,880
+and reason about the various layers.
+
+165
+00:08:19,340 --> 00:08:22,068
+And in step systems,
+architects have developed the concept
+
+166
+00:08:22,068 --> 00:08:23,768
+of a bus layer.
+
+167
+00:08:23,768 --> 00:08:27,974
+Which allows seemingly unrelated modules
+to communicate with each other indirectly
+
+168
+00:08:27,974 --> 00:08:29,900
+by going through a bus.
+
+169
+00:08:29,900 --> 00:08:34,054
+So buses can actually be implemented
+either in software or hardware.
+
+170
+00:08:34,054 --> 00:08:36,251
+And I'm going to start
+with a software example
+
+171
+00:08:36,251 --> 00:08:38,575
+and my software example is XMPP.
+
+172
+00:08:39,045 --> 00:08:41,427
+Which is better known
+as the Jabber protocol.
+
+173
+00:08:42,237 --> 00:08:44,777
+And XMPP allows
+a scalable number of entities
+
+174
+00:08:44,777 --> 00:08:47,045
+to exchange messages with each other
+
+175
+00:08:47,045 --> 00:08:49,595
+and to communicate their presence
+within the bus.
+
+176
+00:08:50,025 --> 00:08:53,281
+And by doing that, you eliminate
+the need to have any need
+
+177
+00:08:53,281 --> 00:08:55,291
+for a direct connection between peers.
+
+178
+00:08:55,291 --> 00:08:58,860
+And yet you create the illusion of having
+point-to-point communication.
+
+179
+00:08:59,700 --> 00:09:03,851
+And of course, XMPP is used to build
+highly scalable instant messaging systems.
+
+180
+00:09:04,231 --> 00:09:06,350
+And I'm sure many of you have used that
+
+181
+00:09:06,350 --> 00:09:08,944
+as part of your favorite
+instant messaging system.
+
+182
+00:09:09,294 --> 00:09:11,502
+But XMPP is actually 
+not only used for humans
+
+183
+00:09:11,502 --> 00:09:14,465
+to communicate with each other
+and to create an ad hoc network,
+
+184
+00:09:14,465 --> 00:09:17,304
+but it's also used for 
+machine-to-machine communication
+
+185
+00:09:17,304 --> 00:09:18,869
+in complex distributed systems.
+
+186
+00:09:19,549 --> 00:09:21,583
+Here again, by introducing a bus layer,
+
+187
+00:09:21,583 --> 00:09:23,012
+we're simplifying the design,
+
+188
+00:09:23,012 --> 00:09:25,798
+by allowing machines 
+to have the appearance
+
+189
+00:09:25,798 --> 00:09:28,164
+of talking directly to each other
+when in reality,
+
+190
+00:09:28,164 --> 00:09:31,452
+they are only talking to
+a single lower layer in the stack.
+
+191
+00:09:33,225 --> 00:09:36,100
+Now here's another example of a bus.
+
+192
+00:09:36,100 --> 00:09:37,847
+This one is taken from the textbook,
+
+193
+00:09:37,847 --> 00:09:39,104
+and as you would expect,
+
+194
+00:09:39,104 --> 00:09:40,901
+this is the computer system bus
+
+195
+00:09:40,901 --> 00:09:44,116
+which is the canonical example
+of a bus in hardware.
+
+196
+00:09:44,696 --> 00:09:47,454
+Now rather than connecting
+the different pieces of a system
+
+197
+00:09:47,454 --> 00:09:48,821
+directly to each other,
+
+198
+00:09:48,821 --> 00:09:51,746
+each component
+is connected only to the bus,
+
+199
+00:09:51,746 --> 00:09:54,551
+and a bus protocol
+enables point-to-point communication
+
+200
+00:09:54,551 --> 00:09:56,940
+between any two entities on the bus.
+
+201
+00:09:57,880 --> 00:10:01,617
+And this is how
+we have all learned the basics
+
+202
+00:10:01,617 --> 00:10:04,715
+of computer systems organization
+on the hardware side.
+
+203
+00:10:04,715 --> 00:10:07,050
+Now, this picture is,
+of course, very simplistic,
+
+204
+00:10:07,050 --> 00:10:09,978
+and as you know, in practice,
+a modern computer,
+
+205
+00:10:09,978 --> 00:10:12,207
+at least a server,
+has a few specialized buses.
+
+206
+00:10:12,207 --> 00:10:15,661
+For example, one that separates
+the CPU to memory communication
+
+207
+00:10:15,661 --> 00:10:17,316
+from the I/O communication.
+
+208
+00:10:17,316 --> 00:10:21,420
+But, nevertheless, the concept of a bus
+in hardware is absolutely fundamental.
+
+209
+00:10:21,420 --> 00:10:24,637
+So, so far I've shown a few examples
+that show how layering can help
+
+210
+00:10:24,637 --> 00:10:27,227
+simplify the complexity
+of computer systems.
+
+211
+00:10:27,227 --> 00:10:29,278
+Now, it's time to look
+at the bigger picture
+
+212
+00:10:29,278 --> 00:10:31,292
+and formalize
+some of these concepts again.
+
+213
+00:10:32,172 --> 00:10:35,705
+I mentioned that each layer
+exposes an abstraction,
+
+214
+00:10:35,705 --> 00:10:38,190
+is modular, and typically
+manages a namespace.
+
+215
+00:10:38,870 --> 00:10:40,604
+The implication is a layer has to be
+
+216
+00:10:40,604 --> 00:10:43,465
+consistent and self-contained.
+
+217
+00:10:44,285 --> 00:10:46,701
+Now when a layer is externally visible,
+
+218
+00:10:47,531 --> 00:10:49,951
+people often talk about the architecture
+
+219
+00:10:49,951 --> 00:10:51,783
+associated with that particular layer.
+
+220
+00:10:51,993 --> 00:10:55,840
+For example, the IP routing layer
+in networking
+
+221
+00:10:55,840 --> 00:10:59,401
+is an extremely well-defined
+combination of protocols and standards
+
+222
+00:10:59,401 --> 00:11:03,584
+that defines what people call
+the layer three layer of networking.
+
+223
+00:11:03,804 --> 00:11:06,905
+But if you're building a component
+that is not externally visible,
+
+224
+00:11:06,905 --> 00:11:08,864
+that is internal to a particular product,
+
+225
+00:11:08,864 --> 00:11:10,583
+you can still have a distinct layer.
+
+226
+00:11:10,583 --> 00:11:12,712
+If you're managing an abstraction,
+
+227
+00:11:12,712 --> 00:11:14,652
+if you have a module implementation,
+
+228
+00:11:14,652 --> 00:11:16,647
+and if you're managing a namespace.
+
+229
+00:11:16,647 --> 00:11:19,503
+And often people talk about
+those principles that are exposed
+
+230
+00:11:19,503 --> 00:11:23,546
+to the upper layers as the theory of
+operations of the particular component.
+
+231
+00:11:23,546 --> 00:11:26,065
+That's not where you're
+describing the implementation,
+
+232
+00:11:26,065 --> 00:11:28,469
+but that is where you're describing
+the abstraction
+
+233
+00:11:28,469 --> 00:11:30,578
+and the API that you're exposing.
+
+234
+00:11:32,228 --> 00:11:37,051
+The second important notion is that layers
+can be, and generally are, a stack.
+
+235
+00:11:37,051 --> 00:11:40,146
+And that each layer generally relies on
+a single underlying layer.
+
+236
+00:11:40,146 --> 00:11:42,527
+So we're not talking about
+hierarchical composition
+
+237
+00:11:42,527 --> 00:11:45,005
+that actually introduces
+a fair amount of complexity,
+
+238
+00:11:45,005 --> 00:11:47,849
+we think about a layered system,
+
+239
+00:11:47,849 --> 00:11:51,069
+typically you should actually
+think about it as a single stack
+
+240
+00:11:51,069 --> 00:11:53,838
+with single dependencies
+from one layer to the layer below.
+
+241
+00:11:53,838 --> 00:11:56,853
+And if you actually can't think
+about it in this particular way,
+
+242
+00:11:56,853 --> 00:11:58,669
+maybe it's time to refactor the system
+
+243
+00:11:58,669 --> 00:12:01,227
+so that it follows
+this particular mental model.
+
+244
+00:12:01,447 --> 00:12:04,697
+Now this model's not overly restrictive
+because you have the ability
+
+245
+00:12:04,697 --> 00:12:06,478
+through runtime bindings,
+
+246
+00:12:06,478 --> 00:12:10,064
+to compose different implementation
+onto the same layer.
+
+247
+00:12:10,064 --> 00:12:13,918
+And the example that we gave
+is VFS which allows different file systems
+
+248
+00:12:13,918 --> 00:12:17,203
+to be implemented on top
+of a single hierarchy of layers
+
+249
+00:12:17,203 --> 00:12:19,355
+that form the file system stack.
+
+250
+00:12:19,355 --> 00:12:21,237
+And there's a third important prinicple
+
+251
+00:12:21,237 --> 00:12:25,097
+which we'll revisit when we
+talk specifically about the compute stack.
+
+252
+00:12:25,097 --> 00:12:28,789
+It's that when building a stack,
+it is important to avoid
+
+253
+00:12:28,789 --> 00:12:30,769
+bypassing layers.
+
+254
+00:12:30,769 --> 00:12:34,002
+If you have three layers in your stack,
+
+255
+00:12:34,002 --> 00:12:35,682
+an A, B, and C,
+
+256
+00:12:35,682 --> 00:12:37,667
+and A depends on B and B depends on C,
+
+257
+00:12:37,667 --> 00:12:40,567
+your implementation, 
+you should have no explicit
+
+258
+00:12:40,567 --> 00:12:43,112
+or implicit dependencies
+between the A and C.
+
+259
+00:12:43,612 --> 00:12:47,495
+And whenever you actually
+have one of those subtle dependencies,
+
+260
+00:12:47,495 --> 00:12:50,666
+this is often the cause
+for complexity and problems.
+
+261
+00:12:52,316 --> 00:12:55,562
+Now you notice that I
+use the "C" word again, complexity.
+
+262
+00:12:55,562 --> 00:12:58,458
+We're always going to go
+back to complexity in this class.
+
+263
+00:12:59,078 --> 00:13:03,272
+Now, unfortunately the operational
+complexity is one of the key
+
+264
+00:13:03,272 --> 00:13:06,941
+undesirable emergent properties
+of a layered design.
+
+265
+00:13:07,411 --> 00:13:09,776
+The more layers, unfortunately often,
+
+266
+00:13:09,776 --> 00:13:12,586
+the more complex
+the management of that system.
+
+267
+00:13:12,586 --> 00:13:15,405
+Now because a layer is self-contained,
+
+268
+00:13:15,405 --> 00:13:18,322
+it is always designed so that it
+can be independently managed.
+
+269
+00:13:18,322 --> 00:13:21,474
+Now managed can have a different meaning
+depending on the context.
+
+270
+00:13:22,044 --> 00:13:24,542
+Now here the best way
+to define management
+
+271
+00:13:24,542 --> 00:13:27,671
+is via the ISO FCAPS management model.
+
+272
+00:13:27,671 --> 00:13:29,555
+And FCAPS is the acronym for
+
+273
+00:13:29,555 --> 00:13:33,003
+Fault, Configuration,
+Accounting or Availability,
+
+274
+00:13:33,003 --> 00:13:35,266
+Performance and Security Management.
+
+275
+00:13:35,266 --> 00:13:37,965
+It represents all the tasks
+that need to be applied
+
+276
+00:13:37,965 --> 00:13:40,594
+to a particular device
+or to a particular layer
+
+277
+00:13:40,594 --> 00:13:43,139
+when you're actually
+using it as part of a system.
+
+278
+00:13:44,219 --> 00:13:46,869
+Now systems management 
+is often overlooked in research.
+
+279
+00:13:46,869 --> 00:13:50,121
+Because we tend to design systems
+for ourselves and build prototypes.
+
+280
+00:13:50,121 --> 00:13:52,618
+But when you build products,
+the management interface
+
+281
+00:13:52,618 --> 00:13:55,801
+is at least as important
+as the functional interface of the layer.
+
+282
+00:13:55,801 --> 00:13:57,285
+And when you're using products,
+
+283
+00:13:57,285 --> 00:14:00,009
+that actually applies to us
+as well in research.
+
+284
+00:14:00,009 --> 00:14:03,626
+The management interface is often
+one of the main point of complexity
+
+285
+00:14:03,626 --> 00:14:06,561
+that we actually have to deal with
+as researchers as well.
+
+286
+00:14:07,381 --> 00:14:09,667
+Now things get even more complicated
+
+287
+00:14:09,667 --> 00:14:12,679
+when you have not a single layer
+to manage but obviously a stack
+
+288
+00:14:12,679 --> 00:14:14,184
+of multiple layers.
+
+289
+00:14:14,184 --> 00:14:17,682
+And that is because vendors
+typically build management interfaces
+
+290
+00:14:17,682 --> 00:14:19,192
+for their own layer.
+
+291
+00:14:19,192 --> 00:14:20,401
+That makes sense.
+
+292
+00:14:20,541 --> 00:14:23,691
+But, unfortunately, by doing that
+vendors often push the complexity
+
+293
+00:14:23,691 --> 00:14:25,991
+of managing an entire stack
+to end users.
+
+294
+00:14:26,571 --> 00:14:29,915
+Consider a stack that has three layers,
+built by different vendors.
+
+295
+00:14:30,505 --> 00:14:32,656
+They each have their own
+management interface,
+
+296
+00:14:32,656 --> 00:14:36,617
+but the end user is responsible
+to make sense of the combination
+
+297
+00:14:36,617 --> 00:14:38,046
+of these three layers.
+
+298
+00:14:38,046 --> 00:14:40,028
+And if you go back to the FCAPS acronym -
+
+299
+00:14:40,028 --> 00:14:43,989
+Fault, Configuration, Accounting,
+Performance and Security -
+
+300
+00:14:43,989 --> 00:14:46,976
+each one of these tasks has to be composed
+
+301
+00:14:46,976 --> 00:14:49,245
+across the layers of the stack.
+
+302
+00:14:50,275 --> 00:14:52,586
+But in this example,
+consider the simple stack
+
+303
+00:14:52,586 --> 00:14:55,481
+that has a file system
+mounted on top of a raid volume.
+
+304
+00:14:56,091 --> 00:14:59,515
+First, provisioning for that raid volume
+must be done in a precise order.
+
+305
+00:14:59,515 --> 00:15:01,859
+First the volume and then the file system.
+
+306
+00:15:01,859 --> 00:15:05,351
+When that's in place,
+normal operations are easy to reason about
+
+307
+00:15:05,351 --> 00:15:07,424
+because of
+the strict layering of the system
+
+308
+00:15:07,424 --> 00:15:11,056
+and because of the abstractions that
+are exposed by the two different layers.
+
+309
+00:15:11,056 --> 00:15:13,483
+The file system is built on
+the namespace of blocks,
+
+310
+00:15:13,483 --> 00:15:15,764
+and these blocks
+are not physical disk addressees
+
+311
+00:15:15,764 --> 00:15:19,968
+but instead virtualized adressees
+that materialize by the raid layer.
+
+312
+00:15:19,968 --> 00:15:21,909
+So, so far, so good.
+
+313
+00:15:21,909 --> 00:15:26,226
+Troubleshooting is where things
+become a lot more complicated.
+
+314
+00:15:26,226 --> 00:15:28,973
+Consider for example
+the loss of a physical drive.
+
+315
+00:15:28,973 --> 00:15:32,344
+The raid layer enables
+the continuous operation of the system
+
+316
+00:15:32,344 --> 00:15:35,660
+but not in a totally transparent manner.
+
+317
+00:15:35,660 --> 00:15:37,582
+Going back to the FCAPS model,
+
+318
+00:15:37,582 --> 00:15:40,535
+at the very least,
+the fault needs to be reported
+
+319
+00:15:40,535 --> 00:15:43,016
+and on top of that the performance
+might be degraded.
+
+320
+00:15:43,446 --> 00:15:45,981
+Now one of the key lessons here
+is that the management
+
+321
+00:15:45,981 --> 00:15:50,633
+and troubleshooting process often
+requires going through the stack manually
+
+322
+00:15:50,633 --> 00:15:53,262
+and to do so in the inverse
+order of operation.
+
+323
+00:15:54,412 --> 00:15:58,324
+When we layer a stack,
+we typically use the stack
+
+324
+00:15:58,324 --> 00:16:01,272
+from top to bottom functionally
+during normal operation,
+
+325
+00:16:01,272 --> 00:16:04,882
+but we typically have to troubleshoot
+going back in the other direction.
+
+326
+00:16:05,642 --> 00:16:06,570
+This is a big deal.
+
+327
+00:16:06,570 --> 00:16:08,997
+As a matter of fact,
+it's the number one cost center
+
+328
+00:16:08,997 --> 00:16:11,571
+in large data center operations today.
+
+329
+00:16:11,571 --> 00:16:14,256
+Well, we've covered a lot of ground
+in this first module.
+
+330
+00:16:14,256 --> 00:16:16,169
+But let me give you a closing thought.
+
+331
+00:16:16,169 --> 00:16:18,921
+I'm sure you've heard of
+the principle of indirection.
+
+332
+00:16:18,921 --> 00:16:20,872
+Often attributed to Butler Lampson,
+
+333
+00:16:20,872 --> 00:16:24,279
+who actually himself attributes it
+to David Wheeler.
+
+334
+00:16:24,279 --> 00:16:27,912
+But let me read it out to you
+completely with the amendment.
+
+335
+00:16:28,612 --> 00:16:31,548
+Any problem in computer science
+can be solved by adding
+
+336
+00:16:31,548 --> 00:16:33,515
+a level of indirection.
+
+337
+00:16:33,515 --> 00:16:35,823
+But this usually creates another problem.
+
+338
+00:16:36,453 --> 00:16:38,618
+Now this obviously applies to layering.
+
+339
+00:16:38,618 --> 00:16:40,685
+It applies more broadly
+in computer systems,
+
+340
+00:16:40,685 --> 00:16:44,861
+but it applies unambiguously
+and completely to layering.
+
+341
+00:16:46,031 --> 00:16:48,754
+But this actually has to me
+two fundamental implications.
+
+342
+00:16:49,664 --> 00:16:53,924
+The first one is designing
+the right layer is extremely hard.
+
+343
+00:16:54,314 --> 00:16:56,966
+It's extremely hard to get
+the abstraction right,
+
+344
+00:16:57,276 --> 00:16:59,265
+to get the functionality correct.
+
+345
+00:16:59,265 --> 00:17:02,554
+To create a layer that is useful
+and lasting
+
+346
+00:17:03,134 --> 00:17:05,816
+and can be deployed in the area
+of computer systems.
+
+347
+00:17:06,306 --> 00:17:08,664
+But if you can actually
+nail the right abstraction
+
+348
+00:17:08,664 --> 00:17:10,117
+and identify the right layer,
+
+349
+00:17:10,117 --> 00:17:11,436
+this could be transforming.
+
+350
+00:17:11,436 --> 00:17:13,761
+And by that I mean industry-transforming.
+
+351
+00:17:14,091 --> 00:17:16,282
+Now the second thought
+that I want to make sure
+
+352
+00:17:16,282 --> 00:17:18,068
+you take away from this first module,
+
+353
+00:17:18,068 --> 00:17:21,283
+is that the composition of layers
+into a stack
+
+354
+00:17:21,283 --> 00:17:25,562
+is an extremely difficult task
+with some unfortunate emergent properties.
+
+355
+00:17:26,012 --> 00:17:30,183
+In particular the management
+of a complex layered systems design
+
+356
+00:17:30,183 --> 00:17:32,569
+can be extremely difficult
+and challenging.
+
+357
+00:17:32,569 --> 00:17:33,675
+Thank you.
+
+358
+00:17:33,675 --> 00:17:37,342
+Next up we'll talk about the compute stack
+and the information stack.

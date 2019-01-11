@@ -1,0 +1,174 @@
+In the previous episode, we have presented, in a very general way, the concept of operator overloading.
+Now, we know that two kinds exist : the internal overloading and the external overloading.
+In today's episode, we will thoroughly focus on the external overloading.
+External overloading consists of defining the operators as usual functions (as opposed to class member functions).
+For example, this function "operator+", taking here 2 complex numbers in order to define the addition operator "+" for the class representing complex numbers.
+Let us thoroughly examine this example.
+Let us suppose we have defined a "Complexe" (= "Complex") class.
+We have declared 3 instances of this class : z1, z2 and z3.
+Now, we wish to compute the addition : "z3 = z1 + z2 ".
+In the case of the external overloading, where the operator is a function, it corresponds, be reminded, to the call " z3 = operator+(...) " with z1 and z2 as arguments.
+We thus deduce that the prototype of the function "operator+" will take two Complex-type arguments and return a Complexe.
+This si therefore a possible prototype for the overloading of "operator+".
+We may want to optimize this call and avoid the copies due to passing the parameters by value, doing a passage by constant reference instead.
+Also, we may want to have
+(this will be explained in the third episode on operator overloading) as return type : "const Complexe".
+For now, we take it as granted; it will all be explained in the last episode on operator overloading.
+Here is thus a second possible prototype for this "operator+" defined in external overloading.
+A third solution, which is the optimial solution in C++ 2011 and will also be explained in the third episode on operator overloading, would be to have the following prototype :
+"const Complex" as the return value, a passage by value for the first argument, and a passage by constant reference for the second argument.
+Here, the passage by value may seem a little suboptimal and conter-intuitive.
+Due to the specificities of C++ 2011, particularly regarding the notion of move instead of copy
+(which stretch far beyond the content of this course) it is ultimately the better solution.
+This leaves us with the following code.
+Let us examine the details.
+We thus have the "Complexe" class which defines a complex number, for example 2 here, "double".
+It also has a constructor permitting to initialize its 2 attributes "x" and "y" by receiving two values here.
+For example, we could construct a complex number like this.
+Here, we are passing the value 1 for
+"x" and the value 2 for "y".
+This is the constructor we have here.
+Then, we have a handful of methods necessary in order to manipulate complex numbers.
+For example, we can retrieve the value "x" and retrieve the value of "y".
+Here, we have our external overloading of "operator+".
+The prototype we have previously described will be written like this.
+Of course, when we write
+"z1 + z2" like this, we must define a new complex "z1 + z2".
+The result of the addition of z1 and z2 is a new value which is neither z1 nor z2.
+We will here define this new value and build using our two-parameters constructor.
+Actually, the formula for the addition of two complex numbers is done by retrieving the "x" of z1 and the "x" of z2, and adding up these 2 "x".
+For the "y" component, we will retrieve the two "y" values and compute their addition.
+Here, we are indeed constructing a complex number corresponding to the definition of the addition of z1 and z2.
+We return this complex number as the return value of "operator+".
+Also, the most advanced out of you will of course note that we could regroup these 2 lines.
+Thus, we could simply write
+"return Complexe(...)", without giving any name.
+"return Complexe(...)", with here an anonymous "Complexe" and a direct call to the constructor.
+But, once again, this is advanced and does not bring much.
+We have seen that there are 2 overloading ways : external and internal.
+In mose cases, we may choose between external overloading and internal overloading.
+In some cases though, we cannot choose; it is absolutely mandatory to use the external overloading.
+Let us look at these cases.
+The first case is when we mix different types.
+For example, here, we would to do the multiplication of a complex number and a double.
+For example, we have here a double "x" and a complex number "z1".
+We would like to retrive the result of "x" times "z1" into "z2".
+"x" is a double-type variable, and "z1" is a Complexe-type variable.
+In principle, we could choose for the rewriting between "z2 = x.operator* " with an internal overloading (call to a method) or "z2 = operator* (x, z1)"
+(call to a function).
+However, it is obvious that the first line makes no sense at all.
+Indeed, "x" is not a class instance but a so-called basic  type, a double.
+"double" is not a class, there are not methods in "double".
+This solution is thus impossible.
+Here, we have no choice but to resort to the external overloading, thus using functions.
+Similarly, in the case where we would like to print a complex number, for example doing "cout << z1 ", using the overloading of the printing operator less than-less than (<<), we could have two possible ways to write it.
+Either with the method "operator<<" of the class where "cout" is an instance
+(the class "ostream"); in this way, we are calling the method of this "ostream" class, or, we could use a function taking here the 2 parameters "cout" and "z1".
+However, here, we only care about overloading the "Complexe" class and definitely not about meddling with the "ostream" class where "cout" is an instance.
+There, in this case, aswell, we will never use the internal overloading of the "ostream" class.
+Instead, we will prefer the external overloading.
+Let us thoroughly examine these 2 examples, starting with the outer multiplication.
+Be reminded that we have declared a double, "x" here.
+We also have two "Complexe" : z1 and z2.
+We wish to compute the multiplication of "x" and "z1" and store the result into "z2".
+The equivalent call would be
+"z2 = operator* (x, z1); ".
+This gives us the prototype.
+The function returns a complex number.
+For the same reasons, which will be explained later, we will rather pick "const".
+We will have "operator* " and then, we are taking a "double" and a "Complexe".
+For optimization reasons, we will pass it  by constant reference.
+We thus end up with the following prototype.
+For the definition, we could either write all the operations explicitly for the multipllication of this double "a" here and this "Complexe" "z".
+Or, if we suppose that the inner overloading exists
+(which is very possible for complex numbers but not possible for all classes).
+But when it is possible, that the internal overloading exists
+(please note we have swapped the other and started by multiplying by "z" ).
+Since something exists able to do "Complexe" times "double", that is, either an internal overloading of the "Complexe" class taking a double, or an already written, external overloading, the multiplication of "Complex" first by a "double" then
+(no matter which solution is chosen).
+What matters is that writing "a" times "z" is mathematically the same thing as "z" times "a".
+In such a case, with this kind of equality, we do not want to write the same code twice but instead use already written code.
+For the printing operator, we may wish, for example, to do 
+"cout << z1 ".
+Here, z1, is of course a complex number.
+Be reminded that the equivalent call would be an external overloading of the function
+"operator<<" with "cout" and z1 as arguments.
+This gives, as the prototype of the function :
+"operator<< ". Here is the type of "cout" and here a "Complexe" which we pass once again, for optimization reasons, by constant reference.
+By the way, "cout" is, an instance of the "ostream" class, is passed by reference.
+Indeed, the very printing
+"cout << z1 " will indeed modify "cout" since we will write informations on "cout", thus modifying it.
+Since we are modifying this argument, we absolutely need to pass it by reference.
+We will give you the return type of this function right away so that you may write correctly this printing operator. The return type is also an "ostream&".
+The reason behind this type will also be explained in the last video on operator overloading, regrouping all these subtleties.
+Let us now move on to the definition of this printing operator for complex numbers.
+The first solution is to use getters, for exemple "getX" or "getY", returning the attributes we wish to print.
+This leads to the following :
+Here we have received, as the first parameter, the output stream on which we wish to write.
+We are using this stream to print, for example, a parenthesis here.
+Let us say we have a complex number where "x" is 3 and "y" is 4.
+The idea is to print " (3, 4) "; this is the desired format for the printing here.
+Therefore, we write the opening parenthesis, then we retrieve the "x" of the complex which we have received as the second argument of this "operator<<" function.
+We now print the comma.
+Then, we print the retrieved value for the attribute "y" of this complex number "z".
+Then, we finish with the closing parenthesis.
+Then we do not forget, because of the return value
+"ostream&" here, to finish our function with a "return" of the output parameter.
+For now, please consider this mandatory in order to avoid unpleasant
+"segmentations faults" so that you can use "operator<<" correctly just like you do for int and double.
+A second possible definition is to use a previously defined method either to convert a "Complexe" into a character string or to directly print a complex.
+Let us look at this first solution.
+Here, we are again using the received stream to print the result of the call to the method "to_string" which transforms a "Complexe" into a character string.
+In its prototype, the return type is typically a a character string, that is, "string".
+The method belongs to the class "Complexe" and is called "to_string".
+It does not take any parameters.
+Also, it does not modify the current instance; indeed, modifying a "Complexe" into a character string does not modify this "Complexe".
+Therefore, we will call this method here, in "operator<< ".
+As previously, we finish by returning the first received argument.
+Another solution could to directly have a method
+"affiche" working just like "operator<<".
+(TN: "affiche" means "print").
+However, it would be a public method in the class receiving the stream on which we print and return this stream.
+Therefore, its prototype is very similar to the one of the printing operator, thus returning an "ostream".
+It is a method of the "Complexe" class.
+It is called "affiche", and it takes, as parameter, a stream it modifies.
+The stream is thus passed by reference.
+This method does not modify the printed complex number; when we print a "Complexe", we do not modify it.
+We conclude here with the keyword "const".
+Those were three possible examples of definition of the printing operator for our "Complexe" class.
+You may freely draw inspiration for your very own classes.
+By the way, please note (we are anticipating on a later subject) that it is prefearable to use these kinds of methods "to_string" or "affiche" when we will be dealing with polymorphism which will come later.
+When we are doing external overloading, it is sometimes necessary to access private attributes of the class on which we wish to apply the operator.
+Even if we think it is bad programming, and that we truly advise you to only use getters and the interface
+(the public part of the class), you may sometimes encounter this kind of practice
+(though we do not recommand to write it yourself) : here, you could be tempted to write
+"z.x" or here "z.y", that is, to directly access the private attributes "x" and "y" of the "Complexe" class.
+In this case, we need to give a priviliged access to this function, since it is outside the "Complexe" class. to give a privileged access to the private parts.
+We call this : declaring a friendship thanks to the keyword "friend".
+Once again, we strongly recommand that you rather use getters, that is, the public part of the class rather than the private part through this indirect way that is the keyword "friend".
+However, since you may encounter it, we will present it.
+If you have to disregard our advice and use a friendship, you will put, in the very definition of the class, a line like
+"friend" followed by the prototype of the function you wish to have access to the private parts of the class.
+Thus, we do it like this :
+"friend" followed by a the prototype of a function.
+This gives us the right to access the private methods and attributes of the class.
+Please note that the definition of these functions remains, of course, outside the class.
+Indeed, these functions have nothing to do with the class.
+We simply indicate in the class that we are giving access rights to these external functions.
+Let us look concretely what it would look like for complex numbers.
+Here, we have the "Complex" class.
+The private parts are the attributes "x" and "y".
+Here, we have our printing operator for complex numbers.
+All is as before.
+However, we have not followed the aforementioned advice
+(we do not recommand you do the same, of course).
+Here, we are trying to access the private parts.
+If we do not do anything particular, we will end up with a compiling error here : we are not allowed to access the private parts with an external function.
+In order for this to work properly, we need to add, in the "Complex" class, a line giving access rights (giving the "friendship") to this external function.
+We are simply putting its prototype after the keyword "friend".
+Adding this line means the given function can now access the private parts.
+Personally, we daresay this is a very poor idea, for it breaks the encapsulation.
+This concludes our episode on the external overloading.
+In the next episode, we will discuss the internal overloading.
+Also, we will tell you in which cases you should prefer either of these two overloading ways.
+Finally, in a last video, we will go back to all the details we have left aside.

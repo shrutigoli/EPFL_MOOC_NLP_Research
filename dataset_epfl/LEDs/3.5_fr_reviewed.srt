@@ -1,0 +1,704 @@
+1
+00:00:00,025 --> 00:00:10,025
+[AUDIO_VIDE]
+
+2
+00:00:11,460 --> 00:00:12,440
+Bonjour.
+
+3
+00:00:12,440 --> 00:00:14,540
+Nous allons faire un peu d'électronique.
+
+4
+00:00:14,540 --> 00:00:19,330
+Nous allons étudier un composant
+extrêmement utilisé dans les afficheurs et
+
+5
+00:00:19,330 --> 00:00:26,450
+également dans les enseignes, à LED,
+qui s'appelle le registre série parallèle.
+
+6
+00:00:26,450 --> 00:00:29,660
+Nous allons d'abord constater
+le besoin de broches
+
+7
+00:00:29,660 --> 00:00:34,620
+dans les enseignes et afficheurs à LED,
+nous allons étudier le registre série,
+
+8
+00:00:34,620 --> 00:00:39,040
+voir ses limites, nous allons
+étudier le registre série-parallèle,
+
+9
+00:00:39,040 --> 00:00:44,340
+puis un circuit particulièrement
+souvent utilisé, le 74HC595.
+
+10
+00:00:44,340 --> 00:00:49,340
+Nous allons également parler
+des registres à sorties à
+
+11
+00:00:49,340 --> 00:00:53,480
+courant constant, qui sont très
+intéressantes et finalement, bien entendu,
+
+12
+00:00:53,480 --> 00:00:59,660
+nous allons voir comment programmer
+l'accès à ces registres série-parallèle.
+
+13
+00:00:59,660 --> 00:01:03,590
+Il est clair que les enseignes et
+afficheurs à LED nécessitent beaucoup
+
+14
+00:01:03,590 --> 00:01:06,710
+de LED pour être
+intéressants et nécessitent,
+
+15
+00:01:06,710 --> 00:01:11,540
+par conséquent, beaucoup de broches sur le
+microcontrôleur qui doit les commander.
+
+16
+00:01:11,540 --> 00:01:16,590
+Beaucoup plus que ce que les
+microcontrôleurs habituels peuvent avoir.
+
+17
+00:01:16,590 --> 00:01:20,600
+Nous allons donc utiliser
+des circuits logiques pour
+
+18
+00:01:20,600 --> 00:01:22,690
+étendre en quelque sorte ces sorties.
+
+19
+00:01:23,770 --> 00:01:26,530
+Il y en a plusieurs qui
+peuvent être utilisées.
+
+20
+00:01:26,530 --> 00:01:30,200
+Je cite ici les Latch adressables,
+par exemple le
+
+21
+00:01:31,660 --> 00:01:36,610
+circuit 74HC259, il se trouve
+qu'on ne l'utilise pas énormément
+
+22
+00:01:36,610 --> 00:01:40,660
+dans les enseignes et afficheurs à LED,
+mais il pourrait être intéressant.
+
+23
+00:01:40,660 --> 00:01:46,190
+Ce que nous allons étudier maintenant,
+c'est les registres série-parallèle.
+
+24
+00:01:46,190 --> 00:01:49,440
+Regardons tout d'abord ce
+qu'est un registre série.
+
+25
+00:01:50,850 --> 00:01:57,260
+Nous avons un certain nombre de bascules,
+des bascules D.
+
+26
+00:01:57,260 --> 00:02:03,960
+Les horloges de chacune de ces
+bascules sont connectées ensemble
+
+27
+00:02:03,960 --> 00:02:10,700
+et la sortie d'une bascule va dans
+l'entrée de la bascule suivante.
+
+28
+00:02:10,700 --> 00:02:13,210
+Nous avons globalement un entrée,
+
+29
+00:02:13,210 --> 00:02:17,730
+nous avons aussi globalement une
+sortie à notre registre série.
+
+30
+00:02:17,730 --> 00:02:21,890
+Vous vous souvenez certainement du
+fonctionnement de ces bascules D,
+
+31
+00:02:21,890 --> 00:02:26,250
+au moment du flanc montant de l'horloge,
+la valeur qui est sur D
+
+32
+00:02:26,250 --> 00:02:30,420
+va être enregistrée dans la bascule
+et apparaître sur la sortie.
+
+33
+00:02:31,480 --> 00:02:37,695
+Si nous présentons à
+notre registre l'entrée
+
+34
+00:02:37,695 --> 00:02:43,805
+suivante avec cette horloge,
+on voit qu'à chaque flanc montant
+
+35
+00:02:43,805 --> 00:02:48,855
+de l'horloge, la valeur de
+l'entrée se place sur la sortie.
+
+36
+00:02:50,785 --> 00:02:52,885
+Mais au coup d'horloge suivant,
+
+37
+00:02:54,400 --> 00:02:59,520
+cette valeur sera décalée
+dans la bascule suivante.
+
+38
+00:02:59,520 --> 00:03:04,350
+Et l'on voit que cette première valeur,
+qui a été mise ici, va se transmettre
+
+39
+00:03:04,350 --> 00:03:09,624
+successivement et finalement,
+apparaître sur la sortie zéro.
+
+40
+00:03:10,915 --> 00:03:11,725
+De même,
+
+41
+00:03:11,725 --> 00:03:16,995
+la deuxième valeur ici va être saisie dans
+la première bascule à ce coup d'horloge,
+
+42
+00:03:16,995 --> 00:03:23,025
+puis être transmise aux bascules suivantes
+jusqu'à terminer sur cette sortie.
+
+43
+00:03:24,165 --> 00:03:32,260
+Nous avons donc réussi à placer ces
+huit valeurs sur ces huit sorties.
+
+44
+00:03:34,960 --> 00:03:39,840
+C'est intéressant mais le problème,
+c'est qu'il y a eu des parasites.
+
+45
+00:03:41,590 --> 00:03:46,160
+la valeur deux ici,
+est apparue sur la sortie sept,
+
+46
+00:03:46,160 --> 00:03:50,890
+sur la sortie six, sur la sortie cinq,
+etc jusqu'à finir à la sortie deux.
+
+47
+00:03:52,350 --> 00:03:54,130
+Or, sur des afficheurs à LED,
+
+48
+00:03:54,130 --> 00:03:58,020
+cela peut produire des effets
+lumineux catastrophiques.
+
+49
+00:03:58,020 --> 00:04:03,220
+Donc ce schéma ne convient pas bien,
+nous allons devoir le compléter.
+
+50
+00:04:03,220 --> 00:04:09,030
+Reprenons un registre série, ajoutons-lui
+
+51
+00:04:09,030 --> 00:04:14,660
+autant de bascules,
+toujours avec une horloge commune qui,
+
+52
+00:04:14,660 --> 00:04:19,070
+naturellement, est différente
+de l'horloge du registre série.
+
+53
+00:04:19,070 --> 00:04:23,480
+On a donc une horloge série
+et une horloge parallèle.
+
+54
+00:04:24,560 --> 00:04:31,320
+Les entrées du registre parallèle
+sont connectées sur chacune
+
+55
+00:04:31,320 --> 00:04:36,500
+des bascules du registre série et l'on
+voit bien, comment est-ce qu'on va faire?
+
+56
+00:04:36,500 --> 00:04:40,170
+On va faire venir la valeur ici,
+
+57
+00:04:40,170 --> 00:04:45,545
+puis en un seul coup d'horloge,
+l'amener dans chacune de ces sorties.
+
+58
+00:04:45,545 --> 00:04:49,090
+Qu'est-ce que ça donne sur
+un diagramme des temps?
+
+59
+00:04:49,090 --> 00:04:54,870
+On a bien évidemment exactement le même
+diagramme des temps que tout à l'heure,
+
+60
+00:04:54,870 --> 00:04:59,150
+avec ses sorties ici qui, finalement,
+prennent une valeur correcte,
+
+61
+00:05:00,660 --> 00:05:05,785
+mais si l'on prend maintenant
+les sorties parallèles, elles
+
+62
+00:05:05,785 --> 00:05:10,855
+seront maintenues à leur ancienne valeur
+jusqu'au moment de l'unique coup d'horloge
+
+63
+00:05:10,855 --> 00:05:15,525
+parallèle qui va faire arriver les huit
+nouvelles valeurs sur nos sorties.
+
+64
+00:05:17,345 --> 00:05:23,335
+On peut comparer ici les timings,
+on voit que l'on a une sortie propre ici,
+
+65
+00:05:23,335 --> 00:05:26,395
+on a eu une sortie polluée
+dans le cas précédent.
+
+66
+00:05:27,730 --> 00:05:33,620
+Voilà le symbole que l'on peut donner
+à ce registre série parallèle.
+
+67
+00:05:33,620 --> 00:05:38,269
+Il a des entrées,
+l'entrée des données, l'horloge série,
+
+68
+00:05:38,269 --> 00:05:41,810
+l'horloge parallèle, il a une sortie,
+
+69
+00:05:43,060 --> 00:05:48,550
+il a évidemment les sorties parallèles,
+on a très souvent également
+
+70
+00:05:48,550 --> 00:05:54,650
+une entrée Reset et une entrée qui permet
+d'activer les sorties Output Enable.
+
+71
+00:05:56,000 --> 00:06:03,780
+Voici le brochage de ce
+circuit intégré 74HC595.
+
+72
+00:06:03,780 --> 00:06:08,190
+Nous avons les deux alimentations
+placées de manière traditionnelle,
+
+73
+00:06:08,190 --> 00:06:11,620
+comme on le faisait toujours
+dans les circuits des séries 74.
+
+74
+00:06:11,620 --> 00:06:16,010
+Nous avons ici les huit
+sorties parallèles.
+
+75
+00:06:17,100 --> 00:06:20,270
+La sortie série,
+et les différentes entrées.
+
+76
+00:06:21,380 --> 00:06:25,485
+Ce qui est très intéressant,
+c'est qu'il est possible de mettre
+
+77
+00:06:25,485 --> 00:06:30,505
+plusieurs registres en cascade,
+c'est-à-dire les uns après les autres.
+
+78
+00:06:30,505 --> 00:06:34,860
+On voit bien qu'il faut
+continuer à brancher ensemble
+
+79
+00:06:34,860 --> 00:06:39,685
+les horloges série
+
+80
+00:06:39,685 --> 00:06:44,385
+et parallèle, qu'il faut connecter la
+
+81
+00:06:44,385 --> 00:06:49,070
+sortie d'un registre à l'entrée du
+suivant, et l'on pourrait continuer ici.
+
+82
+00:06:50,250 --> 00:06:55,310
+Vous voyez que l'on a pu ici,
+avec trois broches du microcontrôleur,
+
+83
+00:06:55,310 --> 00:07:00,070
+commander 16 sorties
+qui peuvent par exemple
+
+84
+00:07:00,070 --> 00:07:04,130
+commander seize LED,
+ou même 16 groupes de LED.
+
+85
+00:07:05,280 --> 00:07:08,890
+Attention tout de même,
+il s'agit de sorties,
+
+86
+00:07:08,890 --> 00:07:13,200
+nous aurons besoin de résistances
+série pour commander les LED.
+
+87
+00:07:14,700 --> 00:07:19,140
+Il existe des registres que l'on
+appelle à sorties à courant constant.
+
+88
+00:07:19,140 --> 00:07:25,380
+Vous voyez qu'ici,
+il y a nos trois entrées habituelles,
+
+89
+00:07:25,380 --> 00:07:30,900
+les deux horloges et le data,
+la sortie série,
+
+90
+00:07:30,900 --> 00:07:35,660
+nous avons également le reset et
+l'output enable, mais nous pouvons,
+
+91
+00:07:35,660 --> 00:07:39,710
+ce qui est intéressant, connecter
+directement des diodes lumineuses,
+
+92
+00:07:39,710 --> 00:07:42,060
+sans qu'il y ait un
+dépassement de courant.
+
+93
+00:07:42,060 --> 00:07:47,840
+Cette unique résistance permet de
+déterminer le courant qui va passer dans
+
+94
+00:07:47,840 --> 00:07:54,760
+chacune de ces sorties, bien entendu,
+lorsqu'elles sont actives à zéro.
+
+95
+00:07:54,760 --> 00:07:59,790
+On voit bien ici que c'est un
+zéro qui va allumer la LED,
+
+96
+00:07:59,790 --> 00:08:03,930
+puisqu'elles sont connectées
+ici à l'alimentation positive.
+
+97
+00:08:03,930 --> 00:08:06,870
+De tels circuits sont proposés
+par plusieurs fabricants,
+
+98
+00:08:06,870 --> 00:08:11,720
+comme Toshiba, comme Texas Instruments,
+comme Allegro.
+
+99
+00:08:13,060 --> 00:08:17,020
+On trouve aussi un circuit très
+fréquemment dans les afficheurs du
+
+100
+00:08:17,020 --> 00:08:20,618
+commerce, il s'appelle parfois SUM2016,
+
+101
+00:08:20,618 --> 00:08:26,740
+sa particularité est que sa documentation
+
+102
+00:08:26,740 --> 00:08:31,840
+n'est qu'en chinois, je n'ai jamais trouvé
+une documentation anglaise de ce circuit.
+
+103
+00:08:31,840 --> 00:08:36,100
+On trouve aussi un circuit
+qui a ce numéro ici ISUM2016,
+
+104
+00:08:37,230 --> 00:08:41,900
+c'est un circuit chinois
+et je n'ai jamais trouvé
+
+105
+00:08:41,900 --> 00:08:45,460
+autre chose qu'une documentation
+en chinois pour ce circuit.
+
+106
+00:08:46,640 --> 00:08:52,930
+Tous ces circuits ont 24 broches avec ici,
+les deux alimentations en tête,
+
+107
+00:08:52,930 --> 00:08:56,580
+ici toutes les sorties,
+et les signaux de commande.
+
+108
+00:08:57,600 --> 00:09:02,310
+C'est extrêmement pratique d'utiliser ce
+circuit, puisqu'il a 16 sorties et qu'il
+
+109
+00:09:02,310 --> 00:09:07,660
+évite donc les résistances habituelles
+pour limiter le courant dans les LED.
+
+110
+00:09:08,870 --> 00:09:12,150
+J'ai cité l'exemple de ce circuit chinois,
+
+111
+00:09:12,150 --> 00:09:14,880
+et c'est une question qui es plus
+importante qu'elle n'y paraît.
+
+112
+00:09:16,170 --> 00:09:19,140
+Les chinois sont extrêmement
+actifs dans le domaine des LED.
+
+113
+00:09:19,140 --> 00:09:22,250
+On trouve énormément de
+produits très intéressants,
+
+114
+00:09:22,250 --> 00:09:25,990
+mais on a parfois de la peine à
+trouver la documentation en chinois.
+
+115
+00:09:25,990 --> 00:09:30,340
+C'est certainement de bonne guerre de leur
+part mais parfois, en tant qu'ingénieur,
+
+116
+00:09:30,340 --> 00:09:35,070
+on est un petit peu frustré de ne pas
+trouver de la documentation en anglais.
+
+117
+00:09:35,070 --> 00:09:38,810
+Essayons de regarder comment
+nous pouvons programmer
+
+118
+00:09:38,810 --> 00:09:42,530
+l'envoi de données sur
+ces registres-série.
+
+119
+00:09:42,530 --> 00:09:44,700
+Comme d'habitude, nous allons définir
+
+120
+00:09:46,230 --> 00:09:51,540
+des macroinstructions
+pour la sortie on et off,
+
+121
+00:09:51,540 --> 00:09:56,320
+l'horloge série haut et bas,
+,l'horloge parallèle haut et bas.
+
+122
+00:09:57,890 --> 00:10:02,090
+Et voilà une procédure très simple,
+qui permet d'envoyer une valeur,
+
+123
+00:10:02,090 --> 00:10:08,160
+dans ce cas-là de huit bits,
+on a donc bien une boucle for
+
+124
+00:10:08,160 --> 00:10:14,150
+qui va s'exécuter huit fois,
+qui va mettre selon
+
+125
+00:10:14,150 --> 00:10:19,000
+le bit numéro i la sortie a1
+
+126
+00:10:20,130 --> 00:10:25,515
+ou a0, qui va ensuite envoyer un coup
+d'horloge en faisant monter puis
+
+127
+00:10:25,515 --> 00:10:30,745
+en faisant descendre l'horloge parallèle,
+tout cela donc dans chaque itération de
+
+128
+00:10:30,745 --> 00:10:36,385
+cette boucle, et tout à la fin,
+une seule activation de l'horloge,
+
+129
+00:10:36,385 --> 00:10:41,475
+pour que le registre parallèle,
+donc les sorties, reçoive les données.
+
+130
+00:10:41,475 --> 00:10:46,395
+Remarquez que dans ce programme,
+nous avons un & logique entre une valeur,
+
+131
+00:10:47,990 --> 00:10:52,010
+c'est l'entrée, et 1 décalé de i.
+
+132
+00:10:52,010 --> 00:10:55,540
+Alors cette valeur 1 décalé de i doit
+être calculé huit fois et c'est un peu
+
+133
+00:10:55,540 --> 00:10:58,700
+compliqué pour le microcontrôleur,
+cela prend du temps.
+
+134
+00:10:58,700 --> 00:11:03,250
+Une variante plus efficace
+permettra de faire le masquage
+
+135
+00:11:03,250 --> 00:11:08,210
+toujours avec le bit 0
+mais de décaler la valeur
+
+136
+00:11:08,210 --> 00:11:13,910
+en direction de la droite à chaque
+itération de cette boucle for.
+
+137
+00:11:13,910 --> 00:11:18,640
+Ce type de détail a son importance.
+
+138
+00:11:18,640 --> 00:11:22,480
+La programmation de l'envoi des
+données depuis un microcontrôleur
+
+139
+00:11:22,480 --> 00:11:25,940
+vers des afficheurs, lorsqu'ils
+deviennent un tout petit peu grands,
+
+140
+00:11:25,940 --> 00:11:30,790
+est extrêmement critique en temps, et nous
+verrons plus tard des techniques beaucoup
+
+141
+00:11:30,790 --> 00:11:33,790
+plus évoluées pour gagner du temps,
+pour être efficace.
+
+142
+00:11:35,590 --> 00:11:39,940
+Nous avons vu comment résoudre
+ce besoin de broches,
+
+143
+00:11:39,940 --> 00:11:44,780
+en utilisant des registres série et mieux,
+des registre série-parallèle.
+
+144
+00:11:44,780 --> 00:11:49,480
+Nous avons vu quelques exemples de
+circuits registre série-parallèle,
+
+145
+00:11:49,480 --> 00:11:54,000
+et finalement, nous avons vu comment les
+programmer, pour leur envoyer des données.

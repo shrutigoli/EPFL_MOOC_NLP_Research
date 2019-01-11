@@ -1,0 +1,112 @@
+Hello!
+It is clear that microcontrollers are ideal for carrying out automation tasks.
+In the French-speaking world, when we talk about automatism, we always talk about Grafcet.
+And then, often my students tell me,
+"Oh, if I want to do a Grafcet, then I have to buy a programmable controller."
+Et bien pas du tout !
+The Grafcet, it is quite as possible to program them, and that is what we are going to do today.
+So, I will not repeat the Grafcet theory, it would be too long.
+I will just give a few reminders that will help us for what we have to do.
+Then we will see how to program in C a Grafcet?
+And of course we will apply it to the example we see for the fourth time, the famous example of the drill that goes down and goes up.
+Then you recognize here an example of Grafcet.
+Compared to the state graph we used, there are a number of differences that are details:
+The stages of the Grafcet are what were called stages:
+The initial step, the initial steps, we will see why.
+Transitions are the same as in state graphs.
+We speak of receptivity, it corresponds to the condition linked to a transition.
+We may have divergences in OR, this is the case here.
+This is the same as in state graphs.
+From this stage, we can arrive at that one or arrive at that one according to whether this transition or this transition will be crossed.
+However, the divergences in AND are some things that do not exist not in the state graphs.
+Here, if this condition if this transition is crossed, we will activate both this step and this step.
+This means that you can have two or more active steps at the same time.
+While in a state graph, one and only one state was always active at a given time.
+This generalization is extremely interesting, extremely powerful, it is in a way the multitasking of automatism.
+So let's start writing our program in C:
+We will define the number of steps we will have in our Grafcet or the maximum number, the number of transitions that will appear in such a way that we can create a table that s 'Calls Steps and a second table called Transitions.
+In fact, these 2 arrays will contain
+Boolean values thus considered as True or False.
+If a step is active, the corresponding value will be true.
+If it is inactive, it will be false therefore equal to 0.
+The same for transitions
+If a transition can be crossed then the value that is in this table will be true.
+As in all programs, there will be a procedure of initialization of the inputs and outputs.
+I will not go into details, it will obviously depend on the processor used.
+We have a procedure here that allows to read
+The inputs, the set of inputs.
+The idea is at one point, to read all entries, one and only once.
+Then,
+We will be able to look at the logical conditions on these inputs on which the transitions depend.
+But if we did several readings, we could have inconsistencies so it is extremely important to have a variable that will contain the value of the input read at the beginning of the procedure.
+I look at the main program:
+Initialization of inputs and outputs.
+Initialization of the steps: they will all be inactive except the step (s), here perhaps the first, which will be activated.
+But I remind you, there could be several initial steps.
+The principle of the Grafcet allows to have several active steps at the same time.
+Then we have an infinite loop that will repeat these procedures.
+First thing: I affect the outputs.
+Like the first time, I already have at least one active step.
+I can, according to the active steps from where active steps, affect the outputs correctly.
+I remind you that the output values depend only on the step or the active steps. then,
+We will perform this procedure which binds the inputs and which stores in these variables the values of the inputs.
+And then, we go successively, calculate the transitions: are they crossable?
+Next,we will deactivate the steps for which a transition passable justify deactivating it and activate the steps that are the result of the transition transition.
+This is the very principle of the Grafcet, it is the rules of evolution of the Grafcet.
+You find this principle in all... the documents that describe what a Grafcet is.
+So I go back to the details on these few procedures.
+The one that calculates the transitions, it will be necessary to look for a given transition, of which stage it depends?
+At what stage is it connected up, up, upstream?
+It is necessary apply the receptivity, we must make the logical AND of these 2 conditions
+And it is memorized whether this transition can be crossed.
+Then for the deactivation, again, it will be necessary to look at the Grafcet and to look that if this transition can be crossed then this stage must be deactivated.
+And in the same way, if this transition can be crossed, at what stage, what next step must be activated?
+And finally, assign the outputs according to the step that is active.
+If this step, and it will be done for the following ones is also active, then  we write the output values according to the definition of the step.
+Perhaps an example, where we will facilitate understanding.
+Our drill,
+I hope you remember, we had described it by a graph of states:
+Stop, descent, climb, three transitions.
+Let us design a perfectly equivalent Grafcet:
+Stop, descent, climb.
+Transitions with Start receptivities, bottom and top
+And for each of the steps, the output values:
+And for each of the steps, the output values:
+Advance is activated, that's what we have there.
+Backspace is activated, that's what we have there.
+So let's look at how we can write this program for the drill.
+Our variables: steps and transitions, the names of the steps that will also be the indices with the enum, the variables in which the entries will be stored, it is precisely in this procedure that these variables are read.
+For the calculation of the transitions: for each of the transitions, we will look at what is the previous step?
+What is receptivity?
+Logical AND is set and the value is stored.
+Here, the stop corresponds to Start.
+When we're going downhill, it's low we'll wait.
+When we are climbing, it is Haut that we will wait.
+We will then be able to deactivate the steps which can be crossed.
+If this transition can be crossed,
+So then the previous step is deactivated, in the same way for the other transitions.
+Similarly, we will activate the steps that must always be in function of the transition.
+And here, we go downhill, uphill and off.
+And finally the procedure Affects Outputs will simply take into account the different values.
+I have to write the Advance downhill value and the Retreat uphill value.
+We finally have the main program that looks the same as what we had earlier.
+Initialization, resetting, inactivating all the steps, activating the first step and this loop which continuously performs these procedures:
+Assign outputs, read inputs, calculate transitions, disable steps that have been crossed, activate the following steps.
+So, you might tell me it's very complicated for this program of the drill that we managed to write infinitely simpler.
+True, for a simple Grafcet, it's too complicated
+And for a complicated Grafcet, it's going to be much simpler, because the method,it is systematic.
+We take care of the stages, we take care of the transitions, we take care of the entrances, we take care of the outings.
+Once we've done everything, it works the first time if we do not make mistakes.
+It is often necessary to add timers in the Grafcet.
+And our system lends itself perfectly to it.
+It will suffice to add a delay in the main loop.
+You remember, we have done that on several occasions.
+For example, 1/100th of seconds. and then
+In the main loop for each Timer that has been initialized at the beginning of 0, we will write if the Timer is greater than 0 then it is decremented.
+So it is necessary to understand that at the moment when one enters for example in a step which requires a Timer, the timer is initialized with the right value and then it will suffice to test if it is equal to 0 to know if the time in question has been expired.
+When we have several Timers, we will proceed in the same way with a Timers array that is initialized to 0 for the number of Timers we have planned
+And in the main loop, again for each Timers, we will test s 'they are greater than 0 and decrement if this is the case..
+Here is the Delay, waiting for 1 / 100th of seconds from the main loop.
+And for example, for the calculation of a transition, we can add if Timer number 3 is equal to 0 then we will do this or that.
+So I wanted to show you that it is possible to program Grafcet with a microcontroller.
+With the habit, it is not complicated and sometimes it is much cheaper than buying a PLC.

@@ -1,0 +1,170 @@
+Now let's look at logic programming, and specifically at Datalog.
+We can think of Datalog as first-order logic, with negation removed.
+That means positive first-order logic, negation removed, and also universal quantification removed.
+And instead we have recursion added, the notion of recursion, we're going to talk about this.
+So, there's a more general notion of Datalog, called Prolog, which actually is older, and it's really a full Turing-complete programming language, while Datalog is a restricted language, which doesn't have the full expressive power of a Turing-complete programming language, and Prolog extends Datalog by a notion of function symbols, we'll see that later.
+But Datalog--a program which consists of a set of rules, and a rule consists of a right-hand side, and an implication to left, the left-hand side is the so-called head, the right-hand side is the body.
+So if the body is true, then the head must also be true, that's the implication.
+Now, the head and body, they have variables inside.
+It's really a fragment of first-order logic, so we've got these kind of atomic formulas with variables inside, and we're testing, so to say, whether something is true by unification--we unify variables of constant symbols for the input database, so if I can make a unification, a function that maps every variable in my rule to constants, in such a way that the body atoms are all in the database already, then the head atom, that I also get by feeding the variables, even replacing them by constants, must also be true.
+It can be conceptually added, so to say, to the results.
+So that's the meaning of single rule.
+In general, rules can be recursive, which means that the head's predicate might also occur in the body.
+So here's an example.
+Here I've got a two-rule program, that computes the transitive closure of a graph.
+The graph is given by its edge relation, E here, that's what we care about, E.
+And we've got two rules--
+The first says that every edge of the graph is in a transitive closure, and if I can connect two edges in transitive closure, and to the transitive step, is again a transitive closure.
+It means if the transitive closure so far contains edges X to Y, and Y to Z, then X to Z must also be in a transitive closure.
+And I can think of this as a recursive, a recursive step, and recursively we add more and more stuff, then we can add nothing more and I've got the transitive closure finished, so to say.
+So I can think of a fixed-point semantics here,
+I add and add until I cannot get more.
+But there is alternative semantics to this Datalog language, again.
+There is again this kind of cryptomorphism.
+We've got three different semantics we're going to talk about: fixpoint semantics, proof-theoretic semantics, and, we're going to start with that, model theoretic semantics.
+In the model theoretic semantics we can think of the program, the set of rules, as logical sentences that state a property of the result.
+It means that you take the rules and you universal quantify over all the variables.
+So that way it becomes self-contained sentences, boolean sentences, boolean formulas, and you take this kind of combination, the end of all these universally quantified boolean formulas, and that's again a huge boolean formula, and now we can ask,
+"give me a set of facts," a relational database, let's say.
+Is that big formula, this combined program, true on that, on that database,
+If so, then this database is called a model, we have already said that, right?
+And now we can talk about-- there might be many different models, but there is a single, unique, minimal model, and this minimal model can also be obtained by computing the intersection of all possible models.
+So that's model theoretic semantics.
+Now along with these three semantics
+I'm going to talk about, and I've mentioned to you, the model theoretic semantics is the only one that is truly declarative, because there I don't have the idea of iterating and computing recursively, and so on--there's no computation here.
+There is just a definition of what you want to have.
+What do I want to have?
+The minimal database on which, that is consistent to input, and on which all these formulas, all the rules, are true.
+So the rules don't compute new stuff, but they're basically just implication formulas that say,
+"if this is true, then this must be true," and otherwise, it's not a model.
+And of all the models, we take the minimal one.
+So that's a truly declarative semantics.
+We say <i>what</i> we want, rather than <i>how</i> to compute it.
+Example here, again, this is again our principle example, now I actually called the edge relation G, not E, but otherwise the same thing, and I've got a concrete example.
+I don't give it as a relational table,
+I give it as a graph, so on the right-hand side, at the top, you got a graph, you've got three nodes, 1, 2, 3, and you've got edges, one from 1 to 2, and 2 and 3 have mutual edges.
+Now, what is the transitive closure of those?
+Actually the leftmost of the bottom solutions.
+I just have to add a single edge, from 1 to 3, and I've got point loops at 3 and at 2.
+This is actually very hard to see, but there are point loops at 2 and 3.
+Now, the middle one is not a solution, because the edge from 1 to 3 is missing.
+So in particular, this is not a model at all.
+And the right-hand solution has everything that the left-hand solution has, plus some additional edge, going back from 2 to 1.
+So this is a model.
+The formulas are true, but it's not a minimal model, so it's not a solution.
+There's a unique solution-- it's the left-hand solution here.
+So why do we take the minimal model among all those?
+Well, we can philosophically argue that you have something like closed-world assumptions.
+Everything that you don't specify explicitly, that you don't add to the database, you implicitly assume to be false, unless the program forces to become true.
+So in a sense, database are incompletely specified, you don't explicitly say-- in a database you've got a finite set of tuples, and implicitly you say everything that is not in there is supposed to be wrong
+It would be very hard to enumerate this infinite number of tuples that are not true, explicitly these are not true.
+That is not possible in a finite database.
+So the idea is that way, that we kind of say closed-world assumption, implicitly everything that is missing is false, and that leads us to the minimum model semantics.
+Also it is the only reasonable, unique thing.
+It's the intersection of all possible models.
+The union of all models would be infinite, which also would be unique, of course, but it's meaningless to talk about this.
+Let's talk about the alternative, fixpoint approach.
+So the idea is that the semantics of a program is defined as a particular solution to a fixpoint equation, so the idea is-- you can think of the end-type program as a fixpoint equation.
+Take a database, such that-- think of these rules as adding new stuff, these rules don't add anything any more.
+Everything that the rules could add, given this database, we have already added before, so that's a fixpoint.
+So fixpoint is not about recursively adding stuff, bottom-up evaluation, although in practice we would do it that way, but fixpoint is about saying,
+"this formula doesn't compute anything new."
+It is happy with its result.
+So being a fixpoint is a bit like, what we have said before, that it's a model.
+And now we require it's the minimal fixpoint, and to get the minimal fixpoint a kind of bottom-up relation, forcing, forward chaining, would use more tuples from the initial input database, and stopping, as we don't get any more results forced.
+That would be a fixpoint reached.
+We've got the same example again, and conceptually, what I do is
+I look at my first rule, initially my result is empty.
+I've got the input database.
+Here, in database terminology we call the input the extensional database.
+That's the stuff that is there, extensionally given explicitly, using tuples, and the IDB, the intensional database, is the result, that includes those that are implicitly given by the rules.
+So we're committing the IDB and the input is to EDB.
+So we start by taking, let's say, the first rule, because the second rule by itself, given that there's nothing yet in the results, in T, we cannot commit anything new.
+There is no unification of error, there is no mapping for the variables x, y and z to constants 1, 2, 3, such that T becomes true, because T is empty.
+So initially, the second rule cannot fire.
+But the first rule can fire, and it can add all these three tuples, all these three edges that are in the input database.
+So we can do this in the first step.
+So this is conceptually, a next iteration, bottom-up.
+If I apply this rule again it doesn't add anything new, so to say.
+We conceptually, in every step can try this first rule again but it will never present anything new, so we can actually forget about it.
+But the second rule can now add new stuff.
+What can it add?
+Well, suppose you take the tuple (1, 2) as G of sets.
+So <i>x</i> is 1, and <i>z</i> is 2.
+Then you can actually take
+<i>y</i> to be 3, <i>z</i> must be 2, and that way, going from
+(<i>x, y</i>), from 1 to 3, we can add this new edge.
+But that's not the only solution.
+I can also go from 2 to 3, that's G.
+So <i>x</i> is 2 and <i>z</i> is 3, and I can take <i>y</i> being 2,
+<i>z</i> again is 3.
+And if you take the path from 2 to 3 and back to 2, and that, as transitive closure, gives me a loop from 2 to 2.
+So I add this one as well.
+And the same element can be taken to actually add loop 3 to 3, and from then on there is nothing you can compute.
+I iterate as many times as I like--
+I've reached a fixpoint,
+I don't require to add anything more, so that's the solution.
+And it's the same solution that you also got by taking the minimal model.
+Now let's look at the final semantic, the proof-theoretic semantics.
+This one is particularly interesting because it's the only way to give a semantics to Prolog, the channelization of Datalog.
+So the idea there is that we don't compute the entire result, the IDB, but we test for a single fact, a single tuple, whether it is to be in the result, and how do we do this?
+We are going to construct a proof tree, top-down, so to say.
+It could be thought of-- the computation of the fixpoint is a bottom-up evaluation and now we're going to do a top-down evaluation, starting with a result, we test it for the result, we create a proof tree that shows that it must be in the result.
+So how do we do this?
+So let's assume that we want to ask whether (1,3) is in the transitive closure.
+So we're going to try to basically build a proof tree that it must be in there.
+And at each of these intermediate nodes we're going to say we have to choose
+[inaudible] conceptually, a rule that you're going to use to expand the proof tree.
+In this case we use rule 2.
+That means we're going to have to find a suitable G of (<i>x,z</i>), but in this particular case,
+I know already <i>x</i> must be 1, because it comes from here.
+Because <i>x</i> is on the left-hand side here.
+We know what <i>y</i> is, and it's 3, so actually <i>y</i> here, T, must be 3.
+But we have to now guess a value for <i>z</i>, and if we guess 2, this is an non-deterministic technique, otherwise you would, in general, just kind of an exponential search, or something like that, but now for this, let's guess 2.
+Well, if we guess 2, we can continue, because we can now apply-- we can check, actually G(1,2) is an input database, so we're done here.
+That branch of the proof tree is done, and was successful.
+So we now have to continue, and still have to prove that T(2,3) must be in the result.
+Well, actually we can do this by actually just choosing that-- the first rule has to be used here to expand it-- that means it just says then G(2,3) must be enabled, or must be inferable, in this case actions and inputs, and we're done.
+We've proved all the leaves, and we're done, and we've proved that T(1,3) indeed is in the result.
+So that's the proof-theoretic semantics.
+So in summary, we've shown you and discussed three equivalent approaches for giving a semantics: the model theoretic, the fixpoint theoretic, and the proof theoretic semantics, and they are all equivalent.
+So the model theoretic one was the truth declarative one.
+The others, maybe a bit more about how to compute things.
+But they are all equivalent with, again, there's this kind of cryptomorphism.
+You've got an elegant "surprise," and that suggests this is a robust language.
+There are many different ways of thinking about it, and there's maybe different ways of approaching different technical problems, like evaluation.
+Here's a more interesting example.
+We're going to simulate a finite state machine, and we're going to model this as follows.
+Actually the first part here, is actually just input modeling the input word to the finite state machine, it's a string machine, and it says we've got eight character positions, and if modeled, these positions 1 to 8, so we haven't [inaudible] explicitly, otherwise we could, of course, make this built-in, if you like.
+There's a successful relation that says first step one, then two, then three, then four, and so on, up to eight.
+And we have labeled these positions 1 to 8, we have a character <i>a</i> or <i>b</i> here, so actually the word is <i>abababab</i>, an eight-character word, on which we're going to run-- this is actually input, that's data.
+It's written as unconditional rules, heads with empty bodies, if they're all true, facts, or we could have thought of them as database tables.
+And as most of--that's also data, which actually models the finite state machine.
+So what does it look like?
+We've got the delta relation, we've got the starts and we've got the final states.
+So we've got actually just two states, <i>q1</i> and <i>q2</i>,
+<i>q1</i> and <i>q2</i>.
+The start set is <i>q1</i>.
+The final state, the only final state, is also <i>q1</i>.
+The transition relation is-- well, I can get from <i>q1</i> to <i>q2</i> using either symbol <i>a</i> or <i>c</i>, and I can get back to <i>q1</i> using <i>b</i>.
+So, in other words, obviously a regular expression is
+<i>a</i> or <i>c</i>, dot <i>b</i>, star.
+And <i>abababab</i> is a special case, it's a word that this machine accepts.
+So I clean up, and let's now look at the final part, which is actually the encoding of the semantics of the finite state machine,
+So, remember, the standard definition of the semantics of the finite state machine is given by the notion of a run.
+So the run is a function that maps every position in the word to a state, and we accept if the final position is mapped to a final state.
+Actually we're going to have points right after a symbol, which is a position, and we're going to ask which state to assign to this.
+So with the first rule we're going to check. first(P) only maps P to 1, the start state is also going to be <i>q1</i>.
+The delta function--let's now, actually we can commit several things, but we could make a run using <i>c</i> or with <i>a</i>, but actually we the symbol of the word at position <i>a</i>--
+1 is <i>a</i>.
+So we have <i>a</i>, <i>q1</i>, and that means
+<i>q</i> must be--
+[inaudible] the machine here--<i>q2</i>.
+So we're getting at the end of position 1 into <i>q2</i>, so actually run will compute 1, <i>q2</i>.
+Now the next step will be, actually we're going to apply the second rule, we're going to make a step.
+So we've got 1 and <i>q2</i> here, and we can pick the success of 1, which is going to be 2, and the delta relation for state <i>q2</i>, for the next symbol, the symbol position 2, which is <i>b</i>, is going to be to <i>q1</i>, because we have a position <i>b</i> being 2, and symbol <i>b</i> there.
+So we are going to thus compute, at position 2, state <i>q1</i>.
+So we are going to be next in state <i>q1</i>
+Now we can actually recursively use this rule a few more times, and you're going to compute state <i>q2</i>, state <i>q1</i>, state <i>q2</i>, state <i>q1</i>, state <i>q2</i> and state <i>q1</i>, that's all of the second rule.
+And now we're in the position that actually has a run, at position 8, and we're in state <i>q1</i>, and the last position is actually 8, and the final state of <i>q1</i>, a final state, so we are going to accept.
+So we compute this final boolean, predicate accept, and if it would not be an accepting run, then we would not be able to compute that.

@@ -1,0 +1,1085 @@
+1
+00:00:00,000 --> 00:00:08,930
+Bonjour, nous continuons le cours
+"Comprendre les microcontrôleurs".
+
+2
+00:00:08,930 --> 00:00:14,360
+Et aujourd'hui, nous allons parler de
+manipulation de champs de bits.
+
+3
+00:00:14,360 --> 00:00:17,960
+Oh, ne soyez pas effrayés de ce nom un
+petit peu compliqué.
+
+4
+00:00:17,960 --> 00:00:21,281
+Il va s'agir tout simplement d'être
+capable de
+
+5
+00:00:21,281 --> 00:00:25,971
+jouer avec des bits individuels à
+l'intérieur de registres.
+
+6
+00:00:25,971 --> 00:00:32,121
+On va donc, au cours de cette leçon,
+chercher à manipuler d'une manière
+
+7
+00:00:32,121 --> 00:00:37,780
+indépendante les bits pour les mettre
+mettre à 1, il s'agira du "set
+
+8
+00:00:37,780 --> 00:00:43,440
+bit", les mettre à 0, le "clear bit", et
+en tester la valeur.
+
+9
+00:00:43,440 --> 00:00:47,010
+Donc je rappelle la problématique :
+
+10
+00:00:47,010 --> 00:00:50,946
+le microcontrôleur voit des ensembles de
+bits,
+
+11
+00:00:50,946 --> 00:00:55,400
+des registres, par exemple 8 bits,
+c'est-à-dire un
+
+12
+00:00:55,400 --> 00:01:00,186
+octet, un byte, ou encore 16 bits, ou
+encore 32 bits.
+
+13
+00:01:00,186 --> 00:01:05,715
+Par contre l'application, qu'on est en
+train d'écrire, souhaite
+
+14
+00:01:05,715 --> 00:01:10,638
+généralement voir des bits indépendants.
+Par exemple,
+
+15
+00:01:10,638 --> 00:01:16,000
+j'ai un port, il y a deux diodes
+lumineuses connectées, il y a
+
+16
+00:01:16,000 --> 00:01:20,345
+un bouton poussoir connecté, Je
+m'intéresse à chacune des
+
+17
+00:01:20,345 --> 00:01:25,090
+diodes lumineuses, je m'intéresse au
+bouton poussoir, je n'ai pas
+
+18
+00:01:25,090 --> 00:01:28,946
+envie de réfléchir au niveau d'un mot de 8
+bits,
+
+19
+00:01:28,946 --> 00:01:33,950
+j'ai bien envie de réfléchir plutôt à mes
+bits séparés.
+
+20
+00:01:33,950 --> 00:01:39,020
+Comment utiliser le langage C pour faire
+ces manipulations de bits?
+
+21
+00:01:39,020 --> 00:01:41,230
+Est-ce que cela engage qu'il, je vous
+
+22
+00:01:41,230 --> 00:01:44,332
+le rappelle, a bien quelques dizaines
+d'années,
+
+23
+00:01:44,332 --> 00:01:47,060
+avait été prévu pour faire ces opérations.
+
+24
+00:01:47,060 --> 00:01:50,804
+Et bien oui, il a effectivement été prévu
+pour le faire.
+
+25
+00:01:50,804 --> 00:01:55,588
+Je vous propose de commencer par un
+exemple, la mise à 1 d'un bit à
+
+26
+00:01:55,588 --> 00:02:02,060
+l'intérieur d'un champs de bits, il
+s'agira donc de l'opération "set bit".
+
+27
+00:02:02,060 --> 00:02:06,650
+Le mot "set" voulant dire aussi, en
+anglais, "mise à 1",
+
+28
+00:02:06,650 --> 00:02:09,030
+"activer", "mettre à 1".
+
+29
+00:02:09,030 --> 00:02:12,767
+Le problème se pose de la manière
+suivante.
+
+30
+00:02:12,767 --> 00:02:19,570
+J'ai un registre, par exemple un registre
+de sortie, les valeurs
+
+31
+00:02:19,570 --> 00:02:25,750
+qui sont dans X0 à X7 je ne les connais
+pas, je les ai notées de cette manière-là.
+
+32
+00:02:25,750 --> 00:02:32,110
+Et je souhaite qu'après une opération bien
+faite, je me retrouve
+
+33
+00:02:32,110 --> 00:02:37,131
+à avoir un 1 sur cette sortie.
+Mais que toutes
+
+34
+00:02:37,131 --> 00:02:42,140
+les autres valeurs aient conservé leur
+valeur initiale.
+
+35
+00:02:42,140 --> 00:02:46,200
+Je souhaite uniquement faire la mise à 1
+de ce bit.
+
+36
+00:02:46,200 --> 00:02:51,900
+Il me faut chercher une opération, donc
+ici une opération qui permet,
+
+37
+00:02:51,900 --> 00:02:57,090
+avec un certain opérant, de faire le
+travail souhaité.
+
+38
+00:02:57,090 --> 00:03:02,190
+Visiblement, une opération arithmétique ne
+va pas convenir pour ce type de travail.
+
+39
+00:03:02,190 --> 00:03:05,500
+On va donc se tourner vers une opération
+logique.
+
+40
+00:03:05,500 --> 00:03:10,704
+Et pour cela, il va falloir revenir à
+l'algèbre de Boole, dont
+
+41
+00:03:10,704 --> 00:03:13,980
+on a un tout petit peu parlé au début de
+ce cours.
+
+42
+00:03:18,185 --> 00:03:22,390
+Et je vais profiter de tester vos
+connaissances en vous posant la question :
+
+43
+00:03:22,390 --> 00:03:27,911
+Quelle est la réponse à ces quatre
+formules, dont deux utilisent
+
+44
+00:03:27,911 --> 00:03:33,630
+le "et" logique, deux autres utilisant le
+"ou" logique?
+
+45
+00:03:33,630 --> 00:03:37,220
+Je vous laisse quelques secondes pour y
+réfléchir.
+
+46
+00:03:41,845 --> 00:03:47,575
+La réponse est la suivante : X et 0
+
+47
+00:03:47,575 --> 00:03:52,980
+me donnent 0, On ne peut jamais avoir une
+sortie
+
+48
+00:03:52,980 --> 00:03:57,500
+de type "et" à 1 lorsqu'il y a un 0.
+Par contre, X et 1
+
+49
+00:03:57,500 --> 00:04:02,103
+me donnent tantôt 1, tantôt 0 selon la
+valeur de X.
+
+50
+00:04:02,103 --> 00:04:07,478
+Donc la réponse est X.
+De la même manière avec le "ou",
+
+51
+00:04:07,478 --> 00:04:13,270
+lorsque j'ai un 0, je maintiens la valeur.
+
+52
+00:04:13,270 --> 00:04:18,080
+Par contre lorsque j'ai un 1, c'est un 1
+que j'aurai à la sortie.
+
+53
+00:04:18,080 --> 00:04:23,380
+On dit parfois, en mathématique, que le 1
+est l'élément
+
+54
+00:04:23,380 --> 00:04:27,910
+neutre du "et" et que le 0 est l'élément
+
+55
+00:04:27,910 --> 00:04:32,700
+neutre du "ou".
+Je reviens au problème qui se posait tout
+
+56
+00:04:32,700 --> 00:04:33,620
+à l'heure.
+
+57
+00:04:33,620 --> 00:04:41,359
+Je souhaite tantôt conserver la valeur,
+tantôt avoir un 1.
+
+58
+00:04:41,359 --> 00:04:47,470
+Il faut donc que je cherche l'opération
+qui convient.
+
+59
+00:04:47,470 --> 00:04:53,204
+On voit bien que c'est l'opération "ou"
+qui tantôt est capable de donner comme
+
+60
+00:04:53,204 --> 00:04:57,736
+résultat la valeur X, tantôt la valeur 1.
+Il est donc facile de
+
+61
+00:04:57,736 --> 00:05:03,756
+voir l'opérande que je dois utiliser.
+Le 0 étant l'élément neutre du
+
+62
+00:05:03,756 --> 00:05:10,066
+"ou", je le place partout où je veux
+conserver la valeur et je place,
+
+63
+00:05:10,066 --> 00:05:15,910
+ici, le 1 là où je souhaite obtenir un 1
+après mon opération.
+
+64
+00:05:15,910 --> 00:05:20,810
+J'ai donc la formule, il suffit de
+l'écrire en C.
+
+65
+00:05:20,810 --> 00:05:23,600
+C'est l'occasion d'introduire
+
+66
+00:05:23,600 --> 00:05:28,486
+un nouvel opérateur en C, que nous n'avons
+pas encore vu, il
+
+67
+00:05:28,486 --> 00:05:33,680
+s'agit du "ou" logique qui est représenté
+par cette barre verticale.
+
+68
+00:05:33,680 --> 00:05:41,070
+P1OUT, c'est ce qui correspond au "après"
+est affecté, c'est
+
+69
+00:05:41,070 --> 00:05:48,415
+le signe égal, par la combinaison avec le
+"ou" logique de deux opérandes, P1OUT,
+
+70
+00:05:48,415 --> 00:05:51,794
+c'est ce que j'avais avant, et cette
+valeur,
+
+71
+00:05:51,794 --> 00:05:55,630
+que j'ai pour le moment écrite en binaire.
+
+72
+00:05:55,630 --> 00:06:00,302
+En regardant cette formule, j'avoue que je
+ne suis pas du tout satisfait.
+
+73
+00:06:00,302 --> 00:06:02,250
+Elle n'est pas très lisible.
+
+74
+00:06:02,250 --> 00:06:05,022
+Nous allons essayer de trouver une manière
+
+75
+00:06:05,022 --> 00:06:08,570
+plus simple d'écrire rigoureusement la
+même chose.
+
+76
+00:06:08,570 --> 00:06:13,770
+Première étape, je vais commencer par
+essayer d'utiliser le "ou égal",
+
+77
+00:06:13,770 --> 00:06:19,450
+qui est une syntaxe proposée par le C, qui
+permet de ne pas avoir à répéter le
+
+78
+00:06:19,450 --> 00:06:25,036
+même opérande mais qui le sous-entend
+comme étant un des deux opérandes.
+
+79
+00:06:25,036 --> 00:06:28,480
+C'est déjà plus compacte, un petit peu
+plus lisible.
+
+80
+00:06:28,480 --> 00:06:31,660
+Par contre, cette valeur binaire n'est pas
+du tout lisible.
+
+81
+00:06:31,660 --> 00:06:38,930
+Voyons ici, c'est le bit numéro 0, 1, 2,
+3, 4, 5, 6, oui, c'est le bit numéro 6.
+
+82
+00:06:38,930 --> 00:06:42,164
+C'est pas du tout évident à la première
+lecture.
+
+83
+00:06:42,164 --> 00:06:45,924
+Je souhaite voir le chiffre 6 apparaître
+dans ma formule.
+
+84
+00:06:45,924 --> 00:06:50,330
+Comme ça, immédiatement, je saurai qu'il
+s'agit du bit numéro 6.
+
+85
+00:06:50,330 --> 00:06:54,270
+Pour cela, je vais devoir être un petit
+peu rusé.
+
+86
+00:06:54,270 --> 00:06:59,355
+Je prends ici la valeur 1, que j'ai
+exprimée en binaire dans un registre.
+
+87
+00:06:59,355 --> 00:07:04,440
+Si je la décale vers la gauche de six
+
+88
+00:07:04,440 --> 00:07:10,010
+positions, j'obtiens ce résultat-là.
+Il se trouve que l'opération existe.
+
+89
+00:07:10,010 --> 00:07:13,450
+Cet opérateur, qui se dessine par plus
+petit que,
+
+90
+00:07:13,450 --> 00:07:18,160
+plus petit que, est le, l'opérateur de
+décalage à gauche.
+
+91
+00:07:18,160 --> 00:07:21,790
+Il existe bien entendu aussi l'opérateur
+de décalage à droite.
+
+92
+00:07:21,790 --> 00:07:26,260
+Donc, ici, la valeur 1 a été décalée de 6.
+
+93
+00:07:26,260 --> 00:07:29,442
+Le résultat que j'obtiens, c'est
+évidemment un
+
+94
+00:07:29,442 --> 00:07:30,850
+résultat sur 8 bits.
+
+95
+00:07:30,850 --> 00:07:34,010
+C'est bits-là sont perdus et c'est bits-là
+
+96
+00:07:34,010 --> 00:07:37,850
+ont été remplacés, conventionnellement,
+par des 0.
+
+97
+00:07:37,850 --> 00:07:42,170
+Donc, cette expression peut s'écrire de la
+manière
+
+98
+00:07:42,170 --> 00:07:45,760
+suivante : Je l'intègre directement à ma
+formule.
+
+99
+00:07:45,760 --> 00:07:47,860
+1 décalé à gauche de 6.
+
+100
+00:07:47,860 --> 00:07:54,779
+Donc finalement, mon "set bit" peut
+s'écrire P1OUT "ou
+
+101
+00:07:54,779 --> 00:07:56,834
+égal" 1 décalé de 6.
+
+102
+00:07:56,834 --> 00:08:02,190
+Alors certains de mes étudiants m'ont dit
+: "mais, c'est quand même très ennuyeux,
+
+103
+00:08:02,190 --> 00:08:07,450
+parce que, ici, nous avions une opération
+logique à faire,
+
+104
+00:08:07,450 --> 00:08:13,082
+ici, nous avons une première puis une
+deuxième opération logique à faire.
+
+105
+00:08:13,082 --> 00:08:17,909
+Ce qui va prendre du temps, prendre de la
+place dans la mémoire."
+
+106
+00:08:17,909 --> 00:08:19,818
+Alors, ça n'est pas tout à
+
+107
+00:08:19,818 --> 00:08:25,120
+fait juste.
+Ce calcul-là doit être fait
+
+108
+00:08:25,120 --> 00:08:29,885
+par le microcontrôleur.
+Par contre, ce calcul-là, étant
+
+109
+00:08:29,885 --> 00:08:34,802
+donné qu'il touche une constante et une
+deuxième
+
+110
+00:08:34,802 --> 00:08:40,148
+constante, il ne va jamais changer.
+Ce résultat
+
+111
+00:08:40,148 --> 00:08:44,919
+lui-même est une constante.
+Et alors, si c'est une
+
+112
+00:08:44,919 --> 00:08:48,658
+constante, ça n'est pas le microcontrôleur
+qui devra
+
+113
+00:08:48,658 --> 00:08:52,310
+la calculer, mais bel et bien le
+compilateur lui-même.
+
+114
+00:08:52,310 --> 00:08:56,696
+Alors le compilateur, s'il a un tout petit
+peu plus de travail par cette ligne
+
+115
+00:08:56,696 --> 00:08:59,156
+que par cette ligne, ça n'a aucune
+
+116
+00:08:59,156 --> 00:09:03,456
+importance, le résultat de la compilation
+est identique.
+
+117
+00:09:03,456 --> 00:09:06,228
+Ces deux lignes, je pourrais même dire
+
+118
+00:09:06,228 --> 00:09:10,265
+ces trois lignes, donnent exactement le
+même résultat
+
+119
+00:09:10,265 --> 00:09:12,000
+après la compilation.
+
+120
+00:09:12,000 --> 00:09:17,370
+Donc je vais pouvoir maintenant me
+souvenir, mémoriser que le "set
+
+121
+00:09:17,370 --> 00:09:23,242
+bit" peut se réaliser par cette
+combinaison "ou egal".
+
+122
+00:09:23,242 --> 00:09:27,510
+Il reste à faire la même chose pour le
+"clear bit".
+
+123
+00:09:27,510 --> 00:09:32,270
+La problématique est presque la même sauf
+qu'il faut mettre un 0.
+
+124
+00:09:32,270 --> 00:09:35,336
+On a de nouveau les lois de
+
+125
+00:09:35,336 --> 00:09:40,854
+l'algèbre de Boole et cette fois c'est le
+"et" logique qui va nous
+
+126
+00:09:40,854 --> 00:09:46,190
+intéresser.
+Et alors, l'opérande aura cette allure-là.
+
+127
+00:09:46,190 --> 00:09:52,184
+Les éléments neutres, les 1 comme éléments
+neutres du "et" losqu'on
+
+128
+00:09:52,184 --> 00:09:58,520
+veut conserver la valeur, et le 0 pour
+imposer le 0 à la sortie.
+
+129
+00:09:58,520 --> 00:10:01,180
+Donc je peux l'écrire
+
+130
+00:10:01,180 --> 00:10:06,500
+de cette manière-là.
+De nouveau, on va chercher à utiliser une
+
+131
+00:10:06,500 --> 00:10:12,380
+syntaxe plus simple, plus lisible.
+On regroupe avec le "ou égal".
+
+132
+00:10:12,380 --> 00:10:17,415
+Reste le problème de cette valeur.
+Ici, c'est
+
+133
+00:10:17,415 --> 00:10:22,470
+le bit numéro 6 qui m'intéresse et c'est
+le seul qui est à 0.
+
+134
+00:10:22,470 --> 00:10:26,566
+Alors j'ai parfois un étudiant distrait
+qui me dit : "mais
+
+135
+00:10:26,566 --> 00:10:31,358
+monsieur, pourquoi ne peut-on pas écrire 0
+décalé à
+
+136
+00:10:31,358 --> 00:10:36,812
+gauche de 6 ?"
+Et bien la réponse est évidente, si je
+
+137
+00:10:36,812 --> 00:10:42,110
+prends 0, que je le décale à gauche de 6
+cases, j'obtiens toujours un 0.
+
+138
+00:10:42,110 --> 00:10:47,600
+Or, dans ce cas, c'est bien ces 1 qui
+m'intéressent, et le 0 naturellement.
+
+139
+00:10:47,600 --> 00:10:50,640
+La syntaxe qu'on va utiliser est la
+suivante.
+
+140
+00:10:50,640 --> 00:10:51,693
+Elle utilise un
+
+141
+00:10:51,693 --> 00:10:57,444
+opérateur qui nous est encore inconnu, qui
+s'appelle l'opérateur d'inversion
+
+142
+00:10:57,444 --> 00:11:03,131
+bit à bit, et qui utilise ce symbole
+Tilde, c'est comme ça qu'on l'appelle.
+
+143
+00:11:03,131 --> 00:11:06,810
+Je vous signale juste que c'est, en
+espagnol, un accent.
+
+144
+00:11:06,810 --> 00:11:12,340
+Donc que quand on le tape sous certains
+éditeurs, il ne vient pas, il se présente
+
+145
+00:11:12,340 --> 00:11:14,240
+comme un accent flottant et qu'il faut
+taper
+
+146
+00:11:14,240 --> 00:11:16,670
+un espace pour qu'il apparaisse en tant
+que caractère.
+
+147
+00:11:16,670 --> 00:11:22,518
+Et alors finalement, on va pouvoir se
+souvenir du fait que l'opération "clear
+
+148
+00:11:22,518 --> 00:11:30,740
+bit", mise à 0 d'un bit, se fait avec cet
+ensemble "et égal tilde".
+
+149
+00:11:30,740 --> 00:11:35,984
+Et j'aimerais bien qu'on apprenne à
+reconnaître le "ou égal" d'une part, le
+
+150
+00:11:35,984 --> 00:11:42,890
+"et égal tilde" comme étant la manière
+d'écrire le "set bit" et le "clear bit".
+
+151
+00:11:42,890 --> 00:11:48,588
+Les opérations "set bit" et "clear bit",
+que nous venons de voir, sont évidemment
+
+152
+00:11:48,588 --> 00:11:54,420
+principalement utilisées pour les sorties.
+Comment maintenant gérer une entrée?
+
+153
+00:11:54,420 --> 00:11:58,920
+Alors, on cherche, généralement, à tester
+une entrée.
+
+154
+00:11:58,920 --> 00:12:03,114
+Par exemple "if" et on souhaite mettre la
+condition qui
+
+155
+00:12:03,114 --> 00:12:06,240
+permet de savoir si le bouton start a été
+pressé.
+
+156
+00:12:06,240 --> 00:12:08,040
+Pour pouvoir avancer,
+
+157
+00:12:08,040 --> 00:12:13,608
+il faut que je vous rappelle une chose, le
+langage C n'a pas de type
+
+158
+00:12:13,608 --> 00:12:19,330
+booléen et pour lui, une valeur nulle
+correspond
+
+159
+00:12:19,330 --> 00:12:24,689
+à faux et une valeur non nulle correspond
+à vrai.
+
+160
+00:12:24,689 --> 00:12:28,370
+Parfois les gens disent la valeur 1
+correspond à vrai.
+
+161
+00:12:28,370 --> 00:12:33,426
+C'est juste, mais la valeur 33 aussi
+correspond à vrai.
+
+162
+00:12:33,426 --> 00:12:38,496
+Une valeur non nulle est considérée comme
+vraie et nous allons utiliser cette
+
+163
+00:12:38,496 --> 00:12:43,966
+astuce pour tester notre entrée.
+Voilà le problème : j'ai 8 valeurs,
+
+164
+00:12:43,966 --> 00:12:48,972
+s'il s'agit d'un registre 8 bits, je
+m'intéresse à savoir si
+
+165
+00:12:48,972 --> 00:12:54,068
+j'ai un 0 ici en position 3, ici, au
+contraire, j'ai un 1.
+
+166
+00:12:54,068 --> 00:12:59,210
+Et j'aimerais pouvoir dire : dans ce
+cas-là, c'est faux,
+
+167
+00:12:59,210 --> 00:13:01,424
+dans ce cas-là, c'est vrai.
+
+168
+00:13:01,424 --> 00:13:06,760
+L'unique présence de ce 1 va pouvoir me
+faire comprendre que c'est vrai.
+
+169
+00:13:06,760 --> 00:13:11,360
+Et la même chose, ce 0 entraîne que la
+condition est fausse.
+
+170
+00:13:11,360 --> 00:13:14,080
+Je rappelle que faux, c'est une valeur
+
+171
+00:13:14,080 --> 00:13:17,240
+nulle, que vrai c'est une valeur non
+nulle.
+
+172
+00:13:17,240 --> 00:13:24,534
+Quelle opération dois-je utiliser
+maintenant pour faire disparaître tous
+
+173
+00:13:24,534 --> 00:13:29,520
+ces bits qui ne m'intéressent pas?
+Et bien, il s'agit
+
+174
+00:13:29,520 --> 00:13:35,080
+évidemment de l'opération logique "et".
+Je mets une valeur 1 à cet endroit.
+
+175
+00:13:35,080 --> 00:13:42,110
+J'obtiens, si j'avais un 0, un 0, si
+j'avais un 1, j'obtiens un 1.
+
+176
+00:13:42,110 --> 00:13:49,148
+Partout ailleurs, ces 0 que j'ai mis là me
+donnent des valeurs nulles.
+
+177
+00:13:49,148 --> 00:13:49,634
+Et si je
+
+178
+00:13:49,634 --> 00:13:53,522
+regarde maintenant globalement cette
+valeur, elle est
+
+179
+00:13:53,522 --> 00:13:57,590
+complètement nulle, c'est donc une
+condition fausse.
+
+180
+00:13:57,590 --> 00:14:01,340
+Cette valeur-là n'est pas nulle, à cause
+de ce 1.
+
+181
+00:14:01,340 --> 00:14:04,502
+Elle rend donc la condition "vraie".
+
+182
+00:14:04,502 --> 00:14:09,890
+Il ne reste plus qu'à l'écrire en C.
+Ma condition, ici, s'écrit de
+
+183
+00:14:09,890 --> 00:14:15,430
+la manière suivante : par exemple, P1IN
+"et"
+
+184
+00:14:15,430 --> 00:14:20,944
+1 décalé de 3.
+Je vous propose que nous écrivions
+
+185
+00:14:20,944 --> 00:14:26,350
+un petit exemple qui utilise ces trois
+notions que nous venons de voir.
+
+186
+00:14:26,350 --> 00:14:32,282
+Ici, nous avons sur une entrée, un bouton
+qui s'appelle "on", sur une autre entrée,
+
+187
+00:14:32,282 --> 00:14:38,330
+un bouton qui s'appelle "off", sur une
+sortie, nous avons une diode lumineuse.
+
+188
+00:14:38,330 --> 00:14:40,570
+Pour marquer que ce schéma n'est
+
+189
+00:14:40,570 --> 00:14:44,792
+pas complet, je n'ai pas pris la peine
+d'indiquer
+
+190
+00:14:44,792 --> 00:14:50,120
+l'alimentation, de mentionner le
+condensateur de découplage,
+
+191
+00:14:50,120 --> 00:14:55,548
+qu'il est juste de mettre entre le plus et
+le moins, je n'ai
+
+192
+00:14:55,548 --> 00:15:00,400
+pas parlé non plus du reset, de la patte
+test.
+
+193
+00:15:00,400 --> 00:15:05,580
+C'est un schéma simplifié étant donné que
+j'ai l'habitude d'utiliser mon
+
+194
+00:15:05,580 --> 00:15:09,150
+microcontrôleur, souvent pour donner des
+explications,
+
+195
+00:15:09,150 --> 00:15:11,576
+je ne répète pas tous ces détails.
+
+196
+00:15:11,576 --> 00:15:14,770
+Alors j'ai écrit ici le programme.
+
+197
+00:15:14,770 --> 00:15:21,089
+Certes, volontairement, il n'utilise pas
+les simplifications que nous
+
+198
+00:15:21,089 --> 00:15:24,680
+avons appris à utiliser pour rendre les
+programmes plus lisibles.
+
+199
+00:15:24,680 --> 00:15:30,220
+L'objectif, ici, est vraiment de montrer
+quelles sont les opérations qu'on utilise.
+
+200
+00:15:30,220 --> 00:15:31,270
+Je dois
+
+201
+00:15:31,270 --> 00:15:36,528
+mettre à 1 le bit numéro 6 de direction
+
+202
+00:15:36,528 --> 00:15:41,930
+pour avoir ma LED en sortie.
+Je fais un "ou égal".
+
+203
+00:15:41,930 --> 00:15:46,666
+Je dois mettre à 1 les deux bits 2
+puissance 2 et 2
+
+204
+00:15:46,666 --> 00:15:52,135
+puissance 3 de mon registre P1OUT pour
+enclencher les résistances en pull up.
+
+205
+00:15:52,135 --> 00:15:56,347
+Nous n'avons pas encore vu cette
+partie-là, on la verra plus tard,
+
+206
+00:15:56,347 --> 00:16:00,910
+mais comprenez bien ici que c'est des "ou
+égal", donc que c'est des "set bit".
+
+207
+00:16:00,910 --> 00:16:06,940
+Au niveau de ma boucle principale, qui
+s'exécute de manière infinie, je vais
+
+208
+00:16:06,940 --> 00:16:13,550
+tester le bit 2 dans P1IN, pour savoir si
+le bouton "on" est allumé.
+
+209
+00:16:13,550 --> 00:16:15,563
+Vous ferez la même chose un peu plus tard
+
+210
+00:16:15,563 --> 00:16:18,720
+avec le 2 puissance 3, qui correspond au
+bouton "off".
+
+211
+00:16:18,720 --> 00:16:22,022
+Si le bouton "on" est actif,
+
+212
+00:16:22,022 --> 00:16:24,710
+je vais allumer la diode lumineuse.
+
+213
+00:16:24,710 --> 00:16:27,370
+Si, au contraire, le bouton "off" est
+
+214
+00:16:27,370 --> 00:16:30,370
+actif, je vais éteindre la diode
+lumineuse.
+
+215
+00:16:30,370 --> 00:16:35,130
+Pourquoi ai-je dû rajouter, ici, ce point
+d'exclamation?
+
+216
+00:16:35,130 --> 00:16:38,055
+Je vous signale juste que c'est lié au
+fait que
+
+217
+00:16:38,055 --> 00:16:41,760
+nous avons cablé les boutons "on" et "off"
+à la masse.
+
+218
+00:16:41,760 --> 00:16:47,487
+Dans un prochain cours, nous aurons des
+explications très précises sur l'usage
+
+219
+00:16:47,487 --> 00:16:52,110
+de ce point d'exclamation qui signifie
+l'inversion d'une condition logique.
+
+220
+00:16:52,110 --> 00:16:56,743
+Nous avons donc appris que le langage C
+permet de manipuler
+
+221
+00:16:56,743 --> 00:17:01,070
+des bits à l'intérieur de champs de bits,
+à l'intérieur de registres.
+
+222
+00:17:01,070 --> 00:17:07,200
+On peut réaliser la fonction de mise à 1
+d'un bit avec le "ou égal".
+
+223
+00:17:07,200 --> 00:17:13,290
+On peut réaliser la fonction de mise à 0
+d'un bit avec le "et égal tilde".
+
+224
+00:17:13,290 --> 00:17:18,322
+Et qu'on peut tester un bit en masquant,
+en
+
+225
+00:17:18,322 --> 00:17:23,920
+faisant le "et" logique avec la valeur
+lue.

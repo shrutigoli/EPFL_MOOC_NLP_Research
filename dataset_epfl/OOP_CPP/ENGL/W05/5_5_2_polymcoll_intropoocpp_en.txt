@@ -1,0 +1,138 @@
+In the previous video, we learned that polymorphism is a central concept in object-oriented programming.
+We learned that to implement a polymorphic solution, we need to make use of what is known as dynamic binding.
+The goal of this episode is to show you how to implement dynamic binding in C++ using virtual methods.
+More specifically, we concluded the last episode by stating that for dynamic binding to take place in C++, two ingredients must be present.
+First, the use of virtual methods on references and pointers.
+This episode will explain this concept.
+Remember that we started with an example where we had a hierarchy of classes in which a subclass, the
+Guerrier subclass, overrides a method already defined in the superclass.
+An object of the subclass type was assigned, via passing arguments, to a variable of the superclass type.
+We had then asked ourselves which rencontrer method would be called here.
+The rencontrer method of the superclass, or the one of the subclass?
+And we had seen that in C++, static binding was used, meaning that the type of the variable on which we call the method determines which method will be called.
+In C++, if we want dynamic binding to be used, that is, if we want the contents of the variable rather than its type determine which method to call, then we must explicitly declare in the program that the method must be dynamically bound.
+And this is done by declaring this method as virtual.
+For dynamic binding to take place, we thus have to declare this method as virtual, but it must also work via a reference or a pointer.
+This is the case here, <i>un</i> is a reference to the object passed as a parameter.
+In C++, we must indicate explicitly to the compiler that a method can use dynamic binding.
+And this is done by declaring it as virtual.
+This declaration must be made in the most general class defining this method, that is, at the highest in the hierarchy, in the original prototype.
+So in the case of our example, in the Personnage class.
+And to make a method virtual in C++, one simply prepends the prototype of the method with the virtual keyword.
+Note that any override in subclasses of a method that was declared as virtual in the superclass will also be considered as being virtual even if we don't add the virtual keyword before its prototype.
+So basically, if I have a superclass,
+A, containing a particular method m, and if I have a subclass B which overrides this method.
+If in the A superclass the method m was declared as virtual, then it will also be virtual in the subclass even if the keyword isn't explicitly included.
+If we go back to our first example, if we want our method to benefit from dynamic binding, then we should declare the method as virtual in the superclass.
+But is this really our original example?
+If you have been attentive, you may have noticed that the example that you see now is a variation on the example presented initially.
+A variation in which the arguments of the <i>faire_rencontrer</i> function are passed by value.
+We deliberately made this change to show you the effect of not using a reference or a pointer on dynamic binding.
+The problem is that when we pass by value the Guerrier object will be copied into a variable of type Personnage.
+The rencontrer method will thus not apply to the original instance, but to a copy of the instance in a variable of type Personnage.
+Essentially, if we had an object of type Guerrier in the variable g, once it is copied into the variable un, which is of type Personnage, it will then be considered only as a Personnage.
+Personnage doesn't have a member variable for a weapon, for example.
+The object contained in the variable un is indeed of type Personnage.
+Therefore, even if the rencontrer method is virtual, and can thus benefit from dynamic binding, since the object contained in the variable is of type Personnage, then the rencontrer method of
+Personnage will always be called here.
+As we mentioned in the previous episode, for dynamic binding to be able to take place, two conditions must be verified.
+The first is that the methods must be virtual, as we have just discussed, and the second is that these virtual methods must apply to real instances via references or pointers.
+If we choose to pass by reference, then when we pass the arguments, we will not copy them into objects of type Personnage; we will simply indicate that un is another name for the variable g.
+This way, we allow the virtual method to work on the actual instance.
+By allowing a virtual method to work on the real instance, we obtain the behavior we want, namely, dynamic binding.
+As we said earlier, it is the combination of using references and making the methods virtual that we obtained the desired result.
+Here of course, we could make do with a constant reference as parameter since the <i>faire_rencontrer</i> function does not modify its parameter un.
+This is how we should write the code in order to obtain dynamic binding in the context of this example.
+So, to allow a virtual method to operate on the real instance, it is possible to use references.
+We can also use pointers as the following example will show.
+And this time, to switch things up, here is a zoological example where we have a subclass Dauphin (TN: means
+"Dolphin") inheriting from a Mammifere superclass (TN: means
+"Mammal"). Each of these classes has a default, explicit constructor and a destructor.
+Mammals, in general, have a default method for eating (TN: "manger").
+Dolphins have a specific method for this action.
+And the same goes for the methods allowing the mammals or dolphins to move (TN: "avancer").
+Here is a small main program which uses the class hierarchy  that you have just seen.
+Let's study its execution step-by-step to see what output it will produce.
+The first line of the program declares a variable named lui (TN: "lui" means "him"), which is a pointer to a Mammifere.
+This variable takes the address of an object of type Dauphin allocated dynamically.
+The object of type Dauphin, allocated dynamically, is constructed using the default constructor of the
+Dauphin class.
+The lui variable thus contains the address of an object of type Dauphin.
+The default constructor of the Dauphin class was used here to construct this object.
+This is the default constructor, as defined in the Dauphin subclass.
+Note that the constructor of a subclass always invokes the constructor of the superclass.
+If it doesn't do so explicitly, then it is the default constructor of the superclass that is called.
+This means that, before the "Coui, Couic !" message is displayed, the message "Un nouveau mammifÃ¨re est nÃ©!" is displayed (TN: means "new mammal born").
+The execution of this line of code will therefore output the following:
+A new mammal is born! Why?
+Because the default constructor of the Dauphin class implicitly called the default constructor of the Mammifere class.
+The constructor of the Mammifere superclass was invoked by Dauphin's one.
+When its execution is done, the body of Dauphin's constructor will be executed, producing the following output.
+Second line.
+We apply to the object pointed to by the lui pointer, that is, this object here, the avancer method.
+Note that here, since we use pointers, we allow the method to be applied to the actual instance pointed to by the object, and thus to have polymorphism.
+Remember that the notation
+"lui->avancer()" is equivalent to writing
+"(*lui).avancer()"
+We access the contents of the object pointed to by lui, and call the avancer method on this object.
+The avancer method is defined as virtual in the superclass and overridden in the
+Dauphin subclass.
+Since we allow this virtual method to act directly on the actual instance via the pointer, dynamic binding is used and it is Dauphin's avancer method which is called.
+Therefore, the message "Je nage" (TN: means 
+"I am swimming") will be displayed here, and at this stage, we have the following output.
+Let's move on to the next line, where the manger method is called on the object pointed to by lui.
+The manger method is indeed overridden in the Dauphin class but careful, unlike the previous case, the manger method was not declared as virtual in the superclass.
+The manger method is indeed called via a pointer but this is only one of the two ingredients necessary for dynamic binding.
+The pointer is there, but the method is not virtual, which means that we cannot have dynamic binding.
+In this case, it is the type of the variable which wins. lui is a pointer to Mammifere, so the object it points to is perceived as an object of type Mammifere.
+Static binding thus occurs in this case and it is the manger method of Mammifere which will be called here.
+The output after execution of this statement will thus be:
+"Miam... croumf !", which is the message displayed by Mammifere's manger method.
+Let's go to the next line.
+"delete lui" means that we free the memory area allocated dynamically at this stage of the program.
+This means, basically, that we recover the memory area associated with the object of type Dauphin previously allocated.
+"delete lui" causes this object's life to end and since its lifetime is up, the destructor is called.
+But which destructor exactly is called?
+If we examine the code of the
+Mammifere class, we can see that the destructor was declared as virtual.
+This means that this method, if called via a pointer for example, will benefit from dynamic binding.
+The destructor is indeed called via a pointer, which means that dynamic binding will take place for destruction as well.
+The object will be perceived according to its real nature, that is, as a Dauphin, and it is Dauphin's destructor which will be called, causing the following output.
+We learned in a previous episode that the order in which destructors are called is the inverse of the orders for constructors.
+So to create an object of type Dauphin, the constructor of the Mammifere supercalss was called, then Dauphin's constructor.
+For destruction, it is the opposite, we will first call Dauphin's constructor, then Mammifere's destructor.
+Now, let's imagine that the destructor of the Mammifere class was not declared as virtual.
+Since the destructor was not declared as virtual in the Mammifere class, the call that is made here cannot be dynamically bound.
+This means that the type of the variable will win for the choice of the destructor method, and it is this destructor here that will be called rather than this one.
+So essentially, if the destructor for Mammifere had not been declared as virtual in our example, then only Mammifere's destructor would have been invoked and Dauphin's one would not have been.
+Meaning that the object that was allocated dynamically in our program with a type of Dauphin would be only partially destroyed.
+Only the part of the Dauphin which is a Mammifere would have been destroyed here.
+If the object of type Dauphin dynamically allocated here had required a certain amount of resources, then these resources would not have been freed correctly.
+To summarize, when a virtual method is called via a reference or a pointer, that is, when both of these ingredients are present, then the choice of the method will be made based on the actual type of the instance.
+This is known as dynamic binding.
+But watch out, here are a few important points to consider regarding virtuality in the context of construction and destruction.
+As we discussed in the example of
+Mammifere and Dauphin, to avoid having a partial destruction only, it is recommended to always declare destructors as virtual.
+However, since a constructor is always designed to initialize the current instance, it cannot be virtual.
+If it calls virtual methods, then the virtual aspect of these methods will simply be ignored.
+This is an advanced concept -- let's see what it means in a concrete example.
+Here is an somewhat academic example that will explain what happens in this case where we have a superclass A of which the B subclass inherits.
+Both classes have a method m which happens to be virtual and is hence overridden in the B subclass.
+When we execute this line of code, the default constructor for the A class is called, and calls in turn the method f.
+The method f is called on the this object, which is of type A, and so we will of course invoke the f method of the A class, which will display the following.
+On the second line, we create an object of type B.
+There is no explicit constructor in the
+B class, and so the default constructor will be invoked, and it will invoke the default constructor of the superclass.
+The f method therefore now applies to a "this" object of type B.
+However, the virtual aspect of the method is completely ignored in a constructor.
+So this aspect is not taken into account, and it is still the current class's method which is called.
+Therefore, when this second line is executed, we will also have the following output.
+The next line of code declared a variable pa of type pointer-to-A, and initializes is with the address of the object b.
+The f method is then called on the object pointed to by the pa pointer, which is an object of type B.
+Here, both ingredients necessary to dynamic binding are present.
+We have a virtual method f which is invoked via a pointer.
+The f method will thus be chosen depending on the real nature of the instance pointed to, and it is the method of the B class which will be invoked.
+So we will have a different message here, when this last line of code is executed.
+Here, we do indeed have polymorphic behavior on the part of the f method since we invoked it outside of a constructor.
+However here, the polymorphic aspect was completely ignored.
+And this concludes our episode on virtual methods which are, in C++, the basic building blocks for polymorphism.

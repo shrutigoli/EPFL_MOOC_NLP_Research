@@ -1,0 +1,73 @@
+I will now solve the nonlinear system of N equations and N unknowns using Newton's method. 
+I remind you that we are searching for the vector u, with components of u_1, u_2 up to u_N, the approximations of u in x_1, u in x_2 and so on to u in x_N such that the vector F(u) = 0.
+And F(u) contains these equation, the first equation is 2u_1 - u_2 all divided by h^2, the approximation of u'' in x_1, plus x_1 times u_1^3 minus f(x_1), and so on for all equations. 
+I shall now use Newton's method to find a zero of this function.
+A short recall on Newton's method.
+I am searching x such that f(x) = 0.
+Here the graph of the function f, and here the zero.
+I start from x_n and I want to calculate x_n+1.
+So I take the tangent and search for the intersection with the x axis. 
+I have f(x_n), this is the graph of the function f,
+I have the slope f '(x_n) which is equal to f(x_n), the increase in y, f(x_n) - 0 divided by the increase in x which is x_n minus x_n+1.
+Beware of the sign: x_n minus x_n+1 !
+Well f ' (x_n) times x_n minus x_n+1 must be equal to f(x_n).
+This is for a function from R to R.
+Now for a nonlinear system, let's assume u^n is known, well u^n is the vector of components u_1^nn, u_2^n and so on up to u _N^n with N lower index and n the upper index. u^n is an approximation of the vector u such that F(u) = 0, and u_n+1 is such that f '(u_n) becomes the jacobian matrix DF evaluated in u^n, which I know, times the vector u^n minus u^n+1 and all this equal to F evaluated in u^n, which is also known since u^n is known.
+Now I must specify what the jacobian matrix is. 
+Here is the expression of F(u), for all u in R^N, with components u_1, u_2 up to u_N.
+I will compute DF evaluated in u.
+So DF(u), what must I do ?
+I must compute all the derivatives, so I take the first line,
+I must differentiate this expression with respect to x_1.
+This will give me the coefficient '' 1 - 1 '' of this jacobian.
+So the derivative of this expression with respect to u_1,
+I get 2 / h^2 and here 3 * x_1 * u_1^2.
+I have 2 over h squared plus 3 times x_1 times u_1 squared.
+This is the derivative of this first line with respect to u_1.
+Then I must differentiate the first line with respect to u_2,
+So here I simply have -1 over h.
+This is the coefficient on the first line second column ("1 - 2") of the jacobian matrix. 
+Next I must differentiate with respect to u_3, but u_3 does not appear in this equation so the derivative is 0.
+Ans do on up to u_N where the derivatives are o.
+So on the first line of this matrix I only have the derivative w.r.t. u_1, and here the derivative w.r.t. u_2.
+By doing the same thing on the second line,
+I get -1 / h^2, the term here below the diagonal-
+The term on the diagonal is 2 / h^2 plus  3 times x_2 times u_2 squared.
+And next I have I will differentiate w.r.t. u_3, and will get  -1 / h^2 for the term above the diagonal.
+I will obtain a tridiagonal matrix.
+The coefficient above and below the diagonal are -1/ h^2.
+Whereas the coefficients on the diagonal are for example
+2 over h squared plus 3 times x_N times u_N squared.
+All the other elements are zero.
+There we have it, I am able to compute the jacobian matrix.
+Now I can write the algorithm which corresponds to Newton's method.
+I start from an initial guess u^0 given, all the components u_0^0, u_1^0 up to u_N^0 are known.
+Next I loop: from n=0 ,1, 2 and so on,
+I must solve a linear system, this one here, a matrix times unknown vector equal to this known vector.
+I set A equal to DF(u^n).
+This is the jacobian  matrix
+I have computed
+I did the computation for any vector u
+I have to evaluate it at u^n which is known. 
+So at the first step of the algorithm, n=0,
+I must evaluate the jacobian at u^0.
+Next I must compute the right hand side of the linear system, denoted as b.
+Here b is equal to F(u^n).
+C'est un vecteur.
+F vecteur de uN vecteur.
+We solve A y = b.
+Donc il se trouve, ici, que la matrice,
+I claim that DF (u) is a symmetric positive definite matrix.
+Indeed, it is a matrix with 2s and -1s here, which is symmetric positive definite, plus a diagonal matrix with positive entries therefore the sum is symmetric positive definite. 
+I can compute the cholesky factorization
+L times L-transpose, A = L L^T.
+Next I must solve both of these linear systems.
+I must solve L z = b, then L-transpose times y = z.
+So I have solved this linear system A y = b.
+Here, y is u^n - u^n+1, so I define: u^n+1 equal to u^n-y.
+And when F(u^n) is small enough,
+I exit this loop.
+I know that Newton's method, if it converges, it will converge if the initial guess is sufficiently close to the solution u, then Newton's method will converge quickly.
+In practice, I will only do a few iterations of Newton's method. 
+You can notice that we have a nonlinear system to solve, a nonlinear system with
+N equations and N unknowns, which comes from a nonlinear differential equation, and this nonlinear system is obtained by solving several linear systems.

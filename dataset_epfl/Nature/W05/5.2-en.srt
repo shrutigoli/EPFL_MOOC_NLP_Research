@@ -1,0 +1,998 @@
+1
+00:00:02,949 --> 00:00:05,949
+Welcome back. Nature in Code.
+We're in chapter 5, lecture 2
+
+2
+00:00:06,118 --> 00:00:09,456
+In this lecture we're going to start
+with the implementation
+
+3
+00:00:09,647 --> 00:00:11,122
+of our spacial simulation.
+
+4
+00:00:11,375 --> 00:00:15,200
+Alright, so here we are in an empty
+document. We are going to
+
+5
+00:00:15,385 --> 00:00:22,785
+get started by saying 
+DOCTYPE html as always.
+
+6
+00:00:23,409 --> 00:00:28,909
+Then of course we have our html
+tag which we're going to close
+
+7
+00:00:29,108 --> 00:00:38,296
+right away and our 'head' tag. Then,
+of course the 'body' tag as well.
+
+8
+00:00:39,301 --> 00:00:44,838
+Now, in this simulation we are going
+to visualize a lot and so
+
+9
+00:00:45,149 --> 00:00:48,849
+we're going to use D3. For this
+reason we're going to put the 
+
+10
+00:00:49,068 --> 00:00:54,268
+'script' tag here in the body just
+as we did in chapter 3.
+
+11
+00:00:57,078 --> 00:01:03,515
+Alright so we would like to 
+develop a pretty sophisticated 
+
+12
+00:01:03,722 --> 00:01:06,022
+spacial simulation.
+How does one start?
+
+13
+00:01:06,228 --> 00:01:09,990
+Well, again I know it sounds trivial
+but you just start at the 
+
+14
+00:01:10,191 --> 00:01:15,379
+first step. Just ask yourself, "What
+would be the first thing I would
+
+15
+00:01:15,550 --> 00:01:18,400
+need to do in my code?
+What would be the first function
+
+16
+00:01:18,599 --> 00:01:24,774
+ I would need to call?"
+We just talked about this grid
+
+17
+00:01:24,949 --> 00:01:27,711
+that we want to implement so
+probably the first function,
+
+18
+00:01:27,893 --> 00:01:30,856
+something like the first function
+will be called 'init_grid'
+
+19
+00:01:31,063 --> 00:01:33,963
+where we would initialize this
+grid and of course we would
+
+20
+00:01:34,172 --> 00:01:41,147
+need to implement this method
+before we can call it 'init_grid'.
+
+21
+00:01:42,750 --> 00:01:45,138
+I'm not getting any
+syntax highlighting here.
+
+22
+00:01:45,357 --> 00:01:49,982
+This is because I haven't saved the
+file yet so let me save the file.
+
+23
+00:01:50,553 --> 00:01:56,641
+Save as; I got code examples
+here. I'm going to call this
+
+24
+00:01:56,839 --> 00:02:04,939
+spacial simulation dot html.
+Alright, looking much better.
+
+25
+00:02:06,200 --> 00:02:09,900
+Before I am going to implement this
+I'd like to think about
+
+26
+00:02:10,401 --> 00:02:16,838
+a number of values I will use
+throughout the simulation
+
+27
+00:02:17,033 --> 00:02:20,183
+that I would like to set up as
+global variables here at the top.
+
+28
+00:02:20,934 --> 00:02:26,109
+One of the variables obviously
+is the size of the grid and so
+
+29
+00:02:26,316 --> 00:02:30,054
+I'm going to call this grid_length
+and I'm going to set this to 100
+
+30
+00:02:30,207 --> 00:02:34,807
+so then we'll have a 100 x 100
+sized grid because we want 
+
+31
+00:02:34,980 --> 00:02:39,805
+a squared grid. That means we'll
+have 10 000 cells and therefore
+
+32
+00:02:39,989 --> 00:02:44,114
+a population size of 10 000. That
+seems like a nice population size.
+
+33
+00:02:45,119 --> 00:02:48,132
+As we said, the grid itself is
+going to be an array. 
+
+34
+00:02:48,367 --> 00:02:51,417
+I'm going to setup this
+empty array. This will eventually
+
+35
+00:02:51,612 --> 00:02:55,912
+be a 2 dimensional array so this
+array will contain other arrays
+
+36
+00:02:56,321 --> 00:03:00,746
+namely the rows. Of course this is
+a population genetic
+
+37
+00:03:00,931 --> 00:03:08,981
+simulation so I'll have a1, a1, a1,
+a2 and a2, a2 genotypes
+
+38
+00:03:09,395 --> 00:03:13,845
+and so I have a1 and a2 frequencies
+so I'm going to set the a1 allele
+
+39
+00:03:14,016 --> 00:03:19,541
+frequency of 'p' here to 0.5.
+Also as we've just seen before,
+
+40
+00:03:19,750 --> 00:03:22,800
+one of the variables we want
+to set and we ultimately 
+
+41
+00:03:22,979 --> 00:03:26,591
+want to change is this mating
+distance so I'm going to call this 
+
+42
+00:03:26,817 --> 00:03:30,554
+max_mating_distance
+just to be clear that this is not
+
+43
+00:03:30,750 --> 00:03:34,175
+an average or anything like that.
+It's simply a maximum.
+
+44
+00:03:35,194 --> 00:03:39,894
+I'm going to start by setting this
+to 1 and we can change this later.
+
+45
+00:03:40,097 --> 00:03:44,122
+We can change all of these later.
+Then also, as I said, we're
+
+46
+00:03:44,317 --> 00:03:47,979
+actually going to put individuals
+on this grid now.
+
+47
+00:03:49,134 --> 00:03:52,197
+What will these individuals be?
+Well, they essentially will
+
+48
+00:03:52,358 --> 00:03:55,933
+simply be genotypes.
+I want to keep track of how many 
+
+49
+00:03:56,132 --> 00:04:00,870
+genotypes I have and so I'm going to
+setup these 3 variables:
+
+50
+00:04:01,917 --> 00:04:12,542
+a1a1, a1a2 and a2a2. 
+These are simply counters for the 
+
+51
+00:04:12,747 --> 00:04:15,760
+number of genotypes that we have
+and correspondingly,
+
+52
+00:04:15,932 --> 00:04:23,132
+I'm going to initialize those at 0.
+Then ultimately we will run some
+
+53
+00:04:23,292 --> 00:04:26,517
+generations and I want to know where
+in the simulation we are
+
+54
+00:04:26,680 --> 00:04:29,830
+so I'll probably need something like
+a generation counter
+
+55
+00:04:29,998 --> 00:04:32,361
+and I'm going to set this to 0.
+Again, you could do this
+
+56
+00:04:32,531 --> 00:04:35,706
+slightly differently. You could
+just start with the function
+
+57
+00:04:36,532 --> 00:04:40,257
+as we have for example in chapter 4
+and instead of implement
+
+58
+00:04:40,595 --> 00:04:43,895
+your code, start developing your
+code and as you realize, "Mmm ...
+
+59
+00:04:44,094 --> 00:04:47,294
+This should probably be a global
+variable," you can setup these
+
+60
+00:04:47,480 --> 00:04:51,055
+global variables. Here I went
+slightly the other way around.
+
+61
+00:04:51,231 --> 00:04:55,106
+Before i got started, I knew I was
+going to use a bunch of these
+
+62
+00:04:55,422 --> 00:05:01,122
+variables here; these values and
+a way to keep track of things
+
+63
+00:05:01,365 --> 00:05:04,290
+so I set those up first.
+You can do either way;
+
+64
+00:05:05,086 --> 00:05:08,886
+ whichever you prefer.
+Now we have this init_grid.
+
+65
+00:05:09,123 --> 00:05:12,673
+What should this be? We'd like
+to initialize a 2 dimensional
+
+66
+00:05:12,852 --> 00:05:16,114
+ array here. At the moment
+we have our grid variable. This is a
+
+67
+00:05:16,292 --> 00:05:19,142
+1 dimensional array. At the
+moment it doesn't store anything.
+
+68
+00:05:19,312 --> 00:05:23,124
+This should store many, many arrays
+which will be the rows of our grid
+
+69
+00:05:23,357 --> 00:05:26,357
+or columns depending on how
+you'd like to think of it.
+
+70
+00:05:27,017 --> 00:05:32,130
+Then in those arrays within the
+grid array, we'll have the
+
+71
+00:05:32,351 --> 00:05:35,951
+individuals so let's go ahead
+and set this up.
+
+72
+00:05:36,322 --> 00:05:43,309
+I'll need a for loop here so
+for (var i = 0; i is smaller than
+
+73
+00:05:43,527 --> 00:05:48,440
+grid length. That's the condition
+and of course i = i+1.
+
+74
+00:05:50,456 --> 00:05:56,956
+Now I'd like to say, "Okay, I need
+to push an empty array into
+
+75
+00:05:57,317 --> 00:06:00,405
+the grid here." One way to do this
+would simply be to say:
+
+76
+00:06:00,646 --> 00:06:05,521
+grid.push ([]); an empty array
+as we've done this before
+
+77
+00:06:05,865 --> 00:06:08,278
+There is another way actually
+that you can do this
+
+78
+00:06:08,453 --> 00:06:11,615
+and I'm going to use the alternative
+way. I'm simply going to say:
+
+79
+00:06:12,006 --> 00:06:21,418
+grid[i] = [] so this assigns the
+empty array; so this one here
+
+80
+00:06:22,323 --> 00:06:28,086
+to this location in the array.
+Java script allows us to do that
+
+81
+00:06:28,362 --> 00:06:31,862
+and that's quite handy and the other
+thing ... The other reason
+
+82
+00:06:32,031 --> 00:06:34,269
+why I'm doing this is 
+because we'll use this type 
+
+83
+00:06:34,435 --> 00:06:38,785
+of notation later to retrieve values
+but just to say you can
+
+84
+00:06:38,960 --> 00:06:43,973
+not only use this notation with
+the indices to retrieve
+
+85
+00:06:44,144 --> 00:06:47,794
+values, elements in an array.
+You can also use it to set them
+
+86
+00:06:47,969 --> 00:06:52,156
+and that's what we're doing here.
+Great, so now I have my 
+
+87
+00:06:52,336 --> 00:06:56,549
+2 dimensional array setup and I'm
+currently within the loop
+
+88
+00:06:56,744 --> 00:07:00,732
+here that sets these up so I can now
+have another loop that's
+
+89
+00:07:00,914 --> 00:07:03,952
+nested in here and because it's
+nested, I'm going to use this
+
+90
+00:07:04,190 --> 00:07:08,365
+(var ii = 0 notation. Again, you
+could in principle use i, j 
+
+91
+00:07:08,555 --> 00:07:12,693
+and so on but I'm going to use this
+i and ii notation and if you're
+
+92
+00:07:12,857 --> 00:07:15,857
+following me, I suggest you do the
+same. Again, I use this because
+
+93
+00:07:16,032 --> 00:07:19,669
+I find it easier because I
+immediately see the level of
+
+94
+00:07:19,833 --> 00:07:24,983
+nesting I'm at so I'm going to use
+this ii. Again, that condition here
+
+95
+00:07:25,166 --> 00:07:30,191
+would be ii smaller than grid
+length. Also in the second
+
+96
+00:07:30,375 --> 00:07:35,675
+dimension because again, we said
+we want to have a squared grid
+
+97
+00:07:36,354 --> 00:07:43,379
+Then of course, the increment.
+Okay and so now at grid[i]
+
+98
+00:07:43,591 --> 00:07:48,316
+which we previously initialized
+as an empty array, I can set
+
+99
+00:07:48,488 --> 00:07:58,988
+now into ii the individual. 
+This will be quite handy as you can
+
+100
+00:07:59,160 --> 00:08:03,098
+see, this is kind of like an X and Y
+co-ordinate system now and
+
+101
+00:08:03,297 --> 00:08:08,597
+that's a really handy notation here.
+What would I set here?
+
+102
+00:08:08,776 --> 00:08:12,288
+I'd like to set 1 of 3 genotypes
+and I'm simply going to set
+
+103
+00:08:12,462 --> 00:08:19,937
+those as strings; a1a1, a1a2 and
+a2a2. Now, I said up here I'd like
+
+104
+00:08:20,130 --> 00:08:26,205
+to initialize this population where
+p = 0.5 so what are the numbers
+
+105
+00:08:26,401 --> 00:08:30,138
+of genotypes that I need?
+Well, you now know from the 
+
+106
+00:08:30,330 --> 00:08:33,330
+Hardy–Weinberg chapters there's
+many ways to initialize 
+
+107
+00:08:33,520 --> 00:08:40,983
+a population given an allele
+frequency but we'd like to be in
+
+108
+00:08:41,173 --> 00:08:44,786
+the one that's considered stable
+which is the Hardy–Weinberg
+
+109
+00:08:44,947 --> 00:08:49,522
+frequency. What I'd like to do is,
+I'd like to set these up in
+
+110
+00:08:49,712 --> 00:08:54,862
+Hardy–Weinberg frequencies given
+p = 0.5 and as you recall, 
+
+111
+00:08:55,039 --> 00:08:58,927
+the Hardy–Weinberg frequencies are
+p squared, 2pq and q squared
+
+112
+00:08:59,128 --> 00:09:09,790
+so we'll have 25% a1a1, 50% a1a2 and
+25% a2a2. How am I going to do this?
+
+113
+00:09:10,032 --> 00:09:15,420
+Well, there's an easy way.
+I can do this using Math.random
+
+114
+00:09:15,862 --> 00:09:19,824
+and I'm going to show you how this
+works right now.
+
+115
+00:09:20,105 --> 00:09:23,593
+Given the a1 allele frequency p,
+we know that the Hardy–Weinberg
+
+116
+00:09:23,775 --> 00:09:32,500
+frequencies of the genotypes a1a1,
+a1a2 and a2a2 will be p squared, 2pq and 
+
+117
+00:09:32,667 --> 00:09:37,742
+q squared and we know that these add up to 1.
+You can think of this as a number
+
+118
+00:09:37,929 --> 00:09:44,966
+line between 0 and 1 and these 3
+numbers are like stretches that
+
+119
+00:09:45,141 --> 00:09:52,166
+when added up, add up exactly to 1.
+For example, you could move from 0
+
+120
+00:09:52,352 --> 00:09:59,114
+ for distance of p squared whatever the 
+concrete value is up to here and so
+
+121
+00:09:59,302 --> 00:10:04,702
+that would be p squared here.
+Alternatively, you can move from 1
+
+122
+00:10:04,892 --> 00:10:10,967
+to the left towards 0 for this
+distance of q squared whatever that value would be
+
+123
+00:10:11,162 --> 00:10:18,412
+in your concrete example.
+Here would be 1 - q squared and it has to be that
+
+124
+00:10:18,601 --> 00:10:26,739
+this stretch here is exactly 2PQ.
+This range, 0 to 1 is of course
+
+125
+00:10:26,931 --> 00:10:30,781
+exactly the range of numbers that
+are returned by Math.random
+
+126
+00:10:30,936 --> 00:10:34,911
+so you can imagine that Math.random
+is essentially returning
+
+127
+00:10:35,101 --> 00:10:40,739
+a random point on this number line.
+Correspondingly, you can then
+
+128
+00:10:40,914 --> 00:10:45,489
+choose based on the stretch where
+this lands which genotype
+
+129
+00:10:45,679 --> 00:10:50,966
+it's going to be. For example, let's
+say Math.random returns 0.4
+
+130
+00:10:51,148 --> 00:10:54,898
+something and this is maybe
+somewhere around here so it
+
+131
+00:10:55,082 --> 00:10:59,694
+landed now on the stretch that is
+here given by this 2pq which
+
+132
+00:10:59,889 --> 00:11:03,689
+of course corresponds to the A1A2
+genotypes. In this case, 
+
+133
+00:11:03,880 --> 00:11:07,042
+you're going to pick an A1A2
+genotype. Correspondingly,
+
+134
+00:11:07,237 --> 00:11:13,025
+let's say Math.random returns 0.1
+or something on that order
+
+135
+00:11:13,226 --> 00:11:16,751
+so maybe around here. It landed on
+this stretch here that is 
+
+136
+00:11:16,924 --> 00:11:21,549
+covered by p squared which means you would
+choose the A1A1 genotype.
+
+137
+00:11:22,052 --> 00:11:26,090
+Last but not not least let's say
+you get a Math.random return
+
+138
+00:11:26,286 --> 00:11:29,148
+value of something like 0.9.
+It lands on this stretch. 
+
+139
+00:11:29,352 --> 00:11:37,152
+Okay, so that is an A2A2 genotype.
+Very simple idea. Just pick a random
+
+140
+00:11:37,334 --> 00:11:41,434
+number between 0 and 1 and wherever
+it lands on the number line,
+
+141
+00:11:41,745 --> 00:11:45,495
+you will then pick the corresponding
+genotype. You just have
+
+142
+00:11:45,689 --> 00:11:48,402
+to figure out where exactly
+it landed.
+
+143
+00:11:48,596 --> 00:11:52,296
+Alright so now that we know how to
+do this, we can set this up
+
+144
+00:11:52,765 --> 00:11:57,628
+in here; in this loop. We can
+of course start by drawing this
+
+145
+00:11:57,825 --> 00:12:00,125
+random number that we just
+talked about;
+
+146
+00:12:00,336 --> 00:12:04,786
+random_number and this is simply
+a random number between 0 and 1
+
+147
+00:12:04,998 --> 00:12:10,323
+so Math.random is perfect.
+This random number is now the dot
+
+148
+00:12:10,507 --> 00:12:16,082
+on our line between 0 and 1.
+Now we can use just exactly this
+
+149
+00:12:16,302 --> 00:12:21,190
+logic that we just developed so we
+can say okay if this random_
+
+150
+00:12:21,382 --> 00:12:30,132
+number is now smaller than p squared 
+so smaller than p x p
+
+151
+00:12:32,134 --> 00:12:37,809
+then that means I'm going to draw an
+A1A1 genotype. What I'm going
+
+152
+00:12:38,012 --> 00:12:47,950
+to do here is I'm going to set this
+grid[i][ii] to A1A1 and I'm going to
+
+153
+00:12:48,145 --> 00:12:52,133
+use capital letters here. 
+Okay and because I want to keep
+
+154
+00:12:52,347 --> 00:12:56,885
+track of the number of A1A1
+genotypes I'm going to increase here
+
+155
+00:12:57,080 --> 00:13:05,230
+this counter variable by 1.
+Good so the next step would be
+
+156
+00:13:05,426 --> 00:13:11,676
+'else if'; so something else
+happened and there's still 2
+
+157
+00:13:11,865 --> 00:13:15,278
+conditions left, 2 possibilities
+left so I'm going to say 'else if'.
+
+158
+00:13:16,840 --> 00:13:20,053
+Now I'm going to come from the other
+side where I'm going to say
+
+159
+00:13:20,320 --> 00:13:23,708
+okay, this number might be actually
+on the right edge of the 
+
+160
+00:13:23,933 --> 00:13:28,846
+number line that we just developed
+so it would be larger than
+
+161
+00:13:29,055 --> 00:13:36,368
+1 - q squared and so the way to say this
+is now simply well else if (random
+
+162
+00:13:36,568 --> 00:13:45,993
+number is larger than 1 - q x q.
+Now of course we need to be careful
+
+163
+00:13:46,235 --> 00:13:52,698
+because we don't have q. We've only
+setup p here but of course
+
+164
+00:13:52,899 --> 00:13:58,762
+we know that q = 1 - p so I'm going
+to replace this with 1 - p
+
+165
+00:13:59,196 --> 00:14:04,233
+and the same over here so this
+term of course is still the 
+
+166
+00:14:04,411 --> 00:14:15,799
+equivalent to 1 - q squared so if that's
+the case then I just drew a A2A2
+
+167
+00:14:15,988 --> 00:14:27,913
+genotype. Grid [i][ii] = A2A2.
+Of course I'm also going to keep
+
+168
+00:14:28,147 --> 00:14:33,747
+track of the A2A2 genotypes so
+I'm going to increase this by 1.
+
+169
+00:14:35,680 --> 00:14:38,992
+If none of those 2 things happen
+then else; that means I'm in
+
+170
+00:14:39,214 --> 00:14:43,901
+the middle on my number line and
+I drew an A1A2 genotype so I can
+
+171
+00:14:44,133 --> 00:14:56,758
+simply say else grid [i][ii] = A1A2.
+Of course, I'm also keep track of
+
+172
+00:14:56,948 --> 00:15:04,973
+the a1a2 genotype so a1a2 = a1a2 + 1
+simply incrimenting this counter
+
+173
+00:15:05,207 --> 00:15:09,182
+by 1 and that's it.
+This initializes my grid.
+
+174
+00:15:09,412 --> 00:15:15,887
+Let's see if we did everything
+correctly so after this 'for' loop
+
+175
+00:15:16,080 --> 00:15:25,255
+here I would like to now just simply
+output the a1a1's, a2a2's and
+
+176
+00:15:25,683 --> 00:15:32,008
+a1a2's. I'm going to say console.
+log a1a1 and then the heterozygote
+
+177
+00:15:32,193 --> 00:15:40,581
+a1a2 and a2a2 and see if
+these are roughly in Hardy-Weinberg
+
+178
+00:15:40,816 --> 00:15:43,766
+equilibrium. Now I'm saying 'roughly'
+because they're not going
+
+179
+00:15:43,952 --> 00:15:48,190
+to be mathematically precisely at
+Hardy-Weinberg equilibrium.
+
+180
+00:15:48,509 --> 00:15:56,259
+With P = 0.5 and 10 000 individuals,
+we said that 25% would be perfect
+
+181
+00:15:56,459 --> 00:16:04,184
+Hardy-Weinberg values so 2500 of the
+a1a1, 5000 of the a2a2 and 
+
+182
+00:16:04,435 --> 00:16:10,085
+2500 a1a2 but because we assigned
+those values randomly
+
+183
+00:16:10,325 --> 00:16:13,687
+using this Math.random there will be
+some randomness, some
+
+184
+00:16:13,879 --> 00:16:17,217
+stochasticity in here but these
+numbers should be roughly in
+
+185
+00:16:17,416 --> 00:16:25,604
+the 2500, 5000 and 2500 range.
+Let's save this and then go over
+
+186
+00:16:25,842 --> 00:16:32,504
+to the browser and open this
+document. Open, File; here is my
+
+187
+00:16:32,697 --> 00:16:35,260
+spacial simulation. I'm going to
+open this. Of course I'm not
+
+188
+00:16:35,448 --> 00:16:38,398
+seeing anything here because I'm
+simply logging into the
+
+189
+00:16:38,589 --> 00:16:43,139
+console so View, Developer,
+JavaScript Console and here
+
+190
+00:16:43,305 --> 00:16:47,443
+are the numbers and you can see
+these are very close to 2500,
+
+191
+00:16:47,625 --> 00:16:52,575
+5000 and 2500. You can reload this
+and you can see there's going to be
+
+192
+00:16:52,756 --> 00:16:56,931
+some variation here but this is
+correct. This is pretty close
+
+193
+00:16:57,181 --> 00:17:03,818
+to this exact equilibrium and it's
+close enough given the
+
+194
+00:17:04,040 --> 00:17:06,290
+stochasticity that we expect
+
+195
+00:17:06,451 --> 00:17:08,238
+from the random 
+process here. 
+
+196
+00:17:08,494 --> 00:17:10,819
+Well done!
+You've implemented the grid. 
+
+197
+00:17:11,016 --> 00:17:13,728
+Alright so you've implemented
+the grid. We're ready to get
+
+198
+00:17:13,908 --> 00:17:18,083
+going. Now we need to implement the
+generations. What happens on
+
+199
+00:17:18,268 --> 00:17:21,443
+this grid in each generation?
+Let's find out. Let's implement it
+
+200
+00:17:21,613 --> 00:17:23,588
+in the next lecture.
+See you there.
+

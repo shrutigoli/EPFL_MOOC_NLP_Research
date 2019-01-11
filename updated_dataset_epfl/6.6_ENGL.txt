@@ -1,0 +1,115 @@
+Welcome back.
+By now you have an appreciation on the importance and the ubiquity of the redundancy principle in computer system.
+By now hopefully you also have an appreciation there are different ways in which redundancy could be applied in order to achieve different levels of fault tolerance or high availability.
+Now in this module we're actually going to look at two different systems that both try to achieve roughly speaking the same degrees of availability but have a very different set of operating and design principles and how to achieve that.
+The first case study is an extension of the enterprise grade clustering design presented in the prior module.
+And the second case study is an in-depth discussion on how Microsoft Azure uses distributed systems and commodity components in order to achieve a highly available storage and service stack.
+So let's get started.
+Let's first talk about our first case study which is the enterprise data base clustering model.
+If you remember there are two sweeping simplifications that were made in this design.
+The first one is the separation between transient state and durable state.
+Now I'm not going to revisit this sweeping simplification again.
+I'm actually going to go in depth into the second sweeping simplification which is that the two servers, the active server and the backup server both had access to a logically-shared disc that can serve as an arbiter.
+Now this is actually a very, very important point.
+The disc has to be logically shared.
+So it has to be logically accessible by both sides and it also has to serve as an arbiter.
+And the reason why having an arbiter is fundamental is that the arbiter is what guarantees that the system will operate correctly at all times and in particular will never suffer from a split brain syndrome.
+And the split brain syndrome would occur if both the active and the passive server were to concurrently conclude that they were actually the primary server and would start to modify the database.
+Corruption would immediately ensure and that needs to be avoided.
+Now in this case there is a hardware mechanism that is used as the foundation of the clustering model that guarantees the absence of split brain and that mechanism is called
+SCSI reservations.
+So deep into the hardware of the logically-shared disc, we have an abstraction which is called
+SCSI reservations, in which basically the primary server or every server that believes to be the primary server must with every disc transaction guarantee the fact that it can prove that it is the primary server by passing a key.
+And that key can change and it's the change of the key that actually ensures that a takeover is explicit and that two servers can never concurrently access the same storage device.
+Now there's a lot of implementation issues associated with creating this abstraction of a logically-shared arbiter, one of which and a non-trivial one is that the disc itself obviously cannot be a single point of failure.
+So if we actually drill into the next level of detail, the disc is never a traditional disc.
+And you remember that from our layering discussion.
+As a matter of fact, the disc is typically a very complex computer system of it's own.
+So think about the logically-shared disc as being a rack-size computer system with lots of rotating media inside it.
+Now those systems themselves are designed with a very high degree of availability, durability, they're also designed explicitly for servicability.
+So they actually meet many of these exact same design principles that we saw in the context of the tandem computer system design but this time applied to the storage subsystem.
+Now let's double click on what we mean and what is inside those systems.
+So the first requirement is to ensure that the logically-shared disc could be made available at all times including in the presence of component failures within the disc subsystem or within the ways in which we connect the servers to the disc subsystem.
+If you remember our conversation in the context of the tandem nonstop system, there was a key hardware design principle which stated that all paths to storage had to be fully duplexed.
+Now that principle still holds
+20 or 30 years later.
+And what you see on screen is the canonical design on how you connect servers to enterprise-grade storage subsystems.
+You have a fully redundant fabric design with redundant adapters connecting the servers to the fabric, redundant switches connecting the switches to the storage arrays ensuring that the storage subsystem will be available and reachable at all times including in the presence of path failures.
+Now the second requirement of course is to ensure that the storage subsystem itself never fails.
+And here also the tandem design principle is the primary guide for the design of an enterprise-grade storage subsystem.
+Now the components of the storage subsystem are not particularly important here.
+I'm not going to go through them in detail.
+What's important is to realize that we applied those exact same principles of redundancy and fault tolerance within the inside of a storage subsystem.
+For example, a storage subsystem has redundant front-end controllers.
+Those are both the recipients of connectivity from the servers but they actually need to work in pairs in order to ensure that the logically-shared arbiter can actually be implemented.
+And so the abstraction of that logically-shared arbiter is actually implemented by having a collection of front-end controllers coordinate their state using a process-pair model or something very similar to the tandem process-pair model for their own implementation.
+At other aspects of the system, storage subsystems also use the fundamental redundancy principles to ensure durability and availability.
+The cache memory uses error-correcting code.
+That was one of the primary applications of error-correcting codes when they were introduced.
+The backing storage controls are also replicated and redundant.
+The connectivity between the backing controllers and the rotating discs is also duplexed to ensure that you can always reach a disc at any particular point in time.
+And then obviously we use raiding coding and various forms of RAIDs in order to ensure the data will be durable including in the presence of rotating media failure.
+So there you have it.
+All the details and the implementation principles of modern storage arrays are actually very much inspired by the original tandem system of the 1980s.
+So to summarize, to create an enterprise-grade high availability system you need to have redundancy between components.
+You need to have redundancy of data through replication in coding and you need to have redundancy of the paths connecting the components together.
+And the key insight here is that there's a magic number of two, which means that by having two sets of components at all levels and duplex paths between the layers, you can actually achieve an enterprise-grade high availability with no single point of failure.
+And that is because some of these abstractions even though they're replicated in pairs of two actually create arbiters that appear as a hardware abstraction to the layer above.
+Now let's keep this number of two in mind especially as we look at our second case study which is from Calder et al.
+This is based on an SOSP paper describing the design and implementation of the 
+Windows Azure Storage System.
+Now one of the important aspects of the paper is the consistency semantics of Azure Storage.
+We're not going to talk about that at all.
+We're actually going to talk about some of the high availability, characteristics of this design.
+So Azure Storage is premised around the notion of a system.
+A system is called a stamp.
+A stamp is quite large.
+It can actually be deployed on multiple racks, ten to 20 racks.
+It could hold 30 petabytes of data but it is a single system running a single software stack and all the components are designed to work with each other in order to create an abstraction delivered by this single system at a large scale.
+Now the components that are within the rack are all commodity based.
+You have commodity-based
+Ethernet switches, commodity-based servers and lots of obviously rotating media within each server instance.
+And we'll focus on how
+Azure designed its system to ensure the highest degree of availability.
+So this is achieved through layering and replication.
+So layering is used first as a design principle to provide various abstractions, modularity in how these abstractions are implemented and the management of different namespaces at each layer within the stack.
+Now the stamp again is the system and the stamp ensures the durability and the availability of data.
+And for this it actually uses replication synchronously within the stamp.
+So we're applying redundancy by using three-way replication within the stamp in a synchronous manner.
+It also provides a greater degree of availability and durability through a geo-replication mechanism which this time is asynchronous across stamps.
+So within the stamp, you replicate synchronously and across stamps you replicate asynchronously.
+And again we have to think of a stamp as a single system and in particular as from a fault and availability perspective as one domain that will ensure the availability of the service even in the presence of component failures.
+And so you have to assume that there are other elements within the stamp such as power distribution units, power supplies, air-conditioning units, network switches.
+All of which also have to be redundantly deployed in order to ensure the availability of the system as a whole.
+One of the key observations is that different stamps will ideally share as few of these global infrastructure components as possible.
+And this simplifies the monitoring of the stamp and the availability of the data that is replicated across stamps.
+Now let's double-click on the different aspects.
+And first a stream layer managers the data.
+And specifically it exposed the abstraction of a highly-available stream to the partition layer of the stamp.
+Now each stamp has a logically-centralized stream manager, it's written SM in the figure, which manages the stream name space for the entire stamp.
+Now of course having a single instance of a stream manager would create a massive single point of failure and therefore the stream manager's database is replicated on the multiple independent servers.
+Now because there's no shared hardware state, the authors chose to use PAXOS which is the de facto standard mechanist to replicate state machines across fully distributed systems.
+Now once the stream has been created, the partition layer which is the client to the stream layer can directly connect to the extent nodes.
+And the extent nodes are responsible to hold storage.
+They're equivalent to the chunk nodes or the chunk servers in Hadoop-based systems.
+And by doing that you ensure that the stream manager is off the critical path for data access.
+It is only there to provide metadata capabilities to look up where the data should actually be stored.
+And then at the layer below each extent node manages its local discs.
+And on any write which is actually the pen within the stream.
+The first extent node that replicates the request, to the two secondary extent nodes before acknowledging the request.
+This is how you implement synchronous three-way replication within the stamp.
+If you're interested in learning more about the Azure system,
+I refer you to the paper.
+But now let's see if we can compare these two case studies.
+As a matter of fact, it's even interesting to question whether these two systems are comparable.
+They're radically different on nearly every point in this spectrum.
+They scale very differently.
+They provide different abstractions which has implications for the applications.
+These abstractions are presented using very different networking technologies.
+They also use different mechanisms to ensure the atomicity of transitions.
+In one case, we use a hardware mechanism which is SCSI reservations and in the other we use the
+PAXOS consensus algorithm.
+They offer different quality of service characteristics.
+They have different deployment models but they're both designed to never fail or more accurately said, they're both designed to ensure maximum availability.
+This wraps it up for this week.
+Thank you! Enjoy the papers.

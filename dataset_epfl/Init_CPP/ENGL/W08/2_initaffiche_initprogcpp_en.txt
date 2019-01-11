@@ -1,0 +1,207 @@
+The coding of an application, whatever it is, requires a careful thinking of the involved data and of the fundamental functionalities which will enable to implement the desired processing.
+In the previous episode., we have already started this thinking about the coding of the Connect Four game.
+This has lead us to identify the fundamental types in order to represent the game grid.
+Today we will expand our reasoning and focus on the basic funtionalities.
+Little reminder: in the previous episode, we have paid attention to the types of the involved data.
+Very naturally, we have contemplated the modelling of the game grid.
+Thus, we have introduced the new type "Grille" (TN: means "grid") as a two-dimensional array.
+We have also modeled the cells' content of all the array's elements.
+This has lead us to introduce a new enumerated type, the type "Couleur" enabling us to represent the content of each array cells.
+The grid's size being fixed, we have naturally chosen to use the "array" type, introduced in C++2011, letting us represent a fixed-size array.
+We have simply declared the type "Grille" as representing a two-dimensional array, its size being fixed with
+6 rows and 7 columns.
+Each element of the grid is of the type "Couleur".
+"Couleur" being an enumerated type allowing only the values "vide" ("empty"), "rouge" ("red") and "jaune" ("yellow").
+Once these types have been introduced, we can easily, in our program, declare a Grille-type variable and assign values to its different elements.
+These values will be taken among the ones of the enumerated type, that is, "vide", "rouge" or "jaune".
+The fundamental types having been defined, we will now focus on the first functionalities we will operate on our grid.
+At the beginning of the game, we will probably want to start playing with an empty grid.
+Therefore, we will have to focus on the initialization, letting us initialize each of the array cells to the value "vide".
+Also, we will have to allow the printing of the grid, so that players may have an understanding of their advancement in the game.
+In the this episode, we will focus on implementing concretely these two functionalities.
+We will forsee the coding of a function
+"initialise" (TN: means "initialize) initializing the grid as well as the coding of another function called "affiche" (TN: means "print") which will print the grid.
+Let us begin with the initialization.
+Let us imagine how to concretely use this "initialise" function in a program.
+We can imagine that, in a program, we have previously declared a Grille-type variable "grille". In order to initialize this grid, we can imagine to write a function which can be called like this.
+We will call the function "intialise" taking, as paramter, the grid in order to modify its content.
+How will be modify its content?
+Well, simply we will fill each of its cells with the value "vide".
+Now, let us focus on the coding of the "initialise" function.
+We can see that the function "initialise", the way we see it, does not need to return any result.
+Its purpose is to modify the grid, to initialize it.
+Naturally, we will describe an
+"initialise" function whose return type is "void", for we do not need to retrieve a value after the execution of the "initialise" function.
+We will write the "initialise" function passing a Grille-type parameter.
+The "initialise" function will have to modify the grid.
+Therefore, once we have finished executing the function, at this point of the program, we will retrieve a grid, the contet of which has been modified.
+For this reason, we will have to resort to  passing by reference so that the grid will indeed be modified by the initialization function.
+By the way, please note that this way to code the "initialise" function is obviously not the only possible solution.
+We could imagine that, instead of working directly on
+ the provided grid,
+ the "initialise" function
+could return a correctly initialized grid.
+This would correspond to the following call.
+Here, we would replace the two lines of code we have written here by something like this.
+We could call the
+"initialise" function which, instead of modifiying a provided grid, would return a new grid.
+At this point, the return type would no longer be "void" but  "Grille" instead.
+Also, any parameter would no longer be necessary since the "initialise" function would return a grid.
+This is another way to proceed, a way we have already discussed in the course about "structures", with the example of the function enabling to "give birth to a new person".
+In this episone, we have chosen an alternative conception, especially illustrating the idea of by-reference passing.
+The header of the function is now clearly defined and we can move on to developping its body.
+Let us focus on the content of the function body.
+What this function has to do is, for each row of the array, to iterate on each cell and assigning it the value "vide".
+Let's see how we can proceed to initialize a single row.
+Let us imagine we are trying to do so for the first row of the grid.
+Obviously, we will need to write a "for loop".
+This loop will iterate on each element of the row.
+We can imagine a range-based for-loop which is written like this.
+As a first introduction. we will first do so for the first row of the grid, iterating square by square.
+This is written like this.
+We will fill the content, assigning the value "vide" to it.
+At this point, as an exercise, we have written the lines of code initializing the first row of the grid, storing the value "vide" in each cell.
+Here, we can simply close the function.
+By the way, please note the use of a "reference" type for the iteration variable in the range-based for-loop.
+This is mandatory if we want the content of each square to be modified.
+If we compile the program as such, we will however encounter a tiny problem.
+The identifier "case" (TN: means "square"), although very natural in French in order to identify a square of the array is actually a reserved keyword of the C++ language.
+We are therefore not allowed to use it as a variable identifier.
+Therefore, we will have to make a slight change so that the program may effectively compile.
+We will change the identifier name.
+We way take the precaution to comment the reason behind this choice, explaining that we are not allowed to use the reserved keyword "case" since it is a reserved keyword of the language.
+Obviously, we will have to rectify the identifier wherever it is used.
+Like this.
+Obviously, this processing we have implemented to initialize the first row of the grid must be repeated for each row so that we can initialize the whole grid.
+It is natural to imagine imbricating these processing in a first "for loop" which will be tasked to iterate on all the rows and realize exactly the same processing.
+Let 's write this first "for loop" iterating on all the rows of the grid.
+Once again, we can use a range-based for-loop.
+Therefore using a variable "ligne"
+(TN: means "row") iterating on each row of the grid.
+For each row, we will have to replace "grille[0]" by "grille[ligne]".
+We are realizing the same processing as before, thus storing the value "vide" inside each square.
+We correct here our identation.
+Finally we have all these lines of code, enabling us to iterate on all the rows in order to modify their content.
+By the way, please note the passing by reference for the range-based for-loop variable, so that the grid will indeed be modified.
+We are now able to initialize a previously declared grid thanks to the Grille-type defined during the previous step.
+Let us now focus on the printing of the grid.
+As before, let us imagine the concrete utiliization of this printing function.
+It is always recommended to start off by imagining how the function will be used before its effective coding.
+Typically, we can imagine that, once the grid has been initialized, and other processing done on the grid, we will need to print it.
+It is natural to imagine calling an "affiche" function taking, as parameter, the grid "affiche".
+Let us now focus on the prototype.
+As before, the type "void" is natural since the printing function will simply print the grid on the terminal and does not need to return any result.
+Here, we pass the grid as parameter.
+Now we are wondering :
+Under what form should we pass the parameter "grille"?
+Should we resort to passing by value or by reference?
+The printing function's purpose is to print the values of the different squares of the came grid.
+Its goal is therefore not to modify the content of the grid.
+Therefore, it rather natural to imagine to resort to passing by value for the parameter "grille".
+Indeed, it is not necessary for the printing function to modify the grid's content.
+However we have seen that, when passing by value, a copy of the argument passed to the function is made in an area local to the "affiche" function.
+If the object passed as argument is big, this copy can be quite resource consuming.
+At this point, we therefore resort to an alternative, an optimization consisting of passing the parameter by reference.
+This will let the "affiche" function work directly on the memory area corresponding to the passed argument, without any copy.
+However, we take the precaution to pass the argument by constant reference in order to make sure that the "affiche" function, even if it operates directly on the argument, will not modify its content.
+For example if, within the body of the "affiche" function, we attempt to modify the grid's content, it will result in an error upon the compiling.
+By the way, please note that we could very well have written this:
+This notation is perfectly equivalent to the former.
+We can use both notations indefferently.
+This here is an optimization letting the function work directly on the argument but adding in stead certain railings hindering the function to modify the grid's content, for this is not the purpose of the function.
+This precautation was essential in C++98.
+In C++2011 however, it is not always the case.
+However, these practice considerations stretch beyond the range of this course.
+We will simply settle for implementing this precautation: good practice in order to avoid the unnecessary copy.
+Here, the prototype of the "affiche" function will use the passing by constant reference in order to avoid the copy.
+Let's now proceed to code the body of the "affiche" function.
+Here, the coding is rather natural.
+It is rather similar to what we have done for the "initialise" function.
+The goal will be to iterate on each of the grid's rows.
+Then, for each of the grid's row, we will iterate on each square in order to print its content in a particular format.
+Here, we will not do any graphical display but will simply print the content of each cell on the terminal, following a particular convention.
+In order to iterate on all the grid's rows, a range-based for-loop is rather natural.
+We know exactly how many rows and how many columns there are in the grid.
+So here, for each of the grid's rows; this is written like this, with a range-based for-loop; we will iterate on each square of the considered row.
+We will thus print the content of each square, in a particular format.
+We will have to resort to tests in order to know, depending on the content, what is to be printed.
+For example, if the square contains the value "vide", that is, if the value of the enumerated type "Couleur", is "vide", we can choose, by convention, to print a blank space on the terminal.
+Otherwise, we will resort to other tests.
+If the value of the square corresponds to the value "rouge" of the enumerated type, second possible convention, we can choose any convention, here, for example, an 'O' for the value "rouge".
+Otherwise, last possible case, we know that it contains the value "jaune".
+We make a printing choice: for example, an 'X' signifying the value "jaune".
+Here, we conclude the body of the first "for loop", the inside "for loop".
+At this point, we have printed the content of one row.
+We take the precaution to generate a line break, separating the different rows, once a row has been printed entierely.
+This closes the body of the very first "for loop".
+Then, we will end the body of our "affiche" function.
+You will note here, that it has not been necessary in our range-based for-loop to resort to the ampersand symbol ('&').
+Why is that?
+Because we are only consulting the content of the different elements.
+We do not aim to modify their content.
+In this case "auto", withtout the by-reference symbol ('&') is amply sufficient.
+As good programmers, we will now comment the "affiche" function.
+Indeed the printing choices we have resorted to are not necessarily forseeable.
+It is therefore useful for someone consulting our code to know the used conventions without having to read the whole function body.
+At this point, we take the precaution to comment our code, explaining the conventions adopted for the coding.
+We precise that we will print an "O" for a red square and "X" for a yellow one.
+Testing the functionalities as we progress in the coding of an application is absolutely indispensable in order to produce a sturdy and high-quality code.
+This recommandation has been given at the very beginning of our case study regarding the Connect Four.
+We will thus begin testing our first functionalities, namely the grid initialization and its printing.
+In order to test the aforementioned functionalities, we simply need to write a little main program, calling the functions "initialise" and "affiche" on a previously declared grid.
+Here, we call the initialization and printing functionalities on our grid.
+It could be natural to wish to test the printings of all the possible forms.
+If we simply initialize the grid and print it directly, all the squares will be empty.
+At this point, it is interesting to make sure that all the cases are correclty covered.
+We will try to cover all cases by filling the grid, at certain places with yellow disks, at others with red disks.
+We are doing just that here, on randomly chosen squares.
+The expected printing, following the program execution should look like this.
+Here, for every square of the grid, excepted the ones we have explicitly assigned, we should print a blank space.
+We are representing this here with this symbol for more clarity.
+However, please note that, in reality, only a blank space will be printed.
+And, for the two particular squares we have filled with red and yellow disks, we will have particular printings.
+Here, the square on the 2nd row,
+3rd column must be yellow; this corresponds, according to our printing convention to an "X".
+Here, we indeed have the row index 0, 1, 2.
+This corresponds to this row number.
+The column index 0, 1, 2, 3, which corresponds to this.
+Similarly we should have the printing convention of a red disk on the 2nd row,
+4th column.
+Concretely, in our Connect Four game, this playtest allows to create a grid with a yellow disk here and a red disk here.
+The bases have now been set and we can start to focus on more cosmetic aspects, tweaking aspects.
+Here, the printing of the grid is rather dry.
+It is not easy to distinguish columns,
+Also, the separation between blank spaces is somewhat hazy.
+Therefore, it would be nice to improve this printing; this can be done by completing the existing code, adding the following aspects which we will now comment.
+This should provide a more explicit printing.
+Especially separating the different columns with vertical bars and explicitly numbering the different columns below the grid in order to make it easier to visualize the content of our game grid.
+What were the necessary additions leading to this printing?
+Well, we begin, before each row, to print a blank space followed by a vertical bar.
+This will allow to print each of these elements for each row.
+Then, following the printing of each case's content, be it "vide", "rouge" or "yellow" we print a vertical bar just after this printing.
+Therefore, we will print each of these vertical bars here.
+The reamining processing is rigorously identical.
+Then, once the whole grid has been printed, we will focus on printing this part above the grid.
+This is fulfilled by these lines of code here.
+Let us comment them.
+We begin by printing an equals symbol, this symbol.
+This is a particular case, not corresponding to the content of a column.
+It simply corresponds to the blank space preceeding the first column.
+Then, thanks to a "for loop", we will iterate on all the rows in order to print their number.
+We preceed the printing of each number with the equals symbol.
+Actually, this "for loop" here will let us print each number preceded by the equals sign.
+Here, we took the precaution to number the columns starting with 1, making it more readable.
+Once this "for loop" has been executed, we will have printed the last column number, preceeded by the equals symbol.
+If we wish to close the printing harmoniously, we still have to print this double equals symbol which you can see here.
+This is followed by as many line breaks as necessary.
+At this point, we have tweaked our printing, thus making it more readable.
+Please note that we are not iterating on all the grid's values.
+We are iterating as many times as there are columns in the grid.
+At this point, we are using a classical iteration and not a range-based for-loop.
+The "i"variable will take as many values as the number of columns in the grid.
+The number of columns is a size-type element; this is represented in C++ with the "size_t" type.
+This is good practice for the coding of such processing.
+We have no reached the end of this step.
+We have been able to model a Connect Four grid.
+We also know how to initialize it and print its content.
+We can now move on to the heart of matter which will be the object of the following sequences.

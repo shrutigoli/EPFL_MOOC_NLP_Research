@@ -1,0 +1,1503 @@
+1
+00:00:00,000 --> 00:00:05,480
+Bonjour.
+
+2
+00:00:05,480 --> 00:00:08,378
+Comprendre les microcontrôleurs, c'est
+aussi
+
+3
+00:00:08,378 --> 00:00:11,000
+être capable de développer des
+applications
+
+4
+00:00:11,000 --> 00:00:13,934
+avec les microcontrôleurs, et aujourd'hui
+
+5
+00:00:13,934 --> 00:00:17,390
+nous allons réaliser une petite
+application.
+
+6
+00:00:17,390 --> 00:00:21,270
+Elle va nous donner l'occasion d'exercer
+
+7
+00:00:21,270 --> 00:00:25,428
+la lecture de valeurs analogiques, et
+également
+
+8
+00:00:25,428 --> 00:00:28,310
+la connexion à une liaison série.
+
+9
+00:00:28,310 --> 00:00:34,680
+Il s'agira d'un testeur et chargeur
+d'accumulateur, très simple.
+
+10
+00:00:34,680 --> 00:00:40,530
+Pour simplifier nous allons utiliser dans
+ce projet un accumulateur avec une
+
+11
+00:00:40,530 --> 00:00:46,232
+tension de 1,2 Volts, en particulier la
+technologie
+
+12
+00:00:46,232 --> 00:00:50,696
+M i M h qui est encore très utilisée.
+La première chose qui nous intéresse
+
+13
+00:00:50,696 --> 00:00:57,142
+c'est d'être capable de mesurer la tension
+à vide de notre accumulateur, on
+
+14
+00:00:57,142 --> 00:01:00,338
+le fait habituellement avec un voltmètre,
+en
+
+15
+00:01:00,338 --> 00:01:04,120
+mesurant la tension aux bornes de
+l'accumulateur.
+
+16
+00:01:04,120 --> 00:01:08,720
+Ce sera facile à faire avec une entrée
+analogique d'un microcontrôleur.
+
+17
+00:01:08,720 --> 00:01:16,266
+On a besoin évidemment de charger
+l'accumulateur, pour le charger
+
+18
+00:01:16,266 --> 00:01:21,950
+il faut faire passer un courant depuis
+l'alimentation, qui va ici
+
+19
+00:01:21,950 --> 00:01:26,640
+charger l'accumulateur, une résistance de
+limitation
+
+20
+00:01:26,640 --> 00:01:29,600
+sera utilisée pour régler le courant.
+
+21
+00:01:29,600 --> 00:01:35,400
+Evidemment ce qui nous intéressera c'est
+de connaitre l'intégrale du courant,
+
+22
+00:01:35,400 --> 00:01:41,395
+qui va représenter l'énergie qu'on a donné
+en charge qui
+
+23
+00:01:41,395 --> 00:01:43,870
+s'exprime donc en ampères heure ou
+
+24
+00:01:43,870 --> 00:01:46,420
+évidemment plus souvent en milliampères
+heure.
+
+25
+00:01:46,420 --> 00:01:48,621
+Ensuite si on a envie de connaitre les
+
+26
+00:01:48,621 --> 00:01:52,840
+caractéristiques de cet accumulateur il
+faut pouvoir le décharger.
+
+27
+00:01:52,840 --> 00:01:56,900
+Pour le décharger on fera passer du
+courant cette fois vers la masse.
+
+28
+00:01:56,900 --> 00:02:02,526
+Donc, comme ceci.
+Et cette fois l'intégrale du courant va
+
+29
+00:02:02,526 --> 00:02:07,780
+représenter la capacité de l'accumulateur.
+Ce que l'accumulateur
+
+30
+00:02:07,780 --> 00:02:12,370
+a réellement pu conserver comme énergie
+électrique
+
+31
+00:02:12,370 --> 00:02:17,385
+qu'on lui a fourni au moment de la charge.
+Comment réaliser ces 3
+
+32
+00:02:17,385 --> 00:02:22,495
+montages avec un microcontrôleur?
+Voici
+
+33
+00:02:22,495 --> 00:02:27,434
+une solution: nous allons utiliser une
+
+34
+00:02:27,434 --> 00:02:32,888
+entrée analogique pour mesurer en
+permanence la tension aux bornes
+
+35
+00:02:32,888 --> 00:02:38,466
+de notre accumulateur, et on va utiliser
+ici notre résistance,
+
+36
+00:02:38,466 --> 00:02:44,039
+celle qui se trouve ici, celle qui se
+trouve là, il n'y en aura qu'une.
+
+37
+00:02:44,039 --> 00:02:49,692
+Et on pourra utiliser cette patte pour
+demander la charge si on
+
+38
+00:02:49,692 --> 00:02:55,520
+met l'état 1, pour demander la décharge si
+on met l'état 0.
+
+39
+00:02:55,520 --> 00:02:58,480
+Et évidemment au moment où on lit la
+tension,
+
+40
+00:02:58,480 --> 00:03:01,040
+on va utiliser la la haute impédance pour
+qu'il
+
+41
+00:03:01,040 --> 00:03:04,450
+n'y ait aucun courant qui passe à travers
+cette résistance.
+
+42
+00:03:04,450 --> 00:03:08,774
+Evidemment il faut bien choisir cette
+résistance, il
+
+43
+00:03:08,774 --> 00:03:12,220
+ne faut pas dépasser le courant de sortie.
+
+44
+00:03:12,220 --> 00:03:16,197
+Rappelez-vous un microcontrôleur est
+capable
+
+45
+00:03:16,197 --> 00:03:19,530
+de fournir environ 30 milliampères.
+
+46
+00:03:19,530 --> 00:03:23,742
+J'aurais même tendance à dire que, il
+faudrait être inférieur
+
+47
+00:03:23,742 --> 00:03:30,650
+à cette valeur-là pour que la chute de
+tension dans la résistance du transistor
+
+48
+00:03:30,650 --> 00:03:33,832
+reste négligeable pour ne pas influencer
+la
+
+49
+00:03:33,832 --> 00:03:37,370
+mesure du courant qu'on verra tout à
+l'heure.
+
+50
+00:03:37,370 --> 00:03:43,258
+Commençons alors à écrire un petit
+programme de test, qui va faire la mesure
+
+51
+00:03:43,258 --> 00:03:48,850
+et l'affichage de la tension, regardons si
+c'est vraiment la
+
+52
+00:03:48,850 --> 00:03:53,970
+tension, alors on a donc notre setup où on
+va simplement
+
+53
+00:03:53,970 --> 00:03:58,940
+enclencher la ligne série pour pouvoir
+dialoguer avec le pc pour
+
+54
+00:03:58,940 --> 00:04:03,747
+pouvoir afficher les messages sur l'écran.
+Dans notre
+
+55
+00:04:03,747 --> 00:04:08,868
+loop principal, on va lire ce qui
+
+56
+00:04:08,868 --> 00:04:13,912
+est à analogique qui s'appelle dans
+
+57
+00:04:13,912 --> 00:04:19,070
+ce cas-là A5 qui est donc l'entrée de
+l'accumulateur, et
+
+58
+00:04:19,070 --> 00:04:23,500
+ensuite on va directement afficher la
+valeur lue, envoyer les caractères
+
+59
+00:04:23,500 --> 00:04:27,760
+correspondants sur la ligne série, on met
+ensuite un délai d'une
+
+60
+00:04:27,760 --> 00:04:31,920
+seconde pour éviter que les messages
+n'arrivent trop vite sur l'écran.
+
+61
+00:04:31,920 --> 00:04:35,310
+Est-ce qu'on a véritablement affiché la
+tension?
+
+62
+00:04:35,310 --> 00:04:38,959
+Certainement pas, on a affiché une valeur
+entre
+
+63
+00:04:38,959 --> 00:04:44,051
+0 et 1023 qui correspond à une
+
+64
+00:04:44,051 --> 00:04:49,029
+valeur de tension entre 0 volts et, et
+quoi?
+
+65
+00:04:49,029 --> 00:04:54,783
+Eh bien et la tension d'alimentation Vcc
+qu'on ne connait pas forcément
+
+66
+00:04:54,783 --> 00:04:58,920
+très bien, admettons pour le moment qu'il
+soit égal à 3,5 volts.
+
+67
+00:04:58,920 --> 00:05:04,529
+Ce programme ne fait évidemment pas encore
+ce qu'on fait mais c'est très important
+
+68
+00:05:04,529 --> 00:05:07,580
+de faire des programmes de test, pour
+tester
+
+69
+00:05:07,580 --> 00:05:11,066
+les fonctions de bas niveau, avec ce
+programme on
+
+70
+00:05:11,066 --> 00:05:14,263
+peut se convaincre que la ligne série
+fonctionne,
+
+71
+00:05:14,263 --> 00:05:18,490
+que la lecture analogique fonctionne,
+c'est déjà très intéressant.
+
+72
+00:05:18,490 --> 00:05:21,820
+Et, n'oubliez pas prenez l'habitude de
+conserver
+
+73
+00:05:21,820 --> 00:05:24,558
+ces programmes de test ils peuvent
+toujours
+
+74
+00:05:24,558 --> 00:05:28,690
+être utiles à un moment ou à un autre de
+la suite du développement.
+
+75
+00:05:28,690 --> 00:05:29,670
+La première
+
+76
+00:05:29,670 --> 00:05:36,240
+modification de ce programme, c'est de
+souhaiter d'afficher la tension en volts.
+
+77
+00:05:36,240 --> 00:05:39,192
+Est-ce que vous vous souvenez de la
+fonction map
+
+78
+00:05:39,192 --> 00:05:41,710
+que nous avions vue il y a quelque temps?
+
+79
+00:05:41,710 --> 00:05:48,000
+On va lui donner le départ pour l'entrée
+et pour la sortie.
+
+80
+00:05:48,000 --> 00:05:53,070
+On va donner l'arrivée pour l'entrée et
+pour la sortie.
+
+81
+00:05:53,070 --> 00:05:55,149
+Alors ici MaxConv c'est
+
+82
+00:05:55,149 --> 00:05:59,208
+bien le 1023, c'est la valeur maximale qui
+
+83
+00:05:59,208 --> 00:06:03,900
+peut être lue par le convertisseur, et
+ici, les
+
+84
+00:06:03,900 --> 00:06:06,571
+2500 ça ne correspond pas à la tension
+
+85
+00:06:06,571 --> 00:06:09,550
+d'alimentation dont je vous ai parlé tout
+à l'heure.
+
+86
+00:06:09,550 --> 00:06:15,155
+Mais c'est bien ce que j'ai voulu choisir,
+en effet j'ai rajouté dans le setup cette
+
+87
+00:06:15,155 --> 00:06:20,594
+ligne qui demande d'utiliser en interne
+une référence,
+
+88
+00:06:20,594 --> 00:06:25,714
+une référence de tension interne au
+microcontrôleur, il y en a 2 sur le msp
+
+89
+00:06:25,714 --> 00:06:30,956
+430, celle qu'on utilise à 2,5 volts.
+donc après avoir
+
+90
+00:06:30,956 --> 00:06:36,266
+écrit cette instruction, les valeurs qu'on
+lit elles
+
+91
+00:06:36,266 --> 00:06:41,320
+correspondent à des fractions de cette
+tension-là.
+
+92
+00:06:41,320 --> 00:06:45,330
+Si, par exemple, je lis la valeur 700,
+
+93
+00:06:45,330 --> 00:06:50,720
+j'aurai 700 deux mille sept-centièmes de
+millivolts.
+
+94
+00:06:50,720 --> 00:06:55,477
+Remarquez effectivement que j'ai utilisé
+des millivolts en permanence quand
+
+95
+00:06:55,477 --> 00:06:58,680
+bien même on l'affichera, on va le voir,
+en volts.
+
+96
+00:06:58,680 --> 00:07:04,894
+Alors ici la routine de lecture tension,
+j'ai
+
+97
+00:07:04,894 --> 00:07:10,699
+bien la lecture comme tout à l'heure, mais
+j'applique directement le map pour avoir
+
+98
+00:07:10,699 --> 00:07:13,850
+une valeur exprimée en millivolts.
+
+99
+00:07:13,850 --> 00:07:19,755
+Ensuite il est nécessaire d'afficher la
+tension, voilà la procédure : alors
+
+100
+00:07:19,755 --> 00:07:24,780
+je vais afficher, non pas les valeurs en
+millivolts, parce que je préfère voir
+
+101
+00:07:24,780 --> 00:07:29,016
+les volts avec le point décimal, donc je
+prend ici la valeur de
+
+102
+00:07:29,016 --> 00:07:34,117
+la tension que je divise par mille, c'est
+à dire les volts eux-mêmes.
+
+103
+00:07:34,117 --> 00:07:35,990
+J'écris ensuite un point.
+
+104
+00:07:35,990 --> 00:07:40,892
+Je n'ai pas envie d'avoir ensuite les 3
+valeurs décimales, 2 me
+
+105
+00:07:40,892 --> 00:07:45,805
+suffisent largement.
+Donc je divise la valeur par 10, et je
+
+106
+00:07:45,805 --> 00:07:51,220
+prend le module O pour avoir exactement la
+valeur que je souhaite.
+
+107
+00:07:51,220 --> 00:07:59,750
+On pourrait faire un petit essai, on a la
+valeur 1230 millivolts qui vient.
+
+108
+00:07:59,750 --> 00:08:01,136
+J'affiche ici cette
+
+109
+00:08:01,136 --> 00:08:05,679
+valeur divisée par mille, je rappelle
+c'est une division entière ça
+
+110
+00:08:05,679 --> 00:08:10,557
+m'affiche bien le 1.
+J'affiche ensuite le point décimal et
+
+111
+00:08:10,557 --> 00:08:16,322
+j'affiche ensuite la valeur divisée par
+10, c'est à dire 123,
+
+112
+00:08:16,322 --> 00:08:21,868
+module O 100, c'est à dire 23.
+Au final, j'ai bien
+
+113
+00:08:21,868 --> 00:08:27,410
+affiché 1 point 23, cette procédure semble
+marcher.
+
+114
+00:08:27,410 --> 00:08:32,790
+Oh, j'ai quand même un doute.
+Essayons
+
+115
+00:08:32,790 --> 00:08:37,011
+encore avec une autre valeur.
+Admettons que notre accumulateur s'est un
+
+116
+00:08:37,011 --> 00:08:44,130
+peu déchargé, et que la valeur que je lis
+est cette fois de 1090 millivolts.
+
+117
+00:08:44,130 --> 00:08:47,360
+Comment est-ce que je vais afficher ça?
+
+118
+00:08:47,360 --> 00:08:52,020
+Alors la valeur divisée par 1000 ça va me
+donner 1.
+
+119
+00:08:52,020 --> 00:08:53,364
+Le point
+
+120
+00:08:53,364 --> 00:08:59,055
+décimal qui s'écrit.
+La valeur divisée
+
+121
+00:08:59,055 --> 00:09:04,294
+par 10, ça me fait 109 module O 100, ça me
+
+122
+00:09:04,294 --> 00:09:09,740
+fait 9 et il m'affiche 1 point 9, c'est
+faux.
+
+123
+00:09:09,740 --> 00:09:14,974
+Voilà un piège qu'on a tous fait une fois
+ou l'autre.
+
+124
+00:09:14,974 --> 00:09:18,418
+Voilà la version corrigée, je dois bien
+afficher
+
+125
+00:09:18,418 --> 00:09:22,790
+séparément chacun des digits pour qu'il
+n'y ait pas la suppression
+
+126
+00:09:22,790 --> 00:09:26,646
+du digit non-significatif.
+Occupons-nous maintenant
+
+127
+00:09:26,646 --> 00:09:30,440
+de la charge et de la décharge de notre
+accumulateur.
+
+128
+00:09:30,440 --> 00:09:36,836
+Le programme a 3 modes de fonctionnement,
+le mode mesure, le mode charge ou
+
+129
+00:09:36,836 --> 00:09:43,572
+recharge et le mode décharge.
+Et on va définir ici, ce qu'il
+
+130
+00:09:43,572 --> 00:09:48,324
+faut mettre sur la patte correspondante,
+la patte
+
+131
+00:09:48,324 --> 00:09:52,684
+PinCharge.
+Elle doit être en
+
+132
+00:09:52,684 --> 00:09:58,371
+sortie à 1 pour la charge.
+
+133
+00:09:58,371 --> 00:10:03,095
+Elle doit être en sortie à 0 pour la
+
+134
+00:10:03,095 --> 00:10:08,768
+décharge et elle doit rester à haute
+impédance, donc elle
+
+135
+00:10:08,768 --> 00:10:14,986
+doit être en entrée pour le mode mesure.
+Dans l'initialisation,
+
+136
+00:10:14,986 --> 00:10:19,050
+on passe en mode mesure, c'est le mode par
+défaut.
+
+137
+00:10:19,050 --> 00:10:23,952
+Je profite ici d'ajouter les deux
+procédures qui vont me permettre
+
+138
+00:10:23,952 --> 00:10:29,213
+d'afficher le courant et d'afficher la
+charge.
+
+139
+00:10:29,213 --> 00:10:34,368
+Je signale que cette charge est une valeur
+
+140
+00:10:34,368 --> 00:10:40,720
+qu'on va exprimer en mAs puisqu'on va
+faire les mesures toutes les secondes
+
+141
+00:10:40,720 --> 00:10:46,710
+et par conséquent ces, les valeurs vont
+devenir importantes.
+
+142
+00:10:46,710 --> 00:10:52,470
+On ne pourra pas utiliser un entier, on
+devra utiliser un mot de 32 bits.
+
+143
+00:10:52,470 --> 00:10:56,356
+Il faut faire extrêmement attention quand
+on écrit des applications
+
+144
+00:10:56,356 --> 00:10:59,505
+de bien regarder la taille des variables
+dont nous avons
+
+145
+00:10:59,505 --> 00:11:06,660
+besoin, un byte ou un char pour 8 bits, un
+int pour 16 bits ou un long en 32 bits.
+
+146
+00:11:06,660 --> 00:11:10,730
+Alors commençons d'écrire la boucle
+principale.
+
+147
+00:11:10,730 --> 00:11:14,299
+Elle est précédée par l'initialisation du
+mode en
+
+148
+00:11:14,299 --> 00:11:17,230
+mode mesure, qui est le mode par défaut.
+
+149
+00:11:17,230 --> 00:11:20,496
+Et ici, en fonction du mode, si on est en
+recharge ou si
+
+150
+00:11:20,496 --> 00:11:24,930
+on est en décharge, on a un certain nombre
+de choses spécifiques à faire,
+
+151
+00:11:24,930 --> 00:11:30,090
+en particulier faire la mesure du courant
+de charge,
+
+152
+00:11:30,090 --> 00:11:35,020
+ou du courant de décharge, on a utilisé la
+même variable, ce sera la
+
+153
+00:11:35,020 --> 00:11:40,420
+tension mesurée divisée par la résistance
+lorqu'on est en décharge.
+
+154
+00:11:40,420 --> 00:11:45,940
+Par contre, le courant qui passera dans la
+résistance lorsqu'on est en charge,
+
+155
+00:11:45,940 --> 00:11:50,660
+ce sera la tension d'alimentation moins la
+tension aux bornes de l'accumulateur
+
+156
+00:11:50,660 --> 00:11:54,120
+et, pour obtenir le courant, je divise
+toujours par la résistance.
+
+157
+00:11:54,120 --> 00:11:57,585
+Donc ici, dans les deux, dans ces deux
+lignes-là,
+
+158
+00:11:57,585 --> 00:12:00,388
+on applique la loi d'Ohm mais en regardant
+le
+
+159
+00:12:00,388 --> 00:12:04,221
+schéma correspondant qu'on utilise pour
+bien utiliser la bonne
+
+160
+00:12:04,221 --> 00:12:08,420
+tension, sachant évidemment que la
+résistance reste toujours la même.
+
+161
+00:12:08,420 --> 00:12:11,876
+Dans les deux cas, on va afficher la
+valeur
+
+162
+00:12:11,876 --> 00:12:15,916
+de ce courant de charge ou de décharge, on
+va
+
+163
+00:12:15,916 --> 00:12:22,180
+ensuite calculer la charge en intégrant le
+courant.
+
+164
+00:12:22,180 --> 00:12:24,460
+En fait, je dois multiplier par le temps
+mais
+
+165
+00:12:24,460 --> 00:12:27,040
+comme le temps, je vais m'arranger que ce
+soit une
+
+166
+00:12:27,040 --> 00:12:31,318
+seconde, je fais en fait l'intégration de
+la recharge
+
+167
+00:12:31,318 --> 00:12:36,652
+et j'obtiens bien l'unité mAs, et cette
+valeur est affichée.
+
+168
+00:12:36,652 --> 00:12:41,130
+Print ln c'est juste pour passer à la
+ligne suivante.
+
+169
+00:12:41,130 --> 00:12:46,128
+Alors, continuons d'écrire cette boucle
+principale,
+
+170
+00:12:46,128 --> 00:12:49,520
+il faut évidemment attendre une seconde,
+
+171
+00:12:49,520 --> 00:12:54,330
+ça correspondra à cette intégration pour
+avoir la mesure de la charge.
+
+172
+00:12:54,330 --> 00:12:57,294
+Et ensuite il va falloir gérer la ligne
+série.
+
+173
+00:12:57,294 --> 00:13:01,190
+Est-ce qu'un caractère est arrivé depuis
+la ligne série?
+
+174
+00:13:01,190 --> 00:13:03,423
+Voilà la question que l'on pose.
+
+175
+00:13:03,423 --> 00:13:06,272
+Si c'est le cas, on lit ce caractère et on
+se
+
+176
+00:13:06,272 --> 00:13:11,138
+sélectionne en fonction du caractère.
+Est-ce qu'on veut passer en charge?
+
+177
+00:13:11,138 --> 00:13:13,470
+Est-ce qu'on veut passer en décharge?
+
+178
+00:13:13,470 --> 00:13:17,980
+Ou est-ce qu'on veut revenir au mode par
+défaut, qui est le mode mesure?
+
+179
+00:13:17,980 --> 00:13:24,590
+On n'oublie pas les break liés à la
+structure switch case.
+
+180
+00:13:24,590 --> 00:13:27,349
+Posons-nous une petite question.
+
+181
+00:13:27,349 --> 00:13:31,316
+Voilà le programme que nous avons écrit,
+il mesure
+
+182
+00:13:31,316 --> 00:13:36,255
+et affiche la tension, il mesure et
+affiche la charge
+
+183
+00:13:36,255 --> 00:13:40,782
+et la décharge, il attend une seconde et
+il gère
+
+184
+00:13:40,782 --> 00:13:45,214
+les caractères en entrée.
+Est-ce que je gère
+
+185
+00:13:45,214 --> 00:13:50,074
+correctement le temps pour l'application
+que nous avons?
+
+186
+00:13:50,074 --> 00:13:56,686
+Je rappelle que si une seconde n'est pas
+une seconde, notre charge en mAh et donc
+
+187
+00:13:56,686 --> 00:14:04,400
+en mAs sera fausse.
+La réponse est non.
+
+188
+00:14:04,400 --> 00:14:11,640
+Il faut que ma boucle dure une seconde.
+
+189
+00:14:11,640 --> 00:14:17,124
+Or, cette instruction dure une seconde.
+Il faudrait donc que tout ce que
+
+190
+00:14:17,124 --> 00:14:22,506
+j'ai écrit en bleu prenne un temps
+négligeable par rapport
+
+191
+00:14:22,506 --> 00:14:27,396
+à la seconde.
+Alors la mesure, ce n'est pas trop long,
+
+192
+00:14:27,396 --> 00:14:32,235
+ça peut aller.
+Mais l'affichage de la tension de la
+
+193
+00:14:32,235 --> 00:14:37,172
+charge, avec les petits textes que l'on a
+prévus dans nos procédures et qu'on
+
+194
+00:14:37,172 --> 00:14:41,980
+a vus tout à l'heure, en tout une
+soixantaine de caractères.
+
+195
+00:14:41,980 --> 00:14:48,277
+Un caractère à 9600
+
+196
+00:14:48,277 --> 00:14:57,440
+bits par seconde ça correspond à environ
+une milliseconde.
+
+197
+00:14:57,440 --> 00:15:02,221
+Je rappelle en effet qu'un caractère,
+c'est 8 bits plus le start bit plus le
+
+198
+00:15:02,221 --> 00:15:07,680
+stop bit, donc c'est 10, éventuellement 11
+bits si on a deux stop bits.
+
+199
+00:15:07,680 --> 00:15:13,614
+Et, si on a 9600 bits par seconde, ça
+correspond donc bien à environ 1 ms pour
+
+200
+00:15:13,614 --> 00:15:14,750
+un caractère.
+
+201
+00:15:14,750 --> 00:15:20,679
+Si j'ai maintenant 60 caractères, ça va
+correspondre
+
+202
+00:15:20,679 --> 00:15:26,554
+à 60 ms, ce n'est donc pas tout à fait
+négligeable par rapport à une
+
+203
+00:15:26,554 --> 00:15:30,672
+seconde et il faudrait donc tenir compte
+du correctement de la valeur
+
+204
+00:15:30,672 --> 00:15:36,390
+du temps en lisant la procédure millis qui
+est disponible avec Arduino.
+
+205
+00:15:36,390 --> 00:15:39,090
+Vous allez me dire que ce montage
+
+206
+00:15:39,090 --> 00:15:44,507
+n'est pas très intéressant parce que
+charger un accumulateur
+
+207
+00:15:44,507 --> 00:15:49,540
+avec 20 mA, par exemple, ça va prendre
+beaucoup, beaucoup de temps.
+
+208
+00:15:49,540 --> 00:15:51,885
+Alors si on veut un montage qui est
+capable
+
+209
+00:15:51,885 --> 00:15:57,140
+d'envoyer plus de courant, il faudrait
+évidemment un, une amplification
+
+210
+00:15:57,140 --> 00:16:01,366
+et ça, ça nécessiterait des transistors et
+en particulier,
+
+211
+00:16:01,366 --> 00:16:04,200
+on utiliserait ce qu'on appelle un
+demi-pont en H de
+
+212
+00:16:04,200 --> 00:16:08,380
+telle manière qu'on puisse imposer un 1,
+imposer
+
+213
+00:16:08,380 --> 00:16:12,020
+un 0 ou ne rien imposer pour la lecture.
+
+214
+00:16:12,020 --> 00:16:16,032
+Il y aurait une autre solution, c'est
+d'utiliser plusieurs pattes
+
+215
+00:16:16,032 --> 00:16:19,670
+du microcontrôleur mais je mets bien en
+évidence le fait
+
+216
+00:16:19,670 --> 00:16:23,595
+qu'on a une résistance pour chacune des
+pattes et que
+
+217
+00:16:23,595 --> 00:16:29,358
+le fait de re, de mettre une seule
+résistance et connecter
+
+218
+00:16:29,358 --> 00:16:35,011
+les trois pattes ensemble, c'est possible
+mais c'est relativement dangereux.
+
+219
+00:16:35,011 --> 00:16:40,321
+Si votre programme a une petite faute et
+que deux pattes de chargement n'ont pas
+
+220
+00:16:40,321 --> 00:16:43,252
+la même valeur, ce sera le court-circuit
+avec
+
+221
+00:16:43,252 --> 00:16:46,760
+un sérieux risque de destruction de votre
+microcontrôleur.
+
+222
+00:16:46,760 --> 00:16:51,180
+Encore un point qui pourrait être amélioré
+dans ce montage.
+
+223
+00:16:51,180 --> 00:16:54,832
+Dans notre programme, on avait écrit que
+la tension
+
+224
+00:16:54,832 --> 00:16:57,430
+d'alimentation était de 3,5V.
+
+225
+00:16:57,430 --> 00:17:02,850
+Si on a effectivement une alimentation
+bien stabilisée à 3,5V, c'est parfait.
+
+226
+00:17:02,850 --> 00:17:04,967
+Si cette tension n'est pas égale à
+
+227
+00:17:04,967 --> 00:17:09,072
+3,5V, il faudra corriger le programme,
+c'est ennuyeux.
+
+228
+00:17:09,072 --> 00:17:11,368
+Et si la tension n'est pas si bien
+
+229
+00:17:11,368 --> 00:17:14,910
+stabilisée que ça, on aura des valeurs
+fausses.
+
+230
+00:17:14,910 --> 00:17:19,040
+Alors une solution consiste à mesurer
+l'alimentation.
+
+231
+00:17:19,040 --> 00:17:20,060
+On prend ici
+
+232
+00:17:20,060 --> 00:17:26,426
+le VCC, on ne peut pas directement le
+mettre sur une patte de lecture puisque
+
+233
+00:17:26,426 --> 00:17:30,326
+la tension sera trop proche, puisqu'elle
+sera identique
+
+234
+00:17:30,326 --> 00:17:32,670
+au VCC et on ne pourra plus mesurer.
+
+235
+00:17:32,670 --> 00:17:36,318
+Donc on va ici utiliser un diviseur de
+tension et la
+
+236
+00:17:36,318 --> 00:17:41,550
+tension qu'on aura ici sera une fraction
+de la tension d'alimentation.
+
+237
+00:17:41,550 --> 00:17:45,472
+Si on part de l'idée qu'on fait une
+lecture
+
+238
+00:17:45,472 --> 00:17:48,710
+entre 0 et 2,5V, et que la valeur de
+
+239
+00:17:48,710 --> 00:17:53,850
+l'alimentation est de l'ordre de 3,5V, on
+pourra utiliser deux
+
+240
+00:17:53,850 --> 00:17:58,664
+résistances identiques et on mesurera la
+tension d'alimentation et
+
+241
+00:17:58,664 --> 00:18:02,770
+on la multipliera par deux pour obtenir un
+résultat correct.
+
+242
+00:18:02,770 --> 00:18:06,389
+Plus exactement, on corrigera les
+paramètres donnés à
+
+243
+00:18:06,389 --> 00:18:09,410
+la procédure map qu'on a vue tout à
+l'heure.
+
+244
+00:18:09,410 --> 00:18:10,697
+Le problème qui
+
+245
+00:18:10,697 --> 00:18:16,464
+se pose c'est, ces deux résistances
+devraient être relativement précises
+
+246
+00:18:16,464 --> 00:18:20,140
+si on veut avoir une mesure aussi précise
+que possible.
+
+247
+00:18:20,140 --> 00:18:26,280
+Est-ce qu'on va être obligé d'acheter des
+résistances de précision pour R1 et R2?
+
+248
+00:18:26,280 --> 00:18:28,990
+Il existe une autre solution très
+élégante.
+
+249
+00:18:28,990 --> 00:18:32,284
+Avec votre multimètre, qui n'est peut-être
+pas de très bonne
+
+250
+00:18:32,284 --> 00:18:35,776
+qualité, qui n'est peut-être pas très
+précis, vous avez une
+
+251
+00:18:35,776 --> 00:18:38,630
+résolution qui est largement suffisante.
+
+252
+00:18:38,630 --> 00:18:42,220
+Vous pouvez donc prendre dans la petite
+boîte des résistances
+
+253
+00:18:42,220 --> 00:18:47,768
+plusieurs résistances notées comme ayant
+la même valeur mais avec
+
+254
+00:18:47,768 --> 00:18:52,975
+des variations, par exemple, de 5%
+possibles puisque les résistances
+
+255
+00:18:52,975 --> 00:18:56,640
+les plus courantes sont effectivement
+données avec une imprécision de 5%.
+
+256
+00:18:56,640 --> 00:19:00,856
+Mais si vous avez un stock suffisant de
+résistances, vous trouverez facilement
+
+257
+00:19:00,856 --> 00:19:06,084
+deux résistances qui ont la même valeur
+vue par votre multimètre.
+
+258
+00:19:06,084 --> 00:19:08,636
+Et si elles ont la même valeur, peu
+
+259
+00:19:08,636 --> 00:19:13,044
+importe cette valeur exacte, vous saurez
+que votre diviseur
+
+260
+00:19:13,044 --> 00:19:15,975
+de tension divisera par deux et vous
+pourrez,
+
+261
+00:19:15,975 --> 00:19:19,660
+ici, faire le calcul correct pour la
+mesure d'alimentation.
+
+262
+00:19:19,660 --> 00:19:23,460
+Que pourrait-on rajouter encore à ce
+montage?
+
+263
+00:19:23,460 --> 00:19:25,935
+Est-ce qu'il est possible de mesurer
+
+264
+00:19:25,935 --> 00:19:28,610
+la résistance interne du condensateur?
+
+265
+00:19:28,610 --> 00:19:32,558
+A priori, ça semble facile, il faut faire
+une mesure de
+
+266
+00:19:32,558 --> 00:19:37,094
+la tension à vide, faire une mesure avec
+la charge, on constate
+
+267
+00:19:37,094 --> 00:19:40,802
+une chute de tension entre ces deux
+mesures et on calcule
+
+268
+00:19:40,802 --> 00:19:45,390
+la résistance interne en appliquant la loi
+d'Ohm puisqu'on connait la résistance.
+
+269
+00:19:45,390 --> 00:19:50,999
+Le problème, c'est que cette résistance
+interne est extrêmement faible et qu'on
+
+270
+00:19:50,999 --> 00:19:54,676
+risque d'avoir une variation trop faible
+pour
+
+271
+00:19:54,676 --> 00:19:58,750
+être mesurée fiablement avec
+l'installation que nous avons.
+
+272
+00:19:58,750 --> 00:20:02,512
+Je rappelle que nous avons un
+convertisseur 10 bits, il est censé donner
+
+273
+00:20:02,512 --> 00:20:07,150
+le pour 1000 mais en réalité, les bruits,
+si on ne fait pas extrêmement
+
+274
+00:20:07,150 --> 00:20:09,670
+attention à la réalisation du montage euh,
+
+275
+00:20:09,670 --> 00:20:12,520
+vont faire qu'on a une imprécision
+beaucoup
+
+276
+00:20:12,520 --> 00:20:16,466
+plus grande que le pour 1000 et, par
+conséquent, on ne pourra pas facilement
+
+277
+00:20:16,466 --> 00:20:21,338
+mesurer cette résistance interne.
+Il y aurait tout de même une
+
+278
+00:20:21,338 --> 00:20:27,250
+possibilité, ce serait de faire ce qu'on
+appelle du suréchantillonnage.
+
+279
+00:20:27,250 --> 00:20:33,358
+On pourrait, par exemple, dire : je mesure
+successivement la tension à vide puis
+
+280
+00:20:33,358 --> 00:20:36,782
+la tension avec une charge, je répète
+
+281
+00:20:36,782 --> 00:20:42,108
+mille fois cette opération, j'obtiens, je
+totalise
+
+282
+00:20:42,108 --> 00:20:47,489
+chacune des deux valeurs et on aura
+peut-être à ce moment-là
+
+283
+00:20:47,489 --> 00:20:52,800
+une différence entre ces deux moyennes, en
+quelque sorte, mesurée
+
+284
+00:20:52,800 --> 00:20:57,864
+qui pourrait être significative et nous
+indiquer la résistance interne
+
+285
+00:20:57,864 --> 00:21:00,570
+de l'accumulateur, qui d'ailleurs pourrait
+
+286
+00:21:00,570 --> 00:21:04,205
+aussi indiquer la, l'état de
+l'accumulateur.
+
+287
+00:21:04,205 --> 00:21:07,683
+Un accumulateur en bon état aura une
+résistance
+
+288
+00:21:07,683 --> 00:21:12,410
+interne relativement faible, dans la
+technologie NiMH en tout cas.
+
+289
+00:21:12,410 --> 00:21:16,425
+Quelles sont encore les améliorations
+possibles de ce montage?
+
+290
+00:21:16,425 --> 00:21:18,834
+On pourrait par exemple détecter la fin
+
+291
+00:21:18,834 --> 00:21:22,625
+de la charge, approximativement à 1,5 ou
+1,6V.
+
+292
+00:21:22,625 --> 00:21:26,772
+On pourrait détecter la fin de la
+décharge, autour de 1V.
+
+293
+00:21:26,772 --> 00:21:32,520
+On pourrait aussi gérer plusieurs
+accumulateurs, des tensions plus élevées.
+
+294
+00:21:32,520 --> 00:21:36,997
+On pourrait aussi utiliser le Trickle
+charging.
+
+295
+00:21:36,997 --> 00:21:41,978
+Oui, c'est une technique qui permet de
+compenser la
+
+296
+00:21:41,978 --> 00:21:47,386
+décharge naturelle de l'accumulateur
+lorsqu'il a terminé
+
+297
+00:21:47,386 --> 00:21:52,760
+de se charger en envoyant un signal PWM,
+qu'on connait bien,
+
+298
+00:21:52,760 --> 00:21:57,655
+qui corresponde justement à cette décharge
+naturelle de telle manière
+
+299
+00:21:57,655 --> 00:22:01,560
+que si le, l'accumulateur reste dans le
+chargeur pendant un certain
+
+300
+00:22:01,560 --> 00:22:06,790
+temps, même un temps relativement long, il
+restera chargé de manière optimale.
+
+301
+00:22:06,790 --> 00:22:09,914
+Bien entendu on pourrait aussi ajouter des
+LED, des
+
+302
+00:22:09,914 --> 00:22:13,636
+boutons, un afficheur, que sais-je, pour
+faire un appareil
+
+303
+00:22:13,636 --> 00:22:16,452
+autonome et à ce moment-là il n'aurait
+plus besoin
+
+304
+00:22:16,452 --> 00:22:19,940
+de la ligne série que nous avons utilisée
+jusqu'à maintenant.
+
+305
+00:22:19,940 --> 00:22:22,692
+Voilà, nous avons donc réalisé cette
+
+306
+00:22:22,692 --> 00:22:25,310
+petite application qui avait l'avantage
+
+307
+00:22:25,310 --> 00:22:27,710
+d'être un montage extrêmement simple
+puisque
+
+308
+00:22:27,710 --> 00:22:29,390
+nous avons eu besoin d'une seule
+
+309
+00:22:29,390 --> 00:22:32,010
+résistance en plus de notre
+microcontrôleur.
+
+310
+00:22:32,010 --> 00:22:35,400
+Nous avons pu voir comment faire les
+lectures analogiques.
+
+311
+00:22:35,400 --> 00:22:40,548
+Nous avons pu voir comment utiliser la
+ligne série et nous avons pu
+
+312
+00:22:40,548 --> 00:22:45,760
+aussi voir un certain nombre de pièges à
+éviter.

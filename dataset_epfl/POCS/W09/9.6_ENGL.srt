@@ -1,0 +1,1560 @@
+1
+00:00:03,980 --> 00:00:06,987
+Now let's look at logic programming,
+and specifically at Datalog.
+
+2
+00:00:06,987 --> 00:00:10,655
+We can think of Datalog as
+first-order logic, with negation removed.
+
+3
+00:00:10,655 --> 00:00:13,279
+That means positive first-order logic,
+negation removed,
+
+4
+00:00:13,279 --> 00:00:14,981
+and also universal quantification removed.
+
+5
+00:00:14,981 --> 00:00:16,812
+And instead we have recursion added,
+
+6
+00:00:16,812 --> 00:00:19,106
+the notion of recursion,
+we're going to talk about this.
+
+7
+00:00:19,455 --> 00:00:22,184
+So, there's a more general notion
+of Datalog, called Prolog,
+
+8
+00:00:22,184 --> 00:00:23,755
+which actually is older,
+
+9
+00:00:23,755 --> 00:00:25,966
+and it's really a full Turing-complete
+programming language,
+
+10
+00:00:25,966 --> 00:00:27,124
+while Datalog is a restricted language,
+
+11
+00:00:27,124 --> 00:00:28,792
+which doesn't have
+the full expressive power
+
+12
+00:00:28,792 --> 00:00:31,310
+of a Turing-complete
+programming language,
+
+13
+00:00:31,822 --> 00:00:34,591
+and Prolog extends Datalog
+by a notion of function symbols,
+
+14
+00:00:34,591 --> 00:00:35,778
+we'll see that later.
+
+15
+00:00:35,778 --> 00:00:38,105
+But Datalog--a program which
+consists of a set of rules,
+
+16
+00:00:38,105 --> 00:00:41,344
+and a rule consists of a right-hand side,
+
+17
+00:00:41,344 --> 00:00:44,821
+and an implication to left,
+the left-hand side is the so-called head,
+
+18
+00:00:44,821 --> 00:00:46,103
+the right-hand side is the body.
+
+19
+00:00:46,103 --> 00:00:48,326
+So if the body is true,
+then the head must also be true,
+
+20
+00:00:48,326 --> 00:00:49,449
+that's the implication.
+
+21
+00:00:49,449 --> 00:00:53,802
+Now, the head and body,
+they have variables inside.
+
+22
+00:00:53,802 --> 00:00:55,734
+It's really a fragment
+of first-order logic,
+
+23
+00:00:55,734 --> 00:00:58,879
+so we've got these kind of
+atomic formulas with variables inside,
+
+24
+00:00:58,879 --> 00:01:02,489
+and we're testing, so to say,
+whether something is true
+
+25
+00:01:02,489 --> 00:01:05,201
+by unification--we unify variables
+of constant symbols
+
+26
+00:01:05,201 --> 00:01:06,565
+for the input database,
+
+27
+00:01:06,565 --> 00:01:09,105
+so if I can make a unification,
+a function that maps
+
+28
+00:01:09,105 --> 00:01:11,947
+every variable in my rule to constants,
+
+29
+00:01:11,947 --> 00:01:15,199
+in such a way that the body atoms
+are all in the database already,
+
+30
+00:01:15,199 --> 00:01:18,774
+then the head atom,
+that I also get by feeding the variables,
+
+31
+00:01:18,774 --> 00:01:20,933
+even replacing them by constants,
+must also be true.
+
+32
+00:01:20,933 --> 00:01:23,303
+It can be conceptually added,
+so to say, to the results.
+
+33
+00:01:23,303 --> 00:01:24,875
+So that's the meaning of single rule.
+
+34
+00:01:24,875 --> 00:01:27,062
+In general, rules can be recursive,
+
+35
+00:01:27,062 --> 00:01:31,306
+which means that the head's predicate
+might also occur in the body.
+
+36
+00:01:32,660 --> 00:01:34,051
+So here's an example.
+
+37
+00:01:34,051 --> 00:01:36,189
+Here I've got a two-rule program,
+
+38
+00:01:36,189 --> 00:01:39,062
+that computes
+the transitive closure of a graph.
+
+39
+00:01:39,062 --> 00:01:40,960
+The graph is given by
+its edge relation, E here,
+
+40
+00:01:40,960 --> 00:01:42,158
+that's what we care about, E.
+
+41
+00:01:42,158 --> 00:01:43,615
+And we've got two rules--
+
+42
+00:01:43,615 --> 00:01:47,676
+The first says that every edge
+of the graph is in a transitive closure,
+
+43
+00:01:48,487 --> 00:01:52,158
+and if I can connect two edges
+in transitive closure,
+
+44
+00:01:53,005 --> 00:01:56,743
+and to the transitive step,
+is again a transitive closure.
+
+45
+00:01:56,743 --> 00:02:01,292
+It means if the transitive closure 
+so far contains edges X to Y,
+
+46
+00:02:01,292 --> 00:02:04,899
+and Y to Z, then X to Z
+must also be in a transitive closure.
+
+47
+00:02:06,282 --> 00:02:09,001
+And I can think of this as a recursive,
+a recursive step,
+
+48
+00:02:09,001 --> 00:02:10,378
+and recursively 
+we add more and more stuff,
+
+49
+00:02:10,378 --> 00:02:11,945
+then we can add nothing more
+
+50
+00:02:11,945 --> 00:02:14,454
+and I've got the transitive 
+closure finished, so to say.
+
+51
+00:02:14,454 --> 00:02:16,661
+So I can think of
+a fixed-point semantics here,
+
+52
+00:02:16,661 --> 00:02:18,859
+I add and add until I cannot get more.
+
+53
+00:02:18,859 --> 00:02:22,299
+But there is alternative semantics
+to this Datalog language, again.
+
+54
+00:02:22,299 --> 00:02:24,015
+There is again this kind
+of cryptomorphism.
+
+55
+00:02:24,015 --> 00:02:26,459
+We've got three different semantics
+we're going to talk about:
+
+56
+00:02:26,459 --> 00:02:28,339
+fixpoint semantics,
+proof-theoretic semantics,
+
+57
+00:02:28,339 --> 00:02:31,393
+and, we're going to start with that,
+model theoretic semantics.
+
+58
+00:02:32,186 --> 00:02:34,586
+In the model theoretic semantics
+we can think of the program,
+
+59
+00:02:34,586 --> 00:02:37,960
+the set of rules, as logical sentences
+that state a property of the result.
+
+60
+00:02:37,960 --> 00:02:41,724
+It means that you take the rules
+and you universal quantify
+
+61
+00:02:41,724 --> 00:02:43,554
+over all the variables.
+
+62
+00:02:43,554 --> 00:02:46,680
+So that way it becomes
+self-contained sentences,
+
+63
+00:02:46,680 --> 00:02:49,245
+boolean sentences, boolean formulas,
+
+64
+00:02:49,245 --> 00:02:51,024
+and you take this kind of combination,
+
+65
+00:02:51,024 --> 00:02:54,999
+the end of all these universally
+quantified boolean formulas,
+
+66
+00:02:55,397 --> 00:02:59,227
+and that's again a huge boolean formula,
+
+67
+00:02:59,227 --> 00:03:01,105
+and now we can ask,
+
+68
+00:03:01,105 --> 00:03:02,983
+"give me a set of facts,"
+
+69
+00:03:02,983 --> 00:03:04,862
+a relational database, let's say.
+
+70
+00:03:04,862 --> 00:03:08,112
+Is that big formula,
+this combined program,
+
+71
+00:03:08,112 --> 00:03:10,609
+true on that, on that database,
+
+72
+00:03:10,609 --> 00:03:12,928
+If so, then this database
+is called a model,
+
+73
+00:03:12,928 --> 00:03:14,540
+we have already said that, right?
+
+74
+00:03:14,540 --> 00:03:17,539
+And now we can talk about--
+there might be many different models,
+
+75
+00:03:17,539 --> 00:03:21,433
+but there is a single, unique,
+minimal model, and this minimal model
+
+76
+00:03:21,433 --> 00:03:25,748
+can also be obtained by computing
+the intersection of all possible models.
+
+77
+00:03:26,327 --> 00:03:28,566
+So that's model theoretic semantics.
+
+78
+00:03:28,841 --> 00:03:31,991
+Now along with these three semantics
+I'm going to talk about,
+
+79
+00:03:31,991 --> 00:03:33,233
+and I've mentioned to you,
+
+80
+00:03:33,233 --> 00:03:36,140
+the model theoretic semantics is
+the only one that is truly declarative,
+
+81
+00:03:36,140 --> 00:03:40,046
+because there I don't have the idea
+of iterating and computing recursively,
+
+82
+00:03:40,046 --> 00:03:42,156
+and so on--there's no computation here.
+
+83
+00:03:42,156 --> 00:03:45,744
+There is just a definition
+of what you want to have.
+
+84
+00:03:46,000 --> 00:03:47,499
+What do I want to have?
+
+85
+00:03:47,499 --> 00:03:51,837
+The minimal database on which,
+that is consistent to input,
+
+86
+00:03:51,837 --> 00:03:56,900
+and on which all these formulas,
+all the rules, are true.
+
+87
+00:03:57,465 --> 00:03:59,125
+So the rules don't compute new stuff,
+
+88
+00:03:59,125 --> 00:04:01,372
+but they're basically just
+implication formulas that say,
+
+89
+00:04:01,372 --> 00:04:03,444
+"if this is true, then this must be true,"
+
+90
+00:04:03,444 --> 00:04:05,031
+and otherwise, it's not a model.
+
+91
+00:04:05,031 --> 00:04:07,046
+And of all the models,
+we take the minimal one.
+
+92
+00:04:07,046 --> 00:04:08,867
+So that's a truly declarative semantics.
+
+93
+00:04:08,867 --> 00:04:11,112
+We say <i>what</i> we want,
+rather than <i>how</i> to compute it.
+
+94
+00:04:12,836 --> 00:04:15,625
+Example here, again,
+this is again our principle example,
+
+95
+00:04:15,625 --> 00:04:17,839
+now I actually called
+the edge relation G, not E,
+
+96
+00:04:17,839 --> 00:04:19,746
+but otherwise the same thing,
+and I've got a concrete example.
+
+97
+00:04:19,746 --> 00:04:21,813
+I don't give it as a relational table,
+I give it as a graph,
+
+98
+00:04:21,813 --> 00:04:23,843
+so on the right-hand side,
+at the top, you got a graph,
+
+99
+00:04:23,843 --> 00:04:26,078
+you've got three nodes, 1, 2, 3,
+and you've got edges,
+
+100
+00:04:26,078 --> 00:04:29,071
+one from 1 to 2,
+and 2 and 3 have mutual edges.
+
+101
+00:04:29,071 --> 00:04:30,981
+Now, what is the transitive
+closure of those?
+
+102
+00:04:30,981 --> 00:04:33,451
+Actually the leftmost
+of the bottom solutions.
+
+103
+00:04:33,451 --> 00:04:35,961
+I just have to add a single edge,
+from 1 to 3,
+
+104
+00:04:35,961 --> 00:04:38,457
+and I've got point loops at 3 and at 2.
+
+105
+00:04:38,978 --> 00:04:43,572
+This is actually very hard to see,
+but there are point loops at 2 and 3.
+
+106
+00:04:43,846 --> 00:04:46,913
+Now, the middle one is not a solution,
+
+107
+00:04:46,913 --> 00:04:49,480
+because the edge from 1 to 3 is missing.
+
+108
+00:04:49,645 --> 00:04:52,469
+So in particular,
+this is not a model at all.
+
+109
+00:04:52,665 --> 00:04:54,093
+And the right-hand solution
+
+110
+00:04:54,093 --> 00:04:56,541
+has everything that
+the left-hand solution has,
+
+111
+00:04:56,541 --> 00:04:59,293
+plus some additional edge,
+going back from 2 to 1.
+
+112
+00:04:59,293 --> 00:05:00,567
+So this is a model.
+
+113
+00:05:00,567 --> 00:05:02,644
+The formulas are true,
+
+114
+00:05:02,644 --> 00:05:05,311
+but it's not a minimal model,
+so it's not a solution.
+
+115
+00:05:05,311 --> 00:05:08,388
+There's a unique solution--
+it's the left-hand solution here.
+
+116
+00:05:10,594 --> 00:05:13,866
+So why do we take
+the minimal model among all those?
+
+117
+00:05:14,349 --> 00:05:15,832
+Well, we can philosophically argue
+
+118
+00:05:15,832 --> 00:05:17,969
+that you have something
+like closed-world assumptions.
+
+119
+00:05:17,969 --> 00:05:19,931
+Everything that you don't
+specify explicitly,
+
+120
+00:05:19,931 --> 00:05:21,592
+that you don't add to the database,
+
+121
+00:05:21,592 --> 00:05:25,951
+you implicitly assume to be false,
+unless the program forces to become true.
+
+122
+00:05:26,161 --> 00:05:28,039
+So in a sense, database 
+are incompletely specified,
+
+123
+00:05:28,039 --> 00:05:29,487
+you don't explicitly say--
+
+124
+00:05:29,487 --> 00:05:31,675
+in a database you've got
+a finite set of tuples,
+
+125
+00:05:31,675 --> 00:05:33,812
+and implicitly you say
+everything that is not in there
+
+126
+00:05:33,812 --> 00:05:35,354
+is supposed to be wrong
+
+127
+00:05:35,354 --> 00:05:37,630
+It would be very hard to enumerate
+this infinite number
+
+128
+00:05:37,630 --> 00:05:41,129
+of tuples that are not true,
+explicitly these are not true.
+
+129
+00:05:41,129 --> 00:05:43,480
+That is not possible in a finite database.
+
+130
+00:05:43,480 --> 00:05:46,435
+So the idea is that way, that we kind
+of say closed-world assumption,
+
+131
+00:05:46,435 --> 00:05:48,712
+implicitly everything
+that is missing is false,
+
+132
+00:05:48,712 --> 00:05:50,688
+and that leads us to
+the minimum model semantics.
+
+133
+00:05:50,688 --> 00:05:54,066
+Also it is the only
+reasonable, unique thing.
+
+134
+00:05:54,066 --> 00:05:56,145
+It's the intersection
+of all possible models.
+
+135
+00:05:57,015 --> 00:05:59,241
+The union of all models would be infinite,
+
+136
+00:05:59,577 --> 00:06:01,699
+which also would be unique, of course,
+
+137
+00:06:02,286 --> 00:06:04,296
+but it's meaningless to talk about this.
+
+138
+00:06:06,075 --> 00:06:08,513
+Let's talk about the alternative,
+fixpoint approach.
+
+139
+00:06:08,513 --> 00:06:11,009
+So the idea is that the semantics
+of a program is defined
+
+140
+00:06:11,009 --> 00:06:14,238
+as a particular solution
+to a fixpoint equation, so the idea is--
+
+141
+00:06:14,238 --> 00:06:16,837
+you can think of the end-type
+program as a fixpoint equation.
+
+142
+00:06:17,407 --> 00:06:19,200
+Take a database, such that--
+
+143
+00:06:19,800 --> 00:06:21,593
+think of these rules as adding new stuff,
+
+144
+00:06:21,593 --> 00:06:23,686
+these rules don't add anything any more.
+
+145
+00:06:23,686 --> 00:06:26,472
+Everything that the rules could add,
+given this database,
+
+146
+00:06:26,472 --> 00:06:29,319
+we have already added before,
+so that's a fixpoint.
+
+147
+00:06:29,319 --> 00:06:32,338
+So fixpoint is not about recursively
+adding stuff, bottom-up evaluation,
+
+148
+00:06:32,338 --> 00:06:34,216
+although in practice
+we would do it that way,
+
+149
+00:06:34,216 --> 00:06:35,780
+but fixpoint is about saying,
+
+150
+00:06:35,780 --> 00:06:37,564
+"this formula doesn't
+compute anything new."
+
+151
+00:06:37,564 --> 00:06:39,238
+It is happy with its result.
+
+152
+00:06:39,238 --> 00:06:43,222
+So being a fixpoint is a bit like,
+what we have said before,
+
+153
+00:06:43,222 --> 00:06:45,052
+that it's a model.
+
+154
+00:06:45,052 --> 00:06:47,463
+And now we require
+it's the minimal fixpoint,
+
+155
+00:06:47,463 --> 00:06:50,316
+and to get the minimal fixpoint
+a kind of bottom-up relation,
+
+156
+00:06:50,316 --> 00:06:53,102
+forcing, forward chaining,
+would use more tuples
+
+157
+00:06:53,102 --> 00:06:55,118
+from the initial input database,
+
+158
+00:06:55,118 --> 00:06:58,431
+and stopping, as we don't get
+any more results forced.
+
+159
+00:06:58,634 --> 00:07:00,848
+That would be a fixpoint reached.
+
+160
+00:07:01,171 --> 00:07:03,380
+We've got the same example again,
+
+161
+00:07:03,380 --> 00:07:05,637
+and conceptually, what I do is
+
+162
+00:07:06,257 --> 00:07:07,894
+I look at my first rule,
+
+163
+00:07:07,894 --> 00:07:10,152
+initially my result is empty.
+
+164
+00:07:10,152 --> 00:07:11,920
+I've got the input database.
+
+165
+00:07:12,765 --> 00:07:15,334
+Here, in database terminology
+we call the input
+
+166
+00:07:15,334 --> 00:07:17,317
+the extensional database.
+
+167
+00:07:17,317 --> 00:07:20,462
+That's the stuff that is there,
+extensionally given explicitly,
+
+168
+00:07:20,462 --> 00:07:21,967
+using tuples,
+
+169
+00:07:22,437 --> 00:07:25,692
+and the IDB, the intensional 
+database, is the result,
+
+170
+00:07:25,692 --> 00:07:28,309
+that includes those that are
+implicitly given by the rules.
+
+171
+00:07:28,309 --> 00:07:31,267
+So we're committing the IDB
+and the input is to EDB.
+
+172
+00:07:31,267 --> 00:07:33,130
+So we start by taking,
+let's say, the first rule,
+
+173
+00:07:33,130 --> 00:07:34,613
+because the second rule by itself,
+
+174
+00:07:34,613 --> 00:07:37,386
+given that there's nothing yet
+in the results, in T,
+
+175
+00:07:37,386 --> 00:07:39,155
+we cannot commit anything new.
+
+176
+00:07:39,155 --> 00:07:41,208
+There is no unification of error,
+
+177
+00:07:41,208 --> 00:07:45,570
+there is no mapping for the variables
+x, y and z to constants 1, 2, 3,
+
+178
+00:07:45,570 --> 00:07:48,193
+such that T becomes true,
+because T is empty.
+
+179
+00:07:48,193 --> 00:07:50,273
+So initially, the second rule cannot fire.
+
+180
+00:07:50,273 --> 00:07:53,702
+But the first rule can fire,
+and it can add all these three tuples,
+
+181
+00:07:53,702 --> 00:07:55,951
+all these three edges
+that are in the input database.
+
+182
+00:07:55,951 --> 00:07:58,050
+So we can do this in the first step.
+
+183
+00:07:58,723 --> 00:08:00,585
+So this is conceptually, 
+a next iteration,
+
+184
+00:08:00,835 --> 00:08:01,677
+bottom-up.
+
+185
+00:08:02,047 --> 00:08:05,061
+If I apply this rule again
+it doesn't add anything new, so to say.
+
+186
+00:08:05,061 --> 00:08:07,796
+We conceptually, in every step
+can try this first rule again
+
+187
+00:08:07,796 --> 00:08:10,784
+but it will never present anything new,
+so we can actually forget about it.
+
+188
+00:08:10,784 --> 00:08:12,832
+But the second rule can now
+add new stuff.
+
+189
+00:08:12,832 --> 00:08:13,890
+What can it add?
+
+190
+00:08:13,890 --> 00:08:17,318
+Well, suppose you take
+the tuple (1, 2) as G of sets.
+
+191
+00:08:17,318 --> 00:08:20,180
+So <i>x</i> is 1, and <i>z</i> is 2.
+
+192
+00:08:20,180 --> 00:08:24,357
+Then you can actually take
+<i>y</i> to be 3, <i>z</i> must be 2,
+
+193
+00:08:24,357 --> 00:08:28,335
+and that way, going from
+(<i>x, y</i>), from 1 to 3,
+
+194
+00:08:29,052 --> 00:08:30,920
+we can add this new edge.
+
+195
+00:08:30,920 --> 00:08:32,834
+But that's not the only solution.
+
+196
+00:08:32,834 --> 00:08:36,251
+I can also go from 2 to 3, that's G.
+
+197
+00:08:36,251 --> 00:08:39,178
+So <i>x</i> is 2 and <i>z</i> is 3,
+
+198
+00:08:39,951 --> 00:08:43,263
+and I can take <i>y</i> being 2,
+<i>z</i> again is 3.
+
+199
+00:08:43,263 --> 00:08:46,861
+And if you take the path
+from 2 to 3 and back to 2,
+
+200
+00:08:46,861 --> 00:08:50,277
+and that, as transitive closure,
+gives me a loop from 2 to 2.
+
+201
+00:08:50,277 --> 00:08:53,138
+So I add this one as well.
+
+202
+00:08:53,138 --> 00:08:56,671
+And the same element can be taken
+to actually add loop 3 to 3,
+
+203
+00:08:56,671 --> 00:08:59,511
+and from then on
+there is nothing you can compute.
+
+204
+00:08:59,511 --> 00:09:02,378
+I iterate as many times as I like--
+I've reached a fixpoint,
+
+205
+00:09:02,378 --> 00:09:05,855
+I don't require to add anything more,
+so that's the solution.
+
+206
+00:09:05,855 --> 00:09:09,347
+And it's the same solution that you also
+got by taking the minimal model.
+
+207
+00:09:09,436 --> 00:09:12,137
+Now let's look at the final semantic,
+the proof-theoretic semantics.
+
+208
+00:09:12,137 --> 00:09:14,578
+This one is particularly interesting
+because it's the only way
+
+209
+00:09:14,578 --> 00:09:17,667
+to give a semantics to Prolog,
+the channelization of Datalog.
+
+210
+00:09:17,667 --> 00:09:21,563
+So the idea there is that we don't compute
+the entire result, the IDB,
+
+211
+00:09:21,563 --> 00:09:24,746
+but we test for a single fact,
+a single tuple,
+
+212
+00:09:24,746 --> 00:09:27,084
+whether it is to be in the result,
+and how do we do this?
+
+213
+00:09:27,084 --> 00:09:29,482
+We are going to construct a proof tree,
+top-down, so to say.
+
+214
+00:09:29,482 --> 00:09:32,216
+It could be thought of--
+the computation of the fixpoint
+
+215
+00:09:32,216 --> 00:09:35,170
+is a bottom-up evaluation and now we're
+going to do a top-down evaluation,
+
+216
+00:09:35,170 --> 00:09:37,133
+starting with a result,
+we test it for the result,
+
+217
+00:09:37,133 --> 00:09:40,015
+we create a proof tree that shows
+that it must be in the result.
+
+218
+00:09:40,420 --> 00:09:44,824
+So how do we do this?
+So let's assume that we want to ask
+
+219
+00:09:44,824 --> 00:09:48,069
+whether (1,3)
+is in the transitive closure.
+
+220
+00:09:48,571 --> 00:09:50,822
+So we're going to try to basically
+build a proof tree
+
+221
+00:09:50,822 --> 00:09:52,407
+that it must be in there.
+
+222
+00:09:52,407 --> 00:09:54,801
+And at each of these intermediate nodes
+
+223
+00:09:54,801 --> 00:09:58,231
+we're going to say we have to choose
+[inaudible] conceptually,
+
+224
+00:09:58,231 --> 00:10:01,128
+a rule that you're going
+to use to expand the proof tree.
+
+225
+00:10:01,128 --> 00:10:02,857
+In this case we use rule 2.
+
+226
+00:10:03,309 --> 00:10:06,154
+That means we're going to have
+to find a suitable G of (<i>x,z</i>),
+
+227
+00:10:06,154 --> 00:10:08,392
+but in this particular case,
+I know already <i>x</i> must be 1,
+
+228
+00:10:08,722 --> 00:10:10,634
+because it comes from here.
+
+229
+00:10:10,634 --> 00:10:13,002
+Because <i>x</i> is on the left-hand side here.
+
+230
+00:10:13,002 --> 00:10:17,174
+We know what <i>y</i> is, and it's 3,
+so actually <i>y</i> here, T, must be 3.
+
+231
+00:10:17,174 --> 00:10:20,159
+But we have to now guess a value for <i>z</i>,
+
+232
+00:10:20,159 --> 00:10:23,213
+and if we guess 2,
+this is an non-deterministic technique,
+
+233
+00:10:23,213 --> 00:10:25,893
+otherwise you would, in general,
+just kind of an exponential search,
+
+234
+00:10:25,893 --> 00:10:28,550
+or something like that,
+but now for this, let's guess 2.
+
+235
+00:10:28,818 --> 00:10:31,353
+Well, if we guess 2, we can continue,
+because we can now apply--
+
+236
+00:10:31,353 --> 00:10:35,888
+we can check, actually G(1,2)
+is an input database, so we're done here.
+
+237
+00:10:35,888 --> 00:10:38,321
+That branch of the proof tree is done,
+and was successful.
+
+238
+00:10:38,321 --> 00:10:40,327
+So we now have to continue,
+and still have to prove
+
+239
+00:10:40,327 --> 00:10:42,440
+that T(2,3) must be in the result.
+
+240
+00:10:42,440 --> 00:10:46,303
+Well, actually we can do this 
+by actually just choosing that--
+
+241
+00:10:46,303 --> 00:10:48,280
+the first rule has to be used
+here to expand it--
+
+242
+00:10:48,280 --> 00:10:53,336
+that means it just says then G(2,3)
+must be enabled, or must be inferable,
+
+243
+00:10:53,336 --> 00:10:55,378
+in this case actions and inputs,
+and we're done.
+
+244
+00:10:55,378 --> 00:10:58,039
+We've proved all the leaves,
+and we're done,
+
+245
+00:10:58,039 --> 00:11:00,674
+and we've proved that T(1,3)
+indeed is in the result.
+
+246
+00:11:01,448 --> 00:11:03,751
+So that's the proof-theoretic semantics.
+
+247
+00:11:03,951 --> 00:11:06,729
+So in summary, we've shown you
+and discussed
+
+248
+00:11:06,729 --> 00:11:09,234
+three equivalent approaches
+for giving a semantics:
+
+249
+00:11:09,234 --> 00:11:11,058
+the model theoretic,
+the fixpoint theoretic,
+
+250
+00:11:11,058 --> 00:11:12,473
+and the proof theoretic semantics,
+
+251
+00:11:12,473 --> 00:11:14,826
+and they are all equivalent.
+
+252
+00:11:14,826 --> 00:11:17,114
+So the model theoretic one
+was the truth declarative one.
+
+253
+00:11:17,114 --> 00:11:20,594
+The others, maybe a bit more
+about how to compute things.
+
+254
+00:11:21,067 --> 00:11:24,318
+But they are all equivalent with, again,
+there's this kind of cryptomorphism.
+
+255
+00:11:24,318 --> 00:11:26,321
+You've got an elegant "surprise,"
+and that suggests
+
+256
+00:11:26,321 --> 00:11:28,533
+this is a robust language.
+There are many different ways
+
+257
+00:11:28,533 --> 00:11:30,664
+of thinking about it, and there's
+maybe different ways
+
+258
+00:11:30,664 --> 00:11:33,403
+of approaching different technical
+problems, like evaluation.
+
+259
+00:11:34,400 --> 00:11:36,676
+Here's a more interesting example.
+
+260
+00:11:37,308 --> 00:11:39,455
+We're going to simulate
+a finite state machine,
+
+261
+00:11:39,455 --> 00:11:41,326
+and we're going to model this as follows.
+
+262
+00:11:41,326 --> 00:11:44,297
+Actually the first part here,
+
+263
+00:11:45,076 --> 00:11:48,705
+is actually just
+input modeling the input word
+
+264
+00:11:48,705 --> 00:11:50,954
+to the finite state machine,
+it's a string machine,
+
+265
+00:11:50,954 --> 00:11:53,691
+and it says we've got
+eight character positions,
+
+266
+00:11:54,521 --> 00:11:56,667
+and if modeled, these positions 1 to 8,
+
+267
+00:11:56,667 --> 00:11:59,026
+so we haven't [inaudible] explicitly,
+
+268
+00:11:59,026 --> 00:12:02,128
+otherwise we could, of course,
+make this built-in, if you like.
+
+269
+00:12:02,589 --> 00:12:05,673
+There's a successful relation that says
+first step one, then two,
+
+270
+00:12:05,673 --> 00:12:08,334
+then three, then four,
+and so on, up to eight.
+
+271
+00:12:08,334 --> 00:12:10,556
+And we have labeled
+these positions 1 to 8,
+
+272
+00:12:10,556 --> 00:12:12,315
+we have a character <i>a</i> or <i>b</i> here,
+
+273
+00:12:12,315 --> 00:12:16,661
+so actually the word is <i>abababab</i>,
+an eight-character word,
+
+274
+00:12:16,791 --> 00:12:19,397
+on which we're going to run--
+this is actually input, that's data.
+
+275
+00:12:19,397 --> 00:12:22,105
+It's written as unconditional rules,
+
+276
+00:12:22,105 --> 00:12:25,727
+heads with empty bodies,
+if they're all true, facts,
+
+277
+00:12:25,727 --> 00:12:28,189
+or we could have thought
+of them as database tables.
+
+278
+00:12:28,189 --> 00:12:31,387
+And as most of--that's also data,
+
+279
+00:12:31,387 --> 00:12:33,479
+which actually models
+the finite state machine.
+
+280
+00:12:33,479 --> 00:12:35,679
+So what does it look like?
+We've got the delta relation,
+
+281
+00:12:35,679 --> 00:12:37,734
+we've got the starts
+and we've got the final states.
+
+282
+00:12:37,734 --> 00:12:42,235
+So we've got actually just
+two states, <i>q1</i> and <i>q2</i>,
+
+283
+00:12:42,784 --> 00:12:44,889
+<i>q1</i> and <i>q2</i>.
+
+284
+00:12:45,241 --> 00:12:47,252
+The start set is <i>q1</i>.
+
+285
+00:12:47,862 --> 00:12:50,608
+The final state,
+the only final state, is also <i>q1</i>.
+
+286
+00:12:51,348 --> 00:12:55,466
+The transition relation is--
+well, I can get from <i>q1</i> to <i>q2</i>
+
+287
+00:12:56,324 --> 00:12:58,684
+using either symbol <i>a</i> or <i>c</i>,
+
+288
+00:12:58,997 --> 00:13:02,299
+and I can get back to <i>q1</i> using <i>b</i>.
+
+289
+00:13:02,808 --> 00:13:06,177
+So, in other words, obviously
+a regular expression is
+
+290
+00:13:06,177 --> 00:13:10,903
+<i>a</i> or <i>c</i>, dot <i>b</i>, star.
+
+291
+00:13:12,059 --> 00:13:15,035
+And <i>abababab</i>
+is a special case,
+
+292
+00:13:15,035 --> 00:13:17,063
+it's a word that this machine accepts.
+
+293
+00:13:17,426 --> 00:13:21,077
+So I clean up, and let's now
+look at the final part,
+
+294
+00:13:21,646 --> 00:13:23,964
+which is actually the encoding
+of the semantics
+
+295
+00:13:23,964 --> 00:13:26,586
+of the finite state machine,
+
+296
+00:13:26,586 --> 00:13:28,184
+So, remember, the standard definition
+
+297
+00:13:28,184 --> 00:13:29,782
+of the semantics 
+of the finite state machine
+
+298
+00:13:29,782 --> 00:13:31,381
+is given by the notion of a run.
+
+299
+00:13:31,381 --> 00:13:36,129
+So the run is a function that maps
+every position in the word to a state,
+
+300
+00:13:36,129 --> 00:13:40,958
+and we accept if the final position
+is mapped to a final state.
+
+301
+00:13:44,016 --> 00:13:47,351
+Actually we're going to have points
+right after a symbol,
+
+302
+00:13:47,351 --> 00:13:49,453
+which is a position,
+
+303
+00:13:49,453 --> 00:13:52,060
+and we're going to ask
+which state to assign to this.
+
+304
+00:13:52,060 --> 00:13:54,230
+So with the first rule
+we're going to check.
+
+305
+00:13:54,632 --> 00:13:57,742
+first(P) only maps P to 1,
+
+306
+00:13:57,742 --> 00:14:00,347
+the start state is also going to be <i>q1</i>.
+
+307
+00:14:00,347 --> 00:14:04,140
+The delta function--let's now,
+actually we can commit several things,
+
+308
+00:14:04,140 --> 00:14:07,323
+but we could make a run using <i>c</i> or with <i>a</i>,
+
+309
+00:14:07,323 --> 00:14:10,167
+but actually we the symbol
+of the word at position <i>a</i>--
+
+310
+00:14:10,657 --> 00:14:11,671
+1 is <i>a</i>.
+
+311
+00:14:11,671 --> 00:14:15,495
+So we have <i>a</i>, <i>q1</i>, and that means
+<i>q</i> must be--
+
+312
+00:14:15,495 --> 00:14:18,168
+[inaudible] the machine here--<i>q2</i>.
+
+313
+00:14:18,168 --> 00:14:23,136
+So we're getting at the end
+of position 1 into <i>q2</i>,
+
+314
+00:14:23,136 --> 00:14:26,877
+so actually run will compute 1, <i>q2</i>.
+
+315
+00:14:26,877 --> 00:14:28,528
+Now the next step will be,
+
+316
+00:14:28,528 --> 00:14:30,454
+actually we're going
+to apply the second rule,
+
+317
+00:14:30,454 --> 00:14:32,094
+we're going to make a step.
+
+318
+00:14:32,094 --> 00:14:34,770
+So we've got 1 and <i>q2</i> here,
+
+319
+00:14:34,770 --> 00:14:38,075
+and we can pick the success of 1,
+which is going to be 2,
+
+320
+00:14:38,075 --> 00:14:41,025
+and the delta relation for state <i>q2</i>,
+
+321
+00:14:41,025 --> 00:14:44,608
+for the next symbol,
+the symbol position 2, which is <i>b</i>,
+
+322
+00:14:44,608 --> 00:14:47,070
+is going to be to <i>q1</i>,
+
+323
+00:14:47,070 --> 00:14:50,563
+because we have a position <i>b</i> being 2,
+
+324
+00:14:50,563 --> 00:14:52,597
+and symbol <i>b</i> there.
+
+325
+00:14:52,597 --> 00:14:57,228
+So we are going to thus compute,
+at position 2, state <i>q1</i>.
+
+326
+00:14:57,228 --> 00:14:59,462
+So we are going to be next in state <i>q1</i>
+
+327
+00:14:59,462 --> 00:15:03,294
+Now we can actually recursively
+use this rule a few more times,
+
+328
+00:15:03,294 --> 00:15:06,733
+and you're going
+to compute state <i>q2</i>, state <i>q1</i>,
+
+329
+00:15:06,733 --> 00:15:11,817
+state <i>q2</i>, state <i>q1</i>,
+state <i>q2</i> and state <i>q1</i>,
+
+330
+00:15:11,817 --> 00:15:13,386
+that's all of the second rule.
+
+331
+00:15:13,386 --> 00:15:17,168
+And now we're in the position
+that actually has a run, at position 8,
+
+332
+00:15:17,168 --> 00:15:18,881
+and we're in state <i>q1</i>,
+
+333
+00:15:18,881 --> 00:15:20,589
+and the last position is actually 8,
+
+334
+00:15:20,589 --> 00:15:24,446
+and the final state of <i>q1</i>, a final state,
+so we are going to accept.
+
+335
+00:15:24,446 --> 00:15:30,292
+So we compute this final boolean,
+predicate accept,
+
+336
+00:15:30,292 --> 00:15:32,837
+and if it would not be an accepting run,
+
+337
+00:15:32,837 --> 00:15:34,997
+then we would not be able to compute that.

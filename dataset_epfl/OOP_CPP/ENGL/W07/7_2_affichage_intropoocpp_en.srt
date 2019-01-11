@@ -1,0 +1,867 @@
+1
+00:00:04,183 --> 00:00:06,362
+In this episode, we continue 
+our case study
+
+2
+00:00:06,362 --> 00:00:08,065
+on watches -- Swiss made or not --
+
+3
+00:00:08,065 --> 00:00:10,458
+and we will attack the
+polymorphic output
+
+4
+00:00:10,458 --> 00:00:12,828
+of the various products in our
+hierarchy.
+
+5
+00:00:12,828 --> 00:00:14,519
+As a reminder, in the
+last step,
+
+6
+00:00:14,519 --> 00:00:17,422
+we had drafted a product
+hierarchy
+
+7
+00:00:17,422 --> 00:00:19,477
+and we will now focus on
+
+8
+00:00:19,477 --> 00:00:21,950
+how to make sure that these
+different products
+
+9
+00:00:21,950 --> 00:00:24,238
+can be displayed in a
+polymorphic way.
+
+10
+00:00:24,238 --> 00:00:26,702
+Basically, a product like a watch, 
+a mechanism
+
+
+11
+00:00:26,702 --> 00:00:29,594
+or an accessory will have its own
+way of being displayed
+
+12
+00:00:29,594 --> 00:00:32,028
+and we want this display to
+be polymorphic.
+
+13
+00:00:32,028 --> 00:00:34,437
+Meaning that if we put an
+object
+
+14
+00:00:34,437 --> 00:00:37,257
+of type Montre, for example, in a
+variable of type Produit
+
+15
+00:00:37,257 --> 00:00:41,652
+and we call the output method on
+that variable,
+
+16
+00:00:41,652 --> 00:00:46,989
+the the output should automatically adapt 
+to the actual type of the instance stored
+
+17
+00:00:46,989 --> 00:00:49,912
+in the variable.
+So each product will have its own way
+
+18
+00:00:49,912 --> 00:00:52,032
+of being displayed, and we want to
+know how to procede
+
+19
+00:00:52,032 --> 00:00:54,434
+to implement a polymorphic output
+
+20
+00:00:54,434 --> 00:00:55,960
+We would like this output
+
+21
+00:00:55,960 --> 00:00:58,498
+to be made using the output operator.
+
+22
+00:00:58,498 --> 00:01:00,593
+So concretely here if we
+imagine, for example,
+
+23
+00:01:00,593 --> 00:01:02,467
+that we declare
+
+24
+00:01:02,467 --> 00:01:06,097
+a pointer <i>p</i> to a product
+
+25
+00:01:06,097 --> 00:01:09,727
+[Silence]
+
+26
+00:01:13,358 --> 00:01:20,673
+we would like this, "display the
+contents pointed to by <i>p</i>"...
+
+27
+00:01:20,673 --> 00:01:26,917
+to display the information specific
+to the watch.
+
+28
+00:01:26,917 --> 00:01:28,887
+So, is it possible to program
+
+29
+00:01:28,887 --> 00:01:32,619
+this operator to have the desired
+polymorphic behavior?
+
+30
+00:01:32,619 --> 00:01:34,854
+The answer is yes.
+
+31
+00:01:34,854 --> 00:01:38,545
+Of course, it is not the operator
+itself which will be declared
+
+32
+00:01:38,545 --> 00:01:40,120
+as a virtual method.
+
+33
+00:01:40,120 --> 00:01:42,149
+It is not a method. It is a function
+
+34
+00:01:42,149 --> 00:01:43,444
+that is external to all classes,
+
+35
+00:01:43,444 --> 00:01:46,325
+so the operator itself cannot
+be virtual.
+
+36
+00:01:46,325 --> 00:01:53,183
+However, nothing prevents us
+from invoking a virtual, polymorphic method
+
+37
+00:01:53,183 --> 00:01:55,616
+on the operand it must display.
+
+38
+00:01:55,616 --> 00:01:58,850
+So the idea here is to make
+our output operator
+
+39
+00:01:58,850 --> 00:02:00,687
+call a polymorphic method
+
+40
+00:02:00,687 --> 00:02:02,841
+which would be defined at
+the superclass level.
+
+41
+00:02:02,841 --> 00:02:05,720
+In this case, in the <i>Produit</i> superclass.
+
+42
+00:02:05,720 --> 00:02:09,207
+Our operator allowing
+the output of a product
+
+43
+00:02:09,207 --> 00:02:11,983
+will thus call an <i>afficher</i> method
+(TN: "afficher"  means "display")
+
+44
+00:02:11,983 --> 00:02:14,387
+defined in the <i>Produit</i> superclass;
+
+45
+00:02:14,387 --> 00:02:17,598
+of course, this <i>afficher</i> method must
+be declared as virtual
+
+46
+00:02:17,598 --> 00:02:20,373
+to allow polymorphic behavior
+
+47
+00:02:20,373 --> 00:02:23,554
+Remember that here, it is the
+fact that this method is virtual
+
+48
+00:02:23,554 --> 00:02:26,413
+and that it is called via a reference
+to a product
+
+49
+00:02:26,413 --> 00:02:29,361
+that allows it to have a polymorphic
+behavior, as desired.
+
+50
+00:02:29,361 --> 00:02:32,294
+You will notice that the <i>afficher</i> method
+is defined as public
+
+51
+00:02:32,294 --> 00:02:33,953
+first, because it makes sense to
+
+52
+00:02:33,953 --> 00:02:35,695
+offer this functionality
+
+53
+00:02:35,695 --> 00:02:38,697
+to the outside world,
+
+54
+00:02:38,697 --> 00:02:40,425
+but also because it will free us
+
+55
+00:02:40,425 --> 00:02:42,401
+from some constraints
+
+56
+00:02:42,401 --> 00:02:45,146
+related to programming the
+output operator.
+
+57
+00:02:45,146 --> 00:02:48,371
+Typically here, since <i>afficher</i> is
+a public-accessible method,
+
+58
+00:02:48,371 --> 00:02:51,703
+the operator can be programmed
+to use it directly
+
+59
+00:02:51,703 --> 00:02:54,128
+and so, it isn't necessary to use
+<i>friend</i>
+
+60
+00:02:54,128 --> 00:02:57,298
+to access this method of the
+<i>Produit</i> class.
+
+61
+00:02:57,298 --> 00:02:59,100
+Once a method, in a class,
+
+62
+00:02:59,100 --> 00:03:00,337
+is declared as virtual,
+
+63
+00:03:00,337 --> 00:03:03,264
+it means that we can potentially
+use instances
+
+64
+00:03:03,264 --> 00:03:05,665
+of this class in a polymorphic way.
+
+65
+00:03:05,665 --> 00:03:09,772
+And so, we must think about
+destroying them appropriately
+
+66
+00:03:09,772 --> 00:03:14,542
+by introducing a destructor, which
+will be virtual
+
+67
+00:03:14,542 --> 00:03:17,598
+We want want the output method of
+a product
+
+68
+00:03:17,598 --> 00:03:19,854
+to display its price by default.
+
+69
+00:03:19,854 --> 00:03:22,901
+We could imagine writing the 
+<i>afficher</i> method
+
+70
+00:03:22,901 --> 00:03:27,203
+in such a way that it displays
+the price of a product.
+
+71
+00:03:27,203 --> 00:03:28,891
+This solution, however, is not good.
+
+72
+00:03:28,891 --> 00:03:30,647
+Do you know why?
+
+73
+00:03:30,647 --> 00:03:33,973
+Indeed, the price of a subclass of
+Produit could very well be different
+
+74
+00:03:33,973 --> 00:03:35,152
+from the base value
+
+75
+00:03:35,152 --> 00:03:37,709
+Using the base value to display the
+price
+
+76
+00:03:37,709 --> 00:03:40,767
+will thus not be correct for all the possible
+instances of Produit
+
+77
+00:03:40,767 --> 00:03:42,970
+including its subclasses.
+
+78
+00:03:42,970 --> 00:03:46,084
+Indeed, for subclasses of Produit such
+as bracelets, for example,
+
+79
+00:03:46,084 --> 00:03:47,652
+we could perfectly imagine that the price
+
+80
+00:03:47,652 --> 00:03:50,496
+would correspond to the base
+value of the product;
+
+81
+00:03:50,496 --> 00:03:53,283
+however, for watches, another
+type of product,
+
+82
+00:03:53,283 --> 00:03:55,765
+we could imagine that the calculation
+of the price would be more complex
+
+83
+00:03:55,765 --> 00:03:58,975
+and that it would be the sum of the
+prices of all its components.
+
+84
+00:03:58,975 --> 00:04:00,896
+The correct way to proceed here
+
+85
+00:04:00,896 --> 00:04:02,737
+is therefore to use,
+instead of values,
+
+86
+00:04:02,737 --> 00:04:05,460
+the prix() (means "price()") method, which will
+itself of course
+
+87
+00:04:05,460 --> 00:04:10,319
+be capable of having a polymorphic behavior
+and calculate the price of a watch
+
+88
+00:04:10,319 --> 00:04:13,960
+if the displayed product is a watch,
+or the price of a bracelet
+
+89
+00:04:13,960 --> 00:04:16,744
+if we are displaying a bracelet.
+
+90
+00:04:16,744 --> 00:04:18,414
+If we go back to our initial example,
+
+91
+00:04:18,414 --> 00:04:25,731
+the one where we declared a pointer
+on a product in which we stored
+
+92
+00:04:25,731 --> 00:04:29,129
+the address of a watch,
+
+93
+00:04:29,129 --> 00:04:34,516
+imagine now that we call the output
+operator
+
+94
+00:04:34,516 --> 00:04:36,612
+on the object pointed to by <i>p</i>.
+
+95
+00:04:36,612 --> 00:04:39,398
+What happens here?
+
+96
+00:04:39,398 --> 00:04:42,820
+This will be translated by a call
+to the output operator,
+
+97
+00:04:42,820 --> 00:04:46,310
+that we have overloaded for products.
+
+98
+00:04:50,700 --> 00:04:53,292
+It will call the <i>afficher</i> method,
+
+99
+00:04:53,292 --> 00:04:56,821
+knowing that now, this variable,
+this parameter,
+
+100
+00:04:56,821 --> 00:04:59,855
+contains a reference to a watch.
+
+101
+00:04:59,855 --> 00:05:02,463
+The <i>afficher</i> method, as it
+is defined in the Produit class,
+
+102
+00:05:02,463 --> 00:05:03,425
+will be called,
+
+103
+00:05:03,425 --> 00:05:07,040
+and it will itself call the price
+calculation method, <i>prix()</i>.
+
+104
+00:05:07,040 --> 00:05:11,110
+This method is polymorphic, so it
+will automatically adapt
+
+105
+00:05:11,110 --> 00:05:13,584
+to the real nature of the object
+on which it is called,
+
+106
+00:05:13,584 --> 00:05:15,193
+which it so happens is a watch here.
+
+107
+00:05:15,193 --> 00:05:17,224
+The <i>prix()</i> method is indeed virtual.
+
+108
+00:05:17,224 --> 00:05:19,460
+As we allow it to access the
+real instance
+
+109
+00:05:19,460 --> 00:05:20,678
+through a pointer,
+
+110
+00:05:20,678 --> 00:05:23,080
+it can truly apply in a polymorphic
+way
+
+111
+00:05:23,080 --> 00:05:24,601
+and we will have the desired result.
+
+112
+00:05:24,601 --> 00:05:27,983
+That is, the price for a watch will be
+calculated as, for example,
+
+113
+00:05:27,983 --> 00:05:30,525
+the sum of the prices of all its components.
+
+114
+00:05:30,525 --> 00:05:32,309
+Now, let's finalize our Produit class.
+
+115
+00:05:32,309 --> 00:05:34,285
+Suppose that we wish to impose
+the fact that
+
+116
+00:05:34,285 --> 00:05:38,552
+the base value of a product should
+remain unchanged once we initialized it.
+
+117
+00:05:38,552 --> 00:05:41,531
+That way, a product's base value
+would remain as
+
+118
+00:05:41,531 --> 00:05:44,463
+it was initialized, and it would be
+impossible to change it
+
+119
+00:05:44,463 --> 00:05:46,169
+during the lifetime of the product.
+
+120
+00:05:46,169 --> 00:05:50,702
+This can be forced by labeling
+the variable as constant.
+
+121
+00:05:50,702 --> 00:05:55,388
+We will be able to initialize the <i>valeur</i> 
+member variable, but once this is done,
+
+122
+00:05:55,388 --> 00:05:57,923
+we will no longer be able to change
+its value
+
+123
+00:05:57,923 --> 00:05:59,257
+If we also wish to impose
+
+124
+00:05:59,257 --> 00:06:02,061
+that by default, a product has
+a base value of zero,
+
+125
+00:06:02,061 --> 00:06:04,840
+we can do this by using a default
+value
+
+126
+00:06:04,840 --> 00:06:06,899
+for the constructor's parameter.
+
+127
+00:06:06,899 --> 00:06:08,461
+So we would have
+
+128
+00:06:08,461 --> 00:06:11,252
+a default constructor for the
+<i>Produit</i> class
+
+129
+00:06:11,252 --> 00:06:12,499
+which, when called,
+
+130
+00:06:12,499 --> 00:06:16,588
+would initialize the product's value with
+a value of <i>0</i>.
+
+131
+00:06:16,588 --> 00:06:18,169
+Finally, let's imagine that
+we want to model
+
+132
+00:06:18,169 --> 00:06:20,859
+the fact that a product does not
+exist as such,
+
+133
+00:06:20,859 --> 00:06:23,331
+that it is an abstract entity
+in our design
+
+134
+00:06:23,331 --> 00:06:25,348
+and that we cannot create any instance
+of Produit as such.
+
+135
+00:06:25,348 --> 00:06:29,907
+How do we force this constraint in
+our design?
+
+136
+00:06:29,907 --> 00:06:31,916
+In C++, for a class to be abstract,
+
+137
+00:06:31,916 --> 00:06:34,466
+it must contain at least one pure
+virtual method,
+
+138
+00:06:34,466 --> 00:06:38,352
+meaning that here, we would
+need to have a method
+
+139
+00:06:41,432 --> 00:06:42,428
+defined as pure virtual.
+
+140
+00:06:42,428 --> 00:06:46,124
+We don't really have any reason
+to create one here,
+
+141
+00:06:46,124 --> 00:06:48,415
+and creating one artificially would
+not really make any sense.
+
+142
+00:06:48,415 --> 00:06:51,834
+A good candidate for a
+pure virtual method
+
+143
+00:06:51,834 --> 00:06:54,459
+in a class is actually the
+destructor.
+
+144
+00:06:54,459 --> 00:07:00,301
+The destructor can be declared as pure
+virtual to ensure that
+
+145
+00:07:00,301 --> 00:07:02,432
+the class becomes abstract.
+
+146
+00:07:02,432 --> 00:07:04,545
+Since any class necessarily has
+a destructor,
+
+147
+00:07:04,545 --> 00:07:06,627
+the fact of declaring it as pure virtual
+
+148
+00:07:06,627 --> 00:07:09,762
+saves us from having to create
+an artificial method
+
+149
+00:07:09,762 --> 00:07:14,509
+simply to make the class abstract
+
+150
+00:07:14,509 --> 00:07:17,272
+Note that it is imperative to
+give a body to all destructors
+
+151
+00:07:17,272 --> 00:07:20,403
+and note, at the same time, that nothing
+prevents a pure virtual method
+
+152
+00:07:20,403 --> 00:07:22,105
+from having a body.
+
+153
+00:07:22,105 --> 00:07:24,371
+This syntax, however, is not valid C++
+
+154
+00:07:24,371 --> 00:07:28,278
+so it is not possible to specify the
+body of a pure virtual destructor
+
+155
+00:07:28,278 --> 00:07:30,029
+within the class, like so.
+
+156
+00:07:30,029 --> 00:07:32,660
+We will have to define
+the destructor of
+
+157
+00:07:32,660 --> 00:07:35,813
+the Produit class outside of the class, with
+this syntax.
+
+158
+00:07:35,813 --> 00:07:37,901
+Meaning that within the <i>Produit</i>
+class,
+
+159
+00:07:37,901 --> 00:07:40,201
+we declare the destructor as pure
+virtual,
+
+160
+00:07:40,201 --> 00:07:43,042
+and we define its body outside.
+
+161
+00:07:43,042 --> 00:07:44,831
+So this body must be specified,
+
+162
+00:07:44,831 --> 00:07:48,842
+we must give a definition for the
+destructor even if it doesn't do anything.
+
+163
+00:07:48,842 --> 00:07:51,793
+This is what we obtain, after this step,
+
+164
+00:07:51,793 --> 00:07:53,973
+for the code of the Produit class.
+
+165
+00:07:53,973 --> 00:07:56,519
+The constructor of the class allows
+initialization
+
+166
+00:07:56,519 --> 00:07:59,993
+of its <i>valeur</i> attribute using a
+value passed as parameter.
+
+167
+00:07:59,993 --> 00:08:03,076
+This constructor can be used as
+a default constructor
+
+168
+00:08:03,076 --> 00:08:05,888
+since all of its parameters have
+a default value,
+
+169
+00:08:05,888 --> 00:08:07,553
+a value of <i>0</i> here.
+
+170
+00:08:07,553 --> 00:08:10,096
+The <i>Produit</i> class provides
+an output method
+
+171
+00:08:10,096 --> 00:08:11,921
+that can be used in a polymorphic way.
+
+172
+00:08:11,921 --> 00:08:13,743
+This method is declared as virtual,
+
+173
+00:08:13,743 --> 00:08:16,506
+so if it is used via a pointer or
+a reference,
+
+174
+00:08:16,506 --> 00:08:18,588
+then it will exhibit polymorphic
+behavior.
+
+175
+00:08:18,588 --> 00:08:22,526
+It then calls another potentially
+polymorphic method,
+
+176
+00:08:22,526 --> 00:08:25,380
+the <i>prix()</i> method, also
+declared as virtual
+
+177
+00:08:25,380 --> 00:08:28,351
+The output operator can
+be overloaded
+
+178
+00:08:28,351 --> 00:08:30,991
+to display instances of <i>Produit</i>.
+
+179
+00:08:30,991 --> 00:08:32,931
+In order to have polymorphic behavior,
+
+180
+00:08:32,931 --> 00:08:37,164
+it simply has to call a polymorphic output
+method in its body; a method
+
+181
+00:08:37,164 --> 00:08:40,384
+defined as public in the
+<i>Produit</i> class.
+
+182
+00:08:40,384 --> 00:08:42,736
+Finally, to model the fact
+that a product
+
+183
+00:08:42,736 --> 00:08:44,839
+is an abstract entity in our design,
+
+184
+00:08:44,839 --> 00:08:48,678
+we have declared the destructor
+as pure virtual
+
+185
+00:08:48,678 --> 00:08:50,468
+and we did not forget to define it
+
+186
+00:08:50,468 --> 00:08:53,420
+even if we have nothing
+specific to make it do, here.
+
+187
+00:08:53,420 --> 00:08:56,268
+And this concludes our episode
+on the definition of products
+
+188
+00:08:56,268 --> 00:08:58,024
+and their polymorphic output.

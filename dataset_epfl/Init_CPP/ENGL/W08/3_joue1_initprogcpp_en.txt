@@ -1,0 +1,194 @@
+Let us resume the programming of our Connect Four game.
+In the first episode, we have endeavoured to represent the game, the colors, namely the data structures used in our prgram.
+Then, in the second episode, we have coded the basic functions for doing the intialization and printing of the game.
+Now, let us tackle the game itself.
+In order to play, we will need to ask the user to drop a disk into the grid.
+We need to make sure that their answer is correct and ensure that the data structures will remain valid according to the player's move, thus indeed playing this move in the grid.
+Then, we will ask the other player to drop a disk, validate and so on.
+Thus, we will loop like this until one player has won or the grid has been filled.
+In this sequence, we will focus on the second point, that is, validate the player's move and, according to the data structure, render the data structure valid, effectively playing the move in the grid.
+Let's decide to make it a function.
+The first step consists of precisely knowing what this function has to do; we here focus on the "what".
+In this case, we already have a precise idea:
+We need to receive a column number, signifying where the player intends to drop his disk.
+Then, we will verify if this move is valid and update the game according to the move indicated by the player.
+We can name this function
+"joue" (TN: means "play"), for example.
+Now, let us focus on this function's prototype.
+What are the arguments to be passed to the function?
+To that end, we will imagine what the typical call of this function would look like. Typically, we would write "joue", of course, we need a game to play with; thus, we will pass a grid as argument.
+Then, we will indicate where we intend to drop the disk; for example to drop a disk down column 3
+Finally, we need the player's color; is it the red  or the yellow player's turn?
+For example, we would inidicate that it is the red player's turn; we would consequently drop a red disk down column 3.
+Then, it would be the yellow player's turn.
+For example, the yellow player could wish to drop a disk down column 2.
+Then, the red player, at turn again, would drop their disk down column 3.
+Thus, we clearly see that the function needs to receive three parameters, we must pass three arguments: the grid, a column number and a color.
+Now, we can start writing the function's prototype.
+Thus, "joue" (the name of the function), then a grid, called "grille", passed as argument.
+(TN:"grille" means "grid").
+Then, we will retrieve a column number, typically an integer number.
+Finally, we will pass the plalyer's color for which we had already defined the type "Couleur".
+Here is a first version of this prototype.
+Let us begin by criticizing it a little.
+Here, for the column number, we used the integer type.
+However, a priori, the columns will go from 0 to 6 and are all positive integers.
+Thus, here, we wish to force this number to be a positive integer.
+Moreover, this column will serve to indicate the position in an array.
+Typically, if we have the grid here, as you have seen during the printing, we used the indices "i" and "j", where j is precisely the column index
+Thus, this column being used to index the array elements, we will respect the previously established conventions, namely that, for array sizes and indices, we use the "size_t" type.
+Here, we will thus use the "size_t" type and correct this aspect in our function's prototype.
+Now, another very important correction regarding the grid.
+Obviously, the fact that we are playing in the grid will modify it.
+The grid will be modified!
+If, for example, the red player drops his disk down column 3, that means that a red disk will appear here; the grid is indeed modified!
+Therefore, we have to resort to by-reference passing.
+The grid being modified, we resort to by-reference passing thanks to this sign which, we remind you, is used to signify that the grid is passed by reference.
+Those were the arguments of our prototype.
+Let us now focus on the return value.
+We did not use any return value in our calls; we did not write something like
+"z = joue(grille, 3)".
+If we had, what would this z be exaclty?!
+Since we do not need to return anything, the return type will be the "void" type.
+Now that the prototype is finished, we can move on to the function definition and start coding what we wish to accomplish.
+Our goal is to drop a disk down the column received as parameter.
+For example, if we drop a red disk down column 3, what we wish to do is to move to the third column, and check what the first empty position is.
+For example, let us suppose that we already have a red disk here and a yellow disk just above.
+So, we are dropping a red disk down column 3.
+This disk will therefore be placed on the first empty position.
+We will thus check: here it is already occupied, here it is empty and we can thus place our red disk.
+First of all, we should write a comment explaining what we wish to accomplish in order to clarify our thoughts and make it easier for future readers to understand our code.
+We will run through the furnished column from bottom to top, starting with the lowest point.
+How will we write this in C++?
+Why, we will give ourselves an index in order to run through the rows.
+Let us call this index "ligne" (TN: means "row").
+With this index, we will start from the bottom.
+By the way, please be reminded that the array is always numbered from 0, at the top, to the bottom.
+The bottom is the size of the array minus 1.
+Therefore, we will start here, at "size -1".
+Thus, we declare a "size_t"-type variable "ligne" initialized to the size of the grid minus 1.
+We run through this column, starting from the bottom until we reach an empty square.
+In C++, "until" means that we have a loop, here a conditional loop.
+Since the condition is :
+"as long we do not have an empty square", that is, as long as the square of the column we are currently visiting is not empty.
+This is written as follows:
+As long as (a "while loop") the square, that is "grille[ligne]", indeed, for a given column, we are running through the different rows starting from the bottom and going up.
+A square of the grid is indeed the row index of "grille" which we decided to call "ligne" and the "colonne" (TN: means "column") index.
+Thus, we are advancing row by row on the column which is the variable received as parameter.
+As long the square with the indices "ligne" and "colonne"
+(going up the lines of a given column), as long as this square is not "vide" (TN: means "empty") where "vide" is a previously defined value, belonging to the "Couleur" type.
+As long as the square of the indices
+"ligne" and "colonne" is not "vide"; at this point, what should we do?
+Well, we go up one line, subtracting 1 from "ligne".
+Indeed, the grid, the array, is numbered from 0 to "size - 1".
+Since we are following this direction, we must decrement 1 from line to line.
+VoilÃ ! At this point, we have found the first empty square in our column.
+Now, we simplty need to fill this square. Thanks to a comment, we clarify the process.
+We will fill the obtained square.
+This is written like this : "grille[ligne] [colonne]"
+"= the color", received as parameter, we wish to store insidie this square.
+This concludes our "joue" function.
+Now, as good programmers, we will test our function.
+We are doing just that, writing the following "main".
+We start, of course, by declaring a game, a grid.
+We then initialize and print this grid here, just as we had done in the previous episode.
+Now we can test our "joue" function on our grid, column 3, color rouge (TN: means "red").
+This should correspond, upon the printing of the grid, to a red disk at this position.
+Then, we will test dropping a yellow disk down the column 2.
+We can then reprint the grid.
+This should correspond to this printing: a yellow disk here.
+Now, we go for a third and final test where we print the grid.
+Feel free to unfold and compile this program yourselves.
+This should correspond to the printing corresponding to two red disks in the column 3 and one yellow disk in the
+ column 2.
+But is our program correct?
+Have we considered all the tests?
+Let us reexamine our code and imagine that a player decides to play all the time in the same column.
+Both players will always drop their disks in the same column.
+What will happen?
+Here, in order to simplify, we will always use the same color.
+We will start by putting a disk here, another here, another here and so on.
+Eventually, we will put a disk here.
+Now let us suppose we ask to drop another disk down column 3.
+What will happen? We will start from the lower row and, until we encounter an empty square, execute the instruction "ligne --".
+Here, we will thus go up our row until here.
+Now we reach the row index 0 but we still have not encountered any empty square. What should we do?
+We execute here the instruction "ligne--".
+The question is:
+What happens now?
+For now, it does not really matter; whatever happens here is a conception error, an algorithm error.
+What we need to do, is correct our algorithm. We will research the fact that the case is indeed empty in the game and that we have not exited.
+Therefore, we will introduce a boolean indicating if yes or no, the column is empty.
+At the beginning, the column is not empty; we will thus initialize our boolean to "false".
+Therefore, during our process, we will verify if we have not overflowed.
+So that, if we ever reach the row 0, here, that means we have overflowed and that the array is full.
+So, we are testing "ligne == 0"
+If so, that means that our variable
+"pleine" (TN: means "full"), which we have declared here, is true since we reached the row 0; the column is thus full.
+Indeed, the row 0 of a column is not empty if and only if the column is full.
+Else, at this point, we will keep going as we did previously, subtracting 1 from the row at every iteration.
+Now, let us correct our loop so that is stops as soon as the column is empty.
+Here, we had a "while loop" which means
+"continue as long as".
+Thus, here, we kept going as long as the column was not full.
+So, we will add "is not full", namely that the column is not full in addition to the prevous condition, namely that we did not encounter an empty square.
+This is written exactly like we had done previously; we are not changing anything, simply adding the condition that the column should not be full.
+Here, we thus explain in a comment that we have either found an empty square or that we will stop for having reached the top of the column.
+Finally, we will correct the end of our program.
+If, at this point, the column was not full, then we will proceed like previously, filling the empty square.
+We could also take the chance to indicate a boolean return value, indicating if we have been able to play.
+In this case, we have indeed been able to drop the desired colored disk in the selected column.
+Therefore, we could, for example, decide to return the value "true", meaning that we have been able to play.
+On the other hand, if the column was full, we will return the value "false".
+We thus take the chance to modify the return type of our function, which now returns a boolean value instead of nothing.
+In a comment, we explain that if the column was not full, we have played and returned the value "true".
+Otherwise, we have not been able to play and have return the value "false".
+Since we have modified our "joue" function here, in order to correct a possible mistake, it is important to test this correction.
+Indeed, it is always important to test your program regularly.
+Thus, we now write another
+"main" here which will allows us to test the exact same thing.
+We declare, initialize and print a grid.
+Here though, we will try to fill, let us say,
+10 times the same column.
+To that end, we will again call our brand new "joue" function, this time playing constantly in the same column.
+This "joue" function now returns a boolean-type value.
+We declare here a bool-type variable in order to retrieve the return value.
+In our loop, we will test at every turn if the played move was valid at this point.
+If it was not valid, we will print that it was impossible to play on this column.
+Also, our loop will print the grid at every iteration.
+What will happen in the "main" is that we will try to play 10 times in the column 3.
+Thus, the first 6 moves will occur without trouble.
+The first 6 moves will be played here.
+Now, let us see what happens upon the 7th move.
+At this point, we will our function :
+" joue(grille, 3 rouge) ", thus asking to drop a red disk down the column 3.
+We will initialize "ligne" to the soze of the grid minus 1 and initialize the "pleine" value to "false".
+Indeed, before the test, we suppose that the column is not full, for it is precisely what we wish to verify.
+Obviously here, the test is true and we will check this part of the test.
+Here, the square on the row
+"size - 1" and on the column 3, here is not empty; the test is correct.
+We are not in the case where
+"ligne" is 0 and will thus decrement the row.
+This condition will still be true as long as the tested square is not empty.
+We will thus decrement, decrement, decrement until we arrive here, on the row 0.
+At this point, we will reach this test phase.
+"pleine" is still false and the square is not empty.
+We thus enter the loop once more except this time, "ligne" is 0.
+Since "ligne" is 0, we will assing "true" to the variable "pleine".
+Also, we will not execute the decrement statement, thus staying on the row 0.
+Therefore, we will loop one last time inside our "while loop".
+This time, the condition "not pleine" is false and we will therefore exit the "while loop".
+We now reach this "if".
+This time, the condition "not pleine" is still false and we will enter the
+"else" block.
+Ultimatley, we see that the grid has not been modified and that we have return "false" here.
+Consequently, the first 6 valid moves were correct and the loop in the "main"
+(the "for loop" here) has looped
+6 times.
+However, upon the 7th move, this "valide" has become "false" because of this returned "false".
+The 7th move is thus invalid and we will print "impossible d'ajouter un pion"
+(TN: means "impossible do drop a disk").
+Since, in our testing "main", we did not add any condition regarding the validity of the game, the "for loop" will be executed
+10 times and the message regarding the impossibility to play will be printed  4 times.
+That is it four this "joue" function, allowing us, given a grid, a column number and a grid, to effectively play if the position is valid and to indicate if the move was invalid.
+There several different ways to write this function; those will be presented in the next episode.

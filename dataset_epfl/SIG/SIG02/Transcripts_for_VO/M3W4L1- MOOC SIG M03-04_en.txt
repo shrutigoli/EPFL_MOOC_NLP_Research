@@ -1,0 +1,896 @@
+1
+00:00:31,611 --> 00:00:33,249
+Hello and welcome to this lesson
+
+2
+00:00:33,434 --> 00:00:36,612
+devoted to the interaction between
+georeferenced data layers.
+
+3
+00:00:37,194 --> 00:00:38,640
+This interaction between layers
+
+4
+00:00:38,839 --> 00:00:41,089
+uses the concept of 
+
+5
+00:00:41,618 --> 00:00:43,370
+spatial overlay,
+
+6
+00:00:43,766 --> 00:00:45,814
+to which a set of methods is related
+
+7
+00:00:45,976 --> 00:00:47,366
+that allow data transfer
+
+8
+00:00:47,528 --> 00:00:50,718
+between objects of different types
+and stored in different layers
+
+9
+00:00:51,062 --> 00:00:54,350
+this according to their spatial
+relations with each other.
+
+10
+00:00:54,999 --> 00:00:56,758
+We will start with the interaction,
+
+11
+00:00:56,937 --> 00:01:00,020
+between raster data 
+and vectorial data.
+
+12
+00:01:01,003 --> 00:01:03,606
+The goals of this lesson are to introduce
+briefly
+
+13
+00:01:03,797 --> 00:01:04,890
+the notion of interaction
+
+14
+00:01:05,134 --> 00:01:07,097
+and differentiate the types of
+interactions
+
+15
+00:01:07,275 --> 00:01:09,532
+between a layer which stores
+vectorial information
+
+16
+00:01:09,725 --> 00:01:12,333
+to a layer which stores 
+the image information.
+
+17
+00:01:13,012 --> 00:01:15,097
+After this lesson, you should be able
+
+18
+00:01:15,259 --> 00:01:18,008
+to distinguish the two types of
+raster-vector interactions
+
+19
+00:01:18,185 --> 00:01:19,406
+which we will describe
+
+20
+00:01:19,972 --> 00:01:21,924
+and to implement them in 
+the QGIS software
+
+21
+00:01:22,101 --> 00:01:24,169
+following the instructions that
+will follow.
+
+22
+00:01:34,450 --> 00:01:37,438
+The spatial overlay is
+the emblematic function
+
+23
+00:01:37,610 --> 00:01:39,383
+of geographic information systems.
+
+24
+00:01:39,724 --> 00:01:41,949
+It alone symbolizes the originality
+
+25
+00:01:42,146 --> 00:01:44,746
+of these information systems
+in relation to others
+
+26
+00:01:44,916 --> 00:01:47,304
+and above all that gives them
+all their power.
+
+27
+00:01:47,905 --> 00:01:48,917
+Indeed,
+
+28
+00:01:49,113 --> 00:01:51,653
+the analysis of phenomena distributed
+in the geographic space
+
+29
+00:01:51,825 --> 00:01:52,751
+often requires
+
+30
+00:01:53,055 --> 00:01:55,273
+that we simultaneously resort 
+to information
+
+31
+00:01:55,458 --> 00:01:57,071
+from distinct layers.
+
+32
+00:01:57,921 --> 00:01:59,687
+This can be the case, for example,
+
+33
+00:01:59,858 --> 00:02:03,011
+if we want to calculate the sum of the
+number of inhabitants per department,
+
+34
+00:02:03,311 --> 00:02:05,060
+the latter being polygons,
+
+35
+00:02:05,460 --> 00:02:08,771
+whereas the population data is
+stored in a distinct layer
+
+36
+00:02:08,952 --> 00:02:12,027
+containing their capital, so a
+series of centroids.
+
+37
+00:02:13,182 --> 00:02:16,434
+The interaction made possible
+by the spatial overlay
+
+38
+00:02:16,780 --> 00:02:18,791
+can allow the transfer of data
+
+39
+00:02:19,001 --> 00:02:21,460
+from a source layer to a target layer
+
+40
+00:02:21,771 --> 00:02:23,899
+by implementing a specific method
+
+41
+00:02:24,103 --> 00:02:26,602
+partially induced by the types of
+layers considered,
+
+42
+00:02:26,868 --> 00:02:28,516
+as we will see a little later.
+
+43
+00:02:28,998 --> 00:02:31,067
+The spatial interaction can take place,
+
+44
+00:02:31,254 --> 00:02:33,295
+between several vector layers,
+
+45
+00:02:33,504 --> 00:02:36,261
+between raster layers and 
+vectorial layers
+
+46
+00:02:36,613 --> 00:02:39,554
+or between several raster layers.
+
+47
+00:02:40,514 --> 00:02:43,220
+The constraints to the implementation
+of spatial interaction
+
+48
+00:02:43,584 --> 00:02:47,291
+are the use of an identical
+coordinate projection system
+
+49
+00:02:48,097 --> 00:02:50,560
+and a common spatial coverage.
+
+50
+00:02:59,086 --> 00:03:02,163
+In the case of the 
+vector-raster interaction
+
+51
+00:03:02,363 --> 00:03:03,915
+which we are looking at in this lesson,
+
+52
+00:03:04,103 --> 00:03:06,086
+the first type of information transfer
+
+53
+00:03:06,266 --> 00:03:09,156
+that we distinguish is that of
+the extraction a variable z
+
+54
+00:03:09,423 --> 00:03:11,166
+stored in the pixels of a raster
+
+55
+00:03:11,350 --> 00:03:14,588
+and its copy in a series of
+punctual vectorial objects
+
+56
+00:03:14,825 --> 00:03:16,223
+spatially distributed
+
+57
+00:03:16,417 --> 00:03:19,328
+and stored in a superimposed 
+vectorial layer.
+
+58
+00:03:20,492 --> 00:03:23,721
+This typical implementation of
+the concept of spatial coincidence
+
+59
+00:03:24,146 --> 00:03:26,132
+allows for example to know the altitude
+
+60
+00:03:26,320 --> 00:03:27,554
+of a series of measurement points
+
+61
+00:03:27,726 --> 00:03:29,566
+which are distributed 
+in a mountain massif,
+
+62
+00:03:29,737 --> 00:03:32,066
+as shown here on the screen.
+
+63
+00:03:32,982 --> 00:03:36,018
+In QGIS, it is the extension
+"point sampling tool"
+
+64
+00:03:36,506 --> 00:03:38,530
+which allows to carry out 
+this type of operation.
+
+65
+00:03:38,996 --> 00:03:41,169
+Let's see how it works.
+
+66
+00:03:42,437 --> 00:03:43,761
+In the QGIS project
+
+67
+00:03:43,961 --> 00:03:47,080
+we have a raster file of
+the digital ground model
+
+68
+00:03:47,592 --> 00:03:48,663
+and a vectorial file
+
+69
+00:03:48,840 --> 00:03:51,679
+containing the points for which we
+want to extract the altitude.
+
+70
+00:03:52,607 --> 00:03:54,659
+In order to combine the two layers,
+
+71
+00:03:54,929 --> 00:03:56,472
+we must first ensure
+
+72
+00:03:56,647 --> 00:03:58,933
+that they are in the same 
+projection system.
+
+73
+00:03:59,821 --> 00:04:02,605
+To do this, we can right click 
+on the raster layer,
+
+74
+00:04:02,791 --> 00:04:05,732
+then define the SRC of a layer,
+
+75
+00:04:06,273 --> 00:04:10,771
+we choose the swiss projection 
+system CH1903/LV03
+
+76
+00:04:11,665 --> 00:04:14,716
+and we do the same for 
+the vectorial file.
+
+77
+00:04:16,613 --> 00:04:19,800
+Now that the two layers are
+in the same projection system
+
+78
+00:04:19,983 --> 00:04:23,278
+we will be able to extract the altitude 
+for the points that interest us.
+
+79
+00:04:24,082 --> 00:04:28,156
+For now, the "points" layer contains
+only one attribute:
+
+80
+00:04:28,582 --> 00:04:30,004
+that is its identifier.
+
+81
+00:04:30,422 --> 00:04:32,899
+We will add an altitude column
+
+82
+00:04:33,100 --> 00:04:35,484
+using the "point sampling tool".
+
+83
+00:04:36,072 --> 00:04:37,980
+This tool is an extension of QGIS
+
+84
+00:04:38,175 --> 00:04:39,929
+and so we have to install it first.
+
+85
+00:04:40,548 --> 00:04:42,910
+By going to the "extensions" menu
+
+86
+00:04:43,582 --> 00:04:45,426
+"install", "manage extensions"
+
+87
+00:04:46,027 --> 00:04:48,664
+we can search the "point sampling tool"
+
+88
+00:04:48,874 --> 00:04:51,125
+in the search bar and click on the tool
+
+89
+00:04:51,329 --> 00:04:52,849
+when it appears in the list,
+
+90
+00:04:53,182 --> 00:04:55,896
+then ask to "install the extension".
+
+91
+00:04:56,644 --> 00:04:58,720
+The extension is thus automatically
+installed
+
+92
+00:04:58,908 --> 00:05:00,945
+and we can click on "close".
+
+93
+00:05:02,375 --> 00:05:04,148
+The tool has been installed
+
+94
+00:05:04,335 --> 00:05:09,097
+under the "extensions" menu, 
+"analysis", "point sampling tool".
+
+95
+00:05:10,025 --> 00:05:11,550
+under the "general" tab,
+
+96
+00:05:11,734 --> 00:05:14,760
+we must first define the layer
+containing the points.
+
+97
+00:05:15,401 --> 00:05:17,683
+In our case, it is the 
+layer named "points".
+
+98
+00:05:18,643 --> 00:05:22,196
+We must then choose the layers 
+which values we want to retrieve.
+
+99
+00:05:22,528 --> 00:05:25,061
+In our case, we select the raster file
+
+100
+00:05:25,263 --> 00:05:26,724
+of the digital ground model.
+
+101
+00:05:27,394 --> 00:05:30,357
+At this point, we also tick
+the "points" vectorial file
+
+102
+00:05:31,019 --> 00:05:33,418
+in order to retrieve 
+attributes of this file,
+
+103
+00:05:33,605 --> 00:05:35,804
+in our case the identifier of the point.
+
+104
+00:05:36,283 --> 00:05:37,677
+On the "field" tab,
+
+105
+00:05:37,877 --> 00:05:39,160
+we have a preview of the columns
+
+106
+00:05:39,356 --> 00:05:41,379
+that will be present in the result file.
+
+107
+00:05:41,790 --> 00:05:43,790
+So we will see the identifier
+of the points
+
+108
+00:05:43,965 --> 00:05:46,217
+and the value extracted from 
+the digital altitude model.
+
+109
+00:05:47,093 --> 00:05:50,431
+We will rename this last column
+"altitude".
+
+110
+00:05:51,568 --> 00:05:53,593
+We then return in the "general" tab
+
+111
+00:05:53,780 --> 00:05:55,980
+to define the name of the result file
+
+112
+00:05:56,182 --> 00:05:58,337
+and where we want to save it,
+
+113
+00:05:58,537 --> 00:06:00,995
+we can then click on OK.
+
+114
+00:06:03,307 --> 00:06:05,785
+The result layer was loaded
+into the project.
+
+115
+00:06:06,339 --> 00:06:07,271
+We find
+
+116
+00:06:07,470 --> 00:06:09,907
+all the points for which we
+wanted to extract the altitude
+
+117
+00:06:10,169 --> 00:06:11,894
+and if we open the attribute table,
+
+118
+00:06:12,104 --> 00:06:14,687
+we now see the presence 
+of an "altitude" column
+
+119
+00:06:14,870 --> 00:06:17,278
+which gives us the required information.
+
+120
+00:06:30,290 --> 00:06:32,403
+The second type of information transfer
+
+121
+00:06:32,582 --> 00:06:35,035
+between a raster and vectorial layer
+
+122
+00:06:35,222 --> 00:06:37,426
+is that of the extraction 
+of a statistic
+
+123
+00:06:37,752 --> 00:06:40,194
+of the values ​​stored in the pixels
+of a raster layer
+
+124
+00:06:40,383 --> 00:06:41,941
+and which must be brought back
+
+125
+00:06:42,141 --> 00:06:44,892
+to the superimposed polygons
+to characterize them.
+
+126
+00:06:45,947 --> 00:06:49,072
+These statistics can be the sum
+of the variable of interest,
+
+127
+00:06:49,509 --> 00:06:53,016
+its maximum, its minimum, its
+standard deviation, its median, etc.
+
+128
+00:06:54,489 --> 00:06:55,534
+Here for example,
+
+129
+00:06:55,721 --> 00:06:58,424
+we want to calculate the average rainfall
+
+130
+00:06:58,595 --> 00:07:00,985
+by administrative regions in Kenya.
+
+131
+00:07:01,684 --> 00:07:03,348
+To perform this type of operation,
+
+132
+00:07:03,523 --> 00:07:06,914
+QGIS has a tool called
+"area statistics".
+
+133
+00:07:08,000 --> 00:07:08,969
+In the QGIS project
+
+134
+00:07:09,180 --> 00:07:11,765
+we have a raster file with the rainfall
+
+135
+00:07:11,961 --> 00:07:15,899
+and a vectorial file of polygons
+with the delimitation of African countries.
+
+136
+00:07:16,451 --> 00:07:17,799
+We will also display
+
+137
+00:07:17,976 --> 00:07:21,026
+the polygons of the contours of
+administrative regions of Kenya
+
+138
+00:07:21,251 --> 00:07:24,184
+for which we would like
+to know the average rainfall.
+
+139
+00:07:24,843 --> 00:07:27,648
+This file contains currently
+only two attributes:
+
+140
+00:07:27,996 --> 00:07:30,215
+the identifier and the name of
+each region.
+
+141
+00:07:32,188 --> 00:07:34,293
+To calculate the average rainfall,
+
+142
+00:07:34,508 --> 00:07:37,020
+we are going to use the 
+"area statistics" tool.
+
+143
+00:07:38,014 --> 00:07:39,922
+This tool is an extension
+
+144
+00:07:40,085 --> 00:07:42,046
+so we have to install it first.
+
+145
+00:07:42,233 --> 00:07:45,977
+In the "extensions" menu, "install",
+"manage extensions"
+
+146
+00:07:46,984 --> 00:07:50,729
+we can search "area statistics"
+and tick the small box.
+
+147
+00:07:51,912 --> 00:07:53,896
+The extension is installed
+
+148
+00:07:54,096 --> 00:07:55,901
+and we can click on "close".
+
+149
+00:07:57,106 --> 00:07:59,292
+This extension has been installed
+in the "area statistics" 
+
+150
+00:07:59,485 --> 00:08:01,491
+raster menu.
+
+151
+00:08:01,952 --> 00:08:05,122
+It will allow to calculate the average
+and the sum of precipitations
+
+152
+00:08:05,313 --> 00:08:08,190
+for each polygon of the 
+administrative regions of Kenya.
+
+153
+00:08:08,992 --> 00:08:10,316
+Under "raster layer",
+
+154
+00:08:10,495 --> 00:08:13,494
+we define the raster layer
+containing the values ​​on which
+
+155
+00:08:13,683 --> 00:08:15,587
+we want to calculate the statistics.
+
+156
+00:08:16,001 --> 00:08:18,649
+In our case, this is the rainfall file.
+
+157
+00:08:19,872 --> 00:08:22,737
+Under "polygon layer" 
+containing the areas,
+
+158
+00:08:23,052 --> 00:08:26,147
+we choose the administrative
+regions of Kenya.
+
+159
+00:08:26,997 --> 00:08:29,403
+The results will be added directly
+
+160
+00:08:29,590 --> 00:08:32,170
+as a new attribute of the layer
+containing polygons.
+
+161
+00:08:32,859 --> 00:08:35,343
+We can, if we wish, define
+a possible prefix
+
+162
+00:08:35,518 --> 00:08:37,827
+which will be placed before
+the name of each column.
+
+163
+00:08:38,576 --> 00:08:42,584
+Here we will put the prefix "prec"
+for precipitations.
+
+164
+00:08:43,105 --> 00:08:44,984
+You can then click on OK.
+
+165
+00:08:47,227 --> 00:08:48,779
+Once the calculation is complete,
+
+166
+00:08:48,973 --> 00:08:52,170
+we can return to our vectorial
+file of the administrative divisions
+
+167
+00:08:52,332 --> 00:08:53,908
+and open the attribute table.
+
+168
+00:08:54,542 --> 00:08:57,206
+We see that three new columns
+have been added,
+
+169
+00:08:57,881 --> 00:09:00,109
+all beginning with the prefix "prec".
+
+170
+00:09:00,994 --> 00:09:03,247
+The first contains the number of values
+
+171
+00:09:03,427 --> 00:09:05,078
+that were present in each polygon
+
+172
+00:09:05,253 --> 00:09:06,756
+so the number of pixels.
+
+173
+00:09:07,454 --> 00:09:10,379
+The second column shows
+the sum of precipitations
+
+174
+00:09:11,002 --> 00:09:14,429
+and the last column contains
+the average that we wanted to know.
+
+175
+00:09:16,986 --> 00:09:19,752
+Now we can represent 
+each region of Kenya
+
+176
+00:09:19,936 --> 00:09:22,478
+with a color depending 
+on the average rainfall.
+
+177
+00:09:23,006 --> 00:09:24,058
+To do this,
+
+178
+00:09:24,263 --> 00:09:26,764
+it necessary go to the properties
+of the vectorial layer,
+
+179
+00:09:26,931 --> 00:09:28,272
+in the "style" tab.
+
+180
+00:09:28,477 --> 00:09:30,314
+We choose a graduated style
+
+181
+00:09:30,510 --> 00:09:33,374
+on the "precmean" column.
+
+182
+00:09:34,990 --> 00:09:37,007
+We can choose a suitable color palette
+
+183
+00:09:37,199 --> 00:09:39,986
+and a class or discretization
+
+184
+00:09:40,211 --> 00:09:41,776
+based on natural soils.
+
+185
+00:09:42,081 --> 00:09:45,629
+We click on OK and we obtain
+the desired map.
+
+186
+00:09:56,072 --> 00:09:57,847
+We have seen in this lesson
+
+187
+00:09:58,022 --> 00:10:00,780
+that the analysis of georeferenced
+phenomena often requires
+
+188
+00:10:00,980 --> 00:10:03,805
+that we combine informations
+from distinct layers.
+
+189
+00:10:04,145 --> 00:10:06,390
+Among the types of possible
+spatial interactions
+
+190
+00:10:06,578 --> 00:10:08,363
+in this first module on the interaction
+
+191
+00:10:08,694 --> 00:10:10,448
+we focused on the interaction
+
+192
+00:10:10,631 --> 00:10:11,995
+between a raster layer
+
+193
+00:10:12,176 --> 00:10:14,711
+and a layer storing 
+vectorial information.
+
+194
+00:10:15,813 --> 00:10:18,891
+We have seen that QGIS allows 
+to perform this type of operation
+
+195
+00:10:19,108 --> 00:10:21,275
+with the "point sampling tool" extension
+
+196
+00:10:21,451 --> 00:10:24,358
+for the data transfer between a layer
+in image mode
+
+197
+00:10:24,675 --> 00:10:27,017
+and a distribution of 
+superimposed centroids.
+
+198
+00:10:28,012 --> 00:10:30,787
+And this is the "area statistics" 
+extension of QGIS
+
+199
+00:10:30,981 --> 00:10:34,725
+which allows to calculate statistics
+on the values ​​of a raster layer
+
+200
+00:10:35,107 --> 00:10:38,994
+brought back in areas defined by
+a file of superimposed polygons.
+

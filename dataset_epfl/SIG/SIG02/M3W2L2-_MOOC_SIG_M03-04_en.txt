@@ -1,0 +1,97 @@
+Welcome to this lesson, which will focus on interpolation.
+Interpolation is a method which will allow you to generalize the discrete information acquired on the territory.
+A set of sampled points, according to one of the procedures presented in the previous lesson, is able to provide interesting information on the domain to which they belong.
+And indeed, through statistical indicators such as the median or the mean we can obtain useful but global information on the area studied.
+And the main interest of sampling is to enable to estimate the value of the variable in any point of the domain by interpolation.
+And whatever its mode of operation, an interpolation is an inference, that is to say an arbitrary or justified prediction of a value of the variable in an unmeasured point.
+The aims of this lesson are to explain the functioning of the main deterministic interpolation methods and their variations into a global approach and a local approach.
+The concepts presented will enable you to acquire the ability to calculate interpolated values on any dataset that contains geo-referenced samples.
+The deterministic interpolation methods presented in this lesson, are methods during the application of which no statistical study on the behavior of the variable is performed.
+And the choice of the most appropriate method will rely on the analyst's experience, and on the knowledge that he has of the studied phenomenon.
+There are two families of deterministic interpolation methods, these are the global methods and the local methods.
+A method is global, if the spatial model of the phenomenon is constructed by taking into account all the existing measuring points on the domain studied.
+Local methods only take into account a limited number of support points to the neighborhood of the point to be estimated.
+In addition, they allow to assign special weights to each measuring point, in particular depending on the distance.
+Global methods are used to analyze spatial distribution trends of a phenomenon in a given field.
+And here we present a global approach which consists of calculating a polynomial of degree 1 or of a higher degree and which minimizes the deviations to the measurement points according to the least squares method.
+This results in a trend surface, representative of the average behavior of the phenomenon in the plan of the coordinates X, Y and Z represents here the measured variable.
+The reference models that can be either a plan or a surface of degree 2 or 3 are too simple in the majority of cases, to provide a realistic approximation of the spatial distribution of the variable.
+But surfaces of a degree greater than 5 are not easy to calculate.
+This is the first reason why local interpolation methods are preferred.
+Another more fundamental reason is that it is not very useful to involve measuring points beyond an auto-correlation threshold distance because the spatial dependence is by hypothesis local and not global.
+Local interpolation methods take into account only a limited number of measurement points in the neighborhood of the point to be estimated.
+Moreover, they enable to weight these measurement points depending on their distances to the pixels to be predicted or depending on a measurement quality information linked to the use of a specific instrument.
+Several methods exist and their choice depends on the density of the information that we have, of the desired precision, of the main objective of the interpolation and as mentioned earlier, of the prior knowledge of the phenomenon.
+The first method presented is that of the nearest neighbor.
+The value assigned in any point in the domain is that of its nearest neighbor.
+The determination of the nearest neighbor is based on the belonging of the point to be interpolated, to the zone of influence of the measuring points.
+These zones of influence are determined by the mediators of the segments.
+These mediators delimit what is called Thiessen's polygons.
+And any point to predict, located within a polygon, is supposed to take the same value than that of the corresponding measuring point, so here the value S2.
+This method in fact transforms the continuous phenomenon in a spatially discrete model.
+The second local interpolation method that we describe is a method based on a network of triangles,
+TIN in English, for Triangulated
+Irregular Network.
+A TIN is formed by connecting the support points with each other, so as to form a network of triangular meshes.
+This TIN is developed from the Delaunay method, whose particularity is to create triangles whose angles are not greater than 90 degrees.
+The variation of the parameter within each triangle is therefore assumed to be linear.
+And interpolation is performed by establishing the equation with 3 unknowns of the plan which is formed by each of the triangular facets.
+The three unknowns are a, b and c.
+And they are determined by the known values of the three vertices of the triangle.
+To implement this method, in general, we select characteristic measurement points, which are located for example on the crests, or at the bottom of the talwegs.
+Originally, the interpolation by TIN has been developed in cartography to manually create isovalue lines, such as the contour lines of the relief.
+Historically, the word spline refers to a long and thin wooden board, used by gardeners to draw a curve going through piles planted in the ground.
+A more recent application of the wooden board is the flexible rule called Cobra, used to draw a curve simulating at best the linear distribution of a collection of points.
+The B-spline method is a mathematization of this practice.
+Instead of looking for a single equation which models a curve going through all the points of support, a polynomial of the third degree is calculated for 4 successive points, contained in a movable window, as shown in the figure on the screen, for the one-dimensional case.
+It is assumed that for each interval, the evolution of the variable to be predicted Z of X, is correctly simulated by means of a polynomial P of X.
+We then slide the movable window of a point to the right and we estimate again the polynomial for the next interval.
+The calculation of the polynomial P of X is elaborated by the introduction of constraints at the junction of two consecutive polynomials.
+The first constraint is the interval in which X is included, the second concerns the continuity at the segment change, in yellow here.
+The third one concerns the continuity in the case where an inflection point is at the junction point of two polynomials.
+In this case, continuity is assured by approximate equality of the second derivatives.
+Let's now turn to the inverse distance weighting, very often abbreviated IDW.
+The estimation of the variable is calculated by using the values â€‹â€‹of a few points measured in the neighborhood, and by assigning them a weight, depending on the distance in particular.
+This approach corresponds to the intuition according to which a remote point has less influence than a close point.
+To implement the IDW, it is necessary to answer certain questions.
+What neighborhood size should be defined?
+How many measurement points should be included?
+What weight should be given to them?
+Should the relative orientation of the phenomenon be taken into account?
+And there, it is the notion of anisotropy that we approach and on which we will return in more detail during the next lesson.
+The answer to these essential questions varies depending on the region of study.
+It also varies according to the phenomenon considered and the configuration of the sample of measuring points.
+In the deterministic framework, the analyst must rely on his or her own experience, to set values â€‹â€‹to the evoked parameters.
+With regards to weighting, for example, we consider that the more distant a point is from the interpolated point, the less influence it has.
+In this case, an inverse function of the distance is chosen, or inverse to the square of the distance.
+Once the number of support points is selected, so here 5 points located in the circle 
+C around the value to be predicted, the latter is equal to the weighted average of these 5 points of support.
+The weight given to the control points Z of alpha can for example be proportional to 1 over the distance, or 1 over the square distance, or 1 over the distance to a higher power.
+And the higher the power, the more the local effect is accentuated.
+The local interpolation methods we have just reviewed do not contain means to estimate the uncertainty linked to the estimated values.
+To evaluate this uncertainty, a cross-validation method must be used.
+This involves splitting the sample randomly into two parts.
+The measuring points of one of the two groups are used for interpolation.
+Whereas the measuring points of the second serve as tests.
+In each test site, we will compare the estimated value with the measured value and deduce the uncertainty from it.
+In general, by calculating the difference between the quadratic means of the two distributions.
+The quadratic mean is the square root of the arithmetic mean of the squares of the values.
+The method is repeated several times with each time a new set of support sites and randomly determined test sites, so as to avoid any bias in the selection of sites.
+The results of this cross-validation allow to evaluate the overall uncertainty and the local uncertainty of the interpolated values.
+Methods of the nearest neighbor of the network of triangles, of the B-spline function and of the inverse distance weighting, are very empirical and the results are highly dependent of the analyst's experience but also of his subjectivity.
+For phenomena that escape visual perception, the situation can be critical as in the absence of additional information, there is no indication that interpolation is possible.
+It is important to note that, indeed, in the absence of any information, of any verified model of behavior, the choice of the interpolation function is completely arbitrary, as this illustration shows.
+Indeed, what is the behavior of the variable Z between the points Z1 and Z2?
+Is it according to the blue function?
+Is it according to the green function?
+Or according to the orange function?
+This type of uncertainty can cause some useless and very high costs, in the case of mining surveys, for example.
+And it is to avoid them that from the 1940s, research work have been developed to propose the concept of regionalized variables, which we will study in the next lesson.
+In this presentation, we focused on deterministic interpolation methods.
+These deterministic methods are not based on any prior statistical study of the phenomenon studied.
+There are two big categories: either global approaches, which allow to carry out the interpolation, taking into account the totality of the measurement points included in a domain.
+And local approaches, which take into account only a limited number of points of support, to the neighborhood of the point to be estimated, and which allow the assignment of specific weights at each measuring point, especially depending on the distance to the point to be predicted.
+Global methods are often too simple to provide a realistic approximation of the spatial distribution of the variable to be predicted.
+And that's why local interpolation methods are preferred.
+But these local approaches, like the approach of the nearest neighbor, or the inverse distance weighting, are very empirical and depend very much on the subjectivity of the analyst.
+They therefore often produce arbitrary results, which imply the existence of a significant uncertainty.

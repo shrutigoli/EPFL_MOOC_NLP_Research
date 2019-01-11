@@ -1,0 +1,2258 @@
+1
+00:00:31,070 --> 00:00:32,346
+Bonjour et bienvenue
+
+2
+00:00:32,542 --> 00:00:34,624
+dans cette troisième leçon
+dédiée aux interactions
+
+3
+00:00:34,824 --> 00:00:36,700
+entre couches
+d'informations spatiales.
+
+4
+00:00:37,015 --> 00:00:38,820
+Nous allons nous intéresser
+cette fois-ci
+
+5
+00:00:39,020 --> 00:00:39,916
+aux opérations
+
+6
+00:00:40,116 --> 00:00:41,762
+qui permettent de mettre en relation
+
+7
+00:00:41,962 --> 00:00:43,765
+plusieurs couches de type vectoriel.
+
+8
+00:00:44,755 --> 00:00:47,417
+Certaines des interactions
+de type vecteur-vecteur
+
+9
+00:00:47,617 --> 00:00:50,118
+peuvent être implémentées
+avec l'aide de requêtes SQL
+
+10
+00:00:50,318 --> 00:00:52,699
+qui ont été déjà traitées
+dans le module numéro 2
+
+11
+00:00:52,899 --> 00:00:56,392
+dans le cours sur
+les requêtes spatiales topologiques.
+
+12
+00:00:56,983 --> 00:00:59,234
+Cette leçon est largement pratique
+
+13
+00:00:59,434 --> 00:01:00,760
+et elle illustre
+
+14
+00:01:00,960 --> 00:01:02,334
+comment le logiciel QGIS
+
+15
+00:01:02,534 --> 00:01:05,238
+peut être utilisé pour faire
+interagir des couches vectorielles,
+
+16
+00:01:05,438 --> 00:01:06,165
+typiquement,
+
+17
+00:01:06,365 --> 00:01:07,321
+comment procéder
+
+18
+00:01:07,509 --> 00:01:08,959
+pour compter le nombre de points
+
+19
+00:01:09,159 --> 00:01:10,891
+stockés dans une couche
+d'information
+
+20
+00:01:11,157 --> 00:01:12,908
+et situés à l'intérieur
+d'un polygone
+
+21
+00:01:13,108 --> 00:01:14,473
+se trouvant dans une autre.
+
+22
+00:01:15,017 --> 00:01:16,135
+Les buts de cette leçon
+
+23
+00:01:16,335 --> 00:01:17,331
+sont de vous expliquer
+
+24
+00:01:17,544 --> 00:01:19,964
+quels sont les différents types
+d'interactions possibles
+
+25
+00:01:20,164 --> 00:01:22,622
+entre plusieurs couches
+de géoinformations vectorielles
+
+26
+00:01:22,822 --> 00:01:23,737
+et de présenter
+
+27
+00:01:23,937 --> 00:01:26,178
+quels sont les outils
+à disposition dans QGIS
+
+28
+00:01:26,378 --> 00:01:29,484
+qui permettent d'effectuer
+les opérations correspondantes.
+
+29
+00:01:38,439 --> 00:01:40,711
+Il est possible
+d'exploiter de différentes manières
+
+30
+00:01:40,914 --> 00:01:43,433
+l'interaction entre plusieurs couches
+de type vectoriel
+
+31
+00:01:43,608 --> 00:01:44,922
+et le logiciel QGIS
+
+32
+00:01:45,122 --> 00:01:47,889
+contient une série de fonctions
+capables de les mettre en œuvre.
+
+33
+00:01:48,089 --> 00:01:49,335
+Il peut s'agir par exemple
+
+34
+00:01:49,535 --> 00:01:51,512
+de découper un polygone
+situé sur une couche
+
+35
+00:01:51,712 --> 00:01:53,728
+au moyen d'un segment
+situé sur une autre.
+
+36
+00:01:54,258 --> 00:01:56,142
+Il faut noter
+que certaines opérations
+
+37
+00:01:56,342 --> 00:01:58,775
+comme la jonction de couches
+sans identifiant commun
+
+38
+00:01:58,975 --> 00:02:00,582
+ou le dénombrement d'objets
+
+39
+00:02:00,782 --> 00:02:03,341
+peuvent être effectués soit
+au moyen des fonctions QGIS
+
+40
+00:02:03,554 --> 00:02:04,935
+qui sont déjà existantes,
+
+41
+00:02:05,135 --> 00:02:06,764
+soit au moyen de requêtes SQL
+
+42
+00:02:06,964 --> 00:02:08,910
+qui vous ont été présentées
+dans le module 2
+
+43
+00:02:09,110 --> 00:02:11,168
+sur les requêtes
+spatiales topologiques.
+
+44
+00:02:11,537 --> 00:02:14,473
+Nous allons maintenant vous présenter
+des opérations de base
+
+45
+00:02:14,905 --> 00:02:16,735
+qu'il est indispensable de maîtriser
+
+46
+00:02:16,935 --> 00:02:19,475
+pour exploiter l'interaction
+entre couches vectorielles,
+
+47
+00:02:19,675 --> 00:02:22,021
+en indiquant
+les requêtes SQL équivalentes
+
+48
+00:02:22,221 --> 00:02:23,270
+quand c'est pertinent.
+
+49
+00:02:31,416 --> 00:02:32,541
+Il peut arriver
+
+50
+00:02:32,741 --> 00:02:34,877
+qu'un jeu de données
+sans identifiant unique
+
+51
+00:02:35,077 --> 00:02:36,345
+et constitué de points,
+
+52
+00:02:36,545 --> 00:02:39,355
+représentant ici dans notre exemple
+des hôtels,
+
+53
+00:02:39,555 --> 00:02:42,296
+contienne une partie
+de ses attributs dans une couche,
+
+54
+00:02:42,860 --> 00:02:44,461
+ici en rouge le nom de l'hôtel
+
+55
+00:02:44,661 --> 00:02:45,823
+et le nombre de chambres,
+
+56
+00:02:46,023 --> 00:02:48,104
+et une autre partie de ses attributs
+
+57
+00:02:48,304 --> 00:02:49,327
+dans une seconde couche,
+
+58
+00:02:49,527 --> 00:02:51,298
+ici en orange le nombre de lits.
+
+59
+00:02:52,338 --> 00:02:55,012
+Pour réunir tous les attributs
+dans une seule couche,
+
+60
+00:02:55,212 --> 00:02:56,473
+il est nécessaire de procéder
+
+61
+00:02:56,673 --> 00:02:58,082
+à la jonction des deux fichiers
+
+62
+00:02:58,282 --> 00:03:00,643
+sur la base
+de la localisation spatiale.
+
+63
+00:03:01,234 --> 00:03:03,154
+La requête SQL correspondante,
+
+64
+00:03:03,354 --> 00:03:04,541
+affichée ici à l'écran,
+
+65
+00:03:04,741 --> 00:03:07,073
+fait appel à la géométrie des objets
+
+66
+00:03:07,273 --> 00:03:09,024
+dont les composantes X et Y
+
+67
+00:03:09,237 --> 00:03:11,992
+doivent être strictement identiques
+dans les deux fichiers
+
+68
+00:03:12,192 --> 00:03:13,660
+pour que le lien puisse être fait.
+
+69
+00:03:14,190 --> 00:03:16,365
+La fonction QGIS équivalente
+
+70
+00:03:16,565 --> 00:03:18,286
+est disponible dans le menu "vecteur"
+
+71
+00:03:18,486 --> 00:03:20,361
+sous "outils de gestion de données",
+
+72
+00:03:20,561 --> 00:03:23,274
+puis "joindre les attributs
+par la localisation".
+
+73
+00:03:24,452 --> 00:03:26,869
+Voyons comment
+mettre cette fonction en œuvre.
+
+74
+00:03:28,334 --> 00:03:29,797
+Dans le projet QGIS,
+
+75
+00:03:29,997 --> 00:03:32,706
+nous avons deux couches vectorielles
+de points superposés
+
+76
+00:03:32,906 --> 00:03:34,135
+contenant des informations
+
+77
+00:03:34,335 --> 00:03:35,843
+sur les hôtels de l'île de Mahé.
+
+78
+00:03:36,958 --> 00:03:39,946
+Dans les attributs
+de la première couche, hotels1,
+
+79
+00:03:40,146 --> 00:03:42,736
+nous avons le nom de l'hôtel
+et le nombre de chambres.
+
+80
+00:03:43,353 --> 00:03:45,007
+La deuxième couche, hotels2,
+
+81
+00:03:45,207 --> 00:03:47,331
+contient exactement
+les mêmes hôtels,
+
+82
+00:03:47,531 --> 00:03:48,664
+mais dans les attributs,
+
+83
+00:03:48,864 --> 00:03:51,160
+nous avons cette fois
+uniquement le nombre de lits.
+
+84
+00:03:53,273 --> 00:03:55,600
+Nous allons joindre
+les attributs de ces deux couches
+
+85
+00:03:55,800 --> 00:03:57,920
+en allant sous "vecteur",
+
+86
+00:03:58,534 --> 00:04:00,462
+"outils de gestion de données",
+
+87
+00:04:01,132 --> 00:04:03,385
+"joindre les attributs
+par la localisation".
+
+88
+00:04:04,267 --> 00:04:07,543
+Dans le premier menu,
+"indiquer une couche vecteur",
+
+89
+00:04:07,743 --> 00:04:10,864
+nous choisissons
+la couche vectorielle hotels1,
+
+90
+00:04:11,064 --> 00:04:13,131
+et dans le menu
+"joindre la couche vecteur",
+
+91
+00:04:13,331 --> 00:04:15,314
+nous choisissons la couche hotels2.
+
+92
+00:04:15,882 --> 00:04:17,948
+Dans la partie "résumé de l'attribut",
+
+93
+00:04:18,148 --> 00:04:19,448
+on pourrait choisir de combiner
+
+94
+00:04:19,648 --> 00:04:21,900
+les informations disponibles
+sur les deux couches.
+
+95
+00:04:22,464 --> 00:04:23,358
+Si on a un attribut
+
+96
+00:04:23,558 --> 00:04:25,419
+qui a le même nombre
+dans les deux tables,
+
+97
+00:04:25,619 --> 00:04:27,025
+par exemple le nombre d'employés,
+
+98
+00:04:27,225 --> 00:04:29,356
+mais que les valeurs ne sont pas
+toujours les mêmes
+
+99
+00:04:29,556 --> 00:04:30,564
+entre les deux fichiers,
+
+100
+00:04:30,741 --> 00:04:32,816
+ce qui pourrait arriver par exemple
+si l'on a
+
+101
+00:04:33,016 --> 00:04:34,988
+dans un fichier
+les employés au mois de janvier
+
+102
+00:04:35,188 --> 00:04:36,680
+et dans l'autre au mois de juin,
+
+103
+00:04:36,880 --> 00:04:38,087
+on pourrait ici choisir
+
+104
+00:04:38,287 --> 00:04:40,277
+de prendre soit la valeur
+de la première couche,
+
+105
+00:04:40,477 --> 00:04:42,471
+soit un résumé des valeurs
+des deux couches,
+
+106
+00:04:42,910 --> 00:04:45,397
+par exemple le nombre
+d'employés moyen,
+
+107
+00:04:45,597 --> 00:04:46,873
+minimum ou maximum.
+
+108
+00:04:47,073 --> 00:04:47,961
+Dans notre cas,
+
+109
+00:04:48,161 --> 00:04:49,645
+nous n'avons pas d'attribut commun
+
+110
+00:04:49,845 --> 00:04:51,731
+et cette partie ne nous est donc
+pas utile.
+
+111
+00:04:53,590 --> 00:04:54,688
+On spécifie ensuite
+
+112
+00:04:54,888 --> 00:04:57,080
+le nom et l'emplacement
+du fichier du résultat.
+
+113
+00:04:59,618 --> 00:05:00,236
+Finalement,
+
+114
+00:05:00,436 --> 00:05:01,972
+dans la dernière partie
+de la fenêtre,
+
+115
+00:05:02,172 --> 00:05:03,506
+on peut choisir de conserver
+
+116
+00:05:03,706 --> 00:05:05,868
+uniquement les enregistrements
+correspondants,
+
+117
+00:05:06,068 --> 00:05:07,702
+c'est-à-dire les points superposés
+
+118
+00:05:07,902 --> 00:05:09,818
+ou de conserver également
+
+119
+00:05:10,018 --> 00:05:11,883
+les enregistrements
+sans correspondances,
+
+120
+00:05:12,083 --> 00:05:14,084
+par exemple dans le cas
+où certains hôtels
+
+121
+00:05:14,284 --> 00:05:16,634
+ne seraient présents
+que dans l'un des deux fichiers.
+
+122
+00:05:16,834 --> 00:05:18,143
+On choisit ici de conserver
+
+123
+00:05:18,343 --> 00:05:19,845
+uniquement les correspondances.
+
+124
+00:05:20,045 --> 00:05:22,170
+Et on peut ensuite cliquer sur OK.
+
+125
+00:05:24,196 --> 00:05:26,073
+Une nouvelle couche vecteur
+est créée
+
+126
+00:05:26,437 --> 00:05:27,876
+et cette couche contient bien
+
+127
+00:05:28,076 --> 00:05:29,570
+les points de tous les hôtels
+
+128
+00:05:30,224 --> 00:05:31,704
+et dans la table d'attributs,
+
+129
+00:05:31,904 --> 00:05:34,097
+on constate que l'on a bien
+récupéré les attributs
+
+130
+00:05:34,297 --> 00:05:35,477
+des deux couches initiales,
+
+131
+00:05:35,677 --> 00:05:39,522
+soit le nom, le nombre de chambres
+et le nombre de lits.
+
+132
+00:05:43,107 --> 00:05:45,847
+Dans cette deuxième situation,
+nous allons devoir compter
+
+133
+00:05:46,064 --> 00:05:48,875
+le nombre de points stockés dans
+une première couche d'information
+
+134
+00:05:49,075 --> 00:05:51,086
+et situés à l'intérieur
+de chaque polygone
+
+135
+00:05:51,286 --> 00:05:52,747
+stocké dans une autre couche.
+
+136
+00:05:53,246 --> 00:05:54,636
+Dans l'exemple proposé,
+
+137
+00:05:54,836 --> 00:05:57,023
+le territoire de l'île de Mahé
+aux Seychelles
+
+138
+00:05:57,223 --> 00:05:59,785
+est composé d'un certain nombre
+de districts en bleu,
+
+139
+00:05:59,985 --> 00:06:00,872
+à l'intérieur desquels
+
+140
+00:06:01,084 --> 00:06:02,757
+nous voulons connaître
+le nombre d'hôtels
+
+141
+00:06:02,957 --> 00:06:04,157
+représentés ici en rouge.
+
+142
+00:06:05,544 --> 00:06:08,322
+La requête SQL permettant
+d'effectuer cette opération
+
+143
+00:06:08,522 --> 00:06:11,998
+fait appel aux instructions
+"count", "contain" et "group".
+
+144
+00:06:13,205 --> 00:06:14,061
+Dans QGIS,
+
+145
+00:06:14,261 --> 00:06:16,589
+la fonction "points dans un polygone"
+
+146
+00:06:16,789 --> 00:06:18,864
+est accessible via le menu "vecteur"
+
+147
+00:06:19,064 --> 00:06:20,630
+puis "outils d'analyse".
+
+148
+00:06:22,867 --> 00:06:24,215
+Voici comment elle fonctionne :
+
+149
+00:06:26,051 --> 00:06:27,360
+dans le projet QGIS,
+
+150
+00:06:27,560 --> 00:06:29,576
+nous avons un fichier vectoriel
+de polygones
+
+151
+00:06:29,776 --> 00:06:31,338
+contenant les districts
+de l'île de Mahé,
+
+152
+00:06:31,538 --> 00:06:33,472
+et un fichier de points
+avec les hôtels.
+
+153
+00:06:34,059 --> 00:06:35,637
+Nous allons compter
+le nombre d'hôtels
+
+154
+00:06:35,837 --> 00:06:37,004
+situés dans chaque district
+
+155
+00:06:37,204 --> 00:06:38,985
+en utilisant l'outil "vecteur",
+
+156
+00:06:39,185 --> 00:06:40,434
+"outils d'analyse",
+
+157
+00:06:40,634 --> 00:06:42,611
+"points dans un polygone".
+
+158
+00:06:43,198 --> 00:06:46,593
+Dans le menu déroulant "couche
+vecteur de polygone en entrée",
+
+159
+00:06:46,793 --> 00:06:48,592
+on choisit la couche district,
+
+160
+00:06:48,792 --> 00:06:50,925
+puis sous "couche vecteur de 
+points en entrée",
+
+161
+00:06:51,125 --> 00:06:52,907
+on sélectionne hotels1.
+
+162
+00:06:53,503 --> 00:06:54,664
+On peut donner un nom
+
+163
+00:06:54,864 --> 00:06:56,837
+à la colonne qui contiendra
+le nombre d'hôtels
+
+164
+00:06:57,037 --> 00:06:58,149
+pour chaque district.
+
+165
+00:06:58,387 --> 00:07:00,826
+Nous allons ici la nommer : nhotels.
+
+166
+00:07:01,804 --> 00:07:02,499
+Finalement,
+
+167
+00:07:02,699 --> 00:07:05,418
+on donne le nom et l'emplacement
+du fichier de résultat.
+
+168
+00:07:06,947 --> 00:07:08,207
+Un avertissement s'affiche
+
+169
+00:07:08,382 --> 00:07:10,756
+pour nous rendre attentifs
+à une différence de projection,
+
+170
+00:07:10,956 --> 00:07:13,276
+ceci car le fichier
+en cours de création
+
+171
+00:07:13,476 --> 00:07:15,850
+n'a pas encore de système
+de projection attribué.
+
+172
+00:07:16,050 --> 00:07:17,799
+Nous pouvons donc ici
+
+173
+00:07:17,999 --> 00:07:19,928
+ignorer ce message
+et cliquer sur OK.
+
+174
+00:07:20,128 --> 00:07:21,557
+C'est à l'étape suivante
+
+175
+00:07:21,757 --> 00:07:24,168
+que l'on va spécifier la projection
+de la couche de résultat.
+
+176
+00:07:24,368 --> 00:07:25,257
+Dans notre cas,
+
+177
+00:07:25,457 --> 00:07:28,752
+nous travaillons dans le système
+UTM zone 40 Sud,
+
+178
+00:07:28,952 --> 00:07:31,015
+qui est adapté
+pour la région des Seychelles.
+
+179
+00:07:32,799 --> 00:07:34,281
+Le résultat s'affiche à l'écran.
+
+180
+00:07:34,818 --> 00:07:36,265
+Il s'agit d'un fichier de polygones
+
+181
+00:07:36,465 --> 00:07:37,923
+contenant tous les districts.
+
+182
+00:07:38,123 --> 00:07:39,732
+Si l'on ouvre la table d'attributs,
+
+183
+00:07:39,932 --> 00:07:42,496
+on constate qu'il y a bien
+une colonne nhotels
+
+184
+00:07:42,696 --> 00:07:45,326
+indiquant le nombre d'hôtels
+situé dans chaque district.
+
+185
+00:07:49,314 --> 00:07:51,113
+Maintenant,
+toujours sur l'île de Mahé,
+
+186
+00:07:51,313 --> 00:07:54,250
+nous désirons calculer la longueur
+totale du réseau routier,
+
+187
+00:07:54,450 --> 00:07:55,385
+ici en violet,
+
+188
+00:07:55,585 --> 00:07:57,498
+situé à l'intérieur
+de chaque district.
+
+189
+00:07:58,169 --> 00:08:00,469
+La requête SQL est plus complexe
+cette fois-ci.
+
+190
+00:08:00,669 --> 00:08:05,063
+Elle fait intervenir les instructions
+"sum", "length", et "intersection",
+
+191
+00:08:05,263 --> 00:08:06,065
+emboîtées
+
+192
+00:08:06,265 --> 00:08:08,514
+avant de regrouper
+les distances par district.
+
+193
+00:08:09,045 --> 00:08:11,905
+Dans QGIS c'est la fonction
+"total des longueurs de lignes"
+
+194
+00:08:12,105 --> 00:08:13,289
+dans le menu "vecteur",
+
+195
+00:08:13,489 --> 00:08:14,602
+puis "outils d'analyse",
+
+196
+00:08:14,802 --> 00:08:16,642
+qui permet d'effectuer
+cette opération.
+
+197
+00:08:18,061 --> 00:08:19,428
+Voyons alors comment procéder
+
+198
+00:08:19,641 --> 00:08:21,909
+pour calculer cette somme
+de longueurs de segments
+
+199
+00:08:22,109 --> 00:08:22,848
+par district.
+
+200
+00:08:24,204 --> 00:08:25,262
+Dans le projet QGIS,
+
+201
+00:08:25,462 --> 00:08:26,814
+nous avons le fichier polygone
+
+202
+00:08:27,039 --> 00:08:28,369
+contenant les districts de Mahé
+
+203
+00:08:28,582 --> 00:08:29,595
+et un fichier de lignes
+
+204
+00:08:29,770 --> 00:08:30,797
+avec les routes de l'île.
+
+205
+00:08:31,375 --> 00:08:33,997
+Nous allons calculer la longueur
+totale des tronçons de route
+
+206
+00:08:34,197 --> 00:08:35,441
+situés dans chaque district
+
+207
+00:08:35,641 --> 00:08:37,262
+en utilisant l'outil "vecteur",
+
+208
+00:08:37,462 --> 00:08:38,881
+"outils d'analyse",
+
+209
+00:08:39,081 --> 00:08:40,546
+"total des longueurs de lignes".
+
+210
+00:08:41,190 --> 00:08:43,951
+Sous "couche vecteur
+de polygones en entrée",
+
+211
+00:08:44,151 --> 00:08:45,840
+nous choisissons la couche district,
+
+212
+00:08:46,040 --> 00:08:48,031
+et sous "couche vecteur
+de lignes en entrée",
+
+213
+00:08:48,231 --> 00:08:49,611
+nous choisissons les routes.
+
+214
+00:08:50,142 --> 00:08:51,669
+On peut ensuite nommer l'attribut
+
+215
+00:08:51,869 --> 00:08:53,185
+qui contiendra le résultat.
+
+216
+00:08:53,385 --> 00:08:55,481
+Ici nous allons l'appeler lroutes.
+
+217
+00:08:56,072 --> 00:08:58,041
+Puis nous spécifions le nom
+et l'emplacement
+
+218
+00:08:58,266 --> 00:08:59,271
+du fichier du résultat.
+
+219
+00:08:59,625 --> 00:09:01,824
+On peut ensuite cliquer sur OK.
+
+220
+00:09:02,639 --> 00:09:04,336
+Le calcul va prendre un peu de temps
+
+221
+00:09:04,536 --> 00:09:06,961
+car il s'agit d'une opération
+relativement complexe.
+
+222
+00:09:09,828 --> 00:09:11,837
+Le résultat s'affiche ensuite
+à l'écran
+
+223
+00:09:12,037 --> 00:09:14,263
+et nous retrouvons
+les districts de Mahé
+
+224
+00:09:15,025 --> 00:09:16,751
+et si l'on ouvre
+la table d'attributs,
+
+225
+00:09:16,988 --> 00:09:18,656
+on constate qu'une colonne lroutes
+
+226
+00:09:18,856 --> 00:09:19,924
+a bien été ajoutée,
+
+227
+00:09:20,124 --> 00:09:21,650
+indiquant la longueur totale
+
+228
+00:09:21,850 --> 00:09:24,156
+des tronçons de route
+situés dans chaque district.
+
+229
+00:09:32,979 --> 00:09:34,112
+Nous allons maintenant
+
+230
+00:09:34,337 --> 00:09:35,946
+présenter les différentes opérations
+
+231
+00:09:36,146 --> 00:09:38,499
+de découpage d'une couche vectorielle
+par une autre.
+
+232
+00:09:38,699 --> 00:09:39,993
+Il est en effet possible
+
+233
+00:09:40,193 --> 00:09:42,288
+de découper des polygones
+avec d'autres polygones,
+
+234
+00:09:42,488 --> 00:09:44,593
+ou de découper des lignes
+avec des polygones.
+
+235
+00:09:45,063 --> 00:09:46,345
+Dans le troisième cas,
+
+236
+00:09:46,545 --> 00:09:49,670
+on parlera plutôt d'extraction
+de points, de segments ou de surfaces
+
+237
+00:09:49,870 --> 00:09:51,448
+situés à l'intérieur d'un polygone.
+
+238
+00:09:53,353 --> 00:09:54,069
+Le découpage
+
+239
+00:09:54,269 --> 00:09:56,868
+tel qu'implémenté
+dans la fonction "découper" de QGIS,
+
+240
+00:09:57,068 --> 00:09:58,494
+génère un résultat qui contient
+
+241
+00:09:58,694 --> 00:10:00,824
+uniquement les attributs
+de la couche découpée.
+
+242
+00:10:02,257 --> 00:10:04,092
+Le premier exemple illustré ici
+
+243
+00:10:04,292 --> 00:10:06,475
+est le cas du découpage
+de lignes par des polygones.
+
+244
+00:10:06,959 --> 00:10:07,716
+Toujours à Mahé,
+
+245
+00:10:07,916 --> 00:10:10,059
+dont le réseau routier est ici
+affiché en jaune,
+
+246
+00:10:10,259 --> 00:10:11,943
+nous souhaitons extraire les routes
+
+247
+00:10:12,143 --> 00:10:14,550
+situées dans les cinq districts
+les plus au sud de l'île
+
+248
+00:10:14,750 --> 00:10:15,939
+et représentées en vert.
+
+249
+00:10:18,096 --> 00:10:19,849
+Voici comment procéder dans QGIS.
+
+250
+00:10:21,239 --> 00:10:22,656
+Dans le projet QGIS,
+
+251
+00:10:22,856 --> 00:10:24,249
+nous avons la couche de lignes
+
+252
+00:10:24,474 --> 00:10:25,724
+contenant les routes de Mahé
+
+253
+00:10:25,924 --> 00:10:27,070
+et un fichier de polygones
+
+254
+00:10:27,270 --> 00:10:29,292
+contenant les cinq districts
+les plus au sud.
+
+255
+00:10:29,826 --> 00:10:31,701
+Nous allons découper
+le fichier de lignes
+
+256
+00:10:31,901 --> 00:10:33,595
+pour ne retenir
+que les tronçons de route
+
+257
+00:10:33,795 --> 00:10:35,125
+situés dans les cinq districts.
+
+258
+00:10:35,593 --> 00:10:37,729
+Nous utilisons à nouveau
+l'outil de découpage
+
+259
+00:10:37,929 --> 00:10:38,666
+sous "vecteur",
+
+260
+00:10:39,229 --> 00:10:40,783
+"outils de géotraitement"
+
+261
+00:10:40,983 --> 00:10:41,901
+et "découper".
+
+262
+00:10:42,547 --> 00:10:44,234
+Comme couche vectorielle de saisie,
+
+263
+00:10:44,422 --> 00:10:45,733
+nous choisissons les routes
+
+264
+00:10:45,933 --> 00:10:47,228
+et comme couche de découpe,
+
+265
+00:10:47,428 --> 00:10:49,966
+le fichier de polygones
+contenant les cinq districts.
+
+266
+00:10:50,659 --> 00:10:53,610
+Il faut ensuite spécifier
+le fichier de résultats,
+
+267
+00:10:55,117 --> 00:10:56,620
+puis cliquer sur OK.
+
+268
+00:10:57,902 --> 00:10:59,567
+Le calcul va prendre un peu de temps
+
+269
+00:11:00,993 --> 00:11:02,777
+et le résultat s'affiche à l'écran.
+
+270
+00:11:03,189 --> 00:11:05,031
+Il s'agit bien d'un fichier
+de lignes
+
+271
+00:11:05,231 --> 00:11:07,107
+contenant uniquement
+les tronçons de route
+
+272
+00:11:07,307 --> 00:11:08,815
+situés dans les cinq districts.
+
+273
+00:11:09,102 --> 00:11:10,376
+Dans la table d'attributs,
+
+274
+00:11:10,576 --> 00:11:13,332
+on constate que tous les attributs
+du fichier initial "route"
+
+275
+00:11:13,532 --> 00:11:14,966
+ont été récupérés.
+
+276
+00:11:19,770 --> 00:11:22,120
+Le cas que nous présentons
+maintenant est fréquent.
+
+277
+00:11:22,320 --> 00:11:23,952
+Il s'agit d'extraire des points
+
+278
+00:11:24,152 --> 00:11:25,418
+situés dans des polygones.
+
+279
+00:11:25,963 --> 00:11:26,927
+Sur l'Île de Mahé,
+
+280
+00:11:27,127 --> 00:11:28,903
+nous souhaitons extraire les hôtels,
+
+281
+00:11:29,103 --> 00:11:30,372
+représentés ici en rouge,
+
+282
+00:11:30,828 --> 00:11:33,366
+des districts de Takamaka
+et de Port Glaud
+
+283
+00:11:33,566 --> 00:11:35,194
+représentés ici en jaune.
+
+284
+00:11:36,945 --> 00:11:39,336
+Regardons comment ça se passe
+dans QGIS.
+
+285
+00:11:40,970 --> 00:11:42,127
+Dans le projet QGIS,
+
+286
+00:11:42,327 --> 00:11:44,129
+nous avons le fichier de points
+des hôtels
+
+287
+00:11:44,329 --> 00:11:45,420
+avec comme attributs
+
+288
+00:11:45,620 --> 00:11:48,004
+le nom de l'hôtel
+et le nombre de chambres,
+
+289
+00:11:48,472 --> 00:11:51,111
+et un fichier de polygones
+contenant deux districts,
+
+290
+00:11:51,311 --> 00:11:53,287
+celui de Takamaka au sud
+
+291
+00:11:53,487 --> 00:11:55,220
+et celui de Port Glaud plus au nord.
+
+292
+00:11:55,897 --> 00:11:57,425
+Nous allons extraire les hôtels
+
+293
+00:11:57,625 --> 00:11:59,008
+situés dans ces deux districts.
+
+294
+00:11:59,208 --> 00:12:01,556
+Pour cela, nous utilisons
+l'outil de découpage
+
+295
+00:12:01,756 --> 00:12:03,095
+que l'on trouve sous "vecteur",
+
+296
+00:12:03,295 --> 00:12:04,651
+"outils de géotraitement",
+
+297
+00:12:04,851 --> 00:12:05,711
+"découper".
+
+298
+00:12:06,648 --> 00:12:08,279
+Comme couche vectorielle de saisie,
+
+299
+00:12:08,479 --> 00:12:10,126
+on choisit la couche à découper,
+
+300
+00:12:10,326 --> 00:12:12,179
+c'est-à-dire la couche de points
+des hôtels.
+
+301
+00:12:13,125 --> 00:12:14,430
+Comme couche de découpage,
+
+302
+00:12:14,630 --> 00:12:17,625
+on choisit la couche contenant
+les polygones des deux districts.
+
+303
+00:12:18,156 --> 00:12:19,403
+On spécifie ensuite
+
+304
+00:12:19,603 --> 00:12:21,842
+le nom et l'emplacement
+du fichier de résultat
+
+305
+00:12:22,579 --> 00:12:24,045
+et on peut cliquer sur OK.
+
+306
+00:12:28,697 --> 00:12:30,025
+Le résultat s'affiche à l'écran.
+
+307
+00:12:30,225 --> 00:12:31,930
+Il s'agit d'un fichier de points
+
+308
+00:12:32,130 --> 00:12:33,686
+contenant bien tous les hôtels
+
+309
+00:12:33,886 --> 00:12:36,564
+situés dans les districts
+de Takamaka et Port Glaud.
+
+310
+00:12:41,230 --> 00:12:42,506
+Dans la couche d'attributs
+
+311
+00:12:42,706 --> 00:12:44,785
+nous retrouvons exactement
+les mêmes attributs
+
+312
+00:12:44,985 --> 00:12:46,795
+que pour la couche initiale
+des hôtels.
+
+313
+00:12:56,947 --> 00:12:58,462
+Nous allons maintenant passer
+
+314
+00:12:58,662 --> 00:12:59,993
+à un autre type d'interaction
+
+315
+00:13:00,193 --> 00:13:02,064
+entre différentes couches
+vectorielles.
+
+316
+00:13:02,264 --> 00:13:05,127
+Il s'agit des opérations booléennes
+sur les polygones.
+
+317
+00:13:06,042 --> 00:13:08,487
+L'algèbre de Boole,
+ou le calcul booléen,
+
+318
+00:13:08,687 --> 00:13:10,486
+est une approche algébrique
+de la logique
+
+319
+00:13:10,686 --> 00:13:12,661
+exprimée en termes de variables,
+d'opérateurs
+
+320
+00:13:12,861 --> 00:13:14,912
+et de fonctions
+sur les variables logiques.
+
+321
+00:13:15,421 --> 00:13:17,705
+Cela permet d'utiliser
+des techniques algébriques
+
+322
+00:13:17,905 --> 00:13:19,794
+pour traiter les expressions
+à deux valeurs
+
+323
+00:13:19,994 --> 00:13:21,453
+du calcul des propositions.
+
+324
+00:13:22,155 --> 00:13:24,284
+Ces expressions
+sont très souvent utilisées
+
+325
+00:13:24,484 --> 00:13:26,321
+dans le cadre de l'analyse
+multicritères
+
+326
+00:13:26,521 --> 00:13:28,579
+pour évaluer l'aptitude
+de certains territoires
+
+327
+00:13:28,779 --> 00:13:30,417
+à remplir une fonction précise.
+
+328
+00:13:30,913 --> 00:13:33,411
+Dans le cas des deux couches
+de polygones superposées,
+
+329
+00:13:33,611 --> 00:13:35,013
+nous pouvons être confrontés
+
+330
+00:13:35,213 --> 00:13:36,396
+aux situations suivantes :
+
+331
+00:13:37,345 --> 00:13:38,177
+l'intersection
+
+332
+00:13:38,377 --> 00:13:40,735
+entre le polygone jaune
+et le polygone gris
+
+333
+00:13:40,935 --> 00:13:42,700
+produit le polygone bleu.
+
+334
+00:13:43,556 --> 00:13:45,546
+L'union du polygone jaune
+
+335
+00:13:45,746 --> 00:13:46,826
+avec le polygone gris
+
+336
+00:13:47,026 --> 00:13:48,869
+donne les polygones verts.
+
+337
+00:13:49,351 --> 00:13:51,678
+Et la différence
+entre le polygone jaune
+
+338
+00:13:51,878 --> 00:13:52,768
+et le polygone gris
+
+339
+00:13:52,968 --> 00:13:54,890
+donne le polygone rouge.
+
+340
+00:13:55,892 --> 00:13:57,749
+Le résultat
+de ces opérations booléennes
+
+341
+00:13:57,949 --> 00:13:59,776
+contient les attributs
+des deux couches
+
+342
+00:13:59,976 --> 00:14:02,020
+et c'est toujours
+dans le menu "vecteur",
+
+343
+00:14:02,220 --> 00:14:03,997
+sous "outils de géotraitement",
+
+344
+00:14:04,197 --> 00:14:05,779
+que l'on trouvera les fonctions QGIS
+
+345
+00:14:05,979 --> 00:14:08,001
+capables d'effectuer
+ce type de traitement.
+
+346
+00:14:08,883 --> 00:14:10,212
+Nous vous proposons un exemple
+
+347
+00:14:10,412 --> 00:14:12,473
+pour illustrer
+l'opération booléenne "union".
+
+348
+00:14:13,401 --> 00:14:16,126
+Il s'agit ici de regrouper
+sur une seule couche d'information
+
+349
+00:14:16,326 --> 00:14:18,231
+les districts situés
+sur l'île de Mahé
+
+350
+00:14:18,431 --> 00:14:19,997
+et ceux situés sur l'île de Praslin,
+
+351
+00:14:20,197 --> 00:14:22,527
+initialement stockés
+sur deux fichiers différents.
+
+352
+00:14:22,727 --> 00:14:25,794
+Cela revient à réunir les entités
+de ces deux fichiers vectoriels
+
+353
+00:14:26,037 --> 00:14:26,776
+sur un seul.
+
+354
+00:14:27,465 --> 00:14:29,186
+La requête SQL correspondante
+
+355
+00:14:29,386 --> 00:14:31,194
+fait appel à l'opérateur "union"
+
+356
+00:14:31,394 --> 00:14:32,372
+et dans QGIS,
+
+357
+00:14:32,572 --> 00:14:34,113
+c'est l'outil de géotraitement "union"
+
+358
+00:14:34,313 --> 00:14:35,322
+qu'il faut utiliser.
+
+359
+00:14:36,663 --> 00:14:38,117
+Voici comment il fonctionne :
+
+360
+00:14:39,751 --> 00:14:40,772
+dans le projet QGIS,
+
+361
+00:14:40,959 --> 00:14:42,308
+nous avons les districts de Mahé,
+
+362
+00:14:42,508 --> 00:14:43,883
+avec dans la table d'attributs
+
+363
+00:14:44,083 --> 00:14:46,295
+l'identifiant et le nom
+de chaque district,
+
+364
+00:14:46,495 --> 00:14:47,887
+ainsi que le nom de l'île.
+
+365
+00:14:48,359 --> 00:14:50,651
+Nous avons aussi
+un autre fichier de polygones
+
+366
+00:14:50,851 --> 00:14:52,579
+contenant les deux 
+districts de Praslin,
+
+367
+00:14:52,779 --> 00:14:55,894
+avec pour chaque district son nom
+et un attribut source.
+
+368
+00:14:56,565 --> 00:14:58,417
+Nous allons fusionner
+ces deux fichiers
+
+369
+00:14:58,617 --> 00:15:00,457
+pour obtenir une seule
+couche de polygones
+
+370
+00:15:00,657 --> 00:15:02,172
+contenant tous les districts.
+
+371
+00:15:02,372 --> 00:15:02,851
+Pour cela,
+
+372
+00:15:03,051 --> 00:15:04,770
+nous utilisons l'outil "union"
+
+373
+00:15:04,970 --> 00:15:05,857
+sous "vecteur",
+
+374
+00:15:06,057 --> 00:15:07,277
+"outils de géotraitement",
+
+375
+00:15:07,477 --> 00:15:08,127
+"union".
+
+376
+00:15:09,199 --> 00:15:11,017
+Sous "couche vectorielle de saisie",
+
+377
+00:15:11,217 --> 00:15:14,773
+nous choisissons la couche "districts"
+qui contient les districts de Mahé.
+
+378
+00:15:14,981 --> 00:15:16,290
+Sous "couche d'union",
+
+379
+00:15:16,490 --> 00:15:18,551
+nous sélectionnons
+les districts de Praslin.
+
+380
+00:15:18,819 --> 00:15:20,156
+Nous pouvons ensuite définir
+
+381
+00:15:20,356 --> 00:15:23,622
+le nom et le répertoire
+où le résultat est enregistré
+
+382
+00:15:24,149 --> 00:15:25,465
+et cliquer sur OK.
+
+383
+00:15:26,439 --> 00:15:29,767
+On doit ensuite spécifier
+le système de projection du résultat,
+
+384
+00:15:29,967 --> 00:15:33,493
+dans notre cas le système
+UTM Zone 40 Sud.
+
+385
+00:15:33,964 --> 00:15:35,766
+Et le résultat s'affiche à l'écran.
+
+386
+00:15:35,966 --> 00:15:37,564
+Il s'agit bien d'une couche
+de polygones
+
+387
+00:15:37,764 --> 00:15:40,418
+contenant tous les districts de Mahé
+ainsi que ceux de Praslin.
+
+388
+00:15:40,618 --> 00:15:41,994
+En ouvrant la table d'attributs,
+
+389
+00:15:42,194 --> 00:15:43,523
+on constate que l'on retrouve
+
+390
+00:15:43,723 --> 00:15:45,537
+tous les attributs
+des districts de Mahé,
+
+391
+00:15:45,737 --> 00:15:48,292
+mais également les attributs
+des districts de Praslin.
+
+392
+00:15:48,515 --> 00:15:50,473
+Comme ces attributs sont différents,
+
+393
+00:15:50,673 --> 00:15:52,604
+les districts de Mahé
+ont des valeurs nulles
+
+394
+00:15:52,804 --> 00:15:55,035
+pour les attributs de Praslin
+et inversement.
+
+395
+00:15:55,286 --> 00:15:57,984
+L'union récupère donc
+les attributs des deux fichiers.
+
+396
+00:16:00,276 --> 00:16:01,867
+Pour illustrer la mise en œuvre
+
+397
+00:16:02,067 --> 00:16:04,181
+de l'opérateur booléen "intersection",
+
+398
+00:16:04,381 --> 00:16:06,509
+nous allons extraire
+les portions du territoire
+
+399
+00:16:06,709 --> 00:16:09,290
+des districts de l'île de Mahé
+situés dans les deux zones d'étude
+
+400
+00:16:09,490 --> 00:16:12,358
+représentées ici
+par les deux polygones oranges.
+
+401
+00:16:12,881 --> 00:16:13,730
+Cela revient
+
+402
+00:16:13,930 --> 00:16:15,968
+à conserver uniquement
+les zones communes
+
+403
+00:16:16,168 --> 00:16:19,142
+entre les deux fichiers vectoriels
+en orange sur la carte.
+
+404
+00:16:19,674 --> 00:16:21,260
+Cette opération fournit un résultat
+
+405
+00:16:21,460 --> 00:16:23,510
+qui contient les attributs
+des deux couches.
+
+406
+00:16:23,710 --> 00:16:25,250
+Dans la même configuration,
+
+407
+00:16:25,450 --> 00:16:28,283
+on peut aussi utiliser la fonction
+Découpage
+
+408
+00:16:28,483 --> 00:16:30,241
+qui va également permettre
+de conserver
+
+409
+00:16:30,441 --> 00:16:32,845
+les zones communes
+entre les deux fichiers vectoriels,
+
+410
+00:16:33,045 --> 00:16:34,771
+mais le résultat contient
+dans ce cas
+
+411
+00:16:34,971 --> 00:16:37,270
+uniquement des attributs
+de la couche découpée.
+
+412
+00:16:38,962 --> 00:16:40,929
+Voici comment procéder dans QGIS :
+
+413
+00:16:42,458 --> 00:16:43,325
+dans le projet QGIS,
+
+414
+00:16:43,537 --> 00:16:44,899
+nous avons les districts de Mahé
+
+415
+00:16:45,099 --> 00:16:46,230
+qui ont comme attributs
+
+416
+00:16:46,430 --> 00:16:48,519
+un identifiant, un nom
+et le nom de l'île
+
+417
+00:16:48,719 --> 00:16:50,863
+ainsi qu'une couche "zone étude"
+
+418
+00:16:51,063 --> 00:16:54,117
+qui indique l'emplacement
+des deux zones qui nous intéressent.
+
+419
+00:16:56,618 --> 00:16:58,444
+Cette couche contient 4 attributs :
+
+420
+00:16:58,644 --> 00:17:01,776
+un identifiant, un nom,
+un lieu et une année d'étude.
+
+421
+00:17:02,937 --> 00:17:04,564
+Nous allons tout d'abord extraire
+
+422
+00:17:04,764 --> 00:17:07,399
+les portions de districts situées
+dans les deux zones d'étude
+
+423
+00:17:07,599 --> 00:17:09,804
+en utilisant la fonction
+"intersection".
+
+424
+00:17:10,292 --> 00:17:11,718
+Dans le menu "vecteur",
+
+425
+00:17:11,918 --> 00:17:13,201
+"outils de géotraitement",
+
+426
+00:17:13,401 --> 00:17:14,337
+"intersection".
+
+427
+00:17:15,000 --> 00:17:16,885
+Nous choisissons
+la couche des districts
+
+428
+00:17:17,085 --> 00:17:18,603
+comme couche de saisie
+
+429
+00:17:18,803 --> 00:17:20,192
+et la couche de la zone d'étude
+
+430
+00:17:20,392 --> 00:17:21,940
+comme couche d'intersection.
+
+431
+00:17:23,223 --> 00:17:26,360
+On spécifie ensuite le nom
+et l'emplacement du résultat,
+
+432
+00:17:27,093 --> 00:17:28,679
+puis on peut cliquer sur OK.
+
+433
+00:17:30,003 --> 00:17:33,035
+Il faut ensuite spécifier le système
+de projection du résultat,
+
+434
+00:17:33,235 --> 00:17:35,096
+UTM Zone 40 Sud.
+
+435
+00:17:35,568 --> 00:17:37,212
+Le résultat s'affiche à l'écran
+
+436
+00:17:37,412 --> 00:17:38,711
+et la couche créée
+contient bien
+
+437
+00:17:38,928 --> 00:17:40,029
+les portions de districts
+
+438
+00:17:40,229 --> 00:17:42,222
+situées à l'intérieur
+des deux zones d'étude.
+
+439
+00:17:42,422 --> 00:17:44,060
+Si l'on ouvre la table d'attributs,
+
+440
+00:17:44,260 --> 00:17:45,649
+on constate que le résultat
+
+441
+00:17:45,849 --> 00:17:48,251
+contient les attributs
+des deux couches initiales,
+
+442
+00:17:48,451 --> 00:17:50,088
+à la fois ceux
+de la couche des districts,
+
+443
+00:17:50,288 --> 00:17:51,914
+ID, nom, île,
+
+444
+00:17:52,114 --> 00:17:54,503
+mais aussi ceux de la couche
+"zone d'étude",
+
+445
+00:17:54,703 --> 00:17:57,620
+ID_ze, nom_ze, lieu, année.
+
+446
+00:17:57,820 --> 00:17:58,714
+Tout comme l'union,
+
+447
+00:17:58,914 --> 00:18:00,976
+l'intersection conserve donc
+les attributs
+
+448
+00:18:01,189 --> 00:18:02,416
+des deux couches combinées.
+
+449
+00:18:04,140 --> 00:18:06,236
+Les mêmes polygones auraient pu
+être obtenus
+
+450
+00:18:06,436 --> 00:18:07,703
+avec la fonction de découpage
+
+451
+00:18:07,903 --> 00:18:09,317
+que l'on a utilisée précédemment,
+
+452
+00:18:09,517 --> 00:18:12,202
+la différence est que
+la fonction de découpage
+
+453
+00:18:12,402 --> 00:18:14,946
+conserve uniquement les attributs
+de la première couche.
+
+454
+00:18:15,476 --> 00:18:16,656
+La couche de découpe
+
+455
+00:18:16,856 --> 00:18:19,539
+sert uniquement à définir les bords
+des nouveaux polygones
+
+456
+00:18:19,739 --> 00:18:21,726
+mais ses attributs ne sont pas
+pris en compte.
+
+457
+00:18:22,210 --> 00:18:23,185
+Pour vous convaincre,
+
+458
+00:18:23,385 --> 00:18:26,345
+nous allons appliquer la fonction
+"découper" pour ce même exemple.
+
+459
+00:18:26,963 --> 00:18:28,147
+Sous "vecteur",
+
+460
+00:18:28,347 --> 00:18:29,975
+"outils de géotraitement",
+
+461
+00:18:30,175 --> 00:18:30,771
+"découper",
+
+462
+00:18:30,971 --> 00:18:32,502
+on choisit la couche de districts
+
+463
+00:18:32,702 --> 00:18:33,767
+comme couche de saisie
+
+464
+00:18:33,967 --> 00:18:35,503
+et la couche zone étude
+
+465
+00:18:35,703 --> 00:18:37,071
+comme couche de découpe.
+
+466
+00:18:37,606 --> 00:18:40,100
+En enregistre le résultat
+et on clique sur OK.
+
+467
+00:18:44,312 --> 00:18:46,260
+On doit spécifier
+le système de projection
+
+468
+00:18:46,460 --> 00:18:48,495
+puis la couche s'affiche à l'écran.
+
+469
+00:18:49,516 --> 00:18:52,117
+On obtient bien exactement
+les mêmes polygones
+
+470
+00:18:52,317 --> 00:18:53,601
+qu'avec l'intersection.
+
+471
+00:18:53,801 --> 00:18:56,283
+Par contre dans la table d'attributs
+
+472
+00:18:56,750 --> 00:18:58,546
+nous n'avons plus aucun attribut
+
+473
+00:18:58,746 --> 00:19:00,212
+de la couche "zone étude",
+
+474
+00:19:00,412 --> 00:19:02,547
+seuls les attributs
+de la couche "districts"
+
+475
+00:19:02,747 --> 00:19:04,024
+ont été conservés.
+
+476
+00:19:14,675 --> 00:19:16,488
+Nous voilà arrivés au terme
+de cette leçon
+
+477
+00:19:16,688 --> 00:19:19,222
+sur les interactions
+entre plusieurs fichiers vectoriels.
+
+478
+00:19:19,393 --> 00:19:21,405
+Nous vous y avons présenté
+les principaux types
+
+479
+00:19:21,605 --> 00:19:23,173
+d'interactions vecteur-vecteur
+
+480
+00:19:23,373 --> 00:19:25,611
+et les opérations
+qu'ils permettent de mettre en œuvre.
+
+481
+00:19:25,811 --> 00:19:26,774
+Vous avez appris
+
+482
+00:19:26,974 --> 00:19:28,748
+comment joindre
+des fichiers ponctuels
+
+483
+00:19:28,948 --> 00:19:31,304
+sur la base des coordonnées
+géographiques uniquement,
+
+484
+00:19:32,213 --> 00:19:34,020
+à effectuer le décompte de points
+
+485
+00:19:34,220 --> 00:19:35,683
+situés à l'intérieur de polygones
+
+486
+00:19:36,417 --> 00:19:38,965
+et à calculer la longueur
+de segments
+
+487
+00:19:39,165 --> 00:19:40,062
+dans des polygones.
+
+488
+00:19:40,761 --> 00:19:42,456
+Ces traitements
+peuvent être effectués
+
+489
+00:19:42,656 --> 00:19:43,815
+au moyen de requêtes SQL,
+
+490
+00:19:44,015 --> 00:19:44,995
+mais le plus souvent,
+
+491
+00:19:45,195 --> 00:19:46,968
+pour les personnes qui
+ne pratiquent pas
+
+492
+00:19:47,168 --> 00:19:48,156
+le SQL régulièrement,
+
+493
+00:19:48,397 --> 00:19:51,029
+ces opérations peuvent être
+menées plus efficacement
+
+494
+00:19:51,229 --> 00:19:53,196
+avec l'aide des fonctions
+correspondantes
+
+495
+00:19:53,396 --> 00:19:54,815
+implémentées dans QGIS.
+
+496
+00:19:56,145 --> 00:19:57,595
+Cette leçon a également permis
+
+497
+00:19:57,795 --> 00:20:00,696
+d'aborder les opérations de
+découpage des objets vectoriels
+
+498
+00:20:00,896 --> 00:20:02,831
+ainsi que des opérations booléennes
+
+499
+00:20:03,031 --> 00:20:04,247
+très utiles dans le cadre
+
+500
+00:20:04,447 --> 00:20:06,235
+des analyses multicritères
+d'aptitude.
+
+501
+00:20:07,694 --> 00:20:09,862
+Ceci conclut cette quatrième semaine
+de cours
+
+502
+00:20:10,062 --> 00:20:11,893
+sur l'interaction
+entre couches de données
+
+503
+00:20:12,093 --> 00:20:13,770
+et met un terme au troisième module
+
+504
+00:20:13,970 --> 00:20:16,407
+consacré à l'analyse
+de l'information géographique.
+
+505
+00:20:17,021 --> 00:20:18,401
+Dès la semaine prochaine,
+
+506
+00:20:18,601 --> 00:20:19,661
+nous nous intéresserons
+
+507
+00:20:19,836 --> 00:20:22,288
+à la représentation
+de l'information géographique.
+

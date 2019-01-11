@@ -1,0 +1,611 @@
+1
+00:00:00,900 --> 00:00:03,140
+It turns out that the introduction of
+mutable
+
+2
+00:00:03,140 --> 00:00:07,660
+state and changing objects has
+repercussions on object identity.
+
+3
+00:00:07,660 --> 00:00:09,840
+That means the question, when are 2
+
+4
+00:00:09,840 --> 00:00:12,580
+objects the same, or when are they
+different?
+
+5
+00:00:12,580 --> 00:00:15,290
+You're going to look at this question in
+detail in this unit.
+
+6
+00:00:17,110 --> 00:00:20,830
+So previously, we questioned whether two
+objects were
+
+7
+00:00:20,830 --> 00:00:24,340
+the same, had often a rather easy answer.
+
+8
+00:00:24,340 --> 00:00:26,430
+Let's say we have two value
+
+9
+00:00:26,430 --> 00:00:33,020
+definitions, x equals E and y equals E
+where E is an arbitrary expression, and we
+
+10
+00:00:33,020 --> 00:00:36,030
+don't consider any assignment, then it's
+reasonable to
+
+11
+00:00:36,030 --> 00:00:38,900
+assume that x and y are the same.
+
+12
+00:00:38,900 --> 00:00:43,090
+By that, we mean that we could also have
+written x equals E, and
+
+13
+00:00:43,090 --> 00:00:47,770
+y equals x, and the two forms of
+definitions would mean the same thing.
+
+14
+00:00:49,070 --> 00:00:52,850
+That property is usually called
+referential transparency.
+
+15
+00:00:52,850 --> 00:00:56,360
+In fact, if we use the substitution model,
+then having
+
+16
+00:00:56,360 --> 00:01:01,130
+written that, we would reduce in one step
+to a program
+
+17
+00:01:01,130 --> 00:01:05,270
+like this because the rule for value
+references means that
+
+18
+00:01:05,270 --> 00:01:09,740
+we replace a value reference, x, by it's
+right-hand side, E.
+
+19
+00:01:09,740 --> 00:01:13,990
+So we arrive from here to here in one
+step.
+
+20
+00:01:13,990 --> 00:01:18,380
+But it turns out that once we introduce
+assignments, the waters
+
+21
+00:01:18,380 --> 00:01:22,190
+are considerably muddied, and we will see
+how in the next slide.
+
+22
+00:01:23,620 --> 00:01:26,730
+So once we allow for assignments, the two
+formulations
+
+23
+00:01:26,730 --> 00:01:31,760
+above, here and here, don't mean the same
+thing anymore.
+
+24
+00:01:31,760 --> 00:01:35,490
+For instance, if we define two bank
+accounts in x and
+
+25
+00:01:35,490 --> 00:01:40,530
+y, can we reasonably assume that x and y
+are the same?
+
+26
+00:01:40,530 --> 00:01:41,190
+What do you think?
+
+27
+00:01:43,260 --> 00:01:46,770
+So if you're like me, then I believe the
+answer to that would be
+
+28
+00:01:46,770 --> 00:01:50,060
+clearly no because creating two bank
+accounts
+
+29
+00:01:50,060 --> 00:01:52,750
+should give you two things that are
+different.
+
+30
+00:01:52,750 --> 00:01:56,330
+But on what grounds, precisely, do you
+base it on?
+
+31
+00:01:56,330 --> 00:01:58,880
+So, is there something that tells you
+clearly
+
+32
+00:01:58,880 --> 00:02:02,780
+that now the answer if you create two
+definitions
+
+33
+00:02:02,780 --> 00:02:05,190
+of the same right-hand sides that give you
+back
+
+34
+00:02:05,190 --> 00:02:08,590
+something different, whereas before it was
+always the same?
+
+35
+00:02:08,590 --> 00:02:12,655
+When do you make that decision in what
+direction?
+
+36
+00:02:12,655 --> 00:02:16,350
+If I were to respond to that question more
+precisely, we
+
+37
+00:02:16,350 --> 00:02:20,310
+need a theory of what it means to be the
+same.
+
+38
+00:02:20,310 --> 00:02:22,950
+And the precise meaning of being the same,
+
+39
+00:02:22,950 --> 00:02:26,460
+is defined by a property called
+operational equivalence.
+
+40
+00:02:27,790 --> 00:02:31,840
+In a somewhat informal way, this property
+can be stated as follows.
+
+41
+00:02:31,840 --> 00:02:33,740
+Let's say you have two
+
+42
+00:02:33,740 --> 00:02:38,140
+definitions for x and y, and they are
+operationally
+
+43
+00:02:38,140 --> 00:02:43,501
+equivalent if no possible test can
+distinguish between them.
+
+44
+00:02:43,501 --> 00:02:48,079
+So let's see what mean by that, clarify
+that, we
+
+45
+00:02:48,079 --> 00:02:52,012
+have to look at what can be a possible
+test.
+
+46
+00:02:52,012 --> 00:02:55,050
+So to test if x and y are the same, what
+
+47
+00:02:55,050 --> 00:02:58,774
+we can do is essentially put them in a
+black box
+
+48
+00:02:58,774 --> 00:03:04,506
+that consists of the definition x and y.
+And then an arbitrary sequence
+
+49
+00:03:04,506 --> 00:03:10,980
+of instructions that pokes into these two
+definitions in any way possible.
+
+50
+00:03:10,980 --> 00:03:14,610
+So let's call this sequence of
+instructions, f and it, we say f
+
+51
+00:03:14,610 --> 00:03:18,456
+of x and y because it can access both x
+and the y.
+
+52
+00:03:19,560 --> 00:03:23,170
+So that was one part of the experiment.
+We create two bank accounts.
+
+53
+00:03:23,170 --> 00:03:23,880
+We do some
+
+54
+00:03:23,880 --> 00:03:24,960
+things with it.
+
+55
+00:03:24,960 --> 00:03:27,800
+What we do is arbitrary, which we have the
+full
+
+56
+00:03:27,800 --> 00:03:31,980
+choice of operations that we can use in
+the experiment.
+
+57
+00:03:33,010 --> 00:03:37,230
+So then the second half of the experiment
+is to run
+
+58
+00:03:37,230 --> 00:03:42,580
+the same sequence of operations on our two
+banks account definitions.
+
+59
+00:03:42,580 --> 00:03:45,940
+But now we are only allowed to access the
+x.
+
+60
+00:03:45,940 --> 00:03:49,588
+So where previously you would have a
+sequence
+
+61
+00:03:49,588 --> 00:03:54,772
+that may be interleafed called x and y,
+now every access to y will
+
+62
+00:03:54,772 --> 00:03:59,729
+be replaced by exactly the same access,
+but to the object x.
+
+63
+00:03:59,729 --> 00:04:05,471
+If you can observe a difference from that
+sequence to that sequence,
+
+64
+00:04:05,471 --> 00:04:11,207
+then the expressions x and y are clearly
+different because, what?
+
+65
+00:04:11,207 --> 00:04:14,902
+It makes a difference whether you access
+one or the other.
+
+66
+00:04:14,902 --> 00:04:18,000
+That's the meaning of being different.
+
+67
+00:04:18,000 --> 00:04:21,340
+On the other hand, if every possible
+experiment,
+
+68
+00:04:21,340 --> 00:04:25,330
+every possible pair of sequences, produces
+the same result,
+
+69
+00:04:25,330 --> 00:04:27,470
+then we say that x and y are the
+
+70
+00:04:27,470 --> 00:04:31,588
+same because there's no way you could
+distinguish them.
+
+71
+00:04:31,588 --> 00:04:35,272
+They can't, they're not different because
+there is no test that can
+
+72
+00:04:35,272 --> 00:04:40,290
+give a different outcome on the x and y or
+the x and
+
+73
+00:04:40,290 --> 00:04:41,430
+x on the right-hand side.
+
+74
+00:04:42,730 --> 00:04:48,830
+So that, in a nutshell, is the definition
+and the theory of operational equivalence.
+
+75
+00:04:48,830 --> 00:04:51,760
+Let's put it to a test in our bank
+accounts example.
+
+76
+00:04:53,010 --> 00:04:56,736
+So, we start with the expressions, lets x
+be a bank account and y
+
+77
+00:04:56,736 --> 00:05:02,170
+be a bank account, and let's see whether
+they define values that are the same.
+
+78
+00:05:02,170 --> 00:05:04,050
+Here's our test sequence.
+
+79
+00:05:04,050 --> 00:05:05,290
+We deposit 30
+
+80
+00:05:05,290 --> 00:05:10,260
+units into x and withdraw 20 units into y.
+What do we get?
+
+81
+00:05:10,260 --> 00:05:13,260
+Well according to our definition of bank
+accounts,
+
+82
+00:05:13,260 --> 00:05:15,870
+we get 30 currency units in the first
+line.
+
+83
+00:05:15,870 --> 00:05:19,914
+Actually, there wouldn't be anything
+printed, it's just 30 currency units.
+
+84
+00:05:19,914 --> 00:05:25,815
+And we get insufficient funds when we
+withdraw 20 currency units from y.
+
+85
+00:05:25,815 --> 00:05:26,670
+Why?
+
+86
+00:05:26,670 --> 00:05:30,180
+Because, well, the initial balance of y
+was zero, and x and y are different,
+
+87
+00:05:30,180 --> 00:05:34,360
+so you can't withdraw 20 from an account
+with a balance of zero.
+
+88
+00:05:35,950 --> 00:05:38,470
+So that was the first half of the
+experiment.
+
+89
+00:05:38,470 --> 00:05:41,570
+In the second half, we rename every
+occurrence of
+
+90
+00:05:41,570 --> 00:05:44,590
+y in in the sequence of operations to x.
+
+91
+00:05:44,590 --> 00:05:48,960
+So now we have x deposit thirty, and x
+withdraw twenty.
+
+92
+00:05:48,960 --> 00:05:51,670
+And yes, indeed, now, the second line
+would give
+
+93
+00:05:51,670 --> 00:05:55,396
+us a result of 10, rather than an
+insufficient
+
+94
+00:05:55,396 --> 00:05:56,960
+fund ex, exception.
+
+95
+00:05:56,960 --> 00:06:02,850
+So the final results of both half of the
+experiment are different, and that means
+
+96
+00:06:02,850 --> 00:06:07,970
+we can conclude that x and y are not the
+same, that they define different objects.
+
+97
+00:06:09,310 --> 00:06:14,705
+On the other hand, if we now defined x
+equals new bank account, and y equals x,
+
+98
+00:06:14,705 --> 00:06:16,940
+then it turns out that no sequence of
+
+99
+00:06:16,940 --> 00:06:20,510
+operations can distinguish between the x
+and the y.
+
+100
+00:06:20,510 --> 00:06:22,840
+So they are the same in this case.
+
+101
+00:06:22,840 --> 00:06:24,850
+Now to prove that two objects are the
+same,
+
+102
+00:06:24,850 --> 00:06:27,520
+and this theory is considerably harder
+than to prove
+
+103
+00:06:27,520 --> 00:06:30,120
+that they are different because you have
+to show
+
+104
+00:06:30,120 --> 00:06:34,110
+that no possible sequence of operations
+can distinguish between them.
+
+105
+00:06:34,110 --> 00:06:39,330
+So, you have to argue about a possibly
+infinite number of possible experiments.
+
+106
+00:06:39,330 --> 00:06:41,336
+Whereas to prove that 2 definitions are
+
+107
+00:06:41,336 --> 00:06:43,860
+different, a single counter example is
+enough.
+
+108
+00:06:45,790 --> 00:06:51,510
+Now, one thing the discussion so far shows
+is that our model of computation
+
+109
+00:06:51,510 --> 00:06:56,530
+by substitution has become problematic, in
+fact that it cannot be used.
+
+110
+00:06:56,530 --> 00:07:01,670
+Indeed, if we apply the Substitution Model
+to our bank account example, then we
+
+111
+00:07:01,670 --> 00:07:05,770
+can always replace the name of a value by
+the expression that defines it.
+
+112
+00:07:05,770 --> 00:07:07,990
+So for instance, if we have the,
+
+113
+00:07:07,990 --> 00:07:11,490
+these two definitions, then by the
+Substitution Model,
+
+114
+00:07:11,490 --> 00:07:17,890
+as we have seen, that rewrites in one step
+to the definitions on the right.
+
+115
+00:07:17,890 --> 00:07:20,390
+So, instead of the reference to x here,
+
+116
+00:07:20,390 --> 00:07:24,080
+I take the right-hand side, new bank
+account.
+
+117
+00:07:24,080 --> 00:07:27,640
+But we have seen that, the, this change,
+this step
+
+118
+00:07:27,640 --> 00:07:30,660
+from here to here, in fact leads to a
+different program.
+
+119
+00:07:32,080 --> 00:07:34,010
+So, clearly going from here to here is not
+
+120
+00:07:34,010 --> 00:07:37,270
+a valid step, and that means that the
+Substitution Model,
+
+121
+00:07:37,270 --> 00:07:42,840
+as a whole, stops being valid once we add
+assignment to a language.
+
+122
+00:07:42,840 --> 00:07:46,390
+It is possible to adapt the substitution
+model, for instance,
+
+123
+00:07:46,390 --> 00:07:50,840
+by introducing a store that keeps track of
+all the references.
+
+124
+00:07:50,840 --> 00:07:54,990
+But unfortunately, this becomes
+considerably more complicated.
+
+125
+00:07:54,990 --> 00:07:58,560
+So, in the future, we will say with some
+regret, goodbye to
+
+126
+00:07:58,560 --> 00:08:02,760
+the Substitution Model for all code that
+is not purely functional, and
+
+127
+00:08:02,760 --> 00:08:07,900
+we will fall back on a more operational
+and sometimes intuitive reasoning instead.
+

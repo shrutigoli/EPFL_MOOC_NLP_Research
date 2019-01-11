@@ -1,0 +1,1669 @@
+1
+00:00:04,439 --> 00:00:07,727
+We have seen that if we want
+a heterogeneous container, 
+
+2
+00:00:07,727 --> 00:00:10,728
+that is, a set of polymorphic
+objects
+
+3
+00:00:10,728 --> 00:00:15,008
+grouped in a same container,
+for example in a vector
+
+4
+00:00:15,008 --> 00:00:17,821
+then, it was necessary,
+in order to have polymorphism,
+
+5
+00:00:17,825 --> 00:00:19,421
+to have a set,
+
+6
+00:00:19,421 --> 00:00:22,611
+a collection of pointers to
+these objects.
+
+7
+00:00:22,627 --> 00:00:24,707
+And we recommended, up until now,
+
+8
+00:00:24,710 --> 00:00:29,400
+that you use a vector of
+C++11 style smart pointers,
+
+9
+00:00:29,403 --> 00:00:32,212
+an vector of unique pointers.
+
+10
+00:00:32,212 --> 00:00:34,537
+In this episode, we'll take a look
+at how we could do this
+
+11
+00:00:34,537 --> 00:00:37,577
+with C-style pointers and
+what it would imply.
+
+12
+00:00:37,616 --> 00:00:41,096
+Remember, we had used the
+Jeu class in our example,
+
+13
+00:00:41,101 --> 00:00:44,061
+containing a collection of characters
+
+14
+00:00:44,070 --> 00:00:46,471
+that could be polymorphic.
+
+15
+00:00:46,471 --> 00:00:49,331
+They could be warriors, thieves,
+magicians, etc.
+
+16
+00:00:49,438 --> 00:00:53,021
+And so for this, we used a
+vector here,
+
+17
+00:00:53,021 --> 00:00:54,813
+with pointers to our characters.
+
+18
+00:00:54,813 --> 00:00:57,843
+In the previous version, we had
+used unique pointers;
+
+19
+00:00:57,857 --> 00:01:01,292
+now, let's see what happens if we
+use C-style pointers
+
+20
+00:01:01,292 --> 00:01:05,712
+since after all, the interface to
+add a character
+
+21
+00:01:05,721 --> 00:01:07,891
+uses a C-style pointer.
+
+22
+00:01:07,910 --> 00:01:12,000
+As a reminder, the usage was to have an
+instance of Jeu,
+
+23
+00:01:12,004 --> 00:01:16,816
+and to call "jeu.ajouter_personnage"
+(TN: means "game.add_character"),
+
+24
+00:01:16,816 --> 00:01:19,511
+with dynamic allocation of a warrior
+here, through "new Guerrier".
+
+25
+00:01:19,511 --> 00:01:22,631
+This returns, of course, a pointer
+to a warrior,
+
+26
+00:01:22,648 --> 00:01:24,696
+and this pointer to a Guerrier
+
+27
+00:01:24,696 --> 00:01:27,929
+is compatible with a pointer
+to a Personnage,
+
+28
+00:01:27,929 --> 00:01:30,369
+since a Guerrier is a Personnage;
+
+29
+00:01:30,369 --> 00:01:34,686
+a pointer to a warrior is also a pointer
+to a character.
+
+30
+00:01:34,686 --> 00:01:37,271
+So in this case, how can we
+write the two methods of
+
+31
+00:01:37,271 --> 00:01:40,191
+the Jeu class with C-style pointers?
+
+32
+00:01:41,215 --> 00:01:43,765
+Let's start with adding a character;
+
+33
+00:01:43,914 --> 00:01:45,647
+the prototype hasn't changed.
+
+34
+00:01:45,647 --> 00:01:48,147
+We take a parameter, "nouveau"
+
+35
+00:01:48,152 --> 00:01:50,453
+which is a C-style pointer to a
+character,
+
+36
+00:01:50,453 --> 00:01:53,353
+since this is the result of a call
+to new.
+
+37
+00:01:53,368 --> 00:01:56,251
+And since we have decided to have
+a vector
+
+38
+00:01:56,251 --> 00:01:58,111
+of C-style pointers to characters,
+
+39
+00:01:58,111 --> 00:01:59,911
+there is nothing complicated here.
+
+40
+00:01:59,911 --> 00:02:01,367
+We simply need to add
+
+41
+00:02:01,367 --> 00:02:04,657
+"push_back" at the end of the vector
+of characters
+
+42
+00:02:04,664 --> 00:02:07,574
+with the "nouveau" parameter that
+we received.
+
+43
+00:02:07,761 --> 00:02:10,840
+As in the previous version, we can
+start by
+
+44
+00:02:10,840 --> 00:02:14,715
+verifying that the pointer we have
+received is not null,
+
+45
+00:02:14,715 --> 00:02:17,549
+that is, that it is a pointer to
+a real object.
+
+46
+00:02:17,564 --> 00:02:21,654
+This version is a little simpler than the
+one with the unique pointers.
+
+47
+00:02:21,795 --> 00:02:23,520
+Similarly, for the display,
+
+48
+00:02:23,520 --> 00:02:27,841
+we can simply use a classical
+"for auto" loop
+
+49
+00:02:27,841 --> 00:02:30,758
+since there is no issue, no problem
+
+50
+00:02:30,758 --> 00:02:34,610
+with having several pointers to the
+same memory area
+
+51
+00:02:34,610 --> 00:02:36,780
+as is the case with unique pointers.
+
+52
+00:02:36,794 --> 00:02:40,994
+So here, there is nothing special to
+be done compared to unique pointers.
+
+53
+00:02:41,239 --> 00:02:43,529
+I will let you compare both
+codes to
+
+54
+00:02:43,540 --> 00:02:46,020
+see where the differences lie.
+
+55
+00:02:56,502 --> 00:02:58,960
+We can see that in the unique
+pointer version,
+
+56
+00:02:58,960 --> 00:03:01,280
+we had to add "unique_ptr"
+here
+
+57
+00:03:01,296 --> 00:03:05,176
+instead of simply having a star.
+
+58
+00:03:05,280 --> 00:03:08,940
+On the unique pointer side,
+we also had to add
+
+59
+00:03:08,944 --> 00:03:12,074
+a "const" here to avoid having
+several pointers to the same area,
+
+60
+00:03:12,187 --> 00:03:16,377
+unlike in the C-style pointer version.
+
+61
+00:03:16,403 --> 00:03:22,103
+And finally, we had to add the conversion
+from a C-style pointer
+
+62
+00:03:22,103 --> 00:03:24,541
+to a unique_ptr,
+
+63
+00:03:24,541 --> 00:03:28,749
+which isn't necessary either in the
+C-style pointer version.
+
+64
+00:03:29,344 --> 00:03:33,473
+Thus it seems that the C-style pointer
+version is simpler
+
+65
+00:03:33,473 --> 00:03:35,883
+that the unique pointer version.
+
+66
+00:03:36,175 --> 00:03:39,165
+So why did we recommend you
+use unique pointers?
+
+67
+00:03:39,846 --> 00:03:42,616
+The problem with C-style pointers is that
+the programmer
+
+68
+00:03:42,622 --> 00:03:46,236
+has to take steps to prevent various
+potential problems
+
+69
+00:03:46,236 --> 00:03:47,296
+with their class.
+
+70
+00:03:47,712 --> 00:03:49,304
+The first thing to think about
+
+71
+00:03:49,304 --> 00:03:52,171
+when using pointers in a class
+-- such as here,
+
+72
+00:03:52,171 --> 00:03:54,772
+when we add pointers to our
+heterogeneous container,
+
+73
+00:03:54,772 --> 00:03:55,612
+in our game --
+
+74
+00:03:55,813 --> 00:03:57,963
+the first thing to think about is:
+
+75
+00:04:01,068 --> 00:04:04,878
+when we have pointers in a class,
+we must think about the copy constructor
+
+76
+00:04:04,890 --> 00:04:09,390
+and the destructor, as well as the
+assignment operator.
+
+77
+00:04:09,399 --> 00:04:12,389
+Indeed, if we have pointers
+in a container,
+
+78
+00:04:12,410 --> 00:04:17,950
+such as in our game here, where
+we have an vector
+
+79
+00:04:17,957 --> 00:04:20,997
+of pointers to characters.
+
+80
+00:04:23,480 --> 00:04:25,250
+The question to ask is:
+
+81
+00:04:25,271 --> 00:04:28,201
+what does it mean to copy a game?
+
+82
+00:04:28,320 --> 00:04:31,410
+Do we want to make a surface copy?
+
+83
+00:04:32,423 --> 00:04:36,633
+If I have a game j2 here,
+which is a copy of j1,
+
+84
+00:04:36,941 --> 00:04:41,791
+it will have a copy of the vector
+of characters,
+
+85
+00:04:41,794 --> 00:04:43,921
+but if we only make a surface copy,
+
+86
+00:04:43,921 --> 00:04:46,761
+if we only use the default
+copy constructor,
+
+87
+00:04:46,773 --> 00:04:49,816
+then we will copy pointers.
+
+88
+00:04:49,816 --> 00:04:53,216
+We will simply copy the various
+elements one after the other,
+
+89
+00:04:53,230 --> 00:04:54,811
+copying only the pointers.
+
+90
+00:04:54,811 --> 00:04:58,201
+This means that the game j2 will point to
+
+91
+00:04:58,207 --> 00:05:02,827
+the same characters as the game j1.
+
+92
+00:05:02,837 --> 00:05:06,817
+And this is usually undesirable,
+since we generally want
+
+93
+00:05:06,817 --> 00:05:09,867
+both collections to have
+independent elements.
+
+94
+00:05:09,877 --> 00:05:11,517
+Here in the example of the games,
+
+95
+00:05:11,517 --> 00:05:15,871
+we would like to be able to play
+the first and second games separately,
+
+96
+00:05:15,877 --> 00:05:20,177
+without the characters from one game
+influencing the characters from the other.
+
+97
+00:05:20,187 --> 00:05:23,403
+This problem does not occur with
+unique pointers
+
+98
+00:05:23,403 --> 00:05:25,053
+since with unique pointers,
+
+99
+00:05:25,055 --> 00:05:29,235
+it is impossible to have multiple
+pointers
+
+100
+00:05:29,261 --> 00:05:30,921
+to the same characters,
+
+101
+00:05:30,921 --> 00:05:34,971
+and we would not be allowed
+to copy them.
+
+102
+00:05:34,971 --> 00:05:37,421
+So copying is inherently forbidden
+
+103
+00:05:37,431 --> 00:05:40,461
+with a game containing
+unique pointers.
+
+104
+00:05:40,489 --> 00:05:43,869
+The compiler would indeed have
+forbidden this call to the copy constructor,
+
+105
+00:05:43,875 --> 00:05:46,391
+which tries to makes copies of the
+unique pointers.
+
+106
+00:05:46,391 --> 00:05:49,111
+So the program would have realized
+that there was a problem here.
+
+107
+00:05:49,391 --> 00:05:53,350
+Moreover, with C-style pointers, it is
+important not to forget deallocation
+
+108
+00:05:53,350 --> 00:05:54,780
+and especially the golden rule,
+
+109
+00:05:54,789 --> 00:05:57,759
+that whoever allocates the memory,
+whoever calls "new",
+
+110
+00:05:57,761 --> 00:06:01,431
+must also free the memory,
+that is, call "delete".
+
+111
+00:06:01,431 --> 00:06:04,283
+Here is a reminder of how this worked;
+
+112
+00:06:04,283 --> 00:06:08,603
+to add a character to the game, the
+character was created
+
+113
+00:06:08,613 --> 00:06:12,136
+with a call to "new", so for
+example "new Magicien",
+
+114
+00:06:12,136 --> 00:06:13,880
+with parameters for its constructor.
+
+115
+00:06:13,880 --> 00:06:18,050
+So it is this one who makes this
+call here, who will have to handle destruction.
+
+116
+00:06:18,130 --> 00:06:21,810
+In this case, there is no way of getting
+the pointer that was allocated,
+
+117
+00:06:21,825 --> 00:06:24,024
+since this value wasn't saved,
+
+118
+00:06:24,024 --> 00:06:28,082
+and we must provide a means to
+destroy the characters
+
+119
+00:06:28,082 --> 00:06:29,562
+we have put into our collection.
+
+120
+00:06:29,562 --> 00:06:32,732
+For example, with a "detruire_personnage"
+method (TN: means "destroy_character")
+
+121
+00:06:32,743 --> 00:06:36,883
+where we would indicate the
+address of the character we wish to
+
+122
+00:06:36,937 --> 00:06:39,317
+destroy; but this would suppose of
+course that the one making the allocation
+
+123
+00:06:39,329 --> 00:06:43,179
+keeps a trace of their pointers
+to be able to use them here.
+
+124
+00:06:43,192 --> 00:06:47,469
+We could also destroy a character by
+indicating which number,
+
+125
+00:06:47,469 --> 00:06:48,735
+which index that character has,
+
+126
+00:06:48,735 --> 00:06:52,521
+supposing that we had numbered, that
+we had access to the characters' numbers,
+
+127
+00:06:52,521 --> 00:06:55,191
+we could destroy character number 2,
+etc.
+
+128
+00:06:55,191 --> 00:06:59,980
+Or, we could provide a method that
+would destroy all the characters.
+
+129
+00:07:00,080 --> 00:07:03,143
+That is up to you, depending
+on your design, depending
+
+130
+00:07:03,143 --> 00:07:05,863
+on the heterogeneous container
+that you want to use.
+
+131
+00:07:05,922 --> 00:07:08,340
+But in any case, you will have
+to think about
+
+132
+00:07:08,340 --> 00:07:12,269
+providing methods allowing deallocation
+of allocated memory,
+
+133
+00:07:12,269 --> 00:07:15,669
+to be able to free the pointers that
+are in your container.
+
+134
+00:07:16,376 --> 00:07:19,915
+For example, if we had decided to
+provide a method to destroy
+
+135
+00:07:19,915 --> 00:07:21,945
+all pointed-to objects stored
+in the collection,
+
+136
+00:07:21,949 --> 00:07:25,199
+that would destroy all the characters
+pointed to in the game,
+
+137
+00:07:25,199 --> 00:07:27,785
+then we would iterate like so,
+with a "for" loop,
+
+138
+00:07:27,807 --> 00:07:31,985
+over all the characters, all the pointers
+in this "personnages" vector,
+
+139
+00:07:31,985 --> 00:07:34,295
+and we would "delete" each of
+these pointers.
+
+140
+00:07:34,534 --> 00:07:35,492
+Of course, in the end,
+
+141
+00:07:35,492 --> 00:07:38,504
+we mustn't forget to empty
+the vector of its pointers
+
+142
+00:07:38,504 --> 00:07:40,204
+to avoid keeping in memory
+
+143
+00:07:40,208 --> 00:07:43,998
+the pointers to memory areas that
+have been freed.
+
+144
+00:07:45,009 --> 00:07:48,238
+Here is another solution, if
+we wish to provide the method
+
+145
+00:07:48,238 --> 00:07:51,166
+allowing the destruction of a character
+specified by their position,
+
+146
+00:07:51,166 --> 00:07:54,046
+for example to destroy the
+second character,
+
+147
+00:07:54,058 --> 00:07:56,708
+we would have the following
+situation:
+
+148
+00:07:56,713 --> 00:07:59,313
+We have a game
+
+149
+00:08:01,109 --> 00:08:03,779
+containing its vector of characters
+
+150
+00:08:05,207 --> 00:08:08,370
+which are pointers to characters,
+
+151
+00:08:08,370 --> 00:08:10,330
+warriors, thieves, magicians,...
+
+152
+00:08:10,997 --> 00:08:14,337
+And suppose that we pass
+the parameter 1 here
+
+153
+00:08:14,340 --> 00:08:16,550
+to this method,
+
+154
+00:08:19,162 --> 00:08:21,780
+meaning that we want to delete
+the second character,
+
+155
+00:08:21,780 --> 00:08:25,740
+-- character 0, character 1 : we want to
+destroy the second character --
+
+156
+00:08:26,040 --> 00:08:27,802
+so the first thing we would do
+
+157
+00:08:27,802 --> 00:08:30,942
+if, of course, we are sure that this
+parameter here, "lequel",
+
+158
+00:08:30,948 --> 00:08:34,328
+is smaller than " personnages.size() ".
+
+159
+00:08:34,437 --> 00:08:38,817
+This could have been tested on the
+outside, before the call to "detruire_personnage",
+
+160
+00:08:38,821 --> 00:08:41,631
+of course, if we cannot guarantee it, if
+it is not the case,
+
+161
+00:08:41,633 --> 00:08:45,323
+we could always add a test here.
+
+162
+00:08:45,327 --> 00:08:47,713
+And so if such a condition
+is guaranteed,
+
+163
+00:08:47,713 --> 00:08:51,504
+the first thing we would do would
+be to "delete" this memory area,
+
+164
+00:08:51,504 --> 00:08:54,628
+so " delete personnages [lequel]; " here,
+
+165
+00:08:54,628 --> 00:08:56,246
+so "personnage[1]".
+
+166
+00:08:56,246 --> 00:08:59,506
+We will call "delete" here
+on this memory area
+
+167
+00:08:59,878 --> 00:09:01,848
+but of course, once we have
+done this,
+
+168
+00:09:01,848 --> 00:09:04,751
+we will have to avoid
+keeping this address
+
+169
+00:09:04,752 --> 00:09:07,072
+of an invalid memory area,
+
+170
+00:09:07,073 --> 00:09:10,163
+so we will have to delete this pointer.
+
+171
+00:09:10,175 --> 00:09:13,812
+So there, you have 3 solutions
+depending on what you want to do.
+
+172
+00:09:13,812 --> 00:09:15,752
+All three solutions are quite
+applicable.
+
+173
+00:09:15,757 --> 00:09:19,277
+It depends on how you want to
+manage your heterogeneous container:
+
+174
+00:09:19,279 --> 00:09:23,929
+if we want to keep the same order
+and the same number of elements
+
+175
+00:09:23,948 --> 00:09:25,697
+in our vector of characters,
+
+176
+00:09:25,697 --> 00:09:27,977
+the same number of possible characters,
+
+177
+00:09:27,980 --> 00:09:30,880
+but simply indicate that this
+character is dead,
+
+178
+00:09:30,893 --> 00:09:34,073
+then at that point, what we could do is
+simply to say
+
+179
+00:09:34,094 --> 00:09:37,106
+that we replace the invalid pointer
+by a null pointer,
+
+180
+00:09:37,106 --> 00:09:39,847
+saying that this character was destroyed,
+
+181
+00:09:39,847 --> 00:09:41,677
+represented by a null pointer,
+"nullptr".
+
+182
+00:09:41,698 --> 00:09:44,518
+This would yield the following
+memory situation
+
+183
+00:09:46,701 --> 00:09:48,435
+and so here we would indeed
+
+184
+00:09:48,435 --> 00:09:52,675
+have an vector that continues to
+have 4 possible characters
+
+185
+00:09:52,693 --> 00:09:54,823
+with a null pointer here to indicate
+
+186
+00:09:54,841 --> 00:09:59,091
+that the character at position 1, the
+second character, no longer exists.
+
+187
+00:09:59,194 --> 00:10:01,734
+This is a possible situation,
+
+188
+00:10:01,742 --> 00:10:06,092
+but that implies that the one using this
+vector will make sure to
+
+189
+00:10:06,097 --> 00:10:08,587
+test if the object does indeed exist
+
+190
+00:10:08,593 --> 00:10:11,613
+before calling a method on it,
+for example.
+
+191
+00:10:12,471 --> 00:10:15,029
+Another solution, when we
+destroy a character,
+
+192
+00:10:15,029 --> 00:10:16,472
+is to say that at that moment,
+
+193
+00:10:16,472 --> 00:10:20,031
+the number of characters in the
+game is decremented by 1,
+
+194
+00:10:20,031 --> 00:10:22,013
+the size of the vector is reduced by 1,
+
+195
+00:10:22,013 --> 00:10:24,713
+and so to actually delete this element.
+
+196
+00:10:24,721 --> 00:10:26,751
+In that case, there are 2 possible
+solutions,
+
+197
+00:10:26,764 --> 00:10:29,404
+an efficient solution which
+does not preserve order,
+
+198
+00:10:29,410 --> 00:10:32,170
+but that is very efficient, that only
+deletes a single element,
+
+199
+00:10:32,187 --> 00:10:35,942
+and a solution that preserves the order
+but that will be very expensive,
+
+200
+00:10:35,942 --> 00:10:38,182
+since it will require copying all
+the elements
+
+201
+00:10:38,182 --> 00:10:41,702
+following the element that
+we are destroying.
+
+202
+00:10:41,729 --> 00:10:43,289
+Let's look at the first solution.
+
+203
+00:10:43,295 --> 00:10:45,960
+The first solution simply consists
+in exchanging,
+
+204
+00:10:45,960 --> 00:10:48,020
+with "utility"'s "swap" function,
+
+205
+00:10:48,025 --> 00:10:52,115
+to exchange the pointer on which
+we have just called "delete"
+
+206
+00:10:52,122 --> 00:10:54,512
+with the last pointer of the vector,
+
+207
+00:10:54,540 --> 00:10:57,880
+" personnages.back ", remember, is the
+last element of
+
+208
+00:10:57,901 --> 00:10:59,576
+the "personnages" vector,
+
+209
+00:10:59,576 --> 00:11:02,626
+and so we will exchange these 2 elements,
+
+210
+00:11:02,628 --> 00:11:04,518
+which will result in this.
+
+211
+00:11:05,127 --> 00:11:07,305
+If we exchange both pointers,
+
+212
+00:11:07,305 --> 00:11:09,025
+this element will now
+
+213
+00:11:09,212 --> 00:11:11,362
+point here,
+
+214
+00:11:11,934 --> 00:11:13,584
+and this element
+
+215
+00:11:14,163 --> 00:11:16,148
+will point over there.
+
+216
+00:11:16,148 --> 00:11:20,348
+We have exchanged these two pointers.
+
+217
+00:11:20,351 --> 00:11:23,171
+Once this exchange has been done,
+
+218
+00:11:23,196 --> 00:11:24,500
+then at that point,
+
+219
+00:11:24,500 --> 00:11:27,692
+we can delete the last element
+of the vector
+
+220
+00:11:27,692 --> 00:11:29,339
+since we now know that this
+last element
+
+221
+00:11:29,339 --> 00:11:31,639
+is the pointer that we want
+to destroy.
+
+222
+00:11:31,656 --> 00:11:33,416
+So with this "pop back",
+
+223
+00:11:33,426 --> 00:11:35,926
+we will delete this last element.
+
+224
+00:11:35,938 --> 00:11:37,580
+This means that after that
+
+225
+00:11:37,580 --> 00:11:39,651
+we will only have 3 characters left
+
+226
+00:11:39,651 --> 00:11:43,168
+and no trace of the address of
+this memory area
+
+227
+00:11:43,168 --> 00:11:44,998
+that we have just freed.
+
+228
+00:11:45,015 --> 00:11:47,754
+A third solution, depending
+on our needs,
+
+229
+00:11:47,754 --> 00:11:51,218
+would be to delete this pointer,
+but to preserve the order,
+
+230
+00:11:51,218 --> 00:11:53,076
+that is, to keep this pointer
+at the beginning,
+
+231
+00:11:53,076 --> 00:11:56,061
+this one in second place,
+this one in third,
+
+232
+00:11:56,061 --> 00:11:57,562
+and not by exchanging them like
+we did here,
+
+233
+00:11:57,562 --> 00:11:59,862
+as we did earlier.
+
+234
+00:11:59,868 --> 00:12:04,818
+By using "vector"'s "erase"
+method,
+
+235
+00:12:04,829 --> 00:12:08,639
+we will delete -- I show you this
+with no further details --
+
+236
+00:12:08,656 --> 00:12:11,227
+the element at the position "lequel".
+
+237
+00:12:11,227 --> 00:12:13,647
+And the reason this is so expensive
+is that this method
+
+238
+00:12:13,656 --> 00:12:18,637
+will indeed delete this element, but it
+will copy all the following elements
+
+239
+00:12:18,637 --> 00:12:21,447
+to move them, one after the other,
+
+240
+00:12:21,500 --> 00:12:23,430
+in order to ensure that the vector
+
+241
+00:12:23,444 --> 00:12:28,114
+stays contiguous in memory,
+with 3 elements.
+
+242
+00:12:29,764 --> 00:12:31,733
+So this is how we could do it,
+
+243
+00:12:31,733 --> 00:12:33,043
+one way or another,
+
+244
+00:12:33,059 --> 00:12:38,189
+to make it possible to remove elements
+from the container.
+
+245
+00:12:38,233 --> 00:12:42,753
+To summarize, C-style pointers
+in a heterogeneous container
+
+246
+00:12:42,757 --> 00:12:46,267
+pose a problem for data integrity.
+
+247
+00:12:46,272 --> 00:12:48,372
+In fact, there are 3 sides to this problem:
+
+248
+00:12:48,390 --> 00:12:51,763
+the first, is to guarantee the lifetime
+of the data pointed to,
+
+249
+00:12:51,763 --> 00:12:53,793
+the lifetime of our characters
+in the game,
+
+250
+00:12:53,802 --> 00:12:56,022
+for at least as long as the
+game exists.
+
+251
+00:12:56,038 --> 00:13:00,198
+We already spoke of this in the
+unique_ptr case.
+
+252
+00:13:00,202 --> 00:13:02,522
+We talked about it in the
+previous episode.
+
+253
+00:13:02,530 --> 00:13:04,505
+This is a point we find
+
+254
+00:13:04,505 --> 00:13:06,875
+both with unique pointers
+
+255
+00:13:10,245 --> 00:13:12,875
+and with C-style pointers.
+
+256
+00:13:13,674 --> 00:13:16,807
+The second problem is the
+deallocation problem:
+
+257
+00:13:16,807 --> 00:13:21,247
+we must guarantee that we will
+free the memory that we allocated,
+
+258
+00:13:21,252 --> 00:13:23,225
+and with unique pointers,
+
+259
+00:13:23,225 --> 00:13:25,725
+since they are smart pointers, there
+is nothing to do.
+
+260
+00:13:25,740 --> 00:13:27,540
+So here, everything is alright.
+
+261
+00:13:28,016 --> 00:13:32,061
+However, with C-style pointers, this is
+of course not automatic.
+
+262
+00:13:32,061 --> 00:13:35,571
+So we must, as we have just
+discussed,
+
+263
+00:13:35,571 --> 00:13:37,761
+provide a means to do so cleanly.
+
+264
+00:13:37,769 --> 00:13:41,469
+Then, third problem, is sharing
+data
+
+265
+00:13:41,472 --> 00:13:42,992
+between different collections.
+
+266
+00:13:42,992 --> 00:13:45,572
+We already briefly discussed
+this earlier with copying,
+
+267
+00:13:45,572 --> 00:13:47,612
+and I will come back to this in a moment.
+
+268
+00:13:47,623 --> 00:13:51,303
+This is not a problem with
+unique_ptrs,
+
+269
+00:13:51,312 --> 00:13:53,442
+as it is this unique aspect
+
+270
+00:13:54,643 --> 00:13:57,080
+which prevents any sharing
+of data
+
+271
+00:13:57,080 --> 00:13:58,560
+between different containers
+
+272
+00:13:58,563 --> 00:14:01,943
+But this is not at all guaranteed by
+C-style pointers,
+
+273
+00:14:01,956 --> 00:14:04,726
+and so we will have to handle this.
+
+274
+00:14:04,731 --> 00:14:07,801
+Finally, let's take a closer look
+at this last point.
+
+275
+00:14:07,811 --> 00:14:10,631
+To do so, I have chosen an example
+that seems a little
+
+276
+00:14:10,633 --> 00:14:12,466
+more illustrative.
+
+277
+00:14:12,466 --> 00:14:14,346
+Imagine that we have drawings
+(TN: "dessins")
+
+278
+00:14:14,360 --> 00:14:16,510
+that would be our heterogeneous containers.
+
+279
+00:14:16,511 --> 00:14:20,021
+Drawings are sets of geometric figures.
+
+280
+00:14:20,034 --> 00:14:21,864
+So we would have 2 classes,
+
+281
+00:14:21,869 --> 00:14:24,669
+the "Figure" class which
+is an abstract class,
+
+282
+00:14:24,669 --> 00:14:28,545
+and we can imagine having
+different figures
+
+283
+00:14:28,545 --> 00:14:31,875
+such as rectangles, circles, etc.,
+
+284
+00:14:32,907 --> 00:14:34,010
+inheriting from it.
+
+285
+00:14:34,010 --> 00:14:37,910
+So we would have a heterogeneous
+container of figures,
+
+286
+00:14:37,918 --> 00:14:42,128
+which would be our drawing and
+would contain different figures,
+
+287
+00:14:42,137 --> 00:14:45,917
+that would be polymorphic:
+rectangles, circles, etc.
+
+288
+00:14:45,995 --> 00:14:49,325
+The question now is to know whether
+the contents of a drawing
+
+289
+00:14:49,330 --> 00:14:51,520
+are personal or shared.
+
+290
+00:14:51,526 --> 00:14:56,386
+So for example, if I imagine that I
+have several drawings,
+
+291
+00:14:56,399 --> 00:14:59,375
+for example, drawing "d18",
+
+292
+00:14:59,375 --> 00:15:04,297
+containing a set of pointers,
+of course,
+
+293
+00:15:04,297 --> 00:15:07,517
+since we want figures to behave in a
+polymorphic way,
+
+294
+00:15:07,534 --> 00:15:09,904
+pointers to figures,
+
+295
+00:15:09,906 --> 00:15:13,176
+and so imagine that I have another
+drawing
+
+296
+00:15:16,687 --> 00:15:18,637
+also with its collectio
+
+297
+00:15:19,815 --> 00:15:21,605
+of pointers to figures.
+
+298
+00:15:22,595 --> 00:15:23,740
+Suppose for example
+
+299
+00:15:23,740 --> 00:15:26,340
+that one of these objects is a circle
+
+300
+00:15:26,357 --> 00:15:30,012
+and that we decide to modify
+a property of this circle,
+
+301
+00:15:30,012 --> 00:15:33,362
+for example to color this
+circle red.
+
+302
+00:15:33,363 --> 00:15:34,517
+The question is,
+
+303
+00:15:34,517 --> 00:15:36,166
+if I color this circle red,
+
+304
+00:15:36,166 --> 00:15:39,466
+will it just be the circle of this
+drawing "d18"
+
+305
+00:15:39,468 --> 00:15:41,668
+that will be colored in red,
+
+306
+00:15:41,668 --> 00:15:44,505
+or will it also be circles for other
+drawings?
+
+307
+00:15:44,505 --> 00:15:46,395
+For example, is this circle
+shared
+
+308
+00:15:46,406 --> 00:15:50,137
+between drawings "d18" and "d4",
+
+309
+00:15:50,137 --> 00:15:53,657
+in which case, if I modify it through
+one drawing, it will be modified for all.
+
+310
+00:15:53,659 --> 00:15:56,719
+The answer to this sort of question
+depends of course
+
+311
+00:15:56,735 --> 00:15:59,965
+on the context in which you are designing
+your heterogeneous containers
+
+312
+00:15:59,967 --> 00:16:03,297
+It depends on the design of
+your heterogeneous containers
+
+313
+00:16:03,297 --> 00:16:05,532
+but I really think that in the
+case of drawings,
+
+314
+00:16:05,532 --> 00:16:08,652
+we don't want figures to be shared
+by several drawings
+
+315
+00:16:08,660 --> 00:16:11,580
+but we want each drawing to
+have its own figures.
+
+316
+00:16:11,595 --> 00:16:15,171
+A drawing has its circle, another
+drawing has another circle,
+
+317
+00:16:15,171 --> 00:16:16,709
+which are different.
+
+318
+00:16:16,709 --> 00:16:18,887
+In the case of the games we had taken
+as the first example,
+
+319
+00:16:18,887 --> 00:16:21,807
+I also think that contents should
+not be shared.
+
+320
+00:16:21,821 --> 00:16:23,214
+With whom would they be shared?
+
+321
+00:16:23,214 --> 00:16:25,583
+I think that in that case, we
+only have a single game
+
+322
+00:16:25,583 --> 00:16:28,553
+and we will avoid copying games.
+
+323
+00:16:28,820 --> 00:16:30,143
+So if you want an example
+
+324
+00:16:30,143 --> 00:16:33,913
+where we could imagine having collections
+that share their contents,
+
+325
+00:16:33,920 --> 00:16:36,850
+it could also be a game, but
+a little more complex,
+
+326
+00:16:36,860 --> 00:16:38,890
+where we would have different cameras
+
+327
+00:16:38,901 --> 00:16:42,471
+that could each see the players of the
+game under different angles,
+
+328
+00:16:42,481 --> 00:16:47,371
+and we could imagine that each
+camera has
+
+329
+00:16:47,371 --> 00:16:51,841
+a collection of characters that
+it can see,
+
+330
+00:16:51,858 --> 00:16:53,138
+like so.
+
+331
+00:16:53,165 --> 00:16:58,865
+So for example, camera 1 could see
+monster 1 and player 2,
+
+332
+00:16:58,889 --> 00:17:02,479
+and camera 2 could see
+both players.
+
+333
+00:17:02,500 --> 00:17:04,030
+And this would give us
+
+334
+00:17:04,039 --> 00:17:06,969
+the elements of the game
+
+335
+00:17:06,993 --> 00:17:10,113
+that are shared by
+different collections.
+
+336
+00:17:10,116 --> 00:17:12,736
+But this kind of design is
+much more advanced,
+
+337
+00:17:12,736 --> 00:17:14,406
+and possibly more rare.
+
+338
+00:17:14,443 --> 00:17:16,235
+In the examples we have given you,
+
+339
+00:17:16,235 --> 00:17:19,684
+we certainly did not want to share
+the contents of the collections
+
+340
+00:17:19,684 --> 00:17:21,454
+between different collections.
+
+341
+00:17:21,463 --> 00:17:23,233
+We would want each collection to have
+
+342
+00:17:23,240 --> 00:17:25,220
+its own characters, in the case
+of the game;
+
+343
+00:17:25,223 --> 00:17:27,223
+its own figures, in the case
+of the drawings.
+
+344
+00:17:27,576 --> 00:17:30,686
+So, we would have to guarantee,
+at the level of the program,
+
+345
+00:17:30,701 --> 00:17:33,181
+using methods and functions,
+
+346
+00:17:33,182 --> 00:17:35,182
+to guarantee that this is the case.
+
+347
+00:17:35,196 --> 00:17:37,905
+Or, use unique_ptrs
+
+348
+00:17:37,905 --> 00:17:42,665
+which prevent having several pointers
+to the same object.
+
+349
+00:17:43,609 --> 00:17:44,479
+To conclude,
+
+350
+00:17:44,549 --> 00:17:47,609
+we have recommended using
+unique pointers
+
+351
+00:17:47,635 --> 00:17:52,225
+to make it easier to guarantee
+data integrity.
+
+352
+00:17:52,247 --> 00:17:55,007
+In any case, be it with unique pointers 
+or C-style pointers,
+
+353
+00:17:55,030 --> 00:17:58,579
+you must think about the problem
+of the lifetime of the data
+
+354
+00:17:58,579 --> 00:17:59,949
+pointed to by these collections,
+
+355
+00:17:59,973 --> 00:18:02,233
+of the objects contained in
+these collections.
+
+356
+00:18:02,305 --> 00:18:04,225
+But in the case of unique pointers,
+
+357
+00:18:04,225 --> 00:18:06,935
+you don't have to worry about
+deallocation,
+
+358
+00:18:06,935 --> 00:18:10,525
+thanks to the smart pointer aspect
+of C++11 pointers,
+
+359
+00:18:10,525 --> 00:18:12,679
+or about sharing data between
+collections,
+
+360
+00:18:12,679 --> 00:18:15,279
+thanks to the unique aspect
+of unique pointers.
+
+361
+00:18:15,289 --> 00:18:18,539
+If you go for a C-style pointer
+implementation,
+
+362
+00:18:18,545 --> 00:18:21,675
+then you will need to thing about
+these problems,
+
+363
+00:18:21,689 --> 00:18:23,989
+and also solve them.

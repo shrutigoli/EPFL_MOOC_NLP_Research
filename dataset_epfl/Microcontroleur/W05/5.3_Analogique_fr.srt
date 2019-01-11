@@ -1,0 +1,959 @@
+1
+00:00:00,000 --> 00:00:05,456
+Bonjour, notre monde est
+
+2
+00:00:05,456 --> 00:00:12,030
+analogique mais les microcontrôleurs sont
+purement digitaux, comme on l'a vu.
+
+3
+00:00:12,030 --> 00:00:16,889
+Il nous faut donc des convertisseurs et
+c'est ce qu'on va étudier aujourd'hui,
+
+4
+00:00:16,889 --> 00:00:22,502
+les convertisseurs analogiques/digitaux
+qui existent dans la
+
+5
+00:00:22,502 --> 00:00:25,106
+plupart des microcontrôleurs et qui sont
+faciles
+
+6
+00:00:25,106 --> 00:00:30,775
+à mettre en oeuvre.
+Les convertisseurs digitaux/analogiques
+
+7
+00:00:30,775 --> 00:00:35,556
+et, avec Arduino, le digitalWrite sèment
+un petit peu la confusion et
+
+8
+00:00:35,556 --> 00:00:40,479
+on aura encore un petit peu de temps pour
+parler de la mémoire eeprom qui
+
+9
+00:00:40,479 --> 00:00:45,448
+existe dans tous les microcontrôleurs.
+Alors comment fonctionne un
+
+10
+00:00:45,448 --> 00:00:50,377
+convertisseur?
+C'est un circuit assez complexe
+
+11
+00:00:50,377 --> 00:00:56,300
+qui va, par itération, lire le signal ici
+entre
+
+12
+00:00:56,300 --> 00:01:02,020
+0 et 5V, et puis calculer les bits
+
+13
+00:01:02,020 --> 00:01:07,606
+typiquement en disant : est-ce que c'est
+supérieur à la moitié de
+
+14
+00:01:07,606 --> 00:01:13,150
+la tension, supérieur au quart de la
+tension, ce qui reste et cetera.
+
+15
+00:01:13,150 --> 00:01:15,460
+L'ordre Arduino AnalogRead
+
+16
+00:01:15,460 --> 00:01:21,740
+permet d'obtenir une valeur 10 bits en
+faisant travailler ce convertisseur.
+
+17
+00:01:21,740 --> 00:01:26,775
+Et ça nous intéresse d'avoir plusieurs
+entrées de conversion
+
+18
+00:01:26,775 --> 00:01:30,824
+et c'est avec un multiplexeur qu'on va
+sélectionner une
+
+19
+00:01:30,824 --> 00:01:33,673
+entrée, donc on pourra faire une mesure à
+la
+
+20
+00:01:33,673 --> 00:01:40,578
+fois, en sélectionnant ici An0, An1, An2
+et démarrer la
+
+21
+00:01:40,578 --> 00:01:45,830
+conversion, obtenir un flag disant que la
+conversion est terminée.
+
+22
+00:01:45,830 --> 00:01:49,900
+Alors, les convertisseurs usuels ont 10
+bits.
+
+23
+00:01:49,900 --> 00:01:54,586
+La précision, 10 bits c'est 1 pour
+
+24
+00:01:54,586 --> 00:02:00,232
+1000, elle dépend du câblage, on a
+facilement des parasites euh, des
+
+25
+00:02:00,232 --> 00:02:05,847
+influences de l'horloge du processeur sur
+les entrées des signaux analogiques.
+
+26
+00:02:05,847 --> 00:02:09,770
+Sur Arduino, on a 6 pins qui peuvent lire
+les valeurs.
+
+27
+00:02:09,770 --> 00:02:16,314
+Et puis, la mise en oeuvre est très facile
+puisqu'on va définir une valeurLue, on va
+
+28
+00:02:16,314 --> 00:02:20,700
+définir une valeurUtile puisqu'en général,
+c'est pas le
+
+29
+00:02:20,700 --> 00:02:23,970
+domaine de 0 à 1024 qui nous intéresse.
+
+30
+00:02:23,970 --> 00:02:28,070
+Dans ces valeurs analogiques, il y a un
+domaine plus étroit.
+
+31
+00:02:28,070 --> 00:02:30,886
+La valeurLue et ben c'est
+
+32
+00:02:30,886 --> 00:02:37,260
+analogRead du canal An0.
+Il n'y a rien à initialiser.
+
+33
+00:02:37,260 --> 00:02:43,036
+Dans cette procédure analogRead, il
+
+34
+00:02:43,036 --> 00:02:48,888
+va déjà y avoir le setup pour modifier la
+pin d'entrée en entrée
+
+35
+00:02:48,888 --> 00:02:55,110
+analogique, il faut bouger des aiguillages
+à l'intérieur du processeur naturellement.
+
+36
+00:02:55,110 --> 00:02:56,254
+Donc on déclare
+
+37
+00:02:56,254 --> 00:03:00,350
+une valeurLue par le convertisseur, une
+valeurUtile
+
+38
+00:03:00,350 --> 00:03:04,142
+qui nécessitera en général une petite
+transformation.
+
+39
+00:03:04,142 --> 00:03:08,915
+La valeurLue, et bien, c'est la valeur
+analogique, 10
+
+40
+00:03:08,915 --> 00:03:13,450
+bits, et la valeurUtile, je peux l'obtenir
+avec cette
+
+41
+00:03:13,450 --> 00:03:17,451
+fameuse fonction map, que l'on avait vue,
+en disant
+
+42
+00:03:17,451 --> 00:03:21,975
+ben c'est la valeurLue mais transformée en
+disant l'espace
+
+43
+00:03:21,975 --> 00:03:28,730
+de minA à maxA, valeur analogique, et
+convertie dans une
+
+44
+00:03:28,730 --> 00:03:35,050
+fourchette minV à maxV, valeurUtile.
+
+45
+00:03:35,050 --> 00:03:40,200
+Il y a des choses un petit peu compliquées
+que l'on ignore en général.
+
+46
+00:03:40,200 --> 00:03:42,810
+Vous avez une tension de référence à
+
+47
+00:03:42,810 --> 00:03:48,200
+l'intérieur du convertisseur qui, en
+général, est l'alimentation
+
+48
+00:03:48,200 --> 00:03:53,482
+mais on peut modifier, par programmation,
+cette tension de référence
+
+49
+00:03:53,482 --> 00:03:58,080
+pour avoir une valeur interne ou pour
+avoir une valeur
+
+50
+00:03:58,080 --> 00:04:03,100
+externe sur une broche qui a été préparée
+par le microcontrôleur.
+
+51
+00:04:03,100 --> 00:04:08,528
+Dans les processeurs de très bas de gamme,
+
+52
+00:04:08,528 --> 00:04:13,465
+très bon marché, le convertisseur
+analogique-numérique prend trop
+
+53
+00:04:13,465 --> 00:04:16,800
+de place et on le remplace par par un
+comparateur.
+
+54
+00:04:16,800 --> 00:04:21,729
+Quand on a besoin de, d'évaluer des
+signaux digitaux, le comparateur, vous
+
+55
+00:04:21,729 --> 00:04:26,741
+pourrez le régler pour, par exemple,
+repérer un signal de supérieur à
+
+56
+00:04:26,741 --> 00:04:32,160
+2,3V et ça n'offre pas autant de
+possibilités
+
+57
+00:04:32,160 --> 00:04:37,090
+que le convertisseur analogique complet
+naturellement.
+
+58
+00:04:37,090 --> 00:04:38,764
+Dans l'autre sens,
+
+59
+00:04:38,764 --> 00:04:43,880
+si on veut aller du digital à
+l'analogique, vous avez la
+
+60
+00:04:43,880 --> 00:04:49,150
+solution Arduino, qui vous dit
+analogWrite,
+
+61
+00:04:49,150 --> 00:04:54,198
+numéro de pin, et puis la valeur du byte
+qui va être
+
+62
+00:04:54,198 --> 00:04:59,090
+convertie en valeur dite analogique.
+Ce n'est en
+
+63
+00:04:59,090 --> 00:05:03,871
+fait pas du tout un convertisseur
+digital-analogique qui est,
+
+64
+00:05:03,871 --> 00:05:08,025
+ça n'envoie pas une valeur analogique sur
+la pin.
+
+65
+00:05:08,025 --> 00:05:11,770
+Ça envoie les impulsions, on retrouvera
+
+66
+00:05:11,770 --> 00:05:15,421
+ce PWM.
+Mais si vous voulez avoir un signal
+
+67
+00:05:15,421 --> 00:05:22,426
+analogique qui est 80% de 5V, donc 4V, et
+bien,
+
+68
+00:05:22,426 --> 00:05:29,258
+vous envoyez des impulsions à une
+fréquence de 1kH par exemple, où vous
+
+69
+00:05:29,258 --> 00:05:34,490
+avez 80% l'état 1, 20% l'état 0
+
+70
+00:05:34,490 --> 00:05:39,383
+et il y a une moyenne de l'énergie
+transmise qui
+
+71
+00:05:39,383 --> 00:05:44,980
+correspond effectivement à une
+alimentation de 4V.
+
+72
+00:05:44,980 --> 00:05:49,727
+Donc, pour obtenir vraiment un signal
+analogique, et
+
+73
+00:05:49,727 --> 00:05:54,503
+bien ce signal PWM, on peut le filtrer en
+utilisant
+
+74
+00:05:54,503 --> 00:05:58,771
+une résistance, un condensateur, c'est
+quelque chose
+
+75
+00:05:58,771 --> 00:05:59,863
+qu'on ne vous a pas expliqué au
+
+76
+00:05:59,863 --> 00:06:00,997
+début du cours parce que je crois
+
+77
+00:06:00,997 --> 00:06:03,640
+que c'est plus clair maintenant de
+comprendre l'effet.
+
+78
+00:06:03,640 --> 00:06:09,400
+Chaque fois que vous avez du 5V ici et
+bien, vous allez charger
+
+79
+00:06:09,400 --> 00:06:14,992
+le condensateur, chaque fois que vous avez
+du 0V, vous allez
+
+80
+00:06:14,992 --> 00:06:20,840
+décharger le condensateur et vous allez
+obtenir
+
+81
+00:06:20,840 --> 00:06:27,913
+un moyennage grâce au condensateur qui va
+se faire autour de 4V.
+
+82
+00:06:27,913 --> 00:06:31,740
+Dans la montée, c'est avec 1V de
+différence
+
+83
+00:06:31,740 --> 00:06:34,528
+un peu près, que l'on charge le
+condensateur.
+
+84
+00:06:34,528 --> 00:06:37,670
+Ici, ça descend plus rapidement puisque
+c'est avec
+
+85
+00:06:37,670 --> 00:06:42,390
+4V de différence que l'on décharge le
+condensateur.
+
+86
+00:06:42,390 --> 00:06:46,440
+Alors, ce schéma a une certaine constante
+de temps,
+
+87
+00:06:46,440 --> 00:06:51,396
+si la résistance augmente, et bien, ça va
+mettre plus de temps pour charger
+
+88
+00:06:51,396 --> 00:06:53,853
+le condensateur, si le condensateur est
+plus
+
+89
+00:06:53,853 --> 00:06:56,105
+grand, ça va aussi mettre plus de temps.
+
+90
+00:06:56,105 --> 00:06:59,075
+Donc on a un, une constante de temps qui
+
+91
+00:06:59,075 --> 00:07:02,830
+est le produit de la résistance par la
+capacité.
+
+92
+00:07:02,830 --> 00:07:07,220
+Si on met 10 kohms et 100 microF et
+
+93
+00:07:07,220 --> 00:07:12,260
+bien ça veut dire que le condensateur va
+se charger
+
+94
+00:07:12,260 --> 00:07:17,716
+complètement à partir d'une impulsion
+positive dans environ une
+
+95
+00:07:17,716 --> 00:07:20,870
+seconde, je ne vous donne pas la formule
+exacte.
+
+96
+00:07:20,870 --> 00:07:26,310
+Alors, une seconde, ça veut dire que,
+effectivement, on va bien attenuer les
+
+97
+00:07:26,310 --> 00:07:31,959
+variations mais par contre, si tout à
+coup, vous avez un changement de PWM,
+
+98
+00:07:31,959 --> 00:07:37,770
+et bien, ça va mettre euh, une demi
+seconde pour descendre
+
+99
+00:07:37,770 --> 00:07:40,470
+au niveau de 2V, par exemple.
+
+100
+00:07:40,470 --> 00:07:46,846
+Alors, du point de vue de programmation,
+si vous voulez, ça peut être très
+
+101
+00:07:46,846 --> 00:07:52,488
+simple puisqu'on a beaucoup d'éléments qui
+intègrent, qui n'ont pas besoin
+
+102
+00:07:52,488 --> 00:07:54,728
+d'une tension continue, vous voulez
+allumer
+
+103
+00:07:54,728 --> 00:07:56,988
+une LED d'une façon proportionnelle, vous
+
+104
+00:07:56,988 --> 00:08:02,960
+voulez faire tourner un moteur, et bien
+vous voyez ces impulsions et c'est
+
+105
+00:08:02,960 --> 00:08:08,020
+l'inertie du moteur ou la persistance
+rétinienne qui va jouer
+
+106
+00:08:08,020 --> 00:08:12,410
+le rôle de ce filtre de la résistance et
+du condensateur.
+
+107
+00:08:12,410 --> 00:08:17,238
+Alors, si vous voulez faire varier une LED
+comme c'est un petit peu le gadget que
+
+108
+00:08:17,238 --> 00:08:22,105
+l'on voit sur beaucoup de de petites
+machines, la lampe ne
+
+109
+00:08:22,105 --> 00:08:27,674
+s'allume pas en tout ou rien mais elle
+augmente son intensité,
+
+110
+00:08:27,674 --> 00:08:33,085
+diminue son intensité, et bien, après
+avoir défini quelle LED vous
+
+111
+00:08:33,085 --> 00:08:38,242
+vouliez et d'avoir choisi une pin sur
+lequel vous avez ce PWM,
+
+112
+00:08:38,242 --> 00:08:43,590
+sur lequel vous avez cette instruction
+analogWrite qui peut agir, donc ce
+
+113
+00:08:43,590 --> 00:08:48,035
+sera, par exemple, sur la pin 3, que l'on
+a en sortie.
+
+114
+00:08:48,035 --> 00:08:52,760
+Maintenant ben, je peux écrire une petite
+boucle for
+
+115
+00:08:52,760 --> 00:08:57,710
+qui va augmenter la valeur du PWM
+
+116
+00:08:57,710 --> 00:09:02,918
+toutes les 10 ms, et bien, on augmente
+
+117
+00:09:02,918 --> 00:09:07,890
+de 1, donc en 2,5 secondes, on va passer
+de l'intensité
+
+118
+00:09:07,890 --> 00:09:12,788
+nulle à l'intensité maximum et ensuite on
+peut refaire la
+
+119
+00:09:12,788 --> 00:09:17,860
+même boucle en décrémantant pour éteindre
+la LED.
+
+120
+00:09:17,860 --> 00:09:22,980
+Donc vous voyez quels sont les paramètres
+que l'on peut modifier.
+
+121
+00:09:22,980 --> 00:09:28,210
+Le schéma interne d'un convertisseur
+
+122
+00:09:28,210 --> 00:09:33,484
+digital-analogique se fait avec des
+résistances, vous trouvez
+
+123
+00:09:33,484 --> 00:09:38,330
+les références sur internet naturellement.
+Ce schéma peut
+
+124
+00:09:38,330 --> 00:09:42,907
+nous intéresser dans des cas pour, par
+exemple,
+
+125
+00:09:42,907 --> 00:09:46,872
+brancher plusieurs interrupteurs sur une
+seule entrée plutôt
+
+126
+00:09:46,872 --> 00:09:51,460
+que d'avoir plusieurs interrupteurs qui
+utilisent plusieurs entrées.
+
+127
+00:09:51,460 --> 00:09:55,730
+Ces convertisseurs n'existent pas dans les
+microprocesseurs,
+
+128
+00:09:55,730 --> 00:10:00,000
+je n'en connais qu'un seul pour le moment.
+
+129
+00:10:00,000 --> 00:10:04,697
+peut-être que ça viendra à l’avenir, c’est
+un circuit moins utile,
+
+130
+00:10:04,697 --> 00:10:07,958
+du point de vue programmation puisqu’on a
+vu qu’avec le «
+
+131
+00:10:07,958 --> 00:10:12,390
+digital right » on peut programmer quelque
+chose qui est tout à fait satisfaisant.
+
+132
+00:10:12,390 --> 00:10:17,192
+Si vous avez vraiment besoin d’un
+convertisseur digital
+
+133
+00:10:17,192 --> 00:10:22,603
+analogue « converter », il existe des
+petits circuits qui
+
+134
+00:10:22,603 --> 00:10:27,690
+vous génèrent deux canaux, par exemple, un
+rentrant
+
+135
+00:10:27,690 --> 00:10:33,300
+l’information en série, on reparlera de
+cette norme SPI.
+
+136
+00:10:33,300 --> 00:10:38,084
+Bien disons encore deux mots de
+
+137
+00:10:38,084 --> 00:10:43,112
+la mémoire EEPROM que vous avez à
+l’intérieur de
+
+138
+00:10:43,112 --> 00:10:48,190
+tous les processeurs, même les processeurs
+assez petits ont une
+
+139
+00:10:48,190 --> 00:10:53,570
+mémoire EEPROM qui ressemble à la mémoire
+FLASH
+
+140
+00:10:53,570 --> 00:10:58,520
+dans laquelle se trouve votre programme,
+mais qui est un
+
+141
+00:10:58,520 --> 00:11:03,720
+peu plus fiable en durée et beaucoup plus
+lente à
+
+142
+00:11:03,720 --> 00:11:09,320
+l’écriture.
+Donc on trouve dans les processeurs
+
+143
+00:11:09,320 --> 00:11:14,260
+64 « bytes » voire 2 kilos « bytes » de
+cette mémoire
+
+144
+00:11:14,260 --> 00:11:19,090
+effaçable électriquement.
+La durée de mémorisation
+
+145
+00:11:19,090 --> 00:11:23,845
+de l’information est d’une dizaine d’année
+en tout cas.
+
+146
+00:11:23,845 --> 00:11:29,204
+Le cycle d’écriture est très lent, 3 à 10
+millisecondes, hein, par rapport à
+
+147
+00:11:29,204 --> 00:11:34,630
+un cinquième de microseconde pour les,
+pour une écriture en mémoire vive.
+
+148
+00:11:34,630 --> 00:11:39,508
+Le nombre de cycles est limité, 100.000 à
+1 million.
+
+149
+00:11:39,508 --> 00:11:42,090
+Vous direz mais c’est beaucoup.
+
+150
+00:11:42,090 --> 00:11:46,565
+Si vous faites une erreur de
+programmation, et puisque
+
+151
+00:11:46,565 --> 00:11:49,217
+vous vous trouvez dans un cycle et vous
+écrivez
+
+152
+00:11:49,217 --> 00:11:54,892
+toujours sur la même mémoire, parce que
+vous avez oublié d’incrémenter
+
+153
+00:11:54,892 --> 00:11:59,558
+un compteur, et bien, en quelques minutes,
+vous aurez
+
+154
+00:11:59,558 --> 00:12:04,367
+exécuté les 100.000 cycles qui font que
+votre position
+
+155
+00:12:04,367 --> 00:12:09,078
+mémoire aura perdu sa fiabilité.
+Alors la lecture est
+
+156
+00:12:09,078 --> 00:12:14,416
+normalement rapide.
+Le principe de fonctionnement
+
+157
+00:12:14,416 --> 00:12:19,367
+c’est un condensateur et ce condensateur
+est
+
+158
+00:12:19,367 --> 00:12:24,840
+isolé.
+On arrive avec des tensions supérieures
+
+159
+00:12:24,840 --> 00:12:29,821
+à faire migrer des électrons pour charger
+ce condensateur ou pour le
+
+160
+00:12:29,821 --> 00:12:35,090
+décharger, donc c’est pour ça que le
+processus est relativement lent.
+
+161
+00:12:35,090 --> 00:12:40,050
+Et puis le condensateur, ben, même s’il y
+a une résistance extrêmement
+
+162
+00:12:40,050 --> 00:12:43,200
+élevée, ici, qui le court-circuite, et
+bien il
+
+163
+00:12:43,200 --> 00:12:46,720
+va se décharger quand même en quelques
+dizaines d’années.
+
+164
+00:12:46,720 --> 00:12:52,370
+Alors c’est très facile d’utiliser cette
+mémoire morte, même du point de
+
+165
+00:12:52,370 --> 00:12:57,886
+vue interne du microprocesseur, il y a
+quelques instructions à respecter.
+
+166
+00:12:57,886 --> 00:13:00,806
+Mais avec « Arduino » par exemple, ben,
+vous
+
+167
+00:13:00,806 --> 00:13:05,129
+pouvez charger une librairie qui s’appelle
+EEPROM point h,
+
+168
+00:13:05,129 --> 00:13:08,717
+que vous trouverez sans devoir installer
+quoi
+
+169
+00:13:08,717 --> 00:13:12,560
+que ce soit.
+Et ensuite, vous pourrez écrire «
+
+170
+00:13:12,560 --> 00:13:19,677
+EEPROM.write » à une certaine adresse de
+l’EEPROM, vous mettez une certaine valeur.
+
+171
+00:13:19,677 --> 00:13:25,560
+Et puis vous pouvez relire le contenu de
+cette adresse
+
+172
+00:13:25,560 --> 00:13:31,410
+avec un « EEPROM.read ».
+Alors ces adresses,
+
+173
+00:13:31,410 --> 00:13:37,326
+c’est à vous de les gérer, vous savez que
+ça va de 0 à 1000, 2000 et vous devrez
+
+174
+00:13:37,326 --> 00:13:43,280
+gérer votre petit espace mémoire pour
+savoir où vous avez mis l’information.
+
+175
+00:13:43,280 --> 00:13:50,170
+Donc ce n’est pas comme avec les
+variables, où le compilateur se préoccupe
+
+176
+00:13:50,170 --> 00:13:52,975
+de gérer le plus efficacement possible
+
+177
+00:13:52,975 --> 00:13:58,030
+les variables locales et les variables
+globales.
+
+178
+00:13:58,030 --> 00:14:01,656
+Alors, il y a beaucoup d’applications pour
+ces EEPROM.
+
+179
+00:14:01,656 --> 00:14:08,960
+Ben, typiquement vous fait des mesures
+météo, vous allez stocker dans une mémoire
+
+180
+00:14:08,960 --> 00:14:13,852
+EEPROM et si vous devez faire des mesures
+toutes les heures, ben naturellement que
+
+181
+00:14:13,852 --> 00:14:18,403
+vous allez endormir votre processeur et le
+réveiller, donc quand il est endormi
+
+182
+00:14:18,403 --> 00:14:20,919
+il consomme extrêmement peu de courant, et
+
+183
+00:14:20,919 --> 00:14:24,004
+vous le réveillerez pour la mesure
+suivante.
+
+184
+00:14:24,004 --> 00:14:28,014
+Et ensuite quand vous passez dans le mode
+de lecture, ben vous
+
+185
+00:14:28,014 --> 00:14:31,850
+lirez toutes les données qui ont été
+accumulées pendant plusieurs semaines.
+
+186
+00:14:31,850 --> 00:14:38,050
+On l’utilise aussi, la mémoire EEPROM,
+pour mémoriser des paramètres
+
+187
+00:14:38,050 --> 00:14:43,065
+qui ont été modifiés pendant l’exécution
+du programme mais que vous voudriez
+
+188
+00:14:43,065 --> 00:14:49,232
+retrouver comme paramètres de démarrage
+quand vous
+
+189
+00:14:49,232 --> 00:14:57,320
+relancez le programme après une coupure de
+courant ou une interruption d’activité.
+
+190
+00:14:57,320 --> 00:14:58,510
+Donc on vient de voir
+
+191
+00:14:58,510 --> 00:15:01,838
+que les convertisseurs analogique-digitaux
+existent
+
+192
+00:15:01,838 --> 00:15:05,030
+dans les microcontrôleurs et sont faciles
+à mettre en œuvre.
+
+193
+00:15:05,030 --> 00:15:10,962
+Les convertisseurs digitaux-analogiques
+sont plus délicats et nécessitent de
+
+194
+00:15:10,962 --> 00:15:14,346
+bien comprendre ce que l’on fait, si on
+n’utilise pas
+
+195
+00:15:14,346 --> 00:15:19,056
+des circuits extérieurs qui vont générer
+un signal analogique
+
+196
+00:15:19,056 --> 00:15:23,570
+parfaitement stable.
+Et on a également vu que la mémoire
+
+197
+00:15:23,570 --> 00:15:30,070
+EEPROM, à l’intérieur des
+microcontrôleurs, est facile à utiliser
+
+198
+00:15:30,070 --> 00:15:35,680
+et très souvent utile dans des
+applications.

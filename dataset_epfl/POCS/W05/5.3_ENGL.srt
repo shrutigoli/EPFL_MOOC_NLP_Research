@@ -1,0 +1,1185 @@
+1
+00:00:04,600 --> 00:00:07,467
+Optimistic concurrency control
+is a technique for ensuring
+
+2
+00:00:07,467 --> 00:00:10,020
+the serializability of
+concurrent transactions.
+
+3
+00:00:10,020 --> 00:00:14,061
+In that sense, it's an alternative
+to lock-based concurrency control.
+
+4
+00:00:14,573 --> 00:00:19,736
+Optimistic concurrency control
+basically assumes that you can be lucky,
+
+5
+00:00:19,736 --> 00:00:21,912
+and nothing is to be done to make sure
+
+6
+00:00:21,912 --> 00:00:24,918
+that consistency is maintained
+in the face of concurrency.
+
+7
+00:00:25,053 --> 00:00:26,775
+That usually works well,
+
+8
+00:00:26,775 --> 00:00:29,824
+when there's relatively little overlap
+between the object request
+
+9
+00:00:29,824 --> 00:00:32,713
+that's used and changed
+by different transactions.
+
+10
+00:00:33,686 --> 00:00:35,249
+It also tends to work better
+
+11
+00:00:35,249 --> 00:00:38,292
+if there is relatively little work
+to be done in transactions.
+
+12
+00:00:38,292 --> 00:00:40,737
+In that sense, it is
+more popular, and useful
+
+13
+00:00:40,737 --> 00:00:42,932
+in the context of, for example,
+transaction memory,
+
+14
+00:00:42,932 --> 00:00:46,646
+than it is in scenarios where
+major, large, bulk changes
+
+15
+00:00:46,646 --> 00:00:49,074
+are to be made,
+on large amounts of data,
+
+16
+00:00:49,074 --> 00:00:51,311
+as is often the case in database systems.
+
+17
+00:00:51,842 --> 00:00:54,819
+Locking, as we've discussed,
+is a conservative approach
+
+18
+00:00:55,378 --> 00:00:59,596
+to ensuring serializability in which
+conflicts are prevented a priori.
+
+19
+00:00:59,596 --> 00:01:02,547
+They cannot arise because
+locking ensures they don't arise.
+
+20
+00:01:03,234 --> 00:01:05,022
+The disadvantages of this are that,
+
+21
+00:01:05,022 --> 00:01:08,137
+a) There isn't a overhead lock management.
+
+22
+00:01:08,137 --> 00:01:09,997
+We need data structures,
+we need machinery,
+
+23
+00:01:09,997 --> 00:01:11,711
+inside our system.
+
+24
+00:01:12,159 --> 00:01:16,142
+There are potentially deadlocks,
+which we have to deal with,
+
+25
+00:01:16,142 --> 00:01:17,337
+or we have to avoid them,
+
+26
+00:01:17,337 --> 00:01:19,139
+which needs more infrastructure.
+
+27
+00:01:19,139 --> 00:01:22,379
+And, lock contention
+can become a big issue
+
+28
+00:01:22,379 --> 00:01:25,130
+if there are some objects
+which are heavily under demand,
+
+29
+00:01:25,130 --> 00:01:27,895
+and each transaction
+wants them, so to say,
+
+30
+00:01:27,895 --> 00:01:31,150
+and then concurrency
+really deteriorates greatly.
+
+31
+00:01:31,938 --> 00:01:34,647
+However, if conflicts are rare,
+
+32
+00:01:35,387 --> 00:01:37,160
+then we could basically, by default,
+
+33
+00:01:37,160 --> 00:01:38,886
+assume that no conflict arises.
+
+34
+00:01:38,886 --> 00:01:40,869
+We act as if no conflict arises,
+
+35
+00:01:40,869 --> 00:01:43,354
+complete our transactions,
+and then, just at the end,
+
+36
+00:01:43,354 --> 00:01:45,669
+check that everything goes fine,
+when we commit.
+
+37
+00:01:45,669 --> 00:01:48,596
+That's the basic idea
+of optimistic concurrency control.
+
+38
+00:01:48,931 --> 00:01:51,419
+We act as if no conflicts can arise,
+
+39
+00:01:51,419 --> 00:01:52,521
+we do our work,
+
+40
+00:01:52,521 --> 00:01:56,039
+we record it in, so to say,
+a temporary copy of the database,
+
+41
+00:01:56,039 --> 00:01:57,955
+then we check,
+when we want to commit,
+
+42
+00:01:57,955 --> 00:01:59,646
+and only if you want to commit.
+
+43
+00:01:59,646 --> 00:02:03,291
+If you decide to abort, you can just
+throw away the copy of the database,
+
+44
+00:02:03,291 --> 00:02:06,109
+and don't even have to think about
+
+45
+00:02:06,109 --> 00:02:09,048
+whether there was any
+concurrent control issue.
+
+46
+00:02:09,048 --> 00:02:12,046
+If you want to commit, we have
+to check that everything went fine,
+
+47
+00:02:12,046 --> 00:02:13,476
+and then we can commit.
+
+48
+00:02:13,476 --> 00:02:15,605
+Of course, in practice we have to avoid
+
+49
+00:02:15,605 --> 00:02:19,268
+naively copying a big piece
+of the database, and doing it smarter,
+
+50
+00:02:19,268 --> 00:02:22,273
+but conceptually the idea is
+that optimistic concurrency control
+
+51
+00:02:22,273 --> 00:02:24,811
+works on a copy of the database.
+
+52
+00:02:26,259 --> 00:02:30,408
+So the basic classical paper
+on optimistic concurrency control
+
+53
+00:02:30,408 --> 00:02:34,058
+was by Kung and Robinson,
+and thus this model is called that way.
+
+54
+00:02:34,300 --> 00:02:38,498
+So the idea there is that each transaction
+is executed in three phases.
+
+55
+00:02:38,498 --> 00:02:40,843
+The first phase is
+the so-called <i>Read phase.</i>
+
+56
+00:02:41,332 --> 00:02:46,109
+This phase actually performs the reads
+and the writes of the transaction,
+
+57
+00:02:46,109 --> 00:02:49,476
+but it works on a copy of the database.
+
+58
+00:02:49,476 --> 00:02:52,897
+That means when you start transaction
+we create a snapshot,
+
+59
+00:02:52,897 --> 00:02:55,931
+we work, reading and writing
+on that database,
+
+60
+00:02:56,682 --> 00:02:59,970
+and only then, when somebody
+says, "and now, please commit,"
+
+61
+00:02:59,970 --> 00:03:03,209
+we start validating our changes,
+
+62
+00:03:03,209 --> 00:03:05,952
+which validating this transaction
+can indeed commit
+
+63
+00:03:05,952 --> 00:03:08,525
+with respect to other
+transactions in the schedule.
+
+64
+00:03:08,525 --> 00:03:11,423
+And only then,
+if we decide everything is fine,
+
+65
+00:03:11,423 --> 00:03:12,774
+nothing bad had happened,
+
+66
+00:03:12,774 --> 00:03:14,525
+we can actually do a write
+
+67
+00:03:14,525 --> 00:03:16,903
+of all the changes
+we've done to the database,
+
+68
+00:03:16,903 --> 00:03:18,778
+to the global copy of the database.
+
+69
+00:03:19,036 --> 00:03:22,053
+Of course other snapshots
+that have been great
+
+70
+00:03:22,053 --> 00:03:25,031
+optimistic concurrency control
+for other transactions,
+
+71
+00:03:25,031 --> 00:03:28,940
+they would still start from
+that old version of the database,
+
+72
+00:03:28,940 --> 00:03:31,570
+so we have to make sure,
+in our protocol,
+
+73
+00:03:31,570 --> 00:03:33,005
+in validation, in particular,
+
+74
+00:03:33,005 --> 00:03:35,284
+that nothing bad arises from this fact.
+
+75
+00:03:37,841 --> 00:03:40,026
+So, how do we perform validation?
+
+76
+00:03:40,608 --> 00:03:43,780
+We are going to do this
+by making three tests,
+
+77
+00:03:43,780 --> 00:03:45,483
+and these tests are going to be sufficient
+
+78
+00:03:45,483 --> 00:03:47,735
+to ensure that no conflict occurred,
+
+79
+00:03:47,735 --> 00:03:50,018
+and that serializability is guaranteed.
+
+80
+00:03:50,701 --> 00:03:54,290
+To do this, we assign
+each transaction a numerical ID,
+
+81
+00:03:54,290 --> 00:03:56,538
+a timestamp,
+meaning a logical timestamp,
+
+82
+00:03:56,538 --> 00:03:58,347
+the order in which
+the transaction was started
+
+83
+00:03:58,347 --> 00:04:00,691
+in the whole history
+of transactions in this system.
+
+84
+00:04:01,244 --> 00:04:04,497
+The transaction ID's are assigned
+at the end of the read phase, actually,
+
+85
+00:04:04,497 --> 00:04:06,716
+just before the validation begins.
+
+86
+00:04:08,190 --> 00:04:10,266
+We're going to talk about the notion
+
+87
+00:04:10,266 --> 00:04:12,073
+of <i>ReadSet</i> and <i>WriteSet</i>
+of a transaction,
+
+88
+00:04:12,073 --> 00:04:16,078
+which is just the objects that are read
+or written by the transaction.
+
+89
+00:04:18,790 --> 00:04:21,061
+So the first of these
+three tests is as follows--
+
+90
+00:04:21,061 --> 00:04:23,010
+it's the most conservative test,
+
+91
+00:04:23,010 --> 00:04:24,877
+and it's also easy to check, basically.
+
+92
+00:04:25,163 --> 00:04:28,032
+So here you see
+two transactions, Ti and Tj.
+
+93
+00:04:28,032 --> 00:04:30,268
+Transaction Ti started before Tj.
+
+94
+00:04:30,268 --> 00:04:32,461
+In this case it has a lower timestamp.
+
+95
+00:04:33,885 --> 00:04:36,311
+Each of those two transactions
+have three phases:
+
+96
+00:04:36,311 --> 00:04:38,296
+the Read, the Validation,
+and the Write phase.
+
+97
+00:04:38,296 --> 00:04:43,516
+Now let's assume that Ti
+completely finishes before Tj begins.
+
+98
+00:04:44,400 --> 00:04:48,275
+Well, in a sense, we don't really
+actually have to refer to this transaction
+
+99
+00:04:48,275 --> 00:04:54,460
+in validation if it has completely
+finalized before Tj begins,
+
+100
+00:04:54,460 --> 00:05:01,839
+because in a sense the start state
+of Tj is the final state of Ti,
+
+101
+00:05:01,839 --> 00:05:03,851
+and there's no overlap.
+
+102
+00:05:04,574 --> 00:05:08,227
+The second test is--well, we can
+actually deal with some overlap--
+
+103
+00:05:08,227 --> 00:05:11,634
+so Tj starts before Ti
+completely finishes,
+
+104
+00:05:11,634 --> 00:05:17,595
+but we know that Ti has completed
+before the Write phase of Tj begins.
+
+105
+00:05:18,775 --> 00:05:21,826
+In that case what we have to do
+is we have to ensure
+
+106
+00:05:21,826 --> 00:05:24,119
+that the WriteSet of the first transaction
+
+107
+00:05:24,119 --> 00:05:26,944
+does not intersect
+with the ReadSet of the second.
+
+108
+00:05:26,944 --> 00:05:29,571
+That means what Tj does
+
+109
+00:05:29,861 --> 00:05:31,454
+does not overlap,
+
+110
+00:05:31,799 --> 00:05:34,149
+does not depend on what Ti did.
+
+111
+00:05:34,576 --> 00:05:36,735
+That means you're going to write,
+
+112
+00:05:36,735 --> 00:05:40,348
+and you're going to potentially overwrite
+values that have been written by Ti,
+
+113
+00:05:41,002 --> 00:05:43,408
+but it doesn't hurt,
+because how we overwrite them
+
+114
+00:05:43,408 --> 00:05:45,272
+does not depend on what Ti did,
+
+115
+00:05:45,272 --> 00:05:48,750
+and since the end of Write phase of Tj
+
+116
+00:05:48,750 --> 00:05:51,627
+is completely after Ti,
+
+117
+00:05:51,627 --> 00:05:55,648
+we are ensured that we're not going
+to have any overlaps between writes.
+
+118
+00:05:55,648 --> 00:05:57,602
+So the last write,
+the winner so to say,
+
+119
+00:05:57,602 --> 00:06:00,836
+is going to be the second transaction,
+it's going to get to overwrite everything.
+
+120
+00:06:00,836 --> 00:06:05,972
+And conceptually this means that we have
+serialized Ti completely before Tj.
+
+121
+00:06:08,109 --> 00:06:11,095
+And the first check,
+is the most powerful check, so to say,
+
+122
+00:06:11,095 --> 00:06:12,909
+the least conservative.
+
+123
+00:06:13,242 --> 00:06:17,013
+We're allowed to do this even if
+the only condition that must hold
+
+124
+00:06:17,013 --> 00:06:20,034
+is that Ti completes
+its Read phase before Tj does,
+
+125
+00:06:20,034 --> 00:06:23,076
+that basically is some protection of two
+
+126
+00:06:23,076 --> 00:06:25,835
+always completes this phase
+before the other.
+
+127
+00:06:26,381 --> 00:06:28,591
+So let's just assume Ti is this one.
+
+128
+00:06:28,591 --> 00:06:31,390
+So Ti completes
+its Read phase before Tj does,
+
+129
+00:06:31,390 --> 00:06:34,480
+and now they have
+overlapping validation phases.
+
+130
+00:06:34,784 --> 00:06:37,909
+And what we're going to require
+is that the second transaction,
+
+131
+00:06:37,909 --> 00:06:39,745
+the one with the younger timestamp,
+
+132
+00:06:39,745 --> 00:06:45,225
+which is assigned at the end
+of the Read phase, if you remember, Tj.
+
+133
+00:06:45,225 --> 00:06:48,601
+It will have to check that
+the WriteSet of Ti
+
+134
+00:06:48,601 --> 00:06:50,507
+does not intersect with its ReadSet,
+
+135
+00:06:50,507 --> 00:06:53,536
+and the two WriteSets of Ti
+actually don't intersect.
+
+136
+00:06:54,350 --> 00:06:58,168
+In that case, well, nothing
+that Tj does depends on Ti,
+
+137
+00:06:58,695 --> 00:07:01,557
+and again, we allow to commit Ti.
+
+138
+00:07:03,136 --> 00:07:04,403
+There are no dirty reads,
+
+139
+00:07:04,403 --> 00:07:08,207
+and Ti cannot overwrite
+any things that Tj does,
+
+140
+00:07:08,207 --> 00:07:11,340
+because there's no overlap
+of writes in the WriteSets.
+
+141
+00:07:12,511 --> 00:07:15,610
+So because there is
+no overlap in the WriteSets,
+
+142
+00:07:16,382 --> 00:07:19,524
+we are guaranteed
+that we don't have to require
+
+143
+00:07:19,524 --> 00:07:21,980
+that the Write phase
+is a distinct [inaudible],
+
+144
+00:07:21,980 --> 00:07:24,326
+as was the case in the second test.
+
+145
+00:07:25,400 --> 00:07:27,252
+Now let's do an example.
+
+146
+00:07:27,532 --> 00:07:29,129
+We have seen this example before.
+
+147
+00:07:29,129 --> 00:07:31,704
+The overlap looked different,
+because right now, conceptually,
+
+148
+00:07:31,704 --> 00:07:33,538
+we cannot talk about schedules anymore,
+
+149
+00:07:33,538 --> 00:07:36,282
+that strictly one happens
+before the other,
+
+150
+00:07:36,282 --> 00:07:40,076
+but in a sense, a priori,
+things start at the same time,
+
+151
+00:07:40,076 --> 00:07:42,360
+there is real overlap and true concurrency
+
+152
+00:07:42,360 --> 00:07:45,917
+of individual atomic actions
+inside two transactions as well.
+
+153
+00:07:46,217 --> 00:07:49,794
+So we have got Ti, and T1 and T2,
+and T1 starts before T2.
+
+154
+00:07:50,650 --> 00:07:53,056
+T1 reads and writes A and B,
+
+155
+00:07:53,056 --> 00:07:55,498
+and T1 reads and writes A and B.
+
+156
+00:07:55,498 --> 00:07:58,037
+Of course this is not going
+to work out if there is overlap.
+
+157
+00:07:58,037 --> 00:08:01,978
+We're not going to be able
+to conceptually serialize
+
+158
+00:08:02,761 --> 00:08:04,978
+the two transactions completely,
+
+159
+00:08:05,702 --> 00:08:09,663
+if the reads and writes of B of T1
+
+160
+00:08:09,663 --> 00:08:11,964
+happen after the reads and writes
+
+161
+00:08:11,964 --> 00:08:14,094
+that happen in T2.
+
+162
+00:08:14,374 --> 00:08:16,968
+I've not shown it like this
+in this example,
+
+163
+00:08:17,336 --> 00:08:21,422
+because conceptually T1
+is not getting blocked
+
+164
+00:08:21,422 --> 00:08:23,448
+as things happen in T2,
+
+165
+00:08:23,448 --> 00:08:25,462
+in the optimistic concurrency
+control model,
+
+166
+00:08:25,462 --> 00:08:29,728
+but what I've written down is
+there is this true overlap,
+
+167
+00:08:29,728 --> 00:08:33,664
+that T1 tries to write something
+while T2 already does something.
+
+168
+00:08:33,664 --> 00:08:35,449
+So what happens in this case?
+
+169
+00:08:36,705 --> 00:08:38,874
+What happens in this case is that--
+
+170
+00:08:38,874 --> 00:08:41,218
+Let's assume the Read phase of T1
+
+171
+00:08:41,218 --> 00:08:43,406
+is completed before the Read phase of T2.
+
+172
+00:08:43,406 --> 00:08:48,226
+So we can say that T1's timestamp is 1,
+and T2's timestamp is 2.
+
+173
+00:08:48,436 --> 00:08:50,677
+So we're going to have
+to worry about the validation
+
+174
+00:08:50,677 --> 00:08:53,039
+of the second transaction, T2,
+what's going to happen.
+
+175
+00:08:53,039 --> 00:08:55,911
+Well, the first test fails,
+because these are overlapping.
+
+176
+00:08:56,458 --> 00:08:59,909
+The second transaction has started
+before the first has completed.
+
+177
+00:09:00,192 --> 00:09:04,314
+The second test fails
+because the WriteSet of T1,
+
+178
+00:09:04,314 --> 00:09:06,275
+and the ReadSet of T2 overlap,
+
+179
+00:09:06,856 --> 00:09:11,266
+and the third test fails
+for the same reason, among others.
+
+180
+00:09:11,885 --> 00:09:15,773
+That means that T2 has to get restarted
+once T1 has completely finished.
+
+181
+00:09:16,408 --> 00:09:18,248
+But observe here that...
+
+182
+00:09:19,455 --> 00:09:22,164
+I've been a bit strange here,
+in my schedule.
+
+183
+00:09:22,164 --> 00:09:27,739
+I've really now had like R of B,
+read of R at B, and read of A
+
+184
+00:09:27,739 --> 00:09:30,090
+completely overlap,
+happen at the same point in time,
+
+185
+00:09:30,660 --> 00:09:32,836
+something that we didn't look at before.
+
+186
+00:09:32,836 --> 00:09:37,750
+Conceptually, I could argue that this
+is actually a serializable schedule,
+
+187
+00:09:38,411 --> 00:09:43,378
+because I could actually
+serialize T1 completely before T2,
+
+188
+00:09:43,378 --> 00:09:45,562
+if things are really like this.
+
+189
+00:09:45,562 --> 00:09:48,469
+If, on the other hand,
+the write of B of T1
+
+190
+00:09:48,469 --> 00:09:52,641
+is really slightly after
+the read of B of T2, for example,
+
+191
+00:09:52,996 --> 00:09:54,725
+then the situation
+is not like this anymore,
+
+192
+00:09:54,725 --> 00:09:56,843
+then it's truly not serializable.
+
+193
+00:09:56,843 --> 00:09:58,605
+But what you're seeing is that
+
+194
+00:09:58,605 --> 00:10:02,697
+if the optimistic concurrency
+control algorithm is succeeding,
+
+195
+00:10:02,697 --> 00:10:04,862
+and we indeed
+have ensured serializability,
+
+196
+00:10:04,862 --> 00:10:08,908
+but vice versa, again,
+there might be serializable schedules,
+
+197
+00:10:08,908 --> 00:10:12,679
+like this one, where optimistic
+concurrency control fails.
+
+198
+00:10:12,924 --> 00:10:15,075
+So, again, it's not a complete mechanism,
+
+199
+00:10:15,700 --> 00:10:17,992
+just like conflict serializability,
+
+200
+00:10:17,992 --> 00:10:19,754
+what the notion of serializability,
+
+201
+00:10:19,754 --> 00:10:22,187
+that optimistic concurrency
+control covers,
+
+202
+00:10:22,187 --> 00:10:24,252
+is not all of serializability.
+
+203
+00:10:26,750 --> 00:10:29,253
+A few words on validation.
+
+204
+00:10:29,613 --> 00:10:33,246
+It's important that the Write phase
+happens in a critical section,
+
+205
+00:10:33,246 --> 00:10:35,215
+that means it happens atomically.
+
+206
+00:10:35,215 --> 00:10:37,630
+Well, what have you achieved this way?
+
+207
+00:10:37,630 --> 00:10:41,047
+I'm talking about atomicity
+on a lower level of abstraction,
+
+208
+00:10:41,047 --> 00:10:45,317
+it's not on the level of transactions
+anymore, it's inside the system,
+
+209
+00:10:45,317 --> 00:10:47,704
+the system has to commit
+all of these changes
+
+210
+00:10:47,704 --> 00:10:50,625
+that a single transaction makes,
+together, atomically,
+
+211
+00:10:50,625 --> 00:10:52,908
+before anything else can happen again.
+
+212
+00:10:53,982 --> 00:10:57,533
+You might say, well, one of the main goals
+of optimistic concurrency control
+
+213
+00:10:57,533 --> 00:11:00,389
+is ensuring atomicity,
+and now we are requiring atomicity
+
+214
+00:11:00,389 --> 00:11:02,482
+to make the protocol work.
+
+215
+00:11:02,482 --> 00:11:05,759
+Well, I would argue,
+at least in a non-distributive scenario,
+
+216
+00:11:05,759 --> 00:11:08,577
+we have achieved something,
+because all we have to do now
+
+217
+00:11:08,577 --> 00:11:10,818
+is use the operating system's machinery
+
+218
+00:11:10,818 --> 00:11:12,730
+for ensuring a critical section here.
+
+219
+00:11:13,367 --> 00:11:15,882
+But we have a clean semantics
+for concurrent transactions,
+
+220
+00:11:15,882 --> 00:11:18,397
+which [allow us to] execute
+the concurrency concurrently,
+
+221
+00:11:18,397 --> 00:11:22,910
+I'm assuming now a single threaded
+model, maybe, a single core machine.
+
+222
+00:11:22,910 --> 00:11:25,822
+We have gotten the semantics
+of the transactions right,
+
+223
+00:11:25,822 --> 00:11:28,188
+but we need some low-level machinery
+
+224
+00:11:28,188 --> 00:11:31,498
+to ensure atomicity of multiple steps.
+
+225
+00:11:31,963 --> 00:11:35,060
+So, now the Write phase
+has to happen in a critical section.
+
+226
+00:11:36,327 --> 00:11:39,361
+This is not to be
+underestimated in its cost,
+
+227
+00:11:39,361 --> 00:11:43,577
+because, on one hand,
+we have split the work
+
+228
+00:11:43,577 --> 00:11:45,432
+done by a transaction into three phases:
+
+229
+00:11:45,432 --> 00:11:49,092
+The Read phase, where the program runs,
+the application program runs,
+
+230
+00:11:49,092 --> 00:11:50,479
+maybe [user interaction is done],
+
+231
+00:11:50,479 --> 00:11:52,476
+humans are involved,
+things are very slow,
+
+232
+00:11:52,476 --> 00:11:54,820
+and this is not our problem anymore,
+
+233
+00:11:54,820 --> 00:11:57,557
+we're not waiting for this
+in our transaction management system.
+
+234
+00:11:57,557 --> 00:11:59,403
+We can do a lot of work
+with other transactions
+
+235
+00:11:59,403 --> 00:12:03,940
+while, maybe, the application [inaudible]
+waits for the user input.
+
+236
+00:12:04,603 --> 00:12:07,585
+The validation can also be done
+with some [overlapping other] parts
+
+237
+00:12:07,585 --> 00:12:08,966
+of the transaction workload.
+
+238
+00:12:09,415 --> 00:12:11,743
+Any Write section has to happen alone;
+
+239
+00:12:11,743 --> 00:12:14,076
+nothing else must happen
+in the system during this.
+
+240
+00:12:14,076 --> 00:12:16,724
+Otherwise, we can corrupt,
+so to say, our database.
+
+241
+00:12:17,787 --> 00:12:20,277
+For certain kinds of transactions,
+this is not a good solution.
+
+242
+00:12:20,277 --> 00:12:25,971
+Just imagine a small transaction
+that does a massive bulk update
+
+243
+00:12:25,971 --> 00:12:31,365
+that says, you know,
+update as select, in SQL.
+
+244
+00:12:31,365 --> 00:12:33,978
+That means we're going to change
+many, many objects
+
+245
+00:12:33,978 --> 00:12:36,727
+by a transaction workload
+that is going to be
+
+246
+00:12:36,727 --> 00:12:38,050
+very little work from the front,
+
+247
+00:12:38,050 --> 00:12:40,146
+it means the Read phase
+is going to be very fast,
+
+248
+00:12:40,146 --> 00:12:42,000
+the Validation phase may be fast,
+
+249
+00:12:42,000 --> 00:12:44,683
+but in the Write phase
+touches many, many objects.
+
+250
+00:12:44,683 --> 00:12:46,949
+Most of the work is actually done in a way
+
+251
+00:12:46,949 --> 00:12:48,877
+that there's no concurrency possible.
+
+252
+00:12:48,877 --> 00:12:50,790
+That is the main disadvantage
+
+253
+00:12:50,790 --> 00:12:53,925
+of optimistic concurrency
+control, potentially.
+
+254
+00:12:54,789 --> 00:12:56,962
+Of course, if you've got
+a read-only transaction,
+
+255
+00:12:56,962 --> 00:12:59,295
+then you don't need
+a critical section for this one,
+
+256
+00:12:59,295 --> 00:13:02,292
+and in some contexts,
+some workloads,
+
+257
+00:13:02,292 --> 00:13:05,045
+many transactions are actually read-only.

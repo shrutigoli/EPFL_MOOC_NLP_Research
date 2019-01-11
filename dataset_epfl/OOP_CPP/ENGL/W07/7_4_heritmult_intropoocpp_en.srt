@@ -1,0 +1,1410 @@
+1
+00:00:04,256 --> 00:00:06,416
+Let's continue our case study
+on watches
+
+2
+00:00:06,416 --> 00:00:09,344
+and cover this time, 
+multiple inheritance
+
+3
+00:00:09,344 --> 00:00:12,434
+through the modeling of the various
+mechanisms considered.
+
+4
+00:00:12,434 --> 00:00:14,463
+As a reminder,
+in the previous episodes,
+
+5
+00:00:14,463 --> 00:00:16,526
+the design on which we had
+settled was
+
+6
+00:00:16,526 --> 00:00:21,123
+to model the watch by giving
+it a core,
+
+7
+00:00:21,123 --> 00:00:23,544
+which is a pointer to a "Mecanisme".
+
+8
+00:00:23,544 --> 00:00:26,236
+An inheritance hierarchy
+had been drafted
+
+9
+00:00:26,236 --> 00:00:28,465
+for the different mechanisms considered.
+
+10
+00:00:28,465 --> 00:00:30,795
+So we had the "Mecanisme" superclass
+
+11
+00:00:30,795 --> 00:00:33,911
+from which three types of
+mechanisms inherit:
+
+12
+00:00:33,911 --> 00:00:36,413
+analog mechanisms ("MecanismeAnalogique"),
+digital mechansims ("MecanismeDigital"),
+
+13
+00:00:36,413 --> 00:00:38,208
+and "double mechanisms"
+("MecanismeDouble").
+
+14
+00:00:38,208 --> 00:00:41,116
+This first hierarchy, however, does not
+quite reflect
+
+15
+00:00:41,116 --> 00:00:43,627
+our wishes concerning "double
+mechanisms".
+
+16
+00:00:43,627 --> 00:00:46,482
+Indeed, in the constraints we
+had set ourselves,
+
+17
+00:00:46,482 --> 00:00:49,101
+we wanted "double mechanisms"
+
+18
+00:00:49,101 --> 00:00:52,884
+to be both analog mechanisms
+
+19
+00:00:52,884 --> 00:00:55,636
+and digital mechanisms, while having,
+
+20
+00:00:56,236 --> 00:00:58,240
+while showing, only one time.
+
+21
+00:00:58,420 --> 00:01:01,372
+Making "MecanismeDouble"
+inherit from "Mecanisme"
+
+22
+00:01:01,372 --> 00:01:04,511
+rather than making it inherit from
+"MecanismeDigital" and "MecanismeAnalogique"
+
+23
+00:01:04,511 --> 00:01:07,311
+does not allow us to model what we
+want properly.
+
+24
+00:01:07,931 --> 00:01:10,217
+So we will now update our
+hierarchy
+
+25
+00:01:10,217 --> 00:01:12,284
+in order to make apparent the
+link between
+
+26
+00:01:12,284 --> 00:01:14,940
+"double mechanisms",
+and analog, as well as
+
+27
+00:01:14,940 --> 00:01:16,758
+digital mechanisms.
+
+28
+00:01:16,758 --> 00:01:18,958
+In C++, since multiple inheritance
+is possible, 
+
+29
+00:01:18,958 --> 00:01:20,525
+the path is quite clear,
+
+30
+00:01:20,525 --> 00:01:22,455
+we must make "MecanismeDouble"
+inherit
+
+31
+00:01:22,455 --> 00:01:24,335
+both from "MecanismeAnalogique"
+
+32
+00:01:24,335 --> 00:01:26,330
+and from "MecanismeDigital".
+
+33
+00:01:26,330 --> 00:01:29,036
+If we set up multiple inheritance
+like this,
+
+34
+00:01:29,036 --> 00:01:30,863
+we must be watch out for one thing.
+
+35
+00:01:30,863 --> 00:01:34,948
+We want a "double mechanism" to display
+only one single time,
+
+36
+00:01:35,588 --> 00:01:37,752
+inherited from above.
+The time is modeled
+
+37
+00:01:37,752 --> 00:01:39,873
+at the level of the "Mecanisme" class.
+
+38
+00:01:39,873 --> 00:01:43,145
+If we simply set up this
+multiple inheritance:
+
+39
+00:01:43,145 --> 00:01:45,899
+"MecanismeDouble" inheriting
+from "MecanismeAnalogique"
+
+40
+00:01:45,899 --> 00:01:47,679
+and "MecanismeDigital",
+
+41
+00:01:47,679 --> 00:01:49,676
+any instance of "MecanismeDouble"
+
+42
+00:01:49,676 --> 00:01:52,009
+will inherit the "heure" variable twice
+(TN: "heure" means "time"):
+
+43
+00:01:52,409 --> 00:01:54,783
+once, as an analog mechanism
+
+44
+00:01:54,783 --> 00:01:57,508
+and once as a digital mechanism
+
+45
+00:01:57,508 --> 00:01:59,299
+However, this is not what we want
+
+46
+00:01:59,299 --> 00:02:02,272
+We want a "double mechanism" to keep
+only one time.
+
+47
+00:02:02,772 --> 00:02:07,718
+So we must make sure that this
+superclass is virtual
+
+48
+00:02:09,658 --> 00:02:12,544
+in order for the "MecanismeDouble"
+subclass
+
+49
+00:02:12,544 --> 00:02:14,969
+to inherit from the "heure"
+variable only once.
+
+50
+00:02:14,969 --> 00:02:17,217
+And for that, all the
+inheritance links
+
+51
+00:02:17,217 --> 00:02:19,529
+linking "Mecanisme" to
+its direct subclasses
+
+52
+00:02:19,529 --> 00:02:22,897
+must be declared as "virtual".
+
+53
+00:02:27,151 --> 00:02:29,629
+The new hierarchy we obtain
+
+54
+00:02:29,629 --> 00:02:32,126
+corresponds to the code that
+you see here.
+
+55
+00:02:32,126 --> 00:02:34,709
+So we have a "Mecanisme" superclass,
+
+56
+00:02:34,709 --> 00:02:37,543
+which will provide the member
+variable indicating the time.
+
+57
+00:02:37,543 --> 00:02:39,423
+From this "Mecanisme" superclass,
+
+58
+00:02:39,423 --> 00:02:41,643
+two direct subclasses will inherit:
+
+59
+00:02:41,643 --> 00:02:43,774
+"MecanismeAnalogique" and "MecanismeDigital".
+
+60
+00:02:43,774 --> 00:02:47,745
+So we make sure to declare the inheritance
+links as "virtual"
+
+61
+00:02:47,745 --> 00:02:50,579
+in order to allow
+the "MecanismeDouble" subclass
+
+62
+00:02:50,579 --> 00:02:54,505
+to inherit only once the attribute
+coming from "Mecanisme".
+
+63
+00:02:55,025 --> 00:02:57,464
+"MecanismeDouble"
+
+64
+00:02:57,464 --> 00:03:01,489
+inherits both from "MecanismeAnalogique"
+and from "MecanismeDigital".
+
+65
+00:03:01,489 --> 00:03:03,960
+To make our example a little
+more interesting,
+
+66
+00:03:03,960 --> 00:03:06,784
+we will give our "MecanismeAnalogique"
+
+67
+00:03:06,784 --> 00:03:09,322
+"MecanismeDigital" subclasses
+specific members
+
+68
+00:03:09,322 --> 00:03:13,358
+such as a date, for example, for
+the analog mechanism
+
+69
+00:03:14,498 --> 00:03:16,745
+and an alarm clock for the digital one.
+(TN: "réveil" means "alarm clock")
+
+70
+00:03:17,085 --> 00:03:19,917
+Note that in C++, a superclass
+
+71
+00:03:19,917 --> 00:03:22,711
+of which subclasses
+inherit virtually
+
+72
+00:03:22,711 --> 00:03:25,605
+is called a "virtual class".
+
+73
+00:03:27,185 --> 00:03:30,821
+This should not be confused
+with an abstract class.
+
+74
+00:03:31,641 --> 00:03:34,500
+The fact that "Mecanisme"
+is a virtual class
+
+75
+00:03:35,015 --> 00:03:38,094
+has an effect on the construction
+of a "double mechanism".
+
+76
+00:03:38,094 --> 00:03:40,166
+Do you know what effects?
+
+77
+00:03:40,166 --> 00:03:43,424
+In a class hierarchy with
+no virtual classes,
+
+78
+00:03:43,424 --> 00:03:46,179
+a subclass's constructor simply
+has to
+
+79
+00:03:46,179 --> 00:03:48,844
+invoke the constructors of its
+direct superclasses.
+
+80
+00:03:48,844 --> 00:03:52,565
+However, in a hierarchy containing
+a virtual class,
+
+81
+00:03:52,565 --> 00:03:54,913
+all the subclasses must call 
+
+82
+00:03:54,913 --> 00:03:57,088
+the constructor of this virtual class.
+
+83
+00:03:57,088 --> 00:04:00,216
+So, let's start by defining how
+mechanisms are built.
+
+84
+00:04:00,216 --> 00:04:02,795
+Up until now, we only had a
+default constructor.
+
+85
+00:04:02,795 --> 00:04:05,382
+Let's refine the definition 
+of this constructor.
+
+86
+00:04:05,382 --> 00:04:08,060
+Given that a mechanism is a product,
+
+87
+00:04:08,060 --> 00:04:10,198
+and thus inherits from the "Produit" class,
+
+88
+00:04:10,198 --> 00:04:13,318
+it must initialize the base value of
+the product, inherited from Produit,
+
+89
+00:04:13,318 --> 00:04:16,554
+and must initialize its own member
+variable, the time.
+
+90
+00:04:16,554 --> 00:04:19,053
+Therefore, for the "Mecanisme"
+class, we could naturally think
+
+91
+00:04:19,053 --> 00:04:21,323
+of making a constructor that
+looks like this.
+
+92
+00:04:21,323 --> 00:04:24,564
+So, it would take as parameters
+a value allowing it
+
+93
+00:04:24,564 --> 00:04:26,951
+to initialize the variable inherited
+from "Produit"
+
+94
+00:04:26,951 --> 00:04:29,183
+and a second value
+
+95
+00:04:29,183 --> 00:04:31,662
+to initialize its own variable
+
+96
+00:04:31,662 --> 00:04:34,679
+We could also imagine giving
+a default value
+
+97
+00:04:34,679 --> 00:04:36,545
+for this second parameter.
+
+98
+00:04:36,885 --> 00:04:40,422
+The constructor for the "Mecanisme"
+class must of course invoke
+
+99
+00:04:40,422 --> 00:04:42,755
+the constructor of the superclass
+"Produit"
+
+100
+00:04:42,755 --> 00:04:44,913
+and initialize its member variable.
+
+101
+00:04:44,913 --> 00:04:47,804
+Now, let's discuss the
+subclasses' constructors.
+
+102
+00:04:47,804 --> 00:04:51,736
+First, the constructor for 
+"MecanismeAnalogique" for example,
+
+103
+00:04:51,736 --> 00:04:54,167
+which inherits directly from the
+"Mecanisme" class.
+
+104
+00:04:54,167 --> 00:04:56,620
+This constructor will take as parameters
+
+105
+00:04:56,620 --> 00:05:00,199
+values allowing it to initialize all
+of its member variables:
+
+106
+00:05:00,199 --> 00:05:03,231
+those inherited from above
+and those that are specific to it.
+
+107
+00:05:03,231 --> 00:05:06,017
+And it will, in any case, invoke
+the constructor
+
+108
+00:05:06,017 --> 00:05:07,561
+of its direct superclass,
+
+109
+00:05:07,561 --> 00:05:09,689
+which happens to be the virtual
+"Mecanisme" class.
+
+110
+00:05:09,689 --> 00:05:13,384
+The constructor for the 
+"MecanismeDigital" class
+
+111
+00:05:13,384 --> 00:05:15,542
+will be written quite similarly.
+
+112
+00:05:16,302 --> 00:05:19,269
+The constructor for the
+"MecanismeDouble" subclass
+
+113
+00:05:19,269 --> 00:05:23,017
+must invoke the constructors for
+its direct superclasses
+
+114
+00:05:23,017 --> 00:05:26,216
+but it must first invoke the constructor
+
+115
+00:05:26,676 --> 00:05:28,551
+of the virtual superclass.
+
+116
+00:05:28,551 --> 00:05:30,564
+Do you remember what happens
+
+117
+00:05:30,564 --> 00:05:33,782
+with the call to the virtual
+superclass's constructor
+
+118
+00:05:33,782 --> 00:05:36,078
+in the direct superclasses?
+
+119
+00:05:36,598 --> 00:05:39,152
+Now, let's have a look at how default
+values are handled.
+
+120
+00:05:39,152 --> 00:05:41,958
+Remember that in the constructor
+for "Mecanisme",
+
+121
+00:05:41,958 --> 00:05:44,760
+the parameter allowing us to
+
+122
+00:05:44,760 --> 00:05:47,607
+initialize the mechanism's time was
+a default value.
+
+123
+00:05:47,967 --> 00:05:50,750
+If we want this default time to
+be preserved
+
+124
+00:05:50,750 --> 00:05:52,908
+by the constructors of
+"Mecanisme"'s subclasses,
+
+125
+00:05:52,908 --> 00:05:54,999
+we will need to take some steps.
+
+126
+00:05:54,999 --> 00:05:57,469
+Then we must make sure that
+it is possible
+
+127
+00:05:57,469 --> 00:06:00,890
+to create an analog mechanism without
+providing a time
+
+128
+00:06:00,890 --> 00:06:03,407
+and in that case, it would have
+the default time,
+
+129
+00:06:03,407 --> 00:06:05,060
+the same as for mechanisms.
+
+130
+00:06:05,060 --> 00:06:07,245
+It should still have the option, of course,
+
+131
+00:06:08,305 --> 00:06:11,416
+of initializing its own member variable.
+
+132
+00:06:11,416 --> 00:06:13,951
+To do so, we should provide
+a second constructor
+
+133
+00:06:13,951 --> 00:06:16,219
+that would take no parameter
+linked to the time
+
+134
+00:06:16,219 --> 00:06:19,408
+and that would call the constructor
+of the superclass,
+
+135
+00:06:19,408 --> 00:06:21,861
+initializing the default time
+
+136
+00:06:21,861 --> 00:06:23,801
+-- that is, without providing
+any value for this time.
+
+137
+00:06:24,261 --> 00:06:26,244
+But wouldn't it have been easier
+
+138
+00:06:26,244 --> 00:06:28,121
+to give a default value
+
+139
+00:06:31,196 --> 00:06:32,652
+for this second parameter?
+
+140
+00:06:35,274 --> 00:06:39,662
+The answer is no, because the
+last parameter, intended for the date,
+
+141
+00:06:39,662 --> 00:06:41,722
+doesn't have a default value
+
+142
+00:06:41,722 --> 00:06:43,521
+and all default values in
+the parameters
+
+143
+00:06:43,526 --> 00:06:46,376
+must be at the end of
+the list.
+
+144
+00:06:46,996 --> 00:06:48,709
+Note that it would also be very bad
+
+145
+00:06:48,709 --> 00:06:51,662
+to duplicate one default value in
+two different places
+
+146
+00:06:51,662 --> 00:06:54,521
+for example here, in the
+analog mechanism
+
+147
+00:06:54,521 --> 00:06:56,509
+and higher up, in the mechanism.
+
+148
+00:06:56,509 --> 00:06:58,839
+This would open the door
+to problems
+
+149
+00:06:58,839 --> 00:07:00,827
+of bad maintenance
+nd incoherence.
+
+150
+00:07:02,007 --> 00:07:04,693
+To correctly manage the default
+value of the superclass,
+
+151
+00:07:04,693 --> 00:07:07,113
+the same reasoning we used
+
+152
+00:07:07,113 --> 00:07:09,477
+for "MecanismeAnalogique" should
+of course also be used
+
+153
+00:07:09,477 --> 00:07:12,849
+in "MecanismeDigital" and in
+"MecanismeDouble".
+
+154
+00:07:12,849 --> 00:07:14,373
+In the "MecanismeDouble" class,
+
+155
+00:07:14,373 --> 00:07:17,000
+where the constructors should
+be overloaded.
+
+156
+00:07:17,000 --> 00:07:19,867
+So here, one takes a time as parameter,
+
+157
+00:07:19,867 --> 00:07:22,568
+and the other takes no
+parameter for the time
+
+158
+00:07:22,568 --> 00:07:25,411
+and will call the constructor
+of the superclass
+
+159
+00:07:25,411 --> 00:07:28,608
+which gives a default value for this
+time attribute, "heure".
+
+160
+00:07:29,448 --> 00:07:30,909
+We have now finished
+
+161
+00:07:30,909 --> 00:07:33,992
+with the construction of mechanisms,
+let's move on to displaying them.
+
+162
+00:07:34,692 --> 00:07:37,030
+Suppose that for these outputs,
+
+163
+00:07:37,030 --> 00:07:39,432
+we want all mechanisms
+
+164
+00:07:39,432 --> 00:07:41,928
+to be displayed following the
+same model
+
+165
+00:07:41,928 --> 00:07:44,279
+a model that is imposed and
+cannot be modified.
+
+166
+00:07:44,279 --> 00:07:47,435
+This model would, for example,
+display systematically
+
+167
+00:07:47,435 --> 00:07:50,531
+the type of the mechanism,
+followed by a display of the watch face
+
+168
+00:07:50,531 --> 00:07:52,905
+containing the time and
+when applicable,
+
+169
+00:07:52,905 --> 00:07:56,494
+the date or the time of the alarm,
+followed by the price for example.
+
+170
+00:07:57,574 --> 00:08:00,524
+But we also want each of
+these parts,
+
+171
+00:08:02,299 --> 00:08:04,649
+each of the parts of this model,
+to be adaptable.
+
+172
+00:08:04,649 --> 00:08:08,094
+What we mean by "part" would
+typically be the part that displays
+
+173
+00:08:08,094 --> 00:08:11,770
+the type of the mechanism, or
+the part that displays the watch face.
+
+174
+00:08:12,943 --> 00:08:14,992
+This description assumes that
+there exists
+
+175
+00:08:14,992 --> 00:08:17,771
+a general display method for
+all mechanisms
+
+176
+00:08:17,771 --> 00:08:19,707
+following a precise model
+
+177
+00:08:19,707 --> 00:08:24,434
+but that this method calls other
+methods itself
+
+178
+00:08:27,874 --> 00:08:30,736
+and these could have an
+adaptable behavior,
+
+179
+00:08:30,736 --> 00:08:33,604
+that is, a polymorphic aspect.
+
+180
+00:08:36,497 --> 00:08:39,220
+The idea is thus to allow these
+methods to have
+
+181
+00:08:39,220 --> 00:08:42,273
+a specific behavior depending
+on subclasses
+
+182
+00:08:42,273 --> 00:08:45,544
+meaning that we could have,
+for example, a method for
+
+183
+00:08:45,544 --> 00:08:48,560
+displaying the mechanism type
+that would be specific to each subclass.
+
+184
+00:08:48,560 --> 00:08:51,682
+Similarly, we could have a method to
+display the watch face
+
+185
+00:08:51,682 --> 00:08:53,575
+that would be specific to
+each subclass
+
+186
+00:08:53,575 --> 00:08:57,253
+and, thanks to polymorphism, they
+would be able to adapt automatically
+
+187
+00:08:57,253 --> 00:08:59,351
+to the real type of the objects
+on which they are called.
+
+188
+00:09:00,331 --> 00:09:03,334
+The fact that the same basic model
+
+189
+00:09:03,334 --> 00:09:06,367
+is imposed to all mechanisms
+
+190
+00:09:06,367 --> 00:09:10,600
+implies that once a method follows
+this fixed model,
+
+191
+00:09:10,600 --> 00:09:12,823
+it must no longer be modified.
+
+192
+00:09:12,823 --> 00:09:16,902
+This should make us think
+of final methods.
+
+193
+00:09:17,682 --> 00:09:21,452
+We also want to provide a default
+version
+
+194
+00:09:21,452 --> 00:09:24,980
+of the watch face display for
+all the subclasses.
+
+195
+00:09:24,980 --> 00:09:27,974
+So this method should have
+a default definition,
+
+196
+00:09:27,974 --> 00:09:31,120
+typically right at the top of the hierarchy,
+in the "Mecanisme" class.
+
+197
+00:09:31,120 --> 00:09:34,550
+This default version could, for example,
+simply display the time
+
+198
+00:09:35,370 --> 00:09:37,737
+and be used in the subclasses
+
+199
+00:09:37,737 --> 00:09:41,042
+to display the time of course, and
+possibly other information.
+
+200
+00:09:41,042 --> 00:09:43,349
+So here, we are moving
+towards a method
+
+201
+00:09:43,349 --> 00:09:45,815
+for displaying the watch face that
+would be polymorphic
+
+202
+00:09:45,815 --> 00:09:48,849
+but that would have a default
+definition in the superclass.
+
+203
+00:09:48,849 --> 00:09:52,828
+However, to display the
+mechanism type,
+
+204
+00:09:52,828 --> 00:09:57,747
+we want to force subclasses to
+redefine it.
+
+205
+00:09:58,387 --> 00:10:00,907
+This, of course, should make us
+think
+
+206
+00:10:02,607 --> 00:10:04,385
+of pure virtual qualifiers
+
+207
+00:10:05,866 --> 00:10:07,686
+This is how we could translate
+
+208
+00:10:07,686 --> 00:10:10,046
+these different constraints
+into C++ code.
+
+209
+00:10:10,046 --> 00:10:12,936
+Our "Mecanisme" superclass
+provides
+
+210
+00:10:12,936 --> 00:10:15,764
+a polymorphic display method
+
+211
+00:10:16,384 --> 00:10:20,193
+which overrides the one inherited from
+"Produit" displaying the price. 
+
+212
+00:10:20,193 --> 00:10:24,151
+Our "Mecanisme" superclass thus
+provides a display method
+
+213
+00:10:24,151 --> 00:10:26,434
+that adheres to a precise model.
+
+214
+00:10:26,434 --> 00:10:30,260
+It will display the type,
+the face and the price
+
+215
+00:10:30,260 --> 00:10:33,576
+via the method inherited
+from "Produit".
+
+216
+00:10:34,236 --> 00:10:38,145
+To make sure that this model is
+fixed once and for all
+
+217
+00:10:38,145 --> 00:10:41,919
+and cannot be overridden in a
+subclass of the hierarchy,
+
+218
+00:10:41,919 --> 00:10:46,493
+we mark this method as "final".
+
+219
+00:10:47,213 --> 00:10:51,465
+"Mecanisme"'s subclasses will thus no longer
+be able to override the "afficher" method,
+
+220
+00:10:51,465 --> 00:10:55,250
+so all the mechanisms will be displayed
+following this precise model.
+
+221
+00:10:55,910 --> 00:10:58,190
+However, via new methods:
+
+222
+00:10:58,190 --> 00:11:00,004
+"afficher_type", "afficher_cadran"
+(TN: "display_type" and "display _ace", resp.)
+
+223
+00:11:00,004 --> 00:11:02,811
+which will be of course defined
+as "virtual",
+
+224
+00:11:02,811 --> 00:11:05,960
+we guarantee that the different parts
+involved in this model
+
+225
+00:11:05,960 --> 00:11:08,496
+can be adapted and modified
+in the subclasses.
+
+226
+00:11:09,216 --> 00:11:12,060
+You may have noticed, by the way,
+that since the "afficher" method
+
+227
+00:11:12,060 --> 00:11:16,254
+from the "Mecanisme" class overrides
+the "afficher" method from the "Produit" class,
+
+228
+00:11:16,254 --> 00:11:19,188
+we have used the "override" qualifier.
+
+229
+00:11:20,088 --> 00:11:21,777
+The "afficher_cadran" method,
+
+230
+00:11:21,777 --> 00:11:24,294
+as specified in the constraints that
+we mentioned earlier,
+
+231
+00:11:24,294 --> 00:11:27,191
+provides a default version that
+will display the time.
+
+232
+00:11:27,191 --> 00:11:29,697
+However, concerning the 
+"afficher_type" method:
+
+233
+00:11:29,697 --> 00:11:33,507
+we want to force its definition in 
+the subclasses,
+
+234
+00:11:33,507 --> 00:11:36,101
+but it is still an abstract concept at
+the level of the mechanisms
+
+235
+00:11:36,101 --> 00:11:39,050
+and so it is declared as a
+pure virtual method.
+
+236
+00:11:39,470 --> 00:11:42,568
+If we want the subclasses of
+"Mecanisme" that have overridden
+
+237
+00:11:42,568 --> 00:11:44,731
+"afficher_cadran" to still be able
+to invoke
+
+238
+00:11:44,731 --> 00:11:46,985
+the "afficher_cadran" method
+inherited from the superclass,
+
+239
+00:11:46,985 --> 00:11:50,792
+then the access to "afficher_cadran"
+must be possible in these subclasses
+
+240
+00:11:50,792 --> 00:11:52,787
+and this is the reason why
+
+241
+00:11:52,787 --> 00:11:55,585
+we labeled this method as protected.
+
+242
+00:11:55,585 --> 00:11:59,262
+Conversely, the "afficher_type" method
+will not be invoked
+
+243
+00:11:59,262 --> 00:12:00,896
+in the subclasses of "Mecanisme";
+
+244
+00:12:00,896 --> 00:12:02,542
+it is pure virtual and has no body.
+
+245
+00:12:02,542 --> 00:12:05,545
+Therefore, it makes sense to declare
+it as "private".
+
+246
+00:12:05,925 --> 00:12:07,952
+All the mechanisms with which
+
+247
+00:12:07,952 --> 00:12:09,821
+we want to be able to work
+
+248
+00:12:09,821 --> 00:12:13,170
+-- we want to be able to give an
+analog mechanism as core for a watch --
+
+249
+00:12:13,170 --> 00:12:15,447
+must inevitably
+
+250
+00:12:15,447 --> 00:12:17,757
+override the "afficher_type" method
+
+251
+00:12:17,757 --> 00:12:19,795
+to be instantiable.
+
+252
+00:12:19,795 --> 00:12:23,443
+We can imagine that for the
+"MecanismeAnalogique" class,
+
+253
+00:12:23,443 --> 00:12:27,511
+"afficher_type" simply displays
+"analog".
+
+254
+00:12:28,171 --> 00:12:30,666
+The "afficher_cadran" method does
+
+255
+00:12:30,666 --> 00:12:33,017
+indeed have a definition in
+the superclass,
+
+256
+00:12:33,017 --> 00:12:36,315
+but it can still be overridden in the
+subclasses.
+
+257
+00:12:36,315 --> 00:12:39,172
+For example here, we can imagine
+overriding it
+
+258
+00:12:39,172 --> 00:12:41,375
+in the "MecanismeAnalogique" subclass
+
+259
+00:12:41,375 --> 00:12:43,588
+in order to make it display the time
+
+260
+00:12:43,588 --> 00:12:46,622
+by calling the method inherited
+from the superclass.
+
+261
+00:12:46,622 --> 00:12:50,499
+As a reminder, here is the syntax
+using the scope resolution operator
+
+262
+00:12:50,499 --> 00:12:54,608
+allowing us to call the "afficher_cadran"
+method from the "Mecanisme" class.
+
+263
+00:12:54,608 --> 00:12:57,680
+But we will also display the date.
+
+264
+00:12:58,380 --> 00:13:00,769
+Analogously, the "MecanismeDouble" class
+
+265
+00:13:00,769 --> 00:13:03,684
+will also provide a concrete definition
+for "afficher_type".
+
+266
+00:13:03,684 --> 00:13:06,886
+It can also override the "afficher_cadran"
+method
+
+267
+00:13:06,886 --> 00:13:08,993
+and it can benefit from the "afficher_cadran"
+
+268
+00:13:08,993 --> 00:13:11,796
+methods inherited from both "MecanismeAnalogique"
+and "MecanismeDigital".
+
+269
+00:13:12,316 --> 00:13:15,058
+This way, we would display the
+information specific to
+
+270
+00:13:15,058 --> 00:13:18,012
+the analog mechanism, that is,
+the time and date,
+
+271
+00:13:18,012 --> 00:13:20,289
+and using this, display the
+information specific
+
+272
+00:13:20,289 --> 00:13:24,486
+to the digital mechanism, i.e the
+time followed by the time of the alarm.
+
+273
+00:13:25,146 --> 00:13:27,715
+And now, as we are now used to doing,
+
+274
+00:13:27,715 --> 00:13:29,700
+we can test the new features
+
+275
+00:13:29,700 --> 00:13:31,811
+using a small main program.
+
+276
+00:13:31,811 --> 00:13:33,878
+We can create an analog mechanism
+
+277
+00:13:33,878 --> 00:13:36,609
+using the default value for
+the time,
+
+278
+00:13:36,609 --> 00:13:38,540
+meaning that we provide no time.
+
+279
+00:13:38,540 --> 00:13:40,526
+We can create a digital mechanism
+
+280
+00:13:40,526 --> 00:13:43,774
+that would have a non-default
+value for the time
+
+281
+00:13:43,774 --> 00:13:46,015
+and specific value for its parameters.
+
+282
+00:13:46,015 --> 00:13:48,104
+And in a similar way, a "double mechanism"
+
+283
+00:13:48,104 --> 00:13:50,877
+by providing all the information
+necessary to initialize it
+
+284
+00:13:50,877 --> 00:13:54,306
+like a time here, a date and
+the time of the alarm.
+
+285
+00:13:54,306 --> 00:13:57,411
+The "afficher" method of the mechanisms
+that we have just developed
+
+286
+00:13:57,411 --> 00:14:00,910
+will be invoked by
+the overloaded output operator
+
+287
+00:14:00,910 --> 00:14:03,636
+that we specified earlier for the
+products.
+
+288
+00:14:03,636 --> 00:14:05,454
+This method is polymorphic
+
+289
+00:14:05,454 --> 00:14:07,538
+and so it will adapt to
+all types of products,
+
+290
+00:14:07,538 --> 00:14:09,297
+including to mechanisms.
+
+291
+00:14:09,297 --> 00:14:12,226
+These lines will allow us to test
+our latest developments
+
+292
+00:14:12,226 --> 00:14:14,532
+on the constructors in "Mecanisme"'s
+hierarchy.
+
+293
+00:14:14,532 --> 00:14:17,676
+And this line will allow us to
+test our display method.
+
+294
+00:14:17,676 --> 00:14:20,592
+We can now give our watch an
+actual core
+
+295
+00:14:20,592 --> 00:14:23,610
+we can for example imagine defining,
+in the "Montre" class,
+
+296
+00:14:23,610 --> 00:14:25,701
+a constructor that would take as argument
+
+297
+00:14:25,701 --> 00:14:28,190
+the value of a pointer to a mechanism.
+
+298
+00:14:28,190 --> 00:14:30,241
+So we can create this mechanism
+
+299
+00:14:30,241 --> 00:14:33,716
+using the constructors that we
+have discussed in this episode.
+
+300
+00:14:33,716 --> 00:14:36,431
+The display of the watch would
+also be completed
+
+301
+00:14:36,431 --> 00:14:38,941
+in such a way to invoke the
+display of its core.
+
+302
+00:14:38,941 --> 00:14:42,732
+The complete code for this part can
+be downloaded on the course website.
+
+303
+00:14:42,732 --> 00:14:46,267
+And this concludes this episode
+on modeling mechanisms.

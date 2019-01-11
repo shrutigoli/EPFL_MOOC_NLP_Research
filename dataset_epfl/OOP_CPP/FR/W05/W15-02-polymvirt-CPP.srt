@@ -1,0 +1,1326 @@
+1
+00:00:04,225 --> 00:00:06,575
+Dans la séquence vidéo précédente,
+nous avons vu
+
+2
+00:00:06,575 --> 00:00:10,495
+que le polymorphisme était une notion
+centrale en programmation orientée objet.
+
+3
+00:00:10,495 --> 00:00:13,655
+Nous avons vu que pour mettre en oeuvre
+une solution polymorphique,
+
+4
+00:00:13,655 --> 00:00:17,248
+il fallait faire appel à ce qu'on appelle
+la résolution dynamique des liens.
+
+5
+00:00:17,528 --> 00:00:22,258
+L'objectif de cette séquence est de vous
+montrer comment on met en oeuvre en C++
+
+6
+00:00:22,258 --> 00:00:25,978
+la résolution dynamique des liens
+en utilisant les méthodes virtuelles.
+
+7
+00:00:26,458 --> 00:00:29,878
+Plus précisément, nous avions conclu
+la séquence précédente
+
+8
+00:00:29,878 --> 00:00:33,458
+en indiquant qu'en C++ pour que
+la résolution dynamique des liens
+
+9
+00:00:33,458 --> 00:00:36,811
+puisse avoir lieu, il faut réunir 
+deux ingrédients.
+
+10
+00:00:36,811 --> 00:00:39,284
+À savoir l'utilisation
+de méthodes virtuelles
+
+11
+00:00:39,284 --> 00:00:41,588
+sur des références et des pointeurs.
+
+12
+00:00:41,588 --> 00:00:45,158
+C'est à l'explication de ce transparent
+qu'est dédiée cette séquence.
+
+13
+00:00:45,578 --> 00:00:49,048
+Pour rappel, nous étions partis d'un
+exemple où nous avions une hiérarchie
+
+14
+00:00:49,048 --> 00:00:52,178
+de classes dans laquelle une sous-classe,
+la sous-classe Guerrier,
+
+15
+00:00:52,178 --> 00:00:54,598
+redéfinit une méthode déjà présente
+dans la super-classe.
+
+16
+00:00:55,298 --> 00:00:58,768
+Un objet de type sous-classe était,
+par le biais du passage des arguments,
+
+17
+00:00:58,768 --> 00:01:01,938
+mis dans une variable
+de type super-classe.
+
+18
+00:01:01,938 --> 00:01:04,188
+Nous nous étions alors 
+posé la question
+
+19
+00:01:04,188 --> 00:01:06,548
+de quelle méthode rencontrer
+était appelée ici.
+
+20
+00:01:06,548 --> 00:01:08,688
+La méthode rencontrer
+de la super-classe
+
+21
+00:01:08,688 --> 00:01:11,298
+ou alors celle de la sous-classe.
+
+22
+00:01:11,298 --> 00:01:14,698
+Et nous avions vu qu'en C++
+il n'en était rien de particulier,
+
+23
+00:01:16,397 --> 00:01:18,737
+c'est la résolution statique
+des liens qui a lieu,
+
+24
+00:01:18,737 --> 00:01:22,017
+c'est-à-dire que c'est le type de
+la variable sur laquelle on appelle
+
+25
+00:01:22,017 --> 00:01:26,227
+la méthode qui prime et qui va
+conditionner le choix de la méthode.
+
+26
+00:01:26,763 --> 00:01:30,663
+En C++, si l'on veut que ce soit 
+la résolution dynamique des liens
+
+27
+00:01:30,663 --> 00:01:36,573
+qui ait lieu, c'est-à-dire la résolution
+par le biais de laquelle c'est le contenu
+
+28
+00:01:36,573 --> 00:01:40,883
+de la variable plutôt que son type qui
+décide de la méthode à utiliser,
+
+29
+00:01:41,443 --> 00:01:45,582
+alors il faut explicitement déclarer
+dans le programme que la méthode
+
+30
+00:01:45,582 --> 00:01:47,442
+doit être résolue dynamiquement.
+
+31
+00:01:47,702 --> 00:01:50,805
+Et ceci se fait en déclarant cette méthode
+
+32
+00:01:52,705 --> 00:01:54,118
+comme virtuelle.
+
+33
+00:01:54,628 --> 00:01:58,091
+Pour que la résolution dynamique des liens
+ait bel et bien lieu,
+
+34
+00:01:58,091 --> 00:02:01,441
+il faudra dont déclarer la méthode 
+comme virtuelle mais il faudra aussi
+
+35
+00:02:01,441 --> 00:02:04,791
+qu'elle puisse s'appliquer via une
+référence ou un pointeur.
+
+36
+00:02:04,791 --> 00:02:10,631
+C'est bien le cas ici, « un » est une
+référence vers l'objet passé en paramètre.
+
+37
+00:02:11,541 --> 00:02:15,761
+En C++ on doit donc indiquer explicitement
+au compilateur qu'une méthode
+
+38
+00:02:15,761 --> 00:02:18,581
+peut faire l'objet d'une résolution
+dynamique des liens.
+
+39
+00:02:18,581 --> 00:02:21,211
+Et ce, en la déclarant comme virtuelle.
+
+40
+00:02:21,231 --> 00:02:25,081
+La déclaration de la virtualité d'une
+méthode doit se faire dans la classe
+
+41
+00:02:25,081 --> 00:02:28,621
+la plus générale qui admet cette méthode,
+c'est-à-dire le plus en haut
+
+42
+00:02:28,621 --> 00:02:31,561
+de la hiérarchie dans le
+prototypage d'origine.
+
+43
+00:02:31,561 --> 00:02:34,831
+Donc dans le cas de notre exemple,
+dans la classe Personnage.
+
+44
+00:02:34,831 --> 00:02:39,031
+Et la virtualité d'une méthode se déclare
+en C++ simplement en précédant
+
+45
+00:02:39,031 --> 00:02:42,371
+le prototype de la méthode 
+par le mot-clé virtual.
+
+46
+00:02:42,721 --> 00:02:46,781
+Il faut noter que toute redéfinition dans
+les sous-classes d'une méthode
+
+47
+00:02:46,781 --> 00:02:51,151
+déjà déclarée comme virtuelle dans
+une super-classe sera aussi considérée
+
+48
+00:02:51,151 --> 00:02:56,031
+comme virtuelle par transitivité même si 
+l'on ne met pas le mot-clé virtual
+
+49
+00:02:56,031 --> 00:02:57,341
+devant son prototype.
+
+50
+00:02:57,341 --> 00:03:01,961
+Donc concrètement, si j'ai une
+super-classe grand A contenant une méthode
+
+51
+00:03:03,361 --> 00:03:09,981
+particulière m et si j'ai une sous-classe
+grand B qui redéfinit cette méthode.
+
+52
+00:03:11,891 --> 00:03:13,651
+Si dans la super-classe grand A
+
+53
+00:03:13,651 --> 00:03:16,701
+la méthode m a été déclarée 
+comme virtuelle,
+
+54
+00:03:17,561 --> 00:03:21,781
+alors elle l'est aussi 
+dans la sous-classe
+
+55
+00:03:21,781 --> 00:03:24,591
+même si le mot-clé
+n'apparaît pas explicitement.
+
+56
+00:03:25,228 --> 00:03:28,838
+Si on revient à notre exemple de départ,
+si l'on veut donc que notre méthode
+
+57
+00:03:28,838 --> 00:03:31,651
+fasse l'objet d'une résolution 
+dynamique des liens,
+
+58
+00:03:31,651 --> 00:03:35,244
+alors il faut déclarer dans la super-classe
+
+59
+00:03:35,244 --> 00:03:37,278
+la méthode comme étant virtuelle.
+
+60
+00:03:37,998 --> 00:03:39,868
+Mais est-ce vraiment là
+notre exemple de départ ?
+
+61
+00:03:40,558 --> 00:03:43,554
+Si vous avez été attentif, 
+vous aurez peut-être remarqué
+
+62
+00:03:43,554 --> 00:03:46,550
+que l'exemple que 
+vous avez ici sous les yeux
+
+63
+00:03:46,550 --> 00:03:49,548
+est une variante de l'exemple
+présenté à l'origine.
+
+64
+00:03:49,548 --> 00:03:53,328
+Une variante dans laquelle le passage
+des arguments de la fonction
+
+65
+00:03:53,328 --> 00:03:56,278
+« faire_rencontrer » est un passage
+d'argument par valeur.
+
+66
+00:03:56,608 --> 00:04:00,278
+Nous avons délibérément fait cette
+modification pour vous montrer l'incidence
+
+67
+00:04:00,278 --> 00:04:03,198
+qu'a le fait de ne pas utiliser
+une référence ou un pointeur
+
+68
+00:04:03,198 --> 00:04:05,438
+sur la résolution dynamique des liens.
+
+69
+00:04:05,438 --> 00:04:08,958
+Le problème est que lorsqu'on fait
+un passage par valeur,
+
+70
+00:04:08,958 --> 00:04:13,628
+l'objet Guerrier va être copié 
+dans une variable de type Personnage.
+
+71
+00:04:13,628 --> 00:04:18,958
+La méthode « rencontrer » ne va donc
+pas s'appliquer à l'instance d'origine,
+
+72
+00:04:19,688 --> 00:04:22,908
+mais à une copie de l'instance dans
+une variable de type Personnage.
+
+73
+00:04:23,518 --> 00:04:27,928
+En clair, si nous avions dans
+la variable g un objet de type Guerrier,
+
+74
+00:04:38,327 --> 00:04:43,077
+une fois copié dans la variable « un »,
+qui est de type Personnage,
+
+75
+00:04:53,238 --> 00:04:56,138
+il n'est plus perçu que
+comme un personnage.
+
+76
+00:04:57,833 --> 00:05:01,333
+Personnage qui n'a pas d'attributs
+pour une arme par exemple.
+
+77
+00:05:01,433 --> 00:05:04,336
+Ce qui est donc contenu
+dans la variable « un »
+
+78
+00:05:04,336 --> 00:05:07,599
+est bel et bien un objet 
+de type Personnage.
+
+79
+00:05:08,059 --> 00:05:11,373
+Par conséquent, même si la méthode
+« rencontrer » est virtuelle,
+
+80
+00:05:11,373 --> 00:05:14,633
+donc peut faire l'objet d'une résolution
+dynamique des liens,
+
+81
+00:05:14,633 --> 00:05:17,493
+et bien puisque l'objet contenu
+est un objet de type Personnage,
+
+82
+00:05:17,493 --> 00:05:20,313
+c'est toujours la méthode « rencontrer »
+
+83
+00:05:22,203 --> 00:05:24,603
+de Personnage qui va s'appliquer ici.
+
+84
+00:05:27,612 --> 00:05:30,278
+Comme évoqué dans la séquence précédente,
+
+85
+00:05:30,278 --> 00:05:32,944
+pour que la résolution dynamique des liens
+puisse avoir lieu,
+
+86
+00:05:32,944 --> 00:05:35,612
+il faut vraiment que deux ingrédients 
+soient présents,
+
+87
+00:05:35,612 --> 00:05:39,435
+le premier est la virtualité des méthodes,
+ce que nous venons de voir,
+
+88
+00:05:39,435 --> 00:05:42,078
+et il faut également 
+que ces méthodes virtuelles
+
+89
+00:05:42,078 --> 00:05:44,712
+puissent s'appliquer aux instances réelles
+
+90
+00:05:44,712 --> 00:05:46,862
+via des références ou des pointeurs.
+
+91
+00:05:47,311 --> 00:05:51,051
+Si ici nous faisons le choix 
+d'un passage par référence,
+
+92
+00:05:52,509 --> 00:05:56,529
+au moment du passage des arguments
+nous n'aurons pas de copie
+
+93
+00:05:57,479 --> 00:06:02,069
+dans un objet de type Personnage,
+nous indiquons simplement que 1
+
+94
+00:06:02,069 --> 00:06:04,529
+est un autre nom pour la variable g.
+
+95
+00:06:05,253 --> 00:06:10,663
+Nous permettons de ce fait à la méthode
+virtuelle d'opérer sur l'instance réelle.
+
+96
+00:06:11,223 --> 00:06:16,543
+En permettant à une méthode virtuelle
+d'opérer sur l'instance réelle,
+
+97
+00:06:16,543 --> 00:06:20,213
+nous obtenons alors l'effet voulu, 
+à savoir
+
+98
+00:06:22,274 --> 00:06:24,764
+une résolution dynamique des liens.
+
+99
+00:06:25,196 --> 00:06:29,196
+Comme dit précédemment, c'est en
+combinant l'utilisation des références
+
+100
+00:06:29,196 --> 00:06:32,806
+et la virtualité des méthodes
+que l'on obtient le résultat voulu.
+
+101
+00:06:32,806 --> 00:06:37,056
+Ici bien sûr, on pourrait se contenter
+d'un passage par référence constante
+
+102
+00:06:37,056 --> 00:06:39,666
+puisque la fonction « faire_rencontrer »
+
+103
+00:06:39,666 --> 00:06:42,836
+n'a pas pour but de modifier
+son paramètre « un ».
+
+104
+00:06:43,566 --> 00:06:48,356
+En clair, voilà comment devrait être
+le code au final pour que l'on obtienne
+
+105
+00:06:48,356 --> 00:06:51,956
+la résolution dynamique des liens
+dans le cadre de cet exemple.
+
+106
+00:06:52,286 --> 00:06:54,976
+Pour permettre donc à une méthode 
+virtuelle de travailler
+
+107
+00:06:54,976 --> 00:06:58,386
+sur l'instance réelle, il est possible donc
+d'utiliser les références.
+
+108
+00:06:58,386 --> 00:07:00,426
+On peut aussi utiliser les pointeurs
+
+109
+00:07:00,426 --> 00:07:02,516
+comme va le montrer l'exemple qui suit.
+
+110
+00:07:02,606 --> 00:07:06,236
+Et cette fois pour changer, un exemple
+zoologique où on a une sous-classe
+
+111
+00:07:06,236 --> 00:07:09,090
+Dauphin héritant 
+d'une super-classe Mammifere.
+
+112
+00:07:09,440 --> 00:07:10,644
+Chacune de ces classes
+
+113
+00:07:10,644 --> 00:07:14,330
+dispose d'un constructeur par défaut
+explicite et d'un destructeur.
+
+114
+00:07:15,400 --> 00:07:19,240
+Les « Mammifere » de façon générale ont
+une méthode par défaut pour manger.
+
+115
+00:07:20,420 --> 00:07:25,210
+Les « Dauphin » ont une méthode spécifique
+pour cette même action.
+
+116
+00:07:26,537 --> 00:07:28,657
+Et de même pour les méthodes
+qui permettent
+
+117
+00:07:28,657 --> 00:07:30,957
+de faire avancer le Mammifere
+ou le Dauphin.
+
+118
+00:07:31,107 --> 00:07:34,497
+Voici maintenant un petit programme
+principal qui utilise la hiérarchie
+
+119
+00:07:34,497 --> 00:07:36,887
+de classe que vous avez vue
+précédemment.
+
+120
+00:07:36,887 --> 00:07:41,047
+Étudions pas à pas son déroulement pour
+voir ce qu'il va produire comme affichage.
+
+121
+00:07:41,945 --> 00:07:45,775
+La première ligne du programme déclare
+une variable qui s'appelle « lui »,
+
+122
+00:07:45,781 --> 00:07:48,801
+qui est de type pointeur sur Mammifere.
+
+123
+00:07:49,181 --> 00:07:54,881
+Cette variable reçoit l'adresse d'un objet
+de type Dauphin alloué dynamiquement.
+
+124
+00:07:54,881 --> 00:07:59,121
+L'objet de type Dauphin alloué
+dynamiquement est construit au moyen
+
+125
+00:07:59,121 --> 00:08:02,291
+du constructeur par défaut
+de la classe Dauphin.
+
+126
+00:08:03,225 --> 00:08:10,475
+La variable lui contient donc l'adresse
+d'un objet de type Dauphin.
+
+127
+00:08:13,979 --> 00:08:17,819
+Le constructeur par défaut de 
+la classe Dauphin a été utilisé ici
+
+128
+00:08:17,819 --> 00:08:19,629
+pour construire cet objet.
+
+129
+00:08:21,879 --> 00:08:25,199
+Il s'agit donc de ce constructeur
+par défaut,
+
+130
+00:08:25,939 --> 00:08:28,435
+tel que défini dans 
+la sous-classe Dauphin.
+
+131
+00:08:28,435 --> 00:08:30,921
+Or le constructeur d'une
+sous-classe invoque toujours
+
+132
+00:08:30,921 --> 00:08:33,499
+le constructeur de la super-classe.
+
+133
+00:08:33,669 --> 00:08:38,469
+S'il ne le fait pas explicitement,
+c'est qu'il y a eu appel
+
+134
+00:08:38,469 --> 00:08:40,729
+au constructeur par défaut 
+de la super-classe.
+
+135
+00:08:41,047 --> 00:08:45,448
+Ce qui veut dire concrètement qu'avant
+que le message « Coui, Couic ! » s'affiche,
+
+136
+00:08:45,448 --> 00:08:49,248
+s'affiche, il y a le message « Un
+nouveau mammifère est né ! ».
+
+137
+00:08:49,838 --> 00:08:54,928
+L'exécution de cette ligne de code va
+donc poser le premier affichage suivant :
+
+138
+00:08:54,929 --> 00:08:57,679
+Un nouveau mammifère est né ! Pourquoi ?
+
+139
+00:08:57,679 --> 00:09:00,229
+Parce que le constructeur 
+par défaut de Dauphin
+
+140
+00:09:00,229 --> 00:09:04,079
+a implicitement appelé le constructeur
+par défaut de Mammifere.
+
+141
+00:09:04,475 --> 00:09:07,605
+Le constructeur de la super-classe
+Mammifere a été invoqué
+
+142
+00:09:07,605 --> 00:09:09,711
+par celui de la classe Dauphin.
+
+143
+00:09:09,711 --> 00:09:11,325
+Lorsqu'il a terminé son exécution,
+
+144
+00:09:11,325 --> 00:09:14,869
+le corps du constructeur de Dauphin
+peut s'exécuter,
+
+145
+00:09:14,869 --> 00:09:16,785
+ce qui produit l'affichage suivant.
+
+146
+00:09:17,389 --> 00:09:18,779
+Seconde ligne.
+
+147
+00:09:20,819 --> 00:09:24,059
+On applique à l'objet
+pointé par le pointeur lui,
+
+148
+00:09:24,059 --> 00:09:27,679
+c'est-à-dire cet objet,
+la méthode avancer.
+
+149
+00:09:28,089 --> 00:09:31,409
+Notez ici au passage que par le fait
+que nous utilisons des pointeurs,
+
+150
+00:09:31,409 --> 00:09:34,729
+nous permettons à la méthode 
+de s'appliquer
+
+151
+00:09:34,729 --> 00:09:38,519
+à l'instance réelle pointée par l'objet,
+
+152
+00:09:38,519 --> 00:09:40,509
+et donc d'avoir du polymorphisme.
+
+153
+00:09:40,899 --> 00:09:46,352
+Rappelons que la notation 
+« lui->avancer() »
+
+154
+00:09:47,982 --> 00:09:55,485
+est équivalente à la notation
+« (*lui).avancer() ».
+
+155
+00:09:56,099 --> 00:10:00,969
+Nous accédons au contenu
+pointé par le pointeur « lui »,
+
+156
+00:10:00,969 --> 00:10:04,109
+et à cet objet nous appliquons
+la méthode « avancer ».
+
+157
+00:10:05,389 --> 00:10:09,019
+La méthode « avancer » est définie 
+comme virtuelle dans la super-classe
+
+158
+00:10:09,019 --> 00:10:11,245
+puis redéfinie dans 
+la sous-classe Dauphin.
+
+159
+00:10:11,545 --> 00:10:13,981
+Comme nous permettons 
+à cette méthode virtuelle
+
+160
+00:10:13,981 --> 00:10:17,799
+d'agir directement sur l'instance réelle
+par le biais du pointeur,
+
+161
+00:10:17,799 --> 00:10:22,599
+la résolution dynamique des liens
+a lieu et c'est la méthode « avancer »
+
+162
+00:10:22,599 --> 00:10:24,149
+du Dauphin qui s'applique.
+
+163
+00:10:24,839 --> 00:10:29,819
+Par conséquent, c'est le message
+« Je nage » qui va s'afficher ici,
+
+164
+00:10:29,819 --> 00:10:32,689
+et nous obtenons à ce stade
+l'affichage suivant.
+
+165
+00:10:33,199 --> 00:10:37,069
+Passons à la ligne suivante où 
+la méthode « manger » est invoquée
+
+166
+00:10:37,739 --> 00:10:39,819
+sur l'objet pointé par « lui ».
+
+167
+00:10:40,409 --> 00:10:44,409
+La méthode « manger » est bien redéfinie
+dans la classe Dauphin mais attention,
+
+168
+00:10:44,409 --> 00:10:47,359
+contrairement au cas précédent,
+la méthode manger
+
+169
+00:10:48,029 --> 00:10:51,939
+n'est pas déclarée comme virtuelle
+dans la super-classe.
+
+170
+00:10:51,968 --> 00:10:55,684
+La méthode « manger » est bel et bien
+appelée via un pointeur
+
+171
+00:10:55,684 --> 00:10:57,910
+mais il n'y a là qu'un seul 
+des deux ingrédients
+
+172
+00:10:57,910 --> 00:11:02,068
+qui est présent pour la résolution
+dynamique des liens, l'aspect pointeur,
+
+173
+00:11:02,068 --> 00:11:06,210
+mais le second aspect, la virtualité 
+de la méthode, n'est pas présent,
+
+174
+00:11:06,210 --> 00:11:08,430
+ce qui signifie que l'on ne peut pas avoir
+
+175
+00:11:08,430 --> 00:11:10,190
+une résolution dynamique des liens.
+
+176
+00:11:10,630 --> 00:11:13,961
+Dans ce cas, c'est le type 
+de la variable qui prime.
+
+177
+00:11:13,961 --> 00:11:16,442
+« lui » est un pointeur sur Mammifère,
+
+178
+00:11:16,442 --> 00:11:22,163
+donc le contenu pointé est perçu 
+comme un objet de type Mammifere.
+
+179
+00:11:23,379 --> 00:11:27,062
+La résolution statique des liens a donc
+lieu dans ce cas
+
+180
+00:11:27,062 --> 00:11:31,102
+et c'est la méthode manger de Mammifere
+qui va être appelée ici.
+
+181
+00:11:31,812 --> 00:11:35,962
+L'affichage après l'exécution 
+de cette instruction sera donc :
+
+182
+00:11:36,422 --> 00:11:41,405
+«Miam... croumf ! », qui est le message
+propre à la méthode manger du Mammifere.
+
+183
+00:11:41,848 --> 00:11:43,758
+Passons à la ligne suivante.
+
+184
+00:11:44,778 --> 00:11:49,136
+« delete lui » signifie que l'on désalloue
+l'emplacement mémoire alloué
+
+185
+00:11:49,136 --> 00:11:51,446
+dynamiquement à ce stade du programme.
+
+186
+00:11:51,451 --> 00:11:57,271
+Ceci signifie en clair, que l'on récupère
+l'emplacement mémoire associé
+
+187
+00:11:57,271 --> 00:11:59,901
+à l'objet de type Dauphin 
+précédemment alloué.
+
+188
+00:12:00,725 --> 00:12:05,962
+« delete lui » cause donc la fin de vie 
+de cet objet et puisqu'il y a fin de vie,
+
+189
+00:12:05,962 --> 00:12:08,044
+il y a appel à un destructeur.
+
+190
+00:12:08,044 --> 00:12:10,936
+Mais de quel destructeur 
+exactement s'agit-il ?
+
+191
+00:12:11,646 --> 00:12:13,920
+Si on examine le code de la classe
+Mammifere,
+
+192
+00:12:13,920 --> 00:12:18,140
+on peut observer que le destructeur 
+y a été déclaré comme virtuel.
+
+193
+00:12:18,410 --> 00:12:23,000
+Ceci signifie que cette méthode pour peu
+qu'elle soit appliquée via un pointeur
+
+194
+00:12:23,000 --> 00:12:26,600
+par exemple, va faire l'objet de la
+résolution dynamique des liens.
+
+195
+00:12:27,730 --> 00:12:31,730
+Le destructeur est bel et bien invoqué
+via un pointeur, ce qui signifie
+
+196
+00:12:31,730 --> 00:12:35,990
+que la résolution dynamique des liens
+a lieu pour la destruction aussi.
+
+197
+00:12:36,500 --> 00:12:39,693
+L'objet va être perçu en fonction
+de sa nature réelle,
+
+198
+00:12:39,693 --> 00:12:41,476
+c'est-à-dire en tant que Dauphin,
+
+199
+00:12:41,476 --> 00:12:44,460
+et c'est le destructeur du Dauphin 
+qui va être invoqué,
+
+200
+00:12:44,460 --> 00:12:46,890
+ce qui cause l'affichage suivant.
+
+201
+00:12:47,750 --> 00:12:51,750
+Nous avons vu dans une séquence précédente
+que l'ordre d'invocation des destructeurs
+
+202
+00:12:51,750 --> 00:12:54,050
+est l'inverse de l'ordre 
+de la construction,
+
+203
+00:12:54,050 --> 00:12:58,250
+donc pour construire un objet 
+de type Dauphin, il y a eu appel
+
+204
+00:12:58,250 --> 00:13:01,830
+au constructeur de la super-classe 
+Mammifere puis à celui de Dauphin.
+
+205
+00:13:01,830 --> 00:13:03,900
+Pour la destruction, c'est l'inverse,
+
+206
+00:13:03,900 --> 00:13:07,310
+on va avoir un appel 
+au destructeur de Dauphin,
+
+207
+00:13:07,310 --> 00:13:10,850
+suivi d'un appel au destructeur 
+de Mammifere.
+
+208
+00:13:11,770 --> 00:13:15,560
+Imaginons maintenant que le destructeur
+de la classe Mammifere
+
+209
+00:13:15,560 --> 00:13:18,026
+n'ait pas été déclaré comme virtuel.
+
+210
+00:13:18,606 --> 00:13:22,796
+Puisque le destructeur n'est pas déclaré
+comme virtuel dans la classe Mammifere,
+
+211
+00:13:22,796 --> 00:13:26,996
+l'appel qui y est fait ici ne peut pas
+être résolu dynamiquement.
+
+212
+00:13:26,996 --> 00:13:30,795
+Ceci signifie que c'est le type de la
+variable qui va primer
+
+213
+00:13:30,795 --> 00:13:32,514
+pour le choix de la méthode destructeur,
+
+214
+00:13:32,514 --> 00:13:36,695
+et donc c'est ce destructeur
+qui est invoqué et non plus celui-ci.
+
+215
+00:13:37,295 --> 00:13:40,098
+Concrètement donc, si le destructeur 
+de Mammifere
+
+216
+00:13:40,098 --> 00:13:42,251
+n'avait pas été virtuel
+dans notre exemple,
+
+217
+00:13:42,251 --> 00:13:46,155
+eh bien seul le destructeur
+de Mammifere aurait été invoqué,
+
+218
+00:13:46,155 --> 00:13:48,431
+le destructeur du Dauphin ne l'est pas.
+
+219
+00:13:48,431 --> 00:13:51,547
+Ce qui signifie que l'objet alloué
+dynamiquement dans le programme
+
+220
+00:13:51,547 --> 00:13:54,545
+qui est de type Dauphin,
+n'est que partiellement détruit.
+
+221
+00:13:54,545 --> 00:13:58,515
+Seul la part du Mammifere
+dans le Dauphin aurait été détruite ici.
+
+222
+00:13:58,885 --> 00:14:01,549
+Si l'objet de type Dauphin 
+dynamiquement alloué ici,
+
+223
+00:14:01,549 --> 00:14:03,903
+avait requis un certain nombre
+de ressources,
+
+224
+00:14:03,903 --> 00:14:07,219
+et bien ces ressources n'auraient donc 
+pas pu être libérées proprement.
+
+225
+00:14:07,771 --> 00:14:12,058
+Pour résumer, lorsqu'une méthode
+virtuelle s'applique via une référence
+
+226
+00:14:12,058 --> 00:14:16,438
+ou un pointeur, c'est-à-dire lorsque 
+ces deux ingrédients sont réunis,
+
+227
+00:14:18,839 --> 00:14:23,549
+alors le choix de la méthode se fait
+en fonction du type réel de l'instance.
+
+228
+00:14:23,549 --> 00:14:26,689
+On a ce qu'on appelle la résolution
+dynamique des liens.
+
+229
+00:14:27,079 --> 00:14:30,609
+Mais attention, quelques remarques
+importantes par rapport à la virtualité
+
+230
+00:14:30,609 --> 00:14:33,139
+dans le cadre de la
+construction-destruction.
+
+231
+00:14:33,139 --> 00:14:35,849
+Comme nous l'avons vu dans l'exemple 
+des Mammifere et des Dauphin,
+
+232
+00:14:35,849 --> 00:14:38,849
+pour éviter qu'une destruction d'objet 
+ne soit que partielle,
+
+233
+00:14:38,849 --> 00:14:42,459
+il est conseillé de toujours déclarer 
+les destructeurs comme virtuels.
+
+234
+00:14:42,779 --> 00:14:45,929
+Par contre, comme un constructeur 
+a toujours pour vocation
+
+235
+00:14:45,929 --> 00:14:49,849
+d'initialiser l'instance courante, 
+eh bien il ne peut pas être virtuel.
+
+236
+00:14:50,269 --> 00:14:53,229
+S'il appelle à son tour 
+des méthodes virtuelles,
+
+237
+00:14:53,229 --> 00:14:56,639
+alors l'aspect virtuel de ces méthodes 
+sera tout simplement ignoré.
+
+238
+00:14:56,639 --> 00:15:01,218
+Il s'agit là d'un aspect avancé, voyons 
+ce qu'il signifie sur un exemple concret.
+
+239
+00:15:01,938 --> 00:15:04,314
+Voici donc un exemple un petit peu
+académique mais pour expliquer
+
+240
+00:15:04,314 --> 00:15:06,280
+ce qui se passe dans ce cas de figure,
+
+241
+00:15:06,280 --> 00:15:10,508
+où nous avons une super-classe grand A,
+dont hérite une sous-classe grand B.
+
+242
+00:15:11,421 --> 00:15:15,669
+Les deux classes comportent une méthode f
+qui se trouve être virtuelle,
+
+243
+00:15:15,669 --> 00:15:18,818
+et qui donc est redéfinie
+dans la sous-classe grand B.
+
+244
+00:15:19,208 --> 00:15:23,088
+Lorsque nous exécutons cette ligne
+de code, il y a appel au constructeur
+
+245
+00:15:23,088 --> 00:15:27,458
+par défaut de la classe grand A,
+lequel fait appel à la méthode f.
+
+246
+00:15:27,988 --> 00:15:31,988
+La méthode f s'applique à l'objet this
+qui est de type grand A,
+
+247
+00:15:31,988 --> 00:15:36,558
+et donc on va naturellement invoquer
+la méthode f de la classe grand A,
+
+248
+00:15:36,558 --> 00:15:43,408
+ce qui aura pour conséquence
+d'afficher ceci :
+
+249
+00:15:44,602 --> 00:15:48,602
+Pour la seconde ligne, nous avons
+construction d'un objet de type B,
+
+250
+00:15:48,602 --> 00:15:51,372
+il n'y a pas de constructeur explicite
+dans la classe B,
+
+251
+00:15:51,382 --> 00:15:54,862
+c'est donc le constructeur par défaut 
+qui va être invoqué,
+
+252
+00:15:54,862 --> 00:15:58,832
+lequel va aussi invoquer le constructeur 
+par défaut de la super-classe.
+
+253
+00:15:59,592 --> 00:16:03,805
+La méthode f s'applique donc désormais
+à un objet this de type grand B,
+
+254
+00:16:03,805 --> 00:16:07,725
+cependant l'aspect virtuel de la
+méthode est complètement ignoré
+
+255
+00:16:07,725 --> 00:16:09,487
+dans un constructeur.
+
+256
+00:16:09,487 --> 00:16:14,817
+Donc cet aspect n'est pas pris en compte,
+et c'est toujours la méthode
+
+257
+00:16:14,817 --> 00:16:16,657
+de la classe courante qui est appelée.
+
+258
+00:16:16,657 --> 00:16:20,677
+Par conséquent, ici également lors 
+de l'exécution de cette seconde ligne
+
+259
+00:16:20,677 --> 00:16:23,897
+nous aurons aussi l'affichage suivant.
+
+260
+00:16:24,119 --> 00:16:29,599
+La ligne suivante de code déclare une
+variable pa de type pointeur sur un A,
+
+261
+00:16:29,599 --> 00:16:32,429
+et l'initialise avec
+l'adresse de l'objet b.
+
+262
+00:16:32,639 --> 00:16:37,879
+La méthode f est ensuite invoquée
+sur l'objet pointé par le pointeur pa,
+
+263
+00:16:37,879 --> 00:16:40,269
+qui est un objet de type B.
+
+264
+00:16:40,466 --> 00:16:42,466
+Ici, les deux ingrédients nécessaires
+
+265
+00:16:42,466 --> 00:16:45,236
+à la résolution dynamique 
+des liens sont réunis.
+
+266
+00:16:45,236 --> 00:16:50,356
+Nous avons une méthode f virtuelle
+qui est invoquée via un pointeur.
+
+267
+00:16:50,356 --> 00:16:53,056
+La méthode f va donc être choisie
+
+268
+00:16:53,056 --> 00:16:56,006
+en fonction de la nature réelle
+de l'instance pointée,
+
+269
+00:16:56,006 --> 00:16:59,716
+et donc c'est la méthode f
+de la classe B qui va être invoquée.
+
+270
+00:17:00,618 --> 00:17:04,008
+C'est donc ici un message différent 
+qui va s'afficher
+
+271
+00:17:04,008 --> 00:17:07,167
+lors de l'exécution de 
+cette dernière ligne de code.
+
+272
+00:17:07,167 --> 00:17:11,437
+Ici, nous avons bel et bien eu un
+comportement polymorphique de la méthode f
+
+273
+00:17:11,437 --> 00:17:14,237
+car nous l'avons invoquée en
+dehors d'un constructeur.
+
+274
+00:17:14,237 --> 00:17:18,057
+Par contre ici, l'aspect polymorphique
+a été complètement ignoré.
+
+275
+00:17:18,173 --> 00:17:22,060
+Et ceci termine notre séquence sur les
+méthodes virtuelles qui, en C++,
+
+276
+00:17:22,060 --> 00:17:25,180
+sont la base de la mise en oeuvre
+du polymorphisme.

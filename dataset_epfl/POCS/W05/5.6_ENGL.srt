@@ -1,0 +1,628 @@
+1
+00:00:03,687 --> 00:00:05,807
+In this video, we discuss 
+snapshot isolation
+
+2
+00:00:05,807 --> 00:00:07,557
+which is yet another formalism
+
+3
+00:00:07,557 --> 00:00:10,367
+for achieving a notion
+of concurrency control.
+
+4
+00:00:12,237 --> 00:00:13,737
+Before we go there, however,
+
+5
+00:00:13,737 --> 00:00:17,177
+let's look at transaction support 
+in standard SQL-92.
+
+6
+00:00:17,780 --> 00:00:20,056
+Inside there, we actually 
+have four different,
+
+7
+00:00:20,056 --> 00:00:21,432
+so-called, isolation levels.
+
+8
+00:00:21,432 --> 00:00:22,700
+Which you can actually 
+pick and choose
+
+9
+00:00:22,700 --> 00:00:24,430
+when you start a transaction.
+
+10
+00:00:24,567 --> 00:00:26,347
+And they have names, 
+they are called:
+
+11
+00:00:26,347 --> 00:00:29,724
+read uncommitted, read committed, 
+repeatable reads, and serializable.
+
+12
+00:00:29,904 --> 00:00:31,814
+And they are subsequently
+stronger and stronger,
+
+13
+00:00:31,814 --> 00:00:33,014
+up to serializable,
+
+14
+00:00:33,014 --> 00:00:34,994
+which is meant to 
+guarantee serializability
+
+15
+00:00:34,994 --> 00:00:36,384
+in the way that we have defined it.
+
+16
+00:00:37,539 --> 00:00:40,315
+They can be characterized,
+
+17
+00:00:40,315 --> 00:00:41,251
+or classified
+
+18
+00:00:41,251 --> 00:00:43,229
+by which anomalies they avoid,
+
+19
+00:00:43,229 --> 00:00:45,389
+and you can see that the weakest,
+the uncommitted,
+
+20
+00:00:45,389 --> 00:00:47,249
+avoids none of these
+three classic anomalies,
+
+21
+00:00:47,249 --> 00:00:49,749
+dirty reads, unrepeatable reads, 
+and phantom problem,
+
+22
+00:00:49,749 --> 00:00:52,039
+while serializability, 
+it does all of them.
+
+23
+00:00:52,723 --> 00:00:55,113
+There is however a problem, 
+in a sense that is,
+
+24
+00:00:55,113 --> 00:00:58,513
+the classical standard defines, 
+essentially, serializability
+
+25
+00:00:58,513 --> 00:01:00,113
+via an implementation.
+
+26
+00:01:00,362 --> 00:01:01,522
+Which is based on locking.
+
+27
+00:01:01,522 --> 00:01:03,482
+That means if you choose
+to try to achieve
+
+28
+00:01:03,482 --> 00:01:05,802
+another implementation
+using different techniques,
+
+29
+00:01:05,802 --> 00:01:06,962
+you might be wrong.
+
+30
+00:01:06,962 --> 00:01:10,962
+And this has actually happened 
+in real, popular database systems.
+
+31
+00:01:11,838 --> 00:01:14,588
+Particularly, snapshot 
+isolation is a technique
+
+32
+00:01:14,598 --> 00:01:17,038
+that is meant to achieve 
+serializability,
+
+33
+00:01:17,038 --> 00:01:17,908
+but actually does not.
+
+34
+00:01:17,908 --> 00:01:19,638
+This was not always clear.
+
+35
+00:01:19,961 --> 00:01:21,731
+However, it is actually used 
+and implemented in
+
+36
+00:01:21,731 --> 00:01:25,071
+major database systems like Oracle, 
+Microsoft SQL Server, and Postgres.
+
+37
+00:01:25,280 --> 00:01:28,820
+So if you studied transaction 
+in Oracle for example,
+
+38
+00:01:28,820 --> 00:01:31,030
+and you set isolation level 
+to serializable,
+
+39
+00:01:31,030 --> 00:01:33,403
+you do no guarantee serializability.
+
+40
+00:01:33,403 --> 00:01:35,563
+And there anomalies that can still happen.
+
+41
+00:01:36,653 --> 00:01:39,713
+However, that is called 
+serializable in these systems.
+
+42
+00:01:40,754 --> 00:01:45,084
+There is actually a patch that somewhat 
+gracefully allows us to modify
+
+43
+00:01:45,084 --> 00:01:48,764
+snapshot isolation into something 
+that actually guarantees serializability.
+
+44
+00:01:48,764 --> 00:01:51,224
+And that has recently 
+been implemented in Postgres.
+
+45
+00:01:51,224 --> 00:01:53,384
+So nowadays, 
+different from earlier versions,
+
+46
+00:01:53,384 --> 00:01:56,724
+when you use Postgres, 
+and you use serializable isolation level,
+
+47
+00:01:56,724 --> 00:01:58,664
+you really guarantee serializability.
+
+48
+00:01:59,183 --> 00:01:59,893
+By default.
+
+49
+00:01:59,893 --> 00:02:03,233
+You can still turn it off, and get 
+the old notion of serializability.
+
+50
+00:02:04,581 --> 00:02:06,441
+So how does snapshot isolation work?
+
+51
+00:02:06,752 --> 00:02:08,882
+Conceptually, a transaction
+works on a copy
+
+52
+00:02:08,882 --> 00:02:10,952
+made by the transaction at start time.
+
+53
+00:02:11,172 --> 00:02:15,105
+So in that sense, it is like
+multi-level concurrency control,
+
+54
+00:02:15,435 --> 00:02:16,178
+conceptually,
+
+55
+00:02:16,348 --> 00:02:18,512
+and it's like optimistic 
+concurrency control.
+
+56
+00:02:18,768 --> 00:02:19,878
+Of course, in practice,
+
+57
+00:02:19,878 --> 00:02:24,148
+you don't want to implement
+copying of the entire database,
+
+58
+00:02:24,148 --> 00:02:26,248
+by really copying it, 
+but what you want to do is,
+
+59
+00:02:26,248 --> 00:02:29,298
+you want to have a multi-version
+concurrency control style scheme
+
+60
+00:02:29,298 --> 00:02:32,478
+where you only copy objects 
+that are getting modified.
+
+61
+00:02:33,154 --> 00:02:34,784
+And this method, of course,
+
+62
+00:02:34,784 --> 00:02:38,564
+guarantees that reads in a transaction
+see a consistent version of the database.
+
+63
+00:02:38,564 --> 00:02:41,004
+Namely, the consistent 
+version of the database
+
+64
+00:02:41,004 --> 00:02:43,494
+at the time the transaction started.
+
+65
+00:02:43,819 --> 00:02:46,719
+By "consistency," I'm a bit sloppy, 
+because, as I said,
+
+66
+00:02:46,729 --> 00:02:50,399
+conceptually, we think of consistency
+only being guaranteed by serializability
+
+67
+00:02:50,399 --> 00:02:53,019
+which is not guaranteed 
+by snapshot isolation.
+
+68
+00:02:53,019 --> 00:02:54,329
+So of course, in a sense,
+
+69
+00:02:54,329 --> 00:02:56,519
+snapshot isolation 
+can corrupt our database,
+
+70
+00:02:56,519 --> 00:02:57,969
+and then we don't see, after,
+
+71
+00:02:57,969 --> 00:02:59,389
+all the transactions 
+that have been committed,
+
+72
+00:02:59,389 --> 00:03:01,899
+and we start a new one, 
+a consistent version of the database.
+
+73
+00:03:01,899 --> 00:03:02,659
+But let's ignore this.
+
+74
+00:03:02,659 --> 00:03:04,229
+Let's assume there are
+no transactions yet.
+
+75
+00:03:04,229 --> 00:03:06,085
+The database is consistent by
+
+76
+00:03:06,585 --> 00:03:07,301
+the field,
+
+77
+00:03:07,471 --> 00:03:09,939
+And now we populate the database,
+
+78
+00:03:09,939 --> 00:03:12,489
+and we only, in that transaction,
+
+79
+00:03:12,489 --> 00:03:17,269
+see the database as copied, 
+or as modified by us.
+
+80
+00:03:17,528 --> 00:03:19,648
+Other modifications 
+work on different copies,
+
+81
+00:03:19,648 --> 00:03:22,328
+and don't affect what we see 
+in our transaction.
+
+82
+00:03:23,060 --> 00:03:25,130
+Now, committing is only allowed
+
+83
+00:03:25,130 --> 00:03:29,020
+if there is no updates of this transaction
+that conflict with updates made
+
+84
+00:03:29,020 --> 00:03:30,400
+since the start of the snapshot.
+
+85
+00:03:30,400 --> 00:03:32,000
+That means by other transactions.
+
+86
+00:03:32,109 --> 00:03:36,149
+And that can, of course, be verified 
+by something like write sets,
+
+87
+00:03:36,149 --> 00:03:37,929
+as in optimistic concurrency control.
+
+88
+00:03:38,703 --> 00:03:41,383
+Now, unfortunately, this does not
+guarantee serializability,
+
+89
+00:03:41,383 --> 00:03:42,703
+and here's a COUNT example.
+
+90
+00:03:42,703 --> 00:03:45,983
+And this kind of COUNT example
+is called a write skew anomaly.
+
+91
+00:03:46,420 --> 00:03:48,750
+So here we've got two transactions:
+T1 and T2.
+
+92
+00:03:49,073 --> 00:03:51,553
+And T1 reads A, and T2 reads B.
+
+93
+00:03:51,784 --> 00:03:54,804
+Then T1 writes B, and T2 writes A.
+
+94
+00:03:55,537 --> 00:03:58,487
+These two transactions 
+have no overlap in their write sets.
+
+95
+00:03:58,487 --> 00:04:01,327
+That means the condition 
+that is required
+
+96
+00:04:01,327 --> 00:04:03,587
+by snapshot isolation
+is actually ensured,
+
+97
+00:04:03,587 --> 00:04:05,887
+and these two transactions 
+are allowed to commit.
+
+98
+00:04:05,887 --> 00:04:08,897
+However, there is no
+equivalency of the schedule.
+
+99
+00:04:09,452 --> 00:04:10,772
+That's a problem, of course.
+
+100
+00:04:12,116 --> 00:04:12,906
+In a sense,
+
+101
+00:04:12,906 --> 00:04:16,346
+snapshot isolation is related 
+to optimistic concurrency control,
+
+102
+00:04:16,941 --> 00:04:20,671
+in that, conceptually, snapshots
+are created at transaction start time,
+
+103
+00:04:21,201 --> 00:04:22,961
+and there is an analysis phase.
+
+104
+00:04:23,191 --> 00:04:26,481
+Which, a bit like in 
+optimistic concurrency control,
+
+105
+00:04:26,481 --> 00:04:27,421
+looks at what has happened,
+
+106
+00:04:27,421 --> 00:04:29,801
+and then decides whether the transaction
+can actually commit or not.
+
+107
+00:04:29,801 --> 00:04:30,724
+And if it commits,
+
+108
+00:04:30,724 --> 00:04:33,237
+it conceptually writes,
+at the time of the commit,
+
+109
+00:04:33,237 --> 00:04:35,421
+the data back into the database.
+
+110
+00:04:35,757 --> 00:04:36,597
+From its copy.
+
+111
+00:04:37,769 --> 00:04:39,979
+In a different way, 
+different sense,
+
+112
+00:04:39,979 --> 00:04:42,949
+it's also similar to 
+multi-version concurrency control.
+
+113
+00:04:42,949 --> 00:04:45,519
+And you can think of multi-version
+concurrency control
+
+114
+00:04:45,519 --> 00:04:47,599
+as a way of implementing
+snapshot isolation.
+
+115
+00:04:47,599 --> 00:04:50,569
+Or a weakened version of 
+multi-version concurrency control
+
+116
+00:04:50,569 --> 00:04:53,199
+where write-read conflicts
+are not properly caught,
+
+117
+00:04:53,199 --> 00:04:55,582
+is someway that corresponds
+to snapshot isolation.
+
+118
+00:04:56,473 --> 00:04:58,843
+But, of course, in snapshot isolation,
+
+119
+00:04:58,843 --> 00:05:01,433
+we don't have to maintain 
+a read and write time stamp,
+
+120
+00:05:01,433 --> 00:05:03,723
+which is basically the reason, arguably,
+
+121
+00:05:03,723 --> 00:05:06,305
+why one might say, 
+you could use snapshot isolation.
+
+122
+00:05:06,305 --> 00:05:08,685
+Another argument would be 
+that people were not aware
+
+123
+00:05:08,686 --> 00:05:10,666
+that snapshot isolation 
+doesn't guarantee serializability,
+
+124
+00:05:10,666 --> 00:05:12,246
+when they chose to implement it.
+
+125
+00:05:13,348 --> 00:05:14,858
+So it's important to understand
+
+126
+00:05:14,858 --> 00:05:17,408
+that snapshot isolation
+does not use locks a priori.
+
+127
+00:05:17,408 --> 00:05:22,468
+So you mustn't equate concurrency 
+control with locking in databases.
+
+128
+00:05:22,468 --> 00:05:25,048
+There is techniques, 
+and they absolutely don't use locking.
+
+129
+00:05:26,221 --> 00:05:27,371
+However, that said,
+
+130
+00:05:27,371 --> 00:05:29,611
+there is systems that use 
+snapshot isolation,
+
+131
+00:05:29,611 --> 00:05:31,461
+nevertheless, have locks 
+for other reasons.
+
+132
+00:05:31,461 --> 00:05:36,091
+For example, for supporting 
+distributed database transactions.
+
+133
+00:05:37,818 --> 00:05:41,068
+So it's important to understand 
+snapshot isolation,
+
+134
+00:05:41,068 --> 00:05:42,548
+because it has its pitfalls.
+
+135
+00:05:42,548 --> 00:05:45,238
+It doesn't guarantee serializability,
+and it's actually,
+
+136
+00:05:45,238 --> 00:05:49,011
+essentially, the dominating method 
+in real-world database systems.

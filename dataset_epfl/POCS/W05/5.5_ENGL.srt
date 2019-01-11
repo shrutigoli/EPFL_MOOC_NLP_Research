@@ -1,0 +1,638 @@
+1
+00:00:04,375 --> 00:00:07,443
+In this video, we discuss
+multiversion concurrency control
+
+2
+00:00:07,443 --> 00:00:11,443
+which is yet another concurrency control
+for achieving serializability.
+
+3
+00:00:11,759 --> 00:00:16,049
+So the basic idea is that you can have
+multiple versions of objects
+
+4
+00:00:16,049 --> 00:00:18,259
+that means we create copies
+when we need them
+
+5
+00:00:18,259 --> 00:00:23,649
+to be able to make sure that
+there is an appropriate copy version
+
+6
+00:00:23,649 --> 00:00:27,139
+for each relevant transaction
+still alive in the system,
+
+7
+00:00:27,139 --> 00:00:29,739
+so that transactions
+can find the object it needs.
+
+8
+00:00:29,739 --> 00:00:32,419
+So in this way, we can basically
+create something
+
+9
+00:00:32,419 --> 00:00:36,229
+like efficient snapshots of the databases
+as it’s also needed, necessary,
+
+10
+00:00:36,229 --> 00:00:38,999
+inside the optimistic
+concurrency control.
+
+11
+00:00:39,023 --> 00:00:44,063
+So we will have in channel a version pool
+and the versions are chained
+
+12
+00:00:44,401 --> 00:00:47,931
+so that the new versions chain
+backwards to the older versions
+
+13
+00:00:47,931 --> 00:00:50,221
+and we can find which older
+versions exist.
+
+14
+00:00:50,221 --> 00:00:52,431
+And there is a main segment
+that tells me about
+
+15
+00:00:52,431 --> 00:00:55,561
+what the current versions
+of DB objects is for new transactions.
+
+16
+00:00:56,411 --> 00:00:59,771
+Each version of an object
+has again a timestamp,
+
+17
+00:00:59,771 --> 00:01:03,831
+a write timestamp and a read timestamp
+just as in timestamp concurrency control.
+
+18
+00:01:03,831 --> 00:01:07,701
+Transactions are classified
+either as readers or writers.
+
+19
+00:01:07,754 --> 00:01:10,874
+The readers can only read.
+The writers can read and write.
+
+20
+00:01:10,934 --> 00:01:13,934
+And the transaction
+has to be declaring its start time
+
+21
+00:01:13,934 --> 00:01:15,534
+whether is a reader or a writer.
+
+22
+00:01:15,534 --> 00:01:19,254
+The fact is just simply that if you know
+that a transaction will never write,
+
+23
+00:01:19,254 --> 00:01:21,304
+we can deliver it more efficiently.
+
+24
+00:01:22,257 --> 00:01:26,257
+And in particular, readers are always
+allowed to proceed, while in general,
+
+25
+00:01:26,257 --> 00:01:30,507
+sometimes we might have to terminate
+and restart writers or block them.
+
+26
+00:01:32,464 --> 00:01:34,494
+The protocol again
+is somewhat complicated
+
+27
+00:01:34,494 --> 00:01:38,594
+and we’re going to discuss the cases
+of readers and writers individually.
+
+28
+00:01:38,733 --> 00:01:40,906
+A reader transaction works as follows.
+
+29
+00:01:40,906 --> 00:01:44,116
+For each object to be read,
+it finds the newest version
+
+30
+00:01:44,319 --> 00:01:48,999
+in the version pool with the write
+timestamp of that object
+
+31
+00:01:49,119 --> 00:01:51,619
+being less than our timestamp.
+
+32
+00:01:52,206 --> 00:01:55,166
+That means, assuming that
+we want to read this object,
+
+33
+00:01:55,166 --> 00:01:57,386
+we’re not going to update
+its write timestamp
+
+34
+00:01:57,386 --> 00:02:02,356
+and we’re going to find the newest
+write timestamp of any transaction
+
+35
+00:02:02,518 --> 00:02:04,958
+that is older than my transaction.
+
+36
+00:02:05,544 --> 00:02:08,914
+Again, as in timestamp
+concurrency of control protocols,
+
+37
+00:02:09,013 --> 00:02:14,473
+we’re going to try to serialize
+the transactions by transaction timestamp.
+
+38
+00:02:14,473 --> 00:02:18,192
+That means we want to serialize them
+in such a way that an older transaction
+
+39
+00:02:18,192 --> 00:02:20,592
+is serialized before a new transaction.
+
+40
+00:02:20,940 --> 00:02:24,940
+And of course in a serial
+orders transaction,
+
+41
+00:02:25,467 --> 00:02:29,707
+my transaction can only read
+older transaction’s output.
+
+42
+00:02:29,747 --> 00:02:32,247
+I will never have to read my own
+transaction’s output
+
+43
+00:02:32,247 --> 00:02:33,787
+because I’m not a writer.
+
+44
+00:02:33,787 --> 00:02:37,787
+So I’m reading the most recent
+all the transactions write.
+
+45
+00:02:38,372 --> 00:02:42,372
+And you have to have such an object
+in the database.
+
+46
+00:02:42,593 --> 00:02:47,213
+For a writer transaction, reading works
+just as for reader transactions.
+
+47
+00:02:47,297 --> 00:02:51,107
+And to write we find the newest
+version of the object
+
+48
+00:02:51,159 --> 00:02:55,159
+such that its write timestamp is less than
+timestamp of the transaction.
+
+49
+00:02:57,016 --> 00:03:01,286
+And if the read timestamp of the object
+is less than the timestamp’s transaction,
+
+50
+00:03:01,286 --> 00:03:05,766
+we make a copy of that object
+with the write timestamp of this copy
+
+51
+00:03:05,766 --> 00:03:07,706
+being the timestamps of the transaction.
+
+52
+00:03:07,706 --> 00:03:10,676
+That means you create a new version
+especially for that transaction
+
+53
+00:03:10,676 --> 00:03:13,366
+and potentially later transactions,
+newer transactions
+
+54
+00:03:13,366 --> 00:03:14,928
+that might also want to read it.
+
+55
+00:03:14,928 --> 00:03:19,038
+The read timestamp is also going to be
+the timestamp of the transaction.
+
+56
+00:03:19,170 --> 00:03:22,398
+And otherwise, if the condition
+read timestamp of the object
+
+57
+00:03:22,398 --> 00:03:24,998
+is not less than the timestamp
+of the transaction,
+
+58
+00:03:24,998 --> 00:03:27,608
+we have to reject the write.
+
+59
+00:03:27,608 --> 00:03:29,779
+Now let’s go over an example.
+
+60
+00:03:29,779 --> 00:03:32,049
+We’ve got two transactions here,
+T1 and T2.
+
+61
+00:03:32,049 --> 00:03:35,169
+T1 starts by reading A.
+Then T2 reads B.
+
+62
+00:03:35,188 --> 00:03:38,818
+Then T1 writes B.
+And finally T2 writes A.
+
+63
+00:03:39,028 --> 00:03:43,028
+The two objects A and B have initial
+read and write timestamps zero.
+
+64
+00:03:43,028 --> 00:03:45,128
+That’s my initial version of the database.
+
+65
+00:03:45,406 --> 00:03:48,763
+And the version zero of the database
+has two values for A and B,
+
+66
+00:03:48,763 --> 00:03:50,930
+15 and six let's say.
+
+67
+00:03:51,010 --> 00:03:54,399
+So we start by reading A.
+
+68
+00:03:56,316 --> 00:03:57,776
+What does this involve?
+
+69
+00:03:57,776 --> 00:04:02,396
+We are going to look up
+the newest value for A
+
+70
+00:04:03,228 --> 00:04:06,618
+who’s timestamp is older than
+transaction T1.
+
+71
+00:04:08,720 --> 00:04:12,200
+That’s of course value 15 in V0.
+
+72
+00:04:12,664 --> 00:04:15,754
+We’re going to update
+the read timestamp to one.
+
+73
+00:04:17,306 --> 00:04:19,936
+Next we’re going to try to read B.
+
+74
+00:04:20,284 --> 00:04:25,334
+For that we look for the newest
+version of the database
+
+75
+00:04:25,820 --> 00:04:30,010
+for this object that is older than
+the two which is also V0.
+
+76
+00:04:30,010 --> 00:04:32,000
+So we get value six.
+
+77
+00:04:32,004 --> 00:04:34,534
+And we have to update the read
+timestamp to two.
+
+78
+00:04:35,124 --> 00:04:37,314
+Next we’re trying to write B.
+
+79
+00:04:38,276 --> 00:04:42,886
+So there we make a comparison
+between the transaction’s timestamp one
+
+80
+00:04:43,116 --> 00:04:47,426
+and the read timestamp of B which is two.
+
+81
+00:04:47,693 --> 00:04:50,193
+According to the rules
+we had on the previous slide,
+
+82
+00:04:50,354 --> 00:04:54,354
+we’re not allowed to do this write because
+we’re going to try backdate this write.
+
+83
+00:04:54,744 --> 00:05:00,344
+We are trying to write to an object
+while we already have read from an object
+
+84
+00:05:00,429 --> 00:05:02,754
+that should have been newer.
+
+85
+00:05:02,754 --> 00:05:04,299
+And this object didn’t exist.
+
+86
+00:05:04,299 --> 00:05:07,849
+That means the read of B in the two
+should have read this value
+
+87
+00:05:07,849 --> 00:05:09,279
+that we’re now going to write.
+
+88
+00:05:09,279 --> 00:05:11,689
+We didn’t do this,
+so we’re not allowed to do this.
+
+89
+00:05:11,689 --> 00:05:15,801
+That means we’re not allowed
+to perform this operation
+
+90
+00:05:15,801 --> 00:05:18,981
+and we will exit this transaction.
+
+91
+00:05:18,981 --> 00:05:21,611
+Now let’s look at the second example.
+
+92
+00:05:21,611 --> 00:05:23,291
+This is the same example again.
+
+93
+00:05:23,291 --> 00:05:27,291
+Let’s modify this by say, writing B here
+and reading B here instead.
+
+94
+00:05:27,291 --> 00:05:30,601
+So we’ve reordered
+the second and third operation
+
+95
+00:05:30,732 --> 00:05:33,052
+giving them to the different transactions.
+
+96
+00:05:33,052 --> 00:05:34,202
+Now let’s start again.
+
+97
+00:05:34,202 --> 00:05:37,722
+We’re going to first read A
+and we’re allowed to do this.
+
+98
+00:05:37,856 --> 00:05:41,006
+We’re reading the initial value, 15.
+
+99
+00:05:41,006 --> 00:05:44,536
+And we’re going to update
+the read timestamp of A to one.
+
+100
+00:05:44,634 --> 00:05:47,014
+Next we’re going to try to write B.
+
+101
+00:05:47,052 --> 00:05:48,402
+So what this take?
+
+102
+00:05:48,520 --> 00:05:51,760
+We’r going to check and realize
+that B is still virgin.
+
+103
+00:05:51,760 --> 00:05:53,690
+There is nothing done to this yet.
+
+104
+00:05:53,725 --> 00:05:55,985
+We are going to be allowed to write B.
+
+105
+00:05:56,284 --> 00:05:59,334
+For that, we have to create a new version.
+
+106
+00:05:59,669 --> 00:06:01,919
+An object V2.
+
+107
+00:06:02,201 --> 00:06:06,441
+And this value will be for B,
+whatever we write here.
+
+108
+00:06:06,522 --> 00:06:08,312
+Let’s say we write seven.
+
+109
+00:06:09,663 --> 00:06:12,193
+Now we also have to update
+the read timestamp
+
+110
+00:06:12,193 --> 00:06:14,093
+and the write timestamp to two.
+
+111
+00:06:15,326 --> 00:06:17,406
+Next we’re going to try to read B.
+
+112
+00:06:18,089 --> 00:06:23,609
+Well, to read B, we have to find
+the oldest version of B
+
+113
+00:06:24,078 --> 00:06:27,818
+that is newer than transaction T1.
+
+114
+00:06:27,818 --> 00:06:29,448
+And that’s actually fifteen again.
+
+115
+00:06:29,448 --> 00:06:31,638
+That means we read 15 again
+despite the fact
+
+116
+00:06:31,932 --> 00:06:35,262
+that B has been updated,
+however, in a new version.
+
+117
+00:06:35,262 --> 00:06:38,892
+So that’s the true value of multiversion
+concurrency control.
+
+118
+00:06:38,892 --> 00:06:40,642
+We can deal with different versions.
+
+119
+00:06:40,642 --> 00:06:42,922
+We can serialize T1 before T2.
+
+120
+00:06:42,935 --> 00:06:45,465
+That was a decision we made
+at transaction start time
+
+121
+00:06:45,465 --> 00:06:48,092
+by giving timestamps to the transactions.
+
+122
+00:06:48,092 --> 00:06:50,332
+We can do this using versions.
+
+123
+00:06:50,587 --> 00:06:52,457
+And we’re allowed to continue here.
+
+124
+00:06:53,743 --> 00:06:56,613
+So finally,
+we’re going to try to write A.
+
+125
+00:06:57,566 --> 00:07:01,966
+And for this we have to compare
+the read timestamp of A
+
+126
+00:07:02,258 --> 00:07:05,328
+which is one with the timestamp
+that was action two
+
+127
+00:07:05,497 --> 00:07:09,714
+and since two is greater than one,
+we’re allowed to write this value here.
+
+128
+00:07:09,714 --> 00:07:13,624
+We’re going to write some value,
+let’s say 16 in version two.
+
+129
+00:07:14,226 --> 00:07:16,846
+And now we can actually
+commit T1 before T2.
+
+130
+00:07:17,469 --> 00:07:19,729
+Multiversion concurrency control
+in summary,
+
+131
+00:07:19,729 --> 00:07:22,109
+is a clever way of dealing with
+multiple versions.
+
+132
+00:07:22,109 --> 00:07:24,829
+So we can for example
+deal with the snapshots if you like
+
+133
+00:07:24,829 --> 00:07:27,129
+that we also used optimistic
+concurrency control.
+
+134
+00:07:27,129 --> 00:07:29,219
+It’s efficient. We don’t copy
+the emptied out database,
+
+135
+00:07:29,219 --> 00:07:31,579
+we only copy stuff
+that we really need to copy.
+
+136
+00:07:31,579 --> 00:07:33,980
+And we have a way of keeping track
+
+137
+00:07:33,980 --> 00:07:36,650
+of all the different versions
+of the objects.

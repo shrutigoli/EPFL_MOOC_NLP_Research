@@ -1,0 +1,444 @@
+1
+00:00:04,394 --> 00:00:06,591
+We will now discuss the 
+design of name service
+
+2
+00:00:06,591 --> 00:00:09,886
+proposed by Butler-Lampson 
+in a classic paper from 1986.
+
+3
+00:00:10,450 --> 00:00:14,617
+We are studying this for two reasons: 
+first, as a name service design
+
+4
+00:00:14,617 --> 00:00:17,472
+it is arguably the most complete one 
+that has been proposed.
+
+5
+00:00:18,009 --> 00:00:22,240
+Second, as a system design in general 
+it is one of the most elegant ones.
+
+6
+00:00:22,712 --> 00:00:25,593
+And we will recognize in it 
+a fundamental design patterns
+
+7
+00:00:25,593 --> 00:00:27,853
+that underly many successful systems.
+
+8
+00:00:28,665 --> 00:00:33,838
+The basic design goals of this system 
+are scalability, reliability, performance,
+
+9
+00:00:33,838 --> 00:00:35,437
+and well-defined behavior.
+
+10
+00:00:35,911 --> 00:00:37,475
+We will examine them one by one.
+
+11
+00:00:37,883 --> 00:00:40,269
+The first design goal is scalability.
+
+12
+00:00:40,616 --> 00:00:43,655
+Which informally is the ability 
+to accommodate growth.
+
+13
+00:00:44,220 --> 00:00:47,981
+Our system should be able to store 
+mappings for an arbitrary number of names
+
+14
+00:00:47,981 --> 00:00:51,056
+and it should continue to function 
+well in the face of growth.
+
+15
+00:00:51,591 --> 00:00:53,113
+Let's see how this is achieved.
+
+16
+00:00:54,287 --> 00:00:58,052
+The role of a name service also called 
+a directory service is to implement
+
+17
+00:00:58,052 --> 00:01:02,005
+the general naming scheme,
+that is map general names to values.
+
+18
+00:01:02,652 --> 00:01:05,422
+The names that Butler-Lampson 
+had in mind when he proposed
+
+19
+00:01:05,422 --> 00:01:09,094
+his design involve an entity 
+and a property of that entity.
+
+20
+00:01:09,719 --> 00:01:14,860
+For example, "Katerina's lab" is a name
+and its value is "Network Architecture".
+
+21
+00:01:15,331 --> 00:01:19,694
+"Katerina's office" is another name 
+and its value is "BC120".
+
+22
+00:01:20,225 --> 00:01:25,408
+Moreover, the name "Katerina's lab" 
+involves "Katerina" who is an entity
+
+23
+00:01:25,815 --> 00:01:28,731
+and her "lab" which is 
+a property of "Katerina".
+
+24
+00:01:32,409 --> 00:01:34,377
+A directory is organized as a tree.
+
+25
+00:01:34,975 --> 00:01:37,670
+Each arch in the tree 
+is assigned a label.
+
+26
+00:01:38,202 --> 00:01:42,840
+Also each node in the tree is assigned 
+a time stamp and we will later see
+
+27
+00:01:42,840 --> 00:01:44,627
+the role of these time stamps.
+
+28
+00:01:46,725 --> 00:01:49,644
+At the second highest level of the tree,
+right below the root,
+
+29
+00:01:49,644 --> 00:01:51,615
+the labels correspond to entities.
+
+30
+00:01:52,368 --> 00:01:55,411
+At the next level down, 
+the labels correspond to properties.
+
+31
+00:01:55,699 --> 00:01:58,426
+And at the bottom level, 
+the labels correspond to values.
+
+32
+00:01:58,426 --> 00:02:02,607
+For example, "Lampson" is an entity, 
+"Password" is a property of "Lampson"
+
+33
+00:02:02,857 --> 00:02:06,780
+and "vnxm56" is the value 
+of Lampson's Password.
+
+34
+00:02:08,857 --> 00:02:11,960
+To accommodate growth we cannot 
+put all the entities, properties,
+
+35
+00:02:11,960 --> 00:02:14,310
+and values in the world 
+into a single directory.
+
+36
+00:02:14,812 --> 00:02:16,630
+So we have multiple directories.
+
+37
+00:02:17,101 --> 00:02:20,359
+And the directories themselves 
+are organized in a tree.
+
+38
+00:02:20,807 --> 00:02:24,064
+Since we have multiple directories 
+we need a way to tell them apart.
+
+39
+00:02:24,630 --> 00:02:28,984
+And for that we use directory identifies 
+that are globally unique.
+
+40
+00:02:30,360 --> 00:02:33,778
+We also use directory names 
+that are unique locally,
+
+41
+00:02:33,778 --> 00:02:35,784
+that is within their parent directory.
+
+42
+00:02:36,630 --> 00:02:37,823
+Let me pause here.
+
+43
+00:02:38,448 --> 00:02:41,591
+I just mentioned two different ways 
+to refer to a directory,
+
+44
+00:02:41,969 --> 00:02:47,466
+using a directory identifier like "311" 
+and using a directory name like
+
+45
+00:02:47,466 --> 00:02:49,540
+"DEC" or "IBM" or "SRC".
+
+46
+00:02:50,047 --> 00:02:54,246
+Do not be confused by the fact 
+that one is called a directory identifier
+
+47
+00:02:54,246 --> 00:02:56,395
+whereas the other 
+is called a directory name.
+
+48
+00:02:56,850 --> 00:02:59,362
+Both of these are names; 
+they're different ways
+
+49
+00:02:59,362 --> 00:03:01,023
+to refer to directories.
+
+50
+00:03:01,523 --> 00:03:05,635
+The fundamental difference between 
+a directory identifier like "311"
+
+51
+00:03:06,044 --> 00:03:10,781
+and a directory name like "SRC" or "DEC" 
+is that the former is globally unique
+
+52
+00:03:11,064 --> 00:03:14,672
+whereas the latter unique within 
+their parent directory.
+
+53
+00:03:15,117 --> 00:03:19,037
+For example, "IBM" could also 
+have a child directory named "SRC".
+
+54
+00:03:20,705 --> 00:03:24,338
+So, we have global directory identifiers
+and local directory names,
+
+55
+00:03:25,027 --> 00:03:26,406
+what about the labels?
+
+56
+00:03:27,005 --> 00:03:31,087
+Labels like "Lampson" and "Password" 
+are also name and they are local,
+
+57
+00:03:31,087 --> 00:03:34,311
+that is they are unique only in 
+the context of their parent node.
+
+58
+00:03:34,970 --> 00:03:38,643
+In other words, each directory 
+has its own private name space.
+
+59
+00:03:39,172 --> 00:03:41,718
+When new nodes and labels 
+are added to one directory
+
+60
+00:03:41,718 --> 00:03:44,355
+the other directories are not effected.
+
+61
+00:03:46,674 --> 00:03:49,779
+We said that the role of a name service 
+is to map names to values
+
+62
+00:03:49,779 --> 00:03:51,256
+but what kind of names?
+
+63
+00:03:51,256 --> 00:03:54,267
+I have already mentioned 
+three different kinds of names to you:
+
+64
+00:03:54,267 --> 00:03:57,127
+directory identifiers, 
+directory names, and labels.
+
+65
+00:03:57,817 --> 00:04:00,924
+The names that we can look up 
+in the name service belong
+
+66
+00:04:00,924 --> 00:04:02,183
+to yet another kind.
+
+67
+00:04:02,462 --> 00:04:03,871
+Let's see a few examples.
+
+68
+00:04:05,157 --> 00:04:08,890
+A name that we can look up in the 
+name service consists of multiple pieces.
+
+69
+00:04:09,423 --> 00:04:13,998
+It starts with a global 
+directory identifier, like "999"
+
+70
+00:04:13,998 --> 00:04:16,519
+which corresponds to the root 
+of the directory tree.
+
+71
+00:04:17,177 --> 00:04:21,104
+Potentially followed by local directory 
+names like "DEC" and "SRC".
+
+72
+00:04:21,726 --> 00:04:24,549
+Followed by an entity label 
+like "Lampson" and then
+
+73
+00:04:24,549 --> 00:04:26,429
+a property label like "Password".
+
+74
+00:04:27,092 --> 00:04:30,037
+This name specifies a node 
+in the directory tree.
+
+75
+00:04:30,822 --> 00:04:33,962
+The value of the name is 
+the label associated
+
+76
+00:04:33,962 --> 00:04:36,312
+with the child of the specified node.
+
+77
+00:04:38,262 --> 00:04:39,857
+Lets's look at a second example.
+
+78
+00:04:40,389 --> 00:04:43,907
+Here the node specified by 
+the name has two children,
+
+79
+00:04:43,907 --> 00:04:48,672
+in this case the value of the name 
+is the set of labels associated
+
+80
+00:04:48,672 --> 00:04:51,120
+with the children of the specified node.
+
+81
+00:04:53,754 --> 00:04:55,697
+And let's look at a third example.
+
+82
+00:04:56,738 --> 00:05:01,628
+Here the node specified by the name 
+is the root of a three level subtree.
+
+83
+00:05:02,283 --> 00:05:06,959
+In this case the value of the name is 
+the entire subtree rooted
+
+84
+00:05:06,959 --> 00:05:08,502
+at the specified node.
+
+85
+00:05:11,290 --> 00:05:15,050
+The fact that each directory has its 
+own name space enables distributed growth.
+
+86
+00:05:15,615 --> 00:05:19,880
+For example, directory 311 may be 
+stored in DEC infrastructure
+
+87
+00:05:20,226 --> 00:05:21,890
+and managed by DEC personnel.
+
+88
+00:05:22,204 --> 00:05:27,512
+While directory 552 is delegated 
+to IBM and directory 935
+
+89
+00:05:27,512 --> 00:05:30,426
+is delegated to a particular 
+subdivision of IBM.
+
+90
+00:05:31,745 --> 00:05:34,919
+So, scalability is achieved 
+through hierarchy.
+
+91
+00:05:35,445 --> 00:05:39,095
+Each directory has its own name space 
+and potentially its own administrator.
+
+92
+00:05:39,482 --> 00:05:42,545
+This enables distributed growth 
+in the sense that administrators
+
+93
+00:05:42,545 --> 00:05:45,368
+can add depth or breadth 
+to the hierarchy
+
+94
+00:05:45,368 --> 00:05:47,905
+without having to coordinate 
+with each other.

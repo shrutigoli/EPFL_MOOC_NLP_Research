@@ -1,0 +1,1290 @@
+1
+00:00:04,225 --> 00:00:06,575
+In the previous video, we learned
+
+2
+00:00:06,575 --> 00:00:10,495
+that polymorphism is a central concept
+in object-oriented programming.
+
+3
+00:00:10,495 --> 00:00:13,655
+We learned that to implement a 
+polymorphic solution,
+
+4
+00:00:13,655 --> 00:00:17,248
+we need to make use of what is known
+as dynamic binding.
+
+5
+00:00:17,528 --> 00:00:22,258
+The goal of this episode is to show you
+how to implement dynamic binding
+
+6
+00:00:22,258 --> 00:00:25,978
+in C++ using virtual methods.
+
+7
+00:00:26,458 --> 00:00:29,878
+More specifically, we concluded the last
+episode
+
+8
+00:00:29,878 --> 00:00:33,458
+by stating that for dynamic binding
+to take place in C++,
+
+9
+00:00:33,458 --> 00:00:36,811
+two ingredients must be present.
+
+10
+00:00:36,811 --> 00:00:39,284
+First, the use of virtual methods
+
+11
+00:00:39,284 --> 00:00:41,588
+on references and pointers.
+
+12
+00:00:41,588 --> 00:00:45,158
+This episode will explain this concept.
+
+13
+00:00:45,578 --> 00:00:49,048
+Remember that we started with an example
+where we had a hierarchy
+
+14
+00:00:49,048 --> 00:00:52,178
+of classes in which a subclass, the
+Guerrier subclass,
+
+15
+00:00:52,178 --> 00:00:54,598
+overrides a method already defined
+in the superclass.
+
+16
+00:00:55,298 --> 00:00:58,768
+An object of the subclass type was assigned,
+via passing arguments,
+
+17
+00:00:58,768 --> 00:01:01,938
+to a variable of the superclass
+type.
+
+18
+00:01:01,938 --> 00:01:04,188
+We had then asked ourselves
+
+19
+00:01:04,188 --> 00:01:06,548
+which rencontrer method
+would be called here.
+
+20
+00:01:06,548 --> 00:01:08,688
+The rencontrer method of the superclass,
+
+21
+00:01:08,688 --> 00:01:11,298
+or the one of the subclass?
+
+22
+00:01:11,298 --> 00:01:14,698
+And we had seen that in C++,
+
+23
+00:01:16,397 --> 00:01:18,737
+static binding was used,
+
+24
+00:01:18,737 --> 00:01:22,017
+meaning that the type of the variable
+on which we call the method
+
+25
+00:01:22,017 --> 00:01:26,227
+determines which method will be called.
+
+26
+00:01:26,763 --> 00:01:30,663
+In C++, if we want dynamic binding
+
+27
+00:01:30,663 --> 00:01:36,573
+to be used, that is, if we want the
+contents of the variable
+
+28
+00:01:36,573 --> 00:01:40,883
+rather than its type determine which
+method to call,
+
+29
+00:01:41,443 --> 00:01:45,582
+then we must explicitly declare
+in the program that the method
+
+30
+00:01:45,582 --> 00:01:47,442
+must be dynamically bound.
+
+31
+00:01:47,702 --> 00:01:50,805
+And this is done by declaring
+this method
+
+32
+00:01:52,705 --> 00:01:54,118
+as virtual.
+
+33
+00:01:54,628 --> 00:01:58,091
+For dynamic binding to take place,
+
+34
+00:01:58,091 --> 00:02:01,441
+we thus have to declare this method
+as virtual, but it must also
+
+35
+00:02:01,441 --> 00:02:04,791
+work via a reference or a pointer.
+
+36
+00:02:04,791 --> 00:02:10,631
+This is the case here, <i>un</i> is a
+reference to the object passed as a parameter.
+
+37
+00:02:11,541 --> 00:02:15,761
+In C++, we must indicate explicitly to the compiler
+that a method
+
+38
+00:02:15,761 --> 00:02:18,581
+can use dynamic binding.
+
+39
+00:02:18,581 --> 00:02:21,211
+And this is done by declaring it
+as virtual.
+
+40
+00:02:21,231 --> 00:02:25,081
+This declaration must be made in
+the most general class
+
+41
+00:02:25,081 --> 00:02:28,621
+defining this method, that is, at
+the highest
+
+42
+00:02:28,621 --> 00:02:31,561
+in the hierarchy, in the original prototype.
+
+43
+00:02:31,561 --> 00:02:34,831
+So in the case of our example,
+in the Personnage class.
+
+44
+00:02:34,831 --> 00:02:39,031
+And to make a method virtual in C++,
+one simply prepends
+
+45
+00:02:39,031 --> 00:02:42,371
+the prototype of the method with
+the virtual keyword.
+
+46
+00:02:42,721 --> 00:02:46,781
+Note that any override in subclasses
+of a method
+
+47
+00:02:46,781 --> 00:02:51,151
+that was declared as virtual in the superclass
+will also be considered as being
+
+48
+00:02:51,151 --> 00:02:56,031
+virtual even if we don't add the virtual
+keyword
+
+49
+00:02:56,031 --> 00:02:57,341
+before its prototype.
+
+50
+00:02:57,341 --> 00:03:01,961
+So basically, if I have a superclass,
+A, containing a particular method
+
+51
+00:03:03,361 --> 00:03:09,981
+m, and if I have a subclass B which
+overrides this method.
+
+52
+00:03:11,891 --> 00:03:13,651
+If in the A superclass
+
+53
+00:03:13,651 --> 00:03:16,701
+the method m was declared as virtual,
+
+54
+00:03:17,561 --> 00:03:21,781
+then it will also be virtual
+in the subclass
+
+55
+00:03:21,781 --> 00:03:24,591
+even if the keyword isn't
+explicitly included.
+
+56
+00:03:25,228 --> 00:03:28,838
+If we go back to our first example,
+if we want our method to
+
+57
+00:03:28,838 --> 00:03:31,651
+benefit from dynamic binding,
+
+58
+00:03:31,651 --> 00:03:35,244
+then we should declare the method
+as virtual
+
+59
+00:03:35,244 --> 00:03:37,278
+in the superclass.
+
+60
+00:03:37,998 --> 00:03:39,868
+But is this really our original example?
+
+61
+00:03:40,558 --> 00:03:43,554
+If you have been attentive,
+you may have noticed
+
+62
+00:03:43,554 --> 00:03:46,550
+that the example that you
+see now
+
+63
+00:03:46,550 --> 00:03:49,548
+is a variation on the example
+presented initially.
+
+64
+00:03:49,548 --> 00:03:53,328
+A variation in which the arguments
+of the <i>faire_rencontrer</i> function
+
+65
+00:03:53,328 --> 00:03:56,278
+are passed by value.
+
+66
+00:03:56,608 --> 00:04:00,278
+We deliberately made this change
+to show you the effect
+
+67
+00:04:00,278 --> 00:04:03,198
+of not using a reference or a pointer
+
+68
+00:04:03,198 --> 00:04:05,438
+on dynamic binding.
+
+69
+00:04:05,438 --> 00:04:08,958
+The problem is that when we
+pass by value
+
+70
+00:04:08,958 --> 00:04:13,628
+the Guerrier object will be copied
+into a variable of type Personnage.
+
+71
+00:04:13,628 --> 00:04:18,958
+The rencontrer method will thus not
+apply to the original instance,
+
+72
+00:04:19,688 --> 00:04:22,908
+but to a copy of the instance in a
+variable of type Personnage.
+
+73
+00:04:23,518 --> 00:04:27,928
+Essentially, if we had an object of
+type Guerrier in the variable g,
+
+74
+00:04:38,327 --> 00:04:43,077
+once it is copied into the variable un,
+which is of type Personnage,
+
+75
+00:04:53,238 --> 00:04:56,138
+it will then be considered only
+as a Personnage.
+
+76
+00:04:57,833 --> 00:05:01,333
+Personnage doesn't have a member
+variable for a weapon, for example.
+
+77
+00:05:01,433 --> 00:05:04,336
+The object contained in the
+variable un
+
+78
+00:05:04,336 --> 00:05:07,599
+is indeed of type Personnage.
+
+79
+00:05:08,059 --> 00:05:11,373
+Therefore, even if the rencontrer method
+is virtual,
+
+80
+00:05:11,373 --> 00:05:14,633
+and can thus benefit from dynamic
+binding,
+
+81
+00:05:14,633 --> 00:05:17,493
+since the object contained in the
+variable is of type Personnage,
+
+82
+00:05:17,493 --> 00:05:20,313
+then the rencontrer method of
+
+83
+00:05:22,203 --> 00:05:24,603
+Personnage will always be
+called here.
+
+84
+00:05:27,612 --> 00:05:30,278
+As we mentioned in the previous episode,
+
+85
+00:05:30,278 --> 00:05:32,944
+for dynamic binding to be able to
+take place,
+
+86
+00:05:32,944 --> 00:05:35,612
+two conditions must be verified.
+
+87
+00:05:35,612 --> 00:05:39,435
+The first is that the methods must be
+virtual, as we have just discussed,
+
+88
+00:05:39,435 --> 00:05:42,078
+and the second is that these
+virtual methods
+
+89
+00:05:42,078 --> 00:05:44,712
+must apply to real instances
+
+90
+00:05:44,712 --> 00:05:46,862
+via references or pointers.
+
+91
+00:05:47,311 --> 00:05:51,051
+If we choose to pass by
+reference,
+
+92
+00:05:52,509 --> 00:05:56,529
+then when we pass the arguments,
+we will not copy them
+
+93
+00:05:57,479 --> 00:06:02,069
+into objects of type Personnage;
+we will simply indicate that un
+
+94
+00:06:02,069 --> 00:06:04,529
+is another name for the variable g.
+
+95
+00:06:05,253 --> 00:06:10,663
+This way, we allow the virtual method
+to work on the actual instance.
+
+96
+00:06:11,223 --> 00:06:16,543
+By allowing a virtual method to
+work on the real instance,
+
+97
+00:06:16,543 --> 00:06:20,213
+we obtain the behavior we want,
+
+98
+00:06:22,274 --> 00:06:24,764
+namely, dynamic binding.
+
+99
+00:06:25,196 --> 00:06:29,196
+As we said earlier, it is the combination
+of using references
+
+100
+00:06:29,196 --> 00:06:32,806
+and making the methods virtual
+that we obtained the desired result.
+
+101
+00:06:32,806 --> 00:06:37,056
+Here of course, we could make do with
+a constant reference as parameter
+
+102
+00:06:37,056 --> 00:06:39,666
+since the <i>faire_rencontrer</i> function
+
+103
+00:06:39,666 --> 00:06:42,836
+does not modify its parameter un.
+
+104
+00:06:43,566 --> 00:06:48,356
+This is how we should write the code
+in order to obtain
+
+105
+00:06:48,356 --> 00:06:51,956
+dynamic binding in the context
+of this example.
+
+106
+00:06:52,286 --> 00:06:54,976
+So, to allow a virtual method to
+operate on
+
+107
+00:06:54,976 --> 00:06:58,386
+the real instance, it is possible to use
+references.
+
+108
+00:06:58,386 --> 00:07:00,426
+We can also use pointers
+
+109
+00:07:00,426 --> 00:07:02,516
+as the following example will show.
+
+110
+00:07:02,606 --> 00:07:06,236
+And this time, to switch things up,
+here is a zoological example where
+
+111
+00:07:06,236 --> 00:07:09,090
+we have a subclass Dauphin (TN: means
+"Dolphin") inheriting from
+
+112
+00:07:09,440 --> 00:07:10,644
+a Mammifere superclass (TN: means
+"Mammal"). Each of these classes
+
+113
+00:07:10,644 --> 00:07:14,330
+has a default, explicit constructor and
+a destructor.
+
+114
+00:07:15,400 --> 00:07:19,240
+Mammals, in general, have a default method
+for eating (TN: "manger").
+
+115
+00:07:20,420 --> 00:07:25,210
+Dolphins have a specific method
+for this action.
+
+116
+00:07:26,537 --> 00:07:28,657
+And the same goes for the methods
+allowing the mammals or dolphins
+
+117
+00:07:28,657 --> 00:07:30,957
+to move (TN: "avancer").
+
+118
+00:07:31,107 --> 00:07:34,497
+Here is a small main program which
+uses the class
+
+119
+00:07:34,497 --> 00:07:36,887
+hierarchy  that you have just seen.
+
+120
+00:07:36,887 --> 00:07:41,047
+Let's study its execution step-by-step
+to see what output it will produce.
+
+121
+00:07:41,945 --> 00:07:45,775
+The first line of the program declares a
+variable named lui (TN: "lui" means "him"),
+
+122
+00:07:45,781 --> 00:07:48,801
+which is a pointer to a Mammifere.
+
+123
+00:07:49,181 --> 00:07:54,881
+This variable takes the address of an
+object of type Dauphin allocated dynamically.
+
+124
+00:07:54,881 --> 00:07:59,121
+The object of type Dauphin, allocated
+dynamically, is constructed using
+
+125
+00:07:59,121 --> 00:08:02,291
+the default constructor of the
+Dauphin class.
+
+126
+00:08:03,225 --> 00:08:10,475
+The lui variable thus contains the
+address of an object of type Dauphin.
+
+127
+00:08:13,979 --> 00:08:17,819
+The default constructor of the Dauphin
+class was used here
+
+128
+00:08:17,819 --> 00:08:19,629
+to construct this object.
+
+129
+00:08:21,879 --> 00:08:25,199
+This is the default constructor,
+
+130
+00:08:25,939 --> 00:08:28,435
+as defined in the Dauphin subclass.
+
+131
+00:08:28,435 --> 00:08:30,921
+Note that the constructor of a subclass
+always invokes
+
+132
+00:08:30,921 --> 00:08:33,499
+the constructor of the superclass.
+
+133
+00:08:33,669 --> 00:08:38,469
+If it doesn't do so explicitly, then
+it is the default constructor
+
+134
+00:08:38,469 --> 00:08:40,729
+of the superclass that is called.
+
+135
+00:08:41,047 --> 00:08:45,448
+This means that, before the "Coui, Couic !"
+message is displayed,
+
+136
+00:08:45,448 --> 00:08:49,248
+the message "Un nouveau mammifère est
+né!" is displayed (TN: means "new mammal born").
+
+137
+00:08:49,838 --> 00:08:54,928
+The execution of this line of code will
+therefore output the following:
+
+138
+00:08:54,929 --> 00:08:57,679
+A new mammal is born! Why?
+
+139
+00:08:57,679 --> 00:09:00,229
+Because the default constructor
+of the Dauphin class
+
+140
+00:09:00,229 --> 00:09:04,079
+implicitly called the default constructor
+of the Mammifere class.
+
+141
+00:09:04,475 --> 00:09:07,605
+The constructor of the Mammifere
+superclass was invoked
+
+142
+00:09:07,605 --> 00:09:09,711
+by Dauphin's one.
+
+143
+00:09:09,711 --> 00:09:11,325
+When its execution is done,
+
+144
+00:09:11,325 --> 00:09:14,869
+the body of Dauphin's constructor will
+be executed,
+
+145
+00:09:14,869 --> 00:09:16,785
+producing the following output.
+
+146
+00:09:17,389 --> 00:09:18,779
+Second line.
+
+147
+00:09:20,819 --> 00:09:24,059
+We apply to the object pointed
+to by the lui pointer,
+
+148
+00:09:24,059 --> 00:09:27,679
+that is, this object here,
+the avancer method.
+
+149
+00:09:28,089 --> 00:09:31,409
+Note that here, since we use pointers,
+
+150
+00:09:31,409 --> 00:09:34,729
+we allow the method to be applied
+
+151
+00:09:34,729 --> 00:09:38,519
+to the actual instance pointed to
+by the object,
+
+152
+00:09:38,519 --> 00:09:40,509
+and thus to have polymorphism.
+
+153
+00:09:40,899 --> 00:09:46,352
+Remember that the notation
+"lui->avancer()"
+
+154
+00:09:47,982 --> 00:09:55,485
+is equivalent to writing
+"(*lui).avancer()"
+
+155
+00:09:56,099 --> 00:10:00,969
+We access the contents of
+the object pointed to by lui,
+
+156
+00:10:00,969 --> 00:10:04,109
+and call the avancer method on
+this object.
+
+157
+00:10:05,389 --> 00:10:09,019
+The avancer method is defined
+as virtual in the superclass
+
+158
+00:10:09,019 --> 00:10:11,245
+and overridden in the
+Dauphin subclass.
+
+159
+00:10:11,545 --> 00:10:13,981
+Since we allow this virtual method
+
+160
+00:10:13,981 --> 00:10:17,799
+to act directly on the actual instance
+via the pointer,
+
+161
+00:10:17,799 --> 00:10:22,599
+dynamic binding is used and it
+is Dauphin's avancer method
+
+162
+00:10:22,599 --> 00:10:24,149
+which is called.
+
+163
+00:10:24,839 --> 00:10:29,819
+Therefore, the message "Je nage" (TN: means 
+"I am swimming") will be displayed here,
+
+164
+00:10:29,819 --> 00:10:32,689
+and at this stage, we have
+the following output.
+
+165
+00:10:33,199 --> 00:10:37,069
+Let's move on to the next line, where
+the manger method is called
+
+166
+00:10:37,739 --> 00:10:39,819
+on the object pointed to by lui.
+
+167
+00:10:40,409 --> 00:10:44,409
+The manger method is indeed
+overridden in the Dauphin class but careful,
+
+168
+00:10:44,409 --> 00:10:47,359
+unlike the previous case, the
+manger method
+
+169
+00:10:48,029 --> 00:10:51,939
+was not declared as virtual in the
+superclass.
+
+170
+00:10:51,968 --> 00:10:55,684
+The manger method is indeed
+called via a pointer
+
+171
+00:10:55,684 --> 00:10:57,910
+but this is only one of the
+two ingredients
+
+172
+00:10:57,910 --> 00:11:02,068
+necessary for dynamic binding.
+The pointer is there,
+
+173
+00:11:02,068 --> 00:11:06,210
+but the method is not virtual,
+
+174
+00:11:06,210 --> 00:11:08,430
+which means that we cannot have
+
+175
+00:11:08,430 --> 00:11:10,190
+dynamic binding.
+
+176
+00:11:10,630 --> 00:11:13,961
+In this case, it is the type of
+the variable which wins.
+
+177
+00:11:13,961 --> 00:11:16,442
+lui is a pointer to Mammifere,
+
+178
+00:11:16,442 --> 00:11:22,163
+so the object it points to is perceived
+as an object of type Mammifere.
+
+179
+00:11:23,379 --> 00:11:27,062
+Static binding thus occurs in this case
+
+180
+00:11:27,062 --> 00:11:31,102
+and it is the manger method of Mammifere
+which will be called here.
+
+181
+00:11:31,812 --> 00:11:35,962
+The output after execution
+of this statement will thus be:
+
+182
+00:11:36,422 --> 00:11:41,405
+"Miam... croumf !", which is the message
+displayed by Mammifere's manger method.
+
+183
+00:11:41,848 --> 00:11:43,758
+Let's go to the next line.
+
+184
+00:11:44,778 --> 00:11:49,136
+"delete lui" means that we free the
+memory area allocated
+
+185
+00:11:49,136 --> 00:11:51,446
+dynamically at this stage of the program.
+
+186
+00:11:51,451 --> 00:11:57,271
+This means, basically, that we recover
+the memory area associated
+
+187
+00:11:57,271 --> 00:11:59,901
+with the object of type Dauphin
+previously allocated.
+
+188
+00:12:00,725 --> 00:12:05,962
+"delete lui" causes this object's life to end
+and since its lifetime is up,
+
+189
+00:12:05,962 --> 00:12:08,044
+the destructor is called.
+
+190
+00:12:08,044 --> 00:12:10,936
+But which destructor exactly
+is called?
+
+191
+00:12:11,646 --> 00:12:13,920
+If we examine the code of the
+Mammifere class,
+
+192
+00:12:13,920 --> 00:12:18,140
+we can see that the destructor was
+declared as virtual.
+
+193
+00:12:18,410 --> 00:12:23,000
+This means that this method, if called
+via a pointer
+
+194
+00:12:23,000 --> 00:12:26,600
+for example, will benefit from
+dynamic binding.
+
+195
+00:12:27,730 --> 00:12:31,730
+The destructor is indeed called via a pointer,
+which means that
+
+196
+00:12:31,730 --> 00:12:35,990
+dynamic binding will take place for
+destruction as well.
+
+197
+00:12:36,500 --> 00:12:39,693
+The object will be perceived according
+to its real nature,
+
+198
+00:12:39,693 --> 00:12:41,476
+that is, as a Dauphin,
+
+199
+00:12:41,476 --> 00:12:44,460
+and it is Dauphin's destructor
+which will be called,
+
+200
+00:12:44,460 --> 00:12:46,890
+causing the following output.
+
+201
+00:12:47,750 --> 00:12:51,750
+We learned in a previous episode that the
+order in which destructors are called
+
+202
+00:12:51,750 --> 00:12:54,050
+is the inverse of the orders
+for constructors.
+
+203
+00:12:54,050 --> 00:12:58,250
+So to create an object of type Dauphin,
+
+204
+00:12:58,250 --> 00:13:01,830
+the constructor of the Mammifere supercalss
+was called, then Dauphin's constructor.
+
+205
+00:13:01,830 --> 00:13:03,900
+For destruction, it is the opposite,
+
+206
+00:13:03,900 --> 00:13:07,310
+we will first call Dauphin's
+constructor,
+
+207
+00:13:07,310 --> 00:13:10,850
+then Mammifere's destructor.
+
+208
+00:13:11,770 --> 00:13:15,560
+Now, let's imagine that the destructor
+of the Mammifere class
+
+
+209
+00:13:15,560 --> 00:13:18,026
+was not declared as virtual.
+
+210
+00:13:18,606 --> 00:13:22,796
+Since the destructor was not declared
+as virtual in the Mammifere class,
+
+211
+00:13:22,796 --> 00:13:26,996
+the call that is made here cannot be
+dynamically bound.
+
+212
+00:13:26,996 --> 00:13:30,795
+This means that the type of the variable
+will win
+
+213
+00:13:30,795 --> 00:13:32,514
+for the choice of the destructor method,
+
+214
+00:13:32,514 --> 00:13:36,695
+and it is this destructor here that
+will be called rather than this one.
+
+215
+00:13:37,295 --> 00:13:40,098
+So essentially, if the destructor
+for Mammifere
+
+216
+00:13:40,098 --> 00:13:42,251
+had not been declared as virtual
+in our example,
+
+217
+00:13:42,251 --> 00:13:46,155
+then only Mammifere's destructor
+would have been invoked
+
+218
+00:13:46,155 --> 00:13:48,431
+and Dauphin's one would not have been.
+
+219
+00:13:48,431 --> 00:13:51,547
+Meaning that the object that was
+allocated dynamically in our program
+
+220
+00:13:51,547 --> 00:13:54,545
+with a type of Dauphin would be
+only partially destroyed.
+
+221
+00:13:54,545 --> 00:13:58,515
+Only the part of the Dauphin which is
+a Mammifere would have been destroyed here.
+
+222
+00:13:58,885 --> 00:14:01,549
+If the object of type Dauphin
+dynamically allocated here
+
+223
+00:14:01,549 --> 00:14:03,903
+had required a certain amount of
+resources,
+
+224
+00:14:03,903 --> 00:14:07,219
+then these resources would not have
+been freed correctly.
+
+225
+00:14:07,771 --> 00:14:12,058
+To summarize, when a virtual
+method is called via a reference
+
+226
+00:14:12,058 --> 00:14:16,438
+or a pointer, that is, when both of these
+ingredients are present,
+
+227
+00:14:18,839 --> 00:14:23,549
+then the choice of the method will be made 
+based on the actual type of the instance.
+
+228
+00:14:23,549 --> 00:14:26,689
+This is known as dynamic binding.
+
+229
+00:14:27,079 --> 00:14:30,609
+But watch out, here are a few important
+points to consider regarding virtuality
+
+230
+00:14:30,609 --> 00:14:33,139
+in the context of construction
+and destruction.
+
+231
+00:14:33,139 --> 00:14:35,849
+As we discussed in the example of
+Mammifere and Dauphin,
+
+232
+00:14:35,849 --> 00:14:38,849
+to avoid having a partial destruction only,
+
+233
+00:14:38,849 --> 00:14:42,459
+it is recommended to always declare
+destructors as virtual.
+
+234
+00:14:42,779 --> 00:14:45,929
+However, since a constructor is always
+designed to
+
+235
+00:14:45,929 --> 00:14:49,849
+initialize the current instance,
+it cannot be virtual.
+
+236
+00:14:50,269 --> 00:14:53,229
+If it calls virtual methods,
+
+237
+00:14:53,229 --> 00:14:56,639
+then the virtual aspect of these
+methods will simply be ignored.
+
+238
+00:14:56,639 --> 00:15:01,218
+This is an advanced concept -- let's see
+what it means in a concrete example.
+
+239
+00:15:01,938 --> 00:15:04,314
+Here is an somewhat academic example
+that will explain
+
+240
+00:15:04,314 --> 00:15:06,280
+what happens in this case
+
+241
+00:15:06,280 --> 00:15:10,508
+where we have a superclass A of which
+the B subclass inherits.
+
+242
+00:15:11,421 --> 00:15:15,669
+Both classes have a method m which
+happens to be virtual
+
+243
+00:15:15,669 --> 00:15:18,818
+and is hence overridden 
+in the B subclass.
+
+244
+00:15:19,208 --> 00:15:23,088
+When we execute this line of code,
+the default constructor for
+
+245
+00:15:23,088 --> 00:15:27,458
+the A class is called, and calls in turn
+the method f.
+
+246
+00:15:27,988 --> 00:15:31,988
+The method f is called on the this object,
+which is of type A,
+
+247
+00:15:31,988 --> 00:15:36,558
+and so we will of course invoke the f
+method of the A class,
+
+248
+00:15:36,558 --> 00:15:43,408
+which will display the following.
+
+249
+00:15:44,602 --> 00:15:48,602
+On the second line, we create
+an object of type B.
+
+250
+00:15:48,602 --> 00:15:51,372
+There is no explicit constructor in the
+B class,
+
+251
+00:15:51,382 --> 00:15:54,862
+and so the default constructor
+will be invoked,
+
+252
+00:15:54,862 --> 00:15:58,832
+and it will invoke the default constructor
+of the superclass.
+
+253
+00:15:59,592 --> 00:16:03,805
+The f method therefore now applies to
+a "this" object of type B.
+
+254
+00:16:03,805 --> 00:16:07,725
+However, the virtual aspect of the method
+is completely ignored
+
+255
+00:16:07,725 --> 00:16:09,487
+in a constructor.
+
+256
+00:16:09,487 --> 00:16:14,817
+So this aspect is not taken into account,
+and it is still the current class's
+
+257
+00:16:14,817 --> 00:16:16,657
+method which is called.
+
+258
+00:16:16,657 --> 00:16:20,677
+Therefore, when this second line
+is executed,
+
+259
+00:16:20,677 --> 00:16:23,897
+we will also have the following output.
+
+260
+00:16:24,119 --> 00:16:29,599
+The next line of code declared a
+variable pa of type pointer-to-A,
+
+261
+00:16:29,599 --> 00:16:32,429
+and initializes is with the address
+of the object b.
+
+262
+00:16:32,639 --> 00:16:37,879
+The f method is then called on the object
+pointed to by the pa pointer,
+
+263
+00:16:37,879 --> 00:16:40,269
+which is an object of type B.
+
+264
+00:16:40,466 --> 00:16:42,466
+Here, both ingredients necessary
+
+265
+00:16:42,466 --> 00:16:45,236
+to dynamic binding are present.
+
+266
+00:16:45,236 --> 00:16:50,356
+We have a virtual method f which
+is invoked via a pointer.
+
+267
+00:16:50,356 --> 00:16:53,056
+The f method will thus be chosen
+
+268
+00:16:53,056 --> 00:16:56,006
+depending on the real nature of
+the instance pointed to,
+
+269
+00:16:56,006 --> 00:16:59,716
+and it is the method of the B class
+which will be invoked.
+
+270
+00:17:00,618 --> 00:17:04,008
+So we will have a different message here,
+
+271
+00:17:04,008 --> 00:17:07,167
+when this last line of code is executed.
+
+272
+00:17:07,167 --> 00:17:11,437
+Here, we do indeed have polymorphic
+behavior on the part of the f method
+
+273
+00:17:11,437 --> 00:17:14,237
+since we invoked it outside of
+a constructor.
+
+274
+00:17:14,237 --> 00:17:18,057
+However here, the polymorphic aspect
+was completely ignored.
+
+275
+00:17:18,173 --> 00:17:22,060
+And this concludes our episode on
+virtual methods which are, in C++,
+
+276
+00:17:22,060 --> 00:17:25,180
+the basic building blocks for
+polymorphism.

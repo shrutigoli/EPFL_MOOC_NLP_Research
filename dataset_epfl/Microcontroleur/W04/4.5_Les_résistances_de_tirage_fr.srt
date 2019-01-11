@@ -1,0 +1,1012 @@
+1
+00:00:04,175 --> 00:00:04,787
+Bonjour.
+
+2
+00:00:04,787 --> 00:00:08,350
+Nous continuons le cours Comprendre les
+microcontrôleurs.
+
+3
+00:00:08,350 --> 00:00:13,970
+Et c'est aujourd'hui de résistances de
+tirage que nous allons parler.
+
+4
+00:00:13,970 --> 00:00:15,820
+Qu'est-ce que c'est que ce mot bizarre?
+
+5
+00:00:15,820 --> 00:00:18,900
+Peut-être les connaissez-vous déjà sous le
+nom pull-up resistors.
+
+6
+00:00:18,900 --> 00:00:26,350
+Nous allons rappeler le principe et
+l'utilité de ces résistances de tirage.
+
+7
+00:00:26,350 --> 00:00:29,352
+Nous allons ensuite parler plus en détail
+des
+
+8
+00:00:29,352 --> 00:00:32,384
+résistances de tirage qui sont intégrées
+dans
+
+9
+00:00:32,384 --> 00:00:35,006
+un grand nombre de microcontrôleurs et
+nous
+
+10
+00:00:35,006 --> 00:00:38,555
+allons regarder plus en détail comment
+c'est
+
+11
+00:00:38,555 --> 00:00:42,030
+implémenté sur les AVR et sur les MSP430.
+
+12
+00:00:42,030 --> 00:00:47,260
+Une fois n'est pas coutume, nous allons
+commencer cette leçon par un quizz.
+
+13
+00:00:47,260 --> 00:00:51,540
+Vous avez ce schéma.
+
+14
+00:00:51,540 --> 00:00:52,322
+Il est très simple.
+
+15
+00:00:52,322 --> 00:00:54,438
+Il vous semble peut-être un peu bizarre
+puisque cette
+
+16
+00:00:54,438 --> 00:01:00,270
+patte est connectée à rien du tout.
+Elle est en l'air.
+
+17
+00:01:00,270 --> 00:01:05,270
+Ici, on a simplement une LED comme on a
+l'habitude de les utiliser.
+
+18
+00:01:05,270 --> 00:01:14,890
+Le programme correspondant, dans sa partie
+setup, met la LED rouge en sortie.
+
+19
+00:01:14,890 --> 00:01:19,650
+On a l'habitude de cette syntaxe.
+Dans la boucle principale,
+
+20
+00:01:19,650 --> 00:01:24,540
+on a une variable qui est la valeur qui
+est lue sur
+
+21
+00:01:24,540 --> 00:01:29,938
+l'entrée digitalRead sur l'entrée P 1
+souligné 3 et cette
+
+22
+00:01:29,938 --> 00:01:35,640
+même valeur val est copiée avec un
+digitalWrite sur la diode lumineuse.
+
+23
+00:01:35,640 --> 00:01:42,154
+Donc on a un programme qui, en permanence,
+copie l'entrée sur la sortie.
+
+24
+00:01:42,154 --> 00:01:44,812
+Alors ma question : Avec ce
+
+25
+00:01:44,812 --> 00:01:49,230
+montage et ce programme, que va-t-on voir
+sur la LED?
+
+26
+00:01:49,230 --> 00:01:51,894
+Pensez-vous qu'elle va rester éteinte?
+
+27
+00:01:51,894 --> 00:01:55,480
+Pensez-vous qu'elle va, par exemple, être
+allumée?
+
+28
+00:01:55,480 --> 00:01:58,911
+Pensez-vous, au contraire, qu'elle va
+peut-être
+
+29
+00:01:58,911 --> 00:02:01,350
+clignoter ou que son état va fluctuer?
+
+30
+00:02:01,350 --> 00:02:06,260
+Et si, pour une fois, nous laissions le
+matériel nous répondre.
+
+31
+00:02:06,260 --> 00:02:08,288
+Regardez cette petite vidéo.
+
+32
+00:02:08,288 --> 00:02:10,160
+Vous remarquez donc le petit
+
+33
+00:02:10,160 --> 00:02:13,480
+fil qui a été connecté sur l'entrée P 1
+point 3.
+
+34
+00:02:13,480 --> 00:02:17,330
+Vous remarquez qu'un certain nombre de
+choses changent.
+
+35
+00:02:17,330 --> 00:02:20,798
+La diode lumineuse change, on sent qu'il y
+a des mouvements.
+
+36
+00:02:20,798 --> 00:02:23,750
+Ces mouvements, on voit qu'ils sont faits
+par une main.
+
+37
+00:02:23,750 --> 00:02:28,935
+Voyez ici mon doigt qui se rapproche mais
+qui ne touche pas ce petit fil
+
+38
+00:02:28,935 --> 00:02:33,940
+et vous voyez que la sortie change à
+certains moments.
+
+39
+00:02:33,940 --> 00:02:36,140
+Essayons de comprendre
+
+40
+00:02:36,140 --> 00:02:38,150
+ce qui s'est passé.
+
+41
+00:02:38,150 --> 00:02:43,109
+Nous utilisons des microcontrôleurs qui
+utilisent la technologie
+
+42
+00:02:43,109 --> 00:02:48,150
+C-MOS et les C-MOS présentent des entrées
+à haute impédance.
+
+43
+00:02:48,150 --> 00:02:51,195
+Et par conséquent, une entrée non
+
+44
+00:02:51,195 --> 00:02:54,550
+connectée capte toutes sortes de
+parasites,
+
+45
+00:02:54,550 --> 00:02:58,739
+toutes sortes d'influences
+électro-magnétiques, toutes sortes
+
+46
+00:02:58,739 --> 00:03:01,337
+de charges statiques même très faibles qui
+
+47
+00:03:01,337 --> 00:03:06,430
+vont lui faire changer d'état d'une
+manière qui semble un peu aléatoire.
+
+48
+00:03:06,430 --> 00:03:11,200
+On ne peut donc pas laisser une entrée non
+connectée.
+
+49
+00:03:11,200 --> 00:03:14,530
+Il faut absolument éviter ces entrées en
+l'air.
+
+50
+00:03:14,530 --> 00:03:19,150
+Quelles solutions peut-on proposer pour
+résoudre ce problème?
+
+51
+00:03:19,150 --> 00:03:22,738
+Ce qu'on cherche, c'est à diminuer
+l'impédance du
+
+52
+00:03:22,738 --> 00:03:26,630
+système et une résistance qui doit être
+liée
+
+53
+00:03:26,630 --> 00:03:30,810
+à une des alimentations va assurer un
+potentiel
+
+54
+00:03:30,810 --> 00:03:34,400
+connu au moment où l'entrée est en l'air.
+
+55
+00:03:34,400 --> 00:03:39,310
+Alors deux schémas sont possibles
+puisqu'on a deux alimentations.
+
+56
+00:03:39,310 --> 00:03:45,136
+La solution avec le tirage vers le haut,
+en anglais Pull-up et on voit
+
+57
+00:03:45,136 --> 00:03:47,656
+bien que la résistance est connectée vers
+
+58
+00:03:47,656 --> 00:03:51,658
+l'alimentation positive et la solution
+avec le tirage
+
+59
+00:03:51,658 --> 00:03:56,490
+vers le bas, Pull-down en anglais, et on
+voit que la résistance est
+
+60
+00:03:56,490 --> 00:04:01,588
+connectée vers le 0 volt vers la masse
+Dans les deux cas, entre
+
+61
+00:04:01,588 --> 00:04:06,656
+un point d'alimentation et l'entrée de
+notre
+
+62
+00:04:06,656 --> 00:04:11,490
+système, on a une résistance qui évite
+donc ce
+
+63
+00:04:11,490 --> 00:04:17,039
+problème de la haute impédance des entrées
+de nos microcontrôleurs.
+
+64
+00:04:17,039 --> 00:04:21,570
+En fait, cette technique est bien connue
+des électroniciens.
+
+65
+00:04:21,570 --> 00:04:26,357
+Et il nous reste à nous poser la question
+: Y a-t-il, entre ces deux
+
+66
+00:04:26,357 --> 00:04:31,770
+solutions Pull-up et Pull-down une qui est
+préférable à l'autre?
+
+67
+00:04:31,770 --> 00:04:36,290
+Alors tout de suite, je vais vous dire que
+celle
+
+68
+00:04:36,290 --> 00:04:39,272
+qui est la plus utilisée, et de loin,
+c'est la Pull-up.
+
+69
+00:04:39,272 --> 00:04:42,128
+Comment puis-je justifier le fait qu'on
+utilisera plutôt
+
+70
+00:04:42,128 --> 00:04:43,930
+une Pull-up qu'une Pull-down?
+
+71
+00:04:43,930 --> 00:04:48,767
+Prenons le cas assez simple d'un
+interrupteur de fin de course qui va se
+
+72
+00:04:48,767 --> 00:04:51,024
+trouver à une certaine distance physique
+de
+
+73
+00:04:51,024 --> 00:04:54,090
+la carte électronique qui contient le
+microcontrôleur.
+
+74
+00:04:54,090 --> 00:05:01,040
+On a donc un bouton-poussoir, et ce
+bouton-poussoir doit être relié
+
+75
+00:05:01,040 --> 00:05:07,172
+à notre carte électronique avec, dans ce
+cas-là, une connexion sur l'entrée et une
+
+76
+00:05:07,172 --> 00:05:09,140
+connexion vers la masse.
+
+77
+00:05:09,140 --> 00:05:13,780
+Dans l'autre cas, on a toujours notre
+bouton-poussoir.
+
+78
+00:05:13,780 --> 00:05:18,948
+On a toujours une connexion vers l'entrée
+et
+
+79
+00:05:18,948 --> 00:05:23,950
+cette fois, la deuxième connexion doit se
+faire vers le plus.
+
+80
+00:05:23,950 --> 00:05:28,746
+En admettant que ce câble, ou que ce
+
+81
+00:05:28,746 --> 00:05:32,293
+câble sont des câbles relativement longs
+et qu'ils
+
+82
+00:05:32,293 --> 00:05:39,350
+se promènent le long du bâti de notre
+machine, quelle solution va-t-on préférer?
+
+83
+00:05:39,350 --> 00:05:45,486
+Transférer le signal et la tension
+positive ou au contraire transférer
+
+84
+00:05:45,486 --> 00:05:51,270
+le signal et la tension négative,
+c'est-à-dire la masse.
+
+85
+00:05:51,270 --> 00:05:54,942
+Eh bien on préférera cette solution
+puisque généralement la
+
+86
+00:05:54,942 --> 00:05:57,588
+masse est effectivement connectée au bâti
+de la machine
+
+87
+00:05:57,588 --> 00:06:02,330
+et les électroniciens ont l'habitude
+d'utiliser ce schéma-là et d'ailleurs, un
+
+88
+00:06:02,330 --> 00:06:08,211
+certain nombre de microcontrôleurs
+proposent des résistances de Pull-up
+
+89
+00:06:08,211 --> 00:06:13,168
+intégrées alors qu'ils sont plus rares
+ceux qui proposent à
+
+90
+00:06:13,168 --> 00:06:17,490
+la fois une résistance de Pull-up et une
+résistance de Pull-down.
+
+91
+00:06:17,490 --> 00:06:22,957
+En effet, beaucoup de fabricants intègrent
+des résistances de tirage directement
+
+92
+00:06:22,957 --> 00:06:24,960
+dans les microcontrôleurs.
+
+93
+00:06:24,960 --> 00:06:29,640
+La valeur de cette résistance est
+généralement d'environ 50 kOhm.
+
+94
+00:06:29,640 --> 00:06:32,850
+Donc on voit bien ici sur ce schéma que la
+résistance
+
+95
+00:06:32,850 --> 00:06:37,290
+n'est pas placée ici à l'extérieur mais
+qu'elle est placée à l'intérieur.
+
+96
+00:06:37,290 --> 00:06:42,513
+Bien évidemment, elle ne doit pas être
+connectée en permanence et il va falloir
+
+97
+00:06:42,513 --> 00:06:48,125
+trouver un mécanisme pour enclencher ou
+déclencher cette résistance
+
+98
+00:06:48,125 --> 00:06:48,900
+de tirage.
+
+99
+00:06:48,900 --> 00:06:52,156
+Malheureusement, il n'y a pas une méthode
+
+100
+00:06:52,156 --> 00:06:56,050
+unique pour enclencher ces résistances de
+tirage.
+
+101
+00:06:56,050 --> 00:06:59,620
+Chaque fabricant propose une technique.
+
+102
+00:06:59,620 --> 00:07:05,266
+Je vais prendre l'exemple pour les
+processeurs AVR de la société Atmel.
+
+103
+00:07:05,266 --> 00:07:08,560
+Je pense que vous vous souvenez de ce
+tableau.
+
+104
+00:07:08,560 --> 00:07:12,620
+Nous en avions parlé lorsque nous avons
+parlé des entrées et sorties.
+
+105
+00:07:12,620 --> 00:07:13,332
+Vous vous
+
+106
+00:07:13,332 --> 00:07:18,384
+souvenez que dans le registre Dir, pour
+chaque patte, le bit
+
+107
+00:07:18,384 --> 00:07:23,246
+correspondant est utilisé soit pour avoir
+une entrée
+
+108
+00:07:23,246 --> 00:07:29,160
+lorsqu'il est à 0, soit pour avoir une
+sortie lorsqu'il est à 1.
+
+109
+00:07:29,160 --> 00:07:32,475
+Dans ce cas-là, c'est le registre Out qui
+permet de mettre
+
+110
+00:07:32,475 --> 00:07:36,130
+la sortie à 0 et de mettre la sortie à 1.
+
+111
+00:07:36,130 --> 00:07:38,334
+Par contre, il faut remarquer que
+
+112
+00:07:38,334 --> 00:07:43,654
+ces 2 lignes sont identiques et le fait
+que le Out soit à 0 ou qu'il
+
+113
+00:07:43,654 --> 00:07:48,880
+soit à 1 lorsque le Dir est à 0 n'a en
+fait pas d'importance.
+
+114
+00:07:48,880 --> 00:07:53,008
+Et certains fabricants ont justement eu
+l'idée de
+
+115
+00:07:53,008 --> 00:07:56,698
+distinguer ces 2 cas en disant dans le cas
+
+116
+00:07:56,698 --> 00:07:59,070
+où DDR est à 0, si Port est à
+
+117
+00:07:59,070 --> 00:08:03,164
+0 alors c'est une entrée normale à haute
+impédance.
+
+118
+00:08:03,164 --> 00:08:07,181
+Par contre, si Port est à 1, toujours avec
+le DDR
+
+119
+00:08:07,181 --> 00:08:12,060
+qui est à 0, alors on passe à une entrée
+avec Pull-up.
+
+120
+00:08:12,060 --> 00:08:16,575
+Donc ce sera extrèmement facile
+d'enclencher l'entrée.
+
+121
+00:08:16,575 --> 00:08:21,418
+Il suffira d'activer le bit correspondant
+du Port pour
+
+122
+00:08:21,418 --> 00:08:23,960
+autant qu'on ait le DDR qui est à 0.
+
+123
+00:08:23,960 --> 00:08:28,177
+Je vous rappelle que sur les Atmel, le
+port de direction
+
+124
+00:08:28,177 --> 00:08:34,140
+s'appelle DDR, data direction register et
+que le port de sortie s'appelle tout
+
+125
+00:08:34,140 --> 00:08:40,280
+simplement Port donc, on aurait, par
+exemple DDR
+
+126
+00:08:40,280 --> 00:08:46,250
+B si c'est le Port B et puis Port B
+correspondant.
+
+127
+00:08:46,250 --> 00:08:51,340
+J'aurais pu vous montrer le schéma interne
+des AVR.
+
+128
+00:08:51,340 --> 00:08:53,474
+Il est fort compliqué mais
+
+129
+00:08:53,474 --> 00:08:58,670
+on y reconnaît quand même même ici cette
+résistance de tirage.
+
+130
+00:08:58,670 --> 00:09:04,724
+On voit qu'elle est actionnée par un
+transistor P connecté au plus.
+
+131
+00:09:04,724 --> 00:09:10,720
+On a donc bien une résistance de pull-up
+qui peut être enclenchée.
+
+132
+00:09:10,720 --> 00:09:16,738
+Ici, on a un inverseur qui correspond à
+l'inversion de ce transistor.
+
+133
+00:09:16,738 --> 00:09:18,691
+On a donc ici une fonction
+
+134
+00:09:18,691 --> 00:09:23,958
+logique, une porte ET pour qu'on ait un 1
+ici et
+
+135
+00:09:23,958 --> 00:09:29,322
+par conséquent, que le transistor conduise
+et que la résistance soit
+
+136
+00:09:29,322 --> 00:09:35,031
+active, on doit avoir ici la valeur 1
+puisqu'il n'y a pas de petit rond.
+
+137
+00:09:35,031 --> 00:09:41,481
+On doit avoir ici, par contre, la valeur
+0, où il doit y avoir un petit rond.
+
+138
+00:09:41,481 --> 00:09:44,690
+Cette valeur 1 ici correspond
+
+139
+00:09:44,690 --> 00:09:51,570
+au Port.
+Cette valeur 0 ici correspond au DDR.
+
+140
+00:09:51,570 --> 00:09:54,686
+Donc on se trouve bien dans la logique que
+je viens
+
+141
+00:09:54,686 --> 00:10:00,940
+de vous expliquer lorsque DDR, le bit
+correspondant est à 0.
+
+142
+00:10:00,940 --> 00:10:04,966
+et que le bit du port correspondant est à
+
+143
+00:10:04,966 --> 00:10:09,165
+1, ces deux conditions, on a le et
+logique,
+
+144
+00:10:09,165 --> 00:10:13,885
+entraînent l'enclenchement de notre
+résistance
+
+145
+00:10:13,885 --> 00:10:18,316
+de Pull Up.
+Un autre microcontrôleur, une autre
+
+146
+00:10:18,316 --> 00:10:23,734
+manière, toute différente de gérer les
+résistances de rappel.
+
+147
+00:10:23,734 --> 00:10:29,173
+Le MSP430, lui, offre pull-up et pull-down
+sur
+
+148
+00:10:29,173 --> 00:10:34,313
+chaque patte.
+C'est nouveau, c'est intéressant dans
+
+149
+00:10:34,313 --> 00:10:38,153
+certains cas, c'est vrai qu'on utilise
+beaucoup plus souvent le pull-up que
+
+150
+00:10:38,153 --> 00:10:39,605
+le pull-down, mais il y a
+
+151
+00:10:39,605 --> 00:10:43,746
+certainement des applications
+intéressantes pour le pull-down.
+
+152
+00:10:43,746 --> 00:10:48,854
+Dans ce cas-là, un registre
+supplémentaire, un registre spécial a été
+
+153
+00:10:48,854 --> 00:10:53,920
+utilisé, il a le nom particulier de REN,
+qui veut dire
+
+154
+00:10:53,920 --> 00:11:00,188
+Resistor Enable, donc enclenchement
+
+155
+00:11:00,188 --> 00:11:06,076
+de la résistance, et lorsqu'on
+
+156
+00:11:06,076 --> 00:11:10,850
+a décidé d'enclencher la résistance, on
+choisit
+
+157
+00:11:10,850 --> 00:11:15,436
+si c'est un pull-up ou un pull-down avec
+la valeur
+
+158
+00:11:15,436 --> 00:11:20,120
+de OUT.
+Donc je vous rappelle dans ce tableau,
+
+159
+00:11:20,120 --> 00:11:25,318
+lorsque DIR est à 0, on a toujours une
+entrée, lorsque DIR est à 1,
+
+160
+00:11:25,318 --> 00:11:30,334
+on a toujours une sortie, lorsqu'il s'agit
+d'une sortie, elle peut être à
+
+161
+00:11:30,334 --> 00:11:35,410
+0 ou à 1 en fonction du OUT, rien n'a
+changé.
+
+162
+00:11:35,410 --> 00:11:40,306
+Par contre, l'entrée est à haute impédance
+et dans l'état
+
+163
+00:11:40,306 --> 00:11:45,350
+normal lorsque le OUT est à 0 et que le
+REN est aussi à 0.
+
+164
+00:11:45,350 --> 00:11:50,914
+Par contre, on enclenche l'une ou l'autre
+des résistances
+
+165
+00:11:50,914 --> 00:11:58,870
+avec le REN à 1, ce sera un pull-up avec
+le 1, un pull-down avec le 0.
+
+166
+00:11:58,870 --> 00:12:01,210
+Je vous signale qu'il faut être prudent si
+
+167
+00:12:01,210 --> 00:12:03,744
+on utilise des valeurs qui sont
+différentes de
+
+168
+00:12:03,744 --> 00:12:05,914
+celles qui sont citées dans cette sorte de
+
+169
+00:12:05,914 --> 00:12:08,370
+table de vérité que je viens de vous
+dessiner.
+
+170
+00:12:08,370 --> 00:12:12,162
+Prenons un exemple, je n'ai pas parlé du
+cas où on aurait
+
+171
+00:12:12,162 --> 00:12:15,290
+un 1 sur le Resistor Enable et un 1 sur le
+DIR.
+
+172
+00:12:15,290 --> 00:12:16,954
+Qu'est-ce qui va se passer?
+
+173
+00:12:16,954 --> 00:12:19,130
+Je ne peux pas vous donner la réponse, la
+
+174
+00:12:19,130 --> 00:12:22,588
+réponse se trouve dans la documentation du
+fabricant, elle va
+
+175
+00:12:22,588 --> 00:12:26,809
+varier d'un fabricant à l'autre, bien
+évidemment, mais soyez extrêmement
+
+176
+00:12:26,809 --> 00:12:30,402
+prudents d'utiliser les modes qui sont
+prévus par le fabricant.
+
+177
+00:12:30,402 --> 00:12:32,642
+Bien évidemment, tout ça est décrit dans
+
+178
+00:12:32,642 --> 00:12:35,340
+les documents que les fabricants nous
+donnent et
+
+179
+00:12:35,340 --> 00:12:38,265
+qui décrivent avec beaucoup de précision,
+mais dans
+
+180
+00:12:38,265 --> 00:12:41,290
+un très grand nombre de pages, le
+fonctionnement
+
+181
+00:12:41,290 --> 00:12:44,830
+exact de toutes les parties des
+microcontrôleurs.
+
+182
+00:12:44,830 --> 00:12:47,410
+Prenons un exemple.
+
+183
+00:12:47,410 --> 00:12:50,056
+En fait, nous avons déjà vu ce programme,
+mais il
+
+184
+00:12:50,056 --> 00:12:53,970
+y avait deux lignes qui n'avaient pas été
+très clairement expliquées.
+
+185
+00:12:53,970 --> 00:12:59,926
+Essayons de les lire, d'abord la seconde,
+ici dans le registre REN, je
+
+186
+00:12:59,926 --> 00:13:06,320
+vais activer le bit 2 et le bit 3, je vais
+donc bel et bien enclencher
+
+187
+00:13:06,320 --> 00:13:07,408
+les résistances.
+
+188
+00:13:07,408 --> 00:13:12,532
+Maintenant, je décide, en agissant avec un
+setbit également sur le
+
+189
+00:13:12,532 --> 00:13:17,910
+bit 2 et sur le bit 3, de choisir des
+résistances du type pull-up.
+
+190
+00:13:17,910 --> 00:13:23,062
+Est-ce que l'Arduino ne pourrait pas
+résoudre notre problème?
+
+191
+00:13:23,062 --> 00:13:27,110
+Dans un certain sens, oui, puisque la
+primitive,
+
+192
+00:13:27,110 --> 00:13:31,574
+la fonction pinMode que nous connaissons
+permet non
+
+193
+00:13:31,574 --> 00:13:37,560
+seulement de mettre une patte en sortie,
+OUTPUT, ou
+
+194
+00:13:37,560 --> 00:13:40,980
+une patte en entrée, mais, je vous
+l'apprends aujourd'hui, il
+
+195
+00:13:40,980 --> 00:13:44,822
+est aussi possible de la mettre en mode
+INPUT_PULLUP, c'est-à-dire
+
+196
+00:13:44,822 --> 00:13:47,740
+une entrée avec une résistance de rappel
+vers le haut.
+
+197
+00:13:47,740 --> 00:13:52,414
+Malheureusement, ils n'ont pas prévu la
+résistance pull-down, donc
+
+198
+00:13:52,414 --> 00:13:56,520
+cette ligne va fonctionner parfaitement
+bien sur un AVR d'Atmel,
+
+199
+00:13:56,520 --> 00:14:01,713
+sur un MSP430 avec l'environnement
+Energia, mais on ne pourra pas
+
+200
+00:14:01,713 --> 00:14:07,087
+utiliser le pull-down, qui est pourtant
+physiquement disponible sur un MSP430.
+
+201
+00:14:07,087 --> 00:14:09,786
+Mais c'est tout de même intéressant, ça
+
+202
+00:14:09,786 --> 00:14:13,218
+permet d'avoir une syntaxe qui fonctionne
+sur tous
+
+203
+00:14:13,218 --> 00:14:16,848
+les microcontrôleurs qui disposent de
+résistances de
+
+204
+00:14:16,848 --> 00:14:20,260
+rappel vers le haut, de résistances de
+pull-up.
+
+205
+00:14:20,260 --> 00:14:21,190
+En résumé,
+
+206
+00:14:21,190 --> 00:14:26,995
+nous venons de voir que les résistances de
+tirage sont indispensables chaque
+
+207
+00:14:26,995 --> 00:14:32,578
+fois qu'une patte risque de se trouver en
+l'air, nous avons vu aussi que beaucoup de
+
+208
+00:14:32,578 --> 00:14:36,034
+microcontrôleurs intègrent ces résistances
+de tirage à
+
+209
+00:14:36,034 --> 00:14:39,185
+l'intérieur du circuit intégré, et nous
+avons
+
+210
+00:14:39,185 --> 00:14:42,245
+aussi noté que chaque fabricant propose sa
+
+211
+00:14:42,245 --> 00:14:46,992
+propre implémentaion pour ces mécanismes
+de pull-up,
+
+212
+00:14:46,992 --> 00:14:50,280
+et éventuellement de pull-down.

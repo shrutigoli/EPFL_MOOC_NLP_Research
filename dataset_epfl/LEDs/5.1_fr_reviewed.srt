@@ -1,0 +1,811 @@
+1
+00:00:00,008 --> 00:00:04,659
+[AUDIO
+
+2
+00:00:04,659 --> 00:00:13,300
+VIDE] Bonjour.
+
+3
+00:00:13,300 --> 00:00:17,090
+Dans cette leçon, nous allons parler
+d'un mécanisme très important dans
+
+4
+00:00:17,090 --> 00:00:20,260
+les systèmes à microcontrôleurs
+: les interruptions.
+
+5
+00:00:21,380 --> 00:00:25,420
+Au cours de notre exposé, nous parlerons
+des principes fondamentaux des
+
+6
+00:00:25,420 --> 00:00:31,190
+interruptions, nous verrons les événements
+pouvant provoquer les interruptions,
+
+7
+00:00:32,620 --> 00:00:38,830
+puis la mise en œuvre de ce mécanisme,
+et nous finirons par deux exemples.
+
+8
+00:00:39,870 --> 00:00:44,500
+Un système à microcontrôleur possède
+généralement, des entrées et des sorties.
+
+9
+00:00:45,940 --> 00:00:50,400
+Le but premier du programme
+est de réagir correctement
+
+10
+00:00:50,400 --> 00:00:54,900
+aux différents changements sur les
+entrées en agissant sur les sorties.
+
+11
+00:00:56,160 --> 00:01:02,290
+Il faut noter que les afficheurs et
+enseignes à LED sont une exception
+
+12
+00:01:02,290 --> 00:01:08,140
+dans ce domaine,
+car possèdent très peu d'entrées.
+
+13
+00:01:08,140 --> 00:01:12,380
+Des enseignes et afficheurs à
+LED peuvent avoir des entrées,
+
+14
+00:01:13,790 --> 00:01:19,880
+par exemple, une télécommande pour
+éteindre ou allumer l'afficheur,
+
+15
+00:01:19,880 --> 00:01:23,660
+un bouton poussoir pour augmenter
+ou diminuer la luminosité,
+
+16
+00:01:24,850 --> 00:01:28,320
+ou même changer le texte à afficher.
+
+17
+00:01:28,320 --> 00:01:33,140
+Il existe des cas où le système
+à microcontrôleur doit réagir
+
+18
+00:01:33,140 --> 00:01:35,010
+à des événements.
+
+19
+00:01:35,010 --> 00:01:38,130
+C'est le cas d'un afficheur multiplexé,
+
+20
+00:01:39,530 --> 00:01:41,868
+où nous avons une gestion
+rigoureuse du temps.
+
+21
+00:01:41,868 --> 00:01:45,430
+Dans ce cas-là, le système doit,
+
+22
+00:01:45,430 --> 00:01:50,593
+à des moments bien précis,
+envoyer de nouvelles valeurs sur les LED.
+
+23
+00:01:50,593 --> 00:01:56,253
+Une interruption en
+informatique est l'arrêt
+
+24
+00:01:56,253 --> 00:02:01,130
+temporaire et inattendu,
+d'un programme en cours d'exécution
+
+25
+00:02:02,350 --> 00:02:07,880
+au profit d'un autre programme
+jugé à ce moment plus important.
+
+26
+00:02:07,880 --> 00:02:13,760
+Nous voyons bien que la notion
+d'interruption en informatique
+
+27
+00:02:13,760 --> 00:02:19,100
+correspond au sens que nous lui
+donnons dans la vie courante.
+
+28
+00:02:19,100 --> 00:02:25,200
+Exemple, je suis assis au bureau en
+train de travailler, le téléphone sonne,
+
+29
+00:02:26,210 --> 00:02:30,700
+j'arrête le travail pour
+répondre au téléphone.
+
+30
+00:02:30,700 --> 00:02:38,040
+Après la conversation, je reprends le
+travail là où je l'avais interrompu.
+
+31
+00:02:39,160 --> 00:02:44,580
+Comme nous le voyons, c'est toujours un
+événement qui provoque une interruption.
+
+32
+00:02:44,580 --> 00:02:48,120
+Cet événement a un caractère imprévisible.
+
+33
+00:02:48,120 --> 00:02:52,930
+Le programme ne sait pas quand il
+va se produire, cet événement.
+
+34
+00:02:52,930 --> 00:02:57,820
+Pour utiliser les interruptions,
+nous n'avons pas besoin
+
+35
+00:02:57,820 --> 00:03:01,810
+de comprendre en détail le
+mécanisme qui les rend possibles.
+
+36
+00:03:02,960 --> 00:03:08,767
+C'est un peu comme les fonctions,
+et les procédures, en langage évolué, que
+
+37
+00:03:08,767 --> 00:03:15,320
+nous utilisons sans toutefois comprendre
+le détail de leur fonctionnement.
+
+38
+00:03:15,320 --> 00:03:19,820
+Voici le programme principal dont
+les instructions sont représentées
+
+39
+00:03:19,820 --> 00:03:21,030
+ici en bleu.
+
+40
+00:03:21,030 --> 00:03:25,080
+Lorsque certaines instructions
+doivent être reprises plusieurs fois,
+
+41
+00:03:25,080 --> 00:03:28,810
+nous formulons une
+routine ou sous routine.
+
+42
+00:03:29,890 --> 00:03:31,630
+Le programme principal s'exécute.
+
+43
+00:03:31,630 --> 00:03:38,670
+À un instant donné, nous avons
+besoin des services de la routine.
+
+44
+00:03:38,670 --> 00:03:43,862
+Avec l'instruction CALL nous appelons
+la routine que nous exécutons.
+
+45
+00:03:43,862 --> 00:03:47,490
+L'instruction RET nous permet de revenir
+
+46
+00:03:48,960 --> 00:03:51,440
+dans le programme principal
+que nous continuons.
+
+47
+00:03:51,440 --> 00:03:56,370
+À un instant bien précis,
+
+48
+00:03:56,370 --> 00:04:01,200
+nous avons également besoin des
+services de la même routine,
+
+49
+00:04:01,200 --> 00:04:04,540
+nous appelons la routine ici,
+et nous l'exécutons.
+
+50
+00:04:05,850 --> 00:04:09,320
+Nous avons ici la routine d'interruption.
+
+51
+00:04:10,500 --> 00:04:15,342
+Pendant l'exécution du programme,
+à cet instant bien précis, nous avons un
+
+52
+00:04:15,342 --> 00:04:22,170
+événement qui provoque l'exécution
+de la routine d'interruption.
+
+53
+00:04:22,170 --> 00:04:27,310
+La fin de la routine d'interruption
+est matérialisée par RETI
+
+54
+00:04:27,310 --> 00:04:31,710
+qui nous permet de revenir au programme
+principal et de continuer son exécution.
+
+55
+00:04:33,520 --> 00:04:40,220
+La suite, nous remarquons que,
+à ce niveau se produit le même événement,
+
+56
+00:04:41,220 --> 00:04:47,770
+alors nous lançons la routine
+d'interruption qui s'exécute.
+
+57
+00:04:47,770 --> 00:04:53,670
+À la fin de la routine,
+nous revenons au programme principal.
+
+58
+00:04:53,670 --> 00:04:57,120
+Deux sortes d'événements
+produisent des interruptions.
+
+59
+00:04:57,120 --> 00:05:02,090
+Nous avons les événements extérieurs au
+microcontrôleur, par exemple changement
+
+60
+00:05:02,090 --> 00:05:09,740
+d'état sur une ligne en entrée ; des
+événements intérieurs au microcontrôleur,
+
+61
+00:05:09,740 --> 00:05:14,560
+exemple, fin de conversion en point
+convertissant analogique numérique.
+
+62
+00:05:14,560 --> 00:05:17,870
+Nous avons également des
+événements liés au timer.
+
+63
+00:05:17,870 --> 00:05:22,615
+Le sujet du timer sera repris en
+détail dans une prochaine leçon.
+
+64
+00:05:23,735 --> 00:05:26,855
+Il y a plusieurs sources
+d'interruption sur un microcontrôleur.
+
+65
+00:05:28,015 --> 00:05:31,585
+Le système doit être capable de
+reconnaître la source d'interruption.
+
+66
+00:05:31,585 --> 00:05:34,355
+Pour reconnaître la source d'interruption,
+deux techniques sont utilisées.
+
+67
+00:05:35,615 --> 00:05:41,055
+Nous avons la consultation des fanions,
+et les vecteurs d'interruption.
+
+68
+00:05:42,630 --> 00:05:47,890
+Dans certains microcontrôleurs,
+on peut combiner ces deux techniques.
+
+69
+00:05:47,890 --> 00:05:51,700
+C'est le cas du MSP430 que nous étudions.
+
+70
+00:05:53,340 --> 00:05:59,320
+Cette table nous donne la liste des
+vecteurs d'interruption sur MSP430G.
+
+71
+00:06:00,905 --> 00:06:03,475
+Nous voyons ici quelques
+vecteurs d'interruption
+
+72
+00:06:05,425 --> 00:06:07,425
+sur un microcontrôleur MSP430.
+
+73
+00:06:08,525 --> 00:06:11,825
+Nous remarquons le vecteur
+d'interruption pour le port 1,
+
+74
+00:06:11,825 --> 00:06:15,115
+et le vecteur d'interruption
+pour le port 2.
+
+75
+00:06:15,115 --> 00:06:18,964
+Là, le vecteur d'interruption
+pour le convertisseur
+
+76
+00:06:18,964 --> 00:06:23,675
+analogique-numérique 10 bits, le vecteur
+d'interruption pour le timer zéro,
+
+77
+00:06:23,675 --> 00:06:27,545
+et le vecteur d'interruption
+pour le reset.
+
+78
+00:06:29,365 --> 00:06:32,765
+La mise en œuvre d'une interruption
+passe par trois étapes.
+
+79
+00:06:32,765 --> 00:06:36,345
+Dans la première étape, nous autorisons
+l'interruption qui nous intéresse.
+
+80
+00:06:36,345 --> 00:06:39,120
+Dans la deuxième étape,
+
+81
+00:06:39,120 --> 00:06:42,430
+nous précisons comment cette
+interruption doit fonctionner.
+
+82
+00:06:43,450 --> 00:06:49,610
+Par exemple pour une entrée,
+il faut préciser le flanc actif.
+
+83
+00:06:50,790 --> 00:06:55,170
+La dernière étape consiste à autoriser
+globalement les interruptions.
+
+84
+00:06:56,410 --> 00:07:02,800
+Montrons sur ce schéma comment la mise
+en œuvre des interruptions se fait.
+
+85
+00:07:02,800 --> 00:07:06,000
+Nous avons ici la logique
+de décodage des événements,
+
+86
+00:07:06,000 --> 00:07:11,160
+qui lorsqu'un événement apparaît ici,
+le fanion va se mettre à 1.
+
+87
+00:07:11,160 --> 00:07:16,560
+Lorsque le fanion d'autorisation
+de l'interruption est mis à 1 ici,
+
+88
+00:07:16,560 --> 00:07:24,510
+ce qui rend la porte ET passante, et nous
+arrivons au niveau de cette porte OU.
+
+89
+00:07:24,510 --> 00:07:30,310
+Plusieurs autres sources d'interruption
+peuvent arriver là, ce qui permet
+
+90
+00:07:30,310 --> 00:07:36,290
+d'activer cette entrée de
+la porte ET que voici.
+
+91
+00:07:36,290 --> 00:07:39,600
+Lorsque nous avons l'autorisation
+générale des interruptions,
+
+92
+00:07:39,600 --> 00:07:45,220
+nous avons finalement à la sortie
+ici le signal d'interruption.
+
+93
+00:07:45,220 --> 00:07:50,280
+Nous présentons ici la syntaxe
+de routine d'interruption en C.
+
+94
+00:07:50,280 --> 00:07:53,880
+Il faut noter que cette
+syntaxe n'est pas normalisée
+
+95
+00:07:53,880 --> 00:07:57,120
+car elle dépend des
+différents compilateurs.
+
+96
+00:07:57,120 --> 00:08:03,430
+Nous avons ici choisi une syntaxe qui
+est acceptée par le compilateur GCC.
+
+97
+00:08:03,430 --> 00:08:08,580
+La première ligne présente le
+numéro du vecteur d'interruption,
+
+98
+00:08:08,580 --> 00:08:13,090
+ensuite la ligne suivante nous
+indique le nom d'une procédure
+
+99
+00:08:14,470 --> 00:08:20,090
+avec void pour dire que cette
+procédure n'a pas de paramètre.
+
+100
+00:08:20,090 --> 00:08:21,870
+Pour les lignes d'entrée sortie,
+
+101
+00:08:21,870 --> 00:08:26,700
+nous avons à notre disposition
+les quatre registres suivants.
+
+102
+00:08:26,700 --> 00:08:31,590
+P1DIR pour signifier si la ligne
+est en entrée ou en sortie,
+
+103
+00:08:32,640 --> 00:08:35,430
+P1OUT pour nous donner
+la valeur de sortie,
+
+104
+00:08:36,730 --> 00:08:41,790
+P1IN pour nous donner la
+valeur des entrées, P1REN qui
+
+105
+00:08:41,790 --> 00:08:46,830
+nous permet d'activer la résistance
+de tirage ou de pull-up.
+
+106
+00:08:46,830 --> 00:08:52,780
+Dans le cas où nous devons utiliser une
+interruption sur une ligne d'entrée,
+
+107
+00:08:52,780 --> 00:08:57,530
+nous devons utiliser les registres
+complémentaires que voici.
+
+108
+00:08:58,930 --> 00:09:02,340
+P1IE Interrupt Enable :
+
+109
+00:09:02,340 --> 00:09:06,210
+c'est dans ce registre que nous autorisons
+l'interruption qui nous intéresse.
+
+110
+00:09:08,270 --> 00:09:16,010
+P1IES Interrupt Edge Select nous
+permet de choisir le flanc actif.
+
+111
+00:09:16,010 --> 00:09:19,040
+Donc c'est dans ce registre
+que nous précisons
+
+112
+00:09:19,040 --> 00:09:22,650
+s'il s'agit d'un flanc montant
+ou d'un flanc descendant.
+
+113
+00:09:24,330 --> 00:09:29,980
+P1IFG Interrupt Flag est le drapeau
+des fanions d'interruption.
+
+114
+00:09:29,980 --> 00:09:32,460
+En consultant ce registre,
+
+115
+00:09:32,460 --> 00:09:36,710
+nous pouvons savoir quelle est la
+broche qui a produit l'interruption.
+
+116
+00:09:36,710 --> 00:09:44,446
+Ces trois registres que nous venons de
+voir agissent à ce niveau pour P1IE,
+
+117
+00:09:44,446 --> 00:09:51,450
+l'autorisation de l'interruption
+qui nous intéresse,
+
+118
+00:09:51,450 --> 00:09:57,400
+P1IES qui nous permet de choisir
+le flanc agit à ce niveau.
+
+119
+00:09:58,460 --> 00:10:04,480
+Donc nous voyons que P1 IES est relié à
+la logique de décodage de l'évènement.
+
+120
+00:10:05,920 --> 00:10:11,240
+P1IFG, le registre d'un fanion
+d'interruption, se trouve à ce niveau.
+
+121
+00:10:12,650 --> 00:10:19,120
+Voici un programme qui nous permet de
+faire la mise en œuvre des interruptions.
+
+122
+00:10:19,120 --> 00:10:26,420
+Nous avons une LED verte
+sur la ligne P1.6,
+
+123
+00:10:26,420 --> 00:10:31,810
+sur la ligne P1.3, nous avons une entrée.
+
+124
+00:10:31,810 --> 00:10:36,710
+La LED verte doit changer d'état à chaque
+
+125
+00:10:36,710 --> 00:10:41,245
+flanc montant de l'entrée P1.3.
+
+126
+00:10:41,245 --> 00:10:45,645
+Cette ligne nous permet de
+stopper le watchdog timer.
+
+127
+00:10:45,645 --> 00:10:51,495
+Ces deux instructions permettent de
+faire un pull-up sur l'entrée P1.3.
+
+128
+00:10:51,495 --> 00:10:59,195
+Nous choisissons un flanc descendant
+en mettant à 1 le bit 3 de P1IES.
+
+129
+00:10:59,195 --> 00:11:06,530
+Nous autorisons l'interruption pour
+la ligne P1.3 par cette instruction.
+
+130
+00:11:07,600 --> 00:11:15,390
+Nous maintenons à zéro le fanion
+d'interruption, qui est dans P1IFG.
+
+131
+00:11:16,460 --> 00:11:20,030
+Cette ligne autorise
+globalement les interruptions.
+
+132
+00:11:20,030 --> 00:11:26,030
+Le programme principal ne fait rien,
+comme nous le voyons ici.
+
+133
+00:11:26,030 --> 00:11:29,092
+Lorsque nous aurons un
+événement sur la ligne P1.3,
+
+134
+00:11:29,092 --> 00:11:37,500
+c'est-à-dire un flanc
+descendant sur la ligne P1.3,
+
+135
+00:11:37,500 --> 00:11:41,120
+la routine d'interruption va s'exécuter.
+
+136
+00:11:41,120 --> 00:11:44,250
+Regardons en détail cette
+routine d'interruption.
+
+137
+00:11:45,350 --> 00:11:50,760
+Cette ligne précise qu'il s'agit du
+vecteur d'interruption du PORT1.
+
+138
+00:11:52,580 --> 00:11:58,140
+Voici, ici, le plan de la routine et cette
+
+139
+00:11:58,140 --> 00:12:02,672
+instruction permet de
+mettre à 0 le fanion.
+
+140
+00:12:02,672 --> 00:12:07,961
+La dernière ligne inverse
+l'état de la LED verte.
+
+141
+00:12:07,961 --> 00:12:12,605
+Voici une variante du programme précédent.
+
+142
+00:12:12,605 --> 00:12:16,475
+Ici, nous avons deux entrées actives.
+
+143
+00:12:16,475 --> 00:12:21,760
+L'entrée P1.3 et l'entrée P1.4.
+
+144
+00:12:21,760 --> 00:12:23,170
+Dans la routine d'interruption,
+
+145
+00:12:24,340 --> 00:12:29,470
+nous voyons bien que nous faisons une
+consultation de ces deux entrées.
+
+146
+00:12:29,470 --> 00:12:36,598
+L'interruption montre qu'ici, nous faisons
+une consultation de l'entrée P1.3.
+
+147
+00:12:36,598 --> 00:12:39,800
+Nous remettons à 0 son fanion
+
+148
+00:12:41,250 --> 00:12:44,770
+et nous faisons les actions
+associées à cette entrée.
+
+149
+00:12:45,780 --> 00:12:52,100
+Dans la deuxième ligne, nous refaisons
+la même chose, mais pour l'entrée P1.4.
+
+150
+00:12:52,100 --> 00:12:55,660
+Ce programme fait intervenir
+
+151
+00:12:55,660 --> 00:12:58,190
+un convertisseur analogique
+numérique 10 bits.
+
+152
+00:12:59,270 --> 00:13:03,200
+Comme la conversion dure un certain temps,
+
+153
+00:13:03,200 --> 00:13:07,660
+l'interruption va se faire
+à la fin de la conversion.
+
+154
+00:13:07,660 --> 00:13:12,550
+Ces trois lignes permettent de configurer
+correctement le convertisseur analogique.
+
+155
+00:13:12,550 --> 00:13:19,900
+Remarquons ici ADC10IE, qui nous
+permet d'autoriser l'interruption.
+
+156
+00:13:19,900 --> 00:13:24,826
+La ligne que nous reconnaissons là
+autorise globalement les interruptions.
+
+157
+00:13:24,826 --> 00:13:31,290
+Nous lançons le convertisseur pour
+la première conversion grâce à cette
+
+158
+00:13:31,290 --> 00:13:37,900
+instruction et remarquons que le programme
+principal ne fait absolument rien.
+
+159
+00:13:39,230 --> 00:13:43,400
+Mais, à la fin de la conversion,
+
+160
+00:13:43,400 --> 00:13:49,480
+un signal d'interruption sera envoyé,
+la routine d'interruption va s'exécuter.
+
+161
+00:13:49,480 --> 00:13:54,390
+Dans cette routine d'interruption que
+nous avons ici, nous remarquons que nous
+
+162
+00:13:54,390 --> 00:13:59,620
+gardons, dans la variable val,
+la valeur obtenue après conversion.
+
+163
+00:13:59,620 --> 00:14:02,520
+Nous lançons une autre conversion.
+
+164
+00:14:03,910 --> 00:14:10,530
+Ensuite, nous comparons la valeur val
+à la moitié de la valeur maximale.
+
+165
+00:14:10,530 --> 00:14:17,730
+Si la tension lue est supérieure à
+cette moitié, la LED verte s'allume.
+
+166
+00:14:19,230 --> 00:14:23,580
+Dans cette leçon, nous avons vu les
+principes fondamentaux des interruptions.
+
+167
+00:14:25,090 --> 00:14:31,240
+Les événements provoquant les
+interruptions internes ou externes.
+
+168
+00:14:31,240 --> 00:14:36,140
+Nous avons fait la mise en œuvre
+du mécanisme des interruptions
+
+169
+00:14:36,140 --> 00:14:37,370
+et montré deux exemples.

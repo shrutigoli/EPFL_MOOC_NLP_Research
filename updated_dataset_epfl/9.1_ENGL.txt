@@ -1,0 +1,204 @@
+So in this series of videos, we're going to talk about languages, language design in particular.
+Domain-specific languages, and engineered languages for one, declarative languages, and we're also going to talk about interpretation, and compiler, and interpreted side of programming languages, and programming systems.
+In this lecture, in this video in particular, we're going to start with talking about engineered languages.
+And the first thing 
+I would like to observe is, there's actually a connection between how systems people view computation as a resource, and how complexity theorists look at this.
+So if you look into the Saltzer Kaeshoek textbook, you'll find among system resources mentioned, computation, memory, and messaging.
+And that's a smart observation because in a strong sense, the analogous observation has been made in computation complexity theory, that there is fundamental resources for computation which are time, space against memory use, and computation complexity.
+How much messaging is necessary to actually get a job done in this one scenario.
+So these dimensions are not completely orthogonal, not quite.
+So for example, the time complexity can be at most exponentially high to the space complexity of the computation.
+Why? Well think of a big memory system even right?
+As a huge finite state machine, which it is, as a localized system.
+Unless you extend the hardware, you got only so many states.
+Now, if you take so much memory, let's say, megabytes or something like that, there's only exponentially many states in that size of the data
+So if you've got <i>n</i> bits, that are different. there's 2 to the <i>n</i> different states that these <i>n</i> bits can be in.
+If you're talking about the entire system's mutable state, so that includes not just the RAM, but also all the caches, the registers etc.
+Everything that belongs to the state of such a computer.
+So if you take this, this entire state, and you've got <i>n</i> bits now,
+<i>n</i> could be a huge number.
+Then there's only 2 to the <i>n</i> different things I can store.
+So if you have a computation that changes the state, and iterates, and it gets stuck in the same state and doesn't change anymore, that's the final state.
+We're talking about well-behaved programs that the program, let's say, terminates.
+Then after, at most, 2 to the <i>n</i> computation steps, you must get into a state that you've already been in.
+So understand there was an accepting state you had stopped in before you are in an infinite loop.
+So that way, we see that time cost of any well-behaved computation that terminates, can be at most exponentially larger than the space cost we have.
+But leaving these aside, these are the fundamental resources.
+And once we have thought of it that way, we can start kind of engineering for a purpose. Because, remember, there's this notion of
+Turing-complete languages.
+And basically, there's this so-called
+Church-Turing thesis.
+You have to decide something that you cannot really prove in that sense.
+But you see, that there's really no computation possible beyond what can be done by a Turing machine.
+And you have also seen that many different models correspond to Turing machines, including, you know, our CPUs.
+And it's very easy to write a programming language that is Turing-complete.
+So all you really need is something like unbounded looping,
+<i>if-then-else</i> branching, and memory.
+And you basically get a Turing machine.
+Now you can actually argue that in corner cases, there's actually something beyond the Church-Turing thesis.
+For example, if you have a way of generating true random numbers, you actually add power.
+Or the so-called Interaction machine.
+If you have, you can make a physical network of computers, and this physical connection means quantum effects physical effects that makes things unpredictable.
+They get random delays, and so on, that are truly random.
+Out of the systems control.
+And you add power. 
+Not really maybe useful power.
+But probably you do, because you have a way of generating true random numbers, which you cannot do in a completely deterministic system otherwise.
+So this is this notion of Turing-complete, and it becomes very useful.
+Things that you think of as classic programming language, they are all Turing-complete languages.
+C, Java, Scala, etc.
+Now, you could artificially restrict the languages.
+For example, you could talk about saying computation can only take so much time.
+Or so much space, as a function of the input size.
+So you can talk about the complexity class, time,
+<i>f</i> of <i>n</i> for <i>n</i> the input size, and <i>f</i> is some function.
+For example, polynomial functions.
+That would be big <i>o</i> of <i>n</i> to the <i>k</i>.
+The <i>k</i> is some constant.
+That would be polynomials.
+Polynomial time.
+So we have heard this in complexity theory lectures, right?
+And you can think about engineering language to capture such complexity class.
+You could also do this for space.
+Or for messaging as communication complexity.
+For example, you could take 
+Loop-and-recursion-free Java.
+And that's going to have bounded running time.
+Or you could have 
+Conditionals-free Java that has no ability to make true decisions.
+So memory and time consumption may be unbounded, but you cannot really compute much.
+So this unbounded computation will not do anything of interest.
+Or space-bounded Turing machines for example, Datalog.
+It has actually bounded memory consumption.
+We're going to see more about this.
+Now let's think about the domain-specific languages.
+Now, what does that mean?
+Well we have talked about engineering languages for a program while restricting it.
+For example, if it doesn't consume more resources than a particular amount.
+That's one way of thinking about it.
+That way you've got, generally, less than Turing-completeness, and it may still be acceptable.
+That way, for example, you're guaranteed a polynomial time restricted class can only complete a computation that runs with polynomial time as it's terminating time.
+That means, it cannot cost too much.
+That might be good, right?
+But let's pull at this abstract argument about cost.
+You might also do it for a particular domain.
+You've got a certain domain, let's say, biology, and you want to do certain kind of biological computations, or simulations, or so, you might create a domain-specific programming language to make certain programming in certain domains particularly easy.
+You could think of SQL as a domain-specific language for the purpose of data-querying.
+Out of the people who know databases, people usually call a domain something else, like their business domain, or so.
+Something like that.
+And then the schema would be specific.
+But from a different view point, more high level, you could say, well, there's a domain of querying.
+And for that, you got a domain-specific language engineered for a purpose.
+SQL is not Turing-complete.
+It's weaker, and you get something out of it.
+The programming of those typical jobs gets easier because the language's constraint doesn't allow it to do other things.
+So you are guided along as helped by the language design what you're going to do. Usually you are going to be more productive.
+And certain things that the language is designed for will be very easy to write, and short to write, so to say.
+The goal of domain specific languages can be of so much help that typical tasks, tasks that support the language, are usually shorter than in the general purpose language.
+So there is growth that you can achieve that way, that are desirable.
+High levels of abstraction.
+You don't have to, in a specific language, that is, for example, only about matrix computation, there's no need to talk about, maybe, some low-level implementation details, and so on.
+You may have matrix operations, like multiplications and so on, in that language.
+And it's a seperation of concern from low level aspects.
+In a database query, like SQL query language, there's no need to have graphics, and there's no need for sockets and things like that.
+A query might be distributed but that happens below the hood.
+So abstraction, seperation of concern, are a big critieria for design of DSLs.
+Domain-specific languages.
+Simplicity and programmer productivity, as we said, by making the language designed for a purpose, you can make typical computations shorter there.
+And you can concisely capture the essence of the system.
+You can make it impossible to program something that is not intended to be programmed.
+And that can allow you avoid bugs, or do malicious code of some kind, and things like that.
+And that's, of course, also desirable.
+Now, how do you capture the essence?
+So you have to ask, for the kind of system that you want to support, or build, or have a language for, to kind of make it flexible, what language would you need?
+Remember that, even graphical user inferfaces, are actually languages, they're visual languages.
+So <i>drag-and-drop</i>, or moving files on a device level, they are basically operations of a language.
+And you can write programs that way.
+And so are APIs, together with protocols.
+Constraints on using them.
+So these are languages designed and engineered for a purpose.
+So let's think about, what do DSLs usually look like?
+Well, many DSLs are actually logic-based in nature.
+SQL is one, we will have much more to say about this later.
+And conversely, most logic-based languages are non Turing-complete.
+Exception would be actually Prolog.
+So you can create the DSL, restricting an existing general-purpose
+Turing-complete language.
+Or, and maybe add a library of domain-specific data structures and methods to create the domain-specific vocabulary.
+For example, I could take Scala, and say I would like to make it the MATLAB style language for kind of matrix computations by saying, add a library for matrix computations.
+So there's a matrix datatype that is new, and there is matrix multiplications, and inversions, and operations like this. Add it new.
+And then in turn I forbid certain things, like let's say, other certain datatypes, they are forbidden to create lists, for example.
+We could do that, for example.
+But if you have user-control structures, and so on, we might have individual floating point numbers, to take them out of reals and so on, it can loop over things, etc.
+And that would be a DSL.
+And how do we get this?
+It's basically a subset of a general purpose language, you take a language, you say, maybe you forbid some feature, you don't permit them, and you add a library.
+So that's one way to do that.
+Why would you bother with this?
+Well, obviously, such a language might be easier to use.
+And these restrictions limit the search space that a human has to explore in their minds, or in their brains, to find the right program.
+And it makes it easier for unsophisticated users to program.
+So for example, SQL is a language that business people can deal with that have not really learned programming properly.
+Also, such restrictions may make certain optimization / analyses possible, that are not possible, unfeasible for general-purpose languages.
+For example, there are certain logics, for which equivalence of two logical formulas is desirable, or whether a formula is satisfiable.
+It is undesirable to tell any industrial property or general-purpose programming language, like C, for example, where it halts.
+Or some general-purpose correctness properties.
+It is impossible to tell for this very powerful language.
+But by making the language smaller, and restricting things, you might be able to tell such things.
+So you can, for example, for a fragment of SQL, not full SQL, it's desirable to find the smallest possible equivalent program query in that language.
+So why is this non-trivial?
+Well, given a query of a certain size, there's only finitely many shorter queries.
+But testing whether shorter queries are equivalent to my query, in general, is undesirable, even for SQL, and certainly it's undesirable for C, where two C programs that were written independently are equivalent for all possible inputs. Undesirable.
+But for restricted languages, maybe desirable.
+For example, for SELECT FROM WHERE restricted fragment queries in SQL, this is desirable.
+So, again, a few more words about interface versus language design.
+You can really think of interface and languages interchangeably.
+In a sense, you can think of DSL update by the general-purpose language adding a particular kind of API and library to it.
+A bit like what you heard in visualization about taking, so to say, above the operating systems, a Unix-like operating system. you've got simpler machine language, plus you've got a POSIX system calls.
+It's extended, it's a library of things, and this extends from the viewpoint of an application program in a 
+Unix operating system, that kind of, the language itself.
+And you get a DSL for Unix programming, so to say.
+Now, so when you design an interface, or a language, you can switch backward and forward between this viewpoint of design language, design the interface.
+And it may help you to do a better job.
+Of course, through layering, creates interpreter stacks.
+If you layer these kind of languages on top of each other, you get a stack of interpreters.
+By the way, if you take a DSL defined as a general-purpose programming language, plus a library, and that's your DSL, notion here, the term used is, that's called a "shallowly embedded" DSL.
+So, I've mentioned SQL several times now.
+It's probably the most successful example of a DSL, so far.
+So let me just say, we will talk more about this concept of declarative languages later,
+But here's an example.
+So we've got a language, an example query in SQL that says,
+SELECT student names, and course names, and the grades of courses taken,
+FROM triples of students tables, courses tables, and taken tables.
+Such that the student ID, the ID of the student and the student relation is the same as the student ID and the taken relation, and the taken course ID is the same as the course ID, in the course.
+So we say these two 'join', so to say.
+If you're a database expert, that's very obvious, otherwise you might not completely understand it from that description, but the important thing is, it is a very declarative statement here.
+I say, SELECT what I want, which comes to end in a WHERE clause, and so on, but I'm not saying how to compute it.
+That's completely happening under the hood of the database system.
+So this is a declarative language.
+And it's super successful, there are huge, multi-billion dollar industry, like the big part of the IT industry really, because, I mean, databases play a role in all these applications, and SAP and things like that.
+There's a huge hardware and consulting market around so this is a gigantic market for computer science.
+And it really drives this nowadays.
+And to some extent, it was an accident that this happened, because there was this gentleman
+Ed Codd at IBM, who advocated for relational database systems.
+Logic-based, with a clean theoretical foundation.
+And nobody wanted to hear that, really.
+At that time, IMS was the big thing, of the relational database systems, something that has now almost died, except for legacy systems that you as a student probably don't see very soon, but these, so IBM, the management, the marketing people, were not particularly interested.
+They were not convinced by the implementations that this kind of relational database abstraction, and declarative languages like this, and so on, were such a good idea.
+And what happened is, at some point you want to deliver some product, and IMS wasn't ready next version and just a relational database server was ready.
+And that's how it got out, and then it got lots of people started liking it.
+So, and the nice thing is also that, it's not just a query language and things are easy to understand, and you say "what", rather than "how", and you don't have to have technical skills.
+Instead, the purpose of the computer optimizing the system to turn this into good execution scheme.
+It's very short, and very succinct.
+And it's only what queries.
+You cannot write something else in the query in this kind of select statement.
+So you cannot write evilly-behaved things.
+You cannot really write a virus.
+You might do something like denial of service attack on the database system by just writing a very expensive query.
+You could do that.
+You cannot do graphs, you cannot really make a graphical computer game in SQL.
+But the very restricted scheme and syntax of the language makes it very easy to direct it towards correct programs.
+And it takes little skill to use it.
+So that's of course a big success.
+So we're going to talk much more about this later.
+But first, as a next step, we're going to talk a little more about interpretation.

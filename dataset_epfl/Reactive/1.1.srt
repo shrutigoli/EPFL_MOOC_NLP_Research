@@ -1,0 +1,1469 @@
+1
+00:00:00,550 --> 00:00:05,300
+In this unit we are going to do a quick
+recap on functions and pattern matching.
+
+2
+00:00:05,300 --> 00:00:06,950
+Most of this you've already seen if you
+
+3
+00:00:06,950 --> 00:00:09,420
+followed the course on functional
+programming in Scala.
+
+4
+00:00:09,420 --> 00:00:12,330
+But there are also some new additions,
+
+5
+00:00:12,330 --> 00:00:15,110
+in particular, the notion of partial
+functions.
+
+6
+00:00:16,640 --> 00:00:20,890
+So to get started lets look at a possible
+domain that we
+
+7
+00:00:20,890 --> 00:00:25,360
+can express with functions and pattern
+matching and that domain is JSON, the
+
+8
+00:00:25,360 --> 00:00:27,860
+Java Script Object Notation.
+
+9
+00:00:27,860 --> 00:00:30,800
+So if you don't know what JSON is then I
+guess it's best
+
+10
+00:00:30,800 --> 00:00:33,340
+understood by looking at this example
+which
+
+11
+00:00:33,340 --> 00:00:35,360
+I have lifted straight out of Wikipedia.
+
+12
+00:00:36,460 --> 00:00:39,080
+a JSON structure is a recursive data
+
+13
+00:00:39,080 --> 00:00:43,320
+structure consisting of fields of
+primitive types.
+
+14
+00:00:43,320 --> 00:00:48,530
+For instance, here, we have a field named
+John, the type is string.
+
+15
+00:00:48,530 --> 00:00:50,340
+Here, you have another string called
+Smith.
+
+16
+00:00:51,820 --> 00:00:54,450
+values can also be structured objects.
+
+17
+00:00:54,450 --> 00:00:58,890
+For instance, the address object consists
+of three fields called streetAddress,
+
+18
+00:00:58,890 --> 00:01:04,170
+state, postalCode which are two strings
+here, and the number there.
+
+19
+00:01:04,170 --> 00:01:09,460
+And they can also be sequences, sequences
+are written in brackets.
+
+20
+00:01:09,460 --> 00:01:11,570
+So here you would have a sequence of two
+
+21
+00:01:11,570 --> 00:01:15,400
+phone numbers, whereas objects are written
+in curly brackets.
+
+22
+00:01:15,400 --> 00:01:17,950
+So this object here has three
+
+23
+00:01:17,950 --> 00:01:21,600
+bindings, three fields, and the outer
+objects that you see
+
+24
+00:01:21,600 --> 00:01:23,610
+here then would have, four
+
+25
+00:01:23,610 --> 00:01:27,650
+fields, firstName, lastName, address, and
+phoneNumbers.
+
+26
+00:01:27,650 --> 00:01:30,300
+So that, in a Nutshell, is what JSON is,
+and it's
+
+27
+00:01:30,300 --> 00:01:33,110
+a fairly popular interchange format,
+
+28
+00:01:33,110 --> 00:01:35,959
+between JavaScript and also other
+technologies.
+
+29
+00:01:37,080 --> 00:01:40,420
+How would we represent JSON data in Scala?
+
+30
+00:01:40,420 --> 00:01:42,950
+The most straightforward way, I guess, is
+to just have
+
+31
+00:01:42,950 --> 00:01:48,250
+a sequence of case classes that capture
+the different cases of a JSON object.
+
+32
+00:01:48,250 --> 00:01:53,045
+So we would start with an abstract class
+JSON, you could also use a trait for that.
+
+33
+00:01:53,045 --> 00:01:56,960
+And then there would be cases, one case
+for each kind
+
+34
+00:01:56,960 --> 00:02:01,270
+of data in JSON, which will give you six
+cases total.
+
+35
+00:02:01,270 --> 00:02:06,440
+The first case here is JSeq, representing
+sequences of JSON objects.
+
+36
+00:02:06,440 --> 00:02:08,030
+The sequence is captured in
+
+37
+00:02:08,030 --> 00:02:11,850
+this list of JSON elements here called
+elems.
+
+38
+00:02:11,850 --> 00:02:16,640
+The second case would be a J object, a
+JSON object that would contain the
+
+39
+00:02:16,640 --> 00:02:19,520
+bindings which are a map from strings,
+
+40
+00:02:19,520 --> 00:02:22,500
+those are the field names, to JSON
+objects.
+
+41
+00:02:23,708 --> 00:02:26,723
+finally there would be the primitive types
+JNum which
+
+42
+00:02:26,723 --> 00:02:29,880
+captures a number, which is a double in
+Scala.
+
+43
+00:02:29,880 --> 00:02:32,360
+Jstring, which captures a string.
+
+44
+00:02:32,360 --> 00:02:35,240
+JBoolean, which captures a Boolean.
+
+45
+00:02:35,240 --> 00:02:39,010
+And finally, JNull, which represents the
+null value.
+
+46
+00:02:41,540 --> 00:02:46,750
+So these sequence of case classes would
+represent JSON data completely.
+
+47
+00:02:48,660 --> 00:02:51,020
+Now here's an example how you can
+construct
+
+48
+00:02:51,020 --> 00:02:54,200
+the JSON object that you've seen before,
+in Scala.
+
+49
+00:02:54,200 --> 00:02:57,380
+It's exactly the same object that you've
+seen on the first slide, here.
+
+50
+00:02:58,540 --> 00:03:02,390
+But now using Scala's internal
+representation, using case classes,
+
+51
+00:03:02,390 --> 00:03:08,300
+rather than the external one using this,
+this text representation.
+
+52
+00:03:08,300 --> 00:03:13,433
+So the JSON data would be a Jobject, which
+has, is a map containing the
+
+53
+00:03:13,433 --> 00:03:19,210
+bindings for firstName, lastName, address,
+and phoneNumbers.
+
+54
+00:03:19,210 --> 00:03:24,010
+FirstName, lastNames are strings, so
+Jstring John, Jstring Smith.
+
+55
+00:03:24,010 --> 00:03:27,720
+The address is again a Jobject with
+another map.
+
+56
+00:03:27,720 --> 00:03:30,590
+the postal code here would be a JNum, a
+number.
+
+57
+00:03:30,590 --> 00:03:33,680
+The state and street address would again,
+be strings.
+
+58
+00:03:33,680 --> 00:03:38,700
+Phone number is a sequence that contains
+as elements in a list.
+
+59
+00:03:38,700 --> 00:03:43,920
+A object which maps type to home, a number
+to this string.
+
+60
+00:03:43,920 --> 00:03:49,150
+And the second object put map type to the
+string fax and number to that string here.
+
+61
+00:03:49,150 --> 00:03:52,090
+So that's how you could represent JSON
+objects.
+
+62
+00:03:52,090 --> 00:03:55,690
+To be sure they're tricks how one could
+dress
+
+63
+00:03:55,690 --> 00:03:59,020
+this up further and make the construction
+of JSON
+
+64
+00:03:59,020 --> 00:04:03,400
+objects even shorter in Scala, but this is
+what you get for a
+
+65
+00:04:03,400 --> 00:04:07,300
+completely straightforward representation
+in case classes, and
+
+66
+00:04:07,300 --> 00:04:09,310
+overall it's quite legible, I would argue.
+
+67
+00:04:11,900 --> 00:04:14,310
+So let's now do something with this data
+structure.
+
+68
+00:04:14,310 --> 00:04:18,950
+The most obvious way is to print the data
+or rather to represent
+
+69
+00:04:18,950 --> 00:04:23,060
+them as a string, in more or less the way
+you have seen before.
+
+70
+00:04:23,060 --> 00:04:28,500
+So what I want to do now, is I want to go
+from this object here
+
+71
+00:04:28,500 --> 00:04:33,280
+and get the string representation for this
+object that you've seen here.
+
+72
+00:04:33,280 --> 00:04:37,240
+Without the new lines, so without any
+formatting I would just write the things
+
+73
+00:04:37,240 --> 00:04:40,460
+with comas one after the other ,but
+otherwise I
+
+74
+00:04:40,460 --> 00:04:43,850
+want to see elements just as they are
+given here.
+
+75
+00:04:43,850 --> 00:04:44,660
+How would we do that?
+
+76
+00:04:46,060 --> 00:04:48,750
+Well here's the method that does that.
+
+77
+00:04:48,750 --> 00:04:52,310
+It's as you would guess a recursive
+function, call
+
+78
+00:04:52,310 --> 00:04:55,290
+it show, which takes the JSON object,
+gives you
+
+79
+00:04:55,290 --> 00:04:58,250
+back a String, and it would work by
+pattern
+
+80
+00:04:58,250 --> 00:05:02,560
+matching over the kind of JSON objects,
+pretty obvious.
+
+81
+00:05:02,560 --> 00:05:05,100
+So you would start with JSON match.
+
+82
+00:05:05,100 --> 00:05:09,910
+Your pattern matching functions in Scala,
+then you would just go case by case.
+
+83
+00:05:09,910 --> 00:05:13,340
+The first case you would say, well, if
+it's the sequence of elements or the
+
+84
+00:05:13,340 --> 00:05:14,950
+pattern would say, well the elements in
+
+85
+00:05:14,950 --> 00:05:18,430
+the sequence are now in this variable
+elements.
+
+86
+00:05:18,430 --> 00:05:19,530
+Then what do you do?
+
+87
+00:05:19,530 --> 00:05:25,010
+You print a open bracket, then you show
+recursively
+
+88
+00:05:25,010 --> 00:05:27,870
+all the elements and you concatenate in a
+string
+
+89
+00:05:27,870 --> 00:05:30,750
+using the make String function with commas
+between
+
+90
+00:05:30,750 --> 00:05:34,250
+them, and you close with a closing
+bracket.
+
+91
+00:05:34,250 --> 00:05:38,870
+I skip object for the time being because
+it's that's, it's the most complicated.
+
+92
+00:05:38,870 --> 00:05:41,840
+So the other four cases are all rather
+simple.
+
+93
+00:05:41,840 --> 00:05:44,750
+JNum, if you have a number then, well you
+just turn
+
+94
+00:05:44,750 --> 00:05:49,350
+the number into a string using Java and
+Scala's toString function.
+
+95
+00:05:49,350 --> 00:05:53,300
+If it's a string, JString string, then you
+print the string
+
+96
+00:05:53,300 --> 00:05:57,960
+between quotes, If it's a boolean, you
+turn the boolean to a string.
+
+97
+00:05:57,960 --> 00:06:00,850
+And if it's a null, you return the string
+null.
+
+98
+00:06:01,920 --> 00:06:05,810
+So the last case we have to look at is the
+case of, JSON objects.
+
+99
+00:06:05,810 --> 00:06:11,110
+So if you have a JSON object with some
+bindings, which are a map in Scala.
+
+100
+00:06:11,110 --> 00:06:14,910
+Then what do you do?
+Well you have to traverse the map.
+
+101
+00:06:14,910 --> 00:06:18,366
+That's done here, we define a value called
+assocs, for
+
+102
+00:06:18,366 --> 00:06:21,680
+associations.
+And you define it like this.
+
+103
+00:06:21,680 --> 00:06:25,170
+You go through the map bindings, so for
+each
+
+104
+00:06:25,170 --> 00:06:28,960
+binding that you find, what does the
+binding look like?
+
+105
+00:06:28,960 --> 00:06:32,540
+Well, it will be a pair from a key to a
+value.
+
+106
+00:06:32,540 --> 00:06:36,960
+And you can do that by just having another
+pattern match here directly on the map
+
+107
+00:06:36,960 --> 00:06:40,610
+function that says well, apply this
+function that
+
+108
+00:06:40,610 --> 00:06:44,230
+takes a key and a value and returns
+
+109
+00:06:44,230 --> 00:06:50,180
+the key in quotes, a colon, and the value
+subjected
+
+110
+00:06:50,180 --> 00:06:55,050
+to the show function.
+So that would give you a list of strings
+
+111
+00:06:55,050 --> 00:07:01,030
+that each contain the key, a colon, and
+the string of a value.
+
+112
+00:07:01,030 --> 00:07:04,590
+And then finally you take that list, you
+concatenate all the
+
+113
+00:07:04,590 --> 00:07:08,850
+elements using commas, and you put it
+inside braces, and you're done.
+
+114
+00:07:11,100 --> 00:07:13,750
+So this was just an example to get warm.
+
+115
+00:07:13,750 --> 00:07:16,800
+Again, with function programming in Scala,
+you've
+
+116
+00:07:16,800 --> 00:07:19,510
+seen the basics of pattern matching,
+recursive
+
+117
+00:07:19,510 --> 00:07:23,050
+functions, and some of the combinators
+that
+
+118
+00:07:23,050 --> 00:07:25,320
+are very important in Scala are just map.
+
+119
+00:07:26,590 --> 00:07:31,550
+What I want to do now is look at some
+aspects of this code in more detail.
+
+120
+00:07:31,550 --> 00:07:35,000
+The first thing I want to look at is this
+function here.
+
+121
+00:07:35,000 --> 00:07:36,430
+So you have a case
+
+122
+00:07:36,430 --> 00:07:39,250
+expression in curly braces.
+
+123
+00:07:39,250 --> 00:07:45,060
+And that's a function that gets passed
+directly to this map combinator.
+
+124
+00:07:45,060 --> 00:07:48,700
+So the question then is what is the type
+of this function?
+
+125
+00:07:50,690 --> 00:07:55,140
+So simplifying slightly, what is the type
+of this expression where we have a pattern
+
+126
+00:07:55,140 --> 00:08:01,290
+match on key and value and return the
+concatenation of key, a colon, and value.
+
+127
+00:08:01,290 --> 00:08:03,490
+If you would try that out you would find
+
+128
+00:08:03,490 --> 00:08:06,510
+that this Scala compiler flags this as an
+error.
+
+129
+00:08:06,510 --> 00:08:12,350
+It would say that an anonymous function
+lacks an expected type for the parameters.
+
+130
+00:08:12,350 --> 00:08:18,520
+So to correct that you would have to give
+this function a type from the outside.
+
+131
+00:08:19,900 --> 00:08:23,120
+So if we plug this function into the
+function
+
+132
+00:08:23,120 --> 00:08:26,660
+map that you've seen before here, that's
+where it appears,
+
+133
+00:08:28,980 --> 00:08:32,650
+then you will find that map expects a type
+like this.
+
+134
+00:08:32,650 --> 00:08:38,293
+What it wants is a function type from or I
+call JBinding to string
+
+135
+00:08:38,293 --> 00:08:43,243
+and the JBinding type I've abbreviated it
+here just to make
+
+136
+00:08:43,243 --> 00:08:48,520
+it cleaner is an alias for pair of string
+in JSON.
+
+137
+00:08:48,520 --> 00:08:52,720
+So those are the bindings in a JSON map
+for an object.
+
+138
+00:08:52,720 --> 00:08:53,990
+The keys are strings,
+
+139
+00:08:53,990 --> 00:09:00,950
+the values are JSON objects and the whole
+function here would
+
+140
+00:09:00,950 --> 00:09:06,430
+then need to have a type that takes one of
+these bindings and returns a string.
+
+141
+00:09:07,960 --> 00:09:13,270
+So as you know in Scala every concrete
+type is a type of some class or trait.
+
+142
+00:09:13,270 --> 00:09:15,730
+And the function type is no exception
+there.
+
+143
+00:09:15,730 --> 00:09:19,030
+A type like JBinding arrow string is in
+fact
+
+144
+00:09:19,030 --> 00:09:23,950
+just a shorthand for Scala Function1 of
+JBinding and String.
+
+145
+00:09:23,950 --> 00:09:26,790
+So if we look at that then we see that
+Scala Function1 is a
+
+146
+00:09:26,790 --> 00:09:30,080
+trait defined in the standard library, and
+
+147
+00:09:30,080 --> 00:09:33,450
+JBinding and String are its type
+arguments.
+
+148
+00:09:33,450 --> 00:09:38,350
+So we write type arguments with brackets
+here rather than angular brackets that you
+
+149
+00:09:38,350 --> 00:09:44,290
+would see in Java or C# or C++.
+So let's look at the Function1 trait
+
+150
+00:09:44,290 --> 00:09:45,670
+in more detail.
+
+151
+00:09:45,670 --> 00:09:47,910
+Here's what you would see in the standard
+library.
+
+152
+00:09:49,190 --> 00:09:51,970
+Function1 is a trait with two type
+parameters, call
+
+153
+00:09:51,970 --> 00:09:54,970
+them A and R, and a function which is
+
+154
+00:09:54,970 --> 00:09:58,500
+abstract here called apply, which takes an
+argument of
+
+155
+00:09:58,500 --> 00:10:02,430
+type A and gives you a result of type R.
+
+156
+00:10:02,430 --> 00:10:09,030
+The function type parameters have these
+minus and plus in front of them.
+
+157
+00:10:09,030 --> 00:10:09,750
+They indicate
+
+158
+00:10:09,750 --> 00:10:13,140
+the variance of a type parameter, so they
+tell you how
+
+159
+00:10:13,140 --> 00:10:16,890
+the type is a whole behaves with
+sub-typing when you'll change the
+
+160
+00:10:16,890 --> 00:10:20,250
+type argument of the re-, result, let's
+say you make it
+
+161
+00:10:20,250 --> 00:10:23,460
+a super type, and the whole function type
+becomes a super type.
+
+162
+00:10:23,460 --> 00:10:26,700
+Whereas for the type argument, it goes in
+the other way.
+
+163
+00:10:26,700 --> 00:10:27,335
+That has been
+
+164
+00:10:27,335 --> 00:10:27,780
+[INAUDIBLE]
+
+165
+00:10:27,780 --> 00:10:32,250
+explained in detail in week 4 of the
+functional programming course.
+
+166
+00:10:32,250 --> 00:10:35,090
+It's not essential to get an understanding
+of the following,
+
+167
+00:10:35,090 --> 00:10:37,650
+so, and we gloss over that a little bit
+here.
+
+168
+00:10:39,740 --> 00:10:43,570
+Now, let's look at the pattern matching
+block that we've seen before.
+
+169
+00:10:43,570 --> 00:10:45,090
+what would that expand to?
+
+170
+00:10:45,090 --> 00:10:49,120
+So if the type is Function1, what would
+the actual value be?
+
+171
+00:10:49,120 --> 00:10:52,040
+Well the actual value would be a
+
+172
+00:10:52,040 --> 00:10:55,435
+new instance of Function1 with the type
+parameter
+
+173
+00:10:55,435 --> 00:10:55,780
+[INAUDIBLE]
+
+174
+00:10:55,780 --> 00:10:58,570
+that we have seen before, and what we need
+to do is
+
+175
+00:10:58,570 --> 00:11:03,290
+we need to give a definition of the
+abstract apply function here.
+
+176
+00:11:03,290 --> 00:11:04,470
+So here it is.
+
+177
+00:11:04,470 --> 00:11:09,450
+So our apply function would take a
+JBinding parameter and it would do the
+
+178
+00:11:09,450 --> 00:11:14,626
+pattern match that we've seen here in the
+block, on the argument here.
+
+179
+00:11:14,626 --> 00:11:19,460
+So we would write x match and then comes
+the pattern matching block.
+
+180
+00:11:19,460 --> 00:11:20,864
+So that completes the
+
+181
+00:11:20,864 --> 00:11:24,920
+function definition and now you've seen
+how case blocks
+
+182
+00:11:24,920 --> 00:11:28,520
+as a whole can expand two functions, one
+instances.
+
+183
+00:11:29,660 --> 00:11:32,605
+Now one nice aspect of functions being
+traits in
+
+184
+00:11:32,605 --> 00:11:35,500
+Scala is that we can sub-class the
+function type.
+
+185
+00:11:36,570 --> 00:11:40,000
+A good instance for that is lets say the
+trait Map which
+
+186
+00:11:40,000 --> 00:11:44,200
+is have you, you have seen before, it
+takes keys to values.
+
+187
+00:11:44,200 --> 00:11:45,900
+You can see that actually as an
+
+188
+00:11:45,900 --> 00:11:51,070
+extention, as a specialization of
+functions from keys to values.
+
+189
+00:11:51,070 --> 00:11:56,460
+Scala maps are functions, so you can apply
+them to a key and get the value directly.
+
+190
+00:11:59,090 --> 00:12:01,510
+So another example are sequences, which
+are treated
+
+191
+00:12:01,510 --> 00:12:06,080
+as functions from indices of type Int to
+values.
+
+192
+00:12:06,080 --> 00:12:08,870
+So sequences would be described by a trait
+
+193
+00:12:08,870 --> 00:12:12,490
+in this color standard library called Seq,
+parameterised
+
+194
+00:12:12,490 --> 00:12:14,930
+with an element, type Elem, and that trait
+
+195
+00:12:14,930 --> 00:12:17,680
+would extend to function type Int arrow
+Elem.
+
+196
+00:12:17,680 --> 00:12:20,400
+Well actually you would need a pair
+
+197
+00:12:20,400 --> 00:12:23,570
+of parentheses to make this syntactically
+correct.
+
+198
+00:12:24,580 --> 00:12:30,020
+That's also why we can write elems of i,
+so the index in parentheses
+
+199
+00:12:30,020 --> 00:12:35,240
+to refer to the ith element of the
+sequences elems.
+
+200
+00:12:35,240 --> 00:12:37,868
+So, sequence indexing is written the same
+
+201
+00:12:37,868 --> 00:12:41,820
+way as function application because
+sequences are functions.
+
+202
+00:12:43,040 --> 00:12:46,680
+And because arrays in Scala are treated as
+sequences
+
+203
+00:12:46,680 --> 00:12:49,590
+by means of an implicit wrapper, the same
+syntax
+
+204
+00:12:49,590 --> 00:12:51,570
+would work for array indexing.
+
+205
+00:12:51,570 --> 00:12:57,010
+Compare to Java, where you would have
+written elems of i in brackets.
+
+206
+00:12:58,900 --> 00:13:04,090
+For array indexing in Java, you would do
+that because, of course, arrays are
+
+207
+00:13:04,090 --> 00:13:09,350
+not functions whereas in Scala, through
+the implicit sequence wrapper, they are.
+
+208
+00:13:12,110 --> 00:13:16,390
+So we have seen that a pattern matching
+block like this one here case ping to pong
+
+209
+00:13:16,390 --> 00:13:22,890
+can be given type String to String.
+Let's try this out directly in practice.
+
+210
+00:13:25,060 --> 00:13:28,718
+So what I do is I go in the Eclipse
+
+211
+00:13:28,718 --> 00:13:29,558
+[INAUDIBLE]
+
+212
+00:13:29,558 --> 00:13:31,260
+Scala IDE.
+I create a new worksheet.
+
+213
+00:13:32,380 --> 00:13:33,130
+Call it test.
+
+214
+00:13:34,350 --> 00:13:34,644
+[UNKNOWN]
+
+215
+00:13:34,644 --> 00:13:36,220
+I want to play with that.
+
+216
+00:13:36,220 --> 00:13:42,310
+So we have, say, first, the pattern
+matching expression, case ping to pong.
+
+217
+00:13:42,310 --> 00:13:44,800
+Would that type check?
+No, it wouldn't.
+
+218
+00:13:44,800 --> 00:13:50,020
+The compiler would say there's a missing
+parameter for an expanded function.
+
+219
+00:13:50,020 --> 00:13:53,860
+so you need to give it a type from the
+outside, let's do that.
+
+220
+00:13:53,860 --> 00:13:54,562
+Let's say val f
+
+221
+00:13:54,562 --> 00:13:55,062
+[NOISE].
+
+222
+00:13:56,080 --> 00:13:58,070
+I guess you would agree that a good type
+
+223
+00:13:58,070 --> 00:14:01,820
+is String to String, equals case ping to
+pong.
+
+224
+00:14:01,820 --> 00:14:03,650
+Yeah, that worked fine.
+
+225
+00:14:03,650 --> 00:14:10,700
+And now we can write something like f of
+ping, and we would get pong as expected,
+
+226
+00:14:10,700 --> 00:14:16,040
+but what would happen if we apply this
+function to another string, call it abc?
+
+227
+00:14:17,040 --> 00:14:21,120
+Well we would get a match error that
+indicates that the pattern match that we
+
+228
+00:14:21,120 --> 00:14:25,250
+have done here, lacks the case abc, so we
+haven't defined a case
+
+229
+00:14:25,250 --> 00:14:29,500
+for that and the resultant in Scala is an
+exception called match error.
+
+230
+00:14:31,070 --> 00:14:34,410
+Now it would be nice to find out
+beforehand given a
+
+231
+00:14:34,410 --> 00:14:39,490
+function f whether the function is
+applicable to a certain argument.
+
+232
+00:14:39,490 --> 00:14:43,710
+And unfortunately with the function type
+itself we can't do that.
+
+233
+00:14:43,710 --> 00:14:46,470
+But it turns out that there's another way
+in Scala to achieve
+
+234
+00:14:46,470 --> 00:14:51,360
+that which we are going to see next.
+So here it is.
+
+235
+00:14:51,360 --> 00:14:55,120
+we can give the expression ping to
+
+236
+00:14:55,120 --> 00:14:59,187
+pong, then type PartialFunction from
+String to String.
+
+237
+00:14:59,187 --> 00:15:04,820
+So PartialFunction is another sub-type of
+function it's a special type.
+
+238
+00:15:04,820 --> 00:15:07,860
+What it does, is like function, you can
+apply
+
+239
+00:15:07,860 --> 00:15:11,910
+it to an argument, but you can also query
+whether
+
+240
+00:15:11,910 --> 00:15:14,670
+the function is defined for a given
+argument.
+
+241
+00:15:14,670 --> 00:15:17,380
+And this is done with the isDefinedAt
+method.
+
+242
+00:15:17,380 --> 00:15:22,320
+So you can write, f is defined at ping,
+and that would give you true,
+
+243
+00:15:22,320 --> 00:15:27,320
+or f is defined at another string like
+pong, and that would give you false.
+
+244
+00:15:27,320 --> 00:15:29,310
+Let's test that in the worksheet.
+
+245
+00:15:29,310 --> 00:15:31,450
+So what I do now is that instead
+
+246
+00:15:31,450 --> 00:15:36,420
+of string, I write PartialFunction of
+String and String
+
+247
+00:15:36,420 --> 00:15:36,920
+[NOISE].
+
+248
+00:15:45,120 --> 00:15:50,480
+And then instead of this thing here, I
+write f is the find at.
+
+249
+00:15:53,720 --> 00:15:55,840
+And what it would give me that now f is
+not
+
+250
+00:15:55,840 --> 00:16:01,010
+defined at a, abc, but would f be defined
+at things a?
+
+251
+00:16:01,010 --> 00:16:02,510
+Yes, here the answer is true.
+
+252
+00:16:06,560 --> 00:16:07,610
+So let's have a look at the
+
+253
+00:16:07,610 --> 00:16:12,050
+definition of PartialFunction in the
+standard Scala library.
+
+254
+00:16:12,050 --> 00:16:16,100
+So it's an extension of Function1 with the
+same type arguments.
+
+255
+00:16:16,100 --> 00:16:19,064
+Like Function1, it has an apply method.
+
+256
+00:16:19,064 --> 00:16:23,350
+the, in fact, the apply method is
+inherited from the Function1 trait.
+
+257
+00:16:23,350 --> 00:16:27,840
+The fact that we have written here, it is
+redundant, it's just there for clarity.
+
+258
+00:16:27,840 --> 00:16:31,850
+And it has an additional method called
+isDefinedAt, which maps an argument
+
+259
+00:16:31,850 --> 00:16:37,660
+x of type A to Boolean.
+So if the expected type of a pattern
+
+260
+00:16:37,660 --> 00:16:43,180
+matching block is PartialFunction then the
+Scala compiler will expand it differently.
+
+261
+00:16:43,180 --> 00:16:47,840
+It will create a PartialFunction object
+now obviously, and it
+
+262
+00:16:47,840 --> 00:16:53,140
+now has to fill in two abstract methods,
+apply and isDefineAt.
+
+263
+00:16:53,140 --> 00:16:57,070
+Apply gets translated just in the case of
+a normal function,
+
+264
+00:16:57,070 --> 00:16:59,150
+the ping gets mapped to pong.
+
+265
+00:16:59,150 --> 00:17:03,590
+Whereas for isDefinedAt, the pattern
+matching block would be like this.
+
+266
+00:17:03,590 --> 00:17:07,000
+If the argument is ping, then the result
+is true.
+
+267
+00:17:07,000 --> 00:17:10,200
+For all other cases, the result is false.
+
+268
+00:17:10,200 --> 00:17:13,130
+So the Scala compiler would do that
+systematically for
+
+269
+00:17:13,130 --> 00:17:16,620
+any pattern matching block if the result
+type is PartialFunction.
+
+270
+00:17:18,510 --> 00:17:19,990
+So let's finish with an exercise.
+
+271
+00:17:21,670 --> 00:17:22,130
+Given this
+
+272
+00:17:22,130 --> 00:17:25,550
+function here, a PartialFunctions from
+list of Ints to
+
+273
+00:17:25,550 --> 00:17:29,350
+Strings that is implemented by this
+pattern matching block here.
+
+274
+00:17:29,350 --> 00:17:34,550
+So in the case of Nil I return one, in the
+case of a list consisting of
+
+275
+00:17:34,550 --> 00:17:40,510
+x followed by y, followed some other
+elements rest, I give back two.
+
+276
+00:17:40,510 --> 00:17:45,540
+What do you expect as the result of f dot
+isDefinedAt list of 1, 2, 3?
+
+277
+00:17:45,540 --> 00:17:47,470
+True or false?
+
+278
+00:17:49,410 --> 00:17:51,840
+I guess the answer to that one is pretty
+straightforward.
+
+279
+00:17:52,970 --> 00:17:57,650
+the second pattern here definitely does
+match lists of three elements.
+
+280
+00:17:57,650 --> 00:17:59,308
+The first one will be x.
+
+281
+00:17:59,308 --> 00:18:01,410
+The second will be y, the rest of
+
+282
+00:18:01,410 --> 00:18:04,960
+the elements will be captured in this
+variable, rest.
+
+283
+00:18:04,960 --> 00:18:10,180
+So the function definitely is defined on
+the input data, and the result is true.
+
+284
+00:18:11,620 --> 00:18:15,220
+So let's look at a slight variation of
+this exercise, and
+
+285
+00:18:15,220 --> 00:18:20,200
+now I have a function g which looks like
+f, except that the second
+
+286
+00:18:20,200 --> 00:18:25,990
+pattern matches elements consisting of a
+head and some arbitrary tail.
+
+287
+00:18:25,990 --> 00:18:28,360
+And then I have a nested pattern match
+which
+
+288
+00:18:29,450 --> 00:18:33,940
+works for the rest being Nil, and no other
+case.
+
+289
+00:18:33,940 --> 00:18:38,868
+So now what would you think?
+Is g defined at the list 1, 2, 3?
+
+290
+00:18:38,868 --> 00:18:45,150
+[BLANK_AUDIO]
+
+291
+00:18:45,150 --> 00:18:50,820
+Actually, it turns out the answer is true,
+g is defined on the list, because after
+
+292
+00:18:50,820 --> 00:18:56,190
+all, the second case of g, x rest matches
+a list of three elements.
+
+293
+00:18:56,190 --> 00:19:01,060
+The first one is x, rest would be bound to
+the list 2, 3 then.
+
+294
+00:19:01,060 --> 00:19:05,850
+Even though when you run this function g,
+then of course, you would get a
+
+295
+00:19:05,850 --> 00:19:08,480
+match error, because what would happen
+when
+
+296
+00:19:08,480 --> 00:19:10,530
+the function g is applied to this argument
+
+297
+00:19:10,530 --> 00:19:16,760
+that the second case here would apply,
+then in the nested pattern match, the list
+
+298
+00:19:16,760 --> 00:19:20,850
+2, 3 would be matched against the single
+case Nil, and that of course can't work.
+
+299
+00:19:20,850 --> 00:19:22,220
+That would give you a match error.
+
+300
+00:19:22,220 --> 00:19:24,310
+So what you see in this example is
+
+301
+00:19:24,310 --> 00:19:30,300
+that the isDefinedAt guarantee that
+PartialFunction gives you.
+
+302
+00:19:30,300 --> 00:19:33,232
+Only applies to the outer most pattern
+matching block.
+
+303
+00:19:33,232 --> 00:19:35,700
+It does, is not a guarantee that if
+
+304
+00:19:35,700 --> 00:19:38,360
+a function is defined at an argument that
+
+305
+00:19:38,360 --> 00:19:41,080
+this function definitely will not throw a
+match
+
+306
+00:19:41,080 --> 00:19:45,802
+error when it is run, because the match
+error could be thrown by, as you see here.
+
+307
+00:19:45,802 --> 00:19:49,880
+Nested pattern matches or it could of
+course also be thrown by a
+
+308
+00:19:49,880 --> 00:19:52,560
+completely different function that gets
+called from
+
+309
+00:19:52,560 --> 00:19:54,800
+this function in a chain of calls.
+

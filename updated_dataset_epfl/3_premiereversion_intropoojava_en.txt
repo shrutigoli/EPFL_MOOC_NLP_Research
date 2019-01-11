@@ -1,0 +1,82 @@
+In the previous episodes, the general case study problem we are interested in has been presented. It's about modeling watches with different mechanisms, different accesssories.
+Then we covered the more specific problem of polymorphic display.
+We also completed the Produit class
+(TN : means "Product").
+In this episode, we will build a first operational version of our code, by adding accessories to watches and defining several of these accessories.
+Let's start with adding accessories to the Montre class (TN: means "Watch" class) which, remember, inherits from Produit and has a "MÃ©canisme" (= "Mechanism") and especially, something that is of interest to us now, a dynamic array of accessories which we called "Accessoire" (TN : means "Accessory")
+The idea is that we want to be able to add elements to this dynamic array by calling for example, on a watch, instance of the Montre class,
+Montre.ajouter, for example, a "new Bracelet" where, remember, "Bracelet" is a subclass of Accessoire
+And we want this to add a new watchstrap to the collection of accessories; a "Bracelet" being an "Accessoire", it can be added to a collection of accessories.
+Now, let's see how this "ajouter" method can be defined.
+Here, we will implement a very very simple solution which we will revise later on, in the last episode in this series, covering the concept of deep copies.
+But for now, we simply make a shallow copy here by just adding a reference to an accessory that we received, to the dynamic array of accessories which is called "accessoires".
+Now, let's try to make a first operational version of the program.
+So let's try to finalize what we have written up until now.
+And for now, let's not add any mechanism nor copy any watch; we will leave these two points for the next two episodes.
+So, to be able to finalize the program that we have written until now, we will need a few more concrete accessories.
+We will have to finish the Montre class which is not quite operational yet and, of course, use all of this in a typical "main" method.
+We will take each of these points one after the other starting with a few accessories.
+Remember that we have an "Accessoire" class which is a "Produit"
+And let's decide, say, that at the accessory level, we have a name to refer to them.
+For this, we will say that we have a name which will not change once it has been fixed by the constructor.
+And so we will add a constructor to the Accessoire class that will take a name, to name this accessory.
+Then, we mustn't forget that any product can be sold and will thus have a price. So it will take a second parameter here to initialize the base value for the price of the product.
+Accessoire's constructor will start by calling the constructor of the superclass, Produit, passing it the parameter valeurDeBase which we received.
+Then, we will initialize the "nom" attribute with the name received.
+So, that's it for the constructor that we decided to give to all the accessories.
+Now, let's decide on a way to display the accessories because, as we have seen all products can be displayed in a polymorphic way.
+So we will override the toString method here, inherited from Produit.
+As we have seen, we override it by adding the "override" annotation here.
+Let's say that, for example, it is displayed with an indication of its name and cost.
+So we will simply display the name then indicate what it costs
+-- and we already know how to display the price -- by simply calling the method from the Produit superclass.
+So here, we use the "super" keyword to call the method inherited from the Produit superclass.
+Because, of course, if we only write toString with no unmasking here, it is the toString method from the current class, and we would have infinite recursion: toString would call itself and so, to call, within the toString method of the Accessoire class, the toString method inherited from the Produit superclass, we need to unmask this toString method.
+Finally, let's say that the price of accessories is the same as the price of a normal product, that is, a product as we designed right at the top of the hierarchy and so now, we don't have to do anything since the prix method that we inherited from the Produit class is enough here, and we don't need to override it in the Accessoire class.
+So now, we have a completely functional Accessoire class that corresponds to what we wanted.
+So let's now define a few accessories for example, a Bracelet (= "watchstrap")
+A "Bracelet" is an "Accessoire" so we have an inheritance relation here.
+Regarding accessories, let's say that we want their name -- remember that accessories have a name, so every accessory will inherit this name -- let's say that we want each of the accessories to have a name that marks what it is, for example, the name of a watchstrap will start with "bracelet", the name of a "Fermoir" will, for example, start with "fermoir" (TN: means "clasp").
+And so we will force this at the constructor level so for example, for the Bracelet subclass of the Accessory class, we will receive the name which will be a complement that we will add here, behind the word "bracelet".
+So for example, "en cuir" for the complete name to be "bracelet en cuir" and as a second parameter the price, which we also pass to the constructor of the superclass.
+So, in the same way, we could define a Fermoir inheriting from Accessory in which we would define a constructor taking a complement to the Fermoir name and a price to be able to call the constructor of the Accessoire superclass where the full name will thus be
+"fermoir" with this complement we received as the first parameter and as second parameter, the price that we received, and as always, the virtual destructor.
+There, we have now finished with accessories
+Let's try to make the Montre class usable, without mechanisms and without copy, still, as we will treat those later.
+At this stage, we have simply defined the contents of the Montre class in which we thus have this "ajouter" method, which allows us to add accessories to our watches.
+Let's start by giving our Montre class a constructor.
+For now, let's settle for a default constructor that we will still override since the "default default constructor" would make this reference null, where we would rather have an empty dynamic array, here, that we could then fill up with our ajouter method
+This is how Montre objects are constructed.
+Now, let's decide how we want to compute the price of watches and let's say that it is the sum of the prices of its accessories.
+For this, we will override the
+"prix" method:
+We override this "prix" method inherited from the Produit superclass.
+So we will decide that, at first, the price of a watch is the base price that we get through the original
+"prix" method inherited from the Produit superclass.
+Then, from this base price, we will add the sum of prices of the various accessories.
+For this, we go through the list of accessories and add their price to the price that we had initialized, by calling the "prix" method each time.
+Finally, we return the price that we have just computed.
+Now, let's define how to display watches.
+For example, let's say that we want a message to say that a watch is composed of, followed by a list of its various accessories, etc.
+Then, at the end, we display the total price of the watch.
+To do so, we will for example add an 
+"afficher" method (TN: "afficher" means "display") in which we will start by displaying
+"une montre composÃ©e de"
+(TN: means "a watch composed of").
+Then, we go through all of the accessories of the watch.
+For each of these accessories, we display an asterisk and then we display the current accessory.
+Finally, we end the display with the message
+"prix total" (means "total price") and a call to the "prix" method of the watch to compute its total cost, as we have just seen.
+Next, to have an executable program, we need a "main" function that we will use here to test the implementations of the objects we have created.
+And to do so, we will declare a watch like this, in the main.
+We can do this because now, we have a default constructor.
+Then, in the watch, we add different accessories, like so.
+Each of the accessories has its own constructor, with the name or the complement to the name, then its price
+This way, we add four accessories for example and finally, we display a message to display the watch here.
+And so executing this program will yield the following result: we will first display the message
+"Montre m" then, we will enter the afficher method of Montre which will display
+"Une montre composÃ©e de: " and then a loop over its different accessories, and then the display of its total price, which is the sum of prices of its accessories.
+For those who would like it, the entire code is available on the course's website
+There, this ends the presentation of this first operational version of our code.
+There are still two chapters to cover in the next two episodes.
+First, all of these mechanisms and their dependencies, and the concept of interfaces, and finally the concept of copying a watch, how to make a deep copy of all the different accessories of a watch.

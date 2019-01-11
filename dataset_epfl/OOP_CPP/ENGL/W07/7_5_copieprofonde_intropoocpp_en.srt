@@ -1,0 +1,1261 @@
+1
+00:00:04,263 --> 00:00:06,839
+Let's conclude this case study
+
+2
+00:00:06,839 --> 00:00:09,219
+with the problem of copying watches.
+
+3
+00:00:09,219 --> 00:00:11,570
+Since we know that our watch
+has pointers
+
+4
+00:00:11,570 --> 00:00:13,606
+to its different components,
+
+5
+00:00:13,606 --> 00:00:16,105
+its mechanism and its accessories,
+
+6
+00:00:16,105 --> 00:00:18,356
+how do we copy a watch?
+
+7
+00:00:18,356 --> 00:00:20,199
+Up til now, we have forbidden copying
+
+8
+00:00:20,199 --> 00:00:22,343
+and forbidden assignment,
+the equals operator
+
+9
+00:00:22,343 --> 00:00:24,567
+but now, we will look into how
+
+10
+00:00:24,567 --> 00:00:26,819
+to actually copy a watch.
+
+11
+00:00:26,819 --> 00:00:29,212
+This will lead us to a new problematic
+
+12
+00:00:29,212 --> 00:00:31,255
+which is polymorphic copying.
+
+13
+00:00:31,635 --> 00:00:34,316
+Let's start with the problem
+of copying watches
+
+14
+00:00:34,316 --> 00:00:37,627
+and suppose, for example, that we have
+two watches <i>m1</i> and <i>m2</i>
+
+15
+00:00:38,287 --> 00:00:41,612
+such that <i>m2</i> is a copy of <i>m1</i>.
+
+16
+00:00:42,832 --> 00:00:45,730
+So, we have the following
+situation in memory:
+
+17
+00:00:48,371 --> 00:00:50,813
+the core, which is a pointer
+
+18
+00:00:50,813 --> 00:00:53,635
+to a mechanism somewhere in memory
+
+19
+00:00:53,635 --> 00:00:57,089
+and the accessories which are
+
+20
+00:00:57,089 --> 00:01:01,283
+a dynamic array of pointers
+
+21
+00:01:02,163 --> 00:01:06,499
+to different accessories in memory.
+
+22
+00:01:08,179 --> 00:01:12,126
+If we make a shallow copy of <i>m1</i>
+into <i>m2</i>,
+
+23
+00:01:12,126 --> 00:01:16,008
+-- a shallow copy means that we will
+simply copy
+
+24
+00:01:17,108 --> 00:01:21,093
+the different values of <i>m1</i>,
+the values of the pointers --
+
+25
+00:01:21,093 --> 00:01:26,010
+so here, we will copy the pointer
+to this element etc.,
+
+26
+00:01:27,750 --> 00:01:30,192
+and at this moment,
+if this were possible
+
+27
+00:01:30,192 --> 00:01:32,446
+-- I will come back to this point
+in a moment --
+
+28
+00:01:32,446 --> 00:01:34,833
+we would already have a problem
+in any case
+
+29
+00:01:34,833 --> 00:01:39,476
+since the watches <i>m2</i> and <i>m1</i>
+share the same accessories
+
+30
+00:01:39,476 --> 00:01:41,911
+and share the same mechanism
+
+31
+00:01:41,911 --> 00:01:44,369
+which means that if, through
+<i>m1</i>, we change
+
+32
+00:01:44,369 --> 00:01:46,107
+for example, the time of the watch,
+
+33
+00:01:46,107 --> 00:01:48,426
+then your friend's watch, watch <i>m2</i>,
+will automatically
+
+34
+00:01:48,426 --> 00:01:49,683
+have the same time
+
+35
+00:01:49,683 --> 00:01:52,689
+If you decide to change the bracelet
+of your watch, <i>m1</i>, 
+
+36
+00:01:52,689 --> 00:01:55,372
+to have a leather bracelet, then
+automatically
+
+37
+00:01:55,372 --> 00:01:59,204
+the watch <i>m2</i> will also
+have a leather bracelet.
+
+38
+00:01:59,204 --> 00:02:01,370
+What's more, with the architecture
+
+39
+00:02:01,370 --> 00:02:05,296
+that we defined currently, that
+is, with the <i>unique_ptr</i>s,
+
+40
+00:02:05,296 --> 00:02:08,342
+we can in any case not make
+copies
+
+41
+00:02:08,342 --> 00:02:12,867
+since <i>unique_ptr</i>s must
+be unique in pointing
+
+42
+00:02:12,867 --> 00:02:14,668
+to their memory area.
+
+43
+00:02:14,668 --> 00:02:17,859
+We cannot copy unique pointers.
+
+44
+00:02:17,859 --> 00:02:20,592
+So in any case, we could not have
+this situation in memory
+
+45
+00:02:20,592 --> 00:02:23,974
+and if we had decided to
+use C-style pointers,
+
+46
+00:02:23,974 --> 00:02:26,581
+then we would run into the
+problem I have just mentioned,
+
+47
+00:02:26,581 --> 00:02:31,043
+of having components that would
+be shared by different watches.
+
+48
+00:02:31,223 --> 00:02:32,891
+So the conclusion for all of this
+
+49
+00:02:32,891 --> 00:02:36,095
+is that we must make deep copies.
+
+50
+00:02:36,095 --> 00:02:39,282
+A deep copy means that instead
+of simply copying
+
+51
+00:02:39,282 --> 00:02:41,554
+the values of the pointers,
+instead of copying the addresses,
+
+52
+00:02:41,554 --> 00:02:44,810
+we copy the pointed-to objects
+themselves
+
+53
+00:02:44,810 --> 00:02:48,737
+and so for each component,
+we actually copy
+
+54
+00:02:48,737 --> 00:02:52,090
+the current object
+
+55
+00:02:52,090 --> 00:02:55,974
+and we store in the copied object,
+
+56
+00:02:57,754 --> 00:03:00,543
+at the highest level, the pointers
+
+57
+00:03:00,543 --> 00:03:04,472
+to the copies of the components.
+
+58
+00:03:04,472 --> 00:03:09,321
+We will have copied, not just
+at the surface,
+
+59
+00:03:09,321 --> 00:03:12,129
+but deep down.
+
+60
+00:03:12,129 --> 00:03:15,210
+And so here, we do not have copies
+of the values of the pointers
+
+61
+00:03:15,210 --> 00:03:20,332
+but pointers to copies of
+the pointed-to objects.
+
+62
+00:03:20,332 --> 00:03:23,042
+This is what we mean when we
+speak of a deep copy
+
+63
+00:03:23,042 --> 00:03:24,856
+versus a shallow copy.
+
+64
+00:03:24,856 --> 00:03:27,572
+And so what we need is
+indeed a deep copy
+
+65
+00:03:27,572 --> 00:03:29,916
+a copy of each component.
+
+66
+00:03:29,916 --> 00:03:31,914
+In those cases, it is also customary
+
+67
+00:03:31,914 --> 00:03:34,374
+to override the assignment
+operator,
+
+68
+00:03:34,374 --> 00:03:36,259
+which is what we will do later on.
+
+69
+00:03:36,259 --> 00:03:39,898
+Let's start with the copy constructor,
+
+70
+00:03:39,898 --> 00:03:41,455
+that is, the constructor of Montre
+
+71
+00:03:41,455 --> 00:03:43,205
+that makes a copy construction.
+
+72
+00:03:43,205 --> 00:03:45,231
+So the parameter taken by
+the copy constructor
+
+73
+00:03:45,231 --> 00:03:47,399
+is of course another watch.
+
+74
+00:03:47,399 --> 00:03:50,231
+The copy constructor should begin with
+
+75
+00:03:50,231 --> 00:03:52,212
+-- one must never forget this aspect --
+
+76
+00:03:52,212 --> 00:03:55,217
+a call to the copy constructors of
+the superclasses.
+
+77
+00:03:55,217 --> 00:03:57,405
+Here, we only have one superclass,
+the Produit class,
+
+78
+00:03:57,405 --> 00:04:00,235
+and so here we must call
+the copy constructor
+
+79
+00:04:00,235 --> 00:04:02,843
+of the Produit class. Otherwise..
+
+80
+00:04:04,203 --> 00:04:07,351
+otherwise, we will call the
+default constructor
+
+81
+00:04:07,351 --> 00:04:10,539
+at this point, if we had not
+written this line.
+
+82
+00:04:10,539 --> 00:04:13,626
+So we would have a default 
+construction
+
+83
+00:04:13,626 --> 00:04:15,530
+of the Produit aspect of a watch.
+
+84
+00:04:15,530 --> 00:04:17,781
+Meaning that its price, for example,
+would be set to zero
+
+85
+00:04:17,781 --> 00:04:19,786
+which is not always desirable.
+
+86
+00:04:19,786 --> 00:04:23,125
+So we must always start with a call
+
+87
+00:04:23,125 --> 00:04:25,532
+to the copy constructor of the
+superclass.
+
+88
+00:04:25,532 --> 00:04:28,071
+Then the question is how to
+continue,
+
+89
+00:04:28,071 --> 00:04:31,418
+when should we copy the
+different components?
+
+90
+00:04:31,418 --> 00:04:33,803
+If we simply write this
+
+91
+00:04:33,803 --> 00:04:36,878
+and in a similar way for the
+accessories,
+
+92
+00:04:36,878 --> 00:04:40,786
+then we will just have a shallow copy,
+
+93
+00:04:40,786 --> 00:04:44,002
+we will have copied the value
+of the pointer, "autre.coeur",
+
+94
+00:04:44,002 --> 00:04:47,173
+into the pointer "coeur" of the instance
+that we are creating.
+
+95
+00:04:47,173 --> 00:04:50,442
+This is exactly what we want
+to avoid
+
+96
+00:04:50,442 --> 00:04:52,458
+so it is not the correct way to do this.
+
+97
+00:04:52,458 --> 00:04:56,600
+What we could imagine, then,
+is to copy the object pointed to
+
+98
+00:04:57,400 --> 00:04:59,794
+by the core of the other watch,
+
+99
+00:04:59,794 --> 00:05:04,567
+that is, to copy *(autre.coeur).
+
+100
+00:05:05,477 --> 00:05:11,531
+Indeed, the access to the contents
+of the other's core
+
+101
+00:05:11,531 --> 00:05:14,496
+is the contents of this cell here.
+
+102
+00:05:14,496 --> 00:05:17,058
+This is what we wanted to copy.
+
+103
+00:05:17,058 --> 00:05:21,140
+Copy this into the core of the
+current instance
+
+104
+00:05:21,840 --> 00:05:25,920
+and to do so, allocate a new
+memory area
+
+105
+00:05:26,500 --> 00:05:29,222
+whose address we would retrieve
+
+106
+00:05:29,222 --> 00:05:34,696
+and this new area will contain the copy
+of the contents of (autre.coeur).
+
+107
+00:05:34,696 --> 00:05:37,139
+So this would be written like this:
+
+108
+00:05:37,139 --> 00:05:42,017
+coeur( new ??? (*(autre.coeur))
+-- but new what?
+
+109
+00:05:42,017 --> 00:05:47,255
+Which object should be copied as
+the core of the other?
+
+110
+00:05:48,515 --> 00:05:50,902
+Since I remind you that a core
+
+111
+00:05:50,902 --> 00:05:54,689
+is a pointer to a mechanism
+
+112
+00:05:55,789 --> 00:06:01,458
+and here, we would of course have
+to convert our C-style pointer
+
+113
+00:06:01,458 --> 00:06:04,574
+into a unique_ptr to a Mecanisme.
+
+114
+00:06:04,574 --> 00:06:06,736
+But we still don't know what
+this core that we are copying
+
+115
+00:06:06,736 --> 00:06:08,936
+should be.
+
+116
+00:06:08,936 --> 00:06:11,130
+Because this other core could
+easily be
+
+117
+00:06:11,130 --> 00:06:13,792
+an analog mechanism or
+a digital mechanism
+
+118
+00:06:13,792 --> 00:06:15,974
+or a double mechanism.
+
+119
+00:06:15,974 --> 00:06:19,956
+And so, what should we
+copy this other core as?
+
+120
+00:06:19,956 --> 00:06:22,641
+What we could imagine
+
+121
+00:06:22,641 --> 00:06:26,329
+would be to copy it as a Mecanisme
+
+122
+00:06:27,289 --> 00:06:30,214
+but this means that we
+would copy
+
+123
+00:06:30,214 --> 00:06:34,020
+only the Mecanisme part of the other's
+core
+
+124
+00:06:34,020 --> 00:06:36,875
+and we would risk losing
+all the specifics
+
+125
+00:06:36,875 --> 00:06:40,972
+of the instance that is actually pointed 
+to, such as the specifics of the analog mechanism
+
+126
+00:06:40,972 --> 00:06:43,353
+if the core is an analog mechanism,
+
+127
+00:06:43,353 --> 00:06:45,435
+the digital specifics, etc.
+
+128
+00:06:45,435 --> 00:06:47,697
+So we would lose the specifics.
+
+129
+00:06:47,697 --> 00:06:51,355
+So here, we cannot make
+a copy like this
+
+130
+00:06:51,355 --> 00:06:53,953
+as a Mecanisme
+
+131
+00:06:53,953 --> 00:06:56,361
+The question, basically, is:
+
+132
+00:06:56,361 --> 00:06:59,503
+how do we copy each element
+as it is?
+
+133
+00:06:59,503 --> 00:07:02,510
+That is, to copy them not just
+as instances
+
+134
+00:07:02,510 --> 00:07:04,805
+of the Mecanisme superclass but
+to copy them
+
+135
+00:07:04,805 --> 00:07:07,681
+as the subclasses to which
+they belong.
+
+136
+00:07:07,681 --> 00:07:09,570
+And the question can of course
+be posed 
+
+137
+00:07:09,570 --> 00:07:13,346
+for all the accessories -- how do
+we copy each of the accessories?
+
+138
+00:07:13,346 --> 00:07:16,178
+The bracelet as a bracelet, the
+clasp as a clasp,
+
+139
+00:07:16,178 --> 00:07:18,106
+the body as a body etc.
+
+140
+00:07:18,106 --> 00:07:20,030
+The question is thus, how
+do we make a copy
+
+141
+00:07:20,030 --> 00:07:22,892
+that respects the proper nature
+of the instances?
+
+142
+00:07:22,892 --> 00:07:25,854
+That is, how do we make a
+polymorphic copy?
+
+143
+00:07:26,594 --> 00:07:28,980
+The solution consists, as usual
+
+144
+00:07:28,980 --> 00:07:30,877
+when we have a particular task to do,
+
+145
+00:07:30,877 --> 00:07:33,337
+in defining a method that carries
+out this task
+
+146
+00:07:33,337 --> 00:07:36,566
+and so, to define a copy method here
+
+147
+00:07:36,566 --> 00:07:39,223
+that is capable of making a 
+polymorphic copy.
+
+148
+00:07:39,223 --> 00:07:43,140
+A polymorphic copy of a Mecanisme here
+
+149
+00:07:43,140 --> 00:07:46,961
+and a polymorphic copy of an
+accessory here.
+
+150
+00:07:46,961 --> 00:07:50,019
+And so of course, we will have
+to copy each accessory
+
+151
+00:07:50,019 --> 00:07:54,757
+as they are, and so iterate over
+the accessories of the other watch
+
+152
+00:07:54,757 --> 00:07:59,544
+one by one to be able to make a
+polymorphic copy of them.
+
+153
+00:08:00,404 --> 00:08:03,254
+Let's see how we can write such
+a polymorphic copy
+
+154
+00:08:03,254 --> 00:08:05,623
+taking the accessories as
+an example.
+
+155
+00:08:05,623 --> 00:08:10,154
+So we have a dynamic array of pointers
+to accessories
+
+156
+00:08:10,154 --> 00:08:12,454
+of which we want to copy each element.
+
+157
+00:08:12,454 --> 00:08:15,197
+Typically, we would copy them
+like this
+
+158
+00:08:15,197 --> 00:08:18,410
+by making a call to a
+polymorphic copy
+
+159
+00:08:18,410 --> 00:08:21,099
+of a pointer to an accessory.
+
+160
+00:08:21,099 --> 00:08:23,945
+So the polymorphic copy
+will be defined
+
+161
+00:08:23,945 --> 00:08:25,945
+at the level of the most general class
+
+162
+00:08:25,945 --> 00:08:28,974
+for which we want to make
+a polymorphic copy.
+
+163
+00:08:28,974 --> 00:08:32,554
+at this level, we will define
+a <i>copie</i> method.
+
+164
+00:08:32,554 --> 00:08:36,485
+The <i>copie</i> method, as such, will
+not modify the instances
+
+165
+00:08:36,485 --> 00:08:37,889
+-- it just copies them --
+
+166
+00:08:37,889 --> 00:08:40,927
+and we don't know how to define
+it at such a general level.
+
+167
+00:08:40,927 --> 00:08:43,050
+So as we are in an abstract class,
+we will say that
+
+168
+00:08:43,050 --> 00:08:44,977
+it is a pure virtual method.
+
+169
+00:08:44,977 --> 00:08:46,818
+The return value of such a method
+
+170
+00:08:46,818 --> 00:08:50,833
+is what we will put in this container
+
+171
+00:08:50,833 --> 00:08:53,743
+and so it will be a unique pointer
+to an accessory
+
+172
+00:08:53,743 --> 00:08:57,653
+so here we will say that it is a
+"unique_ptr<Accessoire>"
+
+173
+00:08:57,653 --> 00:08:59,523
+And so in the subclasses
+
+174
+00:08:59,523 --> 00:09:01,380
+for example here in the Bracelet
+subclass,
+
+175
+00:09:01,380 --> 00:09:04,240
+what we will do is to override
+
+176
+00:09:04,240 --> 00:09:08,709
+the copy that returns a unique_ptr to
+an accessory
+
+177
+00:09:08,709 --> 00:09:13,018
+and say that we will return
+a unique_ptr
+
+178
+00:09:13,018 --> 00:09:16,577
+to an accessory, so this here remains
+a pointer to an accessory,
+
+179
+00:09:16,577 --> 00:09:20,047
+but this pointer, specifically,
+is a pointer
+
+180
+00:09:20,047 --> 00:09:24,759
+to a new bracelet in memory which is
+a copy of the current instance.
+
+181
+00:09:25,011 --> 00:09:28,478
+So I know that this syntax is very
+difficult to understand
+
+182
+00:09:28,478 --> 00:09:30,041
+the first time one comes across it,
+
+183
+00:09:30,041 --> 00:09:31,864
+so let's explain it a little.
+
+184
+00:09:31,864 --> 00:09:34,872
+What we want to do with a copy
+method such as this one
+
+185
+00:09:34,872 --> 00:09:38,422
+is to copy oneself as one is,
+
+186
+00:09:39,282 --> 00:09:43,933
+meaning, to copy oneself as a Bracelet
+if one is a Bracelet.
+
+187
+00:09:43,933 --> 00:09:48,771
+To do so, we will call the copy constructor
+of the Bracelet class
+
+188
+00:09:48,771 --> 00:09:51,135
+to copy the current instance.
+
+189
+00:09:51,135 --> 00:09:53,996
+The current instance is indeed
+
+190
+00:09:55,096 --> 00:09:58,640
+the contents of the <i>this</i> pointer,
+
+191
+00:09:58,640 --> 00:10:01,900
+so "*this" is the current instance.
+
+192
+00:10:01,900 --> 00:10:06,047
+It is the contents of what is pointed
+to by <i>this</i>
+
+193
+00:10:06,047 --> 00:10:10,025
+and since <i>this</i> points to the current instance,
+it is indeed the current instance
+
+194
+00:10:10,025 --> 00:10:12,689
+that we are copying into a new
+Bracelet
+
+195
+00:10:12,689 --> 00:10:15,512
+So that gives us this part
+of this line
+
+196
+00:10:16,192 --> 00:10:21,630
+and then we will do this by creating
+a new memory area
+
+197
+00:10:21,630 --> 00:10:25,377
+and retrieve a pointer
+
+198
+00:10:25,917 --> 00:10:30,569
+to this memory area -- this is
+done by the <i>new</i>.
+
+199
+00:10:30,569 --> 00:10:34,764
+So here, <i>new Bracelet</i> will
+create a new bracelet
+
+200
+00:10:34,764 --> 00:10:36,549
+of which we retrieve the address
+
+201
+00:10:36,549 --> 00:10:39,210
+and this new bracelet is a copy
+
+202
+00:10:39,210 --> 00:10:41,783
+of the current instance.
+
+203
+00:10:41,783 --> 00:10:45,107
+Finally, we will convert
+this C-style pointer
+
+204
+00:10:45,107 --> 00:10:49,620
+which is the result of the <i>new Bracelet</i>
+copying the current instance,
+
+205
+00:10:49,620 --> 00:10:53,916
+we will convert it into a
+unique_ptr-to-Accessoire.
+
+206
+00:10:53,916 --> 00:10:55,922
+We will see it, we will see this pointer
+
+207
+00:10:55,922 --> 00:10:59,398
+as a unique_ptr to an accessory.
+
+208
+00:10:59,398 --> 00:11:02,092
+So this is the syntax that is
+very often used
+
+209
+00:11:02,092 --> 00:11:04,151
+to make polymorphic copies.
+
+210
+00:11:04,151 --> 00:11:07,931
+We return a pointer to the
+abstract class,
+
+211
+00:11:07,931 --> 00:11:10,781
+the superclass at whose level
+we want to make the copy,
+
+212
+00:11:10,781 --> 00:11:13,951
+of a new copy, and be careful here,
+
+213
+00:11:13,951 --> 00:11:17,861
+specific to the current class.
+
+214
+00:11:17,861 --> 00:11:20,441
+So here, we are indeed in the Bracelet class,
+we write "Bracelet"
+
+215
+00:11:20,441 --> 00:11:22,953
+-- in the Fermoir class, we will write "Fermoir".
+
+216
+00:11:22,953 --> 00:11:25,741
+This is a copy of the current instance.
+
+217
+00:11:27,441 --> 00:11:29,580
+That's it for copying watches.
+
+218
+00:11:29,580 --> 00:11:32,419
+What if we also want to take
+care of the assigmnent operator?
+
+219
+00:11:32,419 --> 00:11:35,095
+That is, for example, do 
+<i> m1 = m2 </i>.
+
+220
+00:11:35,095 --> 00:11:38,856
+To do so, we will overload the
+assignment operator
+
+221
+00:11:38,856 --> 00:11:41,604
+the equals operator, in the following way.
+
+222
+00:11:41,604 --> 00:11:44,678
+In the Montre class, we follow the
+model we presented
+
+223
+00:11:44,678 --> 00:11:47,832
+in the episode on operator
+overloading
+
+224
+00:11:47,832 --> 00:11:52,247
+and so here, we have the typical
+prototype for the equals operator
+
+225
+00:11:52,247 --> 00:11:55,737
+where we pass by value here
+
+226
+00:11:55,737 --> 00:12:00,880
+which means that when we write
+<i>m2 = m1</i>,
+
+227
+00:12:01,880 --> 00:12:05,836
+that is, <i>m2.operator=(m1)</i>
+
+228
+00:12:06,896 --> 00:12:12,223
+we will copy <i>m1</i> into
+this new source.
+
+229
+00:12:12,223 --> 00:12:16,632
+So here, we use the copy
+constructor
+
+230
+00:12:17,772 --> 00:12:21,054
+and it is this copy constructor,
+which we have just defined,
+
+231
+00:12:21,054 --> 00:12:23,153
+that will do all the work
+of making the deep copy,
+
+232
+00:12:23,153 --> 00:12:26,373
+then we just have to exchange
+the newly copied instance
+
+233
+00:12:26,373 --> 00:12:30,278
+ex-<i>m1</i>, which is now <i>source</i>,
+into the current instance
+
+234
+00:12:30,278 --> 00:12:34,256
+and to do so, we can for example
+use the <i>swap</i> method
+
+235
+00:12:34,256 --> 00:12:36,677
+provided by the standard library
+<i>utility</i>
+
+236
+00:12:36,677 --> 00:12:40,852
+to swap the core of <i>m2</i>, of
+the current instance
+
+237
+00:12:40,852 --> 00:12:44,387
+with the core of the newly-created
+source, created by copy
+
+238
+00:12:44,387 --> 00:12:48,732
+And so we will swap the array of
+pointers of the current instance
+
+239
+00:12:48,732 --> 00:12:52,981
+with the array of pointers to
+new components
+
+240
+00:12:52,981 --> 00:12:55,864
+created by the deep copy of this source
+
+241
+00:12:55,864 --> 00:12:57,933
+that was just created.
+
+242
+00:12:57,933 --> 00:12:59,966
+And we end with the standard syntax
+
+243
+00:12:59,966 --> 00:13:02,247
+which returns a reference
+to the current instance
+
+244
+00:13:02,247 --> 00:13:04,536
+to conform to this prototype
+
+245
+00:13:04,536 --> 00:13:09,623
+which allows us to write things
+like <i>m3 = m2 = m1</i>.
+
+246
+00:13:10,403 --> 00:13:12,857
+That's it for the assignment operator
+
+247
+00:13:13,477 --> 00:13:15,761
+and of course, all of this must
+be tested,
+
+248
+00:13:15,761 --> 00:13:18,703
+which we will do by completing
+our old <i>main</i>
+
+249
+00:13:18,703 --> 00:13:20,642
+in which we had defined a watch
+
+250
+00:13:20,642 --> 00:13:24,021
+with a call to the copy constructor
+
+251
+00:13:24,021 --> 00:13:27,247
+that copies <i>m</i> into <i>m2</i>.
+Then we check that the copy
+
+252
+00:13:27,247 --> 00:13:30,102
+was made correctly by
+displaying <i>m2</i> here.
+
+253
+00:13:30,102 --> 00:13:33,257
+Then we would test the equals
+operator.
+
+254
+00:13:33,257 --> 00:13:35,660
+First, we create a new watch, <i>m3</i>
+
+255
+00:13:35,660 --> 00:13:38,911
+with whatever in it, then we display
+it,
+
+256
+00:13:38,911 --> 00:13:42,351
+then we assign <i>m2</i> to <i>m3</i>.
+
+257
+00:13:42,351 --> 00:13:44,526
+And we check that this assigment
+
+258
+00:13:44,526 --> 00:13:46,601
+worked correctly.
+
+259
+00:13:46,601 --> 00:13:48,796
+On top of this, to check
+that we have made
+
+260
+00:13:48,796 --> 00:13:51,105
+a deep copy with this copy here,
+
+261
+00:13:51,105 --> 00:13:54,375
+then we would add a method that
+we haven't explained in this
+
+262
+00:13:54,375 --> 00:13:56,536
+video but that doesn't present
+any difficulty:
+
+263
+00:13:56,536 --> 00:14:00,470
+a "mettre à l'heure" method (TN: means "set time")
+which would set the time of watch <i>m2</i>
+
+264
+00:14:00,470 --> 00:14:02,718
+which would modify the time of
+the watch <i>m2</i>
+
+265
+00:14:02,718 --> 00:14:05,285
+And so we would check that
+in this assignment
+
+266
+00:14:05,285 --> 00:14:08,359
+<i>m3</i> has <i>m2</i>'s old time,
+
+267
+00:14:08,359 --> 00:14:12,538
+and is not affected by this change
+of time in <i>m2</i>.
+
+268
+00:14:12,538 --> 00:14:14,436
+If we only had a shallow copy,
+
+269
+00:14:14,436 --> 00:14:18,695
+then <i>m2.mettre_a_l_heure</i>
+would also modify <i>m3</i>'s time.
+
+270
+00:14:18,952 --> 00:14:20,806
+So this line here effectively
+allows us
+
+271
+00:14:20,806 --> 00:14:23,056
+to check that we have made
+a deep copy
+
+272
+00:14:23,056 --> 00:14:25,554
+and not a shallow copy of <i>m2</i>
+into <i>m3</i>.
+
+273
+00:14:25,554 --> 00:14:27,786
+All this code, the complete code
+
+274
+00:14:27,786 --> 00:14:30,438
+is again provided on the course website
+
+275
+00:14:30,438 --> 00:14:32,972
+This concludes this case study
+
+276
+00:14:32,972 --> 00:14:35,804
+and the whole course.

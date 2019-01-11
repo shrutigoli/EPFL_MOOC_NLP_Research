@@ -1,0 +1,1405 @@
+1
+00:00:03,250 --> 00:00:04,640
+Welcome back Nature, in Code.
+
+2
+00:00:04,640 --> 00:00:07,090
+We're in Chapter 3, Lecture 2.
+
+3
+00:00:07,090 --> 00:00:11,380
+In the last video, we developed
+an intuition for coin flipping
+
+4
+00:00:11,380 --> 00:00:15,540
+and the probability of the outcomes
+of these coin-flipping experiments.
+
+5
+00:00:15,540 --> 00:00:16,670
+In this video,
+
+6
+00:00:16,670 --> 00:00:19,720
+we're going to solidify this
+a little bit more quantitatively,
+
+7
+00:00:19,720 --> 00:00:22,780
+and then we're actually going
+to implement this in JavaScript.
+
+8
+00:00:22,780 --> 00:00:27,040
+So this is the binomial distribution
+as we saw it in the last lecture,
+
+9
+00:00:27,040 --> 00:00:29,420
+and here is the possible outcome
+
+10
+00:00:29,420 --> 00:00:34,020
+when you flip the coin,
+a fair coin, ten times.
+
+11
+00:00:34,020 --> 00:00:38,040
+So here we could say these are
+the number of tails that come up,
+
+12
+00:00:38,040 --> 00:00:44,000
+and this would be the probability
+of this number of tails coming up
+
+13
+00:00:44,000 --> 00:00:46,340
+if you did this many, many times.
+
+14
+00:00:46,350 --> 00:00:50,200
+And now we can sort of zoom in 
+into one of those outcomes.
+
+15
+00:00:50,200 --> 00:00:53,470
+So let's say, for example,
+we're going to zoom in on this one.
+
+16
+00:00:53,470 --> 00:00:57,480
+So this one means
+that exactly two tails came up.
+
+17
+00:00:57,480 --> 00:01:02,030
+So we can now calculate
+what is the probability of this happening.
+
+18
+00:01:02,040 --> 00:01:06,490
+So what is the probability that when 
+you flip a fair coin ten times,
+
+19
+00:01:06,500 --> 00:01:11,850
+you get exactly two tails coming up, 
+and therefore exactly eight heads?
+
+20
+00:01:11,850 --> 00:01:13,660
+So we're now going to calculate this,
+
+21
+00:01:13,660 --> 00:01:17,180
+and then we're going to implement 
+this in JavaScript.
+
+22
+00:01:17,180 --> 00:01:21,110
+So we can very easily calculate this,
+we can basically just say
+
+23
+00:01:21,110 --> 00:01:26,340
+we're going to flip ten coins,
+1-2-3-4-5-6-7-8-9-10,
+
+24
+00:01:26,340 --> 00:01:28,480
+so we have ten slots.
+
+25
+00:01:28,480 --> 00:01:31,530
+Each of these slots
+can have one of two outcomes:
+
+26
+00:01:31,530 --> 00:01:33,790
+namely heads or tails.
+
+27
+00:01:34,430 --> 00:01:37,000
+And now we can basically ask ourselves
+
+28
+00:01:37,000 --> 00:01:41,510
+what is the probability
+that we get exactly two tails?
+
+29
+00:01:42,150 --> 00:01:44,030
+So, first of all, we need to know
+
+30
+00:01:44,030 --> 00:01:47,460
+how many possible outcomes
+are there in the first place.
+
+31
+00:01:47,460 --> 00:01:51,080
+That's relatively
+straightforward to calculate.
+
+32
+00:01:51,080 --> 00:01:55,330
+I mean, consider if we were
+only flipping one coin,
+
+33
+00:01:55,330 --> 00:01:57,460
+how many outcomes could we have?
+
+34
+00:01:57,460 --> 00:01:59,030
+Well, basically two, right?
+
+35
+00:01:59,030 --> 00:02:03,900
+Two possible outcomes
+because it could be either heads or tails.
+
+36
+00:02:03,900 --> 00:02:06,950
+Now imagine we would be 
+flipping a coin twice,
+
+37
+00:02:06,950 --> 00:02:09,990
+how many possible outcomes
+could we have now?
+
+38
+00:02:09,990 --> 00:02:14,010
+Well, the answer is <i>2 X 2</i>,
+which is, of course, <i>4</i>.
+
+39
+00:02:14,010 --> 00:02:17,770
+Namely, we could have
+twice heads coming up,
+
+40
+00:02:17,770 --> 00:02:20,140
+we could have first heads and then tails.
+
+41
+00:02:20,140 --> 00:02:22,400
+We could have first tails and then heads,
+
+42
+00:02:22,400 --> 00:02:25,410
+and we could have both tails.
+
+43
+00:02:26,210 --> 00:02:31,090
+If you flip it three times,
+what is the number of outcomes now?
+
+44
+00:02:31,090 --> 00:02:33,180
+Well, for the exact same logic,
+
+45
+00:02:33,180 --> 00:02:36,790
+the number of outcomes now 
+is <i>2 X 2 X 2</i>,
+
+46
+00:02:36,790 --> 00:02:43,320
+which is, of course, <i>8</i>,
+namely, <i>HHH, HHT</i>, and so on.
+
+47
+00:02:43,320 --> 00:02:45,520
+I'm not going to spell these out now,
+
+48
+00:02:45,520 --> 00:02:51,580
+but you can, of course, easily see
+that you can get eight possible outcomes.
+
+49
+00:02:51,580 --> 00:02:54,590
+And so on, and so basically,
+if you do it this ten times,
+
+50
+00:02:54,590 --> 00:02:57,480
+then you simply
+have to multiply 2 ten times,
+
+51
+00:02:57,480 --> 00:02:59,970
+in other words, 2 to the power of 10,
+
+52
+00:02:59,980 --> 00:03:04,830
+and that is 1,024 possibilities.
+
+53
+00:03:04,830 --> 00:03:09,130
+There are 1,024 distinct outcomes
+
+54
+00:03:09,790 --> 00:03:14,140
+of flipping a coin, a fair coin ten times.
+
+55
+00:03:14,140 --> 00:03:16,560
+So this is the set of possibilities.
+
+56
+00:03:16,560 --> 00:03:21,880
+Now we have to ask ourselves how many
+can we get to exactly two tails?
+
+57
+00:03:21,880 --> 00:03:24,420
+So, in other words,
+
+58
+00:03:24,420 --> 00:03:29,810
+how many of these combinations 
+have exactly two tails?
+
+59
+00:03:29,810 --> 00:03:32,530
+-- not less and not more.
+
+60
+00:03:32,530 --> 00:03:36,460
+And then that gives us the fraction
+or the probability
+
+61
+00:03:36,460 --> 00:03:40,150
+that we do indeed get exactly two tails.
+
+62
+00:03:40,150 --> 00:03:42,650
+So we can easily calculate this.
+
+63
+00:03:42,650 --> 00:03:44,770
+So these are the ten possible slots,
+
+64
+00:03:44,780 --> 00:03:47,700
+and so you're going
+to fill these by flipping a coin,
+
+65
+00:03:47,700 --> 00:03:51,030
+and you either get a heads or tails.
+
+66
+00:03:51,030 --> 00:03:55,510
+So, now let's basically prepopulate them,
+
+67
+00:03:55,510 --> 00:03:57,880
+so we're going to say,
+we want to have at the end,
+
+68
+00:03:57,880 --> 00:04:01,440
+we want to have two tails
+in here, and eight heads.
+
+69
+00:04:01,440 --> 00:04:05,670
+So let's do the two tails
+and then we can just fill out the rest.
+
+70
+00:04:05,670 --> 00:04:10,100
+So the first tail, you can choose
+any of those ten slots.
+
+71
+00:04:10,100 --> 00:04:12,290
+You could, for example, put it here.
+
+72
+00:04:12,290 --> 00:04:17,310
+But basically you have
+ten options to fill this slot,
+
+73
+00:04:17,310 --> 00:04:19,920
+or to put the <i>T</i> in any of the free slots.
+
+74
+00:04:19,920 --> 00:04:24,300
+So ten options,
+you could put in any of those.
+
+75
+00:04:24,310 --> 00:04:28,180
+So now you need to put the second one
+-- where are you going to put this?
+
+76
+00:04:28,180 --> 00:04:29,770
+Well, you can put it anywhere,
+
+77
+00:04:29,770 --> 00:04:32,770
+except where you've
+just put the first one,
+
+78
+00:04:32,770 --> 00:04:35,460
+So let's say you're going to put it here.
+
+79
+00:04:35,460 --> 00:04:40,090
+All right, so essentially you had
+nine possible slots.
+
+80
+00:04:41,290 --> 00:04:45,320
+Good, so does that mean
+that there are 90 possible combinations?
+
+81
+00:04:45,320 --> 00:04:48,850
+No, we have to correct this
+for one factor.
+
+82
+00:04:49,610 --> 00:04:52,900
+You could first have chosen
+this slot for the first tails
+
+83
+00:04:52,900 --> 00:04:55,970
+and then the second slot for these tails,
+
+84
+00:04:55,970 --> 00:04:58,570
+and this would have been 
+the exact same outcome,
+
+85
+00:04:58,570 --> 00:05:00,950
+namely a <i>T</i> here and a <i>T</i> here.
+
+86
+00:05:00,950 --> 00:05:04,980
+So there are two ways to put those.
+
+87
+00:05:04,980 --> 00:05:07,400
+The first option is to put it here
+and then there,
+
+88
+00:05:07,400 --> 00:05:10,660
+the second option is to put it
+to here and then there,
+
+89
+00:05:10,660 --> 00:05:14,330
+and these are both included
+in this number 90,
+
+90
+00:05:14,330 --> 00:05:16,220
+but they're obviously the same outcome.
+
+91
+00:05:16,220 --> 00:05:19,520
+And so the whole thing here
+has to be divided by 2,
+
+92
+00:05:19,520 --> 00:05:24,230
+and that of course
+gives us 45 possible ways
+
+93
+00:05:24,230 --> 00:05:28,450
+to put two <i>Ts</i> into these ten slots here.
+
+94
+00:05:28,450 --> 00:05:33,270
+So, in other words, out of 
+1,024 possible outcomes,
+
+95
+00:05:33,270 --> 00:05:38,240
+45 will be exactly containing two <i>Ts</i>.
+
+96
+00:05:38,240 --> 00:05:44,370
+So let's do the math here:
+45 divided by 1,024,
+
+97
+00:05:44,370 --> 00:05:46,200
+you can put this into a calculator
+
+98
+00:05:46,200 --> 00:05:51,550
+and you will get something like 0.0439.
+
+99
+00:05:51,550 --> 00:05:58,310
+Or, in other words,
+4.39% is our probability
+
+100
+00:05:58,310 --> 00:06:05,060
+that we get exactly two tails
+when we flip a fair coin ten times.
+
+101
+00:06:05,590 --> 00:06:09,540
+So this is the math behind it,
+this is basic probability.
+
+102
+00:06:09,540 --> 00:06:13,550
+And now we're going to implement
+the coin flipping in JavaScript,
+
+103
+00:06:13,550 --> 00:06:17,930
+and we're going to see how often
+when we do this actually stochastically.
+
+104
+00:06:17,930 --> 00:06:20,720
+So randomly flipping these coins
+many, many times,
+
+105
+00:06:20,720 --> 00:06:24,170
+randomly flipping ten coins,
+many, many times,
+
+106
+00:06:24,170 --> 00:06:29,130
+how often do we get
+these two <i>Ts</i>, these two tails?
+
+107
+00:06:29,130 --> 00:06:30,730
+And if we do this correctly,
+
+108
+00:06:30,730 --> 00:06:37,170
+we should indeed get a number
+that is extremely close to 4.39%.
+
+109
+00:06:37,170 --> 00:06:39,200
+So, let's go ahead and do this.
+
+110
+00:06:39,200 --> 00:06:43,340
+All right, I'm back here
+at my text editor, TextWrangler,
+
+111
+00:06:43,340 --> 00:06:47,470
+and I would like now
+to implement a coin flipper.
+
+112
+00:06:47,470 --> 00:06:48,880
+So how am I going to do this?
+
+113
+00:06:48,880 --> 00:06:52,360
+First of all, I need to have
+some concept of randomness,
+
+114
+00:06:52,360 --> 00:06:56,580
+I need to have a way
+to generate randomness in code.
+
+115
+00:06:56,580 --> 00:07:00,160
+Well, it turns out that JavaScript
+actually comes with a really handy method
+
+116
+00:07:00,160 --> 00:07:02,290
+that's called <i>Math.random()</i>.
+
+117
+00:07:02,290 --> 00:07:06,840
+So what I'm going to do first here 
+is I'm going to set up a new document,
+
+118
+00:07:06,840 --> 00:07:11,640
+so <i>&lt;DOCTYPE html&gt;</i>,
+
+119
+00:07:11,640 --> 00:07:17,440
+and then I'm going to set up
+my html tag: <i>&lt;html&gt;</i>,
+
+120
+00:07:17,440 --> 00:07:20,530
+and I'm going to close this right away.
+
+121
+00:07:22,260 --> 00:07:28,150
+Again, I'm going to structure this
+with a head tag that I'm going to close,
+
+122
+00:07:28,150 --> 00:07:32,840
+and a body tag that I'm
+also going to close right away.
+
+123
+00:07:32,840 --> 00:07:37,060
+And then here within the head
+we'll have our script tag.
+
+124
+00:07:37,060 --> 00:07:39,130
+This is exactly how we did it before.
+
+125
+00:07:39,130 --> 00:07:43,400
+If you do this a couple times
+it will very quickly become second nature.
+
+126
+00:07:43,400 --> 00:07:48,280
+All right, and so now here
+I'm going to develop my code.
+
+127
+00:07:48,280 --> 00:07:53,700
+So the method that I just referred to
+is called <i>Math.random()</i>,
+
+128
+00:07:53,700 --> 00:07:57,050
+so capital M Math.random parentheses.
+
+129
+00:07:57,050 --> 00:07:59,080
+So this method is really handy
+
+130
+00:07:59,080 --> 00:08:04,700
+because it returns
+a random number between 0 and 1.
+
+131
+00:08:04,700 --> 00:08:07,970
+So let's take a look at how this works.
+
+132
+00:08:07,970 --> 00:08:13,910
+Let's first output whatever number
+<i>Math.random()</i> returns here
+
+133
+00:08:13,910 --> 00:08:16,950
+using the <i>console.log</i> method.
+
+134
+00:08:16,950 --> 00:08:20,250
+So I'm going to call <i>console.log</i>,
+
+135
+00:08:20,250 --> 00:08:24,350
+and then I'm going to pass in
+whatever <i>Math.random()</i> returns here
+
+136
+00:08:24,350 --> 00:08:28,870
+which is supposedly
+a random number between 0 and 1.
+
+137
+00:08:28,870 --> 00:08:32,340
+So let me save this, <i>Save As</i>,
+
+138
+00:08:32,340 --> 00:08:36,220
+and then I'm going
+to call this <i>random.html</i>.
+
+139
+00:08:36,220 --> 00:08:37,490
+Okay, save.
+
+140
+00:08:37,490 --> 00:08:42,120
+All right, we've got the color coding
+here correct, syntax highlighting.
+
+141
+00:08:42,120 --> 00:08:45,590
+So now that I've saved this,
+I'm going to go over to the browser,
+
+142
+00:08:45,590 --> 00:08:49,940
+and I'm going to open
+this document, so <i>Open File</i>.
+
+143
+00:08:49,940 --> 00:08:50,940
+Um, where is it?
+
+144
+00:08:50,940 --> 00:08:53,990
+I didn't save it in the correct location.
+
+145
+00:08:53,990 --> 00:08:59,810
+Once again, <i>Save As</i>, not in <i>Documents</i>
+but actually in <i>Code Examples</i>.
+
+146
+00:08:59,810 --> 00:09:01,600
+Okay, <i>Save</i>.
+
+147
+00:09:01,600 --> 00:09:08,390
+All right, moving over
+to the browser, <i>Open File</i>.
+
+148
+00:09:08,390 --> 00:09:10,820
+Here it is <i>random.html</i>.
+
+149
+00:09:10,820 --> 00:09:14,290
+Okay, so open it, and of course
+we don't see anything here;
+
+150
+00:09:14,290 --> 00:09:17,110
+again we need to take a look
+at the JavaScript console
+
+151
+00:09:17,110 --> 00:09:18,470
+that in Chrome you find here
+
+152
+00:09:18,470 --> 00:09:22,330
+under <i>View &gt; Developer 
+&gt; JavaScript Console</i> as before.
+
+153
+00:09:22,330 --> 00:09:24,710
+And here we see a random number.
+
+154
+00:09:24,710 --> 00:09:27,450
+Now, you know, if you look at this number
+
+155
+00:09:27,450 --> 00:09:29,980
+it's hard to say whether
+it's actually truly random
+
+156
+00:09:29,980 --> 00:09:33,120
+because it's fairly close to 1,
+but, of course, it could happen.
+
+157
+00:09:33,120 --> 00:09:37,320
+So let's reload this document
+and let's keep looking at the number here:
+
+158
+00:09:37,320 --> 00:09:40,770
+0.91, 0.92 -- wow, a lot of 0.92s,
+
+159
+00:09:40,770 --> 00:09:45,850
+0.61, 0.2, 0.7, 0.4, and so on.
+
+160
+00:09:45,850 --> 00:09:47,840
+So you can do this a couple of times
+
+161
+00:09:47,840 --> 00:09:50,010
+and, you know, it may look
+
+162
+00:09:50,010 --> 00:09:54,980
+as if there's a sort
+of bias towards 0.9,
+
+163
+00:09:54,980 --> 00:09:59,550
+but it looks fairly random,
+
+164
+00:10:00,350 --> 00:10:04,480
+and I can in fact
+guarantee you that it's random,
+
+165
+00:10:04,480 --> 00:10:08,370
+and each number
+that you see here coming up
+
+166
+00:10:08,370 --> 00:10:10,160
+comes up with equal probabilities.
+
+167
+00:10:10,160 --> 00:10:13,150
+So all the numbers are equally 
+distributed between 0 and 1,
+
+168
+00:10:13,150 --> 00:10:16,080
+in terms of the probability of showing up.
+
+169
+00:10:16,080 --> 00:10:18,230
+So if we go back to the code,
+
+170
+00:10:18,230 --> 00:10:23,160
+we now have this concept
+of a random number between 0 and 1.
+
+171
+00:10:23,160 --> 00:10:27,810
+So if it's really true that 
+they all show up with equal probability,
+
+172
+00:10:27,810 --> 00:10:30,990
+then if we do this many, many times,
+
+173
+00:10:30,990 --> 00:10:34,310
+the average of those numbers 
+should be 0.5.
+
+174
+00:10:34,310 --> 00:10:38,940
+So why don't we go ahead and test that?
+
+175
+00:10:38,940 --> 00:10:42,770
+So I'm going to implement
+this now in JavaScript, this idea.
+
+176
+00:10:42,770 --> 00:10:47,590
+So what I'm going to do is I'm going
+to draw random numbers
+
+177
+00:10:47,590 --> 00:10:50,900
+using this <i>Math.random()</i> method
+many, many times,
+
+178
+00:10:50,900 --> 00:10:52,530
+and then I'm going to add them up,
+
+179
+00:10:52,530 --> 00:10:55,140
+and I'm going to divide them
+by the number of draws
+
+180
+00:10:55,140 --> 00:10:57,430
+and see what this average is.
+
+181
+00:10:57,430 --> 00:10:59,210
+So, in order to do that,
+
+182
+00:10:59,210 --> 00:11:02,640
+let's first define how often we are
+actually going to draw these numbers.
+
+183
+00:11:02,640 --> 00:11:07,120
+And I'm going to store 
+this value in a variable
+
+184
+00:11:07,120 --> 00:11:11,490
+that I'm going to call <i>Repeats</i>, 
+I'm going to set it to say, a 100.
+
+185
+00:11:13,030 --> 00:11:19,980
+And now what I'm going to do
+is I'd like to have my code
+
+186
+00:11:19,980 --> 00:11:26,570
+such that <i>Math.random()</i> is drawn 
+or is called a hundred times.
+
+187
+00:11:26,570 --> 00:11:29,940
+So this seems like a job for <i>for a loop</i>.
+
+188
+00:11:29,940 --> 00:11:32,140
+So I'm going to implement a <i>for loop</i> here.
+
+189
+00:11:32,140 --> 00:11:37,610
+Okay, so <i>for(var i = 0;</i>
+
+190
+00:11:37,610 --> 00:11:40,740
+this is our initialization step.
+
+191
+00:11:41,370 --> 00:11:44,800
+So now <i>i</i> should simply
+be smaller than <i>repeats</i>,
+
+192
+00:11:45,490 --> 00:11:52,230
+and finally the final expression
+which is simply the increment of <i>i</i> by 1,
+
+193
+00:11:52,230 --> 00:11:55,100
+so that we don't have an infinite loop.
+
+194
+00:11:55,880 --> 00:11:59,450
+So here I can call now <i>Math.random()</i>
+
+195
+00:12:01,530 --> 00:12:05,570
+exactly 100 times or whatever
+I have defined here in <i>repeats</i>;
+
+196
+00:12:05,570 --> 00:12:07,410
+at the moment it's 100.
+
+197
+00:12:07,410 --> 00:12:10,010
+But of course I don't just want
+to draw these numbers.
+
+198
+00:12:10,010 --> 00:12:12,240
+I now want to add them up,
+
+199
+00:12:12,240 --> 00:12:16,260
+so I need to keep track
+of the sum somehow.
+
+200
+00:12:16,260 --> 00:12:18,390
+So what I'm going to do,
+actually to do this,
+
+201
+00:12:18,390 --> 00:12:23,210
+is I'm going to create
+a variable here called <i>sum</i>
+
+202
+00:12:23,210 --> 00:12:25,550
+which I'm going to initialize at zero,
+
+203
+00:12:25,550 --> 00:12:28,740
+because in the beginning, the sum is zero.
+
+204
+00:12:28,740 --> 00:12:31,880
+And then I'm going
+to actually store this value,
+
+205
+00:12:31,880 --> 00:12:37,160
+I'm going to add this value 
+that <i>Math.random()</i> returns at two <i>sum</i>.
+
+206
+00:12:37,160 --> 00:12:43,390
+So similar to here where we're taking
+a value, we're adding something to it,
+
+207
+00:12:43,390 --> 00:12:48,150
+and then the outcome of that
+will be stored back into the value.
+
+208
+00:12:48,150 --> 00:12:49,890
+I'm going to use the same idea here,
+
+209
+00:12:49,890 --> 00:12:54,990
+I'm going to say:
+<i>sum = sum + Math.random()</i>.
+
+210
+00:12:54,990 --> 00:12:57,390
+So what this does basically again,
+
+211
+00:12:57,390 --> 00:13:02,270
+recall that the right-hand side here
+is executed first.
+
+212
+00:13:02,270 --> 00:13:05,430
+So we're going to take
+whatever we have in <i>sum</i>,
+
+213
+00:13:05,430 --> 00:13:08,800
+and then we're going to add
+whatever <i>Math.random()</i> returns,
+
+214
+00:13:08,800 --> 00:13:13,490
+and this new <i>sum</i> we're now going
+to store back into the <i>sum</i> variable.
+
+215
+00:13:13,490 --> 00:13:18,410
+So now this <i>sum</i> variable,
+the value will increase
+
+216
+00:13:18,410 --> 00:13:24,430
+every iteration by whatever <i>Math.random()</i>
+returns in any particular iteration.
+
+217
+00:13:25,130 --> 00:13:28,900
+And so that at the end 
+we can calculate the average
+
+218
+00:13:29,850 --> 00:13:34,560
+using these two values;
+so I'm going to now say:
+
+219
+00:13:34,560 --> 00:13:39,020
+<i>var average =</i>
+-- well, whatever we have in <i>sum</i> --
+
+220
+00:13:39,020 --> 00:13:42,630
+divided by the number of <i>repeats</i>,
+
+221
+00:13:42,630 --> 00:13:46,400
+because that's the definition 
+of the average.
+
+222
+00:13:47,020 --> 00:13:49,150
+The total, the sum of all these values
+
+223
+00:13:49,150 --> 00:13:54,260
+divided by however often
+we actually iterate it.
+
+224
+00:13:54,860 --> 00:13:58,740
+And all that's left to do now
+is basically output these values.
+
+225
+00:13:58,740 --> 00:14:02,870
+I'm going to say: <i>console.log</i>
+and I'm going to say here:
+
+226
+00:14:03,520 --> 00:14:05,880
+<i>The average is</i>
+
+227
+00:14:06,760 --> 00:14:12,660
+and I'm going to terminate 
+the string: <i>, average</i>.
+
+228
+00:14:13,290 --> 00:14:17,470
+So this is now basically just using
+the same types of concepts
+
+229
+00:14:17,470 --> 00:14:20,070
+that we learned in Chapter 2.
+
+230
+00:14:20,070 --> 00:14:22,470
+We're initializing variables,
+
+231
+00:14:23,310 --> 00:14:26,450
+we're setting up a loop
+that allows us to iterate;
+
+232
+00:14:26,450 --> 00:14:28,820
+we're using this new method
+<i>Math.random()</i>,
+
+233
+00:14:28,820 --> 00:14:30,670
+and then we're doing some calculation,
+
+234
+00:14:30,670 --> 00:14:33,470
+and at the end
+we're outputting the result.
+
+235
+00:14:33,470 --> 00:14:36,290
+So let's go ahead and do this,
+let's save this document.
+
+236
+00:14:36,290 --> 00:14:37,370
+Okay, I saved it,
+
+237
+00:14:37,370 --> 00:14:39,100
+I'm going to go over to the browser,
+
+238
+00:14:39,100 --> 00:14:42,770
+and let's reload this document here
+and take a look at the console.
+
+239
+00:14:42,770 --> 00:14:45,910
+So here it says the average is 0.46.
+
+240
+00:14:45,910 --> 00:14:47,440
+Let me reload this.
+
+241
+00:14:47,440 --> 00:14:52,240
+Now it's 0.52, 0.53, 0.49, 0.48.
+
+242
+00:14:52,240 --> 00:14:56,140
+All right, it sort of hovers around 0.5,
+so this seems to be working
+
+243
+00:14:56,140 --> 00:14:59,940
+and it seems to be true
+that the average is close to 0.5.
+
+244
+00:15:00,580 --> 00:15:02,530
+Actually, let's go back to the code here
+
+245
+00:15:02,530 --> 00:15:08,230
+and let's do this maybe a thousand times,
+rather than just a hundred times.
+
+246
+00:15:08,230 --> 00:15:14,020
+So if we did this,
+go back to the browser, reload this,
+
+247
+00:15:14,020 --> 00:15:15,430
+and now it's a little closer,
+
+248
+00:15:15,430 --> 00:15:19,590
+see here we're actually getting
+extremely close to 0.5.
+
+249
+00:15:19,590 --> 00:15:22,550
+This is 0.49999, and so on.
+
+250
+00:15:22,550 --> 00:15:28,640
+So we're generally
+in the 0.49 or 0.51 region.
+
+251
+00:15:29,980 --> 00:15:31,730
+Let's go the other way, actually,
+
+252
+00:15:31,730 --> 00:15:36,700
+let's only do this ten times;
+save it, go back.
+
+253
+00:15:36,700 --> 00:15:39,910
+Now you can see
+it's a bit all over the map,
+
+254
+00:15:39,910 --> 00:15:44,040
+it's still sort of converging towards 0.5,
+
+255
+00:15:44,040 --> 00:15:47,990
+but we're now seeing values around 0.6,
+
+256
+00:15:47,990 --> 00:15:52,580
+we're now seeing values around 0.4, 0.3,
+
+257
+00:15:52,580 --> 00:15:56,090
+here even 0.28 -- that's very low.
+
+258
+00:15:56,090 --> 00:15:59,290
+And so you can see
+just like in the coin-tossing example
+
+259
+00:15:59,290 --> 00:16:03,020
+the variance here in the results
+is actually much larger,
+
+260
+00:16:03,020 --> 00:16:08,150
+because we occasionally get
+these rather extreme values.
+
+261
+00:16:08,890 --> 00:16:09,940
+But by and large,
+
+262
+00:16:09,940 --> 00:16:16,030
+we're still sort of zoning 
+into this 0.5 value average.
+
+263
+00:16:16,530 --> 00:16:22,170
+So, let's quickly go back
+and let's do another extreme,
+
+264
+00:16:22,170 --> 00:16:24,070
+let's do this a million times.
+
+265
+00:16:24,070 --> 00:16:28,980
+A 100 thousand and a million here.
+
+266
+00:16:28,980 --> 00:16:30,870
+Save.
+
+267
+00:16:30,870 --> 00:16:31,950
+Reload.
+
+268
+00:16:31,950 --> 00:16:33,940
+Now, two things:
+
+269
+00:16:33,940 --> 00:16:39,500
+first you saw this was blazingly fast,
+it was just basically instant.
+
+270
+00:16:39,500 --> 00:16:40,890
+The other thing you see here,
+
+271
+00:16:40,890 --> 00:16:45,210
+it's extremely close now 
+to precisely 0.5.
+
+272
+00:16:45,210 --> 00:16:48,330
+Now, your values may look 
+slightly different,
+
+273
+00:16:48,330 --> 00:16:50,380
+I mean I can reload this 
+a couple of times,
+
+274
+00:16:50,380 --> 00:16:55,360
+but you can see now we're always 
+in the sort of 0.4999 area
+
+275
+00:16:55,360 --> 00:17:00,420
+or in the 0.500 something area,
+so we're extremely close.
+
+276
+00:17:01,100 --> 00:17:04,920
+Let's increment this again 
+by another factor 10,
+
+277
+00:17:04,920 --> 00:17:08,900
+so we're now doing 10 million;
+go back here, reload.
+
+278
+00:17:08,900 --> 00:17:13,480
+There's a bit of a delay here,
+but you can tell that this is very fast.
+
+279
+00:17:13,480 --> 00:17:19,030
+Actually, let's go back and do this,
+just for fun, 100 million times.
+
+280
+00:17:19,030 --> 00:17:20,560
+So now when you reload this
+
+281
+00:17:20,560 --> 00:17:24,990
+-- and this depends a little bit
+on the power of your computer --,
+
+282
+00:17:24,990 --> 00:17:29,110
+if you reload this,
+it takes a few seconds,
+
+283
+00:17:29,110 --> 00:17:34,320
+maybe two or three seconds,
+actually a little longer here.
+
+284
+00:17:35,800 --> 00:17:40,650
+But it may take somewhere 
+between two and ten seconds
+
+285
+00:17:40,650 --> 00:17:44,250
+-- and again this may depend
+on your browser --,
+
+286
+00:17:45,270 --> 00:17:47,410
+but very close to 0.5.
+
+287
+00:17:47,410 --> 00:17:53,880
+The point being, we're doing here
+100 million iterations
+
+288
+00:17:53,880 --> 00:17:57,030
+and the browser basically
+calculates a little bit
+
+289
+00:17:57,030 --> 00:18:00,380
+and it's going to take some time,
+but it's super fast.
+
+290
+00:18:00,380 --> 00:18:03,610
+It's incredibly fast, and that is
+of course the power of computers;
+
+291
+00:18:03,610 --> 00:18:06,450
+we can do things now at scale
+
+292
+00:18:06,450 --> 00:18:12,500
+that even in a random browser,
+in a random PC,
+
+293
+00:18:12,500 --> 00:18:15,950
+that simply is astounding.
+
+294
+00:18:15,960 --> 00:18:17,860
+So, the take-home message here
+
+295
+00:18:17,860 --> 00:18:23,910
+is that we can have
+a random number generator
+
+296
+00:18:23,910 --> 00:18:28,080
+by using this <i>Math.random()</i> method;
+this comes in very handy.
+
+297
+00:18:28,080 --> 00:18:33,870
+And now we have all the tools in place
+to actually generate a coin flipper,
+
+298
+00:18:33,870 --> 00:18:38,460
+something where two events,
+two outcomes are possible,
+
+299
+00:18:38,460 --> 00:18:42,170
+and they happen
+exactly with 50% probability.
+
+300
+00:18:42,170 --> 00:18:47,720
+And this is what we're going to do
+in the next video in Lecture 3.
+
+301
+00:18:47,730 --> 00:18:50,850
+So in this video, we learned about 
+an incredibly important method
+
+302
+00:18:50,850 --> 00:18:55,830
+called <i>Math.random()</i> that really allows 
+us to generate randomness in our code,
+
+303
+00:18:55,830 --> 00:19:00,250
+and we'll use that heavily throughout 
+the rest of this course, in fact.
+
+304
+00:19:00,250 --> 00:19:05,830
+And so in the next video, we'll use it
+to implement a coin flipper in JavaScript.
+
+305
+00:19:05,830 --> 00:19:07,101
+We'll see you there.

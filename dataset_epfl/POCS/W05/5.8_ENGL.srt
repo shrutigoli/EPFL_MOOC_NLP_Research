@@ -1,0 +1,1851 @@
+1
+00:00:04,517 --> 00:00:06,517
+In previous videos, 
+we have discussed
+
+2
+00:00:06,517 --> 00:00:07,767
+the notion of consistency
+
+3
+00:00:07,767 --> 00:00:10,307
+that is used in ACID transaction
+processing systems.
+
+4
+00:00:10,307 --> 00:00:14,267
+That means we've got transactions 
+that are conceptually executed atomically,
+
+5
+00:00:14,978 --> 00:00:17,788
+and the executions of many, 
+potentially, interleaving,
+
+6
+00:00:17,788 --> 00:00:19,518
+overlapping concurrent transactions,
+
+7
+00:00:19,518 --> 00:00:22,428
+is equivalent to a serial execution
+where there is no overlap.
+
+8
+00:00:22,428 --> 00:00:28,148
+That means, the [inaudible] first
+transaction is going to read the output,
+
+9
+00:00:28,148 --> 00:00:30,738
+the written values,
+of the cave transaction.
+
+10
+00:00:31,315 --> 00:00:32,615
+It makes sense, in general,
+
+11
+00:00:32,615 --> 00:00:36,095
+to also consider weaker 
+notions of consistency.
+
+12
+00:00:37,949 --> 00:00:41,949
+These are potentially useful 
+to have more scalability in systems,
+
+13
+00:00:42,500 --> 00:00:45,180
+but they come with their own 
+disadvantages and problems.
+
+14
+00:00:46,191 --> 00:00:49,601
+So before we are able to talk about
+weak consistency in general,
+
+15
+00:00:49,601 --> 00:00:51,511
+we have to make a few assumptions.
+
+16
+00:00:51,630 --> 00:00:54,910
+A priori, we will have to now assume
+that we don't talk about general,
+
+17
+00:00:55,445 --> 00:00:57,675
+concurrent applications 
+that work with data,
+
+18
+00:00:57,675 --> 00:01:00,455
+but we have to think about,
+specifically, key-value stores.
+
+19
+00:01:00,455 --> 00:01:03,345
+But the only semantics we have
+is that we can read and write values.
+
+20
+00:01:03,345 --> 00:01:04,745
+Key-value pairs, potentially.
+
+21
+00:01:04,745 --> 00:01:07,315
+In general, we'll have
+a distributed key-value storage,
+
+22
+00:01:07,315 --> 00:01:10,625
+that means, the storage is 
+distributed on multiple machines.
+
+23
+00:01:10,625 --> 00:01:12,195
+There might be replication,
+
+24
+00:01:12,581 --> 00:01:16,581
+but certainly, not all data will,
+in general, be stored at all machines.
+
+25
+00:01:17,141 --> 00:01:21,031
+So if we don't have a sufficiently
+strong notion of consistency,
+
+26
+00:01:21,031 --> 00:01:24,174
+it might well happen that a certain client
+
+27
+00:01:24,174 --> 00:01:26,246
+writes a new value,
+
+28
+00:01:26,246 --> 00:01:30,588
+and after that, another 
+client reads that object,
+
+29
+00:01:30,588 --> 00:01:32,011
+but sees an old value.
+
+30
+00:01:33,860 --> 00:01:36,760
+That is excluded by what you 
+would call strong consistency.
+
+31
+00:01:36,760 --> 00:01:38,490
+It would be excluded, 
+conceptually,
+
+32
+00:01:38,490 --> 00:01:40,160
+by ACID transactions.
+
+33
+00:01:41,190 --> 00:01:43,870
+So we assume a distributed 
+key-value store model,
+
+34
+00:01:43,870 --> 00:01:45,630
+and a client-server model here.
+
+35
+00:01:46,161 --> 00:01:48,941
+Let's next discuss some 
+special cases of weak consistency.
+
+36
+00:01:50,190 --> 00:01:53,010
+The first is what is called 
+causal consistency.
+
+37
+00:01:53,010 --> 00:01:57,850
+So here, you have processes
+communicating with each other,
+
+38
+00:01:57,850 --> 00:01:58,960
+changing values,
+
+39
+00:01:58,960 --> 00:02:03,946
+and if a process A changes a value,
+and tells process B about it, so to say,
+
+40
+00:02:03,946 --> 00:02:05,782
+then subsequently--
+
+41
+00:02:06,282 --> 00:02:07,929
+or communicates with process B,
+
+42
+00:02:07,929 --> 00:02:10,639
+and might have said something
+that relates to this value,
+
+43
+00:02:10,639 --> 00:02:13,539
+subsequently, process B
+must read this value,
+
+44
+00:02:13,539 --> 00:02:15,389
+this written value by process A.
+
+45
+00:02:15,573 --> 00:02:17,563
+So the kind of causal relationship--
+
+46
+00:02:17,563 --> 00:02:20,203
+I've told you about it,
+so you know about it--
+
+47
+00:02:20,647 --> 00:02:21,997
+has to be preserved.
+
+48
+00:02:21,997 --> 00:02:24,707
+Read-your-writes consistency
+is something closely related,
+
+49
+00:02:24,707 --> 00:02:26,137
+or in a sense, a special case,
+
+50
+00:02:26,137 --> 00:02:28,267
+where a process that 
+has written something,
+
+51
+00:02:28,267 --> 00:02:30,237
+has to subsequently, read its own value.
+
+52
+00:02:31,011 --> 00:02:33,441
+Session consistency says that, basically,
+
+53
+00:02:33,441 --> 00:02:35,261
+inside a predefined session,
+
+54
+00:02:35,261 --> 00:02:38,101
+it's a bit like a transaction, 
+a bag of subsequent changes,
+
+55
+00:02:38,664 --> 00:02:41,914
+you will see consistently 
+what you've changed, so to say.
+
+56
+00:02:42,997 --> 00:02:45,347
+In monotonic read consistency,
+
+57
+00:02:45,807 --> 00:02:46,857
+you will--
+
+58
+00:02:47,057 --> 00:02:49,867
+once you have started 
+reading an object,
+
+59
+00:02:50,607 --> 00:02:53,717
+you will, in subsequent reads,
+
+60
+00:02:53,717 --> 00:02:54,717
+see the same version.
+
+61
+00:02:54,717 --> 00:02:56,117
+And not an older version.
+
+62
+00:02:56,702 --> 00:02:58,632
+The monotonic write consistency property
+
+63
+00:02:58,632 --> 00:03:02,272
+means that if you write 
+a new value for an object,
+
+64
+00:03:02,272 --> 00:03:04,302
+and subsequently you overwrite this,
+
+65
+00:03:04,302 --> 00:03:07,972
+then you will not end up
+
+66
+00:03:07,972 --> 00:03:09,692
+with the older version of the write.
+
+67
+00:03:09,776 --> 00:03:13,246
+But the writes are ordered correctly, 
+so to say, within your own process.
+
+68
+00:03:15,270 --> 00:03:18,580
+Now, eventual consistency,
+basically means that,
+
+69
+00:03:19,293 --> 00:03:22,123
+a number of changes can be made,
+a number of reads are made,
+
+70
+00:03:22,123 --> 00:03:24,643
+and after a certain point in time,
+
+71
+00:03:25,357 --> 00:03:27,937
+if no further writes appear,
+
+72
+00:03:28,155 --> 00:03:30,045
+no further changes happen, so to say,
+
+73
+00:03:31,018 --> 00:03:35,018
+we wait a bit, and at some point,
+all reads will return the same--
+
+74
+00:03:35,018 --> 00:03:37,658
+the last updated value for each object.
+
+75
+00:03:38,269 --> 00:03:41,329
+That means, we might be at--
+
+76
+00:03:41,753 --> 00:03:44,173
+while the system is
+not in a stable state,
+
+77
+00:03:44,173 --> 00:03:45,473
+while changes happen,
+
+78
+00:03:45,942 --> 00:03:47,592
+or briefly, thereafter,
+
+79
+00:03:47,592 --> 00:03:51,012
+have processes that read values, 
+and they are outdated values.
+
+80
+00:03:51,012 --> 00:03:52,022
+Because, potentially,
+
+81
+00:03:52,022 --> 00:03:55,262
+there might be multiple servers
+in these distributed key-value stores,
+
+82
+00:03:55,262 --> 00:03:57,962
+and the data has not been
+propagated correctly yet.
+
+83
+00:03:57,962 --> 00:04:00,952
+But with time, as data get 
+more and more propagated,
+
+84
+00:04:00,952 --> 00:04:04,582
+we have reached a stable state, 
+and after that, every read,
+
+85
+00:04:04,582 --> 00:04:06,692
+no matter which server we reach,
+
+86
+00:04:06,692 --> 00:04:08,282
+sees the same value.
+
+87
+00:04:09,231 --> 00:04:12,381
+So, a system that has reached 
+this notion of consistency
+
+88
+00:04:12,381 --> 00:04:14,031
+is said to have converged.
+
+89
+00:04:15,820 --> 00:04:18,120
+This was, in a sense, 
+the client-side viewpoint.
+
+90
+00:04:18,744 --> 00:04:20,584
+So, from the viewpoint of the client,
+
+91
+00:04:20,584 --> 00:04:25,944
+it might connect to any server 
+in this distributed key-value store,
+
+92
+00:04:26,255 --> 00:04:27,885
+and does reads and writes,
+
+93
+00:04:27,885 --> 00:04:30,545
+and might observe certain inconsistencies.
+
+94
+00:04:30,783 --> 00:04:34,353
+Of course, some of these inconsistencies 
+are easier to resolve that others.
+
+95
+00:04:34,353 --> 00:04:35,933
+For example, if already,
+
+96
+00:04:35,933 --> 00:04:40,163
+by ensuring that a client 
+always accesses the same server,
+
+97
+00:04:40,440 --> 00:04:43,260
+which is a way of 
+still achieving scalability
+
+98
+00:04:43,260 --> 00:04:46,270
+by having many servers,
+serve many clients.
+
+99
+00:04:47,130 --> 00:04:49,740
+Unless the server is implemented
+in a very strange way,
+
+100
+00:04:49,740 --> 00:04:52,750
+certain notions of consistency 
+are very easy to kind of ensure.
+
+101
+00:04:52,750 --> 00:04:57,270
+For example, the notion of making sure 
+that writes by the same process
+
+102
+00:04:57,270 --> 00:04:58,770
+are not stored out of order,
+
+103
+00:04:58,770 --> 00:04:59,990
+but are durable.
+
+104
+00:04:59,990 --> 00:05:01,650
+Now let's look at the server-side.
+
+105
+00:05:01,650 --> 00:05:05,000
+Let's assume there is <i>N</i> machines, 
+in this distributed key-value store,
+
+106
+00:05:05,000 --> 00:05:07,150
+that can store replicas of data.
+
+107
+00:05:07,490 --> 00:05:12,370
+Let's assume that whenever we write,
+we write at least two <i>W</i> many replicas.
+
+108
+00:05:12,458 --> 00:05:13,808
+And these have to, together,
+
+109
+00:05:13,808 --> 00:05:16,738
+acknowledge receipt of the update
+before the update completes.
+
+110
+00:05:16,738 --> 00:05:19,748
+So in a sense, the client, 
+or the middleware that supports it,
+
+111
+00:05:19,748 --> 00:05:20,748
+or a client library,
+
+112
+00:05:20,748 --> 00:05:22,998
+will have to wait for all
+the acknowledgements
+
+113
+00:05:22,998 --> 00:05:25,798
+of the machines that were asked
+to write down this value.
+
+114
+00:05:26,720 --> 00:05:30,150
+When we read, we could say 
+that we always read <i>R</i> replicas.
+
+115
+00:05:30,738 --> 00:05:33,028
+From all different machines, 
+we read the value.
+
+116
+00:05:33,028 --> 00:05:34,148
+So what does this mean?
+
+117
+00:05:34,148 --> 00:05:39,398
+We assume now that each machine 
+might hold a replica of each object.
+
+118
+00:05:39,621 --> 00:05:44,071
+And if the number of writes,
+
+119
+00:05:44,446 --> 00:05:46,506
+<i>W</i> is equal to <i>N</i>,
+
+120
+00:05:46,506 --> 00:05:48,786
+then is means that every time we write,
+
+121
+00:05:48,786 --> 00:05:50,866
+we update all the replicas 
+on all machines.
+
+122
+00:05:50,866 --> 00:05:53,106
+That means if you read 
+from any single machine,
+
+123
+00:05:53,106 --> 00:05:54,406
+you will see the new value.
+
+124
+00:05:54,406 --> 00:05:56,816
+And by requiring this receipt 
+and acknowledgement,
+
+125
+00:05:56,816 --> 00:05:58,856
+you basically do these writes 
+atomically, so to say,
+
+126
+00:05:58,856 --> 00:06:01,776
+from the viewpoint of the client 
+who requests the write.
+
+127
+00:06:02,009 --> 00:06:05,669
+But not necessarily from the viewpoint
+of the client who requests some reads.
+
+128
+00:06:05,669 --> 00:06:10,129
+Now reads can also happen, 
+in terms of multiple reads.
+
+129
+00:06:10,529 --> 00:06:14,839
+And this might allow us 
+to identify some inconsistency.
+
+130
+00:06:14,839 --> 00:06:18,469
+For example, if writing has 
+only happened to some of the replicas,
+
+131
+00:06:18,571 --> 00:06:21,971
+and now we read several replicas, 
+and they are not in the same version,
+
+132
+00:06:21,971 --> 00:06:23,951
+we know that there is some inconsistency.
+
+133
+00:06:23,951 --> 00:06:26,061
+And this gives us the basis,
+for basically, for example,
+
+134
+00:06:26,061 --> 00:06:27,241
+collecting a quorum.
+
+135
+00:06:27,241 --> 00:06:29,311
+So, if you for example,
+make three reads,
+
+136
+00:06:29,311 --> 00:06:32,581
+and two of them are equal,
+and the third is different,
+
+137
+00:06:32,581 --> 00:06:35,801
+you might for example, choose
+that the majority, so to say,
+
+138
+00:06:35,801 --> 00:06:38,481
+the value that is represented 
+by two machines, wins.
+
+139
+00:06:38,481 --> 00:06:41,301
+This might not be the right thing 
+to do in general, though.
+
+140
+00:06:41,301 --> 00:06:46,251
+Now, however, suppose that this 
+<i>W</i> plus <i>R</i> is greater than <i>N</i>.
+
+141
+00:06:47,218 --> 00:06:49,948
+Then strong consistency is ensured.
+
+142
+00:06:50,209 --> 00:06:55,169
+So for example, if we have three machines
+that each can store replicas of objects,
+
+143
+00:06:55,409 --> 00:06:57,639
+and <i>R</i> is two, and <i>W</i> is two,
+
+144
+00:06:57,639 --> 00:07:01,029
+that means whenever we write,
+we write it to two machines, together.
+
+145
+00:07:01,029 --> 00:07:03,359
+And then when we read,
+we read from two machines.
+
+146
+00:07:03,616 --> 00:07:06,936
+We can basically identify inconsistencies.
+
+147
+00:07:06,936 --> 00:07:09,636
+And then we just wait, 
+or decide to read more copies--
+
+148
+00:07:09,636 --> 00:07:10,486
+more replicas,
+
+149
+00:07:10,486 --> 00:07:12,406
+to decide which is 
+the winner, so to say,
+
+150
+00:07:12,406 --> 00:07:13,606
+which is the right value.
+
+151
+00:07:13,970 --> 00:07:17,180
+So, by having <i>W</i> plus <i>R</i>
+to be greater than <i>N</i>,
+
+152
+00:07:17,180 --> 00:07:19,370
+we can ensure strong consistency.
+
+153
+00:07:19,370 --> 00:07:22,970
+And if, in general, <i>W</i> is not <i>N</i>, 
+but is less than that,
+
+154
+00:07:22,970 --> 00:07:25,700
+then this is usually called 
+the quorum consensus method.
+
+155
+00:07:25,700 --> 00:07:27,620
+So we will basically collect a quorum.
+
+156
+00:07:28,527 --> 00:07:32,307
+If we have read enough values 
+to be able to decide the right outcome,
+
+157
+00:07:32,307 --> 00:07:33,257
+we are good.
+
+158
+00:07:33,813 --> 00:07:37,343
+In general, if we want to optimize
+for read performance,
+
+159
+00:07:37,343 --> 00:07:41,623
+we might, for example, 
+take large <i>W</i> and <i>R</i> equals one.
+
+160
+00:07:41,623 --> 00:07:44,883
+That means, we are not making our reads
+inefficient by having to read
+
+161
+00:07:44,883 --> 00:07:46,073
+many, many machines,
+
+162
+00:07:46,073 --> 00:07:51,043
+but by writing to many machines,
+making the value highly available,
+
+163
+00:07:51,043 --> 00:07:52,903
+we can really paralyze the reads.
+
+164
+00:07:53,147 --> 00:07:56,207
+Of course, that works best
+if the writes are relatively uncommon,
+
+165
+00:07:56,207 --> 00:07:57,287
+compared to the reads.
+
+166
+00:07:57,287 --> 00:08:00,477
+And of course, by having 
+<i>W</i> more than one,
+
+167
+00:08:00,759 --> 00:08:04,189
+we have better availability, 
+we can deal with failures of machines.
+
+168
+00:08:04,939 --> 00:08:08,129
+Now if <i>W</i> plus <i>R</i>
+is less than or equal to <i>N</i>,
+
+169
+00:08:08,129 --> 00:08:10,439
+then we've got a notion
+of weak consistency only.
+
+170
+00:08:10,439 --> 00:08:12,309
+And then probably, it makes most sense,
+
+171
+00:08:12,309 --> 00:08:14,659
+or maybe <i>only</i> sense to assume
+that <i>R</i> equals one.
+
+172
+00:08:14,902 --> 00:08:18,192
+If we anyway cannot say anything 
+about the correctness of the value,
+
+173
+00:08:18,192 --> 00:08:21,092
+it doesn't make sense to read
+multiple values, potentially.
+
+174
+00:08:24,058 --> 00:08:26,718
+We have talked about 
+ACID transactions before,
+
+175
+00:08:26,718 --> 00:08:29,598
+and now let's think about weak
+consistencies for comparison.
+
+176
+00:08:29,892 --> 00:08:31,602
+So, clearly,
+
+177
+00:08:31,602 --> 00:08:35,682
+what counts against ACID transactions
+and in database management systems,
+
+178
+00:08:35,682 --> 00:08:38,822
+is that strong consistency 
+implemented in distributed scenario
+
+179
+00:08:38,822 --> 00:08:40,332
+by two-phase commit, or Paxos,
+
+180
+00:08:40,332 --> 00:08:42,582
+or strong consistency 
+protocols like this,
+
+181
+00:08:42,582 --> 00:08:43,812
+does not scale.
+
+182
+00:08:44,218 --> 00:08:45,348
+This is well-known.
+
+183
+00:08:45,348 --> 00:08:47,278
+You may have heard about the CAP theorem
+
+184
+00:08:47,278 --> 00:08:49,548
+that essentially asserts
+a related statement.
+
+185
+00:08:49,912 --> 00:08:52,542
+It has been discussed 
+earlier by people,
+
+186
+00:08:52,542 --> 00:08:54,692
+and observed earlier 
+by people like Jim Gray,
+
+187
+00:08:54,692 --> 00:08:57,342
+that actually, beyond a certain
+number of nodes
+
+188
+00:08:57,342 --> 00:09:01,182
+in a distributed database management 
+system that uses strong consistency,
+
+189
+00:09:01,182 --> 00:09:02,622
+two-phase commit for example,
+
+190
+00:09:02,622 --> 00:09:06,102
+adding more nodes makes the system 
+actually not get fast.
+
+191
+00:09:06,102 --> 00:09:08,772
+That means the transaction 
+throughput doesn't increase anymore.
+
+192
+00:09:08,772 --> 00:09:10,932
+So it doesn't make sense
+to add more machines.
+
+193
+00:09:10,932 --> 00:09:13,302
+And whilst it's the 
+communication overhead,
+
+194
+00:09:13,302 --> 00:09:14,882
+ensuring strong consistency.
+
+195
+00:09:14,882 --> 00:09:17,242
+If you think about two-phase 
+commit for example,
+
+196
+00:09:17,242 --> 00:09:20,632
+we need four times <i>N</i>
+many messages, essentially,
+
+197
+00:09:20,632 --> 00:09:22,572
+to finalize the protocol
+
+198
+00:09:22,572 --> 00:09:25,152
+where <i>N</i> is number of machines, 
+overall, in the system.
+
+199
+00:09:25,152 --> 00:09:26,262
+And of course, that's very costly.
+
+200
+00:09:26,262 --> 00:09:28,532
+In a very large system 
+with very many machines,
+
+201
+00:09:28,532 --> 00:09:31,022
+there might be stragglers, 
+there might be failures,
+
+202
+00:09:31,022 --> 00:09:34,143
+and overall, the latencies 
+of finalizing a transaction
+
+203
+00:09:34,143 --> 00:09:36,643
+gets very high, and in general, 
+that means, overall,
+
+204
+00:09:36,643 --> 00:09:38,253
+that there's dependencies
+between transactions,
+
+205
+00:09:38,253 --> 00:09:41,073
+and all these transactions 
+of concurrency protocols,
+
+206
+00:09:41,073 --> 00:09:43,993
+are disconnected-- 
+just completely ruined throughput.
+
+207
+00:09:45,092 --> 00:09:46,302
+So this is well-known.
+
+208
+00:09:46,603 --> 00:09:49,313
+And this has lead to the rise
+
+209
+00:09:49,313 --> 00:09:52,063
+of the so-called NoSQL 
+movement in recent years,
+
+210
+00:09:52,063 --> 00:09:54,573
+started by lots of web 
+application companies like:
+
+211
+00:09:54,573 --> 00:09:56,803
+Google, Ebay, Facebook, Yahoo, etc,
+
+212
+00:09:56,803 --> 00:10:00,083
+that were unhappy with the scalability
+of database management systems,
+
+213
+00:10:00,083 --> 00:10:03,233
+and built their own systems that use 
+weaker notions of consistency
+
+214
+00:10:03,233 --> 00:10:05,523
+to deal with the scalability issue.
+
+215
+00:10:06,128 --> 00:10:07,698
+Of course, if you think about it,
+
+216
+00:10:07,698 --> 00:10:10,168
+weak consistency might be
+cheaper to ensure,
+
+217
+00:10:10,168 --> 00:10:11,128
+because in general,
+
+218
+00:10:11,128 --> 00:10:14,848
+we will not need to do these 
+strong consistency protocols
+
+219
+00:10:14,848 --> 00:10:16,878
+that have these high latencies, obviously.
+
+220
+00:10:17,668 --> 00:10:21,128
+The disadvantage of these 
+weaker consistent systems,
+
+221
+00:10:21,128 --> 00:10:23,788
+is that programming them 
+is very hard and error-prone.
+
+222
+00:10:23,788 --> 00:10:26,268
+In a sense, you will have to, 
+in your applications--
+
+223
+00:10:26,268 --> 00:10:28,038
+every time you write an application--
+
+224
+00:10:28,038 --> 00:10:29,928
+deal with what happens 
+when something went wrong,
+
+225
+00:10:29,928 --> 00:10:31,698
+and you haven't reached 
+strong consistency,
+
+226
+00:10:31,698 --> 00:10:34,118
+you have the right/wrong values etc.
+
+227
+00:10:34,118 --> 00:10:37,078
+So you might end up, 
+in most sophisticated applications,
+
+228
+00:10:37,078 --> 00:10:38,378
+basically re-implementing
+
+229
+00:10:38,378 --> 00:10:41,198
+strong consistency protocols 
+in the applications, which is,
+
+230
+00:10:41,198 --> 00:10:42,648
+ultimately, not what you want.
+
+231
+00:10:43,408 --> 00:10:44,428
+So, compared to that,
+
+232
+00:10:44,428 --> 00:10:47,188
+programming ACID transaction 
+programs is really foolproof,
+
+233
+00:10:47,188 --> 00:10:49,438
+because you need know
+and understand very little
+
+234
+00:10:49,438 --> 00:10:52,639
+about concurrency and the deeper 
+side of distributed algorithms.
+
+235
+00:10:52,639 --> 00:10:55,989
+You can just think as if there was
+no concurrency at all in the system,
+
+236
+00:10:55,989 --> 00:10:57,709
+and you're working with single-node,
+
+237
+00:10:57,709 --> 00:11:01,709
+single-threaded system
+that does your data reads and writes.
+
+238
+00:11:02,531 --> 00:11:06,121
+This is actually a reason 
+that few new systems nowadays
+
+239
+00:11:06,121 --> 00:11:08,251
+use weak or eventual consistency.
+
+240
+00:11:08,577 --> 00:11:12,577
+There is a few kind of bases and centers 
+of using eventual consistency,
+
+241
+00:11:12,577 --> 00:11:15,547
+specifically Amazon, 
+that uses it for example,
+
+242
+00:11:15,547 --> 00:11:18,747
+even nowadays, 
+for managing shopping carts.
+
+243
+00:11:19,432 --> 00:11:22,472
+Also also in some other 
+places in its overall infrastructure.
+
+244
+00:11:22,749 --> 00:11:25,789
+So it can actually happen that if you,
+on your machine,
+
+245
+00:11:25,789 --> 00:11:28,789
+start two different browsers,
+and connect to Amazon,
+
+246
+00:11:28,789 --> 00:11:31,889
+and start putting products
+into your shopping cart,
+
+247
+00:11:31,889 --> 00:11:34,329
+then you will see, although 
+you have the same user,
+
+248
+00:11:34,329 --> 00:11:36,239
+and you have logged in 
+as the same user,
+
+249
+00:11:36,239 --> 00:11:38,219
+you might see two different states
+of your shopping carts,
+
+250
+00:11:38,219 --> 00:11:40,089
+even after several updating runs.
+
+251
+00:11:40,089 --> 00:11:42,139
+So what Amazon has to do, basically,
+
+252
+00:11:42,139 --> 00:11:45,819
+it will propagate data,
+and ultimately at some point,
+
+253
+00:11:45,819 --> 00:11:48,339
+will have to deal with 
+conflict resolution
+
+254
+00:11:48,339 --> 00:11:51,249
+if you have done inconsistent things
+in the two different browsers.
+
+255
+00:11:51,249 --> 00:11:54,259
+It will have to some application-
+specific custom code
+
+256
+00:11:54,259 --> 00:11:56,309
+that will have to decide 
+what to do about this,
+
+257
+00:11:56,309 --> 00:11:58,919
+and how to make the shopping 
+carts consistent again.
+
+258
+00:11:59,817 --> 00:12:01,907
+So also, Google,
+which initially was really,
+
+259
+00:12:01,907 --> 00:12:04,657
+a very militant partisan 
+of the NoSQL movement,
+
+260
+00:12:04,657 --> 00:12:07,407
+and strongly opposed 
+to classical strong consistency,
+
+261
+00:12:07,407 --> 00:12:09,237
+is actually now building ACID systems.
+
+262
+00:12:09,237 --> 00:12:11,907
+And if you look at the development 
+of the whole sequence
+
+263
+00:12:11,907 --> 00:12:14,677
+of major database management 
+systems that they have built,
+
+264
+00:12:14,677 --> 00:12:16,071
+you can see this development.
+
+265
+00:12:16,071 --> 00:12:20,101
+So for example, in Bigtable in 2006, 
+we had atomic tuple updates.
+
+266
+00:12:20,101 --> 00:12:23,351
+So you could actually write tuples 
+that consisted of several fields,
+
+267
+00:12:23,351 --> 00:12:25,151
+atomically, but nothing else.
+
+268
+00:12:25,151 --> 00:12:27,961
+So you could not build transactions 
+in the classical sense.
+
+269
+00:12:28,297 --> 00:12:31,627
+In 2011, they built MegaStore, 
+or published a paper on MegaStore,
+
+270
+00:12:31,627 --> 00:12:33,977
+where they supported 
+the notion of entity groups,
+
+271
+00:12:33,977 --> 00:12:36,857
+that means you could have 
+atomicity across multiple tuples
+
+272
+00:12:36,857 --> 00:12:38,087
+with certain constraints.
+
+273
+00:12:38,602 --> 00:12:42,102
+Then in 2012, they presented Spanner,
+
+274
+00:12:42,102 --> 00:12:44,222
+which is yet another such 
+database system.
+
+275
+00:12:44,222 --> 00:12:45,662
+And it's really not a database system.
+
+276
+00:12:45,662 --> 00:12:47,642
+It is called a globally 
+distributed database system.
+
+277
+00:12:47,642 --> 00:12:49,012
+It does it on a quite large scale,
+
+278
+00:12:49,012 --> 00:12:51,132
+but it really implements 
+ACID transactions.
+
+279
+00:12:51,484 --> 00:12:52,864
+So how is this possible?
+
+280
+00:12:52,864 --> 00:12:55,214
+Because they achieve 
+classical strong consistency
+
+281
+00:12:55,214 --> 00:12:57,104
+and it is still kind of claim to scale.
+
+282
+00:12:57,104 --> 00:12:58,754
+Well the answer is probably that--
+
+283
+00:12:58,754 --> 00:12:59,824
+well the answer is not just <i>probably</i>,
+
+284
+00:12:59,824 --> 00:13:01,934
+but <i>certainly</i> that they don't truly scale.
+
+285
+00:13:01,934 --> 00:13:05,934
+The just achieve a certain 
+high degree of size.
+
+286
+00:13:05,934 --> 00:13:07,134
+And how do they do this?
+
+287
+00:13:07,134 --> 00:13:09,614
+They actually implement a lot 
+of specific machinery
+
+288
+00:13:09,614 --> 00:13:12,644
+for ensuring strong 
+consistency in hardware.
+
+289
+00:13:12,644 --> 00:13:15,924
+So when Jim Gray wrote his paper, 
+that I mentioned above,
+
+290
+00:13:15,924 --> 00:13:18,044
+he actually measured this threshold
+
+291
+00:13:18,044 --> 00:13:19,944
+above which it doesn't 
+make sense to add more nodes
+
+292
+00:13:19,944 --> 00:13:22,454
+to still be able to support 
+something like two-phase commit,
+
+293
+00:13:22,454 --> 00:13:24,214
+at about 70 nodes.
+
+294
+00:13:24,214 --> 00:13:27,034
+But he also remarked 
+that this number
+
+295
+00:13:27,034 --> 00:13:30,514
+depends on hardware 
+technology ultimately,
+
+296
+00:13:30,514 --> 00:13:32,924
+and on lower level, 
+software technology.
+
+297
+00:13:32,924 --> 00:13:36,394
+For example, on how long it takes 
+to transfer messages between machines,
+
+298
+00:13:36,394 --> 00:13:39,284
+so they're lower bound on latencies.
+
+299
+00:13:39,937 --> 00:13:44,037
+So if you can improve on these things,
+you can ultimately push this constant--
+
+300
+00:13:44,037 --> 00:13:45,987
+puts the constant 
+number of nodes higher.
+
+301
+00:13:45,987 --> 00:13:49,297
+And it might be just large enough 
+that you can potentially at one day
+
+302
+00:13:49,297 --> 00:13:50,867
+even support the largest applications.
+
+303
+00:13:50,867 --> 00:13:52,477
+And that's basically what Spanner does.
+
+304
+00:13:52,477 --> 00:13:54,437
+But it doesn't truly support scalability,
+
+305
+00:13:54,437 --> 00:13:56,957
+and it needs a strong 
+consistency mechanism.
+
+306
+00:13:57,916 --> 00:14:00,156
+Another thing that I want to 
+remark upon again,
+
+307
+00:14:00,156 --> 00:14:01,336
+is the CAP theorem.
+
+308
+00:14:01,336 --> 00:14:03,516
+So this is something 
+that was essentially celebrated.
+
+309
+00:14:03,516 --> 00:14:07,516
+Many people use it in all kinds 
+of appropriate context, ultimately.
+
+310
+00:14:07,516 --> 00:14:11,202
+And what it says, is basically, 
+that in ultimately,
+
+311
+00:14:11,202 --> 00:14:12,372
+a key-value store--
+
+312
+00:14:12,372 --> 00:14:14,306
+in a distributed 
+key-value store if you like,
+
+313
+00:14:14,306 --> 00:14:17,416
+you can only have at most, 
+two of the following three properties.
+
+314
+00:14:17,416 --> 00:14:20,666
+Which are: consistency, availability, 
+and partition-tolerance.
+
+315
+00:14:20,666 --> 00:14:24,386
+So, consistency, strong consistency 
+is what you by now know.
+
+316
+00:14:24,390 --> 00:14:27,550
+Availability is what you also know now.
+
+317
+00:14:27,550 --> 00:14:29,040
+And partition-tolerance means,
+
+318
+00:14:29,040 --> 00:14:31,130
+basically, that if you have 
+this distributed system,
+
+319
+00:14:31,130 --> 00:14:34,180
+consisting of many nodes in a network,
+and you partition the network,
+
+320
+00:14:34,180 --> 00:14:36,660
+that means you cannot reach,
+from the viewpoint of a client let's say,
+
+321
+00:14:36,660 --> 00:14:37,930
+or of certain servers,
+
+322
+00:14:37,930 --> 00:14:39,180
+the remaining nodes,
+
+323
+00:14:39,180 --> 00:14:40,770
+the system degrades gracefully.
+
+324
+00:14:40,770 --> 00:14:42,070
+And it can still continue.
+
+325
+00:14:42,070 --> 00:14:43,980
+It might not be fully available anymore,
+
+326
+00:14:43,980 --> 00:14:46,600
+because certain data 
+is not in that part of the system,
+
+327
+00:14:46,600 --> 00:14:47,880
+but it's still continuous,
+
+328
+00:14:47,880 --> 00:14:50,940
+and can do a gracefully 
+degraded partial service.
+
+329
+00:14:51,710 --> 00:14:54,710
+Now, weakly consistent systems,
+
+330
+00:14:54,710 --> 00:14:58,740
+basically choose the two properties:
+availability and partition-tolerance,
+
+331
+00:14:58,740 --> 00:15:01,620
+at the cost of not supporting 
+consistency anymore.
+
+332
+00:15:02,542 --> 00:15:04,122
+What's the alternative, really?
+
+333
+00:15:04,122 --> 00:15:07,032
+Conceptually, the paper about
+
+334
+00:15:07,032 --> 00:15:10,585
+the CAP theorem, originally that
+conjecture leads also to the proof
+
+335
+00:15:10,585 --> 00:15:14,185
+doesn't exclude that you can take 
+any pair of two properties,
+
+336
+00:15:14,185 --> 00:15:15,605
+and build a system around it.
+
+337
+00:15:15,605 --> 00:15:17,635
+So what about database 
+management systems?
+
+338
+00:15:17,635 --> 00:15:19,265
+There are two argumentations.
+
+339
+00:15:19,265 --> 00:15:21,855
+Let's assume I've got a distributed
+database management system,
+
+340
+00:15:21,855 --> 00:15:24,545
+and we are just not very fast.
+
+341
+00:15:24,545 --> 00:15:26,815
+We basically don't keep up 
+with our workload.
+
+342
+00:15:26,815 --> 00:15:32,265
+Then we're getting, maybe, blocked, 
+waiting for my two-phase commit to finish.
+
+343
+00:15:32,567 --> 00:15:36,427
+In that case, we are not availability, 
+or have bad availability,
+
+344
+00:15:36,427 --> 00:15:39,867
+and basically what we are supporting 
+is consistency partition-tolerance.
+
+345
+00:15:39,867 --> 00:15:42,284
+Alternatively, you might 
+say that basically,
+
+346
+00:15:42,284 --> 00:15:47,584
+if you would reduce those overheads 
+of communication, so to say,
+
+347
+00:15:47,584 --> 00:15:49,014
+and of the protocols,
+
+348
+00:15:49,014 --> 00:15:51,434
+and basically,
+the cost of computation
+
+349
+00:15:51,434 --> 00:15:55,254
+to just execute 
+the concurrency control protocols
+
+350
+00:15:55,254 --> 00:15:56,974
+almost to zero, basically.
+
+351
+00:15:56,974 --> 00:15:58,564
+Or make it infinitely small.
+
+352
+00:15:59,045 --> 00:16:01,685
+Then you have consistency 
+and availability.
+
+353
+00:16:01,685 --> 00:16:02,725
+Of course.
+
+354
+00:16:02,725 --> 00:16:05,995
+But of course it requires some kind of
+unrealistic, infinitely fast system
+
+355
+00:16:05,995 --> 00:16:08,475
+that violates all of what 
+we said about locality.
+
+356
+00:16:08,475 --> 00:16:12,625
+But just by increasing the cost 
+of communication between nodes a little,
+
+357
+00:16:13,425 --> 00:16:14,765
+this is not true anymore.
+
+358
+00:16:14,765 --> 00:16:17,495
+So in that sense, 
+it is not partitioning-tolerant,
+
+359
+00:16:17,495 --> 00:16:20,085
+because just this little latency 
+for communicating,
+
+360
+00:16:20,085 --> 00:16:22,765
+you could think of something 
+like a network partition.
+
+361
+00:16:23,245 --> 00:16:24,675
+Of course to some extent,
+
+362
+00:16:24,675 --> 00:16:26,815
+all these comparisons, 
+and all these considerations
+
+363
+00:16:26,815 --> 00:16:31,285
+are somewhat limited in usefulness, 
+simply because, in a sense,
+
+364
+00:16:31,285 --> 00:16:36,035
+the CAP theorem is really not meant 
+for this kind of consideration
+
+365
+00:16:36,035 --> 00:16:38,185
+or for entire applications, in a sense.
+
+366
+00:16:38,491 --> 00:16:41,121
+It is however, important to say 
+that really, key-value stores--
+
+367
+00:16:41,121 --> 00:16:43,011
+this weakest notion of semantics--
+
+368
+00:16:43,011 --> 00:16:46,191
+just as reads and writes are independent 
+and they don't care about anything else,
+
+369
+00:16:46,191 --> 00:16:47,671
+they are no applications.
+
+370
+00:16:47,887 --> 00:16:50,157
+And the CAP theorem
+really says only something
+
+371
+00:16:50,157 --> 00:16:52,157
+about these key-value stores.
+
+372
+00:16:52,716 --> 00:16:56,716
+So consistency refers to dealing with, 
+basically, consistency of replicas.
+
+373
+00:16:57,390 --> 00:16:59,480
+Even if you cannot 
+deal with any atomicity
+
+374
+00:16:59,480 --> 00:17:02,380
+across several different updates,
+as transactions would do.
+
+375
+00:17:02,608 --> 00:17:04,188
+So in a sense, I would argue that
+
+376
+00:17:04,188 --> 00:17:07,238
+if you look at real applications, 
+that as we see nowadays,
+
+377
+00:17:07,238 --> 00:17:08,548
+at Google and other places,
+
+378
+00:17:08,548 --> 00:17:10,628
+really require something 
+like transactions,
+
+379
+00:17:10,628 --> 00:17:12,938
+then, something like a CS theorem,
+
+380
+00:17:12,938 --> 00:17:16,198
+where <i>S</i> stands for scalability, 
+and <i>C</i> of course, for consistency,
+
+381
+00:17:16,198 --> 00:17:18,448
+would be more reasonable 
+than the CAP theorem.
+
+382
+00:17:18,448 --> 00:17:19,168
+Why is this?
+
+383
+00:17:19,168 --> 00:17:21,868
+Well, if you want to think about 
+scalability and performance
+
+384
+00:17:21,868 --> 00:17:23,348
+in the context of real applications--
+
+385
+00:17:23,348 --> 00:17:26,148
+complex applications, 
+where the workloads involve,
+
+386
+00:17:26,148 --> 00:17:30,148
+potentially transactions, 
+or something like this.
+
+387
+00:17:30,148 --> 00:17:34,888
+Then it's not helpful to model 
+scalability and performance
+
+388
+00:17:34,888 --> 00:17:37,168
+using availability and 
+partition-tolerance.
+
+389
+00:17:37,168 --> 00:17:40,138
+That's why we had this 
+strange argumentation
+
+390
+00:17:40,138 --> 00:17:44,138
+about DMS's trading off 
+for consistency and availability,
+
+391
+00:17:44,138 --> 00:17:46,148
+or of consistency and 
+partition-tolerance.
+
+392
+00:17:46,148 --> 00:17:48,658
+So we could however say, 
+because ultimately,
+
+393
+00:17:48,658 --> 00:17:49,898
+given this argumentation,
+
+394
+00:17:49,898 --> 00:17:52,998
+we can model, or translate 
+the CAP theorem
+
+395
+00:17:52,998 --> 00:17:55,928
+to a consistency or a scalability 
+theorem where we can say,
+
+396
+00:17:55,928 --> 00:17:57,838
+"you can have only one of these two."
+
+397
+00:17:58,098 --> 00:18:00,198
+And in my opinion, 
+that is more meaningful.
+
+398
+00:18:00,198 --> 00:18:01,258
+And of course then,
+
+399
+00:18:01,258 --> 00:18:05,028
+ACID systems would make the choice
+of taking consistency,
+
+400
+00:18:05,028 --> 00:18:09,028
+while weaker consistent systems, 
+of course, take the choice of scalability.

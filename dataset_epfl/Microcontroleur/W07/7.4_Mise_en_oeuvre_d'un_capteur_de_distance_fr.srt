@@ -1,0 +1,827 @@
+1
+00:00:00,000 --> 00:00:05,890
+Bonjour.
+
+2
+00:00:05,890 --> 00:00:10,318
+Nous continuons le cours, comprendre les
+microcontrôleurs.
+
+3
+00:00:10,318 --> 00:00:13,582
+Nous avons déjà parlé de capteurs et de
+nombreuses
+
+4
+00:00:13,582 --> 00:00:17,980
+familles qu'il existe, qu'on peut brancher
+sur des microcontrôleurs.
+
+5
+00:00:17,980 --> 00:00:21,547
+Aujourd'hui, nous allons étudier en détail
+un
+
+6
+00:00:21,547 --> 00:00:25,120
+capteur et regarder comment le mettre en
+œuvre.
+
+7
+00:00:25,120 --> 00:00:29,488
+Quelques généralités sur la terminologie,
+tout d'abord.
+
+8
+00:00:29,488 --> 00:00:34,828
+On parle de transducteur lorsqu'on est en
+face d'un composant qui
+
+9
+00:00:34,828 --> 00:00:40,148
+fournit un signal de sortie dans une
+grandeur physique donnée,
+
+10
+00:00:40,148 --> 00:00:45,655
+en réponse à une autre grandeur physique
+qui est le signal d'entrée.
+
+11
+00:00:45,655 --> 00:00:50,342
+On voit, ici, qu'on a une grandeur
+physique, elle passe par
+
+12
+00:00:50,342 --> 00:00:55,776
+le transducteur, et il en ressort une
+autre grandeur physique, mais
+
+13
+00:00:55,776 --> 00:01:00,880
+ces grandeurs vont être liées.
+On utilise les termes de
+
+14
+00:01:00,880 --> 00:01:06,240
+capteurs et d'actuateurs lorsque la
+grandeur physique
+
+15
+00:01:06,240 --> 00:01:11,238
+de sortie, pour le capteur, est une
+grandeur électrique,
+
+16
+00:01:11,238 --> 00:01:15,932
+et lorsque la grandeur physique d'entrée,
+pour un actuateur,
+
+17
+00:01:15,932 --> 00:01:17,950
+est une grandeur électrique.
+
+18
+00:01:17,950 --> 00:01:19,950
+Et on comprend bien que autour
+
+19
+00:01:19,950 --> 00:01:23,660
+des microcontrôleurs, on va brancher des
+capteurs.
+
+20
+00:01:23,660 --> 00:01:26,067
+Il sera possible, alors, de lire
+
+21
+00:01:26,067 --> 00:01:30,384
+une grandeur physique, on obtiendra son
+équivalent
+
+22
+00:01:30,384 --> 00:01:33,948
+électrique, et des actuateurs, à partir
+
+23
+00:01:33,948 --> 00:01:37,340
+d'une grandeur électrique fournie par le
+microcontrôleur.
+
+24
+00:01:37,340 --> 00:01:40,100
+On va pouvoir retourner à une grandeur
+physique.
+
+25
+00:01:40,100 --> 00:01:41,374
+Tout ça a l'air
+
+26
+00:01:41,374 --> 00:01:47,680
+un peu compliqué, mais un pou, un
+bouton-poussoir, c'est un capteur.
+
+27
+00:01:47,680 --> 00:01:52,180
+Un interrupteur de fin de course, comme on
+en a déjà vus, c'est un capteur.
+
+28
+00:01:52,180 --> 00:01:58,130
+Une LDR, cette resistance
+
+29
+00:01:58,130 --> 00:02:02,580
+qui varie selon l'intensité lumineuse,
+c'est aussi un capteur.
+
+30
+00:02:02,580 --> 00:02:07,220
+L'intensité lumineuse est la grandeur
+physique d'entrée,
+
+31
+00:02:07,220 --> 00:02:12,480
+la résistance électrique est la grandeur
+de sortie.
+
+32
+00:02:12,480 --> 00:02:18,330
+Pour les actuateurs, et bien, une simple
+diode lumineuse, c'est aussi un actuateur.
+
+33
+00:02:18,330 --> 00:02:21,210
+On a une tension électrique, ou un courant
+
+34
+00:02:21,210 --> 00:02:25,240
+électrique qui permet d'avoir une
+luminosité en sortie.
+
+35
+00:02:25,240 --> 00:02:32,284
+Un moteur, c'est aussi un actuateur.
+Nous allons nous intéresser
+
+36
+00:02:32,284 --> 00:02:36,390
+aujourd'hui, spécifiquement, à un capteur
+de distance
+
+37
+00:02:36,390 --> 00:02:39,586
+qui se présente de la manière suivante.
+
+38
+00:02:39,586 --> 00:02:45,070
+On y trouve une diode lumineuse et un
+photo-transistor.
+
+39
+00:02:45,070 --> 00:02:47,709
+On les reconnaît parce que la diode
+
+40
+00:02:47,709 --> 00:02:51,370
+lumineuse a un boîtier transparent, alors
+que le
+
+41
+00:02:51,370 --> 00:02:53,738
+transistor a un boîtier qui n'est pas
+
+42
+00:02:53,738 --> 00:02:57,040
+tout à fait transparent, qui est
+légèrement gris.
+
+43
+00:02:57,040 --> 00:02:57,742
+On voit
+
+44
+00:02:57,742 --> 00:03:03,007
+que ces deux composants sont mis
+parallèlement l'un
+
+45
+00:03:03,007 --> 00:03:08,012
+à l'autre, mais ils ne se voient pas, et
+on comprend
+
+46
+00:03:08,012 --> 00:03:13,048
+bien que la diode lumineuse va émettre une
+certaine
+
+47
+00:03:13,048 --> 00:03:18,590
+lumière et le capteur va recevoir une
+certaine lumière.
+
+48
+00:03:18,590 --> 00:03:22,940
+Ce schéma-là montre le brochage en
+regardant
+
+49
+00:03:22,940 --> 00:03:28,170
+le capteur depuis l'arrière, et on voit
+qu'il y a bien une diode lumineuse
+
+50
+00:03:28,170 --> 00:03:33,464
+anode, cathode, et un photo-transistor
+avec son
+
+51
+00:03:33,464 --> 00:03:39,090
+collecteur et son émetteur.
+Qu'est-ce qu'un photo-transistor?
+
+52
+00:03:39,090 --> 00:03:42,720
+C'est un transistor qui apparemment n'a
+pas de base.
+
+53
+00:03:42,720 --> 00:03:48,392
+Il a bien le collecteur et l'émetteur, et
+vous vous souvenez que on peut décrire
+
+54
+00:03:48,392 --> 00:03:54,420
+le fonctionnement d'un transistor en
+disant, la résistance entre le collecteur
+
+55
+00:03:54,420 --> 00:03:59,706
+et l'émetteur va diminuer s'il y a un
+courant dans la base.
+
+56
+00:03:59,706 --> 00:04:07,702
+Or, ici, il n'y a pas de courant dans la
+base, mais c'est la lumière incidente, les
+
+57
+00:04:07,702 --> 00:04:10,791
+photons qui vont exciter ce transistor et
+qui
+
+58
+00:04:10,791 --> 00:04:13,418
+joueront en quelque sorte le même rôle que
+le
+
+59
+00:04:13,418 --> 00:04:14,540
+courant de base.
+
+60
+00:04:14,540 --> 00:04:19,142
+Si la lumière est intense, la résistance
+va diminuer.
+
+61
+00:04:19,142 --> 00:04:23,760
+Le courant pourra facilement passer entre
+le collecteur et l'émetteur.
+
+62
+00:04:23,760 --> 00:04:26,364
+S'il n'y a pas de lumière, très peu
+
+63
+00:04:26,364 --> 00:04:30,840
+de courant pourra passer entre le
+collecteur et l'émetteur.
+
+64
+00:04:30,840 --> 00:04:36,690
+Une petite remarque concernant cette diode
+lumineuse qui se trouve, ici.
+
+65
+00:04:36,690 --> 00:04:38,514
+Elle émet de la lumière
+
+66
+00:04:38,514 --> 00:04:44,100
+mais nous ne pouvons pas la voir, il
+s'agit d'une LED infrarouge.
+
+67
+00:04:44,100 --> 00:04:49,980
+Ça correspond donc à des longueurs d'ondes
+plus grandes que la lumière visible.
+
+68
+00:04:49,980 --> 00:04:53,436
+Vous me direz que c'est un petit peu
+ennuyeux, parce que c'est
+
+69
+00:04:53,436 --> 00:04:56,720
+difficile de savoir si elle marche ou si
+elle ne marche pas.
+
+70
+00:04:56,720 --> 00:04:58,797
+Et bien, il existe une solution très
+
+71
+00:04:58,797 --> 00:05:01,670
+simple, c'est de prendre un appareil de
+photo.
+
+72
+00:05:01,670 --> 00:05:03,700
+Par exemple, celui qu'on trouve
+
+73
+00:05:03,700 --> 00:05:06,500
+dans un téléphone portable, et vous verrez
+que
+
+74
+00:05:06,500 --> 00:05:10,000
+cet appareil de photo voit parfaitement
+bien la
+
+75
+00:05:10,000 --> 00:05:14,234
+lumière qui provient de ce capteur
+infrarouge, on
+
+76
+00:05:14,234 --> 00:05:17,490
+la voit sous une forme légèrement
+violette, généralement.
+
+77
+00:05:17,490 --> 00:05:24,530
+Comment faire pour mettre en œuvre ce
+dispositif avec un microcontrôleur?
+
+78
+00:05:24,530 --> 00:05:26,753
+Pour la LED, c'est évidemment très simple.
+
+79
+00:05:26,753 --> 00:05:29,090
+C'est le schéma traditionnel : une
+résistance
+
+80
+00:05:29,090 --> 00:05:34,558
+de limitation, notre LED en série.
+On va calculer la valeur de la résistance,
+
+81
+00:05:34,558 --> 00:05:39,170
+de telle manière qu'un courant de l'ordre
+de dix milliampères puisse fonctionner.
+
+82
+00:05:39,170 --> 00:05:41,744
+L'intérêt de l'avoir reliée sur une patte
+du
+
+83
+00:05:41,744 --> 00:05:46,039
+microcontrôleur, c'est qu'on va pouvoir
+allumer cette diode lumineuse
+
+84
+00:05:46,039 --> 00:05:49,695
+lorsqu'on en a besoin et l'éteindre
+lorsqu'on ne l'utilise
+
+85
+00:05:49,695 --> 00:05:52,730
+plus, ce qui va réduire la consommation du
+système.
+
+86
+00:05:52,730 --> 00:05:54,905
+Pour le photo-transistor,
+
+87
+00:05:54,905 --> 00:05:57,830
+ça semble un petit peu plus compliqué.
+
+88
+00:05:57,830 --> 00:06:02,030
+Il ne s'agit pas d'une mesure tout ou
+rien, il
+
+89
+00:06:02,030 --> 00:06:04,482
+s'agit d'une mesure qui varie,
+
+90
+00:06:04,482 --> 00:06:07,790
+la résistance de notre photo-transistor
+varie.
+
+91
+00:06:07,790 --> 00:06:14,032
+On aurait pu mettre un diviseur de tension
+et chercher à utiliser
+
+92
+00:06:14,032 --> 00:06:19,805
+une entrée analogique d'un microcontrôleur
+capable de mesurer, donc, une valeur,
+
+93
+00:06:19,805 --> 00:06:22,560
+par exemple, entre zéro et trois volts.
+
+94
+00:06:22,560 --> 00:06:26,510
+Ici, on a utilisé une technique très
+différente.
+
+95
+00:06:26,510 --> 00:06:33,673
+On a curieusement mis un condensateur
+entre le collecteur et l'émetteur,
+
+96
+00:06:33,673 --> 00:06:39,374
+donc, entre la patte du microcontrôleur
+qui fera la mesure et la masse.
+
+97
+00:06:39,374 --> 00:06:45,204
+Pourquoi donc ce condensateur?
+Peut-être vous souvenez-vous
+
+98
+00:06:45,204 --> 00:06:48,726
+de cours d'électricité où on vous a parlé
+
+99
+00:06:48,726 --> 00:06:53,390
+de la décharge d'un condensateur à travers
+une résistance.
+
+100
+00:06:53,390 --> 00:06:56,590
+C'est l'occasion de vous poser la
+question.
+
+101
+00:06:56,590 --> 00:06:58,495
+Quelle est la forme de la courbe
+
+102
+00:06:58,495 --> 00:07:01,590
+de décharge du condensateur à travers la
+résistance?
+
+103
+00:07:01,590 --> 00:07:03,494
+Est-ce une droite, est-ce une
+
+104
+00:07:03,494 --> 00:07:06,800
+exponentielle décroissante, ou est-ce un
+escalier?
+
+105
+00:07:06,800 --> 00:07:12,010
+Alors,
+
+106
+00:07:12,010 --> 00:07:17,220
+la réponse, c'est que c'est bien une
+exponentielle décroissante.
+
+107
+00:07:17,220 --> 00:07:22,400
+Dans notre montage, le condensateur est
+fixe
+
+108
+00:07:22,400 --> 00:07:26,485
+mais la résistance varie, puisqu'il s'agit
+du photo-transistor.
+
+109
+00:07:26,485 --> 00:07:32,298
+On va donc avoir une décharge relativement
+rapide s'il y a beaucoup de lumière
+
+110
+00:07:32,298 --> 00:07:37,750
+sur le photo-transistor, une décharge plus
+lente si il y a peu de lumière.
+
+111
+00:07:37,750 --> 00:07:42,805
+Comment faire pour mesurer, en
+
+112
+00:07:42,805 --> 00:07:48,190
+quelque sorte, ce signal en décroissance
+exponentielle?
+
+113
+00:07:48,190 --> 00:07:51,190
+Et bien, une des manières, c'est
+simplement
+
+114
+00:07:51,190 --> 00:07:54,220
+de le lire avec l'entrée du
+microcontrôleur.
+
+115
+00:07:54,220 --> 00:07:57,484
+Un microcontrôleur, si la valeur est
+
+116
+00:07:57,484 --> 00:08:02,364
+supérieure à une tension de seuil, qui est
+généralement à peu près
+
+117
+00:08:02,364 --> 00:08:06,790
+la moitié de la tension d'alimentation, le
+système rend une valeur à un.
+
+118
+00:08:06,790 --> 00:08:12,968
+Si on est en-dessous de cette valeur,
+c'est une valeur zéro qu'on rend.
+
+119
+00:08:12,968 --> 00:08:17,014
+Donc, si j'applique le scénario suivant,
+je
+
+120
+00:08:17,014 --> 00:08:22,260
+charge la capacité, je la laisse se
+décharger.
+
+121
+00:08:22,260 --> 00:08:22,818
+Je vais
+
+122
+00:08:22,818 --> 00:08:29,106
+obtenir un signal sur l'entrée qui va
+passer à zéro à un instant donné,
+
+123
+00:08:29,106 --> 00:08:35,200
+et cet instant varie selon la résistance
+de notre photo-transistor,
+
+124
+00:08:35,200 --> 00:08:40,140
+par conséquent, selon la lumière incidente
+sur le photo-transistor.
+
+125
+00:08:40,140 --> 00:08:45,130
+C'est intéressant de signaler qu'on a fait
+une mesure doublement indirecte.
+
+126
+00:08:45,130 --> 00:08:48,034
+La distance qu'on souhaitait mesurer
+
+127
+00:08:48,034 --> 00:08:52,464
+a été transformée en intensité lumineuse;
+plus l'objet
+
+128
+00:08:52,464 --> 00:08:57,540
+est proche, plus il va renvoyer une
+luminosité importante.
+
+129
+00:08:57,540 --> 00:09:02,600
+On va ensuite, passer de l'intensité
+lumineuse à la résistance
+
+130
+00:09:02,600 --> 00:09:08,287
+électrique grâce au photo-transistor, et
+ensuite, on va passer
+
+131
+00:09:08,287 --> 00:09:14,162
+de la résistance électrique à un temps de
+décharge du condensateur
+
+132
+00:09:14,162 --> 00:09:19,210
+grâce à notre montage utilisant le
+condensateur et le photo-transistor.
+
+133
+00:09:19,210 --> 00:09:24,251
+Et il se trouve qu'on sait parfaitement
+bien mesurer un temps.
+
+134
+00:09:24,251 --> 00:09:27,580
+On l'a déjà vu, on pourra appliquer la
+méthode.
+
+135
+00:09:27,580 --> 00:09:32,770
+Essayons d'écrire cette procédure qui va
+faire cette mesure de distance.
+
+136
+00:09:32,770 --> 00:09:38,090
+J'ai commencé par définir les pattes que
+je vais utiliser.
+
+137
+00:09:38,090 --> 00:09:39,686
+J'ai utilisé
+
+138
+00:09:39,686 --> 00:09:43,660
+les pattes zéro et un du port P un, et
+
+139
+00:09:43,660 --> 00:09:48,700
+il est nécessaire de spécifier le out, le
+dir et le
+
+140
+00:09:48,700 --> 00:09:52,392
+in, puisque dans le cas de ce montage,
+nous alons bien
+
+141
+00:09:52,392 --> 00:09:58,520
+utiliser tantôt cette patte en sortie,
+tantôt cette patte en entrée.
+
+142
+00:09:58,520 --> 00:10:04,480
+Voilà la procédure elle-même, elle va nous
+rendre une distance.
+
+143
+00:10:04,480 --> 00:10:08,890
+Ici, return distance est une variable
+locale qui
+
+144
+00:10:08,890 --> 00:10:12,400
+a ce nom-là, qui est initialisée à zéro.
+
+145
+00:10:12,400 --> 00:10:16,998
+Il va falloir commencer par mettre la
+patte en
+
+146
+00:10:16,998 --> 00:10:21,940
+sortie, puis la mettre à un pour charger
+le condensateur.
+
+147
+00:10:21,940 --> 00:10:26,030
+On attend un petit moment pour être sûr
+qu'il est chargé.
+
+148
+00:10:26,030 --> 00:10:29,730
+Ensuite, cette même patte, on va la mettre
+
+149
+00:10:29,730 --> 00:10:36,780
+en entrée, en agissant sur le dir.
+De la même manière, on va agir
+
+150
+00:10:36,780 --> 00:10:42,050
+sur le dir de la LED, de telle manière que
+la LED infrarouge soit en sortie.
+
+151
+00:10:42,050 --> 00:10:46,690
+On va, ici, l'allumer, et on est prêt pour
+la boucle de mesure.
+
+152
+00:10:46,690 --> 00:10:50,831
+On a décidé d'obtenir une valeur sur huit
+bits,
+
+153
+00:10:50,831 --> 00:10:55,364
+on va donc faire 255 lectures pour que le
+maximum
+
+154
+00:10:55,364 --> 00:11:00,861
+soit bien 255 et non pas 256 qui
+n'existerait pas sur un nombre
+
+155
+00:11:00,861 --> 00:11:06,219
+de huit bits, donc, de zéro à 254.
+J'attends
+
+156
+00:11:06,219 --> 00:11:10,920
+un certain temps pour cadencer cette
+boucle,
+
+157
+00:11:10,920 --> 00:11:15,690
+et ensuite si on est encore dans la
+situation
+
+158
+00:11:15,690 --> 00:11:20,626
+où le bit du capteur est à un, on
+incrémente
+
+159
+00:11:20,626 --> 00:11:28,122
+distance, sinon on ne l'incrémente pas.
+On va donc, finalement, avoir à la fin
+
+160
+00:11:28,122 --> 00:11:33,302
+le résultat, dans cette variable distance.
+Et ça fonctionne.
+
+161
+00:11:33,302 --> 00:11:39,130
+Ici, j'ai réalisé un petit montage avec un
+plaque d'expérimentation.
+
+162
+00:11:39,130 --> 00:11:44,550
+Vous reconnaissez un processeur; on a
+utilisé, ici, le modèle à 14 pattes.
+
+163
+00:11:44,550 --> 00:11:45,684
+Dans notre cas,
+
+164
+00:11:45,684 --> 00:11:48,033
+les boutons ne sont pas utilisés.
+
+165
+00:11:48,033 --> 00:11:50,868
+Voilà nos deux capteurs de distance, et
+
+166
+00:11:50,868 --> 00:11:55,460
+je vous propose de regarder la vidéo
+suivante.
+
+167
+00:12:01,075 --> 00:12:06,690
+Est-ce que vous avez vu ce qui s'est passé
+sur cette vidéo?
+
+168
+00:12:06,690 --> 00:12:13,275
+Lorsque je tournais ma main au-dessus de
+mon montage, dans un sens, c'est la lampe
+
+169
+00:12:13,275 --> 00:12:16,135
+verte qui s'allumait, et lorsque je
+tournais dans
+
+170
+00:12:16,135 --> 00:12:19,350
+l'autre sens, c'est la lampe rouge qui
+s'allumait.
+
+171
+00:12:19,350 --> 00:12:21,905
+Je ne vais pas vous donner le programme
+qui
+
+172
+00:12:21,905 --> 00:12:26,068
+permet de réaliser cela, à vous d'essayer
+de réfléchir,
+
+173
+00:12:26,068 --> 00:12:32,760
+à vous de le réaliser si vous pouvez.
+Bon travail.

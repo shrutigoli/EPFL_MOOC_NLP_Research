@@ -1,0 +1,123 @@
+Let's continue coding our
+Connect Four game
+In the previous episodes, we covered the data structures that we recommend you use to represent this game; how to represent the players' colors; and 2 basic features which are the initialization of the grid and its display.
+Now, let's look at the actual play.
+What do we need?
+For that, we must be able to ask the user where he wants to play, as well as verify his play, validate both the answer and the data structures.
+That is, if the play is legal, make sure that the structures are valid and put the disk into the grid.
+Then, we must ask the other player to play, and come back, and alternate between the two players.
+And we must decide if the game has ended, either when one of the two players has won, or when the grid is full.
+In this episode we will focus on the second point, that is, ask a user for a column and check if it is valid and then update the game according to the play that was made.
+Now that we know what we want to do with the method that we will implement, let's give it a name. We will call the method "joue" (TN: means "play").
+Now, let's look at how to program it.
+Let's start with its header.
+To have an idea of what to put in the header, we should ask ourselves how the <i>joue</i> would be called in the program.
+For example, when we want to play in a certain column of the grid, for example number 3.
+Here, we are in the program, so the positions will correspond to the positions in Java, where numbering begins with zero, and column number 3 would be...here.
+Then, we have to specify the color of the player: is it a red player, or a yellow player?
+Here is a typical call that we could make, which would give the following situation: in column 3, the player inserts a disk we would have a red disk which would place itself here.
+After that, we would have calls where, typically, we would have a disk, for example yellow, that would be placed in column number 2, that is, the third column, and then the red player would play again in the same column number 3, so the fourth column, which would result in this situation.
+There, now it is quite clear to us how to write the header of our
+<i>joue</i> method.
+So <i>joue</i> will take as first parameter the grid, which is, as we said, a two-dimensional array of integers, then it will take a position which will indicate the column, so another integer here, and finally we decided to represent the player colors as integers, so the third argument here will be the color.
+That's it for the header of the <i>joue</i> method.
+Now, concerning its return value, we will start with the keyword <i>static</i>
+But what is its return type?
+To answer this, note that we did not write "z = joue (...)" we simply made calls to <i>joue</i> directly
+This means that <i>joue</i> returns nothing and its return type will thus be <i>void</i>.
+Now we have written its header, we can continue with the definition, with the body of the method.
+For that, let's start by asking ourselves what we really want to do if, for example, we have a valid play, where the player chooses column 3.
+Let's imagine the general case, where we already had disks in column 3 and the player plays in column 3 again.
+What should we do?
+The disk should stop at the first empty cell in that column.
+But, first from where? The first from the bottom.
+The algorithm will thus search from the bottom for the first empty spot.
+Lines are numbered from zero up until (size of the grid) - 1: remember that an array is indexed from zero to size-1.
+Let's start by declaring a variable which we will call, very creatively,
+"ligne" (TN: means "line"), which will start at size of grid minus 1, and increment it one by one until we find an empty spot.
+All we need to do now is write this.
+We start by writing a comment which explains what we want to do: we iterate over the column from the bottom, until we find an empty cell.
+For that, we will declare a counter variable, let's call it "ligne" (TN: means "row" or "line").
+We will initialize it to the last position of the row array that is, "grille.length - 1".
+So it starts here, then we will go up as long as we haven't found an empty cell, as long as the grid, at the position of the row and column we selected, is not empty.
+For this purpose, we had defined
+<i>VIDE</i>, a value defining an empty cell, which we can reuse here; as long as this column is not empty, we will go up one by one, which we write as " -- ligne ".
+There, at this stage we have found an empty cell, and we can fill it with the color we received.
+For that, as usual, we start by writing the comment, then, in Java, we simply write
+" grille[ligne][colonne] = couleur; ", where couleur is the color we received.
+This ends our first version of the <i>joue</i> method, and, as good programmers, we will now test it.
+To do that, we write a <i>main</i> method which will test its workings.
+In the <i>main</i> method, we will declare a grid, a grid of 6 by 7.
+As you saw in a previous episode, we will initialize the grid. We can start by diplaying it.
+Then, we directly test a play in the third column with the color red, then we display the grid, which should give us an output reflecting the fact that we have a red disk here, since, remember, the index we receive here corresponds to Java numbering, which begins with zero
+So, the output will be like this, then we continue by placing a yellow disk in column number 2, that is, the third column
+Then we continue to test by playing another red disk and displaying the grid, by playing a red disk in the fourth column, column number 3, which will result in an output that will look like the grid here.
+Now, what happens if we continue to play like this in column 3, if we add disks, for example red disks, each time in column 3, what will our <i>joue</i> method do in this case?
+What happens when we play in a column that is already full?
+What will happen is that we initialize our <i>ligne</i> variable as usual to the last row of our array, then, while the row, at the corresponding column, is not empty, i.e here, while the row is not equal to zero, this condition will be true, and we will continue doing "-- ligne", and we will continue going up to position zero.
+When <i>ligne</i> equals zero, what happens?
+At that moment, this condition will still be true, position zero is not empty, and we will do "-- ligne" again.
+This will make us go out of the bounds of our array, outside of our game, which is at least a conception error, since we have a loop which takes us out of our array.
+So, we will have to correct this, and stop this <i>while</i> loop, as soon as we reach the end of the array, that is, as soon as we reach index 0.
+Now we just need to write it.
+To do so, we will declare a boolean which will test whether we have completely filled a column.
+We will call it "pleine" (TN: means "full").
+In the beginning, the column is not supposed to be full, so we will declare this variable as <i>false</i>.
+Then, in the loop which travels upwards to find an empty position, we will change the value of the
+<i>pleine</i> boolean and switch it to true, as soon as we reach position 0.
+This is because if we reach position zero in this loop, it means that position zero was not empty, so position zero is not empty only if the rest of the column is also full
+So, let's continue writing this.
+If the line reaches position zero, then we can say that the column is full, so "pleine = true".
+In this case, we must stop decrementing, we must not subtract 1 from the row, so we protect our "-- ligne" instruction when the row is zero
+So we add an <i>else</i> which protects this decrementation, this "-- ligne" from the condition, from the fact that the row is empty.
+And now we'll correct our loop, by saying that we continue the loop as before, that is, we continue to look for an empty cell, but only while the column is not full.
+This symbol, remember, means <i>not</i>, so while the column is not full, and we haven't found an empty cell, we continue as long as the
+2 conditions are true.
+If it is not full and we haven't found an empty cell, we go up.
+If one of the two conditions, either if it is full, or we have found an empty cell, are true, then the loop will stop.
+We can end by adding a pair of parentheses here to make our code more legible.
+Finally, since we didn't do that in the beginning, as we should have done, we will comment what we have just coded.
+The idea is to iterate over the column from the bottom until we find an empty cell, or until we reach the top.
+Finally, we must not forget to correct the end which is not valid anymore, since we cannot guarantee that it is possible to play every time, since the disk will not be placed if the column is full
+So we protect this with the condition: if the column is not full, so,
+"if (!pleine)". now, we can play, and we can also give an indication: we can add an instruction to our 
+<i>joue</i> method so that it can indicate its status to the outside, for example by returning
+<i>true</i> to say "I was able to play, the <i>joue</i> method was able to do what we want".
+And conversely, it can return 
+<i>false</i>, to say:
+"no, the column was full, the play was not valid,
+I was not able to place this disk at the right position".
+Finally, as usual, we comment our code to explain, either to us, later, when we go over the code again or to anyone else who would read it, what our code does.
+Here, if we haven't reached the top,
+"if (!pleine)", if we haven't reached the top of the column, if it isn't full, then, we can play.
+Let's not forget, finally, to correct our return type since we have now decide to return a boolean to indicate whether the play was valid or not
+So we change the return type from
+<i>void</i> to boolean
+There, now we are pretty sure that we have corrected our first version of the <i>joue</i> method to have a robust version which accounts for the case where the column is full, and now we must test this method and for that, we will write a new <i>main</i> method, where we will specifically test the case where we always play in the same column.
+As usual, we declare the grid, we initialize it, we display it, and then here, we will write a loop which will play
+10 times in the same column, in the fourth column here, i.e column number 3.
+We write a loop that repeats 10 times, playing in column 3.
+Note that now, since the <i>joue</i> function returns a boolean indicating whether the play was valide, we now call <i>joue</i> on the right-hand side of an expression.
+So we fetch the return value by writing "valide = joue(...)", and to see what is going on and to test our program, in case the play was not valid, we will display a message telling us that it was not possible to play.
+In either case, we display the grid to see what is happening.
+What will this give us?
+I copied the <i>main</i> here in the bottom, and all of our <i>joue</i> method.
+Let's run the <i>main</i>. We start at
+"i = 0" -- we don't use the <i>i</i>, it just serves to say that we are executing the loop 10 times.
+So here we start at "i = 0", and we always play in column 3 with red disks.
+This will start by placing a disk here, then another, and so on.
+All of these cases aren't especially interesting, but what will happen when we play the seventh disk?
+Once <i>i</i> has a value of 6, here, we want to play a seventh time in the same column, which is already full, and so when <i>i</i> has a value of 6, we will end up here again, with a value of 3 for the column and the color red, and here, we will initialize the row to the size of the grid minus 1.
+We will initialize the boolean to <i>false</i>, so of course, <i>pleine</i> is <i>true</i>, meaning that the grid, at the position [ligne][colonne], is not empty, the row is not equal to zero, so here we jump into the <i>else</i> and we decrement <i>ligne</i>, which will thus end up here (second row).
+Here, both conditions are verified, so <i>pleine</i> is still <i>true</i>, and we still have a grid here which is not empty, and so we will go up until we reach the position <i>ligne==0</i>.
+So when <i>ligne == 0</i>, what will happen?
+We always arrive here with a true condition, and the grid at [0][column] is not empty, we go in here, but this time the <i>if</i> is true, the row is zero, and at that moment we change the value of <i>pleine</i> to <i>true</i>.
+We are here, we are at the end of the <i>if</i> bloc, we come back into our loop, but this time, the condition,
+"!pleine", is false and so the 
+<i>while</i> loop ends, and we exit the loop.
+Then we continue, here, we reach this <i>if</i>, again, our <i>pleine</i> is not true, so this condition here is false.
+We jump into the <i>else</i> and we return <i>false</i>.
+Which means that when we arrive here, when we have a value of 6,
+<i>valide</i> will be <i>false</i> and so, we will display the error message and this message will be displayed for <i>i</i> equals 6, 7, 8 and 9, so the error message indicating it is impossible to play will be displayed 4 times.
+That was the test which confirms that we cannot add disks to a column that was already full, which is exactly what we wanted.
+There, I propose to end this episode here, and to discuss alternative ways of implementing the <i>joue</i> method in the next episodes.

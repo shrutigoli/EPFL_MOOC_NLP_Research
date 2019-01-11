@@ -1,0 +1,1589 @@
+1
+00:00:00,000 --> 00:00:05,434
+Bonjour.
+Pour cette dernière
+
+2
+00:00:05,434 --> 00:00:11,810
+leçon, on va analyser une application
+robotique simple.
+
+3
+00:00:11,810 --> 00:00:18,490
+Raphaël a programmé son robot, Zébulon,
+pour passer entre deux briques.
+
+4
+00:00:18,490 --> 00:00:25,270
+Sur le rebord, un capteur ultrasonique
+permet de mesurer la distance.
+
+5
+00:00:25,270 --> 00:00:30,700
+Donc, l'algorithme, naturellement, est de
+balayer l'espace pour
+
+6
+00:00:30,700 --> 00:00:35,980
+mesurer les distances, et puis ensuite, de
+partir dans la bonne direction.
+
+7
+00:00:35,980 --> 00:00:41,534
+Comme le robot ne va pas parfaitement
+droit, la solution prudente
+
+8
+00:00:41,534 --> 00:00:47,050
+est de recalibrer, après avoir parcouru
+une certaine distance.
+
+9
+00:00:47,050 --> 00:00:50,750
+Alors Raphaël est très déçu,
+
+10
+00:00:50,750 --> 00:00:54,746
+ça marchait bien chez lui, mais là,
+
+11
+00:00:54,746 --> 00:00:57,920
+catastrophe, il n'a pas pris la bonne
+direction.
+
+12
+00:00:57,920 --> 00:01:00,440
+On va comprendre un peu pourquoi.
+
+13
+00:01:04,945 --> 00:01:10,451
+On va donc un petit peu étudier ce capteur
+ultrasonique, voir comment
+
+14
+00:01:10,451 --> 00:01:15,560
+ce programme simple a été écrit, pourquoi
+on l'a pas suffisamment testé
+
+15
+00:01:15,560 --> 00:01:19,196
+et ce qu'il a fallu faire pour le
+dépanner, et réfléchir un
+
+16
+00:01:19,196 --> 00:01:21,180
+petit peu ensuite pour des programmes
+
+17
+00:01:21,180 --> 00:01:24,900
+plus complexes, par interruption,
+utilisant d'autres capteurs.
+
+18
+00:01:24,900 --> 00:01:29,960
+Le capteur ultrasonique est bien connu, on
+l'a déjà présenté
+
+19
+00:01:29,960 --> 00:01:35,300
+dans une leçon précédente.
+Il est très simple à utiliser, puisqu'il
+
+20
+00:01:35,300 --> 00:01:40,200
+suffit d'envoyer une impulsion de
+démarrage,
+
+21
+00:01:40,200 --> 00:01:45,250
+et ensuite, mesurer la durée de l'écho.
+
+22
+00:01:45,250 --> 00:01:50,398
+À l'oscilloscope, et bien on voit qu'on a
+des signaux tout à fait parfaits et
+
+23
+00:01:50,398 --> 00:01:55,990
+utilisables.
+Et le programme est aussi simple à écrire.
+
+24
+00:01:55,990 --> 00:02:01,593
+Il faut naturellement définir les unités,
+donner les bonnes directions.
+
+25
+00:02:01,593 --> 00:02:04,491
+Et au niveau de la boucle de mesure, que
+l'on va,
+
+26
+00:02:04,491 --> 00:02:10,120
+naturellement, commencer par tester, dans
+le programme le plus simple possible, on
+
+27
+00:02:10,120 --> 00:02:15,920
+active la sortie Trig, on fait un petit
+delay, de plus 10 microsecondes,
+
+28
+00:02:15,920 --> 00:02:21,204
+on désactive, et puis on a une facilité
+Arduino, qui attend
+
+29
+00:02:21,204 --> 00:02:24,809
+l'impulsion et mesure sa durée.
+
+30
+00:02:24,809 --> 00:02:30,024
+Donc, il suffit ensuite d'imprimer la
+valeur
+
+31
+00:02:30,024 --> 00:02:35,316
+que l'on a mesurée, et puis recommencer
+toutes les secondes,
+
+32
+00:02:35,316 --> 00:02:40,404
+par exemple, pour ne pas remplir trop vite
+l'écran pendant qu'on bouge le capteur.
+
+33
+00:02:40,404 --> 00:02:43,060
+Alors, il y deux problèmes avec cette
+routine.
+
+34
+00:02:43,060 --> 00:02:46,510
+C'est qu'ici, elle attend
+
+35
+00:02:46,510 --> 00:02:49,771
+l'Echo, donc, c'est une instruction qui
+
+36
+00:02:49,771 --> 00:02:52,524
+est bloquante, pendant toute la lecture,
+le
+
+37
+00:02:52,524 --> 00:02:56,113
+processeur ne fera rien d'autre, et, les
+
+38
+00:02:56,113 --> 00:02:59,636
+deux autres problèmes qui peuvent être
+embêtants
+
+39
+00:02:59,636 --> 00:03:05,549
+assez souvent, c'est si le capteur ne
+donne pas de signal, et bien
+
+40
+00:03:05,549 --> 00:03:11,582
+la routine va rester bloquée en attente,
+et si le capteur donne un signal
+
+41
+00:03:11,582 --> 00:03:17,040
+trop long, parce que, par exemple, il n'y
+a pas eu de retour de l'information
+
+42
+00:03:17,040 --> 00:03:23,562
+sonore, et bien le programme va aussi
+attendre, cette fois, sur l'état en un.
+
+43
+00:03:23,562 --> 00:03:28,983
+Donc, la durée de l'Echo que l'on espère
+avoir pour un mètre
+
+44
+00:03:28,983 --> 00:03:34,600
+cinquante, c'est typiquement 10ms, vous
+n'avez qu'à calculer la vitesse du son.
+
+45
+00:03:34,600 --> 00:03:36,760
+Avec le capteur qui
+
+46
+00:03:36,760 --> 00:03:42,184
+a quatre pin, on peut avoir jusqu'à 200ms
+pendant lesquelles
+
+47
+00:03:42,184 --> 00:03:46,858
+le circuit, voyant qu'il n'y a pas d'Echo,
+attend encore.
+
+48
+00:03:46,858 --> 00:03:52,069
+Alors que le SR05 avec cinq pattes, lui
+attend maximum 20 ms et
+
+49
+00:03:52,069 --> 00:03:57,462
+vous pouvez recommencer, toutes les 40 ms,
+à faire une lecture.
+
+50
+00:03:57,462 --> 00:04:02,050
+Alors, 200 ms, évidemment, ça peut être
+assez gênant pusique votre
+
+51
+00:04:02,050 --> 00:04:05,365
+bord, s'il se déplace pendant ce temps,
+tout va
+
+52
+00:04:05,365 --> 00:04:10,150
+être bloqué pour prendre des décisions
+concernant ce capteur.
+
+53
+00:04:10,150 --> 00:04:15,190
+Alors, les problèmes qu'on a avec ces
+capteurs sonores, et j'étais pas conscient
+
+54
+00:04:15,190 --> 00:04:22,630
+qu'il y en avait autant que ça, vous avez
+des possibilités de réflexion du sol.
+
+55
+00:04:22,630 --> 00:04:28,160
+Si c'est du tapis, et bien, vous allez
+avoir une réflexion non-négligeable,
+
+56
+00:04:28,160 --> 00:04:33,385
+qui risque de fausser les distances.
+Vous posez le moindre petit
+
+57
+00:04:33,385 --> 00:04:38,352
+objet sur la scène, un crayon, et bien,
+tout de suite il va faire des
+
+58
+00:04:38,352 --> 00:04:43,685
+réflexions.
+Un problème qui est facile à comprendre,
+
+59
+00:04:43,685 --> 00:04:48,415
+c'est que si la surface, dont on doit
+mesurer la
+
+60
+00:04:48,415 --> 00:04:53,245
+distance, est inclinée par rapport à un
+trajet sonore
+
+61
+00:04:53,245 --> 00:04:58,634
+émis, et bien, vous allez avoir une
+réflexion, réflexion au sens d'un
+
+62
+00:04:58,634 --> 00:05:03,069
+miroir, et aucune onde sonore ne va
+revenir vers le capteur, donc
+
+63
+00:05:03,069 --> 00:05:06,645
+si l'objet est proche, et bien il sera vu
+comme étant à
+
+64
+00:05:06,645 --> 00:05:12,615
+l'infini, et vous aurez cette attente, qui
+peut être abusive dans certains cas.
+
+65
+00:05:12,615 --> 00:05:18,730
+Donc, une matière lisse réfléchit, une
+matière poreuse absorbe complètement.
+
+66
+00:05:18,730 --> 00:05:23,005
+Donc, si vous mettez de la mousse très
+proche du robot,
+
+67
+00:05:23,005 --> 00:05:28,255
+et bien vous aurez de nouveau l'impression
+que l'obstacle est à l'infini.
+
+68
+00:05:28,255 --> 00:05:30,660
+Une autre expérience, c'est que du carton
+
+69
+00:05:30,660 --> 00:05:33,790
+ondulé est relativement favorable, même si
+sa longueur
+
+70
+00:05:33,790 --> 00:05:35,870
+d'onde semble un petit peu courte par
+
+71
+00:05:35,870 --> 00:05:38,880
+rapport à la longueur d'onde des ondes
+lumineuses.
+
+72
+00:05:38,880 --> 00:05:43,976
+Alors, le problème, c'est qu'il y un cône
+d'émission, qui est
+
+73
+00:05:43,976 --> 00:05:49,360
+documenté comme étant 15 degrés.
+Notre expérience est que ce cône est en
+
+74
+00:05:49,360 --> 00:05:54,730
+fait beaucoup plus large, et évidemment,
+vous devinez que dès que
+
+75
+00:05:54,730 --> 00:06:00,013
+ce cône touche le bord de l'obstacle, et
+bien,
+
+76
+00:06:00,013 --> 00:06:05,254
+il va y avoir réflexion, et puis vous
+n'aurez plus du tout la distance infinie.
+
+77
+00:06:05,254 --> 00:06:09,478
+Alors, ça c'est naturellement quelque
+chose qu'il faut expérimenter,
+
+78
+00:06:09,478 --> 00:06:12,520
+qu'on aurait dû expérimenter tout de
+suite, je n'aurais
+
+79
+00:06:12,520 --> 00:06:15,780
+peut-être pas proposé ce projet si j'avais
+fait cette expérience.
+
+80
+00:06:15,780 --> 00:06:19,812
+Et, le résultat, c'est que l'angle est
+plus proche et
+
+81
+00:06:19,812 --> 00:06:24,420
+60 degrés si on est relativement proche du
+sol, et apparemment,
+
+82
+00:06:24,420 --> 00:06:27,412
+ça diminue un petit peu, si on surélève le
+capteur,
+
+83
+00:06:27,412 --> 00:06:30,850
+mais ça ne semble quand même pas être la
+solution miracle.
+
+84
+00:06:30,850 --> 00:06:34,650
+Donc, la conclusion, et c'est vrai pour
+tous
+
+85
+00:06:34,650 --> 00:06:40,334
+les projets robotiques, analysez
+soigneusement les capteurs avant de
+
+86
+00:06:40,334 --> 00:06:46,635
+programmer l'application.
+C'est ce qu'on n'a pas fait.
+
+87
+00:06:46,635 --> 00:06:52,400
+Donc, Raphaël a suivi les indications que
+je lui avais donné.
+
+88
+00:06:52,400 --> 00:06:55,260
+On va définir un certain nombre
+
+89
+00:06:55,260 --> 00:06:59,864
+de positions angulaires pour faire des
+mesures.
+
+90
+00:06:59,864 --> 00:07:05,694
+On peut les représenter sous forme d'un
+diagramme horizontal.
+
+91
+00:07:05,694 --> 00:07:09,646
+En face, et bien, on espère avoir une
+distance très grande.
+
+92
+00:07:09,646 --> 00:07:14,856
+Dès qu'on touche l'obstacle, et bien il va
+y avoir une distance qui diminue, et puis
+
+93
+00:07:14,856 --> 00:07:20,285
+qui, tout à coup, peut brusquement
+augmenter à cause de la réflexion.
+
+94
+00:07:20,285 --> 00:07:25,296
+Donc ça, on l'observe facilement, et
+graphiquement, et bien,
+
+95
+00:07:25,296 --> 00:07:31,170
+vous voyez qu'ici, la distance est grande,
+et puis elle a diminué, ce qui
+
+96
+00:07:31,170 --> 00:07:37,090
+nous intéresse c'est de reconnaître cette
+zone de mesure, dont on va reparler.
+
+97
+00:07:37,090 --> 00:07:42,640
+Alors, faire bouger le robot, et bien on
+va faire des impulsions.
+
+98
+00:07:42,640 --> 00:07:46,252
+L'idée, c'est de faire des impulsions de
+10 ms
+
+99
+00:07:46,252 --> 00:07:50,546
+et puis de l'arrêter 10 ms, et de faire la
+
+100
+00:07:50,546 --> 00:07:59,670
+mesure de distance après cette distance,
+pour être sûr que le robot soit stable.
+
+101
+00:07:59,670 --> 00:08:02,720
+C'est peut-être pas essentiel, de nouveau,
+c'est des
+
+102
+00:08:02,720 --> 00:08:06,880
+choses qui méritent d'être analysées, le
+plus précisément possible,
+
+103
+00:08:06,880 --> 00:08:09,299
+et si vous avez un oscilloscope,
+évidement, ça
+
+104
+00:08:09,299 --> 00:08:13,000
+vous vous permet d'avoir une meilleure
+compréhension des phénomènes.
+
+105
+00:08:13,000 --> 00:08:15,368
+Alors, on doit tourner.
+Donc, là,
+
+106
+00:08:15,368 --> 00:08:19,172
+j'ai utilisé des définitions qui modifient
+
+107
+00:08:19,172 --> 00:08:24,605
+les quatre bytes des deux moteurs
+simultanément.
+
+108
+00:08:24,605 --> 00:08:28,570
+C'est beaucoup plus compact que d'aligner
+des digitalWrite.
+
+109
+00:08:28,570 --> 00:08:34,563
+On définit la durée du pas, et puis, on
+définit les
+
+110
+00:08:34,563 --> 00:08:40,370
+fonctions Step à droite, Step à gauche,
+Avance, pas nécessairement de retard
+
+111
+00:08:40,370 --> 00:08:43,178
+après avoir fait le Stop pour Step Avance,
+
+112
+00:08:43,178 --> 00:08:46,010
+si on veut aller plus vite en ligne
+droite.
+
+113
+00:08:46,010 --> 00:08:49,770
+Donc là, il n'y a pas de problème
+maintenant pour faire
+
+114
+00:08:49,770 --> 00:08:54,384
+mon Step de 10 ms et il nous faut faire
+des mesures.
+
+115
+00:08:54,384 --> 00:08:59,870
+Alors, la proposition pour faire les
+mesures, c'est de dire, on va
+
+116
+00:08:59,870 --> 00:09:05,350
+déplacer le robot qui est, plus ou moins,
+en direction de l'obstacle,
+
+117
+00:09:05,350 --> 00:09:09,318
+en lui faisant faire 5 pas à gauche.
+
+118
+00:09:09,318 --> 00:09:15,384
+Ensuite, on va faire 10 pas à droite, en
+faisant les
+
+119
+00:09:15,384 --> 00:09:20,138
+mesures, et, attention, il y a le fameux
+problème des poteaux et des intervalles,
+
+120
+00:09:20,138 --> 00:09:25,296
+il faudra décider si on fait d'abord la
+mesure et ensuite le pas, ou, et
+
+121
+00:09:25,296 --> 00:09:30,548
+dans ces cas-là il faut rajouter la
+dernière mesure, ou bien
+
+122
+00:09:30,548 --> 00:09:34,745
+le pas et la mesure ensuite, et dans ce
+cas-là il fallait,
+
+123
+00:09:34,745 --> 00:09:39,206
+on aurait oublié la première mesure, si on
+n'y a pas pensé.
+
+124
+00:09:39,206 --> 00:09:43,360
+Une fois qu'on a fini les mesures, on va
+remettre le
+
+125
+00:09:43,360 --> 00:09:48,920
+robot en position centrale, pour analyser
+les données qu'on a accumulées.
+
+126
+00:09:48,920 --> 00:09:55,808
+Raphaël, il a préféré, tout de suite,
+revenir du bon pas pour se mettre dans la
+
+127
+00:09:55,808 --> 00:09:58,640
+direction souhaitée.
+
+128
+00:09:58,640 --> 00:10:01,790
+Euh, si on fait comme je l'ai dit, de
+rassembler
+
+129
+00:10:01,790 --> 00:10:04,800
+toutes ces données dans une table, on a
+une plus
+
+130
+00:10:04,800 --> 00:10:10,614
+grande flexibilité de pouvoir ensuite
+tranquillement analyser la table, montrer
+
+131
+00:10:10,614 --> 00:10:17,490
+son contenu, dépanner, afficher euh, sur
+le, sur le terminal naturellement.
+
+132
+00:10:17,490 --> 00:10:20,980
+Donc on définit une table de 11.
+La première
+
+133
+00:10:20,980 --> 00:10:26,559
+boucle for positionne à gauche, on fait
+ces, les cinq pas à gauche.
+
+134
+00:10:26,559 --> 00:10:30,090
+Ensuite on fait la mesure en remplissant
+la table.
+
+135
+00:10:30,090 --> 00:10:34,110
+Et puis on se repositionne, on rajoute la
+dernière valeur ici.
+
+136
+00:10:34,110 --> 00:10:36,542
+Et puis on se repositionne au centre.
+
+137
+00:10:36,542 --> 00:10:41,540
+Donc voilà la programmation est, est tout
+à fait naturelle.
+
+138
+00:10:41,540 --> 00:10:46,284
+Et le programme qui en découle et bien, il
+ne pose pas trop de problèmes
+
+139
+00:10:46,284 --> 00:10:50,550
+puisqu'on n'a pas d'interruptions, que les
+choses peuvent se faire
+
+140
+00:10:50,550 --> 00:10:56,060
+l'une après l'autre en ayant tout le temps
+nécessaire à disposition.
+
+141
+00:10:56,060 --> 00:11:00,572
+On fait la mesure en balayant, comme on
+vient de le voir.
+
+142
+00:11:00,572 --> 00:11:06,969
+On calcule l'angle et là, le raisonnement
+qu'il faut faire c'est là que, il
+
+143
+00:11:06,969 --> 00:11:08,964
+peut y avoir plusieurs algorithmes et des
+
+144
+00:11:08,964 --> 00:11:11,480
+algorithmes qui sont plus fiables que
+d'autres.
+
+145
+00:11:11,480 --> 00:11:15,470
+Euh, on doit travailler ici sur une
+différence,
+
+146
+00:11:15,470 --> 00:11:18,890
+sur la dérivée, dans le fond, du signal.
+
+147
+00:11:18,890 --> 00:11:23,379
+Alors cette différence elle augmente
+brusquement quand on passe de la distance
+
+148
+00:11:23,379 --> 00:11:28,764
+ici, relativement courte, 50 cm, 1 mètre,
+à une distance maximale de
+
+149
+00:11:28,764 --> 00:11:33,950
+3 mètres qui risque d'être affichée par
+une valeur limitée par le capteur.
+
+150
+00:11:33,950 --> 00:11:36,838
+Donc on peut avoir une très grande
+différence
+
+151
+00:11:36,838 --> 00:11:38,220
+de, de variations.
+
+152
+00:11:38,220 --> 00:11:42,730
+On attend un son positif ici d'une
+amplitude suffisante.
+
+153
+00:11:42,730 --> 00:11:47,550
+On attend ensuite un son négatif d'une
+amplitude suffisante.
+
+154
+00:11:47,550 --> 00:11:52,160
+Il ne faut pas être troublé par le fait
+qu'on a eu des
+
+155
+00:11:52,160 --> 00:11:57,692
+passages en réflexion au début et
+éventuellement à la fin.
+
+156
+00:11:57,692 --> 00:12:02,070
+Donc c'est là qu'il faut bien tester
+l'algorithme pour être
+
+157
+00:12:02,070 --> 00:12:07,288
+sûr qu'on repère les flancs correctement.
+Si vous multipliez le nombre
+
+158
+00:12:07,288 --> 00:12:12,360
+de pas, Raphaël en a utilisé 20, là j'en
+ai dessiné 10,
+
+159
+00:12:12,360 --> 00:12:17,451
+vous diminuez l'amplitude des pas et il
+faudrait être sûr
+
+160
+00:12:17,451 --> 00:12:22,456
+que le bruit inévitable que vous avez ne
+devient pas
+
+161
+00:12:22,456 --> 00:12:27,490
+du même ordre de grandeur que les pas.
+Et évidemment, quand le robot
+
+162
+00:12:27,490 --> 00:12:30,971
+se rapproche, et bien, tous ces paramètres
+changent,
+
+163
+00:12:30,971 --> 00:12:33,349
+donc c'est là que c'est nécessaire de
+faire une
+
+164
+00:12:33,349 --> 00:12:36,842
+étude très systématique, en déplaçant le
+robot à
+
+165
+00:12:36,842 --> 00:12:40,482
+la main, en observant sur le terminal les
+valeurs.
+
+166
+00:12:40,482 --> 00:12:45,820
+Une fois que vous avez confiance que vous
+avez ici échantillonné ces deux
+
+167
+00:12:45,820 --> 00:12:52,646
+paramètres, les numéraux, dans le fond,
+angulaires, vous faites la moyenne pour
+
+168
+00:12:52,646 --> 00:12:58,000
+savoir quelle direction euh, vous avez,
+dans le fond, la position
+
+169
+00:12:58,000 --> 00:13:02,459
+idéale par rapport à ces deux mesures mais
+ces deux mesures
+
+170
+00:13:02,459 --> 00:13:06,620
+sont décallées par rapport à la courbe en
+fait hein puisqu'il
+
+171
+00:13:06,620 --> 00:13:10,300
+y a un échantillonnage qui se fait avec un
+certain retard.
+
+172
+00:13:10,300 --> 00:13:14,584
+Donc dans le cas particulier de ce dessin,
+ben vous voyez qu'on partirait euh,
+
+173
+00:13:14,584 --> 00:13:18,260
+pile contre le mur, ce qui n'est pas tout
+à fait ce qu'on souhaite.
+
+174
+00:13:18,260 --> 00:13:22,160
+Donc là évidemment on pourrait réfléchir à
+des corrections ou
+
+175
+00:13:22,160 --> 00:13:25,463
+simplement ce qu'on a fait, ben c'est de,
+plus on se
+
+176
+00:13:25,463 --> 00:13:29,810
+rapproche de, de l'obstacle, et bien, plus
+l'erreur, dans le fond,
+
+177
+00:13:29,810 --> 00:13:34,300
+sera euh, sera diminuée par rapport à la
+largeur de l'obstacle.
+
+178
+00:13:34,300 --> 00:13:39,320
+Donc voilà, alors la programmation euh,
+peut se
+
+179
+00:13:39,320 --> 00:13:43,870
+faire, dans le fond, sans contraintes mais
+maintenant,
+
+180
+00:13:43,870 --> 00:13:47,988
+si vous voulez rajouter des moustaches et
+puis au moment où vous avez, par exemple,
+
+181
+00:13:47,988 --> 00:13:53,010
+un choc contre l'obstacle euh, réagir
+correctement, ce qui serait, par exemple,
+
+182
+00:13:53,010 --> 00:13:58,338
+de reculer un bout et de recalibrer la
+position du trou, et bien
+
+183
+00:13:58,338 --> 00:14:04,040
+cette détection de moustaches, doit être
+intégrée dans
+
+184
+00:14:04,040 --> 00:14:09,230
+la procédure avancer, ce qui n'est
+peut-être pas très difficile
+
+185
+00:14:09,230 --> 00:14:15,050
+parce que, de nouveau, on peut laisser
+l'avance sous contrôle, dans
+
+186
+00:14:15,050 --> 00:14:18,673
+le fond, d'un PWM et d'un retard mais on
+ne va
+
+187
+00:14:18,673 --> 00:14:22,866
+en tout cas pas faire un délai simple, il
+faudra faire
+
+188
+00:14:22,866 --> 00:14:27,460
+un, des petits délais et, dans chaque
+délai, tester les moustaches.
+
+189
+00:14:27,460 --> 00:14:31,223
+Alors, plus on complique évidemment la
+fontionnalité, plus
+
+190
+00:14:31,223 --> 00:14:34,958
+ça devient indispensable, dans le fond, de
+travailler
+
+191
+00:14:34,958 --> 00:14:39,564
+par interruptions.
+Alors est-ce qu'on peut mesurer la
+
+192
+00:14:39,564 --> 00:14:45,490
+distance par interruptions?
+Euh, oui, on va voir rapidement comment.
+
+193
+00:14:45,490 --> 00:14:50,692
+Est-ce que faire les pas pour le balayage
+peut se faire par interruptions?
+
+194
+00:14:50,692 --> 00:14:53,950
+On peut tout faire par interruptions mais
+est-ce que ça vaut la peine?
+
+195
+00:14:53,950 --> 00:14:56,719
+L'avance, ben là on sait bien qu'avec le
+PWM
+
+196
+00:14:56,719 --> 00:14:59,204
+ou le PFM, c'est facile à gérer par euh,
+
+197
+00:14:59,204 --> 00:15:00,470
+l'interruption.
+
+198
+00:15:00,470 --> 00:15:04,110
+Et puis maintenant les décisions, les
+algorithmes de correction
+
+199
+00:15:04,110 --> 00:15:07,937
+d'angle, ça naturellement qu'on les laisse
+en général au
+
+200
+00:15:07,937 --> 00:15:12,105
+programme principal qui appelle les
+fonctions adéquates et on
+
+201
+00:15:12,105 --> 00:15:16,450
+corrige les fonctions jusqu'à ce que le
+comportement soit bon.
+
+202
+00:15:16,450 --> 00:15:20,167
+Alors une approche quand on veut
+travailler par interruptions c'est
+
+203
+00:15:20,167 --> 00:15:25,020
+de dire : ben, pour chaque opération, on
+va susciter
+
+204
+00:15:25,020 --> 00:15:33,035
+une interruption spécifique.
+Et, c'est souvent documenté comme ça,
+
+205
+00:15:33,035 --> 00:15:37,860
+avec des librairies qui, mystérieusement,
+vous gèrent ça par interruptions.
+
+206
+00:15:37,860 --> 00:15:40,238
+Et puis si vous voulez garder le contrôle,
+ben,
+
+207
+00:15:40,238 --> 00:15:43,022
+une approche que j'ai souvent utilisée,
+c'est de dire
+
+208
+00:15:43,022 --> 00:15:46,006
+: toutes les 100 microsecondes, on va
+faire une
+
+209
+00:15:46,006 --> 00:15:50,248
+interruption et puis toutes les 100
+microsecondes, je vais passer
+
+210
+00:15:50,248 --> 00:15:55,230
+par une machine d'état qui va me, me
+construire la distance.
+
+211
+00:15:55,230 --> 00:15:59,010
+Et puis ensuite, on va refaire un petit
+diviseur pour
+
+212
+00:15:59,010 --> 00:16:03,250
+dire : mais toutes les 20 millisecondes,
+j'aimerais faire autre
+
+213
+00:16:03,250 --> 00:16:06,630
+chose, par exemple faire avancer mon
+moteur, et puis on
+
+214
+00:16:06,630 --> 00:16:10,620
+peut encore imaginer d'autres choses qui
+se font plus lentement.
+
+215
+00:16:10,620 --> 00:16:15,674
+Alors là, on a, on sait exactement ce qui
+se passe, chaque fois, et combien
+
+216
+00:16:15,674 --> 00:16:17,220
+de temps ça va mettre.
+
+217
+00:16:17,220 --> 00:16:21,120
+Pour mesurer la distance avec les capteurs
+ultrasonores, là
+
+218
+00:16:21,120 --> 00:16:23,813
+je ne vais pas rentrer dans le détail mais
+il
+
+219
+00:16:23,813 --> 00:16:27,141
+y a, hein puisqu'on a quelque chose
+d'assez gênant puisque
+
+220
+00:16:27,141 --> 00:16:30,150
+le programme qu'on a vu tout à l'heure est
+bloquant.
+
+221
+00:16:30,150 --> 00:16:35,500
+Une solution non bloquante, ben c'est soit
+d'utiliser un timer et puis de repérer
+
+222
+00:16:35,500 --> 00:16:40,900
+le front montant, démarrer le timer,
+repérer le front descendant
+
+223
+00:16:40,900 --> 00:16:45,550
+donc ça ça se fait par des interruptions,
+le timer a la logique nécessaire
+
+224
+00:16:45,550 --> 00:16:49,658
+pour faire ça, et puis ensuite, on lit le
+timer pour avoir la valeur.
+
+225
+00:16:49,658 --> 00:16:53,956
+On peut aussi, comme je viens de
+l'évoquer, faire une interruption toutes
+
+226
+00:16:53,956 --> 00:17:00,056
+les 100 microsecondes et puis passer à
+travers une machine d'état qui va
+
+227
+00:17:00,056 --> 00:17:06,476
+générer l'impulsion 100 microsecondes, ben
+ça sera juste d'un cycle au suivant,
+
+228
+00:17:06,476 --> 00:17:14,771
+et puis ensuite qui va compter pour être
+sûr que le capteur répond dans moins de
+
+229
+00:17:14,771 --> 00:17:20,240
+20 millisecondes, on a vu que s'il est là,
+il doit répondre dans les 5 millisecondes.
+
+230
+00:17:20,240 --> 00:17:25,330
+On peut faire un timeout pour que,
+signaler que ça ne sert à rien de faire
+
+231
+00:17:25,330 --> 00:17:27,665
+démarrer le moteur s'il n'y a pas de
+
+232
+00:17:27,665 --> 00:17:30,840
+capteur connecté ou que le capteur est
+défectueux.
+
+233
+00:17:30,840 --> 00:17:31,608
+Et puis
+
+234
+00:17:31,608 --> 00:17:37,314
+maintenant, on passe dans la mesure.
+Et, là aussi,
+
+235
+00:17:37,314 --> 00:17:42,580
+on a un capteur qui va mesurer la durée de
+l'impulsion
+
+236
+00:17:42,580 --> 00:17:47,990
+avec aussi un timeout puisque ça ne sert à
+rien
+
+237
+00:17:47,990 --> 00:17:53,400
+de mesurer des distances qui,
+théoriquement, auraient plus de 3 mètres.
+
+238
+00:17:53,400 --> 00:17:56,668
+Alors évidemment le capteur,
+l'électronique du
+
+239
+00:17:56,668 --> 00:18:00,709
+capteur n'est pas nécessairement retombée
+sur ses pieds
+
+240
+00:18:00,709 --> 00:18:03,894
+mais si le fabricant garantit qu'il y a un
+
+241
+00:18:03,894 --> 00:18:07,150
+cycle de 20 millisecondes, et bien on peut
+
+242
+00:18:07,150 --> 00:18:10,620
+tout de suite recommencer au bout de 20
+millisecondes.
+
+243
+00:18:10,620 --> 00:18:16,515
+Ça serait dangereux de recommencer tout de
+suite dès que Echo passe à 0 puisqu'on
+
+244
+00:18:16,515 --> 00:18:21,796
+n'est pas sûr que l'électronique interne
+du capteur est bien
+
+245
+00:18:21,796 --> 00:18:23,850
+retombée sur ses pattes.
+
+246
+00:18:23,850 --> 00:18:28,981
+Bien, d'autres solutions pour résoudre ce
+problème, ben naturellement,
+
+247
+00:18:28,981 --> 00:18:33,960
+on pourrait mettre un servo pour orienter
+le capteur, ça permettrait un déplacement
+
+248
+00:18:33,960 --> 00:18:39,890
+continu puisque pendant que le robot
+avance et bien on pourrait basculer le,
+
+249
+00:18:39,890 --> 00:18:45,900
+le capteur de part et d'autre et corriger
+la trajectoire.
+
+250
+00:18:45,900 --> 00:18:46,964
+Mais évidemment
+
+251
+00:18:46,964 --> 00:18:51,794
+ça, ça suppose hein, qu'on voit
+parfaitement bien les ouvertures donc
+
+252
+00:18:51,794 --> 00:18:57,380
+c'est là qu'on a vu que cette application
+pose un problème majeur.
+
+253
+00:18:57,380 --> 00:19:01,751
+Alors par interruptions, ben là on
+commanderait les,
+
+254
+00:19:01,751 --> 00:19:06,130
+on commanderait les moteurs et puis la
+position
+
+255
+00:19:06,130 --> 00:19:09,092
+du servo permettrait de mesurer où est la
+
+256
+00:19:09,092 --> 00:19:12,360
+distance maximale et puis de corriger les
+vitesses
+
+257
+00:19:12,360 --> 00:19:13,630
+des deux moteurs.
+
+258
+00:19:13,630 --> 00:19:18,390
+Est-ce qu'on devrait utiliser un autre
+capteur?
+
+259
+00:19:18,390 --> 00:19:21,000
+Alors oui puisqu'on, je prétends qu'on ne
+peut pas
+
+260
+00:19:21,000 --> 00:19:26,950
+tellement utiliser ces capteurs bon marché
+pour faire cette application.
+
+261
+00:19:26,950 --> 00:19:29,326
+Un capteur ultrason à champ étroit, je
+
+262
+00:19:29,326 --> 00:19:32,395
+ne sais pas s'ils existent mais
+probablement que
+
+263
+00:19:32,395 --> 00:19:34,930
+industriellement ça existe mais à des prix
+qui
+
+264
+00:19:34,930 --> 00:19:37,450
+sont dix fois supérieurs si c'est pas
+plus.
+
+265
+00:19:37,450 --> 00:19:41,290
+Un capteur qui conviendrait bien, c'est le
+PSD de Sharp
+
+266
+00:19:41,290 --> 00:19:45,266
+dont on a euh, dont on a parlé, qu'on a
+mentionné,
+
+267
+00:19:45,266 --> 00:19:49,315
+qui est un petit peu cher mais qui envoie
+un spot
+
+268
+00:19:49,315 --> 00:19:54,368
+lumineux et sa réflexion permet de savoir
+quelle est la distance.
+
+269
+00:19:54,368 --> 00:19:57,750
+Donc là, il n'y a aucun problème de
+largeur.
+
+270
+00:19:57,750 --> 00:20:02,700
+de l’obstacle, puisque même si on est
+suffisamment précis dans
+
+271
+00:20:02,700 --> 00:20:08,290
+le déplacement angulaire, une fente de
+quelques centimètres, même pas 1
+
+272
+00:20:08,290 --> 00:20:14,080
+centimètre, pourrait être vue mais, de
+nouveau, à expérimenter en détail.
+
+273
+00:20:14,080 --> 00:20:17,477
+C’est rare que les spécifications des
+fabricants
+
+274
+00:20:17,477 --> 00:20:22,860
+soient suffisamment précises pour éclairer
+votre application précise.
+
+275
+00:20:22,860 --> 00:20:27,400
+Les capteurs infrarouges qui sont utilisés
+pour mesurer la distance,
+
+276
+00:20:27,400 --> 00:20:29,955
+c’est en général, au maximum, 5 à 10
+
+277
+00:20:29,955 --> 00:20:34,160
+centimètres et ils sont assez sensibles à
+l’ambiance lumineuse.
+
+278
+00:20:34,160 --> 00:20:39,060
+Les photorésistances, qui sont très bon
+marché, ça va bien
+
+279
+00:20:39,060 --> 00:20:42,740
+pour faire un suivi de lumière, un suivi
+de piste, ce
+
+280
+00:20:42,740 --> 00:20:48,237
+qui est une des applications
+traditionnelles des robots mobiles que
+
+281
+00:20:48,237 --> 00:20:52,414
+je ne voulais justement pas vous expliquer
+aujourd’hui puisque vous avez
+
+282
+00:20:52,414 --> 00:20:56,790
+des tas de sites qui vous expliquent ça et
+vous l’avez peut-être fait, déjà, en LEGO!
+
+283
+00:20:56,790 --> 00:20:59,820
+Les moustaches, on en a dit deux mots,
+elles sont
+
+284
+00:20:59,820 --> 00:21:03,390
+faciles à gérer mais évidemment c’est
+toujours une tâche un
+
+285
+00:21:03,390 --> 00:21:08,390
+petit peu supplémentaire à faire en
+parallèle avec les autres tâches, et une
+
+286
+00:21:08,390 --> 00:21:13,420
+gestion par interruption est tout à fait
+souhaitée.
+
+287
+00:21:13,420 --> 00:21:17,515
+Ensuite, un concept important, qu’on n'a
+
+288
+00:21:17,515 --> 00:21:23,862
+pas le temps de bien développer dans ce
+cours, c’est la notion de « timeout ».
+
+289
+00:21:23,862 --> 00:21:27,588
+Vous avez une application, cette
+application, elle
+
+290
+00:21:27,588 --> 00:21:29,464
+peut très bien se produire que les
+
+291
+00:21:29,464 --> 00:21:31,876
+capteurs ne répondent pas, que le robot,
+
+292
+00:21:31,876 --> 00:21:35,210
+dans notre cas simple, le robot est
+bloqué.
+
+293
+00:21:35,210 --> 00:21:39,435
+Bon ça ne gêne pas d’aller le déplacer à
+la
+
+294
+00:21:39,435 --> 00:21:42,750
+main mais si on fait les choses
+sérieusement, ça serait bien
+
+295
+00:21:42,750 --> 00:21:49,125
+de dire, si le robot reste bloqué pendant
+3 secondes, et bien c’est pas normal,
+
+296
+00:21:49,125 --> 00:21:55,250
+on va, par exemple, reculer un peu, lui
+faire chercher ailleurs et cetera.
+
+297
+00:21:55,250 --> 00:21:57,637
+Alors on avait parlé du « watchdog »
+
+298
+00:21:57,637 --> 00:22:01,256
+qui est à l’intérieur du processeur, pour
+surveiller
+
+299
+00:22:01,256 --> 00:22:05,036
+en fait le fonctionnement global du
+processeur, on
+
+300
+00:22:05,036 --> 00:22:07,620
+peut appliquer la même chose, dans le
+fond,
+
+301
+00:22:07,620 --> 00:22:11,430
+avec des compteurs.
+On réinitialise régulièrement un compteur
+
+302
+00:22:11,430 --> 00:22:17,646
+mais ce compteur décompte par interruption
+chaque seconde, par exemple.
+
+303
+00:22:17,646 --> 00:22:20,719
+S’il arrive à 0, c’est qu’on n’a pas
+
+304
+00:22:20,719 --> 00:22:26,624
+réinitialisé régulièrement, et puis on va
+exécuter une tâche.
+
+305
+00:22:26,624 --> 00:22:30,142
+Donc, typiquement, quand on teste les
+moustaches et puis
+
+306
+00:22:30,142 --> 00:22:33,240
+qu’on voit que les moustaches n’ont pas
+été activées,
+
+307
+00:22:33,240 --> 00:22:37,580
+et bien on remet le compteur à une
+certaine
+
+308
+00:22:37,580 --> 00:22:42,238
+valeur, et puis si, tout à coup, les
+moustaches sont
+
+309
+00:22:42,238 --> 00:22:46,533
+bloquées, le compteur décompte, et bien au
+bout de quelques
+
+310
+00:22:46,533 --> 00:22:49,730
+secondes, et bien on va faire cette
+opération de recul.
+
+311
+00:22:49,730 --> 00:22:52,466
+Bien, voilà, il y aurait encore beaucoup
+
+312
+00:22:52,466 --> 00:22:55,925
+de choses à dire pour comprendre les
+capteurs.
+
+313
+00:22:55,925 --> 00:22:58,661
+Des documents sont proposés
+
+314
+00:22:58,661 --> 00:23:03,810
+en annexe, avec ces leçons, pour aller un
+petit peu plus dans
+
+315
+00:23:03,810 --> 00:23:08,540
+le détail et puis vous expliquer des
+choses un peu plus spécialisées.
+
+316
+00:23:08,540 --> 00:23:11,648
+Naturellement, si vous êtes un chercheur
+et puis
+
+317
+00:23:11,648 --> 00:23:15,048
+que vous voulez faire une application de
+robot mobile
+
+318
+00:23:15,048 --> 00:23:20,740
+pour comprendre l’intelligence ou pour
+avoir une application industrielle,
+
+319
+00:23:20,740 --> 00:23:23,704
+là, il y a énormément de choses à
+comprendre.
+
+320
+00:23:23,704 --> 00:23:29,044
+Les logiciels s’appuient sur des noyaux
+temps
+
+321
+00:23:29,044 --> 00:23:32,935
+réel et vous facilitent la gestion, dans
+
+322
+00:23:32,935 --> 00:23:35,838
+le fond, des tâches simultanées sur des
+
+323
+00:23:35,838 --> 00:23:41,050
+processeurs naturellement qui doivent
+devenir beaucoup plus performants.
+
+324
+00:23:41,050 --> 00:23:44,195
+Alors, avec ce cours, on espère vous avoir
+
+325
+00:23:44,195 --> 00:23:49,958
+donné envie de continuer, de progresser
+vers la complexité
+
+326
+00:23:49,958 --> 00:23:54,702
+par petits pas.
+Et, en faisant suffisamment de petits pas,
+
+327
+00:23:54,702 --> 00:24:00,200
+et bien vous savez que on a marché sur la
+Lune!

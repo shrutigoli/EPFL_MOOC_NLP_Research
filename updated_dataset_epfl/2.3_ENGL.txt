@@ -1,0 +1,116 @@
+Hello again, this is [Topaks] still talking about layering, this time, how two layers talk to each other.
+We're no longer looking at the broader, bigger picture of how you compose a stack made up of multiple layers, but the very basic question of how two layers can communicate with each other.
+And the general answer is, they communicate through their API, their interface.
+There are actually three broad ways in which this can be done.
+First, the two layers can share the same address space and the same protection domain.
+That's the case, for example, if a layer is a C++ class and the other layer is another C++ class that depends on it.
+And in that case, the interface is merely that of a local API.
+But sometimes the two layers are protected from each other.
+That's specifically the case of the <i>system call</i> interface.
+The client, which is the application, makes system calls that execute in a blocking, synchronous matter by the operating system.
+And there's a last case, which is an interesting case, where the two layers communicate with each other over some kind of a channel.
+And we refer to this as the client/server programming model.
+And we'll see it's generally based on Remote Procedure Calls, or RPCs.
+Now there are multiple ways in which this channel could be implemented.
+This could be done in hardware, it could be an I/O bus, it could be done over the network, it could also simply be two different processes that are running on the same computer but are communicating with each other over a local socket.
+Now the client/server model is one that enables layering, but also enforces modularity.
+It actually enforces differently than when the two layers are part of the same address space and communicate using a local API because now the modularity is enforced and is no longer discretionary.
+Now this, in turn, has a number of advantages.
+And specifically, you can always reduce the client/server model as being that of two systems running on two different computers using only messages to communicate even though the two entities may actually be co-located on the same computer itself.
+Now, in this mental model it actually enables a sweeping simplification in the design.
+And that is because all forms of communication and errors are actually modelled as messages and the modules are isolated from each other and so they fail independently from each other.
+And so the use of the client/server model even within a local computer actually is one that generally enforces a good design because it makes it impossible, in practice, to bypass any particular abstraction.
+Also makes it impossible for one module to corrupt, inadvertantly, the data structures of another module.
+There's actually a trade-off in the cost associated with this enforced modularity, and that is typically that the granularity of a layer is typically much coarser when the modularity is enforced than if the modularity is discretionary.
+And that is because of the overheads of message space communication.
+And those overheads must be amortized over a more complex computation.
+As long as you run within a single address space, layers of abstractions are cheap, and they're a good programming practice.
+But if you actually need to linearize any single communication, any single call over a communication channel, then this could become quite expensive.
+But if the modularity is actually in force, there are key design trade-offs.
+For example, how much client state, or session state should be kept on the servers.
+This is sometimes required for performance or for correctness, but it increases the complexity of the design.
+So one of the key attributes of the client/server model, unlike the shared address space model, is that the components may fail independently of each other.
+In other words, they don't share the same fate, and each side must determine how to respond to the failure of the other side.
+Now the client/server model is typically implemented using Remote Procedure Calls, and RPCs were introduced in a 1984 paper by Birrell and Nelson.
+And the idea is to wrap both the REQUEST and the RESPONSE messages to look as much as possible like the call and return of a normal procedure call.
+And the picture here shows how the sequence is deployed.
+First, the clients <i>marshalls</i>, which is a technical term to copy all the arguments into the message, and then the message itself is sent by some underlying communication mechanism on the channel.
+Now there on the right, the server processes messages that have been fully received, and does not process partially received messages.
+But when a message is fully received, it then unpacks all the arguments -- this is the <i>unmarshalling</i> step -- and then each message comes with an identifier for the [ro-it] function to call.
+And so at that point the server calls the corresponding function and that is known as the <i>compute</i> step.
+And then once the compute step is done, then it returns by sending the response back to the client.
+And that is similar to the request, the arguments of the response are marshalled to a message, which is sent back to the client over the communication channel.
+And generally, until it receives a response, the client typically is simply waiting for that response to come.
+And that would be known as the
+<i>synchronous RPC</i> model.
+There's also an asynchronous variant which is becoming more and more popular these days, especially for people programming in JAVA Script.
+If you think about this model, it's very easy to use because there are tools that simplify the programming model.
+In the older days, two or three decades ago, the simplification was done by stubs that were automatically generating by programs, and represented in languages such as XDR.
+So you typically had a way of expressing
+RPCs using XDR that would layer directly on top of either UDP or TCP/IP communication protocol.
+In the more current era, we've moved to web services, RESTful APIs or AJAX, all of which are RPCs implemented on top of HTP base protocol.
+The success of RPC is because of its relative simplicity.
+It is designed to look as much as possible like local procedure calls.
+However, there are obvious differences between the two, and one of them is that there is no global shared address space or ability to pass pointers.
+So each request must be self contained, the data structure must be fully marshalled, or linearized, since the server has no opportunity to call back the client for missing information.
+So that is one important difference.
+There's a second important difference, which is the lack of shared fate that I mentioned before.
+And by that I mean that either the client or the server may fail at any point in time when the other side does not fail, and as we will see, this creates complications.
+Now because there's no shared fate, any RPC may fail.
+And because of that, either the client or the server must somehow decide the semantics of an RPC that fails.
+Now it turns out there's no single, universal answer.
+Actually this is a case, or an instance of the application of the <i>enter in</i> principle which you will learn about soon, in which the application generally knows best, and when in doubt, leave the problem of deciding the semantic of a failure to the end-to-end applications rather than the RPC, which is merely the communication subsystem.
+And because of this end-to-end principle, or the application of that end-to-end principle, there actually are three, generally used semantics to deal with RPC failures.
+The first one is known as the <i>at least once</i> semantic.
+And the semantic, in this case, is that the client will actually, in the case of a failure by the server, will keep re-trying until the RPC is proven to be successful.
+And so this actually has consequences.
+First of all, an RPC may hang for an indefinite amount of time.
+And also that the operations themselves may be idempotent because they are going to be applied at least once, but possibly multiple times.
+But yet, this is a very popular way of expressing the semantics of RPCs.
+There's another mechanism which is the <i>at-most once</i> semantic, and this is actually doing the opposite.
+The client will actually attempt at most once to issue the RPC, and if for any reason something fails, they'll simply notify the application of the failure of that RPC.
+That is actually the common approach to the web today.
+An HTTP request will either succeed at most once, or fail.
+And if it fails, then you get either an error code or you get some kind of a time-out message that you were not able to send the message through.
+There's also the ability to have
+<i>exactly-one</i> semantics, but this actually cannot be done in a universal way by the communication subsystem itself, rather, it actually requires that the clients and the servers keep some kind of a persistent state that is coordinated between the two so that they know how far along they've gone in their exchanges and so it can guarantee that every RPC is delivered exactly once to the client.
+So let's wrap this module with an example that puts it all together.
+And the example that I chose is NFS.
+And the NFS paper is simply brilliant because it has the elegance of the earlier era of papers in computer systems.
+Now what's important to [ ] put into perspective is at the time
+NFS was by far not the only proposal for distributed filesystems.
+As a matter of fact, there were many other proposals in flight, many of which were more complex, had more features than NFS itself.
+But one of the reasons why NFS won is because it was the simplest possible way in which you can design a network filesystem protocol.
+And it was simple in multiple ways.
+First of all, it was a very clean RPC design.
+You had requests and responses.
+They developed XTR as part of this in order to simplify the description of the messages themselves.
+And then the protocol allowed for a
+<i>stateless</i> server design which means there was absolutely no per client-specific state that was kept on an NFS server.
+They also simplified the communication relationship so the clients never had to talk to each other.
+And servers managing different filesystems also never had to talk to each other.
+Different clients only talked to their respective NFS servers.
+And that also eliminated many of the issues associated with coherency that were present in other filesystems simply because NFS didn't provide as strong coherency semantics, but did not attempt to provide as strong coherency semantics as other filesystems.
+And then finally it was brilliantly simple in its use of the <i>at least once</i> semantics for RPC failures.
+The server was down; the client would just keep trying.
+And so at the time you had these
+<i>server down</i> messages that would pop up because some of these
+NFS servers were not that reliable.
+But it made for a very simple design because it actually maintained, allowed the operating systems running on the clients to actually thing of an NFS filesystem just like they would think of a local filesystem.
+And that's the last point that was indicative of the success of NFS which is it was well integrated into an existing filesystem, an existing operating system using the VFS layer that is internal to the operating systems themselves which we covered in the previous module.
+So in many ways, NFS is a brilliant example of a very simple, minimalistic design.
+HTTP is another example of a minimalistic design that implements RPCs today.
+So if you actually want to look at what
+NFS looks like in greater detail, this is a picture that I took from the original paper.
+Note that I actually did not tilt the picture myself.
+But instead this paper sold that the only copies available are some scans of a not-so-aligned version of the paper that was printed a few decades ago.
+But this picture actually allows us to review many of the concepts that we've seen so far.
+We see the distinct layering of <i>system call</i> layer and the VFS layer within UNIX.
+This is a form of <i>soft</i> modularity and layering within the operating system.
+We see the VFS layers' ability to virtualize different filesystem drivers below a common interface, and to create a unified namespace that captures multiple files coming from different filesystems of different types.
+Third, we see the layering of the NFS on top of RPC and XDR.
+That's the ENT N layer of the networking stack that provides the communication mechanism.
+And fourth, we see the use of the network layer below to connect the client and the server.
+The link is not shown but that is expected since the design only relies on the Network layer as its lowest layer.
+And that wraps up this module.
+Next, we'll actually go into the next level of detail in the networking stack and talk about the different layers in networking itself.

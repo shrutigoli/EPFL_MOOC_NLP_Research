@@ -1,0 +1,1756 @@
+1
+00:00:22,364 --> 00:00:23,332
+Bonjour.
+
+2
+00:00:23,532 --> 00:00:27,302
+La présente leçon va porter
+sur la fusion de requêtes
+
+3
+00:00:27,502 --> 00:00:30,225
+que l'on utilise lorsque
+l'on souhaite associer
+
+4
+00:00:30,425 --> 00:00:33,509
+les résultats de deux
+ou plusieurs requêtes
+
+5
+00:00:33,709 --> 00:00:36,325
+pour en extraire
+les éléments communs
+
+6
+00:00:36,525 --> 00:00:41,307
+ou alors pour retirer de l'ensemble
+des résultats d'une requête
+
+7
+00:00:41,507 --> 00:00:43,662
+le groupe des éléments
+
+8
+00:00:43,850 --> 00:00:46,016
+qui seraient présents dans
+les résultats d'une autre requête.
+
+9
+00:00:47,349 --> 00:00:48,913
+Nous aborderons également
+
+10
+00:00:49,113 --> 00:00:50,934
+l'utilisation de résultats de requête
+
+11
+00:00:51,134 --> 00:00:54,141
+comme élément d'une autre requête,
+
+12
+00:00:54,341 --> 00:00:57,041
+donc le cas où on emboîte
+une requête
+
+13
+00:00:57,241 --> 00:00:58,341
+dans une autre requête,
+
+14
+00:00:58,541 --> 00:00:59,906
+ce que l'on fait par exemple
+
+15
+00:01:00,106 --> 00:01:02,397
+lorsque l'on souhaite utiliser
+une fonction d'agrégation
+
+16
+00:01:02,597 --> 00:01:06,178
+comme le nombre moyen
+d'employés d'une série d'entreprises
+
+17
+00:01:06,378 --> 00:01:09,384
+comme critère pour sélectionner
+
+18
+00:01:09,584 --> 00:01:12,117
+les PME qui auraient
+moins d'employés
+
+19
+00:01:12,317 --> 00:01:12,954
+que la moyenne.
+
+20
+00:01:13,154 --> 00:01:15,045
+L'objectif de cette leçon
+
+21
+00:01:15,245 --> 00:01:18,178
+est donc de décrire le principe
+des requêtes de fusion
+
+22
+00:01:18,378 --> 00:01:20,966
+et de montrer que des requêtes SQL
+
+23
+00:01:21,166 --> 00:01:23,699
+peuvent contenir
+d'autres requêtes SQL,
+
+24
+00:01:24,086 --> 00:01:25,581
+de sorte qu'au terme de la leçon
+
+25
+00:01:25,781 --> 00:01:28,887
+vous soyez capables d'utiliser
+des requêtes de fusion
+
+26
+00:01:29,087 --> 00:01:31,251
+pour assembler des résultats,
+
+27
+00:01:31,451 --> 00:01:33,095
+associer les résultats
+de plusieurs requêtes
+
+28
+00:01:33,295 --> 00:01:37,411
+et d'écrire des requêtes emboîtées.
+
+29
+00:01:38,511 --> 00:01:39,557
+Dans cette leçon
+
+30
+00:01:39,757 --> 00:01:41,124
+nous allons donc
+aborder successivement
+
+31
+00:01:41,324 --> 00:01:43,469
+le thème de la fusion de requêtes
+
+32
+00:01:43,669 --> 00:01:46,887
+puis nous verrons
+les requêtes emboîtées
+
+33
+00:01:47,087 --> 00:01:48,403
+dans la clause WHERE
+
+34
+00:01:48,603 --> 00:01:50,514
+avant de passer
+aux requêtes emboîtées
+
+35
+00:01:50,714 --> 00:01:51,683
+dans la clause FROM
+
+36
+00:01:51,883 --> 00:01:54,436
+et nous terminerons
+avec l'utilisation
+
+37
+00:01:54,636 --> 00:01:56,376
+des opérateurs IN et NOT IN
+
+38
+00:01:56,576 --> 00:01:58,272
+dans les requêtes de fusion.
+
+39
+00:02:04,093 --> 00:02:05,875
+En reprenant ce tableau qui résume
+
+40
+00:02:06,075 --> 00:02:08,346
+les éléments de la syntaxe de base
+
+41
+00:02:08,546 --> 00:02:09,410
+du langage SQL,
+
+42
+00:02:09,610 --> 00:02:13,905
+nous retrouvons en fait l'ensemble
+des clauses de sélection,
+
+43
+00:02:14,105 --> 00:02:16,523
+de filtre conditionnel,
+d'agrégation et de tri
+
+44
+00:02:16,723 --> 00:02:18,886
+que nous avons vu
+lors des précédentes leçons.
+
+45
+00:02:19,086 --> 00:02:21,960
+Nous voyons qu'il nous reste
+encore à traiter
+
+46
+00:02:22,160 --> 00:02:23,177
+de ces clauses de fusions
+
+47
+00:02:23,377 --> 00:02:26,095
+avec les mots-clés UNION,
+INTERSECT et EXCEPT.
+
+48
+00:02:27,292 --> 00:02:28,996
+La clause UNION du langage SQL
+
+49
+00:02:29,196 --> 00:02:31,525
+permet de mettre bout à bout
+les résultats de plusieurs requêtes
+
+50
+00:02:31,725 --> 00:02:34,319
+qui utilisent elles-mêmes
+la commande SELECT.
+
+51
+00:02:34,519 --> 00:02:36,244
+C'est donc une commande
+qui permet
+
+52
+00:02:36,444 --> 00:02:40,181
+de concaténer les résultats
+de deux requêtes ou davantage.
+
+53
+00:02:40,381 --> 00:02:43,916
+Pour pouvoir utiliser
+cette clause de fusion
+
+54
+00:02:44,116 --> 00:02:46,946
+il est important
+que les deux requêtes
+
+55
+00:02:47,146 --> 00:02:48,170
+que l'on cherche à associer
+
+56
+00:02:48,370 --> 00:02:50,190
+soient structurées de la même manière,
+
+57
+00:02:50,390 --> 00:02:53,904
+donc elles ont le même nombre
+et le même type de colonnes
+
+58
+00:02:54,104 --> 00:02:55,719
+et que ces colonnes apparaissent
+dans le même ordre
+
+59
+00:02:55,919 --> 00:02:58,260
+dans les deux tables
+qui sont associées
+
+60
+00:02:58,460 --> 00:02:59,546
+par la requête d'union.
+
+61
+00:02:59,746 --> 00:03:01,272
+A partir de là
+
+62
+00:03:01,472 --> 00:03:02,332
+la syntaxe est simple
+
+63
+00:03:02,532 --> 00:03:04,574
+c'est deux clauses SELECT
+
+64
+00:03:04,774 --> 00:03:06,979
+qui sont simplement reliées
+par le mot-clé UNION.
+
+65
+00:03:08,566 --> 00:03:10,524
+Dans l'esprit
+il s'agit d'une opération
+
+66
+00:03:10,724 --> 00:03:12,653
+qui est similaire
+à celle du FULL JOIN
+
+67
+00:03:12,853 --> 00:03:15,631
+que nous avons vu
+dans les leçons précédentes,
+
+68
+00:03:15,831 --> 00:03:18,874
+à ceci près que dans la jointure
+
+69
+00:03:19,074 --> 00:03:22,272
+en fait la structure des deux 
+ensembles que l'on associe
+
+70
+00:03:22,472 --> 00:03:23,815
+peut être complètement différente.
+
+71
+00:03:24,015 --> 00:03:26,538
+On a des champs qui sont 
+totalement différents
+
+72
+00:03:26,738 --> 00:03:29,578
+alors qu'ici, lorsqu'on fait
+l'union de deux tables,
+
+73
+00:03:29,778 --> 00:03:30,783
+de deux requêtes,
+
+74
+00:03:30,983 --> 00:03:33,690
+il faut vraiment que la structure
+soit la même
+
+75
+00:03:33,890 --> 00:03:34,829
+dans les deux cas.
+
+76
+00:03:35,029 --> 00:03:37,752
+La particularité de la clause
+UNION ALL
+
+77
+00:03:37,952 --> 00:03:41,463
+consiste à ne pas éliminer
+les doublons
+
+78
+00:03:41,663 --> 00:03:43,866
+donc si nous avons des éléments
+qui sont présents
+
+79
+00:03:44,066 --> 00:03:47,145
+à la fois dans la première
+et dans la seconde table,
+
+80
+00:03:47,345 --> 00:03:48,670
+ils apparaissent les deux
+
+81
+00:03:48,870 --> 00:03:51,920
+alors que dans la requête
+d'union simple,
+
+82
+00:03:52,120 --> 00:03:53,447
+les doublons sont éliminés.
+
+83
+00:03:53,647 --> 00:03:56,205
+Second type de requête de fusion,
+
+84
+00:03:56,405 --> 00:03:57,944
+les requêtes d'intersection
+
+85
+00:03:58,144 --> 00:03:59,668
+avec la clause INTERSECT
+
+86
+00:03:59,868 --> 00:04:02,961
+qui permet d'obtenir l'intersection
+
+87
+00:04:03,161 --> 00:04:04,417
+des résultats de deux requêtes.
+
+88
+00:04:05,623 --> 00:04:06,909
+Comme dans le cas de l'union
+
+89
+00:04:07,109 --> 00:04:08,410
+il est important, il est même
+essentiel
+
+90
+00:04:08,610 --> 00:04:10,444
+que les deux tables que l'on utilise
+
+91
+00:04:10,644 --> 00:04:13,816
+présentent le même nombre
+et le même type de colonnes
+
+92
+00:04:14,016 --> 00:04:16,497
+et que ces colonnes soient listées
+dans le même ordre.
+
+93
+00:04:17,697 --> 00:04:19,808
+A partir de là, la syntaxe
+est de même nature
+
+94
+00:04:20,008 --> 00:04:23,017
+avec deux requêtes
+de sélection classique
+
+95
+00:04:23,217 --> 00:04:25,415
+reliées par le mot-clé INTERSECT,
+
+96
+00:04:25,615 --> 00:04:26,680
+par la clause INTERSECT.
+
+97
+00:04:27,465 --> 00:04:28,449
+Comme précédemment
+
+98
+00:04:28,649 --> 00:04:30,989
+on peut faire un lien
+avec l'idée de jointure
+
+99
+00:04:31,189 --> 00:04:34,047
+où nous avions la jointure simple
+
+100
+00:04:34,247 --> 00:04:39,577
+qui consistait en fait à relier 
+les éléments de deux ensembles,
+
+101
+00:04:39,777 --> 00:04:40,856
+de deux requêtes,
+
+102
+00:04:41,056 --> 00:04:44,279
+par l'intermédiaire
+d'un champ commun.
+
+103
+00:04:44,479 --> 00:04:45,835
+La différence ici
+
+104
+00:04:46,035 --> 00:04:48,980
+c'est que l'intersection entre
+deux requêtes
+
+105
+00:04:49,180 --> 00:04:50,897
+dans une clause de fusion
+
+106
+00:04:51,097 --> 00:04:54,213
+implique que la structure
+des deux ensembles
+
+107
+00:04:54,413 --> 00:04:55,426
+soit la même
+
+108
+00:04:55,626 --> 00:04:57,150
+et non pas qu'on associe
+
+109
+00:04:57,350 --> 00:05:01,162
+deux ensembles avec des attributs
+tout à fait variables.
+
+110
+00:05:02,639 --> 00:05:04,383
+Troisième type
+de requête de fusion
+
+111
+00:05:04,583 --> 00:05:08,485
+qui permet d'extraire des résultats
+d'une requête,
+
+112
+00:05:08,685 --> 00:05:10,490
+ceux qui ne feraient pas partie
+
+113
+00:05:10,690 --> 00:05:12,752
+d'une seconde requête.
+
+114
+00:05:12,952 --> 00:05:14,837
+Avec la clause EXCEPT
+
+115
+00:05:15,037 --> 00:05:17,343
+ou MINUS,
+
+116
+00:05:17,543 --> 00:05:19,043
+dans certains SGBD,
+
+117
+00:05:19,243 --> 00:05:20,377
+en particulier dans MySQL,
+
+118
+00:05:20,577 --> 00:05:22,959
+c'est la clause MINUS
+qu'il faut utiliser.
+
+119
+00:05:23,159 --> 00:05:25,876
+A nouveau, il faut avoir le même
+nombre et le même type
+
+120
+00:05:26,076 --> 00:05:27,241
+de colonnes dans le même ordre
+
+121
+00:05:27,441 --> 00:05:28,292
+dans les deux tables
+
+122
+00:05:28,492 --> 00:05:31,817
+avec une syntaxe toujours
+de même nature,
+
+123
+00:05:32,017 --> 00:05:36,250
+deux requêtes de sélection
+reliées par la clause de fusion.
+
+124
+00:05:37,644 --> 00:05:38,699
+Ce type de fusion
+
+125
+00:05:38,899 --> 00:05:41,119
+s'apparente à une jointure
+gauche
+
+126
+00:05:41,319 --> 00:05:42,256
+sans intersection.
+
+127
+00:05:42,456 --> 00:05:46,253
+En langage ensembliste
+
+128
+00:05:46,453 --> 00:05:47,932
+avec cette représentation,
+
+129
+00:05:48,132 --> 00:05:49,631
+à ceci près toujours
+
+130
+00:05:49,831 --> 00:05:51,539
+que dans le cas d'une jointure
+
+131
+00:05:51,739 --> 00:05:54,564
+les structures des tables
+ne sont pas les mêmes.
+
+132
+00:05:56,065 --> 00:05:57,627
+Pour illustrer
+ces requêtes de fusion
+
+133
+00:05:57,827 --> 00:05:59,876
+nous prenons donc la base
+de données des Seychelles
+
+134
+00:06:00,076 --> 00:06:02,204
+avec la table des districts
+et celle des lieux-dits
+
+135
+00:06:02,404 --> 00:06:04,276
+et les champs
+qui contiennent les noms
+
+136
+00:06:04,476 --> 00:06:05,229
+de ces deux tables.
+
+137
+00:06:05,429 --> 00:06:07,080
+La requête elle-même
+
+138
+00:06:07,280 --> 00:06:10,629
+qui associerait ces deux tables
+
+139
+00:06:10,829 --> 00:06:13,481
+s'écrit comme vous le voyez
+sous les yeux
+
+140
+00:06:13,681 --> 00:06:16,420
+et on copie simplement cette requête
+
+141
+00:06:16,620 --> 00:06:19,486
+pour la reproduire une seconde fois
+
+142
+00:06:19,686 --> 00:06:21,259
+avant de mettre de l'ordre
+
+143
+00:06:21,459 --> 00:06:23,313
+en supprimant dans le premier cas
+
+144
+00:06:23,513 --> 00:06:26,266
+les éléments qui sont
+liés aux lieux-dits
+
+145
+00:06:26,466 --> 00:06:27,569
+et dans le second cas
+
+146
+00:06:27,769 --> 00:06:30,652
+les éléments qui sont liés
+aux districts
+
+147
+00:06:30,852 --> 00:06:32,684
+de sorte à obtenir en fait
+
+148
+00:06:32,884 --> 00:06:35,209
+la table qui associe
+
+149
+00:06:35,409 --> 00:06:36,889
+les noms des districts
+
+150
+00:06:37,089 --> 00:06:38,085
+et les noms des lieux-dits
+
+151
+00:06:38,285 --> 00:06:40,801
+avec 330 résultats.
+
+152
+00:06:41,001 --> 00:06:44,746
+On peut ensuite simplement rajouter
+le mot-clé ALL
+
+153
+00:06:44,946 --> 00:06:47,002
+pour conserver les doublons
+
+154
+00:06:47,202 --> 00:06:51,544
+et on voit qu'on passe à 371 retours
+
+155
+00:06:51,744 --> 00:06:53,689
+donc il y a une quarantaine
+de doublons
+
+156
+00:06:53,889 --> 00:06:55,446
+qui apparaissent.
+
+157
+00:06:55,646 --> 00:06:58,453
+L'intersection des deux ensembles
+
+158
+00:06:58,653 --> 00:07:01,414
+cette fois nous donne 
+17 résultats,
+
+159
+00:07:01,614 --> 00:07:07,631
+donc 17 lieux-dits qui sont
+similaires dans leurs noms
+
+160
+00:07:07,831 --> 00:07:08,915
+aux districts.
+
+161
+00:07:09,115 --> 00:07:13,035
+Finalement, la soustraction
+des lieux-dits
+
+162
+00:07:13,235 --> 00:07:14,833
+à l'ensemble des noms de districts
+
+163
+00:07:15,033 --> 00:07:16,079
+donne 8 résultats,
+
+164
+00:07:16,279 --> 00:07:18,065
+donc 8 districts
+qui n'ont pas d'équivalents
+
+165
+00:07:18,265 --> 00:07:19,545
+dans les lieux-dits.
+
+166
+00:07:19,745 --> 00:07:22,528
+On peut affiner un petit peu
+la recherche
+
+167
+00:07:22,728 --> 00:07:25,960
+en transformant les requêtes
+de sélection
+
+168
+00:07:26,160 --> 00:07:29,770
+et en limitant en fait 
+la recherche des districts
+
+169
+00:07:29,970 --> 00:07:31,931
+à ceux qui commencent
+par la lettre T
+
+170
+00:07:32,131 --> 00:07:38,853
+et en faisant la même chose
+ensuite pour les lieux-dits.
+
+171
+00:07:41,398 --> 00:07:42,604
+Donc on copie cette clause,
+
+172
+00:07:42,804 --> 00:07:47,149
+on la colle à la fin
+de la seconde requête
+
+173
+00:07:47,349 --> 00:07:49,811
+et on remplace l'attribut
+
+174
+00:07:50,011 --> 00:07:51,520
+sur lequel porte le filtre
+
+175
+00:07:51,720 --> 00:07:54,725
+par le mot-clé LIEU-DIT
+
+176
+00:07:54,925 --> 00:07:55,771
+entre guillemets
+
+177
+00:07:55,971 --> 00:07:58,435
+puisqu'on a un tiret
+
+178
+00:07:58,635 --> 00:08:00,378
+qui pourrait causer problème.
+
+179
+00:08:00,578 --> 00:08:01,943
+Mais on voit qu'on a 4 résultats,
+
+180
+00:08:02,143 --> 00:08:05,104
+donc 4 districts et lieux-dits
+
+181
+00:08:05,304 --> 00:08:06,380
+qui commencent par T.
+
+182
+00:08:16,610 --> 00:08:17,643
+Dans le monde SQL
+
+183
+00:08:17,843 --> 00:08:19,259
+on parle de requêtes emboîtées,
+
+184
+00:08:19,459 --> 00:08:20,994
+des requêtes imbriquées
+
+185
+00:08:21,194 --> 00:08:22,416
+ou encore de sous-requêtes
+
+186
+00:08:22,616 --> 00:08:26,915
+lorsqu'une requête est exécutée
+à l'intérieur d'une autre requête.
+
+187
+00:08:27,115 --> 00:08:29,389
+Ce genre de disposition
+
+188
+00:08:29,589 --> 00:08:32,133
+peut se rencontrer dans le cas
+de clauses SELECT,
+
+189
+00:08:32,333 --> 00:08:33,325
+de clauses FROM,
+
+190
+00:08:33,525 --> 00:08:34,556
+de clauses WHERE
+
+191
+00:08:34,756 --> 00:08:35,879
+ou encore de clauses HAVING.
+
+192
+00:08:36,079 --> 00:08:40,183
+Comme il y a plusieurs formes
+d'utilisation
+
+193
+00:08:40,383 --> 00:08:41,823
+de l'emboîtement des requêtes
+
+194
+00:08:42,023 --> 00:08:44,320
+il existe aussi plusieurs types
+de syntaxe
+
+195
+00:08:44,520 --> 00:08:46,689
+que nous allons voir
+un peu plus en détail
+
+196
+00:08:46,889 --> 00:08:49,182
+en commençant par la clause WHERE.
+
+197
+00:08:50,831 --> 00:08:52,256
+La syntaxe d'une requête emboîtée
+
+198
+00:08:52,456 --> 00:08:53,278
+dans la clause WHERE
+
+199
+00:08:53,478 --> 00:08:56,650
+consiste donc à remplacer
+dans la condition
+
+200
+00:08:56,850 --> 00:08:58,191
+que doit vérifier la clause WHERE,
+
+201
+00:08:58,391 --> 00:09:00,574
+à remplacer donc le critère
+
+202
+00:09:00,774 --> 00:09:02,555
+par une requête SQL
+
+203
+00:09:02,755 --> 00:09:04,520
+placée entre parenthèses.
+
+204
+00:09:06,056 --> 00:09:08,502
+Pour illustrer l'utilisation de
+ce type de requête emboîtée
+
+205
+00:09:08,702 --> 00:09:11,062
+on reprend cet exemple
+
+206
+00:09:11,262 --> 00:09:13,469
+où l'on cherchait la valeur maximale
+
+207
+00:09:13,669 --> 00:09:15,150
+du nombre de lits des hôtels
+des Seychelles.
+
+208
+00:09:15,350 --> 00:09:19,061
+On souhaitait extraire 
+en fait le nom de l'hôtel
+
+209
+00:09:19,261 --> 00:09:21,161
+qui avait le plus 
+grand nombre de lits,
+
+210
+00:09:21,355 --> 00:09:23,024
+chose qui pouvait se faire
+
+211
+00:09:23,224 --> 00:09:25,639
+assez facilement si vous
+vous en souvenez
+
+212
+00:09:25,839 --> 00:09:27,126
+avec SpatiaLite
+
+213
+00:09:27,326 --> 00:09:30,085
+mais qui n'était pas praticable
+avec Postgres.
+
+214
+00:09:30,285 --> 00:09:33,541
+Donc il faut une requête un peu
+plus élaborée dans ce cas-là,
+
+215
+00:09:33,741 --> 00:09:38,014
+donc on sélectionne le nom
+et le nombre de lits de l'hôtel,
+
+216
+00:09:38,214 --> 00:09:39,138
+de la table HOTELS
+
+217
+00:09:39,338 --> 00:09:41,746
+et comme condition dans 
+la clause WHERE
+
+218
+00:09:41,946 --> 00:09:44,845
+on aimerait sélectionner les hôtels
+
+219
+00:09:45,045 --> 00:09:48,598
+dont le nombre de lits correspond
+à la valeur maximale
+
+220
+00:09:48,798 --> 00:09:50,264
+du nombre de lits.
+
+221
+00:09:50,464 --> 00:09:52,678
+On l'écrit ici un peu naïvement
+
+222
+00:09:52,878 --> 00:09:55,899
+mais en fait ce maximum
+peut être décrit
+
+223
+00:09:56,099 --> 00:09:59,574
+par la requête de sélection
+qu'on avait tout à l'heure,
+
+224
+00:09:59,774 --> 00:10:03,568
+donc le maximum du nombre
+de lits des hôtels
+
+225
+00:10:03,768 --> 00:10:08,286
+provenant de la table des hôtels
+
+226
+00:10:12,749 --> 00:10:14,293
+avec comme condition...
+
+227
+00:10:15,898 --> 00:10:16,928
+pas de condition.
+
+228
+00:10:22,338 --> 00:10:24,581
+On retrouve Le Berjaya.
+
+229
+00:10:29,349 --> 00:10:32,005
+On peut aussi transformer la requête
+
+230
+00:10:32,205 --> 00:10:35,544
+pour rechercher en fait 
+l'ensemble des hôtels
+
+231
+00:10:35,744 --> 00:10:37,706
+dont le nombre de lits
+est supérieur à la moyenne
+
+232
+00:10:37,906 --> 00:10:40,921
+et on trouve 23 établissements.
+
+233
+00:10:41,121 --> 00:10:44,104
+La moyenne si on s'en souvient
+
+234
+00:10:44,304 --> 00:10:45,676
+dans un précédent exercice
+
+235
+00:10:45,876 --> 00:10:47,617
+on avait vu qu'elle était
+de l'ordre de 38 lits.
+
+236
+00:10:47,817 --> 00:10:50,724
+Donc on a la liste des hôtels
+qui ont plus de 38 lits.
+
+237
+00:10:53,316 --> 00:10:55,045
+Dans le cas de Navicat,
+
+238
+00:10:55,245 --> 00:10:57,237
+la chose se fait
+de manière graphique
+
+239
+00:10:57,437 --> 00:10:59,441
+donc on sélectionne les champs
+
+240
+00:10:59,641 --> 00:11:01,255
+dans la table
+
+241
+00:11:01,455 --> 00:11:03,548
+et puis ensuite dans 
+le constructeur de requêtes
+
+242
+00:11:03,748 --> 00:11:07,941
+on peut ajouter
+les différents paramètres.
+
+243
+00:11:08,141 --> 00:11:10,670
+On va chercher le nombre de lits
+supérieur à la moyenne.
+
+244
+00:11:10,870 --> 00:11:14,103
+Alors la requête emboîtée
+
+245
+00:11:14,303 --> 00:11:16,898
+doit quand même
+être écrite manuellement.
+
+246
+00:11:17,098 --> 00:11:19,710
+L'interface graphique
+qui facilite la vie
+
+247
+00:11:19,910 --> 00:11:20,759
+a ses limites.
+
+248
+00:11:20,959 --> 00:11:22,823
+Donc comme tout à l'heure,
+
+249
+00:11:23,023 --> 00:11:26,298
+on associe comme critères
+de recherche
+
+250
+00:11:26,498 --> 00:11:28,684
+la valeur moyenne du nombre de lits
+
+251
+00:11:28,884 --> 00:11:30,046
+du champ des hôtels
+
+252
+00:11:30,246 --> 00:11:32,133
+et en plus ici on va trier
+
+253
+00:11:32,333 --> 00:11:33,827
+en ordre descendant,
+
+254
+00:11:34,027 --> 00:11:37,809
+en taille descendante ces hôtels.
+
+255
+00:11:47,927 --> 00:11:50,010
+Dans le cas d'une requête
+emboîtée dans la clause FROM,
+
+256
+00:11:50,210 --> 00:11:51,643
+le principe est exactement le même
+
+257
+00:11:51,843 --> 00:11:54,611
+avec la requête de sélection
+
+258
+00:11:54,811 --> 00:11:58,643
+qui remplace en fait 
+le nom de la table
+
+259
+00:11:58,843 --> 00:12:02,101
+sur laquelle porte
+la requête que l'on fait.
+
+260
+00:12:02,301 --> 00:12:05,463
+Ce type de syntaxe est possible
+
+261
+00:12:05,663 --> 00:12:08,263
+car une requête de sélection
+
+262
+00:12:08,463 --> 00:12:10,469
+renvoie l'équivalent d'une table
+
+263
+00:12:10,669 --> 00:12:12,389
+de la base de données.
+
+264
+00:12:13,795 --> 00:12:16,340
+Comme nous allons utiliser plusieurs
+fois la même table HOTELS
+
+265
+00:12:16,540 --> 00:12:17,404
+dans la clause FROM,
+
+266
+00:12:17,604 --> 00:12:20,431
+nous allons devoir recourir
+à des alias,
+
+267
+00:12:20,631 --> 00:12:25,692
+ce qui facilite un petit peu
+l'écriture de la requête SQL.
+
+268
+00:12:25,892 --> 00:12:29,952
+Donc on commence par ajouter
+une deuxième clause FROM
+
+269
+00:12:30,152 --> 00:12:32,382
+qui se présente sous la forme
+d'une requête
+
+270
+00:12:32,582 --> 00:12:33,713
+et dans cette requête
+
+271
+00:12:33,913 --> 00:12:36,683
+on va rechercher la moyenne
+du nombre de lits
+
+272
+00:12:36,883 --> 00:12:37,601
+des hôtels,
+
+273
+00:12:37,801 --> 00:12:40,966
+d'une table HOTELS
+à laquelle on va donner l'alias
+
+274
+00:12:41,166 --> 00:12:45,387
+H2 pour la distinguer de la première
+qui a l'alias H.
+
+275
+00:12:51,519 --> 00:12:53,379
+Ce nombre moyen de lits
+
+276
+00:12:53,579 --> 00:12:56,110
+extrait de cette deuxième table
+
+277
+00:12:56,310 --> 00:13:01,766
+va être utilisé dans la clause
+conditionnelle
+
+278
+00:13:01,966 --> 00:13:06,507
+avec la nécessité
+d'utiliser un alias
+
+279
+00:13:06,707 --> 00:13:09,639
+pour cette table de 
+la clause FROM,
+
+280
+00:13:09,839 --> 00:13:13,181
+donc S pour la table de synthèse
+
+281
+00:13:13,381 --> 00:13:16,724
+et puis un alias également
+pour la colonne
+
+282
+00:13:16,924 --> 00:13:18,261
+qui contient les valeurs moyennes
+
+283
+00:13:18,461 --> 00:13:21,470
+de sorte que l'on puisse référencer
+cet alias
+
+284
+00:13:21,670 --> 00:13:23,046
+dans la clause conditionnelle.
+
+285
+00:13:23,246 --> 00:13:25,994
+On obtient bien les mêmes
+23 résultats
+
+286
+00:13:26,194 --> 00:13:29,459
+que dans le cas où on utilisait
+la clause WHERE.
+
+287
+00:13:29,659 --> 00:13:33,686
+Même chose ici dans le cas
+de Navicat
+
+288
+00:13:33,886 --> 00:13:38,105
+où l'on remplace la table HOTELS
+
+289
+00:13:38,305 --> 00:13:39,063
+par un alias
+
+290
+00:13:39,263 --> 00:13:41,265
+ce qui met à jour
+automatiquement les champs
+
+291
+00:13:41,465 --> 00:13:44,654
+et après la suite peut de nouveau 
+se faire de la même manière
+
+292
+00:13:44,854 --> 00:13:46,331
+dans l'éditeur.
+
+293
+00:13:46,531 --> 00:13:52,790
+On copie ici la requête de calcul
+
+294
+00:13:52,990 --> 00:13:54,685
+de la moyenne,
+
+295
+00:13:54,885 --> 00:13:59,135
+on met des alias sur la deuxième
+table d'hôtels,
+
+296
+00:13:59,335 --> 00:14:01,850
+un alias sur cette requête
+emboîtée,
+
+297
+00:14:02,050 --> 00:14:06,619
+un alias sur la moyenne,
+
+298
+00:14:06,819 --> 00:14:10,289
+ce qui permet de compléter
+
+299
+00:14:10,489 --> 00:14:11,547
+la requête de sélection,
+
+300
+00:14:15,188 --> 00:14:17,437
+ce qui permet de compléter la clause
+conditionnelle
+
+301
+00:14:17,637 --> 00:14:23,308
+et puis on conserve l'idée du tri
+en ordre décroissant.
+
+302
+00:14:36,501 --> 00:14:39,777
+Nous avons vu dans le cas
+de la requête emboîtée
+
+303
+00:14:39,977 --> 00:14:40,855
+dans la clause WHERE
+
+304
+00:14:41,055 --> 00:14:44,734
+que l'on utilise en fait 
+une requête SQL
+
+305
+00:14:44,934 --> 00:14:47,850
+pour définir le critère
+qui est utilisé
+
+306
+00:14:48,050 --> 00:14:52,030
+dans la condition que doit
+vérifier la clause conditionnelle.
+
+307
+00:14:52,230 --> 00:14:54,298
+C'est un cas particulier en fait
+
+308
+00:14:54,498 --> 00:14:57,550
+où la requête qu'on utilise
+renvoie une seule valeur.
+
+309
+00:14:57,750 --> 00:15:00,062
+Mais il peut arriver,
+et même souvent,
+
+310
+00:15:00,262 --> 00:15:01,578
+que la requête utilisée
+
+311
+00:15:01,778 --> 00:15:03,470
+renvoie plusieurs valeurs
+
+312
+00:15:03,670 --> 00:15:06,093
+et que la condition
+que l'on souhaite vérifier
+
+313
+00:15:06,293 --> 00:15:08,267
+c'est que le critère de sélection
+
+314
+00:15:08,467 --> 00:15:11,461
+corresponde à l'une
+des valeurs de cette collection.
+
+315
+00:15:11,661 --> 00:15:12,865
+C'est dans ce cas-là
+
+316
+00:15:13,065 --> 00:15:15,800
+qu'on va utiliser les opérateurs
+IN et NOT IN
+
+317
+00:15:16,000 --> 00:15:20,734
+pour tester en fait les résultats
+
+318
+00:15:20,934 --> 00:15:22,278
+de la requête emboîtée.
+
+319
+00:15:22,478 --> 00:15:26,244
+La syntaxe se présente
+comme précédemment
+
+320
+00:15:26,444 --> 00:15:29,327
+avec simplement
+l'opérateur qui change
+
+321
+00:15:29,527 --> 00:15:34,892
+devenant IN à la place du "égal"
+ou du "plus grand que".
+
+322
+00:15:35,092 --> 00:15:39,414
+Pour illustrer ce type d'utilisation
+de requête emboîtée,
+
+323
+00:15:39,614 --> 00:15:44,166
+nous allons reprendre l'exemple
+des requêtes d'intersection
+
+324
+00:15:44,366 --> 00:15:46,836
+où l'on recherchait en fait les districts
+
+325
+00:15:47,036 --> 00:15:49,477
+qui ont le même nom
+que des lieux-dits
+
+326
+00:15:49,677 --> 00:15:51,547
+ou au contraire
+
+327
+00:15:51,747 --> 00:15:53,464
+des districts qui n'ont pas
+d'équivalents
+
+328
+00:15:53,664 --> 00:15:54,791
+dans la collection des lieux-dits.
+
+329
+00:15:54,991 --> 00:15:59,013
+Nous ajoutons donc la table des
+districts et celle des lieux-dits,
+
+330
+00:15:59,213 --> 00:16:02,715
+sélectionnons le nom
+de la table des districts
+
+331
+00:16:02,915 --> 00:16:05,149
+et on ajoute un critère
+
+332
+00:16:05,349 --> 00:16:07,762
+pour définir la clause WHERE,
+
+333
+00:16:07,962 --> 00:16:10,346
+critère qui va porter
+sur le nom de districts
+
+334
+00:16:10,546 --> 00:16:13,574
+et un opérateur IN
+
+335
+00:16:13,774 --> 00:16:15,345
+pour dire qu'on aimerait que le nom
+
+336
+00:16:15,545 --> 00:16:18,545
+figure dans la collection
+des noms de lieux-dits.
+
+337
+00:16:18,745 --> 00:16:20,702
+Dans cette collection des noms
+de lieux-dits
+
+338
+00:16:20,902 --> 00:16:22,545
+on doit l'écrire à pied
+
+339
+00:16:22,745 --> 00:16:26,142
+avec le nom de la table
+
+340
+00:16:26,342 --> 00:16:27,594
+toujours entre guillemets
+à cause des tirets,
+
+341
+00:16:27,794 --> 00:16:30,243
+la clause FROM
+
+342
+00:16:30,443 --> 00:16:33,089
+et le critère étant défini,
+
+343
+00:16:33,289 --> 00:16:34,867
+on peut encore mettre un peu d'ordre
+
+344
+00:16:35,067 --> 00:16:38,413
+en supprimant la table des
+lieux-dits de la clause principale.
+
+345
+00:16:38,613 --> 00:16:40,190
+Et lorsqu'on exécute cette requête
+
+346
+00:16:40,390 --> 00:16:41,537
+on voit que l'on trouve bien
+
+347
+00:16:41,737 --> 00:16:43,152
+les 17 districts
+
+348
+00:16:43,352 --> 00:16:45,915
+qui ont un équivalent
+dans la collection des lieux-dits.
+
+349
+00:16:46,115 --> 00:16:49,410
+Pour retrouver les districts qui
+n'ont pas d'équivalents
+
+350
+00:16:49,610 --> 00:16:51,784
+on inverse simplement le sens
+de l'opérateur
+
+351
+00:16:51,984 --> 00:16:52,926
+NOT IN
+
+352
+00:16:53,126 --> 00:16:54,439
+et on trouve les 8 districts
+
+353
+00:16:54,639 --> 00:16:56,942
+qui n'ont pas de correspondant
+
+354
+00:16:57,142 --> 00:16:58,779
+dans la collection des lieux-dits.
+
+355
+00:17:00,846 --> 00:17:01,828
+Dans le cas de Navicat
+
+356
+00:17:02,028 --> 00:17:04,016
+on ajoute donc le district,
+
+357
+00:17:04,216 --> 00:17:05,344
+on sélectionne le nom
+
+358
+00:17:05,544 --> 00:17:09,016
+et puis dans la clause conditionnelle
+
+359
+00:17:09,216 --> 00:17:11,809
+on va ajouter simplement
+
+360
+00:17:12,009 --> 00:17:13,924
+le champ "nom de districts",
+
+361
+00:17:17,211 --> 00:17:18,448
+remplacer l'opérateur,
+
+362
+00:17:18,648 --> 00:17:21,648
+alors ici il s'appelle IS IN LIST
+
+363
+00:17:21,848 --> 00:17:24,735
+mais qui est traduit en SQL
+
+364
+00:17:24,935 --> 00:17:26,489
+par simplement le IN
+
+365
+00:17:26,689 --> 00:17:28,598
+et puis comme précédemment,
+
+366
+00:17:28,798 --> 00:17:33,210
+il faut écrire la requête emboîtée
+
+367
+00:17:33,410 --> 00:17:35,289
+de manière explicite
+
+368
+00:17:35,489 --> 00:17:38,347
+sans oublier les guillemets
+pour la table LIEU-DIT
+
+369
+00:17:38,547 --> 00:17:45,525
+et en désactivant l'ajout
+automatique d'apostrophes
+
+370
+00:17:45,725 --> 00:17:49,617
+dans le critère de sélection.
+
+371
+00:17:49,817 --> 00:17:51,705
+Lorsqu'on exécute cette requête,
+
+372
+00:17:51,905 --> 00:17:54,538
+on trouve bien les 17 districts
+que l'on recherchait
+
+373
+00:17:54,738 --> 00:17:57,222
+et pour le complément
+
+374
+00:17:57,422 --> 00:17:59,331
+on inverse l'opérateur
+
+375
+00:17:59,531 --> 00:18:02,611
+et on trouve les 8 districts
+qui n'ont pas d'équivalent
+
+376
+00:18:02,811 --> 00:18:04,321
+dans la collection des lieux-dits.
+
+377
+00:18:15,582 --> 00:18:16,999
+Nous avons vu dans cette leçon
+
+378
+00:18:17,199 --> 00:18:22,797
+qu'il est possible d'utiliser
+des clauses de fusion
+
+379
+00:18:22,997 --> 00:18:25,059
+pour associer les résultats
+de plusieurs requêtes,
+
+380
+00:18:25,259 --> 00:18:27,947
+soit simplement les associer,
+
+381
+00:18:28,147 --> 00:18:30,200
+soit extraire les éléments communs
+
+382
+00:18:30,400 --> 00:18:33,058
+ou soustraire
+les éléments d'une requête
+
+383
+00:18:33,258 --> 00:18:34,812
+des résultats d'une autre requête.
+
+384
+00:18:35,012 --> 00:18:37,485
+Nous avons également vu
+que l'on pouvait
+
+385
+00:18:37,685 --> 00:18:39,529
+utiliser des résultats de requête
+
+386
+00:18:39,729 --> 00:18:41,902
+comme élément d'une requête,
+
+387
+00:18:42,102 --> 00:18:43,078
+d'une autre requête,
+
+388
+00:18:43,278 --> 00:18:44,936
+dans la clause FROM,
+
+389
+00:18:45,111 --> 00:18:45,957
+dans la clause WHERE
+
+390
+00:18:46,144 --> 00:18:48,310
+ou bien aussi à d'autres
+emplacements.
+
+391
+00:18:48,510 --> 00:18:51,252
+Finalement, nous avons vu
+que dans certains cas
+
+392
+00:18:51,452 --> 00:18:53,918
+on pouvait utiliser
+ces requêtes emboîtées
+
+393
+00:18:54,118 --> 00:18:56,843
+avec l'opérateur IN ou NOT IN
+
+394
+00:18:57,043 --> 00:18:58,880
+pour obtenir les mêmes résultats
+
+395
+00:18:59,080 --> 00:19:02,496
+finalement que ce qu'on obtiendrait
+avec des requêtes de fusion.
+

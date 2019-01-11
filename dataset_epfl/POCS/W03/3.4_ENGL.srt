@@ -1,0 +1,268 @@
+1
+00:00:04,130 --> 00:00:07,366
+We are discussing Butler Lampson's
+name service,
+
+2
+00:00:07,366 --> 00:00:09,131
+and the second design goal for the system
+
+3
+00:00:09,131 --> 00:00:10,979
+is reliability.
+
+4
+00:00:10,979 --> 00:00:12,930
+Whenever a user looks up a name,
+
+5
+00:00:12,930 --> 00:00:14,774
+that should be successfully resolved
+
+6
+00:00:14,774 --> 00:00:17,661
+even in the face
+of infrastructure problems.
+
+7
+00:00:17,661 --> 00:00:19,587
+Let's see how that is achieved.
+
+8
+00:00:19,597 --> 00:00:21,875
+So far, we have seen that,
+to its users,
+
+9
+00:00:21,875 --> 00:00:23,963
+the name service exposes the view
+
+10
+00:00:23,963 --> 00:00:25,909
+of a directory tree.
+
+11
+00:00:25,909 --> 00:00:27,585
+Under the covers, however,
+
+12
+00:00:27,585 --> 00:00:29,989
+things are quite different.
+
+13
+00:00:29,989 --> 00:00:33,243
+Each directory is stored
+into multiple servers,
+
+14
+00:00:33,243 --> 00:00:35,189
+and each server maintains its own copy
+
+15
+00:00:35,189 --> 00:00:36,994
+of the directory contents.
+
+16
+00:00:36,994 --> 00:00:40,277
+Now let's zoom into the internals
+of the SRC directory.
+
+17
+00:00:41,447 --> 00:00:44,487
+In the previous slide,
+I implied that all copies
+
+18
+00:00:44,487 --> 00:00:47,325
+of the same directory
+always have the same content.
+
+19
+00:00:47,325 --> 00:00:49,517
+In reality this may not be the case,
+
+20
+00:00:49,517 --> 00:00:52,287
+because different servers
+may see different updates.
+
+21
+00:00:52,287 --> 00:00:55,251
+That is, different changes
+to the directory content.
+
+22
+00:00:55,251 --> 00:00:58,012
+For example, suppose that at some point
+
+23
+00:00:58,012 --> 00:01:00,249
+the three directory copies look like this.
+
+24
+00:01:00,249 --> 00:01:02,016
+Then three updates occurred.
+
+25
+00:01:02,016 --> 00:01:04,412
+Update A reached all servers.
+
+26
+00:01:04,412 --> 00:01:07,163
+Update B reached only server gamma.
+
+27
+00:01:07,163 --> 00:01:10,590
+And Update C
+reached servers alpha and gamma.
+
+28
+00:01:10,590 --> 00:01:13,106
+So, it is possible that
+the directory copies
+
+29
+00:01:13,106 --> 00:01:14,510
+become desynchronized.
+
+30
+00:01:14,510 --> 00:01:16,130
+Which means that we need a mechanism
+
+31
+00:01:16,130 --> 00:01:18,495
+to periodically resynchronize them.
+
+32
+00:01:18,495 --> 00:01:21,570
+This mechanism is called a sweep.
+
+33
+00:01:21,570 --> 00:01:24,109
+And it periodically
+reads all the new updates
+
+34
+00:01:24,109 --> 00:01:26,777
+from directory copies and writes them back
+
+35
+00:01:26,777 --> 00:01:28,741
+to all directory copies.
+
+36
+00:01:28,741 --> 00:01:30,538
+Let us see this visually.
+
+37
+00:01:30,538 --> 00:01:33,822
+The sweep arrives at server alpha,
+
+38
+00:01:33,822 --> 00:01:37,896
+reads the blue and orange updates
+that have reached the server,
+
+39
+00:01:37,896 --> 00:01:42,328
+then moves on to server beta,
+where there are no new updates to read.
+
+40
+00:01:44,368 --> 00:01:46,276
+Then moves on to server gamma,
+
+41
+00:01:46,276 --> 00:01:47,893
+where it reads the green update.
+
+42
+00:01:49,053 --> 00:01:51,744
+Each sweep has a timestamp
+associated with it.
+
+43
+00:01:51,744 --> 00:01:53,527
+In this example it is five.
+
+44
+00:01:53,527 --> 00:01:55,544
+And every time it reads from
+a directory copy,
+
+45
+00:01:55,544 --> 00:01:58,536
+it marks the directory copy
+with its timestamp.
+
+46
+00:01:58,536 --> 00:02:00,903
+After reading all directory copies,
+
+47
+00:02:00,903 --> 00:02:03,818
+the sweep circles back to the beginning,
+
+48
+00:02:03,818 --> 00:02:07,478
+and writes to each server the updates
+that the server is missing.
+
+49
+00:02:07,478 --> 00:02:10,325
+Every time the sweep
+writes the directory copy,
+
+50
+00:02:10,325 --> 00:02:13,972
+it marks again that copy
+with its timestamp.
+
+51
+00:02:13,972 --> 00:02:18,064
+So, reliability is achieved
+through redundancy.
+
+52
+00:02:18,064 --> 00:02:21,368
+Each directory is copied
+into multiple servers,
+
+53
+00:02:21,368 --> 00:02:24,266
+and it is enough for one of
+these servers to be reachable
+
+54
+00:02:24,266 --> 00:02:26,812
+to enable successful name lookup.
+
+55
+00:02:26,812 --> 00:02:28,908
+This requires a bit of extra care,
+
+56
+00:02:28,908 --> 00:02:32,406
+we need to periodically resynchronize
+the different directory copies.
+
+57
+00:02:32,406 --> 00:02:34,205
+That is because different servers
+
+58
+00:02:34,205 --> 00:02:35,666
+see different updates,
+
+59
+00:02:35,666 --> 00:02:37,594
+so we need a periodic sweep
+
+60
+00:02:37,594 --> 00:02:39,887
+in order to bring all
+the different directory copies
+
+61
+00:02:39,887 --> 00:02:41,730
+up to date.

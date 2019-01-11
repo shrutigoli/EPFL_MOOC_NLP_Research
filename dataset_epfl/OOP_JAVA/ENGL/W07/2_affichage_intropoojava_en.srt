@@ -1,0 +1,589 @@
+1
+00:00:04,442 --> 00:00:07,094
+In this episode, we will continue
+our case study on watches,
+
+2
+00:00:07,094 --> 00:00:10,363
+Swiss or not, by the way, and we will
+attack the polymorphic display
+
+3
+00:00:10,363 --> 00:00:12,386
+of the different products
+in our hierarchy
+
+4
+00:00:12,888 --> 00:00:16,564
+As a reminder, at the previous step,
+we made a draft of the hierarchy
+
+5
+00:00:16,564 --> 00:00:20,686
+of products and we know want to
+make sure that
+
+6
+00:00:20,686 --> 00:00:23,878
+these different products can be
+displayed in a polymorphic fashion.
+
+7
+00:00:24,416 --> 00:00:27,942
+Basically, a product like a watch, a mechanism
+or an accessory will have
+
+8
+00:00:27,942 --> 00:00:30,762
+its own way of being displayed
+and we want this display
+
+9
+00:00:30,762 --> 00:00:34,702
+to be polymorphic, that is that,
+if we put an object of type
+
+10
+00:00:34,702 --> 00:00:38,106
+Montre (TN: "watch")  in a variable
+of type Produit (TN: "Product") and we invoke
+
+11
+00:00:38,106 --> 00:00:43,030
+the display method on that variable,
+then we want the output
+
+12
+00:00:43,030 --> 00:00:46,256
+to automatically adapt to the actual
+type of the instance stored in the variable.
+
+13
+00:00:46,568 --> 00:00:49,927
+So each product has its own way of
+being displayed and we are wondering
+
+14
+00:00:49,927 --> 00:00:53,468
+how to proceed to make a
+polymorphic display.
+
+15
+00:00:53,468 --> 00:00:58,162
+So, the idea would be for example that
+I declare a variable of type Produit,
+
+16
+00:00:59,342 --> 00:01:04,443
+I assign to it the reference of an object
+of type Montre, which is a subclass
+
+17
+00:01:04,443 --> 00:01:11,260
+of Produit, and that I then
+proceed to display
+
+18
+00:01:19,473 --> 00:01:23,957
+this object "p". And I would like
+to have all the characteristics of
+
+19
+00:01:23,957 --> 00:01:25,904
+the object, and I want them to
+be automatically adapted to the fact
+
+20
+00:01:25,904 --> 00:01:28,500
+that the object is actually a watch,
+i.e that what I stored
+
+21
+00:01:28,500 --> 00:01:30,500
+in the variable "p" is an object
+of type Montre.
+
+22
+00:01:30,683 --> 00:01:34,012
+The most natural way is of course to
+use the toString method,
+
+23
+00:01:34,012 --> 00:01:37,546
+which is automatically invoked
+by system.out.println,
+
+24
+00:01:37,546 --> 00:01:40,650
+and if we want each product to be
+displayed in its own way, we simply
+
+25
+00:01:40,650 --> 00:01:44,762
+need to override this toString method
+accordingly in
+
+26
+00:01:44,762 --> 00:01:47,220
+each subclass where it seems useful
+to do so.
+
+27
+00:01:47,511 --> 00:01:50,386
+Suppose that we wish to make sure
+that the default way to display
+
+28
+00:01:50,451 --> 00:01:52,383
+a product is to display its price
+
+29
+00:01:52,806 --> 00:01:56,259
+Remember that in the previous episode,
+we described a product
+
+30
+00:01:59,365 --> 00:02:03,521
+as being characterized by an attribute
+of type double
+
+31
+00:02:06,642 --> 00:02:08,925
+corresponding to its base value,
+
+32
+00:02:08,925 --> 00:02:12,568
+and the class also contained a
+public method
+
+33
+00:02:13,378 --> 00:02:16,540
+which calculated the
+price of the product
+
+34
+00:02:19,578 --> 00:02:23,641
+and which, in the Produit class, simply
+returned the base value.
+
+35
+00:02:26,560 --> 00:02:29,361
+In the Produit class, to make sure
+that the toString method
+
+36
+00:02:29,361 --> 00:02:33,810
+displays a representation in the form
+of a character string of the price of the product,
+
+37
+00:02:33,810 --> 00:02:38,215
+and we could thus be tempted
+to display the price
+
+38
+00:02:38,215 --> 00:02:41,683
+by directly using the value of the
+attribute, since we reason that
+
+39
+00:02:41,683 --> 00:02:45,792
+anyway, the price is just the base
+value of the product.
+
+40
+00:02:46,244 --> 00:02:48,220
+This way of doing it, however,
+is not the correct one.
+
+41
+00:02:48,220 --> 00:02:49,464
+Do you know why?
+
+42
+00:02:50,226 --> 00:02:52,503
+We want the toString method
+as defined
+
+43
+00:02:52,503 --> 00:02:55,703
+in the Produit class to determine
+the default behavior,
+
+44
+00:02:55,703 --> 00:02:58,477
+that is, it must be capable of
+displaying the price,
+
+45
+00:02:58,477 --> 00:03:01,238
+the correct price of the product,
+even if it isn't overridden
+
+46
+00:03:01,238 --> 00:03:02,354
+in the subclasses.
+
+47
+00:03:02,687 --> 00:03:06,094
+Yet the price of an object
+corresponds to its base value
+
+48
+00:03:06,094 --> 00:03:08,448
+for a basic product, but this
+is not necessarily
+
+49
+00:03:08,448 --> 00:03:11,760
+the calculation we would make for
+sub-types of products.
+
+50
+00:03:12,347 --> 00:03:14,729
+For example, the price of a bracelet
+could correspond
+
+51
+00:03:14,729 --> 00:03:18,707
+to a base value; however, the price
+of a watch could be calculated
+
+52
+00:03:18,707 --> 00:03:21,368
+as being the sum of the price of
+all its components.
+
+53
+00:03:21,969 --> 00:03:24,579
+And in that case, if we applied
+the toString method to an object
+
+54
+00:03:24,579 --> 00:03:27,902
+of type Montre, we would want
+the price of the watch to be displayed
+
+55
+00:03:27,902 --> 00:03:30,448
+correctly, and not some base value.
+
+56
+00:03:31,318 --> 00:03:34,501
+The correct way to proceed here
+is thus to use, instead of valeur,
+
+57
+00:03:34,501 --> 00:03:37,226
+the prix method, which can of course
+have a polymorphic
+
+58
+00:03:37,226 --> 00:03:39,020
+behaviour itself.
+
+59
+00:03:39,731 --> 00:03:42,339
+Finally, you will have noted that
+here, we had to
+
+60
+00:03:42,339 --> 00:03:47,425
+convert the double returned by
+prix to a string
+
+61
+00:03:47,425 --> 00:03:48,828
+using this syntax.
+
+62
+00:03:49,550 --> 00:03:51,361
+Now, let's finalize
+our Produit class.
+
+63
+00:03:51,719 --> 00:03:54,122
+One of the first things that come
+to mind naturally
+
+64
+00:03:54,122 --> 00:03:56,790
+is that a product does not exist as such
+
+65
+00:03:56,790 --> 00:03:59,288
+It is an abstract entity in
+our implementation.
+
+66
+00:03:59,288 --> 00:04:02,084
+We can make this clear, at the
+design level,
+
+67
+00:04:02,084 --> 00:04:04,954
+by labeling the Produit class
+as being abstract.
+
+68
+00:04:05,629 --> 00:04:09,108
+Suppose that now, we wish to force the
+fact that the value of a product,
+
+69
+00:04:09,108 --> 00:04:11,503
+once initialized, can not be changed
+
+70
+00:04:11,503 --> 00:04:13,305
+during the lifetime of a product.
+
+71
+00:04:13,698 --> 00:04:18,742
+So, the idea would be to give a
+first value to this attribute
+
+72
+00:04:18,742 --> 00:04:21,268
+but not to allow it to be modified.
+
+73
+00:04:21,517 --> 00:04:25,067
+This is possible by
+labeling the attribute
+
+74
+00:04:26,027 --> 00:04:27,060
+as being final.
+
+75
+00:04:27,304 --> 00:04:29,595
+If valeur had been an attribute
+of type object, so
+
+76
+00:04:29,595 --> 00:04:32,924
+something else than a primitive data type,
+would the act of labeling it as final
+
+77
+00:04:32,924 --> 00:04:35,621
+prevent any and all modification
+of this attribute?
+
+78
+00:04:36,231 --> 00:04:39,614
+Suppose lastly that we wish to impose
+that a product should have, by default,
+
+79
+00:04:39,614 --> 00:04:44,172
+a null base value: this can be done
+by adding to the Produit class
+
+80
+00:04:44,172 --> 00:04:46,963
+a default constructor which
+would take care of
+
+81
+00:04:46,963 --> 00:04:49,333
+initializing valeur to a null value.
+
+82
+00:04:50,317 --> 00:04:53,050
+Overloading, and specifically here
+overloading constructors
+
+83
+00:04:53,050 --> 00:04:55,882
+is a rather common way of giving
+default values
+
+84
+00:04:55,882 --> 00:04:57,437
+to certain parameters in Java.
+
+85
+00:04:57,948 --> 00:05:00,685
+So, this is what our Produit
+class looks like in the end.
+
+86
+00:05:00,685 --> 00:05:03,527
+We have declared it as abstract
+because we do not want
+
+87
+00:05:03,527 --> 00:05:05,939
+products to be instantiated as such,
+
+88
+00:05:05,939 --> 00:05:08,084
+they do not exist in that form:
+
+89
+00:05:08,084 --> 00:05:10,981
+a bracelet can be instantiated,
+and so can a watch,
+
+90
+00:05:10,981 --> 00:05:12,770
+but not a product itself.
+
+91
+00:05:12,917 --> 00:05:16,248
+An instance of Produit is defined
+by its base value.
+
+92
+00:05:16,248 --> 00:05:19,567
+We have labeled this attribute
+as final, which means
+
+93
+00:05:19,567 --> 00:05:23,245
+that once it has been initialized
+by one of the constructors,
+
+94
+00:05:23,245 --> 00:05:25,469
+we will not be able to
+change its value.
+
+95
+00:05:25,796 --> 00:05:29,619
+So a product has a constant base
+value during all its lifetime.
+
+96
+00:05:30,378 --> 00:05:34,012
+A product can thus be initialized
+in two ways:
+
+97
+00:05:34,012 --> 00:05:37,733
+either using a constructor that takes
+a base value as argument
+
+98
+00:05:37,733 --> 00:05:39,223
+that will be given to the attribute,
+
+99
+00:05:39,223 --> 00:05:42,812
+or using the default constructor,
+in which case the base value
+
+100
+00:05:42,812 --> 00:05:44,080
+is set to zero.
+
+101
+00:05:44,540 --> 00:05:48,484
+Since we have these constructors,
+would it be possible to write something
+
+102
+00:05:48,484 --> 00:05:52,103
+like this: declaring a variable of
+type Produit,
+
+103
+00:05:52,103 --> 00:05:54,288
+and initializing it like this, for example?
+
+104
+00:05:59,110 --> 00:06:02,179
+The answer is of course no, since
+this class is abstract
+
+105
+00:06:02,179 --> 00:06:03,664
+and thus cannot be instantiated.
+
+106
+00:06:04,181 --> 00:06:07,878
+These constructors will only
+be used by constructors
+
+107
+00:06:07,878 --> 00:06:10,762
+of subclasses of Produit that can actually
+be instantiated.
+
+108
+00:06:11,469 --> 00:06:16,005
+The Produit class contains an override
+of the toString method inherited from Object,
+
+109
+00:06:16,005 --> 00:06:18,756
+and the goal of this is to be able
+to use this toString method
+
+110
+00:06:18,756 --> 00:06:22,119
+in a polymorphic way, that is, to
+be able to override it
+
+111
+00:06:22,119 --> 00:06:23,852
+in subclasses of Produit.
+
+112
+00:06:23,852 --> 00:06:27,412
+That said, it offers a default, basic
+definition which consists in
+
+113
+00:06:27,412 --> 00:06:31,408
+displaying the price, converted
+to a character string.
+
+114
+00:06:31,408 --> 00:06:35,489
+The price is calculated using another
+polymorphic method,
+
+115
+00:06:35,489 --> 00:06:37,931
+that is, a method that we will
+be able to redefine
+
+116
+00:06:37,931 --> 00:06:40,753
+in subclasses of Produit to
+adapt to the actual nature
+
+117
+00:06:40,753 --> 00:06:42,403
+of the instance to which it belongs.
+
+118
+00:06:42,881 --> 00:06:46,337
+That way, when we call the
+toString method on a Montre
+
+119
+00:06:46,337 --> 00:06:48,759
+stored in a variable of type Produit,
+
+120
+00:06:48,759 --> 00:06:52,363
+then the prix method of the Montre
+object will be called
+
+121
+00:06:52,363 --> 00:06:55,496
+and the display of the 
+price will be correct.
+
+122
+00:06:55,673 --> 00:06:58,144
+This concludes our episode
+on the definition of products
+
+123
+00:06:58,144 --> 00:06:59,623
+and their polymorphic display.

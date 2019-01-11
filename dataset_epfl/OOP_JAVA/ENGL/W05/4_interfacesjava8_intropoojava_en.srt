@@ -1,0 +1,1505 @@
+1
+00:00:04,520 --> 00:00:06,650
+As outlined in a previous video,
+
+2
+00:00:06,650 --> 00:00:11,070
+the concept of interfaces has received
+important additions since Java 8.
+
+3
+00:00:11,070 --> 00:00:15,160
+The point of this video is to show
+you these new concepts and particularly
+
+4
+00:00:15,160 --> 00:00:18,299
+the notion of interface default methods.
+
+
+5
+00:00:19,310 --> 00:00:22,990
+We have seen that, up until Java 7 included,
+an interface could contain
+
+6
+00:00:22,990 --> 00:00:25,980
+constants as well as
+abstract method signature.
+
+7
+00:00:27,090 --> 00:00:31,150
+This is of course still
+possible for interfaces in
+
+8
+00:00:31,150 --> 00:00:36,000
+Java 8, but it is now also possible
+to give these methods a body.
+
+9
+00:00:36,000 --> 00:00:40,240
+We can give a default definition
+to an interface's methods,
+
+10
+00:00:40,240 --> 00:00:42,210
+this is a noteworthy addition.
+
+11
+00:00:42,210 --> 00:00:45,880
+It is also possible to give, to define
+inside an interface a
+
+12
+00:00:45,880 --> 00:00:50,120
+number of static methods, in the
+same way we define
+
+13
+00:00:50,120 --> 00:00:51,740
+static methods in a class.
+
+14
+00:00:53,550 --> 00:00:57,591
+In this video, we will
+mostly show this part,
+
+15
+00:00:57,591 --> 00:01:01,530
+that is, default methods
+in an interface.
+
+16
+00:01:01,530 --> 00:01:05,300
+The second part is the subject of a
+PDF supplement that you can find
+
+17
+00:01:05,300 --> 00:01:06,180
+on the class' website.
+
+18
+00:01:07,890 --> 00:01:11,780
+To illustrate the notion of default
+methods in an interface,
+
+19
+00:01:11,780 --> 00:01:13,310
+let us start with an example.
+
+20
+00:01:13,310 --> 00:01:17,279
+We will of course use our famous
+example of game characters.
+
+21
+00:01:18,360 --> 00:01:21,550
+Suppose we now wish to model
+the fact that certain
+
+22
+00:01:21,550 --> 00:01:26,760
+characters are able to ride mounts.
+
+
+23
+00:01:26,760 --> 00:01:30,210
+This means that these characters
+would not be able to
+
+24
+00:01:30,210 --> 00:01:33,840
+have features relative to the
+fact that they are riding a mount.
+
+25
+00:01:33,840 --> 00:01:38,110
+For example, is a character that is
+riding a mount allowed to
+
+26
+00:01:38,110 --> 00:01:40,010
+dismount during gameplay?
+
+27
+00:01:40,010 --> 00:01:42,410
+How will they move around
+while on this mount?
+
+28
+00:01:42,410 --> 00:01:43,190
+And so on.
+
+29
+00:01:44,240 --> 00:01:46,600
+Where to put these features
+in our design ?
+
+30
+00:01:47,680 --> 00:01:49,760
+Suppose now that in our game,
+
+
+31
+00:01:49,760 --> 00:01:55,480
+only rogues and warriors are
+able to ride mounts.
+
+32
+00:01:55,480 --> 00:02:00,250
+It does not make sense, in this case,
+to put features related
+
+33
+00:02:00,250 --> 00:02:03,630
+to riding in the Personnage (="Character") class.
+
+34
+00:02:03,630 --> 00:02:10,920
+Here, it would not make sense to put
+a 'seDeplace' (="moves") method indicating
+
+35
+00:02:10,920 --> 00:02:16,190
+how a character moves with a mount
+in the Personnage class,
+
+36
+00:02:16,190 --> 00:02:20,070
+and neither would putting a 'peutDescendre'
+(="can dismount") method in Personnage
+
+37
+00:02:23,180 --> 00:02:26,660
+indicating if a character is allowed
+to get off his mount or not.
+
+38
+00:02:26,660 --> 00:02:28,700
+Why?
+Well, simply
+
+39
+00:02:28,700 --> 00:02:32,180
+because the wizard is not able
+to ride a mount, and so it does not
+
+40
+00:02:32,180 --> 00:02:35,830
+make sense to make him inherit
+methods 'seDeplace' and 'peutDescendre'.
+
+41
+00:02:37,090 --> 00:02:40,760
+Hence it is normal, here, to rather put
+these methods in an
+
+42
+00:02:40,760 --> 00:02:42,900
+interface, here the interface
+'Chevauchant' (="Riding").
+
+43
+00:02:45,650 --> 00:02:51,460
+We would put in that interface
+methods typically relative to
+
+44
+00:02:51,460 --> 00:02:57,890
+moving around with a mount,
+or to check how we can
+
+45
+00:02:57,890 --> 00:03:01,790
+use this mount, for example
+if we can dismount or not.
+
+46
+00:03:01,790 --> 00:03:05,930
+Here is what the 'Chevauchant'
+interface could look like.
+
+47
+00:03:05,930 --> 00:03:08,990
+This interface could contain
+the signature of a 'seDeplace' method,
+
+48
+00:03:08,990 --> 00:03:12,960
+which would be used
+to indicate how moving
+
+49
+00:03:12,960 --> 00:03:16,960
+while riding would work, as well as
+a method 'peutDescendre' returning a boolean
+
+50
+00:03:16,960 --> 00:03:21,320
+and indicating whether
+or not one can dismount.
+
+51
+00:03:21,320 --> 00:03:24,430
+You can see that this is
+the same as what was shown for
+
+52
+00:03:24,430 --> 00:03:26,900
+interfaces in Java versions
+before Java 8.
+
+53
+00:03:26,900 --> 00:03:31,280
+We have here two abstract method statements:
+each class that we would
+
+54
+00:03:31,280 --> 00:03:35,510
+like to be instantiable and which would
+implement the Chevauchant interface
+
+55
+00:03:35,510 --> 00:03:38,680
+will necessarily
+provide a concrete
+
+56
+00:03:38,680 --> 00:03:42,820
+implementation of these two methods
+just to be instantiable.
+
+57
+00:03:42,820 --> 00:03:45,390
+Let's see what it is possible
+to do from Java 8,
+
+58
+00:03:45,390 --> 00:03:48,050
+and let us suppose that in most cases
+
+59
+00:03:48,050 --> 00:03:52,080
+a character riding a mount
+cannot dismount.
+
+60
+00:03:52,080 --> 00:03:53,240
+Well since Java 8,
+
+61
+00:03:53,240 --> 00:03:57,760
+it is possible to specify this
+behaviour inside the interface.
+
+62
+00:03:57,760 --> 00:04:01,460
+This is done by giving a default
+definition to the 'peutDescendre' method.
+
+63
+00:04:02,830 --> 00:04:06,890
+In practice, this means that this
+method can now have a body.
+
+64
+00:04:08,910 --> 00:04:11,510
+This body simply consists
+of returning false,
+
+65
+00:04:11,510 --> 00:04:14,990
+which indicates that
+one cannot dismount.
+
+66
+00:04:14,990 --> 00:04:16,895
+Every interface method
+which contains a body,
+
+67
+00:04:16,895 --> 00:04:21,170
+that is, a concrete definition such
+as this example, must be
+
+68
+00:04:21,170 --> 00:04:26,110
+prefixed with "default", without it
+the compiler will call you out
+
+69
+00:04:26,110 --> 00:04:29,910
+by telling you that an abstract
+method cannot have a body.
+
+70
+00:04:29,910 --> 00:04:32,640
+Remember, every method
+header is automatically
+
+71
+00:04:32,640 --> 00:04:35,530
+abstract inside an interface,
+even if this modifier,
+
+72
+00:04:35,530 --> 00:04:38,820
+the 'abstract' modifier,
+is not explicitely written.
+
+73
+00:04:38,820 --> 00:04:42,450
+The formal syntax for the declaration
+of a method with a default definition
+
+74
+00:04:42,450 --> 00:04:46,450
+in an interface is simply as follows:
+you have the reserved keyword
+
+75
+00:04:46,450 --> 00:04:52,050
+'default' followed by the concrete
+definition of the method,
+
+76
+00:04:52,050 --> 00:04:55,480
+thsi definition is done in exactly
+the same way as what you do
+
+77
+00:04:55,480 --> 00:04:59,280
+inside a class, you put a header
+followed by a body inside braces.
+
+78
+00:05:00,540 --> 00:05:03,810
+Of course, this addition raises
+new problems.
+
+79
+00:05:03,810 --> 00:05:07,110
+We will see in the next part what
+the usage rules for methods with a
+
+80
+00:05:07,110 --> 00:05:08,395
+default definition are.
+
+81
+00:05:08,395 --> 00:05:10,510
+Are we allowed to redefine them?
+
+82
+00:05:10,510 --> 00:05:14,690
+How do classes which implement
+interfaces with default methods
+
+83
+00:05:14,690 --> 00:05:16,760
+use said methods?
+
+
+84
+00:05:17,850 --> 00:05:21,060
+But above all we will see how to
+solve any ambiguities
+
+85
+00:05:21,060 --> 00:05:25,250
+that can result from using
+these default definitions.
+
+86
+00:05:25,250 --> 00:05:29,140
+For example,
+suppose we have an interface I
+
+87
+00:05:30,910 --> 00:05:35,820
+with a default definition
+for a given method,
+
+88
+00:05:41,980 --> 00:05:47,419
+and suppose that a class C
+which implements
+
+89
+00:05:47,419 --> 00:05:54,410
+interface I also contains
+
+90
+00:05:54,410 --> 00:05:59,680
+a method with the same signature
+but potentially another definition.
+
+91
+00:06:01,580 --> 00:06:09,340
+Thus, we potentially have
+a conflict.
+
+92
+00:06:09,340 --> 00:06:13,990
+Another example: suppose we have this time
+two interfaces,
+
+93
+00:06:18,540 --> 00:06:22,700
+with each one containing a
+default definition
+
+94
+00:06:24,260 --> 00:06:26,890
+for a same signature method.
+
+95
+00:06:26,890 --> 00:06:31,465
+Here, interface I1 has the method M
+with a default definition,
+
+96
+00:06:31,465 --> 00:06:38,515
+similarly, interface I2
+
+
+97
+00:06:38,515 --> 00:06:44,588
+contains a default definition for
+method M, too.
+
+98
+00:06:44,588 --> 00:06:49,080
+What happens if a
+
+99
+00:06:49,080 --> 00:06:54,090
+class implements both interfaces?
+
+100
+00:06:57,760 --> 00:07:04,900
+Here, again, we have a
+potential conflict.
+
+101
+00:07:06,430 --> 00:07:08,920
+Four fundamental rules
+govern the use
+
+102
+00:07:08,920 --> 00:07:11,720
+of default methods
+in interfaces.
+
+103
+00:07:11,720 --> 00:07:13,720
+We will now show them to you.
+
+104
+00:07:13,720 --> 00:07:17,800
+The first rule is that default
+method definitions are inherited.
+
+105
+00:07:17,800 --> 00:07:21,220
+Recall that we defined the 'Chevauchant'
+interface as follows :
+
+106
+00:07:21,220 --> 00:07:24,790
+this interface had an abstract
+method 'seDeplace'
+
+107
+00:07:24,790 --> 00:07:29,200
+as well as a default definition of a
+'peutDescendre' method, returning false
+
+108
+00:07:29,200 --> 00:07:31,700
+to indicate that
+the default behaviour of
+
+109
+00:07:31,700 --> 00:07:34,730
+a mounted character was
+never dismounting.
+
+110
+00:07:34,730 --> 00:07:37,960
+It is entirely possible to
+define a sub-interface,
+
+111
+00:07:37,960 --> 00:07:42,060
+here sub-interface 'Cavalier' (="Rider"),
+of the 'Chevauchant' interface,
+
+112
+00:07:42,060 --> 00:07:45,810
+which does not explicitely redefine
+the 'peutDescendre' method.
+
+113
+00:07:45,810 --> 00:07:50,440
+If a rider has as default behaviour
+never dismounting,
+
+114
+00:07:50,440 --> 00:07:54,140
+then the definition inherited
+from super-interface 'Chevauchant'
+
+115
+00:07:54,140 --> 00:07:57,830
+is enough,
+and in that case,
+
+116
+00:07:57,830 --> 00:08:00,610
+we do not redefine that method
+and keep the inherited one.
+
+117
+00:08:01,630 --> 00:08:04,680
+You will have realised that it is
+possible to implement in a
+
+118
+00:08:04,680 --> 00:08:09,610
+sub-interface, here 'Cavalier',
+a default definition for
+
+119
+00:08:09,610 --> 00:08:14,040
+an abstract method, which was abstract
+in 'Chevauchant', from which it inherits.
+
+120
+00:08:14,040 --> 00:08:18,285
+This is the case here with method 'seDeplace';
+a rider has a concrete definition of
+
+121
+00:08:18,285 --> 00:08:19,255
+the 'seDeplace' method,
+
+122
+00:08:19,255 --> 00:08:22,015
+which was not the case in
+super-interface 'Chevauchant'.
+
+123
+00:08:23,135 --> 00:08:24,455
+A rider goes at a trot.
+
+124
+00:08:25,585 --> 00:08:30,975
+Here, a class implementing the 'Cavalier'
+class would have a 'peutDescendre'
+
+125
+00:08:30,975 --> 00:08:35,520
+method whose default definition
+returns false, and a 'seDeplace'
+
+126
+00:08:35,520 --> 00:08:41,260
+method which has the default behaviour,
+that is, going at a trot.
+
+127
+00:08:41,260 --> 00:08:44,500
+We have said it wasn't necessary
+to redefine a 'peutDescendre'
+
+128
+00:08:44,500 --> 00:08:49,000
+method in 'Cavalier' if we are
+satisfait with the default definition
+
+129
+00:08:49,000 --> 00:08:52,600
+inherit from above, but, of course, if we
+are not satisfied with it,
+
+130
+00:08:52,600 --> 00:08:56,540
+nothing is stopping us from redefining
+what was inherited,
+
+131
+00:08:56,540 --> 00:09:00,150
+just like we did for classes,
+so here, for example, we can imagine
+
+132
+00:09:00,150 --> 00:09:05,290
+an alternative design of the 'Cavalier'
+interface, which would have not only
+
+133
+00:09:05,290 --> 00:09:09,650
+a default definition of 'seDeplace',
+but also a redefinition of the
+
+134
+00:09:09,650 --> 00:09:14,550
+'peutDescendre' method which would this time,
+for example, return true, indicating
+
+135
+00:09:14,550 --> 00:09:18,510
+that a rider has as default behaviour
+the ability to dismount.
+
+136
+00:09:19,520 --> 00:09:22,990
+Rule number two: a class which
+implements an interface
+
+137
+00:09:22,990 --> 00:09:28,050
+is not required to give
+concrete definitions
+
+138
+00:09:28,050 --> 00:09:31,749
+for methods having default 
+definitions in the interface.
+
+139
+00:09:32,880 --> 00:09:37,130
+For example, suppose the 'Guerrier' (="Warrior")
+class implements the 'Cavalier' interface,
+
+140
+00:09:37,130 --> 00:09:41,060
+this interface had two methods,
+'seDeplace' and 'peutDescendre', which
+
+141
+00:09:41,060 --> 00:09:43,960
+had both default definitions;
+in this case
+
+142
+00:09:43,960 --> 00:09:46,480
+the 'Guerrier' class can
+be instantiated as is,
+
+143
+00:09:46,480 --> 00:09:49,730
+it does not have to redefine
+these two methods.
+
+144
+00:09:49,730 --> 00:09:52,260
+This is the main reason
+for the existence of
+
+145
+00:09:52,260 --> 00:09:55,780
+default methods in interfaces.
+
+
+146
+00:09:55,780 --> 00:09:59,950
+Indeed, Java's API contains
+numerous predefined interfaces
+
+147
+00:09:59,950 --> 00:10:02,320
+implemented by a number of classes.
+
+148
+00:10:02,320 --> 00:10:04,490
+Before Java 8, it wasn't possible,
+
+149
+00:10:04,490 --> 00:10:07,980
+without default methods,
+
+
+150
+00:10:07,980 --> 00:10:11,515
+to edit an external interface
+by adding a method,
+
+151
+00:10:11,515 --> 00:10:15,131
+without having to change all classes
+implementing this interface.
+
+152
+00:10:15,131 --> 00:10:19,885
+In concrete terms,
+suppose we have
+
+153
+00:10:19,885 --> 00:10:23,865
+in the API an interface I,
+with a number of methods.
+
+154
+00:10:23,865 --> 00:10:30,584
+Keeping it simple, here,
+two methods, m1 and m2;
+
+155
+00:10:33,340 --> 00:10:37,150
+suppose that a lot of classes
+implement this interface.
+
+156
+00:10:37,150 --> 00:10:38,720
+We take two here, as an example.
+
+157
+00:10:39,780 --> 00:10:46,060
+So, classes C1 and C2, both
+implementing interface I.
+
+158
+00:10:46,060 --> 00:10:48,960
+Both class here are not abstract,
+which means that we want them
+
+159
+00:10:48,960 --> 00:10:51,020
+to be instantiable; for them
+to be instantiable,
+
+160
+00:10:51,020 --> 00:10:55,335
+they must necessarily give a concrete
+definition of methods m1
+
+161
+00:10:55,335 --> 00:10:59,905
+and m2; so if these classes exist
+and are compilable,
+
+162
+00:10:59,905 --> 00:11:02,815
+it is because they have
+a concrete definition
+
+163
+00:11:05,455 --> 00:11:09,835
+of the methods given by
+the implemented interface.
+
+164
+00:11:11,790 --> 00:11:13,390
+So, same here for m2.
+
+165
+00:11:13,390 --> 00:11:20,950
+And we would need to do the same in the
+interface, in the class, sorry, C2.
+
+166
+00:11:26,570 --> 00:11:29,680
+Now, suppose that,
+our needs evolving with time,
+
+167
+00:11:29,680 --> 00:11:36,430
+we realize interface I
+also needs a method m3.
+
+168
+00:11:36,430 --> 00:11:39,260
+What happens to existing code?
+
+
+169
+00:11:40,950 --> 00:11:41,830
+Well, simply,
+
+170
+00:11:41,830 --> 00:11:44,780
+if we write it like this, the existing
+code does not compile any more.
+
+171
+00:11:46,120 --> 00:11:49,340
+Classes C1 and C2 are not abstract,
+and so,
+
+172
+00:11:49,340 --> 00:11:53,020
+like what we did for m1 and m2,
+we would need to edit
+
+173
+00:11:53,020 --> 00:11:56,830
+these classes to give a concrete
+definition to m3.
+
+174
+00:11:56,830 --> 00:12:02,220
+Being able to give a
+default definition
+
+175
+00:12:03,890 --> 00:12:07,590
+for method m3,
+lets us work around this problem.
+
+176
+00:12:09,990 --> 00:12:14,385
+According to this rule,
+a class implementing an interface
+
+177
+00:12:14,385 --> 00:12:17,745
+is not obligated to redefine
+a method which has a default definition,
+
+178
+00:12:17,745 --> 00:12:21,215
+and in this case there is no need to define m3
+inside the classes
+
+179
+00:12:21,215 --> 00:12:24,905
+so that these classes stay
+compilable and instantiable.
+
+180
+00:12:25,915 --> 00:12:28,675
+The two rules we just examined
+determine how we can
+
+181
+00:12:28,675 --> 00:12:31,935
+write and use interface methods,
+with default definitions.
+
+182
+00:12:31,935 --> 00:12:35,710
+Let us now look at the two rules
+relative to potntial conflicts,
+
+183
+00:12:35,710 --> 00:12:38,720
+as shown before.
+
+
+184
+00:12:38,720 --> 00:12:42,870
+To begin with, what happens if a
+class implementing an interface
+
+185
+00:12:42,870 --> 00:12:47,680
+defines a methods which already had
+a default definition in the interface?
+
+186
+00:12:47,680 --> 00:12:52,139
+For example, suppose the 'Guerrier' class
+implements the 'Cavalier' interface,
+
+187
+00:12:54,440 --> 00:12:58,570
+which contains a default definition
+of the 'seDeplace' method.
+
+188
+00:13:02,110 --> 00:13:05,960
+Suppose that same class, 'Guerrier',
+already has an alternative definition
+
+189
+00:13:05,960 --> 00:13:10,859
+of the 'seDeplace' method, here by
+inheritance from the 'Personnage' class.
+
+190
+00:13:13,000 --> 00:13:16,900
+Here, we are in a slightly different context
+than that of our introductory example,
+
+191
+00:13:16,900 --> 00:13:20,160
+we have a design in which a
+general method, 'seDeplace',
+
+192
+00:13:20,160 --> 00:13:24,340
+is present from the start
+in the superclass 'Personnage'.
+
+193
+00:13:24,340 --> 00:13:27,440
+The question is: how to solve the
+ambiguity between this general
+
+194
+00:13:27,440 --> 00:13:32,260
+'seDeplace' method, and the one with
+the same name in interface 'Chevauchant'?
+
+195
+00:13:32,260 --> 00:13:34,880
+Will the warrior move by running,
+or at a trot?
+
+196
+00:13:35,950 --> 00:13:36,980
+Well, the rule chosen
+
+197
+00:13:36,980 --> 00:13:40,390
+by Java, is that methods from
+classes have priority,
+
+198
+00:13:40,390 --> 00:13:44,370
+have precedence, over any default
+definitions in an interface.
+
+199
+00:13:46,090 --> 00:13:53,380
+Here, if I declare an instance of the
+'Guerrier' type, and invoke the 'seDeplace'
+
+200
+00:13:53,380 --> 00:13:58,100
+methoed, in this instance, the definition
+from the class
+
+201
+00:13:58,100 --> 00:14:03,940
+will be chosen, and so the warrior will
+move by running.
+
+202
+00:14:03,940 --> 00:14:07,510
+Of course, if we rather want the
+interface's method to be used,
+
+203
+00:14:07,510 --> 00:14:13,470
+it is completely possible
+to specify that.
+
+204
+00:14:14,820 --> 00:14:18,470
+To do that, the 'seDeplace'
+method must be redefined
+
+205
+00:14:18,470 --> 00:14:20,930
+in the 'Guerrier' class,
+
+206
+00:14:20,930 --> 00:14:25,840
+and it must specify that the method
+from the interface is to be used.
+
+207
+00:14:27,340 --> 00:14:31,540
+So, here, the method 'seDeplace' is
+is redefined in the 'Guerrier' class,
+
+208
+00:14:31,540 --> 00:14:35,340
+it is redefined such as to invoke the
+method, the default definition of the
+
+209
+00:14:35,340 --> 00:14:39,090
+'seDeplace' method, as it was
+defined in the 'Cavalier' interface.
+
+210
+00:14:40,250 --> 00:14:44,230
+To invoke a method with a default
+definition in an interface,
+
+211
+00:14:44,230 --> 00:14:48,610
+we put the name of the interface,
+then a dot, then the reserved keyword
+
+212
+00:14:48,610 --> 00:14:54,320
+'super', another dot, and the name of
+the method with the default definition.
+
+213
+00:14:54,320 --> 00:14:57,210
+Note here the usage of reserved
+keyword 'super'.
+
+214
+00:14:59,350 --> 00:15:02,560
+This keyword is used to differenciate
+between invoking a
+
+215
+00:15:02,560 --> 00:15:05,380
+method with a default definition
+
+216
+00:15:05,380 --> 00:15:09,090
+and invoking a static method from
+the interface.
+
+217
+00:15:09,090 --> 00:15:13,280
+For example, it is possible to declare
+an interface like this,
+
+218
+00:15:16,470 --> 00:15:23,030
+putting in it methods with default
+definitions, which we now know
+
+219
+00:15:23,030 --> 00:15:30,290
+how to do, but also to put in
+static methods,
+
+220
+00:15:31,600 --> 00:15:35,865
+in the same way we can put
+static methods in a class.
+
+221
+00:15:35,865 --> 00:15:44,118
+Suppose a class C
+
+222
+00:15:44,118 --> 00:15:50,530
+implements interface I,
+
+223
+00:15:52,220 --> 00:15:55,830
+if we want to invoke a method
+from the interface
+
+224
+00:15:56,890 --> 00:16:01,740
+inside one of C's methods,
+we proceed as follows.
+
+225
+00:16:06,300 --> 00:16:10,360
+So, to invoke the static method,
+we put the name of the interface,
+
+226
+00:16:10,360 --> 00:16:14,660
+then a dot,
+then the name of the static method.
+
+227
+00:16:14,660 --> 00:16:18,300
+To invoke the method with default
+definition, we use the name of the
+
+228
+00:16:18,300 --> 00:16:23,810
+interface, followed by 'super', then the
+name of the method with default definition.
+
+229
+00:16:25,830 --> 00:16:27,040
+Note the distinction, here:
+
+230
+00:16:27,040 --> 00:16:31,860
+to invoke a static method of an interface,
+we put the name of the interface,
+
+231
+00:16:31,860 --> 00:16:34,730
+then the name of the method;
+it is exactly the same
+
+232
+00:16:34,730 --> 00:16:39,500
+syntax as the one used to invoke
+a static member from a class.
+
+233
+00:16:39,500 --> 00:16:43,330
+However, to invoke a method with
+a default definition,
+
+234
+00:16:43,330 --> 00:16:44,710
+we insert the reserved keyword 'super'.
+
+235
+00:16:46,860 --> 00:16:49,930
+Remember that static interface
+are the subject of a PDF
+
+236
+00:16:49,930 --> 00:16:52,740
+complement on the course website.
+
+237
+00:16:52,740 --> 00:16:54,530
+Small remark, here, before continuing,
+
+238
+00:16:54,530 --> 00:16:57,920
+these two interface methods
+cannot have the same name.
+
+239
+00:16:57,920 --> 00:17:02,130
+The compiler does not accept an interface
+method with the same signature
+
+240
+00:17:02,130 --> 00:17:05,230
+to be at the same time static
+and also have a
+
+241
+00:17:05,230 --> 00:17:06,508
+default definition.
+
+242
+00:17:06,508 --> 00:17:11,470
+What happens, now, if a class
+implements two interfaces, with
+
+243
+00:17:11,470 --> 00:17:15,210
+both containing a default definition
+for the same method?
+
+244
+00:17:15,210 --> 00:17:18,978
+Here, for example,
+we have two interfaces:
+
+245
+00:17:18,978 --> 00:17:21,990
+'Dragonnier' (="Dragon Rider"), and
+'se téléporte' (="teleports").
+
+246
+00:17:21,990 --> 00:17:26,410
+Both of these interfaces have a
+default definition for a 'seDeplace'
+
+247
+00:17:26,410 --> 00:17:31,920
+method, with exactly the same
+signature in both cases.
+
+248
+00:17:31,920 --> 00:17:35,730
+We have here a class, 'Mage Ultime'
+(="Ultimate Mage"), which implements
+
+249
+00:17:35,730 --> 00:17:39,380
+both interfaces; when we invoke
+the 'seDeplace' method
+
+250
+00:17:39,380 --> 00:17:44,090
+on an instance of 'Mage ultime', which
+one of the two methods is invoked?
+
+251
+00:17:45,320 --> 00:17:47,220
+We have here a conflict.
+
+252
+00:17:48,770 --> 00:17:51,980
+The rule adopted by Java to solve
+such situations is that
+
+253
+00:17:51,980 --> 00:17:56,475
+classes which implement conflicting interfaces
+are required to remove the
+
+254
+00:17:56,475 --> 00:17:57,245
+ambiguity themselves.
+
+255
+00:17:58,585 --> 00:17:59,765
+For example, the 'Ultimate Mage'
+
+256
+00:17:59,765 --> 00:18:04,715
+class, which implements both
+conflicting interfaces, must redefine
+
+257
+00:18:04,715 --> 00:18:09,235
+the 'seDeplace' method, to specify
+which of the two it wants to use,
+
+258
+00:18:09,235 --> 00:18:12,845
+Which of the two default definitions,
+from the interfaces, it will use.
+
+259
+00:18:14,010 --> 00:18:16,240
+Here the choice is made,
+
+260
+00:18:16,240 --> 00:18:20,970
+towards the default definition contained
+in the 'Dragonnier' interface.
+
+261
+00:18:20,970 --> 00:18:25,560
+The 'seDeplace' method from 'Mage Ultime'
+is redefined such as to invoke the
+
+262
+00:18:25,560 --> 00:18:30,569
+'seDeplace' method as it was default
+defined in the 'Dragonnier' interface.
+
+263
+00:18:31,840 --> 00:18:35,220
+Nothing prevents us, of course, from
+choosing instead the 'seDeplace' method
+
+264
+00:18:35,220 --> 00:18:37,148
+from the 'se téléporte' interface.
+
+265
+00:18:37,148 --> 00:18:41,130
+In this case, the 'seDeplace'
+method is redefined in
+
+266
+00:18:41,130 --> 00:18:45,480
+'Mage ultime' such as to
+choose the 'seDeplace' method
+
+267
+00:18:45,480 --> 00:18:49,090
+as it is defined in the
+'se téléporte' interface.
+
+268
+00:18:49,090 --> 00:18:53,430
+A lot of other implementations are,
+of course, possible; and nothing prevents
+
+269
+00:18:53,430 --> 00:18:56,870
+the 'Mage ultime' class from
+redefining the 'seDeplace' method
+
+270
+00:18:56,870 --> 00:19:01,760
+such as to use the default definitions
+from both interfaces.
+
+271
+00:19:03,580 --> 00:19:07,980
+Here you have an example of a
+definition of 'seDeplace' which calls,
+
+272
+00:19:07,980 --> 00:19:12,940
+in certain conditions, 'seDeplace' from
+the 'se téléporte';
+
+273
+00:19:12,940 --> 00:19:16,330
+and in other conditions the 'seDeplace'
+method from 'Dragonnier'.
+
+274
+00:19:18,290 --> 00:19:21,380
+If the ultimate mage can dismount, then
+
+
+275
+00:19:21,380 --> 00:19:25,770
+they move by teleporting, otherwise,
+well, they move like a dragon rider.
+
+276
+00:19:27,220 --> 00:19:30,800
+With the introduction of default
+definitions in interfaces, their content
+
+277
+00:19:30,800 --> 00:19:33,790
+is now very close to that of
+abstract classes.
+
+278
+00:19:33,790 --> 00:19:38,230
+We can now indeed put inside an interface
+not only abstract methods,
+
+279
+00:19:38,230 --> 00:19:44,870
+which was already the case before
+Java 8, and we can also add
+
+280
+00:19:44,870 --> 00:19:50,670
+methods which now have a concrete
+definition by default.
+
+281
+00:19:53,350 --> 00:19:56,880
+That puts them very close to
+the concept of abstract class.
+
+282
+00:19:58,350 --> 00:20:01,840
+We can thus ask ourselves when to
+choose on option
+
+283
+00:20:01,840 --> 00:20:03,370
+over another.
+
+284
+00:20:03,370 --> 00:20:06,020
+Well, one of the biggest differences
+is that an interface cannot
+
+285
+00:20:06,020 --> 00:20:08,910
+specify a state,
+it cannot contains attributes.
+
+286
+00:20:08,910 --> 00:20:11,640
+For example,
+it is not possible to define
+
+287
+00:20:11,640 --> 00:20:14,200
+what the rider's mount is in
+the 'Cavalier' interface.
+
+288
+00:20:15,560 --> 00:20:22,210
+Here, I cannot put an attribute like
+'Monture' (="Mount") in 'Cavalier'.
+
+289
+00:20:24,790 --> 00:20:28,910
+Being able to specify an attribute
+would let us specify a state
+
+290
+00:20:28,910 --> 00:20:32,270
+for the rider: depending on
+which mount they are riding,
+
+291
+00:20:32,270 --> 00:20:36,500
+they would be in such or such state; this
+is not possible in an interface.
+
+292
+00:20:36,500 --> 00:20:39,440
+The other difference,
+which is inherent to the notion of state,
+
+293
+00:20:39,440 --> 00:20:44,650
+is the lack of constructor;
+
+294
+00:20:44,650 --> 00:20:48,320
+it is inherent to the notion
+of state, since the
+
+295
+00:20:48,320 --> 00:20:52,400
+constructor is used to initialise
+attributes, but there are none.
+
+296
+00:20:52,400 --> 00:20:56,080
+To sum up, though, no state,
+no constructor.
+
+297
+00:20:57,300 --> 00:21:02,380
+The general rule one should follow is that if
+what we want to modelise is a
+
+298
+00:21:02,380 --> 00:21:07,110
+behavioural, functional aspect,
+
+299
+00:21:08,530 --> 00:21:10,980
+like moving around, independent of state,
+
+300
+00:21:15,160 --> 00:21:21,310
+of an object, then we will favour
+using interfaces.
+
+301
+00:21:21,310 --> 00:21:23,330
+The implements relation
+is much more flexible,
+
+302
+00:21:23,330 --> 00:21:26,300
+less restricting than that of
+inheritance while designing.
+
+303
+00:21:26,300 --> 00:21:29,895
+Remember finally that the main point
+of default definitions
+
+304
+00:21:29,895 --> 00:21:33,495
+for methods in interfaces,
+is not to copy multiple
+
+305
+00:21:33,495 --> 00:21:36,815
+inheritance, or to bring an alternative
+to abstract classes,
+
+306
+00:21:36,815 --> 00:21:42,195
+but it is to allow
+adding new methods
+
+307
+00:21:42,195 --> 00:21:49,325
+to existing interfaces,
+
+308
+00:21:49,325 --> 00:21:56,605
+without penalising existing code,
+
+309
+00:21:56,605 --> 00:21:59,880
+that is, without having to edit
+a class implementing those interfaces.
+
+310
+00:22:01,150 --> 00:22:05,350
+And this concludes this video on
+post Java 7 interface specificities.
+

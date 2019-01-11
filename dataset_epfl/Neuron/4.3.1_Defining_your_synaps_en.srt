@@ -1,0 +1,603 @@
+1
+00:00:05,294 --> 00:00:08,232
+Hi, I'm Elif Muller,
+section manager for cells
+
+2
+00:00:08,437 --> 00:00:10,762
+and circuits at
+the Blue Brain Project.
+
+3
+00:00:10,955 --> 00:00:13,643
+Today I'm going to show you how
+to model your own synapses
+
+4
+00:00:13,843 --> 00:00:15,618
+in the neuron simulator.
+
+5
+00:00:15,808 --> 00:00:18,220
+In this tutorial,
+you've used the NEURON simulator
+
+6
+00:00:18,398 --> 00:00:19,598
+to model neurons.
+
+7
+00:00:19,815 --> 00:00:22,377
+We will use the NMODL language
+
+8
+00:00:22,577 --> 00:00:25,352
+which is an extension of
+the NEURON simulator
+
+9
+00:00:25,537 --> 00:00:28,337
+to allow you to define your
+own synapse models.
+
+10
+00:00:28,562 --> 00:00:31,762
+We will walk you through this
+process and the NMODL syntax
+
+11
+00:00:31,940 --> 00:00:33,478
+on the example of the model of
+
+12
+00:00:33,669 --> 00:00:36,832
+the AMPA and NMDA
+glutamate receptors.
+
+13
+00:00:37,173 --> 00:00:40,748
+You will learn how to make
+your own NMOD mod file
+
+14
+00:00:40,963 --> 00:00:44,313
+model AMPA and NMDA
+glutamate receptors using
+
+15
+00:00:44,517 --> 00:00:47,667
+the NMODL language,
+compile your MOD file
+
+16
+00:00:47,885 --> 00:00:51,723
+insert it into a simple
+neuron and simulate it.
+
+17
+00:00:52,256 --> 00:00:55,856
+First, let's look into
+how to edit MOD files
+
+18
+00:00:56,051 --> 00:00:59,051
+get an overview of their syntax.
+
+19
+00:00:59,334 --> 00:01:00,709
+The NMODL language is
+
+20
+00:01:00,912 --> 00:01:03,912
+a domain specific language
+of the NEURON simulator
+
+21
+00:01:04,137 --> 00:01:08,662
+to define extension such as
+ion channels, or synapse models.
+
+22
+00:01:09,034 --> 00:01:12,159
+To use the NMODL, the user
+writes MOD files adhering to
+
+23
+00:01:12,396 --> 00:01:14,834
+the NMODL language syntax.
+
+24
+00:01:15,118 --> 00:01:17,181
+These are programs
+external to Python
+
+25
+00:01:17,350 --> 00:01:20,688
+so it must be edited using
+an external editor.
+
+26
+00:01:20,933 --> 00:01:25,946
+We will use the embedded editing
+capabilities of the Jupyter system.
+
+27
+00:01:27,790 --> 00:01:32,765
+Going to the view of the files
+available to the Jupyter notebook
+
+28
+00:01:33,060 --> 00:01:38,198
+on the home screen, we define
+a directory called "mechanisms"
+
+29
+00:01:38,421 --> 00:01:41,421
+it can also be a directory
+of a different name
+
+30
+00:01:41,874 --> 00:01:46,462
+where we will place our respected
+MOD files we would like to include
+
+31
+00:01:46,684 --> 00:01:49,684
+in the NEURON
+simulation environment.
+
+32
+00:01:50,983 --> 00:01:54,621
+I've prepared a simple
+AMPA and NMDA MOD file
+
+33
+00:01:54,834 --> 00:01:57,571
+for the purposes of this tutorial.
+
+34
+00:01:57,760 --> 00:02:00,760
+By selecting this
+file and clicking edit
+
+35
+00:02:01,131 --> 00:02:05,443
+you can edit this file interactively
+in the Jupyter framework.
+
+36
+00:02:07,222 --> 00:02:12,534
+Now let's look at the various
+sections of the NMODL MOD file.
+
+37
+00:02:13,192 --> 00:02:15,017
+It begins with comments
+
+38
+00:02:15,203 --> 00:02:17,278
+describing the contents
+of the MOD file
+
+39
+00:02:17,472 --> 00:02:20,884
+a title, indicating
+the purpose of the MOD file
+
+40
+00:02:21,255 --> 00:02:22,480
+and so on.
+
+41
+00:02:22,819 --> 00:02:25,181
+The first block to define
+is the NEURON block.
+
+42
+00:02:25,380 --> 00:02:28,043
+This is a definition of
+variables which maybe
+
+43
+00:02:28,230 --> 00:02:33,117
+accessed by the user in
+the NEURON simulator environment.
+
+44
+00:02:33,326 --> 00:02:36,689
+These in include the parameters
+you want to expose
+
+45
+00:02:36,882 --> 00:02:41,282
+to the user and various variables
+that you would like to record.
+
+46
+00:02:41,629 --> 00:02:46,679
+Also this point process statement
+defines the name of the mechanism
+
+47
+00:02:46,855 --> 00:02:49,855
+as treated in the NEURON simulator.
+
+48
+00:02:51,291 --> 00:02:52,891
+The next block is
+the parameter block
+
+49
+00:02:53,095 --> 00:02:56,895
+which allows the user to define
+constance which maybe set
+
+50
+00:02:57,131 --> 00:02:59,918
+in the NEURON simulator environment.
+
+51
+00:03:00,121 --> 00:03:02,583
+For this example, we're using
+the dual exponential
+
+52
+00:03:02,782 --> 00:03:05,482
+conductance profiles,
+for both the AMPA receptor
+
+53
+00:03:05,702 --> 00:03:07,427
+and the NMDA receptor.
+
+54
+00:03:09,372 --> 00:03:11,785
+Here we provide the rise and decay
+
+55
+00:03:11,970 --> 00:03:14,507
+time constants for
+the AMPA conductance
+
+56
+00:03:14,696 --> 00:03:17,284
+and also the NMDA conductance.
+
+57
+00:03:18,660 --> 00:03:22,872
+Next, we define the reversal
+potential for AMPA and NMDA
+
+58
+00:03:23,465 --> 00:03:26,765
+and the magnesium concentration
+which is required to  implement
+
+59
+00:03:26,967 --> 00:03:31,130
+the voltage gate of
+the NMDA conductance.
+
+60
+00:03:32,383 --> 00:03:36,495
+Gmax AMPA and the Gmax NMDA
+are the conductances of the AMPA
+
+61
+00:03:36,697 --> 00:03:41,122
+and the NMDA receptors, respectively
+in units of micro Siemens.
+
+62
+00:03:42,101 --> 00:03:46,514
+In the next block, the state block,
+we declare the state variables
+
+63
+00:03:46,701 --> 00:03:49,501
+which make up this mechanism.
+
+64
+00:03:49,706 --> 00:03:54,156
+Since we're implementing
+dual exponential rise kinetics
+
+65
+00:03:54,352 --> 00:03:58,352
+and decay kinetics of
+the respective conductances
+
+66
+00:03:58,594 --> 00:04:01,269
+we need to implement
+two state variables
+
+67
+00:04:01,489 --> 00:04:04,539
+for both the AMPA and the NMDA
+conductances.
+
+68
+00:04:04,882 --> 00:04:08,832
+The rise kinetics
+and decay kinetics.
+
+69
+00:04:11,221 --> 00:04:13,146
+Next we have the assigned block
+
+70
+00:04:13,315 --> 00:04:15,377
+this is
+the declaration of variables
+
+71
+00:04:15,569 --> 00:04:19,544
+that are to be computed,
+for example in the break point block
+
+72
+00:04:19,759 --> 00:04:22,521
+which we'll see in a second.
+
+73
+00:04:24,102 --> 00:04:28,077
+The next block is the initial block,
+this is the definition of initial
+
+74
+00:04:28,308 --> 00:04:32,120
+conditions of state variables,
+and is also where we should compute
+
+75
+00:04:32,314 --> 00:04:35,314
+any calibrating factors.
+
+76
+00:04:35,976 --> 00:04:39,239
+So first of all,
+here we declare some
+
+77
+00:04:39,466 --> 00:04:42,604
+local variables that allows us
+to compute some specific
+
+78
+00:04:42,837 --> 00:04:45,299
+calibrating factors.
+
+79
+00:04:46,140 --> 00:04:51,652
+Next we zero the receptor rise
+and fall kinetics variables.
+
+80
+00:04:53,193 --> 00:04:56,893
+Here we compute the constance needed
+to normalize the dual exponential
+
+81
+00:04:57,082 --> 00:04:58,957
+receptor dynamics.
+
+82
+00:04:59,937 --> 00:05:02,362
+First we have to compute
+the expression for the time
+
+83
+00:05:02,569 --> 00:05:05,169
+to peak of the AMPA dual
+exponential conductance
+
+84
+00:05:05,354 --> 00:05:08,866
+and the NMDA dual
+exponential conductance.
+
+85
+00:05:09,328 --> 00:05:13,803
+Then we compute the normalizing
+factor such that the peak
+
+86
+00:05:14,003 --> 00:05:20,403
+of the rise and decay mechanism
+is exactly equal to one.
+
+87
+00:05:21,931 --> 00:05:25,231
+These factors implement
+this normalization.
+
+88
+00:05:27,281 --> 00:05:29,481
+The next block is
+the break point block
+
+89
+00:05:29,636 --> 00:05:31,162
+this is where we declare the method
+
+90
+00:05:31,353 --> 00:05:34,103
+to propagate the state
+variables in time.
+
+91
+00:05:34,813 --> 00:05:40,826
+This is the essential simulation
+block that defines how your model
+
+92
+00:05:41,059 --> 00:05:42,521
+will be simulated.
+
+93
+00:05:42,753 --> 00:05:46,253
+First you specify how to solve
+the system of equations
+
+94
+00:05:46,444 --> 00:05:49,444
+which will be declared
+below the derivative block.
+
+95
+00:05:49,748 --> 00:05:53,123
+The Cnx specifies integration method
+
+96
+00:05:53,348 --> 00:05:55,348
+it is an implicit integration method
+
+97
+00:05:55,546 --> 00:05:58,546
+that's stable even
+for stiff systems.
+
+98
+00:06:00,349 --> 00:06:02,761
+Next we compute
+and assign quantities
+
+99
+00:06:02,974 --> 00:06:04,812
+which depend on the state variables.
+
+100
+00:06:05,019 --> 00:06:08,394
+First we compute the time
+varying AMPA receptor conductance
+
+101
+00:06:08,607 --> 00:06:13,757
+as the difference of the rise
+and decay kinetic variables
+
+102
+00:06:13,969 --> 00:06:16,019
+B AMPA and A AMPA.
+
+103
+00:06:16,747 --> 00:06:20,485
+This gives us the exponential
+rise and decay.
+
+104
+00:06:20,710 --> 00:06:25,797
+Similarly for NMDA we can compute
+the rise and decay kinetics
+
+105
+00:06:26,038 --> 00:06:28,363
+of the NMDA conductance.
+
+106
+00:06:28,629 --> 00:06:31,816
+Now we have an additional term
+to implement the magnesium
+
+107
+00:06:32,000 --> 00:06:35,638
+block kinetics,
+due to Jarl and Stevens, 1990.
+
+108
+00:06:42,143 --> 00:06:43,993
+Then the total
+conductance is the sum
+
+109
+00:06:44,174 --> 00:06:47,411
+of the AMPA
+and the NMDA conductances.
+
+110
+00:06:47,786 --> 00:06:52,674
+Next we can compute the specific
+currents of AMPA and NMDA.
+
+111
+00:06:52,960 --> 00:06:57,135
+These are simply the conductance
+multiplied by the driving force
+
+112
+00:06:57,341 --> 00:07:00,641
+which is the instantaneous
+membrane voltage
+
+113
+00:07:00,930 --> 00:07:03,343
+minus the reversal potential.
+
+114
+00:07:03,614 --> 00:07:07,014
+Finally we can compute
+the total current due to
+
+115
+00:07:07,206 --> 00:07:10,206
+these combined receptors.
+
+116
+00:07:11,190 --> 00:07:13,290
+The next block is
+the derivative block.
+
+117
+00:07:13,486 --> 00:07:17,773
+This block declares the ODEs to
+be solved in the break point block.
+
+118
+00:07:18,020 --> 00:07:24,333
+Here we see that the rise and decay
+kinetics of the AMPA and NMDA
+
+119
+00:07:24,532 --> 00:07:26,719
+follows decaying exponentials
+
+120
+00:07:26,909 --> 00:07:29,909
+with their respective
+time constants.
+
+121
+00:07:31,006 --> 00:07:34,493
+The final block in the MOD
+file is the net receive block.
+
+122
+00:07:34,682 --> 00:07:36,382
+This is the block
+to be executed
+
+123
+00:07:36,598 --> 00:07:39,860
+when a presynaptic
+spike even arrives.
+
+124
+00:07:40,111 --> 00:07:42,661
+In this case,
+when a spike even arrives
+
+125
+00:07:42,849 --> 00:07:48,911
+each of the rise and decay
+kinetic variables is increased
+
+126
+00:07:49,143 --> 00:07:51,706
+by a specific jump factor.
+
+127
+00:07:51,890 --> 00:07:57,652
+This triggers the postsynaptic
+response kinetics.
+

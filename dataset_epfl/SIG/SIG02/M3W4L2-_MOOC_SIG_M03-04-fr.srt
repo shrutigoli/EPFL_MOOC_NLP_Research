@@ -1,0 +1,1016 @@
+1
+00:00:31,253 --> 00:00:33,124
+Bonjour et bienvenue 
+dans cette deuxième leçon
+
+2
+00:00:33,302 --> 00:00:36,202
+dédiée aux interactions entre couches 
+d'information spatiale. 
+
+3
+00:00:37,018 --> 00:00:39,028
+Nous allons nous intéresser 
+cette fois-ci aux opérations 
+
+4
+00:00:39,205 --> 00:00:42,739
+qui permettent de mettre en relation 
+plusieurs couches de type raster. 
+
+5
+00:00:43,705 --> 00:00:45,755
+C'est ce type d'interactions 
+qui a donné naissance 
+
+6
+00:00:45,941 --> 00:00:48,587
+à l'algèbre de carte 
+ou map algebra en anglais, 
+
+7
+00:00:49,025 --> 00:00:52,762
+dont la théorie a été introduite 
+en 1983 par Dana Tomlin 
+
+8
+00:00:52,953 --> 00:00:55,966
+dans les Proceedings de la Harvard 
+Computer Graphics Conference, 
+
+9
+00:00:56,377 --> 00:00:59,567
+puis formalisée en 1990 
+dans un livre appelé  
+
+10
+00:00:59,744 --> 00:01:02,947
+Geographic Information Systems 
+and Cartographic Modeling. 
+
+11
+00:01:03,561 --> 00:01:06,732
+Nous en verrons quelques applications 
+dans un instant. 
+
+12
+00:01:07,437 --> 00:01:09,553
+Les buts de cette leçon 
+sont de vous présenter 
+
+13
+00:01:09,734 --> 00:01:12,851
+les bases de l'interaction 
+entre plusieurs couches de type raster 
+
+14
+00:01:13,178 --> 00:01:15,738
+et d'expliquer le principe 
+de l'algèbre de carte. 
+
+15
+00:01:16,409 --> 00:01:18,583
+Après cette leçon, 
+vous serez capable de combiner 
+
+16
+00:01:18,764 --> 00:01:21,149
+les informations contenues 
+par plusieurs fichiers raster 
+
+17
+00:01:21,468 --> 00:01:24,723
+et aussi d'utiliser 
+la calculatrice raster de QGIS. 
+
+18
+00:01:34,198 --> 00:01:36,029
+Les contraintes évoquées 
+dans la dernière leçon 
+
+19
+00:01:36,221 --> 00:01:38,311
+à propos des interactions 
+raster-vecteur 
+
+20
+00:01:38,681 --> 00:01:41,922
+existent également dans le cas 
+de l'interaction raster-raster. 
+
+21
+00:01:42,658 --> 00:01:45,860
+Le système de projection des couches 
+utilisé doit être le même 
+
+22
+00:01:46,296 --> 00:01:48,978
+et la zone géographique considérée 
+doit être commune, 
+
+23
+00:01:49,493 --> 00:01:51,159
+mais il y a une contrainte 
+supplémentaire 
+
+24
+00:01:51,336 --> 00:01:53,035
+qui concerne la résolution spatiale, 
+
+25
+00:01:53,415 --> 00:01:56,312
+soit la taille des pixels 
+qui doit être identique. 
+
+26
+00:01:57,555 --> 00:02:00,408
+L'idée de Tomlin 
+est que les fichiers de type raster 
+
+27
+00:02:00,573 --> 00:02:03,228
+peuvent être soumis 
+à des opérations de type algébrique 
+
+28
+00:02:03,519 --> 00:02:06,177
+dont les résultats sont stockés 
+également dans des rasters. 
+
+29
+00:02:06,645 --> 00:02:09,360
+Tomlin a élaboré un langage standardisé
+
+30
+00:02:09,533 --> 00:02:10,935
+et une représentation formalisée 
+
+31
+00:02:11,105 --> 00:02:13,748
+de toutes les combinaisons possibles 
+de couches d'information. 
+
+32
+00:02:14,434 --> 00:02:16,880
+Les raster sont traités
+comme des grilles de points 
+
+33
+00:02:17,180 --> 00:02:18,359
+et l'algèbre de carte décrit
+
+34
+00:02:18,555 --> 00:02:21,139
+des opérations arithmétiques 
+sur des cellules, 
+
+35
+00:02:21,332 --> 00:02:23,860
+sur des groupes de cellules 
+ou des classes d'objets 
+
+36
+00:02:24,033 --> 00:02:25,550
+dans l'ensemble des cellules. 
+
+37
+00:02:26,235 --> 00:02:27,491
+Dans ce cours d'introduction, 
+
+38
+00:02:27,931 --> 00:02:30,476
+nous allons décrire 
+quelques opérations globales utiles 
+
+39
+00:02:30,765 --> 00:02:33,000
+et pour plus de détails 
+sur les opérations locales, 
+
+40
+00:02:33,173 --> 00:02:34,683
+focales et zonales, 
+
+41
+00:02:34,998 --> 00:02:37,942
+nous vous renvoyons aux références 
+mentionnées ici à l'écran. 
+
+42
+00:02:46,474 --> 00:02:49,036
+Le premier exemple concerne 
+l'étude des précipitations
+
+43
+00:02:49,230 --> 00:02:51,324
+durant la saison des pluies 
+au Burkina Faso 
+
+44
+00:02:51,508 --> 00:02:53,042
+et une partie des pays voisins. 
+
+45
+00:02:53,879 --> 00:02:56,216
+Nous aimerions connaître 
+les précipitations totales 
+
+46
+00:02:56,419 --> 00:02:57,998
+pendant les quatre mois en question,
+
+47
+00:02:58,210 --> 00:03:01,282
+mais nous n'avons à disposition 
+que les images raster correspondant 
+
+48
+00:03:01,499 --> 00:03:03,728
+à la quantité 
+de précipitations mensuelles. 
+
+49
+00:03:04,581 --> 00:03:05,993
+Pour obtenir le total, 
+
+50
+00:03:06,185 --> 00:03:09,144
+nous devons donc additionner 
+les valeurs mensuelles de chaque pixel 
+
+51
+00:03:09,323 --> 00:03:11,898
+pour les mois de juin,
+juillet, août et septembre 
+
+52
+00:03:12,075 --> 00:03:14,631
+et stocker le résultat 
+dans une nouvelle couche. 
+
+53
+00:03:14,995 --> 00:03:17,858
+Dans le pixel situé au sud-ouest
+de notre exemple schématique, 
+
+54
+00:03:18,409 --> 00:03:23,068
+le total des précipitations annuelles 
+est une hauteur donc de 757 millimètres 
+
+55
+00:03:23,250 --> 00:03:25,660
+sur une surface plane 
+de un mètre carré. 
+
+56
+00:03:27,392 --> 00:03:30,228
+Voyons comment mettre en œuvre 
+l'algèbre de carte dans QGIS 
+
+57
+00:03:30,403 --> 00:03:32,437
+avec l'aide de la calculatrice raster. 
+
+58
+00:03:33,690 --> 00:03:34,912
+Dans le projet QGIS, 
+
+59
+00:03:35,087 --> 00:03:38,087
+nous avons à disposition les limites 
+géographiques des pays d'Afrique 
+
+60
+00:03:38,503 --> 00:03:39,822
+et des fichiers raster 
+
+61
+00:03:40,024 --> 00:03:42,564
+contenant les précipitations 
+pour les mois de juin, juillet, 
+
+62
+00:03:42,758 --> 00:03:44,337
+août et septembre. 
+
+63
+00:03:44,733 --> 00:03:47,221
+Tous ces fichiers sont 
+dans le même système de projection 
+
+64
+00:03:47,412 --> 00:03:49,503
+et ont la même résolution spatiale. 
+
+65
+00:03:49,842 --> 00:03:53,043
+Pour calculer la somme des précipitations 
+durant la saison des pluies, 
+
+66
+00:03:53,424 --> 00:03:55,254
+nous allons utiliser l'outil raster,
+
+67
+00:03:55,952 --> 00:03:57,593
+calculatrice raster. 
+
+68
+00:03:57,846 --> 00:03:59,252
+Dans la calculatrice raster,
+
+69
+00:03:59,430 --> 00:04:01,505
+en haut, à gauche, se trouvent 
+la liste des couches raster 
+
+70
+00:04:01,679 --> 00:04:03,628
+à disposition pour les calculs. 
+
+71
+00:04:03,882 --> 00:04:05,366
+Sur la partie de droite, 
+
+72
+00:04:05,535 --> 00:04:08,535
+nous avons les paramètres à définir 
+pour le fichier de résultats, 
+
+73
+00:04:09,169 --> 00:04:10,126
+le nom du fichier, 
+
+74
+00:04:10,303 --> 00:04:13,495
+l'emprise spatiale du résultat 
+et le format. 
+
+75
+00:04:14,655 --> 00:04:17,482
+Enfin dans la partie inférieure,
+nous trouvons la calculatrice 
+
+76
+00:04:17,727 --> 00:04:20,603
+avec les différents opérateurs
+que nous pouvons utiliser. 
+
+77
+00:04:23,118 --> 00:04:25,390
+Nous allons calculer 
+la somme des valeurs des pixels 
+
+78
+00:04:25,576 --> 00:04:27,585
+pour les quatre couches 
+qui nous intéressent. 
+
+79
+00:04:28,041 --> 00:04:31,246
+En double-cliquant sur la couche,
+elle s'affiche dans l'expression. 
+
+80
+00:04:32,225 --> 00:04:35,188
+On double-clique donc sur le fichier
+des précipitations au mois de juin, 
+
+81
+00:04:35,553 --> 00:04:37,421
+puis on clique sur "plus"
+
+82
+00:04:37,937 --> 00:04:41,092
+et on ajoute les autres fichiers raster 
+de la même façon. 
+
+83
+00:04:41,986 --> 00:04:45,558
+On indique ensuite le nom du fichier
+de résultats et son emplacement. 
+
+84
+00:04:46,157 --> 00:04:47,434
+Pour l'emprise de la couche, 
+
+85
+00:04:47,619 --> 00:04:48,855
+nous voulons la même emprise 
+
+86
+00:04:49,055 --> 00:04:50,993
+que les couches 
+de précipitations mensuelles. 
+
+87
+00:04:51,258 --> 00:04:53,476
+On sélectionne donc 
+une couche de précipitations 
+
+88
+00:04:53,661 --> 00:04:54,693
+dans la liste de gauche, 
+
+89
+00:04:54,921 --> 00:04:57,141
+puis on clique 
+sur emprise actuelle de la couche, 
+
+90
+00:04:57,463 --> 00:04:59,126
+on peut ensuite cliquer sur OK. 
+
+91
+00:05:00,455 --> 00:05:02,731
+Le nouveau fichier créé
+est ajouté au projet. 
+
+92
+00:05:03,193 --> 00:05:05,068
+Nous allons le placer
+devant les autres couches, 
+
+93
+00:05:05,264 --> 00:05:08,199
+puis changer le style 
+pour afficher un dégradé de couleurs. 
+
+94
+00:05:09,153 --> 00:05:11,436
+Nous allons donc
+dans les propriétés de la couche, 
+
+95
+00:05:11,706 --> 00:05:13,217
+sous l'onglet "style". 
+
+96
+00:05:13,673 --> 00:05:16,577
+On choisit un type de rendu 
+pseudo-couleur à bande unique, 
+
+97
+00:05:17,062 --> 00:05:19,263
+puis on sélectionne 
+une palette de couleurs. 
+
+98
+00:05:19,977 --> 00:05:23,789
+On clique ensuite sur "classer",
+puis sur "appliquer" et OK. 
+
+99
+00:05:38,459 --> 00:05:39,761
+Avec ce deuxième exemple, 
+
+100
+00:05:39,930 --> 00:05:41,894
+nous allons expliquer 
+comment calculer un indice 
+
+101
+00:05:42,078 --> 00:05:44,419
+très utilisé en analyse d'image. 
+
+102
+00:05:45,105 --> 00:05:48,232
+Il s'agit de l'indice de végétation
+par différence normalisé, 
+
+103
+00:05:49,121 --> 00:05:51,783
+connu sous son abréviation 
+en anglais NDVI,
+
+104
+00:05:52,194 --> 00:05:53,957
+ou encore indice de Tucker, 
+
+105
+00:05:54,236 --> 00:05:57,211
+et appliqué ici 
+à une région du nord de la Tunisie 
+
+106
+00:05:57,606 --> 00:05:59,970
+avec l'aide d'une image 
+du satellite Landsat. 
+
+107
+00:06:00,738 --> 00:06:04,368
+Le NDVI est sensible à la vigueur
+et à la quantité de la végétation. 
+
+108
+00:06:05,180 --> 00:06:06,756
+Son interprétation biophysique 
+
+109
+00:06:06,937 --> 00:06:09,114
+est la fraction 
+de radiation photosynthétique 
+
+110
+00:06:09,306 --> 00:06:10,938
+active qui est absorbée. 
+
+111
+00:06:11,274 --> 00:06:13,354
+Il est basé 
+sur des opérations arithmétiques 
+
+112
+00:06:13,541 --> 00:06:15,109
+entre deux bandes spectrales : 
+
+113
+00:06:15,280 --> 00:06:18,508
+sur le rouge, 
+notre couche raster numéro un
+
+114
+00:06:18,936 --> 00:06:22,319
+et le proche infrarouge, 
+notre couche raster numéro deux. 
+
+115
+00:06:22,925 --> 00:06:26,559
+Le NDVI met en valeur la différence 
+entre la bande visible du rouge 
+
+116
+00:06:26,873 --> 00:06:28,697
+et celle du proche infrarouge. 
+
+117
+00:06:28,886 --> 00:06:31,383
+La normalisation par la somme 
+des deux bandes 
+
+118
+00:06:31,605 --> 00:06:35,080
+permet de borner l'indice 
+et de limiter les effets de réflectance. 
+
+119
+00:06:36,099 --> 00:06:39,470
+Les valeurs du NDVI 
+sont comprises entre -1 et +1. 
+
+120
+00:06:40,134 --> 00:06:42,322
+Les valeurs négatives 
+correspondent aux surfaces 
+
+121
+00:06:42,519 --> 00:06:46,025
+autres que les couverts végétaux, 
+comme la neige, l'eau ou les nuages.
+
+122
+00:06:46,578 --> 00:06:47,899
+Et pour les sols nus, 
+
+123
+00:06:48,080 --> 00:06:50,546
+le NDVI présente 
+des valeurs proches de zéro. 
+
+124
+00:06:51,185 --> 00:06:53,846
+Les formations végétales, quant à elles,
+ont des valeurs positives, 
+
+125
+00:06:54,035 --> 00:06:57,035
+généralement comprises 
+entre 0,1 et 0,7. 
+
+126
+00:06:57,514 --> 00:06:58,685
+Les valeurs les plus élevées
+
+127
+00:06:58,886 --> 00:07:01,334
+correspondant aux couverts végétaux 
+les plus denses. 
+
+128
+00:07:02,419 --> 00:07:05,526
+La calculatrice raster de QGIS 
+va nous permettre de mettre en œuvre 
+
+129
+00:07:05,726 --> 00:07:08,430
+le calcul du NDVI 
+pour cette région de la Tunisie. 
+
+130
+00:07:09,922 --> 00:07:11,009
+Dans le projet QGIS, 
+
+131
+00:07:11,190 --> 00:07:13,260
+nous trouvons les deux 
+fichiers raster correspondant 
+
+132
+00:07:13,419 --> 00:07:16,280
+aux bandes spectrales rouges
+et infrarouges de l'image Landsat. 
+
+133
+00:07:16,991 --> 00:07:18,387
+Pour calculer le NDVI, 
+
+134
+00:07:18,579 --> 00:07:21,411
+nous allons à nouveau 
+utiliser la calculatrice raster. 
+
+135
+00:07:22,383 --> 00:07:24,786
+Il faut entrer 
+l'expression correspondante. 
+
+136
+00:07:25,602 --> 00:07:27,471
+On ouvre une parenthèse 
+
+137
+00:07:27,680 --> 00:07:31,168
+dans laquelle on va soustraire 
+la bande rouge à la bande infrarouge. 
+
+138
+00:07:32,344 --> 00:07:34,056
+On ferme ensuite la parenthèse. 
+
+139
+00:07:34,533 --> 00:07:37,393
+On doit alors diviser ce résultat
+par la somme des deux bandes. 
+
+140
+00:07:38,642 --> 00:07:40,506
+On ouvre donc une nouvelle parenthèse
+
+141
+00:07:40,705 --> 00:07:42,831
+dans laquelle on inscrit 
+la somme des deux bandes,
+
+142
+00:07:42,998 --> 00:07:44,974
+puis on ferme la parenthèse. 
+
+143
+00:07:45,967 --> 00:07:48,211
+On enregistre ensuite le fichier résultat
+
+144
+00:07:48,395 --> 00:07:51,156
+et on lui indique 
+l'emprise d'une couche actuelle. 
+
+145
+00:07:54,281 --> 00:07:56,491
+Le résultat est chargé
+dans le projet QGIS. 
+
+146
+00:07:57,371 --> 00:08:00,613
+On va afficher le NDVI 
+avec une palette de couleurs. 
+
+147
+00:08:01,695 --> 00:08:04,456
+Dans les propriétés de la couche,
+sous l'onglet "style", 
+
+148
+00:08:04,658 --> 00:08:07,334
+on choisit un type 
+pseudo-couleur à bande unique, 
+
+149
+00:08:07,996 --> 00:08:09,521
+puis une palette de couleurs. 
+
+150
+00:08:09,779 --> 00:08:12,283
+On clique sur "classer", puis sur OK. 
+
+151
+00:08:14,105 --> 00:08:17,809
+Le résultat nous indique en vert
+les régions avec un NDVI fort, 
+
+152
+00:08:18,183 --> 00:08:20,213
+donc beaucoup de végétation
+
+153
+00:08:20,516 --> 00:08:22,072
+et en rouge les régions 
+
+154
+00:08:22,249 --> 00:08:25,224
+avec très peu de végétation, 
+typiquement dans la mer. 
+
+155
+00:08:35,381 --> 00:08:38,674
+Parmi les calculs rendus possibles
+par l'algèbre de carte 
+
+156
+00:08:38,888 --> 00:08:41,838
+figurent les opérateurs relationnels
+et les fonctions logiques. 
+
+157
+00:08:42,541 --> 00:08:44,346
+Les opérateurs relationnels sont utiles 
+
+158
+00:08:44,532 --> 00:08:46,827
+lorsque l'on recherche 
+des portions de territoire 
+
+159
+00:08:47,003 --> 00:08:49,016
+correspondant 
+à des critères bien précis. 
+
+160
+00:08:49,871 --> 00:08:51,763
+Ces critères peuvent être combinés 
+
+161
+00:08:52,128 --> 00:08:54,778
+et l'algèbre de carte 
+permet de rapidement déterminer 
+
+162
+00:08:54,975 --> 00:08:57,770
+tous les pixels qui correspondent 
+à ces conditions multiples. 
+
+163
+00:08:58,463 --> 00:09:00,422
+Dans l'exemple proposé ici, 
+
+164
+00:09:00,680 --> 00:09:04,522
+nous recherchons des terrains 
+dont la pente est supérieure à 45°.
+
+165
+00:09:05,015 --> 00:09:06,814
+Nous avons donc besoin 
+d'un premier raster 
+
+166
+00:09:06,983 --> 00:09:08,889
+avec la pente de tous les pixels. 
+
+167
+00:09:10,002 --> 00:09:12,929
+Une seconde exigence 
+est que ces terrains soient exposés 
+
+168
+00:09:13,119 --> 00:09:15,629
+dans une portion comprise
+entre l'ouest et le nord. 
+
+169
+00:09:16,237 --> 00:09:18,348
+C'est notre second raster qui contient
+
+170
+00:09:18,532 --> 00:09:21,121
+l'orientation en degré 
+de tous les pixels. 
+
+171
+00:09:22,443 --> 00:09:23,606
+Sur cette base, 
+
+172
+00:09:24,015 --> 00:09:26,290
+nous aimerions calculer
+une couche résultante 
+
+173
+00:09:26,472 --> 00:09:28,413
+qui contiendra un résultat booléen, 
+
+174
+00:09:28,817 --> 00:09:32,622
+nous montrant tous les pixels 
+qui satisfont aux deux critères. 
+
+175
+00:09:34,209 --> 00:09:37,103
+Voyons comment 
+la calculatrice raster de QGIS 
+
+176
+00:09:37,303 --> 00:09:39,562
+nous permet d'effectuer 
+cette opération. 
+
+177
+00:09:40,785 --> 00:09:43,806
+Dans QGIS, nous avons 
+le fichier raster avec la pente
+
+178
+00:09:44,003 --> 00:09:45,771
+et le fichier avec l'orientation. 
+
+179
+00:09:46,279 --> 00:09:49,274
+Nous allons utiliser la calculatrice 
+raster pour trouver les terrains 
+
+180
+00:09:49,470 --> 00:09:52,149
+dont la pente est supérieure 
+à la valeur de 100 
+
+181
+00:09:52,555 --> 00:09:56,010
+et l'orientation comprise 
+entre des valeurs de 10 et 270. 
+
+182
+00:09:56,891 --> 00:09:58,606
+Dans la calculatrice raster,
+
+183
+00:09:58,775 --> 00:10:01,581
+on écrit l'expression
+correspondant à ces conditions. 
+
+184
+00:10:02,281 --> 00:10:04,261
+Il faut ouvrir une première parenthèse
+
+185
+00:10:04,441 --> 00:10:06,620
+dans laquelle 
+on écrit la première condition, 
+
+186
+00:10:06,975 --> 00:10:09,398
+la pente est supérieure à 100. 
+
+187
+00:10:10,450 --> 00:10:13,175
+Ensuite, il faut utiliser 
+l'opérateur AND 
+
+188
+00:10:13,359 --> 00:10:15,655
+pour s'assurer que les deux conditions 
+seront vérifiées. 
+
+189
+00:10:15,820 --> 00:10:17,762
+Puis dans une deuxième parenthèse, 
+
+190
+00:10:18,222 --> 00:10:20,821
+on écrit les conditions 
+s'appliquant à l'orientation, 
+
+191
+00:10:21,092 --> 00:10:22,992
+"orientation est plus petit que 10"
+
+192
+00:10:23,165 --> 00:10:26,021
+ou "orientation est plus grand que 270". 
+
+193
+00:10:30,888 --> 00:10:32,009
+On enregistre le résultat 
+
+194
+00:10:32,182 --> 00:10:33,895
+en lui donnant l'emprise 
+d'une couche actuelle, 
+
+195
+00:10:34,081 --> 00:10:35,730
+puis on clique sur OK. 
+
+196
+00:10:39,947 --> 00:10:41,914
+Le résultat s'affiche dans QGIS. 
+
+197
+00:10:42,104 --> 00:10:45,485
+On a en blanc les zones qui ont obtenu 
+une valeur de un, 
+
+198
+00:10:45,812 --> 00:10:48,740
+c'est-à-dire les terrains 
+qui correspondent aux critères définis, 
+
+199
+00:10:49,269 --> 00:10:53,119
+toutes les autres zones en noir
+ne répondent pas à ces exigences. 
+
+200
+00:11:04,013 --> 00:11:05,636
+Les interactions 
+entre plusieurs couches
+
+201
+00:11:05,824 --> 00:11:07,636
+de type raster 
+de même résolution spatiale 
+
+202
+00:11:07,827 --> 00:11:10,732
+ont été théoriquement définies 
+dans le cadre de l'algèbre de carte 
+
+203
+00:11:10,905 --> 00:11:13,940
+ou map algebra, développée par 
+Charles Dana Tomlin 
+
+204
+00:11:14,141 --> 00:11:16,151
+pendant les années 1980. 
+
+205
+00:11:16,723 --> 00:11:19,765
+Cette théorie décrit 
+quatre types d'opérations possibles, 
+
+206
+00:11:19,966 --> 00:11:22,321
+parmi lesquelles les opérations globales 
+
+207
+00:11:22,577 --> 00:11:25,808
+qui impliquent tous les pixels 
+de toutes les couches dans les calculs 
+
+208
+00:11:26,175 --> 00:11:27,796
+et ce sont celles 
+que nous avons décrites 
+
+209
+00:11:27,964 --> 00:11:29,634
+et illustrées dans cette leçon. 
+
+210
+00:11:30,493 --> 00:11:32,090
+Dans le logiciel QGIS, 
+
+211
+00:11:32,603 --> 00:11:35,627
+c'est l'outil calculatrice raster 
+qui permet d'opérer les calculs 
+
+212
+00:11:35,809 --> 00:11:38,306
+sur la base des valeurs des pixels 
+d'un raster existant 
+
+213
+00:11:38,559 --> 00:11:41,485
+et de stocker les résultats 
+dans une nouvelle couche raster. 
+
+214
+00:11:43,022 --> 00:11:46,748
+Il nous reste à étudier les interactions
+entre couches de type vectoriel 
+
+215
+00:11:47,189 --> 00:11:49,889
+et c'est ce thème qui fera l'objet 
+de la prochaine leçon, 
+
+216
+00:11:50,184 --> 00:11:52,002
+la dernière du module trois 
+
+217
+00:11:52,298 --> 00:11:54,551
+sur l'analyse 
+de l'information géographique. 
+

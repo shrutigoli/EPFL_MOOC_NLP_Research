@@ -1,0 +1,99 @@
+Optimistic concurrency control is a technique for ensuring the serializability of concurrent transactions.
+In that sense, it's an alternative to lock-based concurrency control.
+Optimistic concurrency control basically assumes that you can be lucky, and nothing is to be done to make sure that consistency is maintained in the face of concurrency.
+That usually works well, when there's relatively little overlap between the object request that's used and changed by different transactions.
+It also tends to work better if there is relatively little work to be done in transactions.
+In that sense, it is more popular, and useful in the context of, for example, transaction memory, than it is in scenarios where major, large, bulk changes are to be made, on large amounts of data, as is often the case in database systems.
+Locking, as we've discussed, is a conservative approach to ensuring serializability in which conflicts are prevented a priori.
+They cannot arise because locking ensures they don't arise.
+The disadvantages of this are that, a) There isn't a overhead lock management.
+We need data structures, we need machinery, inside our system.
+There are potentially deadlocks, which we have to deal with, or we have to avoid them, which needs more infrastructure.
+And, lock contention can become a big issue if there are some objects which are heavily under demand, and each transaction wants them, so to say, and then concurrency really deteriorates greatly.
+However, if conflicts are rare, then we could basically, by default, assume that no conflict arises.
+We act as if no conflict arises, complete our transactions, and then, just at the end, check that everything goes fine, when we commit.
+That's the basic idea of optimistic concurrency control.
+We act as if no conflicts can arise, we do our work, we record it in, so to say, a temporary copy of the database, then we check, when we want to commit, and only if you want to commit.
+If you decide to abort, you can just throw away the copy of the database, and don't even have to think about whether there was any concurrent control issue.
+If you want to commit, we have to check that everything went fine, and then we can commit.
+Of course, in practice we have to avoid naively copying a big piece of the database, and doing it smarter, but conceptually the idea is that optimistic concurrency control works on a copy of the database.
+So the basic classical paper on optimistic concurrency control was by Kung and Robinson, and thus this model is called that way.
+So the idea there is that each transaction is executed in three phases.
+The first phase is the so-called <i>Read phase.</i>
+This phase actually performs the reads and the writes of the transaction, but it works on a copy of the database.
+That means when you start transaction we create a snapshot, we work, reading and writing on that database, and only then, when somebody says, "and now, please commit," we start validating our changes, which validating this transaction can indeed commit with respect to other transactions in the schedule.
+And only then, if we decide everything is fine, nothing bad had happened, we can actually do a write of all the changes we've done to the database, to the global copy of the database.
+Of course other snapshots that have been great optimistic concurrency control for other transactions, they would still start from that old version of the database, so we have to make sure, in our protocol, in validation, in particular, that nothing bad arises from this fact.
+So, how do we perform validation?
+We are going to do this by making three tests, and these tests are going to be sufficient to ensure that no conflict occurred, and that serializability is guaranteed.
+To do this, we assign each transaction a numerical ID, a timestamp, meaning a logical timestamp, the order in which the transaction was started in the whole history of transactions in this system.
+The transaction ID's are assigned at the end of the read phase, actually, just before the validation begins.
+We're going to talk about the notion of <i>ReadSet</i> and <i>WriteSet</i> of a transaction, which is just the objects that are read or written by the transaction.
+So the first of these three tests is as follows-- it's the most conservative test, and it's also easy to check, basically.
+So here you see two transactions, Ti and Tj.
+Transaction Ti started before Tj.
+In this case it has a lower timestamp.
+Each of those two transactions have three phases: the Read, the Validation, and the Write phase.
+Now let's assume that Ti completely finishes before Tj begins.
+Well, in a sense, we don't really actually have to refer to this transaction in validation if it has completely finalized before Tj begins, because in a sense the start state of Tj is the final state of Ti, and there's no overlap.
+The second test is--well, we can actually deal with some overlap-- so Tj starts before Ti completely finishes, but we know that Ti has completed before the Write phase of Tj begins.
+In that case what we have to do is we have to ensure that the WriteSet of the first transaction does not intersect with the ReadSet of the second.
+That means what Tj does does not overlap, does not depend on what Ti did.
+That means you're going to write, and you're going to potentially overwrite values that have been written by Ti, but it doesn't hurt, because how we overwrite them does not depend on what Ti did, and since the end of Write phase of Tj is completely after Ti, we are ensured that we're not going to have any overlaps between writes.
+So the last write, the winner so to say, is going to be the second transaction, it's going to get to overwrite everything.
+And conceptually this means that we have serialized Ti completely before Tj.
+And the first check, is the most powerful check, so to say, the least conservative.
+We're allowed to do this even if the only condition that must hold is that Ti completes its Read phase before Tj does, that basically is some protection of two always completes this phase before the other.
+So let's just assume Ti is this one.
+So Ti completes its Read phase before Tj does, and now they have overlapping validation phases.
+And what we're going to require is that the second transaction, the one with the younger timestamp, which is assigned at the end of the Read phase, if you remember, Tj.
+It will have to check that the WriteSet of Ti does not intersect with its ReadSet, and the two WriteSets of Ti actually don't intersect.
+In that case, well, nothing that Tj does depends on Ti, and again, we allow to commit Ti.
+There are no dirty reads, and Ti cannot overwrite any things that Tj does, because there's no overlap of writes in the WriteSets.
+So because there is no overlap in the WriteSets, we are guaranteed that we don't have to require that the Write phase is a distinct [inaudible], as was the case in the second test.
+Now let's do an example.
+We have seen this example before.
+The overlap looked different, because right now, conceptually, we cannot talk about schedules anymore, that strictly one happens before the other, but in a sense, a priori, things start at the same time, there is real overlap and true concurrency of individual atomic actions inside two transactions as well.
+So we have got Ti, and T1 and T2, and T1 starts before T2.
+T1 reads and writes A and B, and T1 reads and writes A and B.
+Of course this is not going to work out if there is overlap.
+We're not going to be able to conceptually serialize the two transactions completely, if the reads and writes of B of T1 happen after the reads and writes that happen in T2.
+I've not shown it like this in this example, because conceptually T1 is not getting blocked as things happen in T2, in the optimistic concurrency control model, but what I've written down is there is this true overlap, that T1 tries to write something while T2 already does something.
+So what happens in this case?
+What happens in this case is that--
+Let's assume the Read phase of T1 is completed before the Read phase of T2.
+So we can say that T1's timestamp is 1, and T2's timestamp is 2.
+So we're going to have to worry about the validation of the second transaction, T2, what's going to happen.
+Well, the first test fails, because these are overlapping.
+The second transaction has started before the first has completed.
+The second test fails because the WriteSet of T1, and the ReadSet of T2 overlap, and the third test fails for the same reason, among others.
+That means that T2 has to get restarted once T1 has completely finished.
+But observe here that...
+I've been a bit strange here, in my schedule.
+I've really now had like R of B, read of R at B, and read of A completely overlap, happen at the same point in time, something that we didn't look at before.
+Conceptually, I could argue that this is actually a serializable schedule, because I could actually serialize T1 completely before T2, if things are really like this.
+If, on the other hand, the write of B of T1 is really slightly after the read of B of T2, for example, then the situation is not like this anymore, then it's truly not serializable.
+But what you're seeing is that if the optimistic concurrency control algorithm is succeeding, and we indeed have ensured serializability, but vice versa, again, there might be serializable schedules, like this one, where optimistic concurrency control fails.
+So, again, it's not a complete mechanism, just like conflict serializability, what the notion of serializability, that optimistic concurrency control covers, is not all of serializability.
+A few words on validation.
+It's important that the Write phase happens in a critical section, that means it happens atomically.
+Well, what have you achieved this way?
+I'm talking about atomicity on a lower level of abstraction, it's not on the level of transactions anymore, it's inside the system, the system has to commit all of these changes that a single transaction makes, together, atomically, before anything else can happen again.
+You might say, well, one of the main goals of optimistic concurrency control is ensuring atomicity, and now we are requiring atomicity to make the protocol work.
+Well, I would argue, at least in a non-distributive scenario, we have achieved something, because all we have to do now is use the operating system's machinery for ensuring a critical section here.
+But we have a clean semantics for concurrent transactions, which [allow us to] execute the concurrency concurrently,
+I'm assuming now a single threaded model, maybe, a single core machine.
+We have gotten the semantics of the transactions right, but we need some low-level machinery to ensure atomicity of multiple steps.
+So, now the Write phase has to happen in a critical section.
+This is not to be underestimated in its cost, because, on one hand, we have split the work done by a transaction into three phases:
+The Read phase, where the program runs, the application program runs, maybe [user interaction is done], humans are involved, things are very slow, and this is not our problem anymore, we're not waiting for this in our transaction management system.
+We can do a lot of work with other transactions while, maybe, the application [inaudible] waits for the user input.
+The validation can also be done with some [overlapping other] parts of the transaction workload.
+Any Write section has to happen alone; nothing else must happen in the system during this.
+Otherwise, we can corrupt, so to say, our database.
+For certain kinds of transactions, this is not a good solution.
+Just imagine a small transaction that does a massive bulk update that says, you know, update as select, in SQL.
+That means we're going to change many, many objects by a transaction workload that is going to be very little work from the front, it means the Read phase is going to be very fast, the Validation phase may be fast, but in the Write phase touches many, many objects.
+Most of the work is actually done in a way that there's no concurrency possible.
+That is the main disadvantage of optimistic concurrency control, potentially.
+Of course, if you've got a read-only transaction, then you don't need a critical section for this one, and in some contexts, some workloads, many transactions are actually read-only.

@@ -1,0 +1,1553 @@
+1
+00:00:01,340 --> 00:00:07,760
+The error kernel pattern allows us to keep
+important actors relatively safe.
+
+2
+00:00:07,760 --> 00:00:12,740
+But there are cases where we need to not
+lose state at all.
+
+3
+00:00:12,740 --> 00:00:13,940
+We need to persist it.
+
+4
+00:00:15,280 --> 00:00:18,510
+In this lecture we look at how actors can
+do that.
+
+5
+00:00:19,800 --> 00:00:23,140
+The first observation is, that losing
+state future
+
+6
+00:00:23,140 --> 00:00:26,250
+restart is not the only thing which can
+happen.
+
+7
+00:00:26,250 --> 00:00:31,440
+Not only our software can be buggy, our
+hardware can make mistakes too.
+
+8
+00:00:31,440 --> 00:00:35,970
+For example the computer's power supply
+might fail or there might be
+
+9
+00:00:35,970 --> 00:00:40,030
+a power outage in the whole region and the
+beta center goes down.
+
+10
+00:00:40,030 --> 00:00:43,160
+In that case, the running state of actors
+will
+
+11
+00:00:43,160 --> 00:00:45,300
+be lost, because it is only kept in
+memory.
+
+12
+00:00:46,355 --> 00:00:51,250
+If we need to keep that state across, for
+example the power outage, then we
+
+13
+00:00:51,250 --> 00:00:56,570
+need to make sure that is stored on a hard
+drive, for example.
+
+14
+00:00:56,570 --> 00:00:58,800
+When the power comes back on, we can then
+
+15
+00:00:58,800 --> 00:01:02,220
+read the last persistent state and start
+from there.
+
+16
+00:01:03,890 --> 00:01:09,110
+The same principle applies when it comes
+to a softer source of the restart.
+
+17
+00:01:10,690 --> 00:01:13,440
+The reason why we did it might be
+different,
+
+18
+00:01:13,440 --> 00:01:15,830
+but what needs to be done is exactly the
+same.
+
+19
+00:01:17,140 --> 00:01:20,780
+We need to store the result of successful
+processing.
+
+20
+00:01:20,780 --> 00:01:26,800
+And once a failure has happened, when we
+recover from it we need to recreate
+
+21
+00:01:26,800 --> 00:01:32,040
+the current running state so that we can
+keep running from where we left off.
+
+22
+00:01:33,570 --> 00:01:37,140
+There are two main ways in which state can
+be persisted.
+
+23
+00:01:37,140 --> 00:01:43,390
+The first is to have the actor mirror a
+persistent storage location and
+
+24
+00:01:43,390 --> 00:01:45,960
+do in-place updates of both.
+
+25
+00:01:45,960 --> 00:01:50,780
+So when the actor's state changes, the
+persistent location is also updated.
+
+26
+00:01:51,850 --> 00:01:55,550
+This persistent location could be files,
+in the file system.
+
+27
+00:01:55,550 --> 00:01:59,180
+Or it could also be a record in a
+relational database.
+
+28
+00:02:01,130 --> 00:02:06,260
+The other way is to not persist the state
+itself, and update it.
+
+29
+00:02:06,260 --> 00:02:08,460
+But to persist the changes which are
+
+30
+00:02:08,460 --> 00:02:10,660
+applied to state.
+
+31
+00:02:10,660 --> 00:02:14,110
+And this is done in an append-only
+fashion,
+
+32
+00:02:14,110 --> 00:02:17,970
+meaning that these change records will
+never be deleted.
+
+33
+00:02:17,970 --> 00:02:19,600
+They will only be added to.
+
+34
+00:02:21,070 --> 00:02:26,640
+The current state can then be derived by
+reapplying all changes from the beginning.
+
+35
+00:02:28,520 --> 00:02:32,710
+There are obvious benefits to persisting
+the state.
+
+36
+00:02:32,710 --> 00:02:34,550
+And doing in-place updates.
+
+37
+00:02:36,290 --> 00:02:40,930
+The first is that recovery of the latest
+state can be done in constant time
+
+38
+00:02:40,930 --> 00:02:45,170
+because you just need to go to that one
+memory location and read it back.
+
+39
+00:02:46,610 --> 00:02:50,810
+The other advantage is that the data of
+all you needed for storage
+
+40
+00:02:50,810 --> 00:02:55,980
+depends only on the number of records and
+not on their rate of change.
+
+41
+00:02:55,980 --> 00:03:01,320
+It is easy to see that if you persist the
+changes you will always persist at least
+
+42
+00:03:01,320 --> 00:03:04,040
+as much and most of the time much more
+
+43
+00:03:04,040 --> 00:03:08,150
+data than if you would just persist the
+records themselves.
+
+44
+00:03:08,150 --> 00:03:11,520
+But there are also benefits to persisting
+the changes.
+
+45
+00:03:12,980 --> 00:03:19,060
+For example if you do that you can go back
+to any point in time and replay history.
+
+46
+00:03:19,060 --> 00:03:24,030
+Audit what happened in which order or
+restore a certain state.
+
+47
+00:03:24,030 --> 00:03:26,270
+Say from last Thursday,
+
+48
+00:03:26,270 --> 00:03:30,230
+because you need to either rerun what has
+happened or you
+
+49
+00:03:30,230 --> 00:03:34,380
+need to discard all the changes which have
+been done since then.
+
+50
+00:03:35,720 --> 00:03:40,390
+During a replay, the code which handles
+the processing could also
+
+51
+00:03:40,390 --> 00:03:44,890
+have, for example, been fixed, because it
+had a bug previously.
+
+52
+00:03:44,890 --> 00:03:47,070
+And that means that errors which crept
+
+53
+00:03:47,070 --> 00:03:51,230
+into the current state can be corrected
+retroactively.
+
+54
+00:03:51,230 --> 00:03:54,020
+This is not possible if you only store the
+
+55
+00:03:54,020 --> 00:03:56,970
+current state, because it will have the
+bug in it.
+
+56
+00:03:58,050 --> 00:04:01,990
+You all have seen the third advantage at
+work.
+
+57
+00:04:01,990 --> 00:04:08,160
+For example, if you were shopping at a
+large shopping site on the Internet
+
+58
+00:04:08,160 --> 00:04:14,570
+which we all well know, if you look at the
+shopping cart and you put an item in.
+
+59
+00:04:14,570 --> 00:04:16,900
+It is in the shopping cart.
+You might
+
+60
+00:04:16,900 --> 00:04:21,380
+continue shopping, take it out, replace it
+by another one, and finally, once you go
+
+61
+00:04:21,380 --> 00:04:23,850
+to the checkout, the current contents of
+
+62
+00:04:23,850 --> 00:04:27,580
+the shopping cart is what you actually
+buy.
+
+63
+00:04:27,580 --> 00:04:31,170
+If you only persist that, then the whole
+history is lost.
+
+64
+00:04:31,170 --> 00:04:34,010
+But it might be very interesting to keep
+statistics.
+
+65
+00:04:34,010 --> 00:04:38,745
+For example, this refrigerator has been
+replaced in
+
+66
+00:04:38,745 --> 00:04:41,550
+50% of the cases by that other one,
+
+67
+00:04:41,550 --> 00:04:45,620
+and people can then learn from other
+people's decisions.
+
+68
+00:04:45,620 --> 00:04:47,960
+Of course, these insights can also be used
+
+69
+00:04:47,960 --> 00:04:52,350
+inside the company itself to organize
+their logistics processes.
+
+70
+00:04:53,940 --> 00:04:56,740
+Storing all these events takes a lot
+
+71
+00:04:56,740 --> 00:05:00,730
+of space, but space is comparatively cheap
+nowadays.
+
+72
+00:05:00,730 --> 00:05:04,170
+And therefore, if profit can be made from
+
+73
+00:05:04,170 --> 00:05:06,420
+analyzing these data, then it's well worth
+it.
+
+74
+00:05:08,030 --> 00:05:12,210
+The fourth advantage has to do with
+hardware and how that works.
+
+75
+00:05:13,360 --> 00:05:18,510
+If you write to an append-only stream, you
+can write a much higher
+
+76
+00:05:18,510 --> 00:05:24,850
+bandwidth to IO, to network devices and
+also to hard disks.
+
+77
+00:05:24,850 --> 00:05:29,080
+The reason is, that in-place updates need
+to at least appear
+
+78
+00:05:29,080 --> 00:05:32,640
+to occur in exactly the order in which
+they were given.
+
+79
+00:05:32,640 --> 00:05:33,730
+Which limits
+
+80
+00:05:33,730 --> 00:05:40,930
+the possibilities for optimization.
+Finally, persisting immutable data
+
+81
+00:05:40,930 --> 00:05:46,010
+has the advantage we have seen throughout
+the functional programming course.
+
+82
+00:05:46,010 --> 00:05:51,710
+Anything which cannot possibly change can
+be freely shared and replicated.
+
+83
+00:05:51,710 --> 00:05:54,560
+There is no need to synchronize access.
+
+84
+00:05:54,560 --> 00:05:58,930
+And whether you store an event stream to
+one, two, or three
+
+85
+00:05:58,930 --> 00:06:02,980
+locations does not make a difference.
+This
+
+86
+00:06:02,980 --> 00:06:07,760
+point allows the benefits of both
+approaches to be combined.
+
+87
+00:06:07,760 --> 00:06:13,150
+Consider an actor which wants to persist
+its state.
+
+88
+00:06:13,150 --> 00:06:19,180
+It writes, events describing all the
+changes, into a event log.
+
+89
+00:06:22,690 --> 00:06:28,940
+Since this log is immutable, another
+process could take these data,
+
+90
+00:06:31,210 --> 00:06:37,290
+and feed them into a database offline.
+From which the actor could then
+
+91
+00:06:37,290 --> 00:06:41,910
+retrieve the latest persistent state in
+constant time.
+
+92
+00:06:43,250 --> 00:06:48,190
+Doing that for all changes can be the
+right answer in certain situations.
+
+93
+00:06:48,190 --> 00:06:53,860
+For example, if there are multiple readers
+for that state, and not only this actor.
+
+94
+00:06:53,860 --> 00:06:56,670
+But if you only want to persist the state
+of an actor and
+
+95
+00:06:56,670 --> 00:07:00,650
+put an upper bound on the time a recovery
+may take.
+
+96
+00:07:00,650 --> 00:07:02,090
+Then you can also use snapshots.
+
+97
+00:07:04,830 --> 00:07:10,080
+So we have again our actor, producing the
+stream of changes.
+
+98
+00:07:13,760 --> 00:07:19,090
+And then to the side, there are snapshots.
+Which it
+
+99
+00:07:19,090 --> 00:07:24,570
+tags at this state when I persist that
+event that was my state.
+
+100
+00:07:28,460 --> 00:07:33,720
+And it can do so periodically to keep the
+time short between these.
+
+101
+00:07:34,900 --> 00:07:38,140
+And if a recovery's needed then only the
+na-, latest
+
+102
+00:07:38,140 --> 00:07:41,280
+snapshot will be taken and all events
+which came after that.
+
+103
+00:07:42,460 --> 00:07:46,820
+Snapshots again have the property that
+they are immutable so they can
+
+104
+00:07:46,820 --> 00:07:51,840
+be written append-only in an efficient
+fashion and they can be freely shared.
+
+105
+00:07:53,240 --> 00:07:53,600
+With this
+
+106
+00:07:53,600 --> 00:07:58,230
+background we can look at how actors
+actually persist to changes.
+
+107
+00:07:59,420 --> 00:08:04,189
+There are two ways to do this,
+Command-Sourcing and Event-Sourcing.
+
+108
+00:08:04,189 --> 00:08:11,260
+Command-Sourcing means that we make sure
+that the actor does not lose any commands.
+
+109
+00:08:11,260 --> 00:08:13,920
+Since it persists them before they arrive.
+
+110
+00:08:17,120 --> 00:08:22,480
+So in front of the actor, or in front and
+to the side we place a log.
+
+111
+00:08:23,860 --> 00:08:27,850
+And a command which comes in is diverted
+via the log.
+
+112
+00:08:29,040 --> 00:08:30,320
+And goes then to the actor.
+
+113
+00:08:31,590 --> 00:08:34,110
+That means that all messages which are
+
+114
+00:08:34,110 --> 00:08:37,270
+received by the actor have already been
+persisted.
+
+115
+00:08:39,590 --> 00:08:42,230
+The actor can then reply normally
+
+116
+00:08:46,650 --> 00:08:47,820
+to all requests it gets.
+
+117
+00:08:49,920 --> 00:08:53,950
+But how does recovery work?
+Again, we have the actor.
+
+118
+00:08:56,090 --> 00:08:57,850
+We have the log.
+
+119
+00:08:57,850 --> 00:09:04,310
+During recovery, all messages which have
+been logged are sent to the actor.
+
+120
+00:09:06,370 --> 00:09:08,270
+The actor will process them again.
+
+121
+00:09:08,270 --> 00:09:12,200
+It will go through the same state changes
+again and arrive at
+
+122
+00:09:12,200 --> 00:09:17,070
+the same state that it was in before the
+failure or crash.
+
+123
+00:09:17,070 --> 00:09:19,030
+But an actor does not only change its
+
+124
+00:09:19,030 --> 00:09:22,820
+own behavior it also sends messages to
+other actors.
+
+125
+00:09:24,680 --> 00:09:29,260
+During a replay all of those messages
+would of course be sent again.
+
+126
+00:09:29,260 --> 00:09:31,880
+As we discussed last week, sending
+messages
+
+127
+00:09:31,880 --> 00:09:33,700
+again is a common pattern.
+
+128
+00:09:33,700 --> 00:09:37,590
+It is retrying in case we did not get a
+reply, and the only
+
+129
+00:09:37,590 --> 00:09:42,220
+thing we need to do is to make sure that
+the receiver can disambiguate.
+
+130
+00:09:42,220 --> 00:09:44,780
+Is this something I have seen already or
+is it not?
+
+131
+00:09:46,420 --> 00:09:51,625
+For this purpose, the message types which
+are handled by the log are
+
+132
+00:09:51,625 --> 00:09:57,390
+specially coded and they contain serial
+numbers for example and identifiers
+
+133
+00:09:57,390 --> 00:09:59,720
+of which actor it was that possessed them.
+
+134
+00:10:00,940 --> 00:10:04,950
+The actor then does not send directly to
+its targets.
+
+135
+00:10:04,950 --> 00:10:10,865
+For example, when it replies, it uses a
+so-called, channel.
+
+136
+00:10:12,110 --> 00:10:17,010
+And the messages which arrive at this
+channel will be checked.
+
+137
+00:10:17,010 --> 00:10:19,240
+Have they been delivered already or not?
+
+138
+00:10:19,240 --> 00:10:21,610
+Because the channel is also persistent.
+
+139
+00:10:22,820 --> 00:10:28,630
+A command-sourced actor persists all the
+commands it gets before processing them.
+
+140
+00:10:28,630 --> 00:10:31,210
+And while recovery, it will go through all
+
+141
+00:10:31,210 --> 00:10:35,660
+the same actions it did while first
+processing them.
+
+142
+00:10:35,660 --> 00:10:40,800
+But since the side effects which we are
+looking at are only sending messages to
+
+143
+00:10:40,800 --> 00:10:44,350
+other actors The channel abstraction can
+make sure
+
+144
+00:10:44,350 --> 00:10:47,970
+that during a replay all effects stay
+local
+
+145
+00:10:47,970 --> 00:10:51,870
+within here.
+We will see how to deal with external
+
+146
+00:10:51,870 --> 00:10:55,850
+effects in the next section.
+The
+
+147
+00:10:55,850 --> 00:10:59,670
+other way of persisting an actor state is
+called Event-Sourcing.
+
+148
+00:11:01,250 --> 00:11:08,700
+The focus here does not lie on replaying
+the commands which generated this state.
+
+149
+00:11:08,700 --> 00:11:14,040
+Instead while processing commands, events
+are emitted
+
+150
+00:11:14,040 --> 00:11:17,380
+which describe the state changes which are
+supposed to happen.
+
+151
+00:11:18,540 --> 00:11:20,420
+Let's look at, at a little diagram.
+
+152
+00:11:22,640 --> 00:11:29,370
+We have the, commands coming in, and our
+actor here.
+
+153
+00:11:30,720 --> 00:11:35,320
+And the actor processes the commands.
+But instead of updating
+
+154
+00:11:35,320 --> 00:11:39,900
+its own state directly, it generates
+events.
+
+155
+00:11:43,790 --> 00:11:46,540
+The fundamental difference between these
+two is
+
+156
+00:11:46,540 --> 00:11:49,860
+that a command describes something which
+shall hap-,
+
+157
+00:11:49,860 --> 00:11:52,590
+happen in the future whereas an event
+
+158
+00:11:52,590 --> 00:11:56,550
+describes something which has happened in
+the past.
+
+159
+00:11:58,210 --> 00:12:03,350
+This means that for commands you do not
+know yet what their outcome will be,
+
+160
+00:12:03,350 --> 00:12:05,660
+but for events you know what for sure
+
+161
+00:12:05,660 --> 00:12:08,550
+what has happened, and that cannot change
+afterwards.
+
+162
+00:12:09,830 --> 00:12:17,060
+The events are what gets stored in
+Event-Sourcing inside our log.
+
+163
+00:12:18,650 --> 00:12:23,620
+During a replay, the actor does not need
+to see the commands again.
+
+164
+00:12:23,620 --> 00:12:28,700
+It will just receive the events which it
+has generated from them.
+
+165
+00:12:28,700 --> 00:12:32,030
+And once it has reached its last known
+
+166
+00:12:32,030 --> 00:12:35,370
+state, it will continue processing
+commands as usual.
+
+167
+00:12:38,080 --> 00:12:41,510
+The mechanism which is used during replay
+is
+
+168
+00:12:41,510 --> 00:12:44,720
+that events are applied to the current
+state to
+
+169
+00:12:44,720 --> 00:12:48,500
+produce the changed state, and that is
+exactly the
+
+170
+00:12:48,500 --> 00:12:52,780
+same mechanism which is also used during
+normal operation.
+
+171
+00:12:55,165 --> 00:13:00,730
+Meaning that there is no code duplication
+necessary to support both use cases.
+
+172
+00:13:02,430 --> 00:13:08,010
+Obviously this round trip through the log
+will take some time.
+
+173
+00:13:08,010 --> 00:13:13,260
+The log, of course, will typically be an
+actor, so the events will be sent.
+
+174
+00:13:13,260 --> 00:13:17,930
+And then messages will be sent back.
+To the actor before they can be applied.
+
+175
+00:13:19,090 --> 00:13:20,170
+Let us look at what that
+
+176
+00:13:20,170 --> 00:13:21,543
+means in an example.
+
+177
+00:13:22,770 --> 00:13:26,580
+Suppose we want to write an actor which
+processes blog posts.
+
+178
+00:13:27,860 --> 00:13:30,283
+A user can send in new blog posts, but
+
+179
+00:13:30,283 --> 00:13:34,360
+there is also a limit beyond which posts
+are accepted.
+
+180
+00:13:35,410 --> 00:13:38,910
+The state transitions of this actor can be
+modeled by having two events.
+
+181
+00:13:39,950 --> 00:13:43,810
+Post Created contains the new text of the
+post.
+
+182
+00:13:45,120 --> 00:13:50,230
+And Quota Reached signals that this user
+has reached his or her
+
+183
+00:13:50,230 --> 00:13:55,350
+limit for example for today to post new
+entries.
+
+184
+00:13:55,350 --> 00:13:59,520
+In order to conveniently pattern match
+against all events, we
+
+185
+00:13:59,520 --> 00:14:03,910
+use a sealed trait from which these two
+events extend.
+
+186
+00:14:05,760 --> 00:14:10,760
+The state of the actor is encapsulated in
+this case class here,
+
+187
+00:14:10,760 --> 00:14:14,550
+which holds the post and the current,
+status
+
+188
+00:14:14,550 --> 00:14:16,290
+with the new posts are allowed or not.
+
+189
+00:14:17,350 --> 00:14:20,770
+And the state knows how to update itself
+so how
+
+190
+00:14:20,770 --> 00:14:24,110
+to produce the next state when an event
+comes in.
+
+191
+00:14:26,150 --> 00:14:29,608
+If a Post Created Event is applied then we
+copy
+
+192
+00:14:29,608 --> 00:14:33,780
+the state by appending the text to the
+previous list.
+
+193
+00:14:36,230 --> 00:14:42,910
+If a Quota Reached event comes in, then we
+switch the disabled flag to true.
+
+194
+00:14:42,910 --> 00:14:47,430
+It is good to keep these operations
+separate, because
+
+195
+00:14:47,430 --> 00:14:50,420
+semantically, they don't have anything to
+do with each other.
+
+196
+00:14:50,420 --> 00:14:53,720
+Creating posts is just about creating
+posts.
+
+197
+00:14:53,720 --> 00:14:57,800
+And whether or not the quota was reached
+at the same time is unrelated.
+
+198
+00:14:59,190 --> 00:15:01,610
+Therefore we have defined two distinct
+
+199
+00:15:01,610 --> 00:15:02,780
+event types for that.
+
+200
+00:15:04,680 --> 00:15:09,510
+Our User Processor Actor which uses these
+types could look like this.
+
+201
+00:15:09,510 --> 00:15:13,760
+It starts out with an empty state which is
+not yet disabled.
+
+202
+00:15:14,950 --> 00:15:17,278
+And then when a new post is submitted
+
+203
+00:15:17,278 --> 00:15:22,240
+It checks is submitting new posts
+currently disabled.
+
+204
+00:15:22,240 --> 00:15:23,980
+If not, that's okay.
+
+205
+00:15:23,980 --> 00:15:26,890
+So, I iterate an event
+
+206
+00:15:26,890 --> 00:15:30,180
+post created with the text, but then let's
+
+207
+00:15:30,180 --> 00:15:33,220
+say the quota was one, so it's immediately
+reached.
+
+208
+00:15:35,370 --> 00:15:41,510
+The emit method which I stopped out here
+is supposed to send these events to the
+
+209
+00:15:41,510 --> 00:15:47,090
+log which will send them back eventually.
+So we will see them in the behavior again.
+
+210
+00:15:48,210 --> 00:15:51,970
+And for each event which is received, we
+update the state.
+
+211
+00:15:53,240 --> 00:16:00,700
+There is one obvious issue here.
+If between sending the events and
+
+212
+00:16:00,700 --> 00:16:04,310
+receiving them back, a new post comes in.
+
+213
+00:16:04,310 --> 00:16:08,540
+It will perform the step, the, the check
+here with the old state.
+
+214
+00:16:09,800 --> 00:16:12,610
+This means that we will potentially create
+two or
+
+215
+00:16:12,610 --> 00:16:16,960
+even more posts even though only one
+should've been allowed.
+
+216
+00:16:16,960 --> 00:16:19,490
+There are two basic choices when it comes
+
+217
+00:16:19,490 --> 00:16:24,700
+to when to apply the changes which were
+persisted.
+
+218
+00:16:24,700 --> 00:16:25,930
+The first one we have just
+
+219
+00:16:25,930 --> 00:16:30,080
+seen applying them only when they come
+back from the log.
+
+220
+00:16:30,080 --> 00:16:33,090
+In this case they leave the actor in a
+stale state.
+
+221
+00:16:33,090 --> 00:16:36,600
+In the meantime the alternative would be
+to apply
+
+222
+00:16:36,600 --> 00:16:40,790
+the, the changes immediately before they
+have been persisted.
+
+223
+00:16:42,340 --> 00:16:46,210
+We can compare what this means in two
+little flow diagrams.
+
+224
+00:16:49,440 --> 00:16:53,040
+We have the processor here.
+And the log here.
+
+225
+00:16:56,610 --> 00:17:02,870
+When a new post comes in, the processor
+will perform
+
+226
+00:17:02,870 --> 00:17:09,110
+check and then send the events to the log.
+
+227
+00:17:10,720 --> 00:17:14,290
+The log will write them to disk, and that
+takes some time.
+
+228
+00:17:15,810 --> 00:17:21,794
+After a while, the events come back to the
+processor
+
+229
+00:17:21,794 --> 00:17:31,910
+at which point they are applied.
+And finally, the result is sent back.
+
+230
+00:17:31,910 --> 00:17:34,640
+This was emitted from the code for brevity
+reasons.
+
+231
+00:17:37,280 --> 00:17:40,340
+Now the question is, what shall happen
+with
+
+232
+00:17:40,340 --> 00:17:43,090
+another post which comes in at this time.
+
+233
+00:17:45,460 --> 00:17:50,440
+At this point, the actor's state has not
+yet been updated to, to reflect the
+
+234
+00:17:50,440 --> 00:17:55,240
+previous post effects.
+It might just be that we admit more
+
+235
+00:17:55,240 --> 00:18:00,510
+posts than we wanted to.
+The alternative
+
+236
+00:18:00,510 --> 00:18:05,510
+would be to not leave the processor in a
+stale state.
+
+237
+00:18:05,510 --> 00:18:11,490
+So, when a new post comes in, we perform
+
+238
+00:18:11,490 --> 00:18:12,910
+the check.
+
+239
+00:18:12,910 --> 00:18:17,660
+We generate the events and send them to
+the log.
+
+240
+00:18:17,660 --> 00:18:20,630
+But we immediately apply them.
+
+241
+00:18:20,630 --> 00:18:23,800
+All of this happens during the same
+message processing,
+
+242
+00:18:23,800 --> 00:18:26,650
+so it cannot be interrupted by a new post.
+
+243
+00:18:28,080 --> 00:18:35,010
+Eventually, the events will come back.
+But we don't need to apply them.
+
+244
+00:18:36,040 --> 00:18:36,906
+We just need
+
+245
+00:18:36,906 --> 00:18:43,230
+the signal to generate
+
+246
+00:18:43,230 --> 00:18:48,450
+the final response.
+Now if a new post comes in at this point,
+
+247
+00:18:48,450 --> 00:18:53,700
+the check which is performed will be done
+with the newest data.
+
+248
+00:18:53,700 --> 00:18:56,200
+And in this case it will correctly be
+rejected.
+
+249
+00:18:58,050 --> 00:19:03,020
+The disadvantage of the approach shown on
+the right hand side is
+
+250
+00:19:03,020 --> 00:19:05,160
+that in case of a crash of the whole
+
+251
+00:19:05,160 --> 00:19:10,570
+system, the processor might not reach the
+last known state.
+
+252
+00:19:10,570 --> 00:19:15,290
+Because the states reached here are not
+guaranteed to be persisted.
+
+253
+00:19:16,530 --> 00:19:18,990
+In the left case, all states which
+
+254
+00:19:18,990 --> 00:19:24,290
+the processor was in have already been
+persisted.
+
+255
+00:19:24,290 --> 00:19:27,840
+So it can be a recreated just as it was at
+that time.
+
+256
+00:19:29,010 --> 00:19:30,800
+So it seems like you need to
+
+257
+00:19:30,800 --> 00:19:36,380
+choose between correct persistence and
+correct behavior.
+
+258
+00:19:36,380 --> 00:19:38,840
+But in this case, there is a third way.
+
+259
+00:19:40,180 --> 00:19:45,260
+When a new command comes in while
+outstanding events have not yet been
+
+260
+00:19:45,260 --> 00:19:51,870
+persisted, then the actor must simply not
+respond to it right away.
+
+261
+00:19:51,870 --> 00:19:54,260
+It must keep it buffered until
+
+262
+00:19:54,260 --> 00:19:57,530
+the events come back from the persistent
+store.
+
+263
+00:19:57,530 --> 00:19:59,384
+This will give lower performance [UNKNOWN]
+lower
+
+264
+00:19:59,384 --> 00:20:03,710
+throughput, but it will be more
+consistent.
+
+265
+00:20:06,210 --> 00:20:10,910
+The ability to postpone messages which can
+currently not be
+
+266
+00:20:10,910 --> 00:20:14,952
+handled is provided by the stash trait in
+our code.
+
+267
+00:20:14,952 --> 00:20:15,710
+.
+
+268
+00:20:15,710 --> 00:20:20,350
+This actor does the same thing as the last
+example shown, but
+
+269
+00:20:21,440 --> 00:20:26,980
+when it gets a new post and was not
+disabled and it has emitted the events,
+
+270
+00:20:26,980 --> 00:20:31,370
+it changes its behavior.
+It becomes waiting for
+
+271
+00:20:31,370 --> 00:20:38,850
+the two events to be persisted.
+This uses the stacking feature
+
+272
+00:20:38,850 --> 00:20:45,450
+of the behavior stack of Akka actors by
+discarding equals false.
+
+273
+00:20:45,450 --> 00:20:50,260
+When waiting for in events to be
+persisted, we treat only events.
+
+274
+00:20:51,290 --> 00:20:56,410
+In which case, we update the state.
+And if this was the last
+
+275
+00:20:56,410 --> 00:21:01,770
+one we were waiting for, we pop the
+behavior off the stack and
+
+276
+00:21:01,770 --> 00:21:06,420
+allow all messages which came in in the
+meantime to be reprocessed.
+
+277
+00:21:08,100 --> 00:21:10,820
+They were stored in an internal stash, and
+the
+
+278
+00:21:10,820 --> 00:21:14,730
+way they get in there is in this default
+case.
+
+279
+00:21:14,730 --> 00:21:17,510
+Anything which is not an event is stashed
+away.
+
+280
+00:21:18,730 --> 00:21:21,530
+When messages come back from the stash,
+they need to
+
+281
+00:21:21,530 --> 00:21:26,170
+be pre-pended to the mailbox instead of
+the usual appending.
+
+282
+00:21:26,170 --> 00:21:31,660
+And it is done so that the order is
+retained in which they originally arrived.
+
+283
+00:21:33,800 --> 00:21:39,590
+This actor has the desired behavior of
+persisting the events
+
+284
+00:21:39,590 --> 00:21:45,330
+and only then applying them, but not to
+respond to new posts in the meantime.
+
+285
+00:21:47,220 --> 00:21:50,670
+Dealing with consistent application of
+changes within an
+
+286
+00:21:50,670 --> 00:21:53,980
+actor is relatively easy as we have seen.
+
+287
+00:21:55,160 --> 00:21:58,880
+But it gets messy once we leave the actor
+world.
+
+288
+00:21:58,880 --> 00:22:02,630
+Consider for example an addition to our
+block post service
+
+289
+00:22:03,850 --> 00:22:07,730
+where it would cost some money to post an
+entry.
+
+290
+00:22:07,730 --> 00:22:10,940
+This could be paid by credit card for
+example.
+
+291
+00:22:10,940 --> 00:22:13,340
+And the actor would have to perform a
+credit
+
+292
+00:22:13,340 --> 00:22:17,380
+card transaction every time a blog post is
+accepted.
+
+293
+00:22:18,930 --> 00:22:24,040
+In this case, the external entity which
+processes the request,
+
+294
+00:22:24,040 --> 00:22:29,790
+the credit card company, does not offer
+any way to interact with them
+
+295
+00:22:29,790 --> 00:22:34,950
+in, in this actor kind of fashion where
+you can apply Command or Event-Sourcing.
+
+296
+00:22:34,950 --> 00:22:38,278
+It is just something where you either make
+a request, and then
+
+297
+00:22:38,278 --> 00:22:42,050
+the credit card will be charged, or you
+don't, and then it won't.
+
+298
+00:22:43,350 --> 00:22:49,690
+What the actor needs to do in order not to
+charge multiple times is to persist that
+
+299
+00:22:49,690 --> 00:22:54,770
+this has been done.
+But unfortunately, persisting that
+
+300
+00:22:54,770 --> 00:22:59,500
+I have charged the credit card or even
+that I will charge the credit card.
+
+301
+00:23:00,650 --> 00:23:07,000
+Cannot be made consistent or atomic with
+actually charging the credit card.
+
+302
+00:23:08,132 --> 00:23:12,920
+It will always be two lines in your
+program, and one will go before the other.
+
+303
+00:23:12,920 --> 00:23:14,760
+You need to order them in some fashion.
+
+304
+00:23:16,500 --> 00:23:21,170
+In this case, there is no smart way out.
+There are just two choices.
+
+305
+00:23:21,170 --> 00:23:26,130
+If you perform the actions, so you charge
+the credit card before the events
+
+306
+00:23:26,130 --> 00:23:31,740
+have been persisted then you achieve that
+you charged the credit card at least once.
+
+307
+00:23:31,740 --> 00:23:35,010
+You need to do that if you need to ensure
+that the credit card is charged.
+
+308
+00:23:36,480 --> 00:23:38,670
+If you do it the other way around.
+
+309
+00:23:38,670 --> 00:23:41,880
+Then the event might be persistent, but
+the system might crash
+
+310
+00:23:41,880 --> 00:23:46,800
+right after that, so charging the credit
+card might not actually happen.
+
+311
+00:23:48,740 --> 00:23:52,300
+In this case, the action is performed at
+most once.
+
+312
+00:23:53,530 --> 00:23:55,340
+Which of these two you choose
+
+313
+00:23:55,340 --> 00:23:57,860
+depends entirely on your underlying
+business model.
+
+314
+00:23:59,640 --> 00:24:02,870
+In summary, actors can persist their state
+
+315
+00:24:02,870 --> 00:24:06,190
+by persisting either incoming messages or
+generated events.
+
+316
+00:24:07,520 --> 00:24:09,120
+Events are immutable and can be therefore
+
+317
+00:24:09,120 --> 00:24:13,530
+be replicated, read many times and
+analyzed.
+
+318
+00:24:14,560 --> 00:24:17,620
+They can also be used to inform other
+components as we have seen.
+
+319
+00:24:19,260 --> 00:24:23,980
+To recover an actor's state at any given
+point in time, commands
+
+320
+00:24:23,980 --> 00:24:28,210
+or events need to be replayed since the
+last snapshot was performed.
+
+321
+00:24:29,220 --> 00:24:33,190
+And while investigating how to update an
+actor's state
+
+322
+00:24:33,190 --> 00:24:37,200
+consistently with its persistence
+mechanism, we encountered
+
+323
+00:24:37,200 --> 00:24:41,200
+a useful utility from the Akka toolbox.
+
+324
+00:24:41,200 --> 00:24:44,290
+The Stash trait allows us to defer
+
+325
+00:24:44,290 --> 00:24:46,770
+messages which shall not currently be
+handled.
+

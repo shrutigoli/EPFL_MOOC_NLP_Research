@@ -1,0 +1,245 @@
+Well next we're going to talk about <i>locality</i> in the context of <i>data structure</i> and <i>data structures</i>.
+We will not be very concrete about <i>data structures</i> talking about specific tree data structures for example.
+We will talk in general about <i>arrays</i>, about <i>trees</i> and about <i>graphs</i> and what implications these kinds of data, have on <i>locality</i>.
+We're going to assume that there is basically a single linearly local memory.
+That means, there's only, you know, in a single dimension, there are ediation data elements.
+Now let's look at an array; any dimensional array.
+Let's say a two dimensional array.
+A matrix, for example.
+If we have such a matrix we stored in a linear memory, then we would actually have to shred up this two dimensional array into a sequence of several linear pieces.
+So for example, in the matrix on the right here, we can shred it up column by column and concatanate the columns and store it so that it enters a matrix as a linear array.
+Or you could do it, row by row, for example.
+If we do computations on this array, we will have to worry about whether my looping order matches my representation order.
+So for example, if I have stored my array, one column after the other,
+I could do two ways to loop all the elements of this array.
+The first would be, that a loop, let's say of an index "I" first and then of an index "J" or "Aij" that means for each column
+I loop over each row, over each element.
+The second choice would be to do the other way around.
+For each row, I iterate over all the columns.
+And given that we've decided to store column by column, the first way to do this is vastly more efficient then the second.
+Because the first basically does overall a single linear scan over the entire linearist version of the array while the second choice makes a huge number of random accesses, right?
+One random access basically for every element in the array.
+So we would have to get performance well done here.
+We would have to align our storage layout with the use cases, or visa versa.
+That means if I have the ability to reorder my loops, I could do this automatically to adapt myself to the storage layout.
+That's something that is actually happening in compilers that use loop reordering to get good performance.
+Visa versa, if I know a workload, a set of use cases, a set of different kinds of algorithms that I want to run,
+I could potentially optimize my storage structures for these.
+And that's something that is important in databases.
+So, concerns about sorting, nesting, and grouping as we're doing it here, co-clustering. All these concern database systems that relate to such data stuctures and their arrays and relations.
+One thing that is particularly important in this context is this consideration of row versus column-stores and columnar representations.
+We've basically just discussed this but there is more to say about it.
+In the context of databases specifically in data warehousing and analytical databases there is now a big battle that basically has been won by the column- stores, between row and column-stores.
+And it can be argued that column-stores, those that actually take relations and shred them up column by column and store the columns individually. they are better suited for many analytical tasks than classical row stores where either relations are stored in pages, and each page consists of a sequence of tuples.
+And why is that?
+Because many analytical queries use relations that have many columns and many such queries use only some of the relations.
+That means I've got a choice to use row-store, and I would have to fetch all of the tuples in entirety.
+And then always throw away stuff that I don't need in each of these tuples.
+Or I could store them column by column.
+Then I would only fetch those columns that I care about and combine those into those projected relations, hese partial relations that are necessary to actually add to the query.
+Also if I store column by column, 
+I can use compression on this more effectively.
+That means if for example, 
+I have a column that stores telephone numbers then if I compress only these columns, all the telephone numbers together,
+I will be able to reach much better compression rates then if I store and compress an entire address table with street addresses, personal names and identifiers, but also phone numbers, for example together, tuple by tuple.
+Because then the phone numbers are not local next to each other and I need a much smarter, more intelligent compressions algorithm or I will need something much more general.
+If I have only phone numbers 
+I will have only ten digits maybe, right, that I have to compress and I can use better compression schemes that are more succinct.
+That means there will be less to read and write from and to disk and I will be faster overall because the disks are slow.
+But this is a concern that is not just true and relevant in databases, even for example look at option on the programming language specifically about the Java virtual machine then the same applies.
+Actually column representations are much more efficient row representations of (inaudible) relations.
+So take an example of a row representation where you've got an array of structures and each struct has two integers inside.
+So it's basically two tuples, right?
+So you can think of this as an option on the representation of a relational database table.
+Now I could do this or I could use a pivoted column representation where I've got a struct, a pair of two integers arrays.
+And I can store the same data in there and I can relink this data by the array index.
+Now these relations are equivalent but actually the second, the column representation is vastly more efficient.
+So why is that?
+Well if you think of what happens inside 
+Java you'll see that in the first case you're producing linearly many objects, while in the second you only produce constantly many.
+Simply because each of the structs in the first case is going to be an object.
+And this means that in practice at runtime we will create and destroy vast amounts of objects and of course this pollutes the entire memory hierarchy.
+You're going to see this in the caches as well and if you make a deep analysis of what your program does you will see a surprising number of object creations and destructions that you wouldn't potentially expect, just temporarily.
+Actually a column representation can be much more efficient in this context then a row representation even in the context of let's say the Java virtual machine.
+Now let's look at <i>trees</i>.
+Let's take an example of a binary tree, but a Belan's binary tree.
+So such a tree on each level has twice as many nodes as on the level above.
+So in a sense, as you go downwards the tree grows exponentially fast.
+And there is no way to store the data of this tree in a linear memory or even a finite dimensional memory.
+So that the parent-child relation remains close and preserved.
+That means parents are stored close to their children.
+No matter how you present the tree you're going to have to tear this apart and there will be non local child-parent pairs.
+That means going from parent to child would be a big jump.
+That means we are basically, so to say, hopelessly lost in the context of trees.
+What we can do, however, is we can keep siblings local by let's say a <i>breadth-first enumeration</i>.
+And even if you take a <i>depth-first enumeration</i> to store your data, you know, linearly.
+It remains essentially local because the lowest level dominates the overall size, the lowest level is as big as the rest.
+So if you care about the lowest level you can read it sequentially, you have just an overhead of effectors too.
+And that ultimately is the basis of tree indexing.
+Let's say in databases but in general in data structures.
+So let's look at these tree indexes a bit more in detail.
+So the leaf level of a balanced tree is essentially local in reasonable representations we've already said that.
+And that's the idea of a primary, let's say B tree index in a database management system.
+We can align the leaf level with the sort order the data files.
+So we assume the index is separate from the actual stored data.
+Of course we could store the data in the B tree index itself but let's assume we don't do this because we want to have many indexes on the same data.
+So we store the actual data in a Heap file, in some sort order.
+And if we have just one index and that index gives us sorted access, you can efficiently find data elements and then let's say we can scan from an item we found from there to the right sequentially and find elements that are next large in the sort order of that tree index.
+And that way we can officially do range indexes--range lookups.
+If I want to do a search for a range of values, for which I've got an index structure, 
+I don't have to find each value in that range individually
+I go to the first value and then I read to the write until I find a value that is out of the range.
+Now the problem is, that's well known in the context of databases,
+I can have at most one such index that is aligned with the sorting order of the data structure in general, of the actual data file.
+If I have a second that uses a different sorting criterium they cannot be both aligned if they're sorted.
+That means one of those different data structures will require completely random access to the data which will be very inefficient.
+Now in general if you go down from the root to find our elements, always compare. Do we take the left or the right side of the children, of each node?
+We're going to do random access.
+Overall as we down we will do logarithmicly many steps of random access to get to our data.
+And then if we want to fetch many items in the primary index that is aligned in sort order with the data file, we can then scan on and get all the items out until there is an item that we don't want anymore.
+But if it's the secondary index, the one that is not aligned, it's not like this.
+So here's an example on the right hand side.
+So you see that we've got a data file with binary tuples and the tree above the data file as shown is indexing the first column of this relation and the data file is ordered by that first column.
+That means if for example, 
+I want to find all my values from five to 14, I use the B tree index to find value five and then I scan on the data file until I find the value 14 or above, and then I stop.
+On the other hand I've got a second B tree index shown below the data file in this example.
+And that index on the second value as you see at the bottom level, these pointers that connect the leaves of the B tree with the actual data file.
+It's completely out of order, lots of crossing, it's random access.
+That means of course that if I want to do a range lookup it will be very inefficient.
+I will have to find each value individually and have to jump around and jump around.
+And that's going to be terrible.
+So in that case it's probably better to just scan the entire data file and just take the values that actually match the selection condition.
+But even the primary index is not that greatly useful because if you think about this you could just as well do a binary search on the actual data file to get the same effect as looking it up in the binary tree.
+Now let's look into graphs.
+So we have to distinguish a number of types of graphs, graphs that have different properties.
+Well first there are the graphs whose edge relations are really having a local representation.
+And there is really not some interesting graphs here.
+We've got chains, right?
+Or even trees and we've discussed this before, they're not interesting in general.
+And then there are the graphs that have relatively small cuts.
+What does this mean?
+I mean by that,
+I've got the representation of the graph and I can cut the representation into pieces so that in each piece there are some nodes and lots of edges and there's only very few edges that cross in the pieces between two nodes and different pieces.
+Those edges I also have to record because in general, they matter.
+These graphs with small cuts they can be essentially processed, more or less by embarrassing parallelism, piece by piece and then I have to worry about edges that connect them.
+It depends, of course, on the algorithmic problem that I'm trying to solve, whether that's that simple but in general small cuts are good.
+And these small cuts exist in certain resource-constrained graphs.
+Let's, for example, talk about planar or almost planars embeddings into a 2D surface.
+What do we mean by this?
+Just imagine a map of the world, for example.
+And I've got a graph and I can project the nodes of that graph to positions in the map so that no edges cross each other.
+So that would be a planar embedding.
+And almost planar is if there are only a few edges crossing each other.
+Now a <i>road network</i>, where I think of roads never tunneling under each other, there are no bridges.
+I always think of roads being connected where there is a bridge, they would be planar graphs.
+So from a certain view point on a high level, if you look at maps of a country, road maps of a country, these are planar graphs.
+So these are not trees but they have a relatively low degree of cyclicity.
+They have few redundant, non-local links.
+So for example, in a road network, roads take space. I cannot look at any particular line on that map and say an arbitrary number of roads could cross this line of a certain length.
+Because roads have a certain width. It doesn't make sense to put roads higher than a certain density into the map because people couldn't use them, it would be expensive, there would be no space in the country left for other things than roads.
+If you look at physical internetworks, there you have to deal with line costs and routing complexity, etc.
+It doesn't make sense or it would just be extremely expensive if we have linearly many in the number of nodes in the internetwork, deep sea lines between Europe and US.
+There are relatively few and they hopefully have good enough bandwidth.
+But if you make cuts, there are small cuts between these areas.
+Although the graph is not a tree, it has relatively few cycles actually compared to its size.
+And if you think about it the human brain connecting neurons, in a sense it's such a graph in practice because there are physical constrains.
+We cannot have infinitely many connections between neurons in a finite amount of area or space.
+But then there are all other graphs and they are locality a nightmare.
+And there are many many interesting examples,
+Internet communication patterns.
+Differently from the
+Internet networking infrastructure there are the communication patterns.
+Who connects to whom.
+And these graphs don't have these small cuts or social networks in general.
+Of course Internet communication patterns you can think of social networks.
+Or the brain in practice.
+And there are many other examples.
+To talk about these other graphs, the bad graphs, let's talk a bit about random graphs.
+So what is a random graph?
+We've got a set of nodes, initially without any edges and then I randomly,
+I toss some coins and choose some pair of node and make an edge between them.
+So if a randomly add edges, completely randomly until I get more and more edges, there are some predictable structs to these graphs.
+The first thing that is worth mentioning is as I reach a certain edge to node ratio, which is about one, essentially, all the graph gets connected.
+It becomes very unlike these big disconnected components because there are so many nodes in each of these components that probably at least two of them are connected somewhere.
+So we get these monster components, that's well understood.
+Such graphs always tend to have a low degree of separation.
+That's the small world phenomenon.
+And they have no small cuts.
+That means as we said before, if you try to take the graph, the set of nodes and partition into two equal sized sets of nodes there is no way to do this.
+Such that, there are very few, let's say, constantly or sup-linearly many edges between these two sets of nodes.
+And the interesting thing is that's already true when the graph is sparse.
+Which means that the edge to node ratio is just linear.
+Of course the edge to node ratio could be up to quadratic but already for linear edge to node ratios for random graphs we have to since there are no small cuts.
+And that's of course bad because embarrassing parallelism is not possible in general anymore.
+So if we talk about real-world graphs and networks and we're excluding those resource constraint graphs that we've talked about before, road-networks, the physically internetwork, etc.
+Then arguably we could say essentially all the other graphs and networks are of that kind, they behave like random graphs and they have these nasty properties.
+So one thing that is known to say a bit more about random-- about graphs as they happen in reality that are actually random-like, there are alternative characterizations, that are actually very robust and interchangeable for here, for this.
+So take for example a random graph in which you add neighbors such that there is a power law, in the sense shift distribution.
+There are logarithmically few nodes which have exponentially many links.
+And then there's degrees, more and more nodes that have fewer and fewer links.
+That's called a <i>power law graph</i>.
+Another thing is typical social networks, where they've got this "rich get richer" phenomenon.
+Popular people get even more friends.
+In a sense you could say it's a random graph again where you enter edges and node is more likely to get another edge, yet another edge, even though it already has many edges connecting it to other nodes.
+So that's the "rich get richer" phenomenon.
+And you see this very often in social networks of all kinds.
+Or these so called <i>small world graphs</i> which have only these
+"k degrees of separation" famously has been observed that probably there is about six degrees of separation in the world.
+So that over a sequence of six people, 
+I know any person in the world.
+So I've got a friend, who has a friend, who has a friend, etc. six times
+I connect to anybody in the world about like this.
+So this has studied in more detail, for example in Facebook where you can formally study this with a real graph, people have observed that degree of separation is about five point something.
+And probably decreases with time.
+Now the important thing is to say there are three different characterizations that are actually equivalent.
+An important thing again is you have this property, no small cuts and that's really true for all sparse graphs.
+All these graphs have this problem that essentially-- if you do have this random component, there's a lot of noise of natural, real world phenomenon here.
+They behave like random graphs and there is a way of deterministically constructing such graphs.
+Graphs that have no small cuts and they are sparse, there are only linearly many edges and number of nodes.
+And this construction is actually surprisingly difficult given that if you do it randomly you'll also get this graph.
+But it's possible. And these are called expanding graphs, they play an important role in theoretical computer science, for the derandomization of randomized algorithms for example.
+Now as we said <i>non-resource bounded real graphs</i> have no small cuts.
+I've told you what that is.
+That means they cannot be partitioned effectively to handle regions independently without requiring lots of communication between regions.
+So it's essentially impossible to paralyze graph analytics effectively on such real graphs that we see everywhere.
+In those contexts in particular where you want to do graph analytics like let's say in large social networks,
+Facebook, Google, etc.
+Well it's impossible in a sense to do it practically well but everybody still does it because we need it.
+And there are these system like 
+[Pragle] and Giraffe and so on, that do that and they have horrible performance if you think about it.
+It's really the worst case scenario from the viewpoint of locality.
+Every node has to talk to every node in every computation step, more or less.
+People do it because they have to.
+And in a sense, in the worst case there's nothing you can do about it.
+Of course you can assume that certain algorithmic problems have a deep-seated property that you could exploit if you find it, to make things better.
+But in general, that's the situation.
+On the other hand, if you talk about a <i>small world phenomenon</i> that we have mentioned.
+It says something about locality in a sense.
+It says that there are short paths within any two nodes, which is of course relevant for routing.
+It does not mean that communication is spatially local.
+In the internetwork there are long paths, there's right area for connections, etc.
+But it's local if you only count the hops, not the time it takes to move between hops.
+And that's also relevant.
+If for example, time cost of communication is somewhat dominated by the routing for example.
+Which we hope is not so often the case.
+Well then that's what matters to you.
+What we're saying here is still that there is this notion of the <i>small world phenomenon</i> that has been studied in many different contexts and it can explored in many different ways.
+For example, in sociology there is the famous theory of "weak ties" by Granovetter, which is one of the most cited papers in sociology, if not the most cited actually.
+And it basically says that if you've got such a graph, a social network, and you've got close neighbors and more distant neighbors.
+For example, you're best friends, you're drinking buddies that you see every evening and you compare those to those kind of long distance connections.
+For example, your lawyer that you don't see very often, who has very different friends, etc.
+Then for learning something new, for getting new connections over a great distance these weak ties, these infrequent connections, the lawyer for example, is much more useful than your best friends.
+In the sense, you cannot learn anything from your best friends because your best friends they behave equally to you.
+They have the same taste, they have the same favorite movies, etc.
+But if you want to, for example, quickly get to somebody you don't know via a short chain to someone in China let's say, then this distant connection is much more useful than the close connection.
+That's ultimately also interestingly used in routing.
+If you want to move somewhere far away you will try to use the right, hopefully, long distance connection rather than move around locally in your network.
+That's ineffective.
+So to summarize we've talked about data structures.
+We've talked about arrays, relations, graphs, and trees.
+And we have sturdied how locality effects them and what we can say about optimizing locality in all kinds of algorithmic techniques.
+This of course, underlies programming in general.
+It underlies databases.
+It underlies networks and there's a lot more to be said.
+This was a high level overview.
+And there is much more that you can see in concrete examples.

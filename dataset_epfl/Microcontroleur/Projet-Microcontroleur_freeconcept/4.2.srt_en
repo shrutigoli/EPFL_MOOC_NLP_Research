@@ -1,0 +1,1059 @@
+1
+00:00:00,000 --> 00:00:08,870
+Hello we continue the course
+"Understanding microcontrollers."
+
+2
+00:00:08,870 --> 00:00:12,928
+We started talking about time management,
+and
+
+3
+00:00:12,928 --> 00:00:16,920
+we applied it to programs that
+used only the outputs.
+
+4
+00:00:16,920 --> 00:00:21,098
+Now, we will also deal with entries, and
+
+5
+00:00:21,098 --> 00:00:25,390
+in particular, look at the problem
+of uncertainty that exist
+
+6
+00:00:25,390 --> 00:00:29,660
+on the entries, look at how we
+can scrutinize the
+
+7
+00:00:29,660 --> 00:00:35,318
+inputs to take care of detecting
+flanks, to consider the
+
+8
+00:00:35,318 --> 00:00:40,342
+problem of contact rebounds, also to count
+
+9
+00:00:40,342 --> 00:00:45,300
+the events, and how to measure
+a duration, measure a time.
+
+10
+00:00:45,300 --> 00:00:50,605
+Do you remember the pattern
+that corresponds to what is
+
+11
+00:00:50,605 --> 00:00:54,680
+behind each microcontroller tab,
+inside the circuit?
+
+12
+00:00:54,680 --> 00:00:59,238
+We had seen that there was a
+
+13
+00:00:59,238 --> 00:01:04,586
+flip-flop, associated with the output,
+and a
+
+14
+00:01:04,586 --> 00:01:10,030
+passer, associated with the input.
+
+15
+00:01:10,030 --> 00:01:15,776
+When an output is used, that
+passer is used, but we see well
+
+16
+00:01:15,776 --> 00:01:18,778
+that there is basically something
+
+17
+00:01:18,778 --> 00:01:21,800
+different between inputs and outputs.
+
+18
+00:01:21,800 --> 00:01:26,840
+For an entry,we look briefly at the value
+
+19
+00:01:26,840 --> 00:01:30,735
+which is on the tab, on the other hand,
+for an
+
+20
+00:01:30,735 --> 00:01:35,994
+output, we write in a flip-flop,
+which has the peculiarity,
+
+21
+00:01:35,994 --> 00:01:40,537
+to memorize this value, and
+this value will not change,
+
+22
+00:01:40,537 --> 00:01:43,480
+so a new value is not going to be written.
+
+23
+00:01:43,480 --> 00:01:48,855
+Thus, the flip-flop offers certainty
+about the value
+
+24
+00:01:48,855 --> 00:01:53,138
+of the output, on the other hand,
+the input passer gives
+
+25
+00:01:53,138 --> 00:01:57,240
+the value of the input, only at
+the time of the reading,
+
+26
+00:01:57,240 --> 00:02:02,080
+and leaves an uncertainty for
+all the rest of the moments.
+
+27
+00:02:02,080 --> 00:02:06,128
+We will therefore use, to read
+the entries,
+
+28
+00:02:06,128 --> 00:02:09,690
+a mechanism called scrutiny.
+
+29
+00:02:09,690 --> 00:02:13,760
+The English term often used is "polling".
+
+30
+00:02:13,760 --> 00:02:18,996
+According to the dictionary, it is a repeated
+examination of the state of one or
+
+31
+00:02:18,996 --> 00:02:25,330
+several elements of a system,
+in order to detect a possible change.
+
+32
+00:02:25,330 --> 00:02:31,536
+So we will read, read, read and
+re-read an entry, hoping to find
+
+33
+00:02:31,536 --> 00:02:36,070
+an event that will happen,
+a change in particular.
+
+34
+00:02:36,070 --> 00:02:42,305
+Obviously, the time constraints associated
+
+35
+00:02:42,305 --> 00:02:47,870
+with this scan are very different,
+depending on the nature of a problem.
+
+36
+00:02:47,870 --> 00:02:53,590
+Here you see a turnstile that is used,
+
+37
+00:02:53,590 --> 00:02:56,685
+for example, in metros to count
+
+38
+00:02:56,685 --> 00:03:00,470
+people who pass a given corridor,
+for example.
+
+39
+00:03:00,470 --> 00:03:08,760
+Here you have a motorcycle engine,
+which can run extremely fast.
+
+40
+00:03:08,760 --> 00:03:16,302
+Let us ask the question, what is the
+minimum time between two scans,to
+
+41
+00:03:16,302 --> 00:03:21,600
+know reliably the rotation of these
+two devices?
+
+42
+00:03:21,600 --> 00:03:27,436
+I specify that the  metro turnstile
+receives an impulse when
+
+43
+00:03:27,436 --> 00:03:32,620
+the passing of a person, a person
+walking, or possibly running.
+
+44
+00:03:32,620 --> 00:03:38,880
+The motorcycle engine itself
+receives 12 pulses per revolution,
+
+45
+00:03:38,880 --> 00:03:44,700
+with a maximum speed of 8000 per minute.
+
+46
+00:03:52,325 --> 00:03:58,075
+We will see that this answer
+is acceptable, of course,
+
+47
+00:03:58,075 --> 00:04:03,078
+this one too, but that only that one,
+
+48
+00:04:03,078 --> 00:04:08,340
+is acceptable. Try to look at why.
+
+49
+00:04:08,340 --> 00:04:11,380
+The pedestrian will take about
+one second to
+
+50
+00:04:11,380 --> 00:04:15,640
+tip the turnstile, maybe half a second.
+
+51
+00:04:15,640 --> 00:04:17,551
+We imagine then that a
+
+52
+00:04:17,551 --> 00:04:22,130
+structuring every hundredth
+of a second would be largely
+
+53
+00:04:22,130 --> 00:04:26,705
+sufficient. On the other hand,
+the engine runs at maximum of
+
+54
+00:04:26,705 --> 00:04:31,871
+8000 rpm, a little more than
+133 revolution per
+
+55
+00:04:31,871 --> 00:04:37,592
+second, this corresponds to a
+minimum period of about 7.5
+
+56
+00:04:37,592 --> 00:04:43,095
+milliseconds. If there are 12 pulses,
+the minimum time
+
+57
+00:04:43,095 --> 00:04:47,172
+between two changes, half a pulse in
+
+58
+00:04:47,172 --> 00:04:52,670
+in a few sorts, thus corresponds
+to 312 microseconds.
+
+59
+00:04:52,670 --> 00:04:55,220
+So, in this case, a scan
+
+60
+00:04:55,220 --> 00:04:59,100
+every millisecond would be
+largely insufficient.
+
+61
+00:04:59,100 --> 00:05:04,490
+We have already learned to read
+an entry, hence,
+
+62
+00:05:04,490 --> 00:05:08,455
+apparently, it is very easy to write
+a program whose
+
+63
+00:05:08,455 --> 00:05:12,693
+specifications would be: "the red LED
+must be switched on when
+
+64
+00:05:12,693 --> 00:05:16,513
+the push-button is pressed".
+This is a mistake that the
+
+65
+00:05:16,513 --> 00:05:22,200
+beginners would easily make
+the main loop, if we
+
+66
+00:05:22,200 --> 00:05:28,174
+pressed on the pushbutton,
+then,  we turn on the LED,
+
+67
+00:05:28,174 --> 00:05:33,767
+I reproduced exactly the
+specifications, as I read.
+
+68
+00:05:33,767 --> 00:05:38,542
+This is indeed false,
+it is clear that this program
+
+69
+00:05:38,542 --> 00:05:42,670
+Would turn on once the lamp,
+and would never extinguish it.
+
+70
+00:05:42,670 --> 00:05:47,875
+We might have to express the
+specifications by saying,we want the
+
+71
+00:05:47,875 --> 00:05:50,475
+red lamp to light up when we press
+the
+
+72
+00:05:50,475 --> 00:05:54,380
+push button, and goes out
+the rest of the time.
+
+73
+00:05:54,380 --> 00:05:58,883
+And then the program must be completed
+by an else, if we do not press
+
+74
+00:05:58,883 --> 00:06:03,580
+the push-button, then we turn off
+the lamp.
+
+75
+00:06:03,580 --> 00:06:07,948
+Here is a variant of this program,
+which uses
+
+76
+00:06:07,948 --> 00:06:13,233
+inside the main loop, a second loop, we
+
+77
+00:06:13,233 --> 00:06:16,610
+have therefore a variable which is
+blocking, but which,
+
+78
+00:06:16,610 --> 00:06:20,460
+for this problem, will solve
+the problem just as well.
+
+79
+00:06:20,460 --> 00:06:24,135
+The fact that an entry is active is one
+
+80
+00:06:24,135 --> 00:06:29,300
+thing, detecting when it is activated,
+
+81
+00:06:29,300 --> 00:06:33,800
+for example a rising flank, is one other.
+
+82
+00:06:33,800 --> 00:06:39,220
+This is a program that will detect
+a rising edge.
+
+83
+00:06:39,220 --> 00:06:43,970
+In the main loop, we will first wait,
+
+84
+00:06:43,970 --> 00:06:49,157
+as long as the input is at 0, when it is no
+
+85
+00:06:49,157 --> 00:06:55,190
+no longer at 0, it is at 1, we will be able
+to execute the desired action.
+
+86
+00:06:55,190 --> 00:07:00,270
+And then, we will have to wait
+for the falling flank,
+
+87
+00:07:00,270 --> 00:07:05,750
+with, again, a loop, but this time
+with the reverse condition.
+
+88
+00:07:05,750 --> 00:07:09,698
+Again, the program we have just written is
+
+89
+00:07:09,698 --> 00:07:14,460
+blocking, since it contains
+two while loops, and there is
+
+90
+00:07:14,460 --> 00:07:18,363
+a method, which allows not
+to not use while
+
+91
+00:07:18,363 --> 00:07:23,810
+in the main loop, alone, here,
+an if, will be used.
+
+92
+00:07:23,810 --> 00:07:27,692
+The trick is the following, we will use two
+
+93
+00:07:27,692 --> 00:07:32,364
+variables, one called value,
+which will correspond to
+
+94
+00:07:32,364 --> 00:07:34,938
+the last value of our entry that has
+
+95
+00:07:34,938 --> 00:07:38,533
+been read, and one, which
+corresponds to the old value.
+
+96
+00:07:38,533 --> 00:07:39,481
+Students
+
+97
+00:07:39,481 --> 00:07:42,650
+often have a little trouble understanding.
+
+98
+00:07:42,650 --> 00:07:48,230
+So you have to start by initializing it,
+with the value,
+
+99
+00:07:48,230 --> 00:07:54,190
+but then it takes, at the end of the loop,
+while,
+
+100
+00:07:54,190 --> 00:07:59,838
+from the main loop, it takes
+the value which was, in the
+
+101
+00:07:59,838 --> 00:08:05,874
+value variable, so which has been read
+at the beginning of the loop.
+
+102
+00:08:05,874 --> 00:08:10,378
+This means that during the execution of
+
+103
+00:08:10,378 --> 00:08:14,947
+the middle part of the loop, we have
+
+104
+00:08:14,947 --> 00:08:19,620
+, both the last read value, and
+
+105
+00:08:19,620 --> 00:08:25,131
+the penultimate value read. Then look at
+
+106
+00:08:25,131 --> 00:08:31,062
+now this diagram of the times,
+it is clear that, we have
+
+107
+00:08:31,062 --> 00:08:36,580
+in value, a kind of copy of our
+
+108
+00:08:36,580 --> 00:08:41,574
+entry with a shift related to
+the fact that we read
+
+109
+00:08:41,574 --> 00:08:46,579
+the values ​​successively, remember
+what was said earlier,
+
+110
+00:08:46,579 --> 00:08:51,350
+we do not know what happens between
+the readings, so here there is a small
+
+111
+00:08:51,350 --> 00:08:56,788
+offset between this flank and that one,
+between that sidewall and that one,
+
+112
+00:08:56,788 --> 00:09:01,510
+and this signal still has about
+the same pace as that one.
+
+113
+00:09:01,510 --> 00:09:08,000
+And we see that this old value
+is exactly the same as value
+
+114
+00:09:08,000 --> 00:09:14,870
+but shifted by a playback of
+the signal, always this offset.
+
+115
+00:09:14,870 --> 00:09:17,390
+And what is interesting is that
+
+116
+00:09:17,390 --> 00:09:22,260
+by comparing, the value with the old value,
+
+117
+00:09:22,260 --> 00:09:27,820
+It is possible, for example here,
+to detect the rising flanks,
+
+118
+00:09:27,820 --> 00:09:32,900
+with the presence of a 1 here,
+of a 0 there.
+
+119
+00:09:32,900 --> 00:09:37,589
+It would of course also be possible
+to detect, a
+
+120
+00:09:37,589 --> 00:09:42,700
+falling flank at that point, or to detect
+
+121
+00:09:42,700 --> 00:09:47,530
+any flank saying, it is necessary
+that the old
+
+122
+00:09:47,530 --> 00:09:51,410
+value must be different from the
+current value.
+
+123
+00:09:51,410 --> 00:09:58,980
+We note that it is different,
+that it is different, and so on.
+
+124
+00:09:58,980 --> 00:10:04,401
+Again, this programming technique
+is very interesting
+
+125
+00:10:04,401 --> 00:10:09,370
+because it allows to execute
+several tasks in our main loop.
+
+126
+00:10:09,370 --> 00:10:12,982
+I wrote here in red what should be added
+
+127
+00:10:12,982 --> 00:10:17,801
+to manage a second input.
+Obviously, the two
+
+128
+00:10:17,801 --> 00:10:22,340
+variables, reading, at the beginning of
+
+129
+00:10:22,340 --> 00:10:27,380
+the loop, reading, pardon me,
+copy, at the end of
+
+130
+00:10:27,380 --> 00:10:32,888
+the loop, and finally the specific
+precessing to detect
+
+131
+00:10:32,888 --> 00:10:38,374
+the flank on the second input.
+The pushbutton is very often
+
+132
+00:10:38,374 --> 00:10:40,990
+connected to an input of
+a microcontroller.
+
+133
+00:10:40,990 --> 00:10:42,910
+We might therefore think that,
+
+134
+00:10:42,910 --> 00:10:46,310
+we have just seen, works
+with a push button.
+
+135
+00:10:46,310 --> 00:10:48,312
+Well, that's not the case.
+
+136
+00:10:48,312 --> 00:10:53,317
+In fact, in a push-button, there are
+metallic elements, which
+
+137
+00:10:53,317 --> 00:10:58,810
+move, and we will have a contact
+rebound effect.
+
+138
+00:10:58,810 --> 00:11:03,512
+This phenomenon occurs when we press on
+
+139
+00:11:03,512 --> 00:11:05,930
+the button, but also when it is released.
+
+140
+00:11:05,930 --> 00:11:11,420
+Let's look at a time chart that
+highlights these
+
+141
+00:11:11,420 --> 00:11:16,880
+contact bounces when we press,
+and when we release.
+
+142
+00:11:16,880 --> 00:11:22,904
+There is a very simple technique,
+which allows to overcom these
+
+143
+00:11:22,904 --> 00:11:29,583
+contact bounce, is to read the
+input value only at
+
+144
+00:11:29,583 --> 00:11:37,400
+sufficiently long intervals, so as not
+to risk including a contact bounce.
+
+145
+00:11:37,400 --> 00:11:42,400
+Here, it is clear that the contact bounce
+was completely between two readings,
+
+146
+00:11:42,400 --> 00:11:46,640
+There is obviously no problem,
+we passed cleanly from 0 to 1.
+
+147
+00:11:46,640 --> 00:11:51,194
+Here, it seems less favorable,
+since it is well
+
+148
+00:11:51,194 --> 00:11:54,540
+in the middle of the rebound that we read,
+
+149
+00:11:54,540 --> 00:11:58,763
+and despite everything, we see that
+here we read a 1, here, we
+
+150
+00:11:58,763 --> 00:12:02,590
+could have read a 1 or a 0,
+it will depend on a few
+
+151
+00:12:02,590 --> 00:12:07,728
+things , then here a 0, and in both cases
+that I mentioned we could have
+
+152
+00:12:07,728 --> 00:12:13,160
+successively 1, then 0, so the
+rebounds would had been deleted.
+
+153
+00:12:13,160 --> 00:12:15,860
+The English term used for the
+
+154
+00:12:15,860 --> 00:12:20,470
+suppression of contact rebounds
+is debouncing.
+
+155
+00:12:20,470 --> 00:12:25,790
+Here we have the program that allows
+to carry out this suppression function
+
+156
+00:12:25,790 --> 00:12:30,803
+of the contact bounces,
+with inside the main loop,
+
+157
+00:12:30,803 --> 00:12:35,920
+a delay, which means that the
+entries are read, only every 20
+
+158
+00:12:35,920 --> 00:12:40,779
+milliseconds. One variant,
+would be to read
+
+159
+00:12:40,779 --> 00:12:45,944
+permanently, and when the rising edge
+
+160
+00:12:45,944 --> 00:12:50,920
+has been detected, we make a wait,
+which would mask the rebound.
+
+161
+00:12:50,920 --> 00:12:55,670
+Be careful, it will not work that way.
+
+162
+00:12:55,670 --> 00:13:00,942
+We would be in a situation
+where we read, read, read, we
+
+163
+00:13:00,942 --> 00:13:06,568
+would have the delay, read, read,
+read, read, and there, we would recover
+
+164
+00:13:06,568 --> 00:13:11,625
+all contact rebounds. So it is necessary
+
+165
+00:13:11,625 --> 00:13:16,478
+to, when we again have a value
+which corresponds
+
+166
+00:13:16,478 --> 00:13:20,470
+to the descending flank, to wait
+in the 20 milliseconds.
+
+167
+00:13:20,470 --> 00:13:25,720
+So here is the program, with
+detection of the rising
+
+168
+00:13:25,720 --> 00:13:31,970
+edge, delay application, with detection
+
+169
+00:13:31,970 --> 00:13:37,240
+of the falling flank, with the application
+of the delay. When performing the
+
+170
+00:13:37,240 --> 00:13:40,163
+regular scan,  of an entry, it is done at
+
+171
+00:13:40,163 --> 00:13:45,490
+a certain frequency, called
+sampling frequency.
+
+172
+00:13:45,490 --> 00:13:49,460
+And the choice of this frequency
+should not be made at random.
+
+173
+00:13:49,460 --> 00:13:52,248
+The signal processing theory gives
+
+174
+00:13:52,248 --> 00:13:55,634
+indications, in particular the fact that,
+
+175
+00:13:55,634 --> 00:13:57,988
+if there is a maximum frequency on
+
+176
+00:13:57,988 --> 00:14:03,030
+the input, the minimum sampling frequency,
+
+177
+00:14:03,030 --> 00:14:10,760
+must be at least equal to twice
+the maximum frequency of the input.
+
+178
+00:14:10,760 --> 00:14:13,548
+Again, we are not going to enter into
+
+179
+00:14:13,548 --> 00:14:16,630
+these theories that would go
+beyond the scope of this course.
+
+180
+00:14:16,630 --> 00:14:21,320
+Let's try to program now,
+
+181
+00:14:21,320 --> 00:14:24,428
+events counting that occurs on an input.
+
+182
+00:14:24,428 --> 00:14:28,720
+Here is another program that
+corresponds to a beginner error.
+
+183
+00:14:28,720 --> 00:14:35,706
+If the push button is active,
+the counter is incremented.
+
+184
+00:14:35,706 --> 00:14:40,368
+It will not correspond to the
+number of times we press
+
+185
+00:14:40,368 --> 00:14:45,130
+the button, you can see it on this diagram.
+
+186
+00:14:45,130 --> 00:14:49,427
+When I press the button, I will count
+
+187
+00:14:49,427 --> 00:14:53,770
+several times, here I arrived at 6, while
+
+188
+00:14:53,770 --> 00:14:58,000
+I had two impulses that occurred.
+
+189
+00:14:58,000 --> 00:15:01,852
+Let us apply the detection technique
+
+190
+00:15:01,852 --> 00:15:05,700
+of the flanks, which we now know.
+
+191
+00:15:05,700 --> 00:15:11,426
+Again, acquisiring the value,
+memorizing of the old
+
+192
+00:15:11,426 --> 00:15:17,464
+value, and in that part detecting
+a flank which  will produce,
+
+193
+00:15:17,464 --> 00:15:21,594
+incrementing the counter. Another
+problem that we
+
+194
+00:15:21,594 --> 00:15:26,150
+are able to solve now, it is
+the measure of time.
+
+195
+00:15:26,150 --> 00:15:30,850
+For example, measure the duration
+of a pulse.
+
+196
+00:15:30,850 --> 00:15:37,359
+I have illustrated here a counter,
+which, whenever the value
+
+197
+00:15:37,359 --> 00:15:43,440
+is active, will be incremented and will be reset
+
+198
+00:15:43,440 --> 00:15:47,480
+to 0, when the falling edge
+has been found.
+
+199
+00:15:47,480 --> 00:15:51,135
+If we want to have a display at
+the same time, of
+
+200
+00:15:51,135 --> 00:15:55,366
+the value, it is when the impulse
+has been completed, when the
+
+201
+00:15:55,366 --> 00:15:59,920
+falling flank has been detected,
+which must be copied on the display
+
+202
+00:15:59,920 --> 00:16:04,735
+and hold the value until the
+end of the next pulse.
+
+203
+00:16:04,735 --> 00:16:09,080
+So we always have the last
+impulse that has ended,
+
+204
+00:16:09,080 --> 00:16:12,590
+which duration is displayed
+on the display.
+
+205
+00:16:12,590 --> 00:16:19,520
+Here is the corresponding program,
+I recall that we use a loop,
+
+206
+00:16:19,520 --> 00:16:25,966
+a loop with fixed duration,
+there is no loop
+
+207
+00:16:25,966 --> 00:16:32,026
+inside the main loop, we find only if.
+
+208
+00:16:32,026 --> 00:16:33,142
+We will,
+
+209
+00:16:33,142 --> 00:16:40,532
+count, whenever the input is active,
+we therefore totalize, the duration
+
+210
+00:16:40,532 --> 00:16:47,526
+of the pulse, on the other hand,at the
+falling edge, we will, set the counter
+
+211
+00:16:47,526 --> 00:16:52,126
+to 0 for the next count, but
+beforehand we will display
+
+212
+00:16:52,126 --> 00:16:56,860
+the value, which will remain
+until the end of the next pulse.
+
+213
+00:16:56,860 --> 00:16:58,199
+And again,
+
+214
+00:16:58,199 --> 00:17:04,154
+in order that this line may have a meaning,
+that is to say that we have at the same time,
+
+215
+00:17:04,154 --> 00:17:09,290
+knowledge of the preceding value,
+and the current value,
+
+216
+00:17:09,290 --> 00:17:13,906
+this mechanism needs to copy the
+value to the old value at the end of
+
+217
+00:17:13,906 --> 00:17:18,909
+the loop, while it is at the beginning
+of the loop that the value is read.
+
+218
+00:17:18,909 --> 00:17:23,290
+We have now integrated the entries
+into the
+
+219
+00:17:23,290 --> 00:17:27,914
+time management. We have studied
+the uncertainty of
+
+220
+00:17:27,914 --> 00:17:34,260
+entries, we looked at how to scrutinize inputs make polling
+
+221
+00:17:34,260 --> 00:17:40,000
+We learned to detect a sidewall,
+to remove a contact bounce, to count
+
+222
+00:17:40,000 --> 00:17:45,690
+events, and time went by.
+
+223
+00:17:45,690 --> 00:17:48,870
+In practice, the applications
+we are likely toencounter,
+
+224
+00:17:48,870 --> 00:17:53,920
+Will certainly be more complex.
+In particular, we will be able to realize
+
+225
+00:17:53,920 --> 00:17:59,058
+states machines, which we learned at the
+beginning of this course, to describe them
+
+226
+00:17:59,058 --> 00:18:06,960
+with state graphs. This will be the
+subject of an upcoming chapter.
+

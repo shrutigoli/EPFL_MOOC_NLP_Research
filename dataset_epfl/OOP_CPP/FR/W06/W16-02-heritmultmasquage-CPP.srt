@@ -1,0 +1,767 @@
+1
+00:00:03,948 --> 00:00:05,316
+Nous avons vu qu’en C++,
+
+2
+00:00:05,316 --> 00:00:07,774
+une classe peut hériter
+de plusieurs superclasses.
+
+3
+00:00:07,774 --> 00:00:10,074
+C’est ce que l’on appelle
+l’« héritage multiple ».
+
+4
+00:00:10,074 --> 00:00:12,261
+Que se passe-t-il
+si plusieurs superclasses
+
+5
+00:00:12,261 --> 00:00:15,829
+offrent à une de leurs sous-classes
+un membre portant le même nom ?
+
+6
+00:00:15,829 --> 00:00:17,497
+Il y a une situation d’ambiguïté,
+
+7
+00:00:17,497 --> 00:00:18,842
+et c’est ce thème précisément
+
+8
+00:00:18,842 --> 00:00:20,907
+que nous traitons
+dans la séquence qui suit.
+
+9
+00:00:20,907 --> 00:00:24,276
+Les règles régissant les droits d’accès
+dans le cadre de l’héritage multiple
+
+10
+00:00:24,276 --> 00:00:26,235
+sont les mêmes que pour l’héritage simple,
+
+11
+00:00:26,235 --> 00:00:29,756
+ce qui signifie qu’une sous-classe
+peut accéder directement aux membres
+
+12
+00:00:29,756 --> 00:00:31,344
+(c’est-à-dire attributs et méthodes)
+
+13
+00:00:31,344 --> 00:00:34,340
+protégés (ou publics, bien sûr)
+de ses superclasses.
+
+14
+00:00:34,340 --> 00:00:36,368
+La nouvelle question
+qui se pose par contre
+
+15
+00:00:36,368 --> 00:00:38,256
+dans le cadre de l’héritage multiple est :
+
+16
+00:00:38,256 --> 00:00:40,959
+« Que se passe-t-il
+si plusieurs superclasses
+
+17
+00:00:40,959 --> 00:00:42,562
+offrent à une sous-classe
+
+18
+00:00:42,562 --> 00:00:45,976
+des attributs et des méthodes
+portant le même nom ? »
+
+19
+00:00:45,976 --> 00:00:47,426
+Partons d’un exemple concret.
+
+20
+00:00:47,426 --> 00:00:48,604
+Reprenons pour cela
+
+21
+00:00:48,604 --> 00:00:50,992
+le cas de notre petite hiérarchie
+de classes zoologiques,
+
+22
+00:00:50,992 --> 00:00:54,231
+où nous avions deux superclasses
+<i>Ovipare</i> et <i>Vivipare</i>,
+
+23
+00:00:54,231 --> 00:00:57,157
+dont héritait une sous-classe <i>Ovovivipare</i>.
+
+24
+00:00:57,157 --> 00:00:59,749
+Supposons maintenant que,
+dans chacune des superclasses,
+
+25
+00:00:59,749 --> 00:01:01,627
+soit présente une méthode « afficher »,
+
+26
+00:01:01,627 --> 00:01:03,075
+permettant d’afficher par exemple
+
+27
+00:01:03,075 --> 00:01:06,003
+les caractéristiques des instances
+de chacune de ces classes.
+
+28
+00:01:06,003 --> 00:01:08,108
+Comme la classe <i>Ovovivipare</i> dérive
+
+29
+00:01:08,108 --> 00:01:10,773
+de la classe <i>Ovipare</i>
+et de la classe <i>Vivipare</i>,
+
+30
+00:01:10,773 --> 00:01:13,241
+elle va donc disposer,
+par héritage justement,
+
+31
+00:01:13,241 --> 00:01:14,797
+de deux méthodes « afficher » :
+
+32
+00:01:14,797 --> 00:01:17,014
+la méthode « afficher » de la classe <i>Ovipare</i>
+
+33
+00:01:17,014 --> 00:01:20,668
+et la méthode « afficher »
+de la classe <i>Vivipare</i> ;
+
+34
+00:01:20,668 --> 00:01:23,842
+deux méthodes, donc,
+ayant strictement le même nom.
+
+35
+00:01:23,842 --> 00:01:25,077
+Supposons maintenant que,
+
+36
+00:01:25,077 --> 00:01:27,992
+ailleurs dans le programme
+(par exemple dans un programme principal),
+
+37
+00:01:27,992 --> 00:01:30,665
+nous créions une instance d’<i>Ovovivipare</i>,
+
+38
+00:01:30,665 --> 00:01:34,138
+et sur cette instance,
+invoquions la méthode « afficher ».
+
+39
+00:01:34,138 --> 00:01:40,253
+En clair, va se poser à nous le problème
+de « quelle méthode est ici invoquée ? »
+
+40
+00:01:40,253 --> 00:01:43,723
+Celle héritée d’<i>Ovipare</i>
+ou celle héritée de <i>Vivipare</i> ?
+
+41
+00:01:43,723 --> 00:01:45,826
+Le compilateur réagirait
+de la même façon,
+
+42
+00:01:45,826 --> 00:01:46,988
+se poserait le même problème,
+
+43
+00:01:46,988 --> 00:01:48,650
+et donc refuserait cette tournure.
+
+44
+00:01:48,650 --> 00:01:51,436
+Pour le compilateur,
+il y a en effet une ambiguïté :
+
+45
+00:01:51,436 --> 00:01:52,762
+il y a un problème de masquage,
+
+46
+00:01:52,762 --> 00:01:55,290
+dans le sens où un identificateur
+en masque un autre,
+
+47
+00:01:55,290 --> 00:01:56,457
+et le compilateur ne sait pas
+
+48
+00:01:56,457 --> 00:02:01,914
+dans quelle portée
+il faut résoudre cet appel.
+
+49
+00:02:01,914 --> 00:02:02,914
+Alors attention,
+
+50
+00:02:02,914 --> 00:02:05,430
+nous sommes bel et bien ici
+face à un problème de masquage :
+
+51
+00:02:05,430 --> 00:02:07,970
+un problème de résolution de portée.
+
+52
+00:02:07,970 --> 00:02:10,260
+En effet, l’invocation
+de la méthode « afficher »
+
+53
+00:02:10,260 --> 00:02:12,130
+sur une instance d’<i>Ovovivipare</i>
+
+54
+00:02:12,130 --> 00:02:14,300
+provoquera une erreur à la compilation
+
+55
+00:02:14,300 --> 00:02:18,020
+et ce, même si la méthode « afficher »
+n’avait pas les mêmes paramètres
+
+56
+00:02:18,020 --> 00:02:20,164
+dans les classes <i>Ovipare</i> et <i>Vivipare</i>,
+
+57
+00:02:20,164 --> 00:02:22,900
+ce qui, <i>a priori</i>,
+peut sembler un peu inattendu.
+
+58
+00:02:22,900 --> 00:02:24,552
+En clair, supposez par exemple
+
+59
+00:02:24,552 --> 00:02:28,294
+que dans la classe <i>Ovipare</i>
+la méthode « afficher » soit sans paramètres
+
+60
+00:02:28,294 --> 00:02:30,096
+et que dans la classe <i>Vivipare</i>
+
+61
+00:02:30,096 --> 00:02:33,266
+la méthode « afficher »
+ait un paramètre de type <i>string</i>,
+
+62
+00:02:33,266 --> 00:02:36,748
+alors on pourrait imaginer
+qu’en invoquant la méthode « afficher »
+
+63
+00:02:36,748 --> 00:02:40,042
+en lui fournissant
+une chaîne de caractères
+
+64
+00:02:40,042 --> 00:02:41,438
+lève toute ambiguïté :
+
+65
+00:02:41,438 --> 00:02:46,692
+il semblerait clair ici que ce soit
+cette méthode qui doive être invoquée.
+
+66
+00:02:46,692 --> 00:02:48,946
+Or, l’ambiguïté pourrait être levée ici
+
+67
+00:02:48,946 --> 00:02:52,160
+seulement dans les situations
+où on aurait de la surcharge.
+
+68
+00:02:52,160 --> 00:02:54,091
+Mais, comme vous avez eu
+l’occasion de le voir
+
+69
+00:02:54,091 --> 00:02:55,522
+dans les séquences précédentes,
+
+70
+00:02:55,522 --> 00:02:59,184
+en C++ on ne peut surcharger
+que dans la même portée,
+
+71
+00:02:59,184 --> 00:03:00,572
+et donc ici, concrètement,
+
+72
+00:03:00,572 --> 00:03:03,448
+nous n’avons pas affaire
+à un problème de surcharge
+
+73
+00:03:03,448 --> 00:03:08,952
+et le compilateur va quand même
+refuser cette tournure.
+
+74
+00:03:08,952 --> 00:03:11,212
+En effet, la méthode
+« afficher » sans paramètres
+
+75
+00:03:11,212 --> 00:03:13,412
+est dans la portée de la classe <i>Ovipare</i>,
+
+76
+00:03:13,412 --> 00:03:15,874
+la méthode « afficher »
+avec un paramètre de type <i>string</i>
+
+77
+00:03:15,874 --> 00:03:17,922
+est dans la portée de la classe <i>Vivipare</i>,
+
+78
+00:03:17,922 --> 00:03:20,403
+ces deux méthodes ne sont pas
+dans la même portée :
+
+79
+00:03:20,403 --> 00:03:22,312
+on ne peut pas considérer, donc,
+
+80
+00:03:22,312 --> 00:03:24,638
+que <i>cette</i> méthode « afficher »
+est une surcharge
+
+81
+00:03:24,638 --> 00:03:26,514
+de <i>cette autre</i> méthode « afficher ».
+
+82
+00:03:26,514 --> 00:03:29,133
+Ça n’est donc pas un mécanisme
+lié à la surcharge
+
+83
+00:03:29,133 --> 00:03:32,406
+qui peut être employé ici
+pour lever l’ambiguïté ;
+
+84
+00:03:32,406 --> 00:03:36,549
+il faut plutôt résoudre la portée
+de façon correcte.
+
+85
+00:03:36,549 --> 00:03:38,459
+Et quelles solutions
+s’offrent à nous maintenant
+
+86
+00:03:38,459 --> 00:03:41,219
+pour résoudre ce problème
+de résolution de portée ?
+
+87
+00:03:41,219 --> 00:03:42,337
+Première possibilité :
+
+88
+00:03:42,337 --> 00:03:45,745
+simplement utiliser
+l’opérateur de résolution de portée.
+
+89
+00:03:45,745 --> 00:03:46,763
+Donc, ici par exemple,
+
+90
+00:03:46,763 --> 00:03:49,041
+dans le programme principal
+qui crée l’instance d’<i>Ovipare</i>,
+
+91
+00:03:49,041 --> 00:03:51,781
+au moment où l’on veut appeler
+la méthode « afficher »,
+
+92
+00:03:51,781 --> 00:03:55,079
+il faut préciser dans quelle portée
+on va chercher cette méthode « afficher » ;
+
+93
+00:03:55,079 --> 00:03:56,098
+par exemple dire
+
+94
+00:03:56,098 --> 00:04:02,096
+que nous invoquons sur l’instance <i>o</i>
+la méthode « afficher » de la classe <i>Vivipare</i>.
+
+95
+00:04:02,096 --> 00:04:06,046
+Nous établissons le lien
+entre la méthode et la classe
+
+96
+00:04:06,046 --> 00:04:08,586
+au moyen de l’opérateur
+de résolution de portée.
+
+97
+00:04:08,586 --> 00:04:10,135
+Cette façon de résoudre le problème,
+
+98
+00:04:10,135 --> 00:04:13,678
+c’est-à-dire par l’utilisation externe
+de l’opérateur de résolution de portée,
+
+99
+00:04:13,678 --> 00:04:15,301
+n’est cependant pas une bonne solution.
+
+100
+00:04:15,301 --> 00:04:16,315
+Pourquoi ?
+
+101
+00:04:16,315 --> 00:04:19,215
+Parce qu’elle délègue
+à l’utilisateur de la classe <i>Ovovivipare</i>
+
+102
+00:04:19,215 --> 00:04:22,335
+le soin de choisir
+comment s’affiche un ovovivipare.
+
+103
+00:04:22,335 --> 00:04:25,507
+C’est une responsabilité
+qui devrait clairement plutôt incomber
+
+104
+00:04:25,507 --> 00:04:27,859
+au concepteur de la classe <i>Ovovivipare</i>.
+
+105
+00:04:27,859 --> 00:04:30,087
+L’idée ici est que,
+pour une meilleure solution,
+
+106
+00:04:30,087 --> 00:04:31,762
+il faudrait que ce soit la sous-classe
+
+107
+00:04:31,762 --> 00:04:33,987
+(ici, en l’occurrence
+la sous-classe <i>Ovovivipare</i>)
+
+108
+00:04:33,987 --> 00:04:38,163
+qui indique quelle méthode héritée
+elle veut voir invoquée sur ses instances.
+
+109
+00:04:38,163 --> 00:04:39,774
+On peut pour cela en C++
+
+110
+00:04:39,774 --> 00:04:43,075
+ajouter à la sous-classe
+une déclaration spéciale qui indique
+
+111
+00:04:43,075 --> 00:04:46,297
+quels méthodes ou attributs ambigus,
+hérités de plus haut,
+
+112
+00:04:46,297 --> 00:04:50,421
+seront invoqués exactement au travers
+des instances de la sous-classe.
+
+113
+00:04:50,421 --> 00:04:52,513
+La syntaxe pour cette déclaration
+est la suivante :
+
+114
+00:04:52,513 --> 00:04:54,505
+on utilise le mot réservé <i>using</i>,
+
+115
+00:04:54,505 --> 00:04:57,377
+suivi du nom de l’attribut
+ou de la méthode ambiguë,
+
+116
+00:04:57,377 --> 00:04:58,385
+et on indique,
+
+117
+00:04:58,385 --> 00:05:00,293
+au moyen de l’opérateur
+de résolution de portée,
+
+118
+00:05:00,293 --> 00:05:01,815
+dans quelle superclasse
+
+119
+00:05:01,815 --> 00:05:04,667
+on va aller chercher
+cet attribut ou cette méthode.
+
+120
+00:05:04,667 --> 00:05:05,835
+Dans le cas de notre exemple,
+
+121
+00:05:05,835 --> 00:05:07,983
+on pourrait donc,
+dans la classe <i>Ovovivipare</i>,
+
+122
+00:05:07,983 --> 00:05:12,541
+indiquer par une telle déclaration
+que c’est la méthode « afficher » de <i>Vivipare</i>
+
+123
+00:05:12,541 --> 00:05:15,783
+qui va être choisie
+pour afficher un ovovivipare.
+
+124
+00:05:15,783 --> 00:05:19,273
+En clair, lorsque
+la méthode « afficher » sera appliquée
+
+125
+00:05:19,273 --> 00:05:20,793
+à une instance d’<i>Ovovivipare</i>,
+
+126
+00:05:20,793 --> 00:05:23,795
+on ira rechercher cette méthode
+dans la classe <i>Vivipare</i>.
+
+127
+00:05:23,795 --> 00:05:26,049
+Alors attention,
+soyez attentifs à la syntaxe :
+
+128
+00:05:26,049 --> 00:05:28,303
+au moment de cette déclaration,
+
+129
+00:05:28,303 --> 00:05:32,407
+on ne mettra pas de parenthèses
+ni de type de retour
+
+130
+00:05:32,407 --> 00:05:33,545
+pour la méthode en question.
+
+131
+00:05:33,545 --> 00:05:36,067
+On indique uniquement qu’on veut utiliser
+
+132
+00:05:36,067 --> 00:05:39,196
+la méthode de nom « afficher »
+de la classe <i>Vivipare</i>.
+
+133
+00:05:39,196 --> 00:05:41,040
+Cette solution est
+meilleure que la précédente,
+
+134
+00:05:41,040 --> 00:05:43,164
+dans le sens où c’est maintenant
+la classe <i>Ovovivipare</i>
+
+135
+00:05:43,164 --> 00:05:46,588
+qui décide elle-même
+de comment s’affichent ses instances.
+
+136
+00:05:46,588 --> 00:05:50,906
+Ce choix n’est plus de la responsabilité
+de celui qui utilise la classe.
+
+137
+00:05:50,906 --> 00:05:52,857
+On peut rendre les choses
+encore plus claires,
+
+138
+00:05:52,857 --> 00:05:55,238
+en faisant en sorte
+que la classe <i>Ovovivipare</i>
+
+139
+00:05:55,238 --> 00:05:58,731
+contienne une méthode dédiée
+qui indique en clair
+
+140
+00:05:58,731 --> 00:06:02,113
+comment se font les affichages
+de ses instances.
+
+141
+00:06:02,113 --> 00:06:04,755
+De cette façon, les choses deviennent
+le plus explicite possible :
+
+142
+00:06:04,755 --> 00:06:06,929
+il n’est pas nécessaire
+de parcourir la classe
+
+143
+00:06:06,929 --> 00:06:09,133
+pour voir s’il n’existe pas
+une déclaration <i>using</i>
+
+144
+00:06:09,133 --> 00:06:11,303
+indiquant comment afficher un <i>Ovovivipare</i>,
+
+145
+00:06:11,303 --> 00:06:14,203
+on sait qu’un <i>Ovovivipare</i> a
+sa propre méthode d’affichage,
+
+146
+00:06:14,203 --> 00:06:15,313
+et donc c’est cette méthode
+
+147
+00:06:15,313 --> 00:06:19,783
+qui va décider de comment se font
+ces affichages à proprement parler.
+
+148
+00:06:19,783 --> 00:06:21,913
+On pourrait parfaitement
+vouloir par exemple que,
+
+149
+00:06:21,913 --> 00:06:23,353
+pour afficher un <i>Ovovivipare</i>,
+
+150
+00:06:23,353 --> 00:06:26,293
+on affiche aussi bien
+ses caractéristiques en tant qu’ovipare
+
+151
+00:06:26,293 --> 00:06:28,939
+que ses caractéristiques
+en tant que vivipare.
+
+152
+00:06:28,939 --> 00:06:30,631
+La méthode « afficher » d’<i>Ovovivipare</i>,
+
+153
+00:06:30,631 --> 00:06:32,903
+dans ce cas, va invoquer
+les deux méthodes,
+
+154
+00:06:32,903 --> 00:06:35,035
+en utilisant l’opérateur
+de résolution de portée
+
+155
+00:06:35,035 --> 00:06:36,693
+pour lever l’ambiguïté.
+
+156
+00:06:36,693 --> 00:06:38,373
+Ici donc, le choix d’implémentation
+
+157
+00:06:38,373 --> 00:06:41,043
+qui est fait pour la méthode
+« afficher » de <i>Ovovivipare</i>
+
+158
+00:06:41,043 --> 00:06:43,275
+est d’invoquer les deux méthodes « afficher »
+
+159
+00:06:43,275 --> 00:06:45,757
+(donc méthodes de même nom
+héritées de plus haut) :
+
+160
+00:06:45,757 --> 00:06:49,221
+d’abord la méthode « afficher »
+héritée de la classe <i>Ovipare</i>,
+
+161
+00:06:49,221 --> 00:06:53,045
+puis la méthode « afficher »
+héritée de la classe <i>Vivipare</i>.
+
+162
+00:06:53,045 --> 00:06:55,129
+Il s’agit là d’une bonne solution,
+
+163
+00:06:55,129 --> 00:06:57,843
+où la sous-classe fournit
+une méthode explicite
+
+164
+00:06:57,843 --> 00:07:02,059
+qui définit la bonne interprétation
+des invocations ambiguës.
+
+165
+00:07:02,059 --> 00:07:03,390
+Et ceci conclut cette séquence
+
+166
+00:07:03,390 --> 00:07:06,280
+sur le masquage dans le cadre
+de l’héritage multiple.

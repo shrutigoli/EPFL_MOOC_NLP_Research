@@ -1,0 +1,1920 @@
+1
+00:00:03,750 --> 00:00:04,505
+Welcome again.
+
+2
+00:00:04,505 --> 00:00:06,769
+Another module on virtualization.
+
+3
+00:00:06,929 --> 00:00:10,438
+This time, very specifically, 
+we'll talk about VMM construction,
+
+4
+00:00:10,901 --> 00:00:12,406
+how to create the piece of software,
+
+5
+00:00:12,679 --> 00:00:16,096
+the virtual machine monitor or VMM
+that runs virtual machines,
+
+6
+00:00:16,096 --> 00:00:18,285
+and more importantly, 
+how to create that piece of software
+
+7
+00:00:18,553 --> 00:00:20,835
+so that the virtual machines 
+run efficiently.
+
+8
+00:00:21,100 --> 00:00:23,211
+Now the high level answer 
+is pretty simple.
+
+9
+00:00:23,583 --> 00:00:24,625
+In an earlier module,
+
+10
+00:00:24,625 --> 00:00:28,061
+we saw that there were three techniques 
+to virtualize resources.
+
+11
+00:00:28,061 --> 00:00:31,500
+You can multiplex, you can aggregate, 
+you can emulate.
+
+12
+00:00:31,849 --> 00:00:34,535
+Well, a VMM uses two of those 
+three techniques,
+
+13
+00:00:34,689 --> 00:00:39,714
+specifically it multiplexes some 
+resources and it emulates other resources.
+
+14
+00:00:40,012 --> 00:00:43,151
+Now there are two resources 
+that are critical to the multiplex,
+
+15
+00:00:43,681 --> 00:00:45,537
+and those are both the 
+CPU and the memory
+
+16
+00:00:45,537 --> 00:00:47,712
+and that's critical from a 
+performance perspective.
+
+17
+00:00:47,883 --> 00:00:51,470
+The last thing you want is for the 
+VMM to be in the way on the path
+
+18
+00:00:51,521 --> 00:00:55,628
+between the virtual machine 
+and the physical CPU,
+
+19
+00:00:55,696 --> 00:00:58,014
+or similarly you don't want the 
+VMM to be on the path
+
+20
+00:00:58,014 --> 00:01:01,341
+between the virtual machine 
+and its ability to access DRAM.
+
+21
+00:01:01,803 --> 00:01:05,200
+So both CPU and memory 
+are multiplex resources,
+
+22
+00:01:05,353 --> 00:01:09,636
+and in both cases, we export the 
+identical abstraction that we have
+
+23
+00:01:09,636 --> 00:01:11,870
+from the hardware to the 
+virtual machine.
+
+24
+00:01:12,026 --> 00:01:14,565
+So our virtual machine 
+has multiple virtual cores
+
+25
+00:01:15,046 --> 00:01:19,585
+and a virtual machine has some amount 
+of virtualized, physical memory,
+
+26
+00:01:19,585 --> 00:01:21,402
+which is different 
+from virtual memory.
+
+27
+00:01:22,554 --> 00:01:25,483
+Now multiplexing unfortunately 
+is not sufficient.
+
+28
+00:01:25,662 --> 00:01:27,287
+Sometimes you actually need to emulate.
+
+29
+00:01:27,287 --> 00:01:30,438
+You need to be on the path, at runtime,
+
+30
+00:01:30,569 --> 00:01:32,868
+between the virtual machine 
+and the hardware.
+
+31
+00:01:32,868 --> 00:01:35,748
+And this is where emulation comes in play.
+
+32
+00:01:35,840 --> 00:01:39,721
+And there actually are two forms of 
+emulation that are important.
+
+33
+00:01:39,721 --> 00:01:43,069
+One, is there is a class of instructions 
+that actually need to be emulated,
+
+34
+00:01:43,069 --> 00:01:45,743
+even in systems that have 
+architectural support for that,
+
+35
+00:01:46,118 --> 00:01:48,549
+and we'll define that in a few minutes,
+
+36
+00:01:48,868 --> 00:01:52,682
+and you'll also need to emulate 
+resources and devices
+
+37
+00:01:52,682 --> 00:01:56,001
+above and beyond CPU and memory 
+so that the virtual machine
+
+38
+00:01:56,001 --> 00:01:59,642
+has the illusion that it has a 
+complete hardware base.
+
+39
+00:01:59,768 --> 00:02:03,033
+So for example, a virtual machine 
+has a reasonable expectation
+
+40
+00:02:03,208 --> 00:02:06,751
+that it will have its own network device, 
+its own disk drive,
+
+41
+00:02:06,763 --> 00:02:10,327
+its own keyboard's on screen if it's 
+desktop and all these devices
+
+42
+00:02:10,327 --> 00:02:14,701
+are typically emulated in software,
+rather than multiplexed in hard.
+
+43
+00:02:14,784 --> 00:02:19,052
+Now to understand how a virtual machine 
+monitor can multiplex the CPU resource,
+
+44
+00:02:19,052 --> 00:02:22,034
+we actually need to forget about 
+virtual machines for a second
+
+45
+00:02:22,034 --> 00:02:25,602
+and just go back to our understanding 
+of how an operating system
+
+46
+00:02:25,602 --> 00:02:28,306
+performs layering, and refresh 
+our understanding of that.
+
+47
+00:02:28,454 --> 00:02:31,274
+Now this picture actually comes from 
+the textbook from discussion,
+
+48
+00:02:31,274 --> 00:02:33,261
+from the chapter on layering.
+
+49
+00:02:33,709 --> 00:02:36,800
+And what this picture shows is that 
+there are two distinct APIs,
+
+50
+00:02:37,270 --> 00:02:39,950
+the hardware/software interface 
+exports the instructions
+
+51
+00:02:39,950 --> 00:02:41,469
+and architecture of the CPU,
+
+52
+00:02:41,646 --> 00:02:44,574
+and then there's the whole set of 
+instructions privileged or unprivileged,
+
+53
+00:02:44,656 --> 00:02:47,431
+that can be issued by software.
+
+54
+00:02:48,040 --> 00:02:51,851
+And now the operating system 
+multiplexes the CPU
+
+55
+00:02:52,227 --> 00:02:56,143
+and augments the abstraction 
+of a virtual CPU with the ability
+
+56
+00:02:56,143 --> 00:02:59,472
+to perform system calls, and that is what 
+we commonly understand as a thread,
+
+57
+00:02:59,472 --> 00:03:03,576
+so if you would be running 
+on a Linux system on x86,
+
+58
+00:03:03,576 --> 00:03:08,371
+your API as an application is the 
+combination of the ISA x86
+
+59
+00:03:08,371 --> 00:03:11,310
+as well as the ability to issue 
+POSIX system calls.
+
+60
+00:03:11,721 --> 00:03:14,012
+So if you actually think about it 
+from that perspective,
+
+61
+00:03:14,012 --> 00:03:17,402
+there is a layer in between the 
+application and operating system
+
+62
+00:03:17,544 --> 00:03:21,032
+and there is obviously a layer in between 
+software and hardware.
+
+63
+00:03:21,474 --> 00:03:25,089
+What's equally important to understand 
+and appreciate, however,
+
+64
+00:03:25,312 --> 00:03:29,868
+is that applications can actually 
+directly issue instructions to the CPU,
+
+65
+00:03:29,868 --> 00:03:32,368
+and that unprivileged instructions, 
+very specifically,
+
+66
+00:03:32,650 --> 00:03:36,407
+all are executed directly about the CPU 
+without the intervention
+
+67
+00:03:37,201 --> 00:03:38,207
+of the operating system.
+
+68
+00:03:38,207 --> 00:03:40,544
+If you had to go through the operating 
+system for every instruction,
+
+69
+00:03:40,637 --> 00:03:42,612
+things would go incredibly slow.
+
+70
+00:03:42,776 --> 00:03:48,124
+So let's keep that in mind, we have a 
+layering system that provides protection,
+
+71
+00:03:48,308 --> 00:03:51,130
+and yet we also have to ability, 
+selectively,
+
+72
+00:03:51,130 --> 00:03:54,924
+for the application to bypass the 
+operating system layer
+
+73
+00:03:54,924 --> 00:03:58,559
+and directly access the hardware, 
+and that is critical for performance,
+
+74
+00:03:58,559 --> 00:04:01,155
+in the classic operating system 
+and obviously as we will see,
+
+75
+00:04:01,358 --> 00:04:05,709
+this is equally important and equally 
+critical for a virtualized environment.
+
+76
+00:04:06,740 --> 00:04:09,515
+So with that background in place, 
+let's go back to VMMs
+
+77
+00:04:09,515 --> 00:04:14,179
+and try to picture how a VMM might 
+look like from a layering perspective.
+
+78
+00:04:14,741 --> 00:04:17,680
+Now as you would expect is that 
+some things would change,
+
+79
+00:04:17,680 --> 00:04:19,072
+and some things would not change.
+
+80
+00:04:19,218 --> 00:04:22,990
+The first thing that would not change is 
+the relationship between the application
+
+81
+00:04:22,990 --> 00:04:24,982
+and the operating system 
+because by definition,
+
+82
+00:04:24,982 --> 00:04:28,739
+a virtual machine is identical to the 
+piece of hardware that runs
+
+83
+00:04:28,739 --> 00:04:32,050
+without a virtual machine monitor, 
+but also there's now change
+
+84
+00:04:32,050 --> 00:04:35,384
+is the hardware/software API that is 
+basically the instructions
+
+85
+00:04:35,384 --> 00:04:37,231
+that architecture export 
+by the hardware
+
+86
+00:04:37,231 --> 00:04:40,180
+because we're assuming that the 
+hardware is now different.
+
+87
+00:04:40,400 --> 00:04:44,252
+What is obviously new here is that 
+we have a virtual machine monitor that,
+
+88
+00:04:44,252 --> 00:04:47,442
+from a layering perspective, 
+it sits between the hardware
+
+89
+00:04:47,594 --> 00:04:48,852
+and the virtual machine.
+
+90
+00:04:49,071 --> 00:04:53,838
+And that layering, that layer, 
+exports the same,
+
+91
+00:04:53,903 --> 00:04:58,078
+identical virtualized abstraction of the 
+underlying resource that it multiplexes
+
+92
+00:04:58,078 --> 00:05:03,386
+in specifically in the case of the CPU, 
+it would export a virtual version
+
+93
+00:05:03,386 --> 00:05:07,360
+of a core running the same 
+instructions that architecture as,
+
+94
+00:05:07,360 --> 00:05:10,277
+the underlying hardware.
+
+95
+00:05:10,500 --> 00:05:14,001
+And if you could do that, then at least 
+in [inaudible] everything would still work.
+
+96
+00:05:14,001 --> 00:05:17,084
+Obviously we would have an issue 
+with respect to performance
+
+97
+00:05:17,084 --> 00:05:19,747
+because this diagram 
+does not show any ability
+
+98
+00:05:19,747 --> 00:05:25,175
+to bypass a virtual machine either by the 
+operating system or by the application
+
+99
+00:05:26,017 --> 00:05:28,752
+in order to issue instructions 
+on the CPU,
+
+100
+00:05:29,054 --> 00:05:31,820
+and therefore the situation 
+would be relatively slow,
+
+101
+00:05:31,820 --> 00:05:33,371
+but we can hold that 
+thought for a second.
+
+102
+00:05:33,567 --> 00:05:36,962
+Let's first think about how this relates 
+in the context of multiplexing
+
+103
+00:05:37,125 --> 00:05:40,867
+and then we'll think about it from the 
+context of performance and efficiency.
+
+104
+00:05:41,877 --> 00:05:43,591
+So what do we mean by multiplexing?
+
+105
+00:05:43,800 --> 00:05:47,976
+Well first, the virtual machine monitor 
+multiplexes the cores
+
+106
+00:05:47,976 --> 00:05:49,820
+both in space and in time.
+
+107
+00:05:49,983 --> 00:05:51,723
+Now what that means specifically,
+
+108
+00:05:51,723 --> 00:05:57,287
+is if you have a system with multiple 
+physical cores that are shown here,
+
+109
+00:05:58,704 --> 00:06:03,086
+the virtual machine monitor can multiplex
+these cores into the virtual--
+
+110
+00:06:03,183 --> 00:06:04,767
+the different virtual machines.
+
+111
+00:06:05,162 --> 00:06:08,130
+Now we can multiplex them in space, 
+in the sense that
+
+112
+00:06:08,130 --> 00:06:12,533
+you can have a virtual machine 
+with a smaller set of cores
+
+113
+00:06:13,033 --> 00:06:16,796
+that are available physically, 
+and it could run next to,
+
+114
+00:06:16,796 --> 00:06:20,528
+and in parallel with another virtual 
+machine that has another set of cores,
+
+115
+00:06:20,528 --> 00:06:22,667
+and that's actually the picture 
+that we're showing here.
+
+116
+00:06:22,866 --> 00:06:26,249
+But we're also-- can multiplex 
+the cores in time,
+
+117
+00:06:26,403 --> 00:06:30,865
+by scheduling the same physical core 
+among multiple virtual machines,
+
+118
+00:06:30,865 --> 00:06:33,483
+so it is absolutely possible for 
+this particular core
+
+119
+00:06:33,483 --> 00:06:36,075
+to be assigned to one particular 
+virtual CPU for a while,
+
+120
+00:06:36,536 --> 00:06:39,508
+and then be assigned to another 
+particular CPU, for,
+
+121
+00:06:39,508 --> 00:06:40,737
+at a later point in time.
+
+122
+00:06:40,742 --> 00:06:45,105
+And that is very similar to the problem 
+of scheduling in an operating system.
+
+123
+00:06:45,323 --> 00:06:48,454
+And yet, in all cases, a virtual machine 
+remains isolated.
+
+124
+00:06:48,454 --> 00:06:50,772
+So this is multiplexing of the CPU.
+
+125
+00:06:51,338 --> 00:06:54,781
+Let's now shift into the 
+discussion of efficiency
+
+126
+00:06:54,996 --> 00:06:57,531
+of the virtualization of the CPU.
+
+127
+00:06:58,989 --> 00:07:01,570
+And the key point here, 
+when in comes to efficiency,
+
+128
+00:07:01,570 --> 00:07:05,111
+is that we achieve efficiency 
+through direct execution,
+
+129
+00:07:05,574 --> 00:07:10,295
+and specifically, through the ability 
+in a controlled, and secured,
+
+130
+00:07:10,295 --> 00:07:14,136
+and layered manner that bypass 
+the layers selectively.
+
+131
+00:07:14,675 --> 00:07:17,695
+What we're basically, specifically doing 
+is augmenting the picture
+
+132
+00:07:17,695 --> 00:07:20,622
+that we saw that talked about 
+layer bypass in the context
+
+133
+00:07:20,622 --> 00:07:25,330
+of an operating system by adding a new 
+construct, which is the virtual machine.
+
+134
+00:07:25,538 --> 00:07:29,492
+So what we had in the earlier diagram, 
+is the ability for the operating system
+
+135
+00:07:29,492 --> 00:07:32,824
+to issue instructions directly 
+and for the applications
+
+136
+00:07:32,824 --> 00:07:34,670
+to issue instructions directly.
+
+137
+00:07:34,833 --> 00:07:38,021
+We insert a new piece of software, 
+the virtual machine monitor,
+
+138
+00:07:38,021 --> 00:07:39,704
+which is in full control of the system.
+
+139
+00:07:39,733 --> 00:07:42,262
+It obviously can issue 
+instructions directly,
+
+140
+00:07:42,262 --> 00:07:46,101
+but what's important here is that it's 
+the operating system and the applications
+
+141
+00:07:46,257 --> 00:07:50,193
+that can actually still issue 
+instructions directly on the CPU.
+
+142
+00:07:51,322 --> 00:07:55,198
+Now this is easier said than done, 
+and the reason the why this is complex
+
+143
+00:07:55,354 --> 00:07:58,412
+is that the virtual machine monitor 
+must, at all times,
+
+144
+00:07:58,412 --> 00:08:00,599
+remain in control of the system.
+
+145
+00:08:00,953 --> 00:08:02,823
+So that's one important relationship,
+
+146
+00:08:02,823 --> 00:08:06,794
+which is that the virtual machine monitor 
+needs to guarantee the integrity
+
+147
+00:08:06,794 --> 00:08:10,034
+of this interface that it exports 
+to the virtual machine
+
+148
+00:08:10,175 --> 00:08:12,512
+and guarantee the isolation 
+of the virtual machine.
+
+149
+00:08:12,512 --> 00:08:15,166
+And what's equally important is that 
+the operating system
+
+150
+00:08:15,166 --> 00:08:17,529
+needs to remain protected 
+from the application
+
+151
+00:08:17,529 --> 00:08:20,273
+because if you lose any of the isolation,
+
+152
+00:08:20,273 --> 00:08:24,313
+guarantees that the operating system 
+might expect, with respect,
+
+153
+00:08:24,313 --> 00:08:26,132
+to it's relationship to applications,
+
+154
+00:08:26,298 --> 00:08:29,652
+where you run into and you would open 
+a whole set of security issues.
+
+155
+00:08:29,955 --> 00:08:31,687
+So this is easier said than done,
+
+156
+00:08:31,859 --> 00:08:34,657
+but this is what we mean by 
+direct execution,
+
+157
+00:08:34,657 --> 00:08:39,900
+the ability for virtual machine software, 
+whether in kernel space or in user space,
+
+158
+00:08:40,591 --> 00:08:43,491
+to directly issue instructions on the CPU.
+
+159
+00:08:43,491 --> 00:08:47,624
+And this brings up to probably the 
+most significant contribution
+
+160
+00:08:47,805 --> 00:08:50,209
+to the theory of virtualization 
+and virtual machines,
+
+161
+00:08:50,209 --> 00:08:52,274
+and this is the Popek
+and Goldberg Theorem.
+
+162
+00:08:52,274 --> 00:08:54,852
+This is the paper that you're reading 
+in this module.
+
+163
+00:08:54,852 --> 00:08:59,792
+This was published in 1974 and this 
+formalizes the characteristics
+
+164
+00:08:59,792 --> 00:09:02,673
+of an architecture that 
+can be virtualized.
+
+165
+00:09:03,898 --> 00:09:06,124
+And how specifically this theorem 
+defines a property
+
+166
+00:09:06,124 --> 00:09:07,770
+of instruction set architecture
+
+167
+00:09:08,757 --> 00:09:12,839
+and what it does for that instruction set 
+architecture is classify instructions
+
+168
+00:09:12,839 --> 00:09:15,906
+into at least two important categories:
+
+169
+00:09:17,126 --> 00:09:19,013
+the set of "privileged" instructions,
+
+170
+00:09:19,013 --> 00:09:21,582
+that's obviously a subset 
+of all instructions,
+
+171
+00:09:21,582 --> 00:09:23,205
+and the privileged instructions, 
+which are instructions,
+
+172
+00:09:23,205 --> 00:09:28,539
+can only be issued in kernel mode and can 
+only be executed by an operating system,
+
+173
+00:09:29,167 --> 00:09:30,932
+and then there's another category 
+of instructions,
+
+174
+00:09:30,932 --> 00:09:32,934
+which are called "sensitive" instructions,
+
+175
+00:09:32,934 --> 00:09:35,396
+and these are instructions
+whose semantics vary
+
+176
+00:09:35,805 --> 00:09:37,348
+without causing a trap
+
+177
+00:09:37,348 --> 00:09:40,304
+based on the privileged level 
+that they're executing at.
+
+178
+00:09:41,720 --> 00:09:45,601
+So you basically have-- if you think 
+about the universe of instructions,
+
+179
+00:09:46,090 --> 00:09:48,539
+you have all instructions, 
+among them you have a subset
+
+180
+00:09:48,539 --> 00:09:51,035
+which are privileged 
+and a subset that is sensitive.
+
+181
+00:09:51,630 --> 00:09:55,938
+And what the theorem states is that 
+you can create a virtual machine monitor
+
+182
+00:09:56,659 --> 00:10:00,161
+that uses direct execution, 
+so the ability to bypass a layer
+
+183
+00:10:00,161 --> 00:10:03,454
+when executing both the application 
+and the operating system,
+
+184
+00:10:03,769 --> 00:10:09,790
+and you can only do that if all sensitive 
+instructions are also privileged.
+
+185
+00:10:10,272 --> 00:10:13,749
+So if instruction semantic varies 
+based on the privileged level,
+
+186
+00:10:15,107 --> 00:10:20,179
+and that instruction is not privileged, 
+that means it could be executed
+
+187
+00:10:20,674 --> 00:10:24,258
+by an application, 
+then it is not possible to build a VMM
+
+188
+00:10:24,258 --> 00:10:28,768
+that relies exclusively on 
+direct execution and layer bypass.
+
+189
+00:10:28,912 --> 00:10:30,602
+So this is a fundamental theorem.
+
+190
+00:10:30,602 --> 00:10:35,409
+Obviously there's an intuition behind it, 
+there's a proof behind it,
+
+191
+00:10:35,409 --> 00:10:37,106
+the paper focuses on the proof.
+
+192
+00:10:37,106 --> 00:10:39,100
+I'm going to limit myself here to it.
+
+193
+00:10:39,100 --> 00:10:42,635
+Some form of an intuition, 
+and the intuition is the following:
+
+194
+00:10:42,813 --> 00:10:45,367
+you can construct a 
+virtual machine monitor
+
+195
+00:10:45,941 --> 00:10:49,929
+that runs the guest kernel in user mode.
+
+196
+00:10:50,108 --> 00:10:51,793
+So if you assume an architecture,
+
+197
+00:10:51,793 --> 00:10:53,856
+a very simple architecture, 
+with only two layers,
+
+198
+00:10:54,641 --> 00:10:56,176
+kernel mode and user mode,
+
+199
+00:10:56,176 --> 00:10:59,231
+the operating system 
+is designed to run in kernel mode,
+
+200
+00:10:59,231 --> 00:11:02,037
+but if you somehow run the 
+operating system in user mode,
+
+201
+00:11:03,166 --> 00:11:06,318
+and emulate all privileged instructions
+
+202
+00:11:07,728 --> 00:11:11,532
+so that they fold the semantics 
+that would be expected of them
+
+203
+00:11:11,532 --> 00:11:14,406
+if these instructions had been 
+executed in kernel mode.
+
+204
+00:11:15,694 --> 00:11:18,074
+Then, you can actually convince 
+the operating system
+
+205
+00:11:18,074 --> 00:11:19,834
+that it's actually running in 
+kernel mode.
+
+206
+00:11:20,045 --> 00:11:21,813
+And therefore everything would work.
+
+207
+00:11:21,813 --> 00:11:25,078
+And that is the intuition, 
+and obviously this is only possible
+
+208
+00:11:25,078 --> 00:11:29,040
+if the semantics of instruction is not 
+a function of the privileged level,
+
+209
+00:11:29,211 --> 00:11:33,815
+or more specifically, if all sensitive 
+instructions are also privileged,
+
+210
+00:11:33,815 --> 00:11:35,453
+because that means that all 
+sensitive instructions
+
+211
+00:11:35,453 --> 00:11:38,586
+would create a trap and the virtual 
+machine monitor in software
+
+212
+00:11:38,586 --> 00:11:42,170
+has the ability to emulate those 
+sensitive instructions,
+
+213
+00:11:42,331 --> 00:11:46,067
+in order to represent the full 
+semantic of these instructions,
+
+214
+00:11:46,067 --> 00:11:47,901
+assuming that they 
+executed in kernel mode.
+
+215
+00:11:48,437 --> 00:11:51,380
+So this is where we go back to the fact 
+that in order to build a VMM,
+
+216
+00:11:51,380 --> 00:11:53,020
+you need to both multiplex and emulate.
+
+217
+00:11:53,020 --> 00:11:54,987
+You want to multiplex 
+as much as possible,
+
+218
+00:11:55,447 --> 00:11:59,246
+and yet a minimal VMM that is 
+running on an architecture
+
+219
+00:11:59,246 --> 00:12:02,068
+that is strictly virtualizable,
+according to this theorem,
+
+220
+00:12:02,470 --> 00:12:05,900
+has some form of emulation for all 
+privileged instructions
+
+221
+00:12:06,419 --> 00:12:07,724
+of the virtual machine.
+
+222
+00:12:08,648 --> 00:12:10,970
+So this is the intuition, 
+obviously there are details,
+
+223
+00:12:12,525 --> 00:12:14,089
+there are details on the paper,
+
+224
+00:12:14,089 --> 00:12:17,704
+and that is one of the key 
+tasks for this week,
+
+225
+00:12:17,704 --> 00:12:25,938
+is for you to get a deep understanding of 
+how this theorem is constructed
+
+226
+00:12:26,387 --> 00:12:30,522
+and the implication that this theorem 
+has on architectural design.
+
+227
+00:12:31,502 --> 00:12:33,642
+We'll talk about it in our 
+discussion section,
+
+228
+00:12:33,642 --> 00:12:36,568
+in particular around the 
+historical importance
+
+229
+00:12:36,700 --> 00:12:38,738
+of this theorem as time went on.
+
+230
+00:12:38,895 --> 00:12:41,934
+Now the paper actually doesn't talk 
+about memory that much,
+
+231
+00:12:42,029 --> 00:12:43,261
+and once you read the paper,
+
+232
+00:12:43,261 --> 00:12:45,433
+you'll get a sense of 
+what I'm saying here.
+
+233
+00:12:45,583 --> 00:12:47,105
+So let me give you 
+a little bit of perspective
+
+234
+00:12:47,105 --> 00:12:51,354
+on how a virtual machine monitor 
+virtualized the second critical resource
+
+235
+00:12:51,354 --> 00:12:54,402
+that must be multiplexed, 
+and that is memory itself.
+
+236
+00:12:54,932 --> 00:12:57,136
+And the challenge is to 
+efficiently multiplex
+
+237
+00:12:57,136 --> 00:13:00,164
+physical memory of the real machine
+
+238
+00:13:00,164 --> 00:13:03,534
+into the physical memory 
+of the virtual machines.
+
+239
+00:13:04,031 --> 00:13:05,961
+Now this is a challenge 
+because obviously,
+
+240
+00:13:05,961 --> 00:13:07,218
+from a performance perspective,
+
+241
+00:13:07,218 --> 00:13:10,663
+because nearly every instruction accesses 
+memory and on top of that
+
+242
+00:13:10,663 --> 00:13:12,331
+every instruction is stored in memory
+
+243
+00:13:12,331 --> 00:13:15,813
+and so it must actually be done 
+without any runtime overheads.
+
+244
+00:13:16,273 --> 00:13:20,124
+So if you actually think about what 
+happens in this situation,
+
+245
+00:13:20,215 --> 00:13:24,570
+we're adding a level of 
+indirection between--
+
+246
+00:13:25,170 --> 00:13:26,502
+within the memory hierarchy.
+
+247
+00:13:26,502 --> 00:13:32,369
+So an application in orange 
+uses virtual addresses.
+
+248
+00:13:33,224 --> 00:13:35,418
+The operating system 
+manages the relationship
+
+249
+00:13:35,418 --> 00:13:38,588
+between virtual addresses 
+and physical addresses.
+
+250
+00:13:39,128 --> 00:13:43,232
+Now a virtual machine monitor, 
+which multiplexes memory
+
+251
+00:13:43,232 --> 00:13:46,948
+across multiple virtual machines, 
+adds another level of indirection
+
+252
+00:13:46,948 --> 00:13:50,745
+between the operating system's 
+view of memory--
+
+253
+00:13:50,745 --> 00:13:55,344
+of physical memory, and the virtual 
+machine monitor's view of physical memory.
+
+254
+00:13:55,344 --> 00:13:58,101
+So there are two distinct views 
+of physical memory.
+
+255
+00:13:58,971 --> 00:14:01,746
+And as a matter of fact, these two 
+distinct views of physical memory
+
+256
+00:14:01,746 --> 00:14:05,816
+are generally called "guest" physical 
+memory and "host" physical memory,
+
+257
+00:14:05,968 --> 00:14:08,730
+corresponding to the two 
+different levels of indirection.
+
+258
+00:14:09,446 --> 00:14:13,239
+What's important in this diagram 
+is actually not the relationship,
+
+259
+00:14:13,239 --> 00:14:17,837
+the layered relationship on the left, 
+but the relationship that you see
+
+260
+00:14:17,837 --> 00:14:22,589
+on the right that shows the TLB 
+mapping virtual addressees
+
+261
+00:14:22,589 --> 00:14:25,266
+directly onto host physical address.
+
+262
+00:14:25,879 --> 00:14:29,285
+Now by insuring that the TLB,
+
+263
+00:14:29,397 --> 00:14:31,904
+which runs as part of the 
+processor pipeline,
+
+264
+00:14:33,214 --> 00:14:37,834
+has mappings between virtual addressees 
+and host physical addressees,
+
+265
+00:14:38,003 --> 00:14:41,644
+we can insure that instructions can 
+execute at the normal rate
+
+266
+00:14:41,644 --> 00:14:43,265
+without any particular overhead.
+
+267
+00:14:43,751 --> 00:14:47,042
+Now this is easier said than done, 
+and it's very specifically a challenge
+
+268
+00:14:47,042 --> 00:14:51,266
+is how to insert into the TLB 
+mappings between virtual
+
+269
+00:14:51,453 --> 00:14:54,625
+and host physical addressees when 
+there actually are two levels
+
+270
+00:14:54,625 --> 00:14:56,621
+of indirections that need to be looked at.
+
+271
+00:14:57,443 --> 00:15:01,203
+And in the industry and in 
+computer systems today,
+
+272
+00:15:01,203 --> 00:15:04,869
+there are actually two generally 
+possible answers to this challenge.
+
+273
+00:15:04,869 --> 00:15:07,799
+The first one is to use 
+shadow page tables,
+
+274
+00:15:07,799 --> 00:15:10,379
+and the second one is to use 
+nested page tables
+
+275
+00:15:10,379 --> 00:15:11,981
+and I'm just going to very quickly illustrate
+
+276
+00:15:11,981 --> 00:15:13,952
+what we mean by both of them.
+
+277
+00:15:13,952 --> 00:15:16,368
+So let's first talk about 
+shadow page tables,
+
+278
+00:15:16,368 --> 00:15:19,243
+and that is the technique that is used 
+by the virtual machine monitor
+
+279
+00:15:19,243 --> 00:15:24,056
+when there is no architectural support 
+for virtual machines in the processor,
+
+280
+00:15:24,126 --> 00:15:26,561
+and very specifically when there's 
+no architectural support
+
+281
+00:15:26,649 --> 00:15:29,250
+in the memory management of the processor.
+
+282
+00:15:29,250 --> 00:15:30,764
+So effectively, 
+the virtual machine monitor
+
+283
+00:15:30,764 --> 00:15:33,439
+is left having to solve the problem 
+entirely in software.
+
+284
+00:15:33,590 --> 00:15:36,031
+And the way the virtual machine monitor 
+solves this problem,
+
+285
+00:15:36,031 --> 00:15:41,110
+is by keeping pages that define 
+address spaces in correspondence.
+
+286
+00:15:41,224 --> 00:15:45,967
+So the operating system, on top, 
+manages it's own address space.
+
+287
+00:15:46,046 --> 00:15:49,120
+The address space is typically 
+routed by a register
+
+288
+00:15:49,120 --> 00:15:51,790
+which defines the base 
+of the address space.
+
+289
+00:15:52,389 --> 00:15:55,104
+Now that register is actually 
+not used by the hardware.
+
+290
+00:15:55,534 --> 00:15:57,506
+The register that the hardware uses
+
+291
+00:15:57,506 --> 00:16:00,264
+is under the control 
+of the virtual machine monitor,
+
+292
+00:16:00,905 --> 00:16:04,634
+but the mappings that are 
+managed by the operating systems,
+
+293
+00:16:04,634 --> 00:16:09,068
+are obviously stored here and 
+those mappings relate to,
+
+294
+00:16:09,068 --> 00:16:11,716
+or define the mappings, 
+between virtual addressees
+
+295
+00:16:11,716 --> 00:16:13,577
+and guest physical addressees.
+
+296
+00:16:14,025 --> 00:16:17,298
+What the VMM does is it composes 
+this first mapping
+
+297
+00:16:17,929 --> 00:16:20,766
+with the mapping between guest physical 
+and host physical addresses,
+
+298
+00:16:20,766 --> 00:16:24,196
+and stores the resulting mapping 
+in a corresponding page
+
+299
+00:16:24,196 --> 00:16:25,823
+that shadows the original page.
+
+300
+00:16:25,936 --> 00:16:31,150
+So the term shadowing
+defines the relationship,
+
+301
+00:16:31,150 --> 00:16:37,505
+between the guest page table pages 
+and the VM page table pages.
+
+302
+00:16:38,005 --> 00:16:41,392
+And as long as the VMM can effectively, 
+efficiently shadow these pages,
+
+303
+00:16:41,392 --> 00:16:43,226
+ensure that the correspondence is met,
+
+304
+00:16:43,399 --> 00:16:46,904
+then the entries inserted 
+into the TLB correspond
+
+305
+00:16:46,904 --> 00:16:50,578
+to the ones that are under the control 
+of the VMM and the virtual machine
+
+306
+00:16:50,578 --> 00:16:54,951
+is executing at full speed using-- 
+because the mappings
+
+307
+00:16:54,951 --> 00:16:57,765
+between virtual addressees and 
+host physical addressees
+
+308
+00:16:57,765 --> 00:16:59,569
+are directly stored into the hardware.
+
+309
+00:16:59,772 --> 00:17:02,468
+And for completeness, 
+this picture also describes,
+
+310
+00:17:02,656 --> 00:17:06,775
+or illustrates, the fact that the VMM 
+itself needs to be somewhere in memory,
+
+311
+00:17:06,775 --> 00:17:08,747
+and there's typically a portion 
+of the address space
+
+312
+00:17:08,747 --> 00:17:11,553
+that is reserved for the VMM, 
+for this particular purpose.
+
+313
+00:17:12,015 --> 00:17:13,681
+So this is shadow page tables,
+
+314
+00:17:13,681 --> 00:17:16,637
+and again shadow page tables
+is a technique that is required
+
+315
+00:17:17,307 --> 00:17:20,483
+when the hardware
+does not provide architectural support
+
+316
+00:17:20,931 --> 00:17:22,609
+to virtualize physical memory.
+
+317
+00:17:22,989 --> 00:17:24,486
+Now as you can imagine,
+
+318
+00:17:24,486 --> 00:17:26,543
+maintaining shadow page 
+tables in consistence
+
+319
+00:17:26,543 --> 00:17:29,311
+can be quite expensive 
+and quite complicated.
+
+320
+00:17:29,311 --> 00:17:31,626
+As a matter of fact, there were 
+years of research
+
+321
+00:17:31,626 --> 00:17:34,755
+associated with how to make that 
+as efficiently as possible.
+
+322
+00:17:35,416 --> 00:17:36,733
+And fortunately also,
+
+323
+00:17:36,733 --> 00:17:39,550
+that research is no longer required
+because now most systems
+
+324
+00:17:39,550 --> 00:17:42,689
+have hardware support
+and architectural support
+
+325
+00:17:42,689 --> 00:17:45,727
+for virtualized physical memory.
+
+326
+00:17:45,903 --> 00:17:49,185
+And that is what the industry calls 
+nested page tables,
+
+327
+00:17:49,200 --> 00:17:50,667
+or extended page tables.
+
+328
+00:17:51,256 --> 00:17:53,082
+And so this is a hardware implementation
+
+329
+00:17:53,082 --> 00:17:57,968
+that actually walks through two 
+different sets of page table structures
+
+330
+00:17:58,461 --> 00:18:02,703
+simultaneously, in order to 
+reload a TLB entry.
+
+331
+00:18:03,628 --> 00:18:06,223
+So, you actually have 
+two hardware registers,
+
+332
+00:18:06,223 --> 00:18:07,208
+rather than one.
+
+333
+00:18:07,208 --> 00:18:09,394
+One in privileged mode, 
+one in de-privileged mode,
+
+334
+00:18:09,582 --> 00:18:11,689
+that determine the roots 
+of these address spaces.
+
+335
+00:18:11,689 --> 00:18:14,933
+The first one is the mapping between 
+virtual addressees and guest physical,
+
+336
+00:18:14,933 --> 00:18:17,237
+and the second one is the 
+mapping between guest physical
+
+337
+00:18:17,291 --> 00:18:19,002
+and host physical addressees.
+
+338
+00:18:19,481 --> 00:18:24,633
+And then as you walk through the 
+page table structures on a TLB reload,
+
+339
+00:18:24,633 --> 00:18:29,447
+the hardware automatically 
+looks at the coarse--
+
+340
+00:18:29,534 --> 00:18:33,869
+the combination of those two mappings 
+in order to find the right answer.
+
+341
+00:18:34,414 --> 00:18:37,609
+Now if you actually -- there's an 
+interesting [inaudible] paper on this.
+
+342
+00:18:38,180 --> 00:18:40,940
+The number of page table walks, 
+that is required
+
+343
+00:18:40,940 --> 00:18:43,357
+in order to provide and implement 
+nested page tables,
+
+344
+00:18:43,357 --> 00:18:45,669
+is quadratic with the depth 
+of the page table
+
+345
+00:18:45,669 --> 00:18:47,971
+and today most page tables 
+have a depth of four.
+
+346
+00:18:48,480 --> 00:18:51,753
+So this is actually a very large number 
+of memory references
+
+347
+00:18:51,753 --> 00:18:54,381
+that are potentially required 
+in order to do a nested walk,
+
+348
+00:18:54,504 --> 00:18:57,035
+and there are many alogorithms that 
+have been implemented also in hardware
+
+349
+00:18:57,035 --> 00:19:00,862
+in order to optimize the walking 
+of these nested page tables.
+
+350
+00:19:01,447 --> 00:19:04,765
+Now, I want to conclude this 
+module on VMM construction
+
+351
+00:19:04,765 --> 00:19:07,861
+with an orthogonal point that is 
+important because it's a recurring point
+
+352
+00:19:07,861 --> 00:19:11,308
+in the industry and often 
+an area of confusion.
+
+353
+00:19:11,792 --> 00:19:14,458
+And that is the classification 
+between type l
+
+354
+00:19:14,458 --> 00:19:16,471
+and type ll virtual machine monitors.
+
+355
+00:19:17,594 --> 00:19:21,133
+Now, this was actually also defined by 
+Goldberg in his thesis
+
+356
+00:19:21,133 --> 00:19:24,042
+in a separate document also in the 1970s,
+
+357
+00:19:25,092 --> 00:19:27,267
+and what very specifically the 
+document states
+
+358
+00:19:27,267 --> 00:19:30,525
+is that the type l 
+virtual machine monitors allocate
+
+359
+00:19:30,525 --> 00:19:33,833
+and schedule the physical resources 
+among the virtual machines.
+
+360
+00:19:33,870 --> 00:19:36,527
+So they not only perform the 
+multiplexing function,
+
+361
+00:19:36,527 --> 00:19:39,600
+but also perform the 
+resource management function.
+
+362
+00:19:40,630 --> 00:19:45,406
+And in contrast, the type ll VMMs rely 
+on a separate host operating system
+
+363
+00:19:45,542 --> 00:19:47,453
+for resource scheduling, 
+so in this case,
+
+364
+00:19:47,911 --> 00:19:52,375
+the VMM performs the multiplexing 
+function and the emulation function,
+
+365
+00:19:52,375 --> 00:19:55,473
+but the VMM does not perform the 
+resource management
+
+366
+00:19:55,473 --> 00:19:57,133
+and resource allocation functions.
+
+367
+00:19:58,249 --> 00:20:01,528
+And as we will see in the next module, 
+efficient resource scheduling
+
+368
+00:20:01,528 --> 00:20:05,280
+is actually fundamental to any 
+particular layered design,
+
+369
+00:20:05,280 --> 00:20:08,418
+and specifically fundamental to any 
+virtualized design.
+
+370
+00:20:08,651 --> 00:20:13,917
+And so the choice of the VMM architecture 
+type l versus type ll
+
+371
+00:20:14,083 --> 00:20:15,470
+is extremely important.
+
+372
+00:20:16,484 --> 00:20:21,401
+If you actually look at what is currently 
+out and available today,
+
+373
+00:20:21,772 --> 00:20:25,267
+we actually see a combination 
+of type l and type ll systems.
+
+374
+00:20:26,063 --> 00:20:28,402
+Most of you are probably familiar, 
+or heard of Xen,
+
+375
+00:20:28,570 --> 00:20:30,671
+which is an open-source type l hypervisor.
+
+376
+00:20:30,671 --> 00:20:34,303
+So it manages the resources itself, 
+it does the scheduling of the CPU,
+
+377
+00:20:34,303 --> 00:20:38,195
+and of the physical memory of the system.
+
+378
+00:20:38,268 --> 00:20:41,356
+There are other type l architectures 
+VMware or vSphere,
+
+379
+00:20:41,546 --> 00:20:44,854
+and Microsoft Hyper-V are two examples 
+of those architectures.
+
+380
+00:20:45,422 --> 00:20:48,733
+But equally importantly, 
+there are extremely important
+
+381
+00:20:48,889 --> 00:20:52,511
+and significant systems 
+that are type ll designs.
+
+382
+00:20:52,511 --> 00:20:55,156
+KVM is an open-source Linux based 
+type ll design,
+
+383
+00:20:55,156 --> 00:20:58,334
+it's main advantage over Xen 
+is that it is part of Linux,
+
+384
+00:20:58,949 --> 00:21:03,350
+and so it does not require a separate 
+hypervisor running on the bare metal,
+
+385
+00:21:03,350 --> 00:21:06,886
+but rather it can run a virtual machine, 
+any number of virtual machines,
+
+386
+00:21:06,901 --> 00:21:12,167
+as an extension of an existing canonical, 
+normal Linux based operating system.
+
+387
+00:21:12,712 --> 00:21:14,516
+And on your desktop or your laptops,
+
+388
+00:21:14,516 --> 00:21:16,525
+you're maybe familiar with 
+VMware workstation,
+
+389
+00:21:16,525 --> 00:21:20,090
+and if you have a Mac, you may be using 
+a product called Fusion,
+
+390
+00:21:20,090 --> 00:21:22,303
+which basically allows you run 
+any virtual machine
+
+391
+00:21:22,303 --> 00:21:26,336
+running any operating system on top of 
+the Mac OS operating system.
+
+392
+00:21:26,518 --> 00:21:30,141
+Parallels is another commercial company 
+that has products in a similar plane.
+
+393
+00:21:30,667 --> 00:21:33,744
+So there are two types of 
+virtual machine monitor architectures,
+
+394
+00:21:33,744 --> 00:21:36,866
+type l and type ll, both of them 
+are actually still used today,
+
+395
+00:21:37,023 --> 00:21:41,629
+with a little bit of a bias towards 
+type l in data centers and in the cloud,
+
+396
+00:21:41,949 --> 00:21:45,667
+and type ll designs in the 
+enterprise and on the desktop,
+
+397
+00:21:45,667 --> 00:21:47,590
+where convenience and 
+ease of installation
+
+398
+00:21:47,590 --> 00:21:49,008
+is actually the most important.
+
+399
+00:21:49,008 --> 00:21:50,410
+And with that, I want to thank you.
+
+400
+00:21:50,410 --> 00:21:52,997
+This is the end of the module 
+on VMM construction.
+
+401
+00:21:53,599 --> 00:21:54,270
+Goodbye.

@@ -1,0 +1,41 @@
+I will now discuss the stability of Euler's schemes when solving the following differential equation:
+On se donne un Î² positif, et on considÃ¨re l'Ã©quation diffÃ©rentielle u'(t)=-Î²*u(t) for Î² nonnegative and with an initial value u(0)=u0.
+The unique solution is given by u(t)=u0*exp(-Î²t) and so I can plot the solution, here is t, start from u0, here is u0*exp(-Î²t).
+Note that the limit when t goes to the infinity of u(t) is 0.
+I will require about the numerical scheme iss the following: given a numerical scheme that allows to compute approximations u_0, u_1, u_2, ..., u_n and from u_n, compute u_(n+1) where u_(n+1) is an approximation of u at the time t(n+1),
+I would like to reproduce this property from a numerical standpoint.
+I require the following :
+Definition: the method is stable, there are several definitions of stability, this is one the simplest, the method is stable if the limit when n goes to the infinity of u_n is 0.
+For instance, here are approximations, here u1, u 2, etc ... and I want these approximations to go to 0 when n goes to the infinity.
+Let's now consider Euler's forward method for this differential equation:
+(u_(n+1)-u_n)/h h is the time step, tn=n*h, equals -Î²*u_n, that is to say u_(n+1)=(1-Î²h)*u_n so it is a geometric sequence of progression (1-Î²h), so u_(n+1)=(-Î²h)^(n+1)*u_0, which goes to 0 when n goes to the infinity if and only if the progression (1-Î²h) in absolute value is less than 1,
+In other words if and only if
+-1<1-Î²h<1,
+Î² and h being nonnegative, 
+1-Î²h is always less than 1 but the other inequality yields
+Î²h is less than 2, so h is less than 2/Î².
+So Euler's forward scheme is stable when h is less than or equal to 2/Î².
+What happens when it's not the case?
+If I take h, greater than 2/Î², u_n goes to the infinity when n goes to the infinity, which is not a desired property since the exact solution u converges to 0.
+This stability condition is a drawback, because if Î² is large, then the time step h must be small, so if I want to make a simulation, for example to forecast the weather for 24hour, I will have to use small time steps, which is not desirable.
+Let's now go to Euler's backward method.
+Euler's backward scheme on this differential equation reduces to (u_(n+1)-u_n)/h=-Î²u_(n+1) so u_(n+1)=u_n/(1+Î²h).
+Again, we have a geometric sequence, with progression 1/(1+Î²h), by induction, u_(n+1)=u_0*(1/(1+Î²h))^(n+1) and this quantity goes to 0 when n goes to the infinity if and only if the progression is less than 1,
+1/(1+Î²h)
+Î² and h being nonnegative, cette quantitÃ©-lÃ  est positive
+-je peux enlever la valeur absolue- which is always the case, for all nonnegative h, 
+1/(1+Î²h) is less than 1.
+It suffices to study the function 1/(1+x) with x nonnegative.
+So this backward Euler's scheme is stable for any poistive h, we say it is unconditionally stable. which means it is stable without condition on h, unlike Euler's forward method, stable if h is less than or equal to 2/Î².
+Let's now talk about convergence of Euler's schemes we used a finite difference formula, forawrd or backward, both are finite difference formulas of order 1 in h. pour Ã©crire les schÃ©mas d'Euler progressif ou rÃ©trograde.
+Those two Euler's schemes converge at order 1 in h.
+What does this mean?
+Let's do the following experiment.
+I start from u0, and I want to compute u(t) at some final time T, let tn=n*h, n=0,1,2,etc... here I have t0, t1, t2, t3, etc ... and the last time is tN, which is Nh, equals to the final time T.
+I claim that at the time T, u(T), which I do not know, minus its approximation u_N ontained using an Euler's scheme, forward or backward, in the case of forward Euler's method under the stability condition this quantity is of order 1 in h, this is not surprising since I used finite difference formula, forward or backward, which are of order 1 in h, to approach the derivative u' t the time tn or t(n+1).
+So this statement corresponds to the following experiment.
+Fix the final time T, and choose some h and compute, from u0, u1, u2, u3 until u4, and write down the error u(tN)-u_N.
+Now divide h by 2, je prends un h deux fois plus petit compute the u_n to arrive at the same final time T,
+I must multiply the number of time steps, N, by 2 as well, in this case the error is approximatively divided by 2.
+I do another simulation with a time step twice as small, so I will do twice more computations but at the end the error will be divided by 2.
+Thus when the time step goes to zero, et le pas de temps tend vers 0, my numerical approximation will be closer and closer to the exact solution.

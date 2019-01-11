@@ -1,0 +1,140 @@
+In this episode and the following one, we'll see a new concept:
+Java interfaces.
+But first, let's begin with an example, with another game that would for example need balls, rackets, nets, and players.
+And let's suppose that each of these entities needs an 'evolue' (= "evolves") method, to make them evolve during the game.
+Naturally, the way of conceiving this in object-oriented programming would be to create an abstract class 'Entite' (= "Entity") which would have the abstract method 'evolue', and to make the ball, the rackets, the net, the player inherit from the abstract class
+'Entite'.
+But let's suppose that we go a bit further in the game's analysis, and that we realize that some of these entities, for example the balls, the rackets, the nets, should have a graphical representation such that we effectively do see them on the game's screen, and that, for example, we don't see the player.
+So at that moment we would have to dissociate the players from the balls, the rackets, and the nets, as having or not  a graphical representation.
+We could also imagine that some entities should be interactive, for example to be able to control them with the keyboard or with the mouse, like a ball or a racket.
+And others that we couldn't move, so for example the net and the player.
+So how would we organize all this in the context of our object- oriented conception?
+Ideally we would do all this through classes with, for example, an interactive class which would allow us to manage the ball and the racket in an interactive way.
+A class that would allow us to have a method to graphically draw the graphical objects of which would inherit net, racket and ball.
+But this would make what is called multiple inheritance.
+The ball would inherit in multiple ways from an interactive and graphical entity.
+But we can't have multiple inheritance in Java; there's only single inheritance in Java.
+So how do we do?
+Before answering that question, let's simply note that some other programming languages have chosen multiple inheritance, so why isn't there multiple inheritance in Java?
+Simply because multiple inheritance may induce confusion, and make some situations difficult to understand.
+For example if we had a class that multiply inherits of an animal, is it an animal? The same animal?
+Or is it two animals?
+And these situations are also difficult for the compiler, which has decisions to take.
+Those that would want to convince themselves could go and see the episode on virtual classes in C++, on our other MOOC that is taking place in parallel on the C++ language, and you'll most certainly be convinced.
+Another reason is that there can be ambiguity when a method or a variable is declared in many super-classes.
+Which one to use? How to access it?
+So, for good reasons, Java decided not to have multiple inheritance.
+So, how can we well design the game that we've imagined until now in Java?
+For that, let's go back to the reason that pushed us to introducing multiple inheritance.
+Why did we want multiple inheritance in our video game?
+To impose the use of common methods to some classes.
+So for example, we wanted
+'ball' and 'racket' to have methods that allow you to manage a mouse click, for example.
+But the 'gestionClic' (= "clickManager") method can't be a method for their super-class, common to all for the 'Entite' class, because a 'gestionClic' method makes no sense for the player for example.
+What we want to do is to impose a common content to some sub-classes, without any inheritance relation, and differentiate them from other sub-classes.
+That's the notion of interface in Java.
+The interface notion in Java, which is different from the notion of class, will allow us to impose to some classes to have a particular content, without them being part of a class, properly speaking.
+So for example, here, the sub-classes
+'Raquette' and 'Balle', sub-classes of the 'Entite' class, will additionally have, for example, the 'Interaction' or
+'Interactive' interface, which gives the ability to manage, for example, mouse interactions.
+Of course, it wouldn't have been correct to have this 'gestionClic' method in the 'Entite' class, because in that case, the net and the player would also have had a
+'gestionClic' method, of which they doesn't have any use.
+The 'balle', 'raquette' and 'filet' (= "net") sub-classes of the 'Entite' class will also have an interface that oblige them to make a choice, from a graphical point of view.
+So that's it concerning the interface concept.
+Now that you have an idea of the utility of interfaces, let's see what they concretely look like in Java.
+Before going on about interfaces, we shall add an important remark.
+Interfaces up to Java 7, as you'll see it in the coming slide, can contain only constant variables, and abstract methods.
+However, many new features have been added in Java 8.
+In the following slides, we will mainly present interfaces as they were till Java 7.
+The new Java 8 features will be presented in another video.
+In Java, an interface is declared a bit like a class, with the difference that we'll replace reserved word 'class' with the reserved word 'interface' followed by the interface's name, freely chosen, then a pair of opening and closing curly braces, like the body of a class.
+Unlike a class, an interface can only contain abstract methods, which is the most common case, or also constants.
+This is how the code of interfaces from the small introductory example could look like.
+Here you'll wonder why the methods defined inside the interfaces are defined without the reserved word 'abstract', when we've just seen that an interface can only contain abstract methods.
+We'll come back to this later.
+As a reminder, the idea was that these interfaces impose a certain content to the classes to which they are related to.
+And here the imposed content was typically a number of methods.
+An interface, that can only contain abstract methods, can't contain any constructors.
+It is therefore impossible to create an interface instance.
+So for example here, I can't write something like this in a program, which is to declare a graphical object and try to instantiate it this way.
+This is obviously impossible.
+But let's go back to the question in which we were concerned before: why are we here exempt from explicitly putting the reserved word
+'abstract', for example?
+As the methods of an interface are necessarily abstract, java exempts you from explicitly mentioning it.
+What you must know is that any method declared in an interface is necessarily abstract and necessarily public.
+If you try declaring an interface method with another modifier than
+'public', you'll get a compiler error message.
+It is also possible to put constants in an interface, even if that's less common than abstract methods.
+For example, I could define an interface like this that contains constants.
+And in this case, I need to give values to the constants, as there's no eventual constructor that could give initial values to these constants.
+I must do it at this stage, and like the methods, there are also implicit modifiers for the constants.
+Every constant that you put in an interface is necessarily public, final, and static.
+We now know what we can put inside an interface.
+Let's look at how to establish the link between the interface and the class.
+This link is established with a particular reserved word: the reserved word 'implements'.
+When we declare the class, we'll indicate that this class implements a number of interfaces.
+There can be many, separated by commas.
+For example, to indicate that our net class extends the class Entite, but implements the Graphique interface, which will let us see this net as a draw-able object, we'll write, in Java, the class 'Filet' (= net) extends the class 'Entite' (= entity), and implements the 'Graphique'
+(= Graphical) interface.
+When a class implements a number of interfaces,
+It is imperative, if we want it to be instanciable, that is redefines all the methods declared in the interfaces.
+All the abstract methods must be concretely redefined in the class that implements them, so that these are instanciable.
+This is the way that an interface imposes a content to a class that implements it.
+The moment we establish the link between the class and the interface, so the class, if we want to instantiate it, must redefine all the methods specified in the interface.
+So as we've seen, a class can perfectly implement many interfaces, for example, the ball is a clickable object and is a draw-able object, so it implements two interfaces.
+The Interactive interface and the Graphique interface.
+If we want to create basic instances, which is probably the case, then the Balle class must imperatively give a concrete definition of the 'gestionClic' and 'dessiner' (= draw) methods.
+Note that in Java, it is totally possible to declare a hierarchy of interfaces.
+We'll say that an interface extends another and this is expressed with the reserved word 'extends', like with the classes.
+For example, here we have two interfaces
+GerableParSouris (= manageable with the mouse) and
+GerableParClavier (= manageable with the keyboard), which both extend an Interactive super-interface.
+Here we indeed have a hierarchy of interfaces and two interactive super-interfaces, and two sub-interfaces
+GerableParSouris and by keyboard.
+Before continuing, let's go back to our first example of a class implementing an interface, to mention a point that can have its importance.
+We previously saw that, in an interface, the methods are de facto public.
+What happens if a class that implements an interface defines the method present in the interface but with rights different that the public right?
+So imagine for example that here
+I put the access right
+'protected'.
+Well this will simply be refused by the compiler because in Java, when you redefine an existing method, you are allowed to enlarge the rights, but never restrict them.
+Note that this is also valid for the redefinition in the context of inheritance.
+For example, if I have a super-class  A of which inherits a sub-class 'B', if  A defines a method m as 'public', then the method's redefinition can't restrict the rights.
+This will be refused.
+By declaring an interface in a Java program, you in fact declare a new type, as it is the case when you declare a new class.
+It is therefore possible to declare a variable of 'interface' type like this, for example, and to affect an object to it. But be careful, not any object: the object of a class that implements this interface.
+This is the case here, so we affect to a variable of type Graphique, an object initially instantiated as a Balle.
+So that it is possible, the 'Balle' class must obviously implement the 'Graphique' interface.
+In some situations, it can be interesting to manipulate the objects through their interface rather than through their initial type.
+For example here, rather manipulate a ball as a graphical object, and in this case, it justifies this kind of assignment.
+Last small note: knowing that we can perfectly assign an object of a sub-class type to a variable of super-class type, this variable containing an object of 'Balle' type, which implements the 'Graphique' interface.
+Is it possible to assign this variable to an object of 'Graphique' type?
+So, this is possible, but with a condition.
+You must here reassure your compiler on the fact of what is contained in the variable is indeed an object that implements the interface in question, the 'Graphique' interface.
+To do so, we use type conversion, casting, here.
+To summarize, the essential function of an interface is to attribute common components to classes that aren't linked with an inheritance relation.
+In our example, the 'Interactif' interface allowed us here to impose a common content, a
+'gestionClic' method, to two classes, Balle and
+Raquette for example, which aren't related by an inheritance relation.
+We don't have 'Balle' inheriting from 'Raquette' or vice versa.
+An interface can have constants, that is, final, static, public variables.
+That's quite rare and requires some discipline.
+Why? Because there can be a possible ambiguity, if, for example, a class implements two interfaces that each contain the same constant.
+Suppose for example that in a program, we have a first interface 'l1' that contains the definition of a constant, and a second interface 'l2' that would contain a constant of the same name.
+With possibly another value, but not necessarily.
+Now, if we want to declare a class C that implements the two interfaces, then there is clearly a problem, an ambiguity: which of the two constants do we want to use?
+This will be refused by the compiler.
+Another possible component of an interface, and the most common one: the abstract methods.
+And here we saw that every class that implements the interface, if it wants to be instantiated, must provide a concrete definition of the method, otherwise it can't be instantiated.
+The interface therefore allow to impose to some classes to provide a certain content without necessarily using the notion of class and abstract method.
+Contrary to the case of variables, as the abstract methods don't have any instruction lines, there isn't any possible ambiguity, for example, if in the 'l1' interface there's an abstract method m, and in another interface 'l2' there's also an abstract method 'm', then a class 'C' can perfectly implement the two interfaces without making the compiler react.
+If it wants to be instantiated, the 'C' class must, indeed, provide a definition of the 'm' method, no matter what imposes its presence.
+Note that the Java API provides many predefined interfaces, for example, the 'comparable' interface imposes to the classes that implement it to provide a 'compareTo' method, that takes an object of Object type as an argument.
+To conclude, let's look at what relation types set up an interface.
+Typically, we saw that inheritance allows us to use an
+"is-a" relation type.
+A ball "is an" entity of the game.
+We also saw that when a class has as an object of another class as an attribute, then a "has-a" relation type is established between the two classes: a warrior has a weapon.
+Finally, an interface lets us be reassured that a class conforms to a certain protocol, and we'll say that the relation that is set up is a relation of type:
+"behaves-as": a ball 'is-a' game entity, but it behaves like a graphical object and an interactive object.
+And this concludes our episode about Java interfaces.

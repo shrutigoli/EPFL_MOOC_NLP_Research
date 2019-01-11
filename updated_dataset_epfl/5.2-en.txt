@@ -1,0 +1,108 @@
+Welcome back. Nature in Code.
+We're in chapter 5, lecture 2
+In this lecture we're going to start with the implementation of our spacial simulation.
+Alright, so here we are in an empty document. We are going to get started by saying 
+DOCTYPE html as always.
+Then of course we have our html tag which we're going to close right away and our 'head' tag. Then, of course the 'body' tag as well.
+Now, in this simulation we are going to visualize a lot and so we're going to use D3. For this reason we're going to put the 
+'script' tag here in the body just as we did in chapter 3.
+Alright so we would like to develop a pretty sophisticated spacial simulation.
+How does one start?
+Well, again I know it sounds trivial but you just start at the first step. Just ask yourself, "What would be the first thing I would need to do in my code?
+What would be the first function
+ I would need to call?"
+We just talked about this grid that we want to implement so probably the first function, something like the first function will be called 'init_grid' where we would initialize this grid and of course we would need to implement this method before we can call it 'init_grid'.
+I'm not getting any syntax highlighting here.
+This is because I haven't saved the file yet so let me save the file.
+Save as; I got code examples here. I'm going to call this spacial simulation dot html.
+Alright, looking much better.
+Before I am going to implement this
+I'd like to think about a number of values I will use throughout the simulation that I would like to set up as global variables here at the top.
+One of the variables obviously is the size of the grid and so
+I'm going to call this grid_length and I'm going to set this to 100 so then we'll have a 100 x 100 sized grid because we want a squared grid. That means we'll have 10 000 cells and therefore a population size of 10 000. That seems like a nice population size.
+As we said, the grid itself is going to be an array. 
+I'm going to setup this empty array. This will eventually be a 2 dimensional array so this array will contain other arrays namely the rows. Of course this is a population genetic simulation so I'll have a1, a1, a1, a2 and a2, a2 genotypes and so I have a1 and a2 frequencies so I'm going to set the a1 allele frequency of 'p' here to 0.5.
+Also as we've just seen before, one of the variables we want to set and we ultimately want to change is this mating distance so I'm going to call this max_mating_distance just to be clear that this is not an average or anything like that.
+It's simply a maximum.
+I'm going to start by setting this to 1 and we can change this later.
+We can change all of these later.
+Then also, as I said, we're actually going to put individuals on this grid now.
+What will these individuals be?
+Well, they essentially will simply be genotypes.
+I want to keep track of how many genotypes I have and so I'm going to setup these 3 variables: a1a1, a1a2 and a2a2. 
+These are simply counters for the number of genotypes that we have and correspondingly,
+I'm going to initialize those at 0.
+Then ultimately we will run some generations and I want to know where in the simulation we are so I'll probably need something like a generation counter and I'm going to set this to 0.
+Again, you could do this slightly differently. You could just start with the function as we have for example in chapter 4 and instead of implement your code, start developing your code and as you realize, "Mmm ...
+This should probably be a global variable," you can setup these global variables. Here I went slightly the other way around.
+Before i got started, I knew I was going to use a bunch of these variables here; these values and a way to keep track of things so I set those up first.
+You can do either way;
+ whichever you prefer.
+Now we have this init_grid.
+What should this be? We'd like to initialize a 2 dimensional
+array here. At the moment we have our grid variable. This is a
+1 dimensional array. At the moment it doesn't store anything.
+This should store many, many arrays which will be the rows of our grid or columns depending on how you'd like to think of it.
+Then in those arrays within the grid array, we'll have the individuals so let's go ahead and set this up.
+I'll need a for loop here so for (var i = 0; i is smaller than grid length. That's the condition and of course i = i+1.
+Now I'd like to say, "Okay, I need to push an empty array into the grid here." One way to do this would simply be to say: grid.push ([]); an empty array as we've done this before
+There is another way actually that you can do this and I'm going to use the alternative way. I'm simply going to say: grid[i] = [] so this assigns the empty array; so this one here to this location in the array.
+Java script allows us to do that and that's quite handy and the other thing ... The other reason why I'm doing this is because we'll use this type of notation later to retrieve values but just to say you can not only use this notation with the indices to retrieve values, elements in an array.
+You can also use it to set them and that's what we're doing here.
+Great, so now I have my 
+2 dimensional array setup and I'm currently within the loop here that sets these up so I can now have another loop that's nested in here and because it's nested, I'm going to use this
+(var ii = 0 notation. Again, you could in principle use i, j and so on but I'm going to use this i and ii notation and if you're following me, I suggest you do the same. Again, I use this because
+I find it easier because I immediately see the level of nesting I'm at so I'm going to use this ii. Again, that condition here would be ii smaller than grid length. Also in the second dimension because again, we said we want to have a squared grid
+Then of course, the increment.
+Okay and so now at grid[i] which we previously initialized as an empty array, I can set now into ii the individual. 
+This will be quite handy as you can see, this is kind of like an X and Y co-ordinate system now and that's a really handy notation here.
+What would I set here?
+I'd like to set 1 of 3 genotypes and I'm simply going to set those as strings; a1a1, a1a2 and a2a2. Now, I said up here I'd like to initialize this population where p = 0.5 so what are the numbers of genotypes that I need?
+Well, you now know from the 
+Hardyâ€“Weinberg chapters there's many ways to initialize a population given an allele frequency but we'd like to be in the one that's considered stable which is the Hardyâ€“Weinberg frequency. What I'd like to do is,
+I'd like to set these up in
+Hardyâ€“Weinberg frequencies given p = 0.5 and as you recall, the Hardyâ€“Weinberg frequencies are p squared, 2pq and q squared so we'll have 25% a1a1, 50% a1a2 and
+25% a2a2. How am I going to do this?
+Well, there's an easy way.
+I can do this using Math.random and I'm going to show you how this works right now.
+Given the a1 allele frequency p, we know that the Hardyâ€“Weinberg frequencies of the genotypes a1a1, a1a2 and a2a2 will be p squared, 2pq and q squared and we know that these add up to 1.
+You can think of this as a number line between 0 and 1 and these 3 numbers are like stretches that when added up, add up exactly to 1.
+For example, you could move from 0
+for distance of p squared whatever the concrete value is up to here and so that would be p squared here.
+Alternatively, you can move from 1 to the left towards 0 for this distance of q squared whatever that value would be in your concrete example.
+Here would be 1 - q squared and it has to be that this stretch here is exactly 2PQ.
+This range, 0 to 1 is of course exactly the range of numbers that are returned by Math.random so you can imagine that Math.random is essentially returning a random point on this number line.
+Correspondingly, you can then choose based on the stretch where this lands which genotype it's going to be. For example, let's say Math.random returns 0.4 something and this is maybe somewhere around here so it landed now on the stretch that is here given by this 2pq which of course corresponds to the A1A2 genotypes. In this case, you're going to pick an A1A2 genotype. Correspondingly, let's say Math.random returns 0.1 or something on that order so maybe around here. It landed on this stretch here that is covered by p squared which means you would choose the A1A1 genotype.
+Last but not not least let's say you get a Math.random return value of something like 0.9.
+It lands on this stretch. 
+Okay, so that is an A2A2 genotype.
+Very simple idea. Just pick a random number between 0 and 1 and wherever it lands on the number line, you will then pick the corresponding genotype. You just have to figure out where exactly it landed.
+Alright so now that we know how to do this, we can set this up in here; in this loop. We can of course start by drawing this random number that we just talked about; random_number and this is simply a random number between 0 and 1 so Math.random is perfect.
+This random number is now the dot on our line between 0 and 1.
+Now we can use just exactly this logic that we just developed so we can say okay if this random_ number is now smaller than p squared so smaller than p x p then that means I'm going to draw an
+A1A1 genotype. What I'm going to do here is I'm going to set this grid[i][ii] to A1A1 and I'm going to use capital letters here. 
+Okay and because I want to keep track of the number of A1A1 genotypes I'm going to increase here this counter variable by 1.
+Good so the next step would be
+'else if'; so something else happened and there's still 2 conditions left, 2 possibilities left so I'm going to say 'else if'.
+Now I'm going to come from the other side where I'm going to say okay, this number might be actually on the right edge of the number line that we just developed so it would be larger than
+1 - q squared and so the way to say this is now simply well else if (random number is larger than 1 - q x q.
+Now of course we need to be careful because we don't have q. We've only setup p here but of course we know that q = 1 - p so I'm going to replace this with 1 - p and the same over here so this term of course is still the equivalent to 1 - q squared so if that's the case then I just drew a A2A2 genotype. Grid [i][ii] = A2A2.
+Of course I'm also going to keep track of the A2A2 genotypes so
+I'm going to increase this by 1.
+If none of those 2 things happen then else; that means I'm in the middle on my number line and
+I drew an A1A2 genotype so I can simply say else grid [i][ii] = A1A2.
+Of course, I'm also keep track of the a1a2 genotype so a1a2 = a1a2 + 1 simply incrimenting this counter by 1 and that's it.
+This initializes my grid.
+Let's see if we did everything correctly so after this 'for' loop here I would like to now just simply output the a1a1's, a2a2's and a1a2's. I'm going to say console. log a1a1 and then the heterozygote a1a2 and a2a2 and see if these are roughly in Hardy-Weinberg equilibrium. Now I'm saying 'roughly' because they're not going to be mathematically precisely at
+Hardy-Weinberg equilibrium.
+With P = 0.5 and 10 000 individuals, we said that 25% would be perfect
+Hardy-Weinberg values so 2500 of the a1a1, 5000 of the a2a2 and 
+2500 a1a2 but because we assigned those values randomly using this Math.random there will be some randomness, some stochasticity in here but these numbers should be roughly in the 2500, 5000 and 2500 range.
+Let's save this and then go over to the browser and open this document. Open, File; here is my spacial simulation. I'm going to open this. Of course I'm not seeing anything here because I'm simply logging into the console so View, Developer,
+JavaScript Console and here are the numbers and you can see these are very close to 2500,
+5000 and 2500. You can reload this and you can see there's going to be some variation here but this is correct. This is pretty close to this exact equilibrium and it's close enough given the stochasticity that we expect from the random process here. 
+Well done!
+You've implemented the grid. 
+Alright so you've implemented the grid. We're ready to get going. Now we need to implement the generations. What happens on this grid in each generation?
+Let's find out. Let's implement it in the next lecture.
+See you there.

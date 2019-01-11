@@ -1,0 +1,779 @@
+1
+00:00:00,025 --> 00:00:10,025
+[AUDIO_VIDE]
+
+2
+00:00:12,120 --> 00:00:13,190
+Bonjour.
+
+3
+00:00:13,190 --> 00:00:16,420
+Nous allons voir nous allons voir comment
+nous pouvons commander à distance des
+
+4
+00:00:16,420 --> 00:00:21,570
+enseignes et afficheurs à Led,
+au moyen d'infrarouges, de modules radio,
+
+5
+00:00:21,570 --> 00:00:23,200
+de Bluetooth, de WiFi,
+
+6
+00:00:23,200 --> 00:00:26,760
+nous parlerons également un tout
+petit peu de l'Internet des objets.
+
+7
+00:00:28,170 --> 00:00:32,710
+Fondamentalement, une enseigne
+ou un afficheur fonctionne sans
+
+8
+00:00:32,710 --> 00:00:34,530
+que l'on ait besoin d'intervenir.
+
+9
+00:00:34,530 --> 00:00:38,159
+Mais, il est parfois intéressant de
+changer son mode de fonctionnement.
+
+10
+00:00:39,210 --> 00:00:43,770
+Par exemple, allumer, éteindre une
+enseigne, la passer en mode de nuit,
+
+11
+00:00:45,370 --> 00:00:47,990
+ou naturellement,
+changer des textes pour un afficheur.
+
+12
+00:00:49,230 --> 00:00:52,033
+On peut utiliser des boutons-poussoirs,
+
+13
+00:00:52,033 --> 00:00:55,390
+des claviers, mais ce serait plus
+intéressant de le faire sans fil.
+
+14
+00:00:56,610 --> 00:00:59,630
+Nous avons fondamentalement
+deux techniques,
+
+15
+00:00:59,630 --> 00:01:04,780
+soit utiliser des infrarouges,
+soit utiliser des ondes radio.
+
+16
+00:01:05,990 --> 00:01:10,050
+Examinons les solutions possibles
+avec ces deux technologies.
+
+17
+00:01:10,050 --> 00:01:12,740
+Pour transmettre des
+données par infrarouges,
+
+18
+00:01:12,740 --> 00:01:15,990
+on va utiliser une Led infrarouges.
+
+19
+00:01:15,990 --> 00:01:22,020
+Mais il faudra moduler son signal,
+généralement à une fréquence de 38
+
+20
+00:01:22,020 --> 00:01:28,320
+kiloHertz, de telle manière qu'on ne soit
+pas gêné par d'autres signaux infrarouges.
+
+21
+00:01:28,320 --> 00:01:31,430
+C'est ainsi que fonctionnent des
+télécommandes de téléviseurs,
+
+22
+00:01:31,430 --> 00:01:35,220
+et l'on pourrait tout à fait en utiliser
+pour piloter une enseigne ou un afficheur.
+
+23
+00:01:35,220 --> 00:01:41,330
+À la réception, il faut certes,
+un phototransistor, mais il faut aussi
+
+24
+00:01:41,330 --> 00:01:47,150
+un système de réglage automatique de gain,
+plus le fameux filtre à 38 kiloHertz.
+
+25
+00:01:47,150 --> 00:01:51,370
+Et l'on trouve des modules de ce
+type-là qui font tout ce travail.
+
+26
+00:01:52,430 --> 00:01:57,406
+Alors, il faut bien comprendre,
+les signaux émis sont sous
+
+27
+00:01:57,406 --> 00:02:01,350
+forme d'impulsions à 38 kiloHertz,
+
+28
+00:02:03,690 --> 00:02:08,530
+des trains d'impulsions sont envoyés,
+à la réception,
+
+29
+00:02:08,530 --> 00:02:15,650
+à la sortie de notre récepteur,
+on va obtenir le signal de l'enveloppe,
+
+30
+00:02:17,380 --> 00:02:22,060
+et ensuite on devra déduire de cette
+enveloppe le signal qui a été envoyé.
+
+31
+00:02:23,450 --> 00:02:28,540
+Par exemple, on a un système de codage,
+avec des temps
+
+32
+00:02:28,540 --> 00:02:34,010
+ici qui sont variables,
+courts pour un 0, longs pour un 1.
+
+33
+00:02:34,010 --> 00:02:41,440
+Et vous voyez ici un 0, un 1,
+de nouveau un 1, un 0, un 0, un 1, etc.
+
+34
+00:02:42,650 --> 00:02:48,905
+Il y a plusieurs standards, je dirai même
+de nombreux standards qui cohabitent.
+
+35
+00:02:48,905 --> 00:02:52,072
+Par exemple,
+
+36
+00:02:52,072 --> 00:02:57,480
+le standard RC5 également le standard
+
+37
+00:02:57,480 --> 00:03:03,470
+japonais connu souvent sous le nom de
+Neck, mais il y a de nombreuses variantes.
+
+38
+00:03:04,670 --> 00:03:09,624
+On trouve par exemple sur
+Arduino des librairies qui
+
+39
+00:03:09,624 --> 00:03:15,130
+permettent de décoder en
+particulier les signaux RC5.
+
+40
+00:03:15,130 --> 00:03:17,530
+Dans une enseigne ou un afficheur à Led,
+
+41
+00:03:17,530 --> 00:03:20,020
+le microcontrôleur est
+généralement très occupé.
+
+42
+00:03:21,120 --> 00:03:25,550
+Comment faire pour qu'il s'occupe
+en plus du décodage de ces signaux?
+
+43
+00:03:25,550 --> 00:03:33,040
+Eh bien, on va utiliser des interruptions
+pour détecter chaque flanc.
+
+44
+00:03:33,040 --> 00:03:39,629
+On va utiliser un timer, pour faire
+la mesure de ces différents temps,
+
+45
+00:03:40,670 --> 00:03:45,520
+et en fonction de ces différents temps, on
+pourra interpréter correctement le signal.
+
+46
+00:03:45,520 --> 00:03:49,980
+À noter que la lumière et également,
+la lumière infrarouge,
+
+47
+00:03:49,980 --> 00:03:56,520
+se propage en ligne droite, mais avec
+ce système de modulation à 38 kiloHertz
+
+48
+00:03:56,520 --> 00:04:02,180
+et ce type de récepteur, on a une très
+bonne sensibilité qui fait que l'on peut
+
+49
+00:04:02,180 --> 00:04:08,570
+recevoir des signaux qui ont été
+retransmis par réflexion sur l'entourage.
+
+50
+00:04:08,570 --> 00:04:11,880
+C'est assez spectaculaire de
+voir qu'en tournant le dos,
+
+51
+00:04:11,880 --> 00:04:14,790
+on peut parfaitement faire
+fonctionner une télécommande.
+
+52
+00:04:15,820 --> 00:04:18,920
+L'autre moyen de transmettre
+des données à distance,
+
+53
+00:04:18,920 --> 00:04:21,620
+c'est naturellement des ondes radio.
+
+54
+00:04:21,620 --> 00:04:27,300
+Radio Frequencies, RF,
+il s'agit donc d'ondes électromagnétiques,
+
+55
+00:04:27,300 --> 00:04:31,530
+qui ont des fréquences sur un
+spectre extrêmement étendu
+
+56
+00:04:31,530 --> 00:04:36,570
+de trois kiloHertz jusqu'à 300 GigaHertz.
+
+57
+00:04:36,570 --> 00:04:41,280
+Mais attention,
+il faudra respecter les normes en vigueur
+
+58
+00:04:41,280 --> 00:04:45,420
+dans chaque pays et c'est
+évidemment très contraignant.
+
+59
+00:04:45,420 --> 00:04:49,870
+Dans une zone située
+autour de 433 MégaHertz,
+
+60
+00:04:49,870 --> 00:04:54,970
+il y a possibilité de faire de
+l'émission à faible énergie.
+
+61
+00:04:54,970 --> 00:04:59,340
+Voilà par exemple des modules qui
+permettent de faire de l'émission
+
+62
+00:05:00,520 --> 00:05:01,360
+et de la réception.
+
+63
+00:05:02,700 --> 00:05:04,509
+Ces modules sont extrêmement peu coûteux.
+
+64
+00:05:05,740 --> 00:05:11,140
+Attention, il va falloir leur
+envoyer des signaux compatibles
+
+65
+00:05:11,140 --> 00:05:16,950
+avec la technologie utilisée, on ne
+peut pas simplement mettre des 1 et des
+
+66
+00:05:16,950 --> 00:05:20,990
+0 comme on le souhaite, on doit respecter
+des temps minimum pour chaque valeur.
+
+67
+00:05:22,080 --> 00:05:25,570
+On a donc des contraintes
+sur le signal modulant,
+
+68
+00:05:25,570 --> 00:05:28,500
+et l'utilisation de librairies
+est vivement conseillée.
+
+69
+00:05:28,500 --> 00:05:34,010
+On a par exemple la
+librairie Virtual Wire,
+
+70
+00:05:34,010 --> 00:05:36,080
+qui certes n'est plus
+officiellement supportée,
+
+71
+00:05:36,080 --> 00:05:40,130
+mais qui fonctionne parfaitement bien,
+et que beaucoup de gens utilisent.
+
+72
+00:05:40,130 --> 00:05:45,060
+On trouve des modules plus complexes, qui
+gèrent également des colisions au moment
+
+73
+00:05:45,060 --> 00:05:49,910
+de la transmission,
+par exemple ce module, ici,
+
+74
+00:05:49,910 --> 00:05:54,740
+permet d'avoir un émetteur
+et un récepteur et c'est
+
+75
+00:05:54,740 --> 00:05:59,240
+plus simple d'avoir des transmissions
+fiables par l'usage de tels modules.
+
+76
+00:06:00,740 --> 00:06:04,760
+Il est même possible d'avoir des
+portées de plusieurs kilomètres
+
+77
+00:06:04,760 --> 00:06:07,120
+sans augmentation de la puissance.
+
+78
+00:06:07,120 --> 00:06:09,510
+Cela peut vous sembler curieux,
+
+79
+00:06:09,510 --> 00:06:13,220
+plusieurs kilomètres avec de
+toutes petites puissances.
+
+80
+00:06:13,220 --> 00:06:16,540
+Eh bien, on a par exemple le système LoRa,
+qui est utilisé
+
+81
+00:06:16,540 --> 00:06:21,440
+par exemple en France pour les compteurs
+d'eau et les compteurs de gaz.
+
+82
+00:06:21,440 --> 00:06:27,490
+C'est un système avec, au niveau
+de l'émission, un spectre étendu,
+
+83
+00:06:27,490 --> 00:06:32,504
+et la réception du signal
+peut se faire en-dessous
+
+84
+00:06:32,504 --> 00:06:36,340
+du bruit électromagnétique ambiant.
+
+85
+00:06:36,340 --> 00:06:39,930
+Donc des signaux extrêmement
+faibles noyés dans le bruit,
+
+86
+00:06:39,930 --> 00:06:42,590
+peuvent être décodés
+avec ces technologies.
+
+87
+00:06:43,980 --> 00:06:46,980
+Ce genre de systèmes ont
+probablement beaucoup d'avenir,
+
+88
+00:06:46,980 --> 00:06:50,870
+c'est extrêmement pratique de pouvoir
+transmettre des données librement,
+
+89
+00:06:50,870 --> 00:06:55,340
+à des distances relativement importantes,
+par exemple dans une ville,
+
+90
+00:06:56,380 --> 00:07:01,150
+sans devoir faire appel à des opérateurs
+ou à d'autres techniques plus complexes.
+
+91
+00:07:02,370 --> 00:07:06,890
+Le Bluetooth est bien connu dans
+le monde de l'informatique.
+
+92
+00:07:06,890 --> 00:07:10,380
+Il est disponible sur des smartphones,
+sur des tablettes,
+
+93
+00:07:10,380 --> 00:07:14,270
+des PC, il a l'avantage d'être
+relativement économe en énergie,
+
+94
+00:07:14,270 --> 00:07:17,630
+en particulier au niveau
+de sa version Low Energy,
+
+95
+00:07:17,630 --> 00:07:21,290
+mais ce n'est pas très important pour
+des afficheurs et enseignes à Led,
+
+96
+00:07:21,290 --> 00:07:23,740
+qui de toute façon consomment
+passablement de courant.
+
+97
+00:07:24,780 --> 00:07:31,370
+Ils sont censés assurer la confidentialité
+des données, pour autant que l'on mette un
+
+98
+00:07:31,370 --> 00:07:36,990
+mot de passe qui n'est pas par
+exemple 0000 ou encore 1234.
+
+99
+00:07:36,990 --> 00:07:40,960
+Il existe les modules,
+qui sont faciles à mettre
+
+100
+00:07:40,960 --> 00:07:43,840
+en œuvre pour utiliser le Bluetooth
+et qui ne sont pas coûteux.
+
+101
+00:07:44,860 --> 00:07:49,150
+Mais il faut bien comprendre
+qu'il faut alors écrire
+
+102
+00:07:49,150 --> 00:07:54,090
+une application sur l'ordinateur ou le
+terminal que l'on souhaite utiliser.
+
+103
+00:07:55,540 --> 00:08:01,980
+Sur des PC, il faudra écrire un programme
+pour Windows, pour Linux, pour MacOsx,
+
+104
+00:08:01,980 --> 00:08:05,840
+sur des smartphones ou des tablettes
+il faudra une version pour Androïd,
+
+105
+00:08:05,840 --> 00:08:10,590
+ou pour peut-être, Windows 10,
+c'est apparemment plus difficile sur Ios,
+
+106
+00:08:10,590 --> 00:08:12,589
+qui ne supporte pas toutes
+les versions du Bluetooth.
+
+107
+00:08:14,010 --> 00:08:20,380
+Le Wi-Fi résout ce problème de
+nécessité d'une application.
+
+108
+00:08:20,380 --> 00:08:24,580
+En effet, il s'agit d'un système de
+réseau sans fil avec des protocoles
+
+109
+00:08:24,580 --> 00:08:26,520
+nombreux et bien standardisés.
+
+110
+00:08:27,570 --> 00:08:31,820
+TCPIP pour l'aspect réseau par exemple,
+http pour l'aspect Web.
+
+111
+00:08:32,950 --> 00:08:36,180
+Il est donc possible en
+utilisant ces standards
+
+112
+00:08:36,180 --> 00:08:40,830
+que n'importe quel navigateur internet,
+Web Browser,
+
+113
+00:08:40,830 --> 00:08:46,620
+puisse être utilisé pour dialoguer avec
+notre enseigne ou notre afficheur.
+
+114
+00:08:46,620 --> 00:08:49,850
+Le fait de ne pas avoir besoin
+d'application spécifique,
+
+115
+00:08:49,850 --> 00:08:50,999
+est vraiment très intéressant.
+
+116
+00:08:52,540 --> 00:08:56,700
+On trouve des modules,
+en particulier le très populaire ESP8266,
+
+117
+00:08:56,700 --> 00:09:01,290
+ce petit module-là dont
+
+118
+00:09:01,290 --> 00:09:06,660
+le coût est ridiculement bas, on peut
+le programmer de plusieurs manières.
+
+119
+00:09:06,660 --> 00:09:10,169
+Soit en envoyant des commandes du
+type AT par un microcontrôleur,
+
+120
+00:09:11,190 --> 00:09:16,350
+Mais on peut aussi le programmer lui-même,
+pour qu'il travaille en mode Arduino,
+
+121
+00:09:16,350 --> 00:09:21,060
+ou alors utiliser des scripts en Lua,
+en MicroPython, en Basic, etc.
+
+122
+00:09:21,060 --> 00:09:26,160
+Il est possible de trouver des modules un
+peu plus puissants, qui ont l'avantage
+
+123
+00:09:26,160 --> 00:09:30,000
+d'avoir un vrai système d'exploitation,
+généralement du type Linux.
+
+124
+00:09:30,000 --> 00:09:36,860
+C'est le cas par exemple, de ces modules
+Linkit Smart, un tout petit peu plus pro.
+
+125
+00:09:38,020 --> 00:09:41,510
+Il y a une alimentation une sortie USB,
+
+126
+00:09:41,510 --> 00:09:44,940
+des broches pour se
+connecter à l'application.
+
+127
+00:09:46,290 --> 00:09:52,050
+Ce circuit utilise un System on Chip de
+Media Tek avec un processeur puissant,
+
+128
+00:09:52,050 --> 00:09:57,850
+à plusieurs centaines de
+MégaHertz avec plusieurs dizaines,
+
+129
+00:09:57,850 --> 00:10:01,240
+voire centaines de
+Mégaoctets de mémoire vive.
+
+130
+00:10:01,240 --> 00:10:05,990
+Ce genre de modules
+viennent avec ne version
+
+131
+00:10:05,990 --> 00:10:10,010
+de Linux qui s'appelle OpenWRT,
+qui est particulièrement intéressante,
+
+132
+00:10:10,010 --> 00:10:15,290
+elle est optimisée pour les WiFi routers,
+donc pour les routeurs WiFi.
+
+133
+00:10:15,290 --> 00:10:19,060
+Elle vient naturellement avec ses
+compilateurs, ses serveurs, ses outils.
+
+134
+00:10:19,060 --> 00:10:23,530
+Il est par exemple extrêmement
+simple de réaliser un serveur Web
+
+135
+00:10:23,530 --> 00:10:25,000
+sur un tel système.
+
+136
+00:10:26,610 --> 00:10:30,740
+Toute autre technologie,
+le réseau téléphonique GSM
+
+137
+00:10:30,740 --> 00:10:35,930
+peut être aussi utilisé pour
+transférer des données à un afficheur.
+
+138
+00:10:35,930 --> 00:10:39,740
+L'avantage, c'est naturellement une
+couverture universelle des zones habitées
+
+139
+00:10:39,740 --> 00:10:40,870
+actuellement dans le monde.
+
+140
+00:10:41,970 --> 00:10:46,530
+Mais bien sûr, il faut une carte
+SIM et la prestation sera facturée
+
+141
+00:10:46,530 --> 00:10:48,410
+par l'opérateur GSM.
+
+142
+00:10:48,410 --> 00:10:51,760
+On trouve des modules extrêmement
+peu coûteux comme, par exemple,
+
+143
+00:10:51,760 --> 00:10:53,440
+ce module chinois Neoway.
+
+144
+00:10:54,750 --> 00:11:01,420
+il est possible d'envoyer des SMS, de
+recevoir des SMS, et tout cela se pilote
+
+145
+00:11:01,420 --> 00:11:06,640
+assez facilement avec des commandes AT,
+il existe des librairies pour l'Arduino.
+
+146
+00:11:07,760 --> 00:11:12,450
+Avec ces technologies, on se rend compte
+que nos enseignes et afficheurs peuvent
+
+147
+00:11:12,450 --> 00:11:17,695
+entrer dans le monde de l'Internet des
+objets et devenir des objets connectés.
+
+148
+00:11:17,695 --> 00:11:22,670
+Mais attention, il faudra respecter tout
+
+149
+00:11:22,670 --> 00:11:27,930
+ce qui est nécessaire pour que
+cet environnement reste sûr,
+
+150
+00:11:27,930 --> 00:11:32,170
+fiable et insensible à des attaques.
+
+151
+00:11:32,170 --> 00:11:33,880
+Alors c'est très intéressant.
+
+152
+00:11:33,880 --> 00:11:38,520
+On va pouvoir aussi transférer des
+données de maintenance du matériel,
+
+153
+00:11:38,520 --> 00:11:42,950
+par exemple des tensions et des courants
+d'alimentation, détecter des pannes,
+
+154
+00:11:42,950 --> 00:11:45,220
+mesurer des heures de fonctionnement.
+
+155
+00:11:45,220 --> 00:11:49,300
+On pourra aussi transmettre des données
+de surveillance et de sécurité,
+
+156
+00:11:49,300 --> 00:11:54,290
+par exemple des détections d'intrusion,
+également des images de l'environnement.
+
+157
+00:11:54,290 --> 00:11:59,090
+Nous avons vu comment commander à
+distance des afficheurs ou des enseignes,
+
+158
+00:12:00,550 --> 00:12:05,596
+grâce à de l'infrarouge, grâce à des
+ondes radio, avec des modules radio,
+
+159
+00:12:05,596 --> 00:12:10,220
+du Bluetooth, du WiFi.
+
+160
+00:12:10,220 --> 00:12:12,990
+On voit que c'est un domaine
+en plein développement
+
+161
+00:12:12,990 --> 00:12:17,540
+et cela donnera des applications très
+intéressantes et une attractivité très
+
+162
+00:12:17,540 --> 00:12:20,430
+intéressante à nos enseignes
+et afficheurs à Led.

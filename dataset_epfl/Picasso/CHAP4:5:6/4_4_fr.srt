@@ -1,0 +1,560 @@
+1
+00:00:00,567 --> 00:00:03,750
+Passons maintenant 
+au chapitre 5 du livre :
+
+2
+00:00:03,750 --> 00:00:06,696
+décomposition LU, 
+décomposition de Choleski.
+
+3
+00:00:06,696 --> 00:00:10,305
+Je veux résoudre le système linéaire
+AX = B
+
+4
+00:00:10,305 --> 00:00:17,425
+et je vais décomposer la matrice A
+(matrice à N lignes et N colonnes)
+
+5
+00:00:20,815 --> 00:00:28,954
+comme le produit d'une matrice L
+et d'une matrice U
+
+6
+00:00:31,392 --> 00:00:34,998
+Toutes ces matrices sont des matrices
+à N lignes et N coefficients.
+
+7
+00:00:34,998 --> 00:00:39,655
+La matrice A a comme coefficient
+a a1 sur la première ligne
+
+8
+00:00:39,655 --> 00:00:43,042
+a aN première ligne, dernière colonne.
+
+9
+00:00:43,042 --> 00:00:46,942
+Ici première colonne finit à a N1
+
+10
+00:00:46,942 --> 00:00:51,808
+et ici le dernier coefficient aNN
+
+11
+00:00:53,288 --> 00:00:54,816
+Voilà la matrice A.
+
+12
+00:00:54,816 --> 00:00:59,925
+Les matrices L et U : nous avons déjà
+parlé de la matrice U,
+
+13
+00:00:59,925 --> 00:01:03,969
+c'est une matrice 
+(en anglais 'upper matrix')
+
+14
+00:01:03,969 --> 00:01:06,423
+une matrice triangulaire supérieure
+
+15
+00:01:06,423 --> 00:01:08,240
+et nous avons tout à l'heure décidé
+
+16
+00:01:08,240 --> 00:01:11,563
+qu'il y aurait des 1 sur la diagonale
+
+17
+00:01:12,363 --> 00:01:15,495
+0 sur la partie triangulaire inférieure.
+
+18
+00:01:15,505 --> 00:01:21,787
+Ici un coefficient U 1 2 et U 1 N
+
+19
+00:01:21,787 --> 00:01:27,748
+ici jusqu'à U N -1 N1
+
+20
+00:01:31,248 --> 00:01:38,267
+La matrice L est une matrice triangulaire
+inférieure ('lower matrix')
+
+21
+00:01:38,267 --> 00:01:44,476
+Donc la diagonale, la partie triangulaire
+supérieure ne contient que des 0
+
+22
+00:01:44,476 --> 00:01:50,442
+et les coefficients L 1 1, L 2 2 
+jusqu'à ici L N N
+
+23
+00:01:50,442 --> 00:02:00,507
+avec le coefficient ici L N 1, 
+dernière ligne première colonne.
+
+24
+00:02:00,507 --> 00:02:03,414
+Supposons qu'on sache écrire A,
+
+25
+00:02:03,414 --> 00:02:08,239
+le travail est de trouver 
+les matrices L et U,
+
+26
+00:02:08,239 --> 00:02:10,665
+triangulaires inférieures et supérieures
+
+27
+00:02:10,665 --> 00:02:12,485
+de sorte que A soit égal à LU
+
+28
+00:02:12,485 --> 00:02:15,212
+Ce qui est donné, je vous le rappelle, 
+c'est la matrice A
+
+29
+00:02:15,212 --> 00:02:17,620
+ce qu'on cherche 
+ce sont les matrices L et U
+
+30
+00:02:17,620 --> 00:02:19,640
+tel que A = L U
+
+31
+00:02:19,640 --> 00:02:22,848
+Si on sait faire une telle opération,
+
+32
+00:02:22,848 --> 00:02:25,849
+il est alors facile de résoudre 
+le système linéaire. Pourquoi ?
+
+33
+00:02:25,849 --> 00:02:29,835
+Je rappelle que vous voulez résoudre
+un système linéaire Ax = b
+
+34
+00:02:29,835 --> 00:02:36,032
+Vous avez A qui s'écrit comme 
+le produit de L fois U
+
+35
+00:02:36,032 --> 00:02:38,903
+donc vous devez résoudre L U x = b
+
+36
+00:02:38,903 --> 00:02:44,357
+et vous allez découper 
+ce système linéaire en deux.
+
+37
+00:02:44,357 --> 00:02:51,576
+Si je pose ici y = Ux
+
+38
+00:02:51,576 --> 00:02:56,654
+et bien je dois résoudre Ly = b 
+ceci est une opération facile :
+
+39
+00:02:56,654 --> 00:03:03,331
+je vous rappelle que L est une matrice
+triangulaire inférieure
+
+40
+00:03:03,901 --> 00:03:08,233
+donc quand je dois résoudre Ly = b
+
+41
+00:03:09,833 --> 00:03:13,173
+et bien je vais commencer par le haut.
+
+42
+00:03:13,173 --> 00:03:19,708
+J'ai L A1 y1 = b1 ensuite je vais calculer
+y2 et ainsi de suite jusqu'en bas,
+
+43
+00:03:19,708 --> 00:03:23,781
+donc résoudre Ly = b lorsque 
+L est triangulaire inférieure
+
+44
+00:03:23,781 --> 00:03:25,326
+est une opération facile.
+
+45
+00:03:25,326 --> 00:03:30,471
+Une fois que j'ai trouvé y, 
+je dois résoudre Ux = y
+
+46
+00:03:30,471 --> 00:03:36,326
+Je connais maintenant y puisque 
+j'ai résolu Ly = b
+
+47
+00:03:36,326 --> 00:03:40,242
+et donc résoudre Ux = y
+est aussi une opération simple,
+
+48
+00:03:40,242 --> 00:03:42,090
+j'ai vu ceci tout à l'heure :
+
+49
+00:03:42,090 --> 00:03:45,432
+vous avez vu U matrice 
+triangulaire supérieure.
+
+50
+00:03:45,432 --> 00:03:48,774
+Ici il y a des 0 et
+il y a des 1 sur la diagonale
+
+51
+00:03:48,774 --> 00:03:52,117
+et donc vous connaissez le vecteur y
+
+52
+00:03:52,117 --> 00:03:56,385
+le vecteur y est connu, 
+vous venez de résoudre Ly = b
+
+53
+00:03:56,385 --> 00:03:59,962
+et maintenant vous devez résoudre
+Ux = y
+
+54
+00:03:59,962 --> 00:04:04,197
+et cette fois-ci vous partez par le bas,
+
+55
+00:04:04,197 --> 00:04:09,910
+vous avez xN = yN et ainsi de suite
+jusqu'en haut.
+
+56
+00:04:11,040 --> 00:04:13,471
+Alors la question qui se pose maintenant
+
+57
+00:04:13,471 --> 00:04:17,804
+est comment trouver 
+les coefficients de L et U ?
+
+58
+00:04:17,804 --> 00:04:23,765
+C'est assez simple, pour trouver
+les coefficients de L et U
+
+59
+00:04:23,765 --> 00:04:27,765
+on identifie simplement 
+les coefficients de la matrice A
+
+60
+00:04:27,765 --> 00:04:32,593
+avec les coefficients du produit L fois U
+dans le bon ordre.
+
+61
+00:04:33,033 --> 00:04:44,339
+Pour obtenir les coefficients 
+des matrices L et U
+
+62
+00:04:48,435 --> 00:05:00,959
+on identifie les coefficients de la matrice A
+et de la matrice LU dans l'ordre suivant.
+
+63
+00:05:06,549 --> 00:05:10,823
+Ce dont il faut se souvenir,c'est l'ordre 
+dans lequel on identifie ces coefficients.
+
+64
+00:05:14,113 --> 00:05:20,517
+La première étape est la suivante :
+(je change de couleur)
+
+65
+00:05:26,707 --> 00:05:45,627
+on va identifier les coefficients 
+de la première colonne de A et LU.
+
+66
+00:05:46,727 --> 00:05:48,927
+Voilà la première colonne de A.
+
+67
+00:05:48,927 --> 00:05:51,697
+Si j'identifie les coefficients de la
+première colonne de A
+
+68
+00:05:51,697 --> 00:05:55,034
+avec les coefficients de la première 
+colonne du produit L fois U,
+
+69
+00:05:55,034 --> 00:06:03,030
+je prétends qu'on obtient 
+les coefficients
+
+70
+00:06:04,730 --> 00:06:13,720
+de la première colonne de la matrice L
+qui se trouve ici.
+
+71
+00:06:15,182 --> 00:06:19,608
+En effet, faisons ainsi pour le premier
+coefficient par exemple,
+
+72
+00:06:19,608 --> 00:06:26,120
+vous avez le coefficient A1, c'est 
+le produit de la première ligne de L
+
+73
+00:06:26,120 --> 00:06:28,959
+avec la première colonne de U
+
+74
+00:06:28,959 --> 00:06:33,388
+Vous voyez que quand je fais le produit
+première ligne de L/première colonne de U
+
+75
+00:06:33,388 --> 00:06:37,388
+je dois faire le produit scalaire 
+de cette ligne avec cette colonne ici,
+
+76
+00:06:37,388 --> 00:06:40,259
+j'ai simplement L 1 1 fois 1
+
+77
+00:06:40,259 --> 00:06:48,966
+cela je peux l'écrire : 
+a 1 1 = l 1 1 fois 1
+
+78
+00:06:48,966 --> 00:06:51,873
+donc j'ai trouvé l 1 1
+
+79
+00:06:51,873 --> 00:06:55,550
+Je peux faire maintenant 
+le coefficient a 1 2 par exemple,
+
+80
+00:06:57,860 --> 00:07:03,427
+j'ai ici le coefficient a 1 2
+
+81
+00:07:03,427 --> 00:07:09,834
+je dois faire le produit scalaire 
+entre la deuxième ligne de L
+
+82
+00:07:09,834 --> 00:07:12,693
+et toujours la première colonne de U
+
+83
+00:07:15,979 --> 00:07:21,267
+Donc ici j'ai le coefficient, 
+que je peux rajouter ces coefficients ici.
+
+84
+00:07:21,803 --> 00:07:32,102
+a 2 1 ici vous avez l 2 1
+donc quand je fais le calcul,
+
+85
+00:07:32,102 --> 00:07:39,651
+j'obtiens a 2 1 égal l 2 1 fois 1
+
+86
+00:07:39,651 --> 00:07:47,737
+Donc a 2 1 égal l 2 1 fois 1
+et ainsi de suite.
+
+87
+00:07:48,738 --> 00:07:51,829
+Donc si j'identifie les coefficients
+de la première colonne de A
+
+88
+00:07:51,829 --> 00:07:53,758
+et la première colonne de LU
+
+89
+00:07:53,758 --> 00:07:58,720
+j'obtiens tous les coefficients
+de la première colonne de L
+
+90
+00:07:59,547 --> 00:08:04,869
+Maintenant je continue, 
+deuxième étape :
+
+91
+00:08:10,101 --> 00:08:16,229
+cette fois-ci on identifie 
+les coefficients de la première ligne de A
+
+92
+00:08:17,018 --> 00:08:21,278
+avec les coefficients de la première ligne
+du produit L fois U
+
+93
+00:08:22,015 --> 00:08:26,251
+et cette fois-ci je veux obtenir 
+les coefficients de la première ligne de U
+
+94
+00:08:29,202 --> 00:08:33,901
+Je prends tous les coefficients 
+qui sont ici.
+
+95
+00:08:34,972 --> 00:08:39,007
+Je vais les identifier au produit L fois U
+
+96
+00:08:39,007 --> 00:08:42,957
+et je vais obtenir tous les coefficients
+qui sont là.
+
+97
+00:08:44,749 --> 00:08:46,283
+Par exemple, pour le premier :
+
+98
+00:08:47,092 --> 00:08:51,942
+vous avez ici le coefficient a 1 2
+
+99
+00:08:52,804 --> 00:08:58,308
+je dois faire le produit scalaire
+de la première ligne de L
+
+100
+00:08:59,051 --> 00:09:02,263
+et de la deuxième colonne de U
+
+101
+00:09:02,821 --> 00:09:05,045
+Je vais obtenir ce coefficient U 1 2
+
+102
+00:09:05,390 --> 00:09:07,399
+ainsi de suite sur tous les coefficients.
+
+103
+00:09:07,501 --> 00:09:14,947
+Lorsque je vais identifier a 1 N, produit
+scalaire entre première ligne de L
+
+104
+00:09:16,200 --> 00:09:18,680
+et dernière colonne de U
+
+105
+00:09:19,179 --> 00:09:22,302
+je vais obtenir ce coefficient U 1 N
+
+106
+00:09:22,973 --> 00:09:25,777
+Et après, on continue de la même manière.
+
+107
+00:09:28,695 --> 00:09:40,858
+Troisième étape : on identifie les 
+coefficients de la deuxième colonne de A
+
+108
+00:09:42,838 --> 00:09:45,283
+et deuxième colonne de LU
+
+109
+00:09:45,864 --> 00:09:51,364
+et on obtient les coefficients de la
+deuxième colonne de L
+
+110
+00:09:53,949 --> 00:09:57,376
+Voilà tous les coefficients 
+que je vais identifier :
+
+111
+00:09:58,082 --> 00:10:02,059
+ce sont ceux de la deuxième colonne de A
+
+112
+00:10:02,809 --> 00:10:09,525
+et je vais obtenir les coefficients 
+de la deuxième colonne de L
+
+113
+00:10:10,199 --> 00:10:15,273
+donc tous les coefficients qui vont
+de L 2 2 à L N 2
+
+114
+00:10:16,099 --> 00:10:18,872
+et je continue de la même manière
+jusqu'à la fin.
+
+115
+00:10:19,374 --> 00:10:22,496
+J'identifie ces coefficients-là
+
+116
+00:10:23,692 --> 00:10:25,620
+je vais obtenir ces coefficients-là
+
+117
+00:10:25,620 --> 00:10:27,911
+et ensuite ceux-là
+pour obtenir ceux-là,
+
+118
+00:10:27,911 --> 00:10:31,125
+et ainsi de suite, jusqu'à la fin
+
+119
+00:10:32,061 --> 00:10:35,584
+et j'aurai obtenu tous les coefficients 
+de L et tous les coefficients de U
+
+120
+00:10:37,936 --> 00:10:39,683
+Nous allons voir maintenant
+
+121
+00:10:39,683 --> 00:10:41,899
+ces décompositions LU
+
+122
+00:10:41,899 --> 00:10:44,067
+sur une matrice tridiagonale.

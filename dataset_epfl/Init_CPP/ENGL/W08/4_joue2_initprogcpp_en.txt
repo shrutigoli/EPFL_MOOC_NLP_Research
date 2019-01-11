@@ -1,0 +1,86 @@
+In this episode, we will present the different alternative versions of the "joue" (TN: means "plays") function that we have written in the previous episode.
+Please be reminded that this  function's goal is to place a disk in the grid, given the number of the column where we intend to drop our disk.
+Also given is the player's color.
+By the way, do not forget that this function also verifies the validity of our move.
+Namely, if the column is full, we will declare that the move is not valid.
+No matter the implementing we choose for our alternate version of the "joue" function, the prototype is not going to change.
+Therefore, we will still have here a grid passed by reference, a column passed as argument and a color passed as argument aswell.
+Nothing has changed here.
+However, the idea is to come up with a rather different algorithm.
+We will thus start by saying that, if the column is full, we will not play.
+The idea is to start by run the test here instead of doing it later.
+This is written like this:
+We are testing if the column is full,
+Be reminded that a column is full if and only if the uppermost level, the level 0 is occupied.
+Here, we will thus test if the square in the row 0, this row here, and in the column received as argument is not empty.
+If this square is not empty, that means that the column is full and we will immediately return the fact that this move was invalid, that is, the value "false",
+We are now released from this condition.
+Since at this point we know the column is not empty, we can calmly search the place where the disk will be placed.
+We can freely seek the place where we will play.
+To that end, we will run through the column, like we did in the previous version, starting from the bottom.
+In C++, this is written like this.
+We are declaring a variable which will allow us to climb up the rows, just like we did in the previous version of the "joue" function.
+We initialize this variable to the size of the grid - 1 then to the current position.
+That means that, if the square on the position "grille[ligne][colonne]" is not empty, we will decrement the row by 1.
+Finally, the last step is to fill the square we have found
+(indeed, thanks to our previous test, we know that such a square exists) and finally to return "true" since we have been able to play our move.
+Now, we should test our brand new "joue" function; we let you do this as an exercise.
+Also, feel free to appreciate the differences between the two codes, independently of the number of lines and the comments, by the way.
+Now, let us see a third version of this "joue" function, restarting with the beginning of the first version, which we presented in the previous episode.
+We will start by helping you recall the first version.
+The idea is to focus on the troubles we initially encountered, and brought us so many lines with "pleine" (TN: means "full") here, also revised here aswell.
+Those precisely pertained on this critical point of decrementing "ligne" here when "ligne" was 0.
+What happens then?
+Also, is there a way to rewrite the code in a slightly different way?
+The idea is to do without this boolean "pleine" and to replace it with another test.
+Let us keep going from the intial problem. and with a question that we had left unanswered, that was: what happened when we were at the line 0.
+Since we had not written all this text here, we still executed the instruction " ligne --"
+Therefore, there was a risk, in this case, to exit the array.
+So, let us go back to the type of "ligne", which is of "size_t" type.
+As we told you before, this type, the "size_t" type is always a positive integer.
+Here, we thus have a problem regarding the number representation.
+Practically, what wil happen in the memory is that we will have a very big number.
+No matter the technical aspects though; this is not our focus here.
+However, this very big number will certainly not be a row number of our array.
+And so, what should we do here?
+Well, the systematic reflex we should learn here
+-another critique regarding our code here will thus arise- is that we should systematically test if the accesses to our array are correct.
+We garantee this either by a demonstration of our algorithm or by a true test.
+So, the conditions here are that "ligne" should always be less than "grille.size()".
+Secondly, an array index cannot be greater than the array size.
+And, lastly, we should be able to verify that "colonne" (TN: means "column") should always be less than
+"grille[ligne.size()]"
+Therefore, this value here "-1" which is the "size_t"-type 0 on which we execute the instruction " -- " will be represented one way or another, for example "impossible", or a very big number, no matter what, this number,
+" 0 -- ", that is, -1 cannot be represented as a "size_t".
+Therefore, condition grid here, 
+"less than grille.size() " is not verified.
+We will use precisely this condition as the overflowing condition of our array.
+We will thus write, along with a comment here, that if the test
+"ligne" less than grille.size() is false, that means that the column is full.
+We thus need to stop since the move is invalid.
+Now that we have understood and explained what we wish to accomplish, we can correct our code and supress the variable "pleine".
+We supress here the test which involved it and replace it by this test :
+"ligne" less than the size of the grid.
+Please note the protection of the access index, according to the size of the accessed array, before we access it. This is an advice you should systematically abide by.
+Of course, if such a condition is garanteed by "for loop", or some other constraint, you will not add such a test at every step. However, every time you have to access an array through an index, you should at least ask yourself whether the condition that it is less than the array size is fulfilled.
+So, we now see that we have explicitly written this useful test, tasked to test if the column is full.
+Now, we can keep suppressing everything involving "pleine" and finally correct our program wherever the variable "pleine" is no longer needed.
+Here, still the same test : if the row is less than the grid size, then we can play.
+Otherwise, that means we could not play.
+We thus modify our code accordingly.
+Our third version of "joue" function is now finished.
+That being said, if you have followed our discourse so far, then you should realize that an error remains in all our
+"joue" functions.
+Do you have any idea what we should add to our three
+"joue" functions in order to render them correct?
+We will let you implement it yourself as an exercise in the variant of the "joue" function you have choosen to keep for your Connect Four.
+So, at this point, you should have a correct "joue" function.
+In the previous episodes, we have presented the data structures necessary to build a Connect Four game, simple functions such as "initialize" and "affiche".
+Also, in these last two episodes, we have implement the "joue" function, letting us a drop a disk down the indicated column (if this column is valid).
+Now, we still have to ask the players where they intend to play.
+We then validate their move
+-we have just done that.
+Then, we just just need to iterate, alternating between players.
+Asking the red player to play, the yellow player and so on.
+Finally, we will terminate the program once a player wins or once the grid is full.
+This will occupy us for the next episodes.

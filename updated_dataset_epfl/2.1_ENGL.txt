@@ -1,0 +1,191 @@
+Hi. Welcome to POCS.
+My name is Ed Bugnion.
+Now this week in POCS, we'll be studying layering.
+The layering in computer systems is a deceptively simple concept.
+And that's because we all have an intuition as to what a layer is.
+We all learn in our classes the difference between applications and operating systems, or how file systems are layered on top of disks.
+Now we're actually going to revisit all these concepts in the various modules.
+But more importantly, we're going to look at the principle behind layering.
+Because there are actually a fair number of nuances and subtleties behind this deceptively simple concept.
+So the lecture this week is broken up into four distinct modules.
+First, I'm going to go over the concepts themselves in the abstract
+We're going to learn about layers, stacks, buses.
+Then we'll go in depth into two important stacks that each consist of multiple layers: the compute stack and the information stack.
+Then we'll talk about another way in which you can layer a system together.
+Which is by having clients talk to servers and form a relationship in the client/server model.
+And then we'll wrap up this module with a session on the various layers of the networking stack.
+So let's get started.
+Well, first, layering builds on the notion of modularity abstraction in naming.
+We've covered modularity and abstraction in the previous lecture, and you'll actually learn about naming and going depth in naming in a subsequent lecture.
+But here we're just using these concepts to formalize the notion of a layer.
+So a layer is a piece of a computer system.
+Could be a hardware component, could be a software component, but it generally has the following characteristics: first, it exports a well-defined abstraction.
+By well-defined we mean something that is defined in one particular domain.
+For example, a file system, a database, or a disk are examples of such an abstraction.
+But a link list is not a layer.
+It's just a module or library, it's a piece of code.
+It serves a function, but it is not a layer in the context of computer systems.
+The second is, a layer typically relies on a single lower layer.
+Now there are exceptions to that rule, but, in general, layers are organized as a stack with each layer relying on a single lower layer.
+For example the file system layer is built on top of the block layer.
+Now the block layer itself can have multiple distinct implementations.
+And there's a runtime binding between a file system and the underlying block layer.
+But for every instance of a stack, there is a hierarchy with the file system being layered on top of one instance of the block layer.
+And the third defining characteristic of a layer is that it generally manages a distinct and well-defined namespace.
+As I mentioned, we'll be spending an entire week on naming, so I won't dwell on this here.
+But just think of it as the access mechanism to the objects that are exposed by the abstractions.
+So a classic example, the namespace of the file system layer is, as you would expect, the set of directories and file names.
+The name space of the virtual address space consists of 64-bit values that can be dereferenced by the processor.
+And so on, and so on.
+So our first example comes from the compute stack.
+Take, for example, a JVM emulator.
+It provides a distinct layer implemented in software.
+And that layer allows Java applications to run on the machine.
+Now the JVM itself runs directly on the hardware ISA.
+And in this example the hardware ISA is an X86 CPU.
+Of course the X86 CPU is a distinct layer.
+This one is implemented entirely in hardware.
+It's a piece of silicon with a well-defined interface, the instruction set architecture of the X86 processor.
+That CPU manages the namespace.
+Which is the architectural state of the machine.
+The registers, the memory, and the interrupt subsystem.
+And at the same time, the X86 processor hides all the implementation details of the processor from the layers running on top of it.
+For example, an X86 CPU has an out-of-order execution engine, it has a cache hierarchy, but all of that is abstracted from the layers that are running on top of it.
+So you have a hardware layer, and you have a software layer.
+And they're layered on top of each other.
+When we study system software, the processor instruction set architecture is typically the lowest layer that we study.
+However, when we study computer architecture, the processor is further broken down into architectural components that play a direct role in the performance of the software.
+And below them, into micro-architectural implementation elements.
+Now, onto our second example.
+And actually file systems are the canonical example often used to discuss layering.
+And that's because the file system abstraction itself, as well as the implementation of file systems on disks, are two good examples of layered systems.
+Now a file system also meets the general criteria of a layer.
+There's a well-defined API, there are well-defined abstractions, things like files.
+There's a well-defined namespace with files and directories.
+And we take all these abstractions for granted.
+But keep in mind that systems had to evolve to the point where we are today.
+Mainframe systems, for example, had records and exposed blocks directly.
+In slightly more recent time, digital VMS operating systems had a built-in versioning system that exposed directly the different versions of a file into the namespace of the file system.
+Turns out that that feature proved not to be sufficiently useful so it doesn't exist anymore today in current operating systems.
+So although we take layers for granted, they often take a while to gel and to evolve into the state where they are today.
+And our one key point here is that we're talking about the file system layer, not about any particular specific file system.
+And specifically not on any particular layout of the file system on disk.
+So, for example, if all the most files in the namespace are stored on disk, that's not always the case.
+And that's because the file system layer is not built directly on some storage abstraction, but rather on some intermediate layer, which is called VFS in Unix, which provides extensively by connecting drivers into the namespace.
+We'll actually revisit this in the next section.
+So let's expand actually on the difference between file system layer and individual file systems.
+As I mentioned, the POSIX API has a single namespace, but the use of mount points allows multiple file system drivers to coexist.
+And each materialize a portion of the namespace.
+Now, internally within the kernel, these drivers register themselves into the VFS link.
+And that's a different layer that is internal to the OS, and the way they register into the VFS layer is via callbacks.
+If you actually recall George's lecture on modularity and abstraction,
+George showed that the source code of the debugfs file system driver it's kind of a coincidence, but is shows precisely how the debugfs file system driver, connects into the VFS layer.
+So each file system driver is a layer itself, and each one of them relies on a lower layer.
+And now the example that you see on screen is a dump of the mount table of a completely vanilla Linux system.
+What we see is that the ext3 driver relies on a block layer as its lower layer but we also see that there are other file systems such as tmpfs that implement a shared memory abstraction that does not rely on an underlying actual block device.
+We also see that /proc and /sys are two file systems that expose the internal structure of Linux as a file system to applications.
+But the key point here is not in the details of tmpfs, proc, or sysfs, it's that all these things are file systems.
+And they all respond to the file system operation, the same file system operations.
+And they all can be stacked together as part of a file system stack.
+Now in the previous example, we showed how a virtual layer, similar to an abstract class in object-oriented programming, enables extensibility in systems.
+Now here we're introducing another technique, which uses layering to reduce modularity.
+Now the idea here is to avoid having point-to-point connections between a collection of unrelated modules.
+As this approach is not scale, it makes it very difficult to organize and reason about the various layers.
+And in step systems, architects have developed the concept of a bus layer.
+Which allows seemingly unrelated modules to communicate with each other indirectly by going through a bus.
+So buses can actually be implemented either in software or hardware.
+And I'm going to start with a software example and my software example is XMPP.
+Which is better known as the Jabber protocol.
+And XMPP allows a scalable number of entities to exchange messages with each other and to communicate their presence within the bus.
+And by doing that, you eliminate the need to have any need for a direct connection between peers.
+And yet you create the illusion of having point-to-point communication.
+And of course, XMPP is used to build highly scalable instant messaging systems.
+And I'm sure many of you have used that as part of your favorite instant messaging system.
+But XMPP is actually not only used for humans to communicate with each other and to create an ad hoc network, but it's also used for machine-to-machine communication in complex distributed systems.
+Here again, by introducing a bus layer, we're simplifying the design, by allowing machines to have the appearance of talking directly to each other when in reality, they are only talking to a single lower layer in the stack.
+Now here's another example of a bus.
+This one is taken from the textbook, and as you would expect, this is the computer system bus which is the canonical example of a bus in hardware.
+Now rather than connecting the different pieces of a system directly to each other, each component is connected only to the bus, and a bus protocol enables point-to-point communication between any two entities on the bus.
+And this is how we have all learned the basics of computer systems organization on the hardware side.
+Now, this picture is, of course, very simplistic, and as you know, in practice, a modern computer, at least a server, has a few specialized buses.
+For example, one that separates the CPU to memory communication from the I/O communication.
+But, nevertheless, the concept of a bus in hardware is absolutely fundamental.
+So, so far I've shown a few examples that show how layering can help simplify the complexity of computer systems.
+Now, it's time to look at the bigger picture and formalize some of these concepts again.
+I mentioned that each layer exposes an abstraction, is modular, and typically manages a namespace.
+The implication is a layer has to be consistent and self-contained.
+Now when a layer is externally visible, people often talk about the architecture associated with that particular layer.
+For example, the IP routing layer in networking is an extremely well-defined combination of protocols and standards that defines what people call the layer three layer of networking.
+But if you're building a component that is not externally visible, that is internal to a particular product, you can still have a distinct layer.
+If you're managing an abstraction, if you have a module implementation, and if you're managing a namespace.
+And often people talk about those principles that are exposed to the upper layers as the theory of operations of the particular component.
+That's not where you're describing the implementation, but that is where you're describing the abstraction and the API that you're exposing.
+The second important notion is that layers can be, and generally are, a stack.
+And that each layer generally relies on a single underlying layer.
+So we're not talking about hierarchical composition that actually introduces a fair amount of complexity, we think about a layered system, typically you should actually think about it as a single stack with single dependencies from one layer to the layer below.
+And if you actually can't think about it in this particular way, maybe it's time to refactor the system so that it follows this particular mental model.
+Now this model's not overly restrictive because you have the ability through runtime bindings, to compose different implementation onto the same layer.
+And the example that we gave is VFS which allows different file systems to be implemented on top of a single hierarchy of layers that form the file system stack.
+And there's a third important prinicple which we'll revisit when we talk specifically about the compute stack.
+It's that when building a stack, it is important to avoid bypassing layers.
+If you have three layers in your stack, an A, B, and C, and A depends on B and B depends on C, your implementation, you should have no explicit or implicit dependencies between the A and C.
+And whenever you actually have one of those subtle dependencies, this is often the cause for complexity and problems.
+Now you notice that I use the "C" word again, complexity.
+We're always going to go back to complexity in this class.
+Now, unfortunately the operational complexity is one of the key undesirable emergent properties of a layered design.
+The more layers, unfortunately often, the more complex the management of that system.
+Now because a layer is self-contained, it is always designed so that it can be independently managed.
+Now managed can have a different meaning depending on the context.
+Now here the best way to define management is via the ISO FCAPS management model.
+And FCAPS is the acronym for
+Fault, Configuration,
+Accounting or Availability,
+Performance and Security Management.
+It represents all the tasks that need to be applied to a particular device or to a particular layer when you're actually using it as part of a system.
+Now systems management is often overlooked in research.
+Because we tend to design systems for ourselves and build prototypes.
+But when you build products, the management interface is at least as important as the functional interface of the layer.
+And when you're using products, that actually applies to us as well in research.
+The management interface is often one of the main point of complexity that we actually have to deal with as researchers as well.
+Now things get even more complicated when you have not a single layer to manage but obviously a stack of multiple layers.
+And that is because vendors typically build management interfaces for their own layer.
+That makes sense.
+But, unfortunately, by doing that vendors often push the complexity of managing an entire stack to end users.
+Consider a stack that has three layers, built by different vendors.
+They each have their own management interface, but the end user is responsible to make sense of the combination of these three layers.
+And if you go back to the FCAPS acronym -
+Fault, Configuration, Accounting,
+Performance and Security - each one of these tasks has to be composed across the layers of the stack.
+But in this example, consider the simple stack that has a file system mounted on top of a raid volume.
+First, provisioning for that raid volume must be done in a precise order.
+First the volume and then the file system.
+When that's in place, normal operations are easy to reason about because of the strict layering of the system and because of the abstractions that are exposed by the two different layers.
+The file system is built on the namespace of blocks, and these blocks are not physical disk addressees but instead virtualized adressees that materialize by the raid layer.
+So, so far, so good.
+Troubleshooting is where things become a lot more complicated.
+Consider for example the loss of a physical drive.
+The raid layer enables the continuous operation of the system but not in a totally transparent manner.
+Going back to the FCAPS model, at the very least, the fault needs to be reported and on top of that the performance might be degraded.
+Now one of the key lessons here is that the management and troubleshooting process often requires going through the stack manually and to do so in the inverse order of operation.
+When we layer a stack, we typically use the stack from top to bottom functionally during normal operation, but we typically have to troubleshoot going back in the other direction.
+This is a big deal.
+As a matter of fact, it's the number one cost center in large data center operations today.
+Well, we've covered a lot of ground in this first module.
+But let me give you a closing thought.
+I'm sure you've heard of the principle of indirection.
+Often attributed to Butler Lampson, who actually himself attributes it to David Wheeler.
+But let me read it out to you completely with the amendment.
+Any problem in computer science can be solved by adding a level of indirection.
+But this usually creates another problem.
+Now this obviously applies to layering.
+It applies more broadly in computer systems, but it applies unambiguously and completely to layering.
+But this actually has to me two fundamental implications.
+The first one is designing the right layer is extremely hard.
+It's extremely hard to get the abstraction right, to get the functionality correct.
+To create a layer that is useful and lasting and can be deployed in the area of computer systems.
+But if you can actually nail the right abstraction and identify the right layer, this could be transforming.
+And by that I mean industry-transforming.
+Now the second thought that I want to make sure you take away from this first module, is that the composition of layers into a stack is an extremely difficult task with some unfortunate emergent properties.
+In particular the management of a complex layered systems design can be extremely difficult and challenging.
+Thank you.
+Next up we'll talk about the compute stack and the information stack.

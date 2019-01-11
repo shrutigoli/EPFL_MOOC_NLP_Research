@@ -1,0 +1,183 @@
+A well thought-out user interface of a class is key to a good design of an object-oriented program.
+Indeed, a poorly-designed interface that gives the user too much access to implementation details can be just as risky as leaving data members public.
+In this episode we will compare two possible interfaces for a class.
+In the first interface, the functionalities are too low-level and reveal to the outside user the implementation details of the class.
+While in the second interface, only indispensable functionalities are provided.
+We will see, of course, that the second option is much better than the first one.
+So we want to program a class that allows us to play a game of tic-tac-toe.
+As a reminder, it is a game for two players played on a 3 by 3 grid with 3 lines and 3 columns.
+The first player places Os while the other player plays Xs.
+The two players take turns and try to get three of their pieces in a row either across, diagonally, or vertically.
+In this first version of the class "JeuMorpion", the programmer has a minimalist vision of what functionalities he offers to the user.
+When he designed the class, he looked at how to model the problem, and what characterizes a typical game of tic-tac-toe.
+He said to himself that logically you need a grid.
+So he defined a new type Grille (TN: means "Grid") as an array with a fixed size to represent the member variable
+"grille" (TN: = grid) of the class JeuMorpion.
+In the interface, he provides a method to initialize the grid, and a method giving the external user access to the grid.
+So a player who can access this grid from the outside could be free to place his pieces on the grid as he pleases to implement the game's rules strictly speaking.
+Let's examine more closely the implementation details of this first version.
+First of all, how does the type "Grille" model a tic-tac-toe grid?
+If we examine this type, we see that the programmer made a particular choice in order to have an one-dimensional array.
+This means that he probably sees the grid like this.
+So the grid is modeled by a 1D array of fixed size where the first 3 places represent the first line of the tic-tac-toe grid; the 3 following positions represent the 2nd line and the 3 last represent the last line.
+This is one possible choice even if it is not very natural a priori.
+The programmer of the class JeuMorpion wants to give the user of this class, access to this grid so that he can fill out the grid himself.
+So he makes the choice to model the grid with a pointer to a grid.
+And it is this pointer that is returned through the method "get_grille".
+Concretely, our data member "grille" is nothing other than a pointer to an array with a fixed size of 9.
+We saw that the primary functionality of the class JeuMorpion is the method get_grille that returned the value of this pointer to the external user.
+And by the bias of this pointer, it is possible for the user to access and fill the grid to implement the game's rules.
+So we see that in this design of the class JeuMorpion, the programmer entrusts the user with following the rules of the game instead of defining them inside the class JeuMorpion.
+This is a very bad decision and we will discuss it later on.
+The second method offered by the programmer of this class is the method "initialise" which simply allocates memory for a 9-item array.
+So someone who wants to use the class JeuMorpion could use it in this manner:
+To start, he declares a variable, for example "jeu" (="game"), of type JeuMorpion.
+Then he could call the method "initialise" to initialize the grid.
+At this point, we would have in the variable "jeu", an object with a member variable that is a pointer, or address of an array with 9 elements.
+To program the game's rules, it will be for example the user who will program how the game is played: with a player placing one of his pieces each turn.
+So the user will have to access with this pointer the grid and place
+Os and Xs as needed.
+To learn the value of this pointer giving him access to the grid, the user will have to use the public method "get_grille".
+So here, to access the value of this pointer, he uses "get_grille" like this.
+And we will see how to concretely use this functionality to fill the grid using the functions in this first version of "JeuMorpion".
+Let's now imagine a situation where a programmer has written the class "JeuMorpion" with the functionalities that we just examined and that now a user wants to use it to program the rules of tic-tac-toe.
+Now the user asks himself
+"How do I place a piece, for example an O, on the grid in the first box?"
+The first thing he would have to do is adopt a few conventions on how to represent the pieces.
+Knowing that the array representing the grid is an array of integers, he could choose for instance that "1" represents an O, that "2" represents an X, and that "0" represents an empty box.
+This puts into question the initialization of the grid.
+If we examine the code, the programmer of the class simply allocated memory space for the array representing the grid, but he never initializes the contents of each box, which is still undetermined.
+If the user of JeuMorpion decides to start with an empty grid, he will have to go through the grid and fill it with 0s that represent that the grid's boxes are all empty.
+Here, the initialization of the grid should have been undertaken by the programmer, and not the user.
+To place an O in the first box of the grid, the user doesn't have any choice but to go look at how the class JeuMorpion is implemented.
+He has to know that his variable
+"jeu" henceforth contains an object with a member variable that points to a 9-element one-dimensional array and he has to know that placing an
+O on the grid is represented by putting a
+"1" in the corresponding position. 
+He will have to get the value of this pointer with "jeu.get_grille".
+And so he can access the value referenced by the pointer: the grid, and more particularly the box 0 of this grid where he will put the value "1".
+If he is attentive enough, the user of "JeuMorpion" will come up with a perfectly functional version of tic-tac-toe.
+But he would have had to deal with several pitfalls and problems along the way that in principle he shouldn't have encountered.
+One of the fundamental problems with this first version of tic-tac-toe is that the user cannot implement the game properly without knowing the class's internal implementation details.
+He has to know under what form and with what conventions the representation of the grid is stored, for example in this case a 1D integer array with each 3 positions representing a line.
+He will also have to adopt some arbitrary conventions of his own such as a "0" representing an empty slot, a "1" an "O", and a "2" an "X".
+Since these conventions will probably not be used by other programmers of this class, the resulting code will be hard to understand for others.
+In conclusion, to use the class
+"JeuMorpion" properly, the user has to know the intimate details of how the data is coded in this class and also adopt several arbitrary conventions himself.
+Furthermore, the resulting code of the class "JeuMorpion" will be completely opaque.
+This line is incomprehensible to anyone who reads it.
+What does an "0" mean?
+What does a "1" mean?
+This line can only be understood by looking inside the class "JeuMorpion".
+Another thing is that the user's code is not robust in the case of changes made by the programmer of the class "JeuMorpion" to the implementation details.
+Suppose that he decides to switch from a grid represented by a 1D array to a 2D array.
+Well, the user would have to rewrite this line of code that is now useless.
+So the user of "JeuMorpion" is effected by any modification made internally to the class.
+He would have to rewrite this line like this, if a 2D array is used.
+And if he had written many lines of code respecting the implementation choices of the programmer, he would have to revise everything he had written.
+And finally, an extremely important point: with this functionality, the programmer-user can access the value of the pointer which gives him direct access to the game grid.
+This enables, as we will later see, numerous manipulations to be made to this grid that are undesirable.
+So even if the class programmer of "JeuMorpion" made the right decision to declare the data field "grille" private; which prevents direct manipulation of the grid through the data member like this.
+However, he allows the value of the pointer to be accessed freely with "get_grille" which enables the exact same manipulation to be done but only in a more indirect manner.
+This destroys any advantage of declaring "grille" private, making the declaration "private" completely useless
+ in this case.
+More generally, when in a class, a data member is a pointer to an object, like this array, offering external access to the value of this pointer is adverse to the goal of encapsulation because it allows the implementation details to be accessed.
+And this access of the grid implementation though the pointer results in many lamentable consequences.
+For example nothing prevents me to do this: access a box of the grid with an invalid index.
+The person who uses "get_grille" can make a mistake in the index, perhaps not as obvious as in this case, but nothing prevents him to do this kind of manipulation.
+At this point, the program will behave improperly which can, in some cases, result in errors like
+"segmentation faults" and the abrupt interruption of the program.
+Nor does anything prevent me to enter unaccounted values different than 1s and 2s representing Os and Xs.
+We could imagine that someone using the grid maliciously or inadvertently enters unexpected values.
+Such as 42, 11 or 3.
+This results in a situation where the game's logic and rules aren't respected.
+Imagine that the programmer of the game's rules, programmed a method
+"get_joueur_gagnant" (= "get_winner()") whose job it is to go through the grid and determine if any Xs or Os are in a row.
+If the method is expecting to find values like
+0,1 and 2, and finds 42 instead, it  will behave incorrectly.
+Lastly, imagine that the grid's user want to cheat, for example replace an O with an X that is already on the grid.
+Nothing stops him.
+So here we could, after putting a 1 here, replace it with a 2 using this kind of command.
+There is no control to make sure not to erase an existing piece on the grid.
+All these problems proceed from the fact that the functionalities offered publicly are too low of level, relating too much to the implementation details which then need to be known.
+They offer  too much access to the data which can be used without restriction.
+This is obviously a bad design.
+To program a class JeuMorpion that is correctly encapsulated, it is crucial that the implementation choices are not accessible or visible through the user interface that the external programmer is given.
+Furthermore, the internal implementation decisions for example, how to represent the grid and how to represent the pieces on the grid; is the concern of the programmer of "JeuMorpion", and not its user.
+Now we will study a superior version of this class.
+In this 2nd version of the class JeuMorpion, the programmer-designer has duly chosen to model all the elements need to play a virtual game of tic-tac-toe.
+Namely, not only the grid, but also the pieces that will be played.
+And to this end, he chose an enumerated type to manipulate the pieces with understandable names.
+To model the grid itself, the programmer made more logical choices than in the last version.
+He uses an array with 3 lines and 3 columns, which is closer to a real tic-tac-toe grid.
+In the class JeuMorpion, he doesn't need to access the grid with a pointer.
+So rationally, the data member is defined of type "Grille" like this.
+And the initialization of the grid, which was badly and partially done in the last version, is thoroughly carried out here.
+The class programmer initializes each element of the grid.
+And to do this, he goes through each line of the grid and fills each slot of this line by explicitly putting
+"VIDE" (TN: = "empty").
+The idea is now to offer the user several well-chosen methods that allow him to manipulate the grid without having to know how it is implemented.
+We could imagine that a method "placer_rond" (TN: = "place O") whose role it is to place an O on the game grid at the intersection of a line and column given by the user.
+Likewise, "placer_croix" places an X on the line and column that are given.
+These methods return a boolean that indicates if the O or X was successfully placed in the desired location.
+We can of course, imagine other methods for example, a method
+"get_joueur_gagnant" (= "get_winner()") that evaluates the grid to see if 3 Os or Xs are aligned.
+Placing a token on the grid is done with the same procedure whether it is an O or an X.
+It is therefore logical to modularize the process and write a method "placer_coup" that places the different pieces on the game grid.
+The two methods "placer_rond" and "placer_croix" are sufficient for the user to place the tokens on the grid.
+Consequently, the user doesn't need to access "placer_coup" which is an auxiliary method that helps "placer_croix" and "placer_rond" in their work but is not part of the class user interface.
+Again, these two methods
+"placer_rond" and "placer_croix" suffice completely for the user of "JeuMorpion" to place virtual tokens on the grid.
+On the other hand, "placer_coup" does not need to be accessed and can be consider as an utilitarian method aiding the aforesaid methods to their work and does not belong to the user interface.
+Therefore, we will declare this method
+"placer_coup" as private.
+So this method places each move either an O or an X on a given line and a given column.
+Because this information for the line and column are given by the user through the method "placer_rond" and "placer_croix", the line and column have to be verified to ensure that the requested move corresponds to a valid line and column.
+So the first thing placer_coup does is to carry out this verification.
+If the move is not valid, the error is signaled with "return false", which means that the piece wasn't placed.
+The method placer_coup has to also verify that the token isn't placed on a box that is already occupied.
+This verification is done by explicitly testing the slot to make sure that it is empty.
+If this is not the case, a error is indicated by returning "false".
+If this is the case, the token will be placed, and "true" is returned to signal that placer_coup was successfully called.
+You will notice that here it is not necessary to verify which symbol is being placed: an O or an X, because placer_coup is private and is only invoked by placer_rond and placer_croix that will pass the right values to be placed.
+Let's see how all these modifications in this new version of JeuMorpion effect the user.
+So the user of this class will probably start by declaring a variable of type JeuMorpion.
+Next, he will use the public method "initialise" to initialize the grid's contents.
+Then he will start to place the different tokens, on the game grid.
+If he wants to place an O on line 1, column 1 of the grid, he would have to use an expression like this which is much more clear and explicit compared to before.
+He simply indicates that he is placing an O on line 1, column 1.
+Especially because this formula does not neccessitate prior knowledge of how the class is implemented.
+The user also benefits from the validation of the move by the methods placer_rond and placer_croix.
+And he will be informed with a boolean returned by these methods whether or not the move was made.
+Placing an X on the grid involves the same procedure.
+The new version of the class JeuMorpion boosts a much more robust and clear usage.
+It frees the user from having to chose certain conventions for using the interface methods.
+For instance, the user has to be informed of the convention that the enumeration of the lines and columns start with 0 and not 1.
+The documentation of these conventions has to be given in order to use the class.
+The 2nd version of the class "JeuMorpion" offers several advantages compared to the 1st.
+The first advantage is the validation of the user input.
+It is henceforth impossible for the user to place a value in the array, other than one that is expected.
+In fact, he doesn't even know how the values are coded internally.
+He doesn't even know that an enumerated type is used to represent each of the values.
+He has absolutely no idea how things are implemented.
+Another aspect is that the user can no longer fill a box that is already filled.
+Which was not the case before.
+Here the methods of the interface are in charge of verifying the move and will prohibit this from happening.
+Another important advantage: an implementation like this allows what is called
+"the separation of concerns".
+Each programmer is responsible for his part and does not have to be preoccupied with problems concerning the implementation of another part.
+For example, the person who uses the class "JeuMorpion" does not need to know how the game grid is stored, nor that it uses integers, nor which values represent what.
+The programmer of the class
+JeuMorpion takes care of these details.
+And the user only has to take care of the game's logic.
+Another important point: the readability of this new code.
+The code written by the user of this class is even comprehensible anyone.
+So here, understanding the expression
+"jeu.placer_rond(...)" is not a problem.
+No need for much explanation to know how it works.
+Again this was not the case in the previous implementation where you had to write a cryptic expression for a similar command.
+The last advantage is that with the validation of moves, the user is now informed of abnormalities in the input with an understandable message.
+So if we place a token on an invalid slot on the grid, placer_coup will process the error and inform the user of the anomaly and that the piece was not placed.
+In the first version, the program ended with an unintelligible error "segmentation fault". 
+We've come to the end of this first case study on the game of tic-tac-toe.
+Which demonstrated the necessity to encapsulate and hide correctly the implementation details, to offer only the functionalities that are essential to the outside user and that do not give him to much control to alter and modify the implementation details.

@@ -1,0 +1,91 @@
+Welcome back! Nature, In Code.
+We are in Chapter 7, lecture 4.
+We have everything set up for our simulation.
+The exposure function is there, but now we need to implement it.
+We need to implement the whole infection process.
+So, this is what we are gonna do, in this lecture.
+Alright, just as a reminder, how we do it is again, we are gonna borrow heavily from Chapter five.
+Where we talked about this in great detail.
+But just as a reminder. We have a focal individual here at location I. i, i and then correspondingly we now set, ok, these are the contacts here.
+Eight cells in the vicinity and we now know that the indices correspondingly here are i - 1 and ii - 1 for up here, so here we have i - 1 the ones at the top, and here we have i + 1 for the ones at the bottom and we just keep the i constant here and correspondingly, if we go to the left, we simply have to subtract one from i, and we have to add one to ii, if we want to go to the left. 
+And here, in this particular case
+Where we are simply moving up and down but not to left, and to the right we will of course, remain we will retain the ii value and so, this is exactly how we implemented this back in Chapter five.
+If this doesn't ring a bell, please go back to Chapter five lecture four, where we talk about all of this in great detail.
+So, let's go ahead and implement this.
+Here we are, back in our code. We have to run time step, set up here. and we are creating this temp grid and we call this function exposed_neighbours on the individuals, on the grid who are in the infected state and then at the end, when everything is set and done.
+We are gonna copy back, the valuation template which has now been updated into the grid.
+So, now what we need to do is, we need to implement this exposed_neighbours function.
+So, let's go ahead and do this.
+I am gonna define here the function expose_neighbours expose neighbours and I am gonna keep those value here i & ii
+I am not gonna change the name.
+So, we have these two parameters here in this function.
+This is, of course, the location of the individual that is infected that is supposed to expose the neighbours.
+So, we just learned about the coordinate system which neighbors will be exposed.
+Now here, this is not a random thing, we actually have to systematically go through all the neighbors. So, what I am gonna do is, I am gonna set up the corresponding two-dimensional
+loop here. I am gonna say, for var n_i and I am now gonna use n_i, OK
+Because, first of all
+I already used i here so, we shouldn't mess with that.
+But secondly, this just now stands, essentially for a neighbour
+Ok, neighbour i
+So, n_i should start at the minimum value which as we know is i - 1. this is the initialization here, of the loop then the condition will be that, this n_i be smaller or equal to some maximum value and we know that this maximum value is 1 + i or i + 1.
+Of course, it's the same, and then finally in the same logic as before, we have to of course, make sure that we keep increasing this n_i by one.
+Ok, so this is now a slightly modified loop from what we know, but it is essentially exact same logic.
+So, var n_i = i - 1 so, gonna have little space here, to make this look little nicer and so, this is the initialization, the minimum value and then, we keep increasing this value by one until, we reach the maximum value.
+Ok, basically now I am going to do the exact same thing again for the for the i im values.
+So, what I am gonna say here is for var n_ii and this, the minimum value here of course, equals ii - 1 then n_ii smaller than or equal to the maximum value which is ii + 1 and finally of course, the increment n_ii equals n_ii + 1.
+Alright, so now, we are basically going through all  the neighbouring individuals, and the coordinates are now here for the neighbors n_i and n_ii.
+So the first thing I need to do is,
+I need to say, look if I now actually add i equals n_i and ii equals n_ii or what does that mean? That means
+I am not actually in a neighbour our cell, I'm in my own cell, right.
+Because what I am doing here is
+I am simply going horizontally and vertically through this grid that is spanned by these maximum values and minimum values. But of course, it contains my own cell i, ii so, I need to make sure that
+I disregard the one cell that is actually mine.
+So, I am simply gonna say
+Ok, if n_i equals i this is of course, the double equals and also, if n_ii equals ii.
+So, if these two conditions are true. Oops, ii not 11 then, I am in fact in my own cell.
+So don't do anything, just go on and act as if nothing happened, and in fact the keyword in java script to do this in a loop is, simply say continue.
+Ok, this is a keyword, you can see this here in my text editor, in my textwrangler here actually highlights this as a keyword
+So, this is a keyword to continue. when you are in a loop and the loop hits the continue statement it is simply  gonna ignore, whatever happens further down here it's gonna go into the next iteration and this sometimes can be quite handy, and here is a case where this is handy. Ok, so now, here on this line now
+I am going to now, try an infection because now, indeed we are at the situation, where we have the infected indiviual i, ii.
+We are now certain, we are on a neighbouring cell so, I am going to try to infect this neighbour
+I am gonna call a function for that, which I have to define a try_infection.
+And again just to be clear the loop, the code will never get to this line if this is true, that's what continue does it immediately aborts the current iteration and continues at the next iteration. So, this line here, will only ever be executed if this condition is not true.
+Ok, so try_infection, well I would like to now try and infect the neighbour. So, basically
+I need to give the coordinates here n_i and n_ii there is one more thing here that I am sure you have been kind of nervous about, all this time, coming from Chapter five, and that has to do with these boundary issues.
+Right? means some of these values may actually now be not good, quote unquote values to be used as array indices.
+Why? Well, because for example, i may actually be zero and so, your n_i here would be a negative value and of course, you know, you can not use a negative value in Java Script as an array index, nor can you use an value that's greater or equal to the array length and we again talked about this in detail, in Chapter five.
+So, what we are gonna do is, we're gonna use this exact same solution that we used in Chapter five.
+So, you should go and copy this function get_bounded index, and I have already done this here and have just pasted in here now this function, you have in the spatial simulation html file it is a function, that we developed in Chapter five.
+It gets an index essentially and then it checks, whether that index is actually out of bounds or not given the grid length, and if it is, it will return the correct index if it's not it will simply return the same index.
+So, this is a really handy function, go over to Chapter five and copy it from your spatial simulation and paste it in here. So, now instead of passing in n_i & n_ii.
+We should actually pass in the values that have first gone through this get_bounded_index function
+So, I am gonna say get_bounded_index n_i and get_bounded_index n_ii.
+Write it in the original n_i & n+ii values
+Ok.
+Alright, and so now we can be certain, that the values that we pass here to this try_infection function as arguments are indeed correct indices and so, with that in place, we can now finally implement this try_infection methods.
+So, function try_infection and then, the two values, and again here I can just use ii, i it doesn't matter, these are now just two corrected values.
+So, this is now a neighboring individual that is exposed to an infected individual.
+So when can the infection happen? and It can only happen under two circumstances.
+First of all, this individual has to be susceptible
+Ok, this is the first condition, we can simply say ok, if grid i, ii equals, and this is the double equals S
+Ok, if this individual, that is exposed here, is susceptible then it can potentially happen. But there is of course, a second condition and we know this is not deterministic there is a probability now that this happens and this probability is of course exactly beta.
+And so, we can simply say if math_random is smaller than beta.
+So, now with the probability beta this will now happen
+So, here now we're gonna set the individual to i and be very careful here.
+As we said many times
+In this Chapter, we are not going to update the individual on the grid because that would lead to complicated errors as some errors though, we are going to update the temp_grid
+Ok, temp_grid i, ii we will set this to infected and then, you know this will happen a lot of times potentially and then at the end. Of course because we implemented this here correctly in the run time step this status here in the temp_grid will of course, be then copied over to grid.
+But here be careful at, that you really update the temp_grid individuals and not the grid individuals good so, with that in place. I think we can now actually save this. and take a look at an epidemic in the browser.
+So, let's go ahead and do this.
+Let's switch over to the browser.
+So, here is our original situation but of course now,
+I am gonna reload this it start from another location but let me go ahead and do this reload and so now, here you can see, it started here and it's now spreading expremely rapidly and it's of course, given the boundary conditions
+it's coming in from the other sides and very quickly, the whole thing will be infected
+Boom, here we are everyone is now infected let me reload this, just to see what this looks like again. it's starting from here, locally spreading out now it is going over the boundaries, of course coming in here to the right and to the top, and then eventually here to the top right and now, everyone is infected
+Ok, this seems to be working.
+Great job! we have an infection spreading, and this is an epidemic here now, something is though, not quite right yet, fully why? well basically, the end situation here is that everyone is infected and will remain infected
+So, this is not totally what we wanted, right? we will have to implement now, a recovery step as well. if we don't do this, then we get exactly this outcome which is that, every single individual will be infected and this will always happen.
+Well, why? because there is no recovery right. even the individuals that are at the very end of this spread will eventually get infected.
+It's just guaranteed that it will happen eventually this exposure will occur and the probabilities will be lower than beta and the infection will occur.
+So, that's why every single individual will always get infected in this particular version of our code.
+So, what we need to do now is, we need to finish the simulation by implementing the recovery step and this we'll do in the next lecture.

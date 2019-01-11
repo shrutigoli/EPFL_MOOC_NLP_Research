@@ -1,0 +1,754 @@
+1
+00:00:00,540 --> 00:00:02,884
+In the second example of the Discrete
+Event
+
+2
+00:00:02,884 --> 00:00:06,330
+Simulation case study, we will look at the
+APIs.
+
+3
+00:00:06,330 --> 00:00:10,780
+The programming interfaces of the core
+libraries and how they are used.
+
+4
+00:00:12,060 --> 00:00:18,045
+So we've seen in the last unit that the
+class wire and the functions inverter,
+
+5
+00:00:18,045 --> 00:00:24,500
+AND gate, and OR gate, represent a small
+description language for digital circuits.
+
+6
+00:00:24,500 --> 00:00:25,620
+What we need to do now
+
+7
+00:00:25,620 --> 00:00:28,560
+is we need to give an implementation of
+the class
+
+8
+00:00:28,560 --> 00:00:32,700
+wire and these functions which allow us to
+simulate circuits.
+
+9
+00:00:32,700 --> 00:00:37,170
+And those implementations in turn are
+based on a simple API
+
+10
+00:00:37,170 --> 00:00:40,870
+for discrete event simulation which we are
+going to study first.
+
+11
+00:00:43,550 --> 00:00:49,282
+So what is discrete emu, event simulation?
+A discrete event simulator performs
+
+12
+00:00:49,282 --> 00:00:54,500
+actions which are specified by the user to
+take place at a given moment.
+
+13
+00:00:54,500 --> 00:00:56,704
+An action is simply a function that
+
+14
+00:00:56,704 --> 00:01:00,381
+doesn't take any parameters, and which
+returns unit.
+
+15
+00:01:00,381 --> 00:01:04,850
+So everything in action do, it does by its
+side side effect.
+
+16
+00:01:04,850 --> 00:01:08,950
+And the time when an action is takes place
+is simulated.
+
+17
+00:01:08,950 --> 00:01:12,320
+It has nothing to do with the actual wall
+clock time.
+
+18
+00:01:12,320 --> 00:01:13,730
+It is the simulated time.
+
+19
+00:01:15,660 --> 00:01:18,585
+So, concretely, we are going to write
+simulations
+
+20
+00:01:18,585 --> 00:01:23,560
+inside objects that inherit from a trait
+called simulation.
+
+21
+00:01:23,560 --> 00:01:26,260
+And that trait has the following
+signature.
+
+22
+00:01:26,260 --> 00:01:30,004
+There's a function currentTime, which
+returns the current
+
+23
+00:01:30,004 --> 00:01:32,610
+simulated time in the form of an integer.
+
+24
+00:01:33,830 --> 00:01:38,954
+Then there's a function afterDelay, where
+the user gives can
+
+25
+00:01:38,954 --> 00:01:43,800
+install a block of statements to be
+performed as an action.
+
+26
+00:01:43,800 --> 00:01:48,540
+At a time that is delay time units after
+the current time.
+
+27
+00:01:49,700 --> 00:01:53,370
+And finally, there's the function run,
+which lets the user start
+
+28
+00:01:53,370 --> 00:01:59,280
+the simulation and execute all installed
+actions until no further actions remain.
+
+29
+00:02:00,850 --> 00:02:05,430
+So let's take a look at the structure of a
+typical simulation application.
+
+30
+00:02:05,430 --> 00:02:10,420
+It would be composed of several classes
+that are shown in this Class Diagram.
+
+31
+00:02:10,420 --> 00:02:13,740
+At the top of the diagram you have the
+trait simulation,
+
+32
+00:02:16,350 --> 00:02:20,030
+which we have just seen in its API.
+
+33
+00:02:22,320 --> 00:02:25,100
+that trait would give, give you the
+necessary
+
+34
+00:02:25,100 --> 00:02:28,030
+tools to do any kind of discrete event
+simulation.
+
+35
+00:02:29,290 --> 00:02:32,580
+that trait would be inherited by something
+that is a little bit more
+
+36
+00:02:32,580 --> 00:02:37,970
+special, namely that gives you the tools
+to the, do basic circuit simulation.
+
+37
+00:02:37,970 --> 00:02:46,140
+In particular, it would contain the class
+wire, and the gates for
+
+38
+00:02:46,140 --> 00:02:51,030
+AND, OR, and inverter.
+They would be defined on this level here.
+
+39
+00:02:52,290 --> 00:02:56,090
+one level further down you would have a
+trait
+
+40
+00:02:56,090 --> 00:02:59,880
+that gives you more complex circuits, call
+it circuits.
+
+41
+00:03:02,165 --> 00:03:06,190
+And here, you would find things like the
+half adder and b adder.
+
+42
+00:03:09,320 --> 00:03:11,510
+And, then finally you would have the
+
+43
+00:03:11,510 --> 00:03:15,000
+concrete objects that the user wants to
+simulate.
+
+44
+00:03:15,000 --> 00:03:21,460
+Call this maybe my simulation, so that
+would typically be an object that
+
+45
+00:03:21,460 --> 00:03:26,320
+can obtain all of the functionality and
+discrete event simulation.
+
+46
+00:03:26,320 --> 00:03:31,130
+The gates and the circuits, by inheriting
+from these traits.
+
+47
+00:03:31,130 --> 00:03:34,282
+So that's a structure of a typical
+application.
+
+48
+00:03:34,282 --> 00:03:37,760
+We have already seen simulation.
+
+49
+00:03:37,760 --> 00:03:41,580
+Let's look at the interface of this gates
+layer next.
+
+50
+00:03:43,250 --> 00:03:47,480
+So indicates layer.
+You have first have the class of wires.
+
+51
+00:03:47,480 --> 00:03:52,390
+To be simulated a wire should support
+three basic operations.
+
+52
+00:03:52,390 --> 00:03:55,020
+The first operation is get signal.
+
+53
+00:03:55,020 --> 00:03:59,320
+That should return the current value of
+the signal that's transported
+
+54
+00:03:59,320 --> 00:04:00,530
+by the w, wire.
+
+55
+00:04:00,530 --> 00:04:04,210
+Current means, at the current simulated
+time.
+
+56
+00:04:04,210 --> 00:04:06,330
+Then there should be a way to change the
+signal
+
+57
+00:04:06,330 --> 00:04:10,090
+of a wire, that's done by the method set
+signal.
+
+58
+00:04:10,090 --> 00:04:14,740
+And that modifies the va, value of the
+signal that's transported by the wire.
+
+59
+00:04:14,740 --> 00:04:21,540
+And finally there's a third method called
+add action, which let's us add an action.
+
+60
+00:04:21,540 --> 00:04:24,700
+To be performed every time the signal
+
+61
+00:04:24,700 --> 00:04:26,260
+of a wire changes.
+
+62
+00:04:26,260 --> 00:04:28,010
+Here the idea would be when the signal
+
+63
+00:04:28,010 --> 00:04:31,050
+of a wire changes, then certain things
+should happen.
+
+64
+00:04:31,050 --> 00:04:33,690
+The things that should happen can be
+installed
+
+65
+00:04:33,690 --> 00:04:36,620
+so to speak with a call to add action.
+
+66
+00:04:38,620 --> 00:04:42,170
+So, here's an implementation of these
+ideas for wires.
+
+67
+00:04:42,170 --> 00:04:46,240
+So, a wire then would have a private
+variable,
+
+68
+00:04:46,240 --> 00:04:49,770
+sigVal which is the value of the current
+signal from
+
+69
+00:04:49,770 --> 00:04:55,100
+the wire, and it would have also private
+variable actions which are the actions
+
+70
+00:04:55,100 --> 00:05:01,240
+to be performed when that signal changes.
+GetSignal simply returns sigVal.
+
+71
+00:05:01,240 --> 00:05:05,460
+The set signal method would take a new
+signal value.
+
+72
+00:05:05,460 --> 00:05:10,500
+If it's different from the old one, the
+old, the current signal value is updated.
+
+73
+00:05:10,500 --> 00:05:13,200
+And all actions are executed.
+
+74
+00:05:13,200 --> 00:05:15,130
+So that's done by calling the foreach
+
+75
+00:05:15,130 --> 00:05:19,562
+method on each action.
+And what, what is being done
+
+76
+00:05:19,562 --> 00:05:24,740
+is that the action is simply run by
+applying it to the unit parameter.
+
+77
+00:05:24,740 --> 00:05:31,040
+If we use a for loop for the same
+signification we would write it like this.
+
+78
+00:05:34,490 --> 00:05:38,330
+So that would expand into exactly this
+code over here.
+
+79
+00:05:38,330 --> 00:05:41,320
+For a taken from action run a.
+
+80
+00:05:42,910 --> 00:05:47,520
+The last method is called addAction, and
+what it simply does is it prefixes
+
+81
+00:05:47,520 --> 00:05:52,500
+the current action to all of actions that
+are all ready stored in the wire.
+
+82
+00:05:53,640 --> 00:05:56,410
+And what it also does it turns out to
+
+83
+00:05:56,410 --> 00:05:59,530
+be technically necessary to get the
+simulation off the
+
+84
+00:05:59,530 --> 00:06:00,600
+ground is.
+
+85
+00:06:00,600 --> 00:06:05,840
+Once we add an action we immediately
+perform it a first time because otherwise
+
+86
+00:06:05,840 --> 00:06:07,950
+it turns out that the simulation would
+
+87
+00:06:07,950 --> 00:06:11,120
+essentially rest in an inert state
+forever.
+
+88
+00:06:11,120 --> 00:06:15,430
+So we have to perform the action the first
+time to get things off the ground.
+
+89
+00:06:18,330 --> 00:06:20,440
+So to summarize, the state of a wire
+
+90
+00:06:20,440 --> 00:06:23,810
+is modeled by two variables, sigVal which
+represents the
+
+91
+00:06:23,810 --> 00:06:27,080
+current value of the signal and actions
+that represents
+
+92
+00:06:27,080 --> 00:06:30,510
+the actions that are currently attached to
+the wire.
+
+93
+00:06:32,590 --> 00:06:35,480
+So, once we have wires we can look at
+gates.
+
+94
+00:06:35,480 --> 00:06:37,520
+Let's look at the inverter first.
+
+95
+00:06:37,520 --> 00:06:44,080
+So, the inverter is implemented by
+installing an action on its input wire.
+
+96
+00:06:44,080 --> 00:06:49,870
+That way, that action would be performed
+each time the input write changes.
+
+97
+00:06:49,870 --> 00:06:51,378
+And what would the action do?
+
+98
+00:06:51,378 --> 00:06:54,378
+Well, it would produce the inverse of the
+input
+
+99
+00:06:54,378 --> 00:06:58,340
+signal, but not immediately but only after
+a certain delay.
+
+100
+00:06:58,340 --> 00:07:02,520
+Call that InverterDelay, units of
+simulated time.
+
+101
+00:07:02,520 --> 00:07:09,013
+So that's the idea, let's see how that
+would be put in code.
+
+102
+00:07:09,013 --> 00:07:10,670
+Here's the inverter method.
+
+103
+00:07:10,670 --> 00:07:16,130
+It takes an input wire and an output wire.
+And here's the inversion action.
+
+104
+00:07:16,130 --> 00:07:20,050
+So, what to invert, the input wire, what
+we would
+
+105
+00:07:20,050 --> 00:07:23,900
+do is we would take the signal of the
+input wire.
+
+106
+00:07:23,900 --> 00:07:27,930
+And then we would set the output to the
+negation of the
+
+107
+00:07:27,930 --> 00:07:32,370
+input signal, but we would do that only
+after a certain delay.
+
+108
+00:07:32,370 --> 00:07:35,150
+So we'll use this method from the
+simulation API.
+
+109
+00:07:35,150 --> 00:07:39,210
+After delay it says, perform this block
+here,
+
+110
+00:07:39,210 --> 00:07:42,710
+invert the delay time units after the
+current time.
+
+111
+00:07:42,710 --> 00:07:45,390
+So that's the invert action, and this
+action
+
+112
+00:07:45,390 --> 00:07:49,070
+should be performed every time the input
+wire
+
+113
+00:07:49,070 --> 00:07:50,360
+changes it's signal.
+
+114
+00:07:50,360 --> 00:07:55,570
+So we achieve that by adding this invert
+action to the input wire, so that way the
+
+115
+00:07:55,570 --> 00:08:00,700
+wire itself would perform this action
+every time it's signal changes.
+
+116
+00:08:03,260 --> 00:08:06,510
+The AND gate is implemented in a similar
+way.
+
+117
+00:08:06,510 --> 00:08:09,040
+The action of the AND gate then would
+produce the
+
+118
+00:08:09,040 --> 00:08:12,670
+AND, the conjunction of the input signals
+of the output wire.
+
+119
+00:08:12,670 --> 00:08:14,610
+And it would happen after a certain
+
+120
+00:08:14,610 --> 00:08:18,470
+delay, call it AndGateDelay, units of
+simulated time.
+
+121
+00:08:19,920 --> 00:08:22,940
+So that gives us the following
+implementation here,
+
+122
+00:08:22,940 --> 00:08:26,130
+AND gate takes two inputs and one output.
+
+123
+00:08:26,130 --> 00:08:28,380
+The AND action we take
+
+124
+00:08:28,380 --> 00:08:33,210
+the values of the two input signal, after
+AND gate delay.
+
+125
+00:08:33,210 --> 00:08:40,070
+We set the output to the logical AND of
+the two values of the input signals.
+
+126
+00:08:40,070 --> 00:08:42,610
+And when should this action be performed?
+
+127
+00:08:42,610 --> 00:08:45,280
+Well, it should be performed anytime the
+signal
+
+128
+00:08:45,280 --> 00:08:47,780
+of one of the two input wires changes.
+
+129
+00:08:47,780 --> 00:08:52,360
+So we add that AND action to both input
+one and input two.
+
+130
+00:08:52,360 --> 00:08:53,550
+That way we're sure
+
+131
+00:08:53,550 --> 00:08:55,710
+that whenever one of the two input
+
+132
+00:08:55,710 --> 00:08:59,280
+changes, the output signal would be
+recomputed.
+
+133
+00:09:01,320 --> 00:09:04,720
+As to the OR gate, that's implemented
+quite analogously to
+
+134
+00:09:04,720 --> 00:09:07,550
+the AND gate, so here you still see the
+AND gate.
+
+135
+00:09:07,550 --> 00:09:12,734
+To go to the OR gate we simply change the
+action in
+
+136
+00:09:12,734 --> 00:09:18,734
+orAction from the logical conjunction to
+logical disjunction.
+
+137
+00:09:18,734 --> 00:09:26,554
+The order of the two input signals, and
+otherwise everything is exactly as in the
+
+138
+00:09:26,554 --> 00:09:27,616
+AND Gate.
+
+139
+00:09:27,616 --> 00:09:32,740
+So to test the understanding, let's have a
+look at the way the signals are computed.
+
+140
+00:09:32,740 --> 00:09:36,500
+So we take the getSignal for, for input
+one and input two
+
+141
+00:09:36,500 --> 00:09:41,750
+before we run the code in afterDelay in a
+separate val definition.
+
+142
+00:09:41,750 --> 00:09:45,930
+So the question to you is what happens if
+we compute the two signals in1Sig and
+
+143
+00:09:45,930 --> 00:09:51,940
+in2Sig inline, that means inside the
+afterDelay call,
+
+144
+00:09:51,940 --> 00:09:55,530
+instead of before writing them in value
+definitions.
+
+145
+00:09:56,710 --> 00:10:00,875
+Would the new definition of OR gate, call
+it orGate2, have the same
+
+146
+00:10:00,875 --> 00:10:06,330
+behavior as the previous one, or would
+orGate2 not model OR gates faithfully.
+
+147
+00:10:08,730 --> 00:10:10,710
+So, let's analyze what would happen.
+
+148
+00:10:10,710 --> 00:10:17,440
+In the new program, once an input signal
+changes, we would wait OR gate delay time
+
+149
+00:10:17,440 --> 00:10:23,240
+units, and then set the output to the,
+this junction of the sampled two signals.
+
+150
+00:10:23,240 --> 00:10:27,190
+But, the sampling would take place at the
+time after OR gate delay,
+
+151
+00:10:27,190 --> 00:10:32,720
+and the output change in the sampling
+would appear at exactly the same time.
+
+152
+00:10:32,720 --> 00:10:33,940
+In the original orGate
+
+153
+00:10:33,940 --> 00:10:37,410
+of course we would sample first, then wait
+
+154
+00:10:37,410 --> 00:10:41,110
+orGateDelay time units and then set the
+output afterwards.
+
+155
+00:10:41,110 --> 00:10:46,539
+So you have seen that it does make a big
+difference whether the signals are
+
+156
+00:10:46,539 --> 00:10:49,921
+computed outside after delay, or inside
+and
+
+157
+00:10:49,921 --> 00:10:54,607
+consequently orGate2 does not model OR
+Gates faithfully.
+
+158
+00:10:54,607 --> 00:10:57,840
+[BLANK_AUDIO]
+

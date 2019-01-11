@@ -1,0 +1,72 @@
+Welcome to POCS again.
+This week we'll talk about redundancy and fault tolerance.
+Now redundancy is one of the most important principles of computer systems.
+It actually has roots in digital systems design.
+And fault tolerance is one of the most important attributes that we could associate with any of the systems we've built through careful design.
+So this is a broad topic and as usual break it into different components.
+First we'll talk about redundancy itself and the techniques by which we can achieve it.
+Then we'll talk about the fundamentals of the fault tolerance design process.
+Then in the third module we'll shift and start talking briefly about the metrics and a little bit word of caution about some of the most commonly used metrics in the field.
+In the fourth module we'll talk about high-availability.
+And high-availability is an approach in which we apply a sweeping simplification and the separation of state in order to create simple systems that can achieve a high degree of availability.
+In the fifth module, George Candea will actually talk to us about consensus in the presence of fully distributed systems including systems that have various types of faults including Byzantine Fault and talk about some of the complications associated with achieving consensus in these fully distributed systems.
+And then I'll come back in the final module and we'll put it all together by comparing two case studies.
+Two very very different ways of achieving the same degree of fault-tolerance in modern systems.
+So let's talk about redundancy.
+And first redundancy is an overloaded term and if you look it up and thank you Wikipedia you'll see different definitions for it.
+First, it actually has a precise definition in the context of information theory.
+There redundancy equates the wasted space used to carry certain data.
+Now outside of our scientific field it has a meaning as well.
+For example, in certain countries that speak a dialect of American, a redundancy is a synonym for a layoff or termination.
+It also has a precise meaning in product design, where a feature is considered redundant if the same task could be achieved through multiple different ways.
+And the people who are responsible for product design often refer to this situation as a belt and suspenders approach to the system.
+That is because you have two possible ways of achieving the same function.
+Now this brings up, of course, to the case of redundancy in fashion with belts and suspenders as a fashion statement that you may not want to try this at home.
+But redundancy in computer systems is very different.
+It is aptly fundamental, it has a positive connotation, it is the foundation for digital design and computer system.
+Now in digital design, redundancy is defined as the ability to automatically detect and correct deviations for normal behavior.
+And you can do that both in space or in time.
+And here's an example of space-space redundancy, it's the classic three way modular redundancy that is fundamental to digital design.
+You replicate the circuit three times and you have a discrete fourth circuit which is the majority gate that is the responsible to determine the correct output.
+Now redundancy also applies to computer systems as we'll see the different ways in which this can be done.
+You can achieve this through coding, through data replication, through N-way modular redundancy this time applied to other aspects not just digital designs but computer systems.
+And by replication of the entire software stack.
+But let's first talk about redundancy in the context of coding.
+Coding is a way to achieve redundancy in an incremental and efficient way.
+This is a principle technique used to detect, contain, and mask faults that occur in memory subsystems and in communication subsystems.
+Now coding is cheap since it only requires an incremental amount of redundancy.
+Just add a few bits and you increase the resiliency of the overall systems.
+So for memories, error correcting codes, or ECC, have been a saving grace in improving the availability of computer systems.
+And this is an instance of space redundancy.
+Now because they repair single bit errors which eliminate many forms of failures,
+ECCs improve availability of the systems.
+In addition, they can detect double bit errors which allow the computer systems to take appropriate action.
+And in many cases the action is either to stop execution or to take down a particular process.
+Now similarly for disk, various forms of RAID use coding to recover data efficiently in the presence of sector failures or drive failures.
+RAID5 for example uses a simple parity encoding using XOR which is then symmetrically distributed across sectors and that helps you deal with signal drive failures.
+RAID6 extends the concept by using much more advanced mathematics,
+Galois fields to be precise, and that provides you the ability to tolerate two independent drive failures within a RAID group without losing any data.
+Now coding is also present in all communication layers.
+And here this is an instance of time redundancy.
+At the network link layer, layer one, forward-error-correction is used to correct transmission errors as they occur.
+And at layer two, CRC are used to detect transmission errors on the link itself and that is a link local check.
+And then finally, checksums are often present at the end layer, at layer four, and that is the well known 
+TCP checksum for example.
+You can actually take the approach even further and apply the end-to-end principle of applying incremental redundancy for end-to-end checks in communication or in storage.
+For example, the data integrity field or DIF part of the SCSI standard is a way to ensure the end-to-end integrity of sectors written on disk.
+Now coding applies best to well defined structures such as cache lines, disk sectors, and network packets.
+Obviously its main virtue is that it is very efficient because it is incremental, the overheads are measured in percentages of the underlying resource.
+Now when that does not work, replication is the big hammer of redundancy.
+And that is either where we double or triple the resources required to ensure availability or durability of information.
+So RAID1 is a classic example.
+Rather than having the content on a single disk you mirror it on two disks.
+Works great, works fast.
+So if performance is more important than capacity, use the big hammer of redundancy which is simply replication and, in this case, RAID1 mirroring.
+Now replication is also commonly used for scale out data storage access systems such as Amazon S3 or Hadoop.
+And this time by replicating the data not twice but three times, now why three times and not two?
+Well there are a few good reasons that have to do with ensuring both the durability and the availability of data in the presence of disk failures, server failures and even possibly rack failures.
+And in particular considering the repair time that could grow very large given the size of disks and the bandwidth available across networks these days.
+Okay, so we've talked about redundancy and the main message is that redundancy is a good thing.
+And then we talked a little bit about two ways in which we can achieve redundancy.
+Coding, which is a form of incremental redundancy and then replication, the big hammer of redundancy when it applies to data.
+Next we'll talk about how we can apply the same concept to systems.

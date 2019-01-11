@@ -1,0 +1,56 @@
+We now have all the ingredients to calibrate an interest rate model to market data. 
+More specifically, we calibrate a two factor 
+Gaussian Heathâ€“Jarrowâ€“Morton model to market data consisting of swamp rates and at-the-money cap quotes.
+For that, we first derive pricing formulas for caps in Gaussian HJM models. 
+And for the calibration, we need the appropriate function to be minimized, and we will see that a good choice for weights of pricing errors are the the vegas, the derivatives of the Black and Bachelier prices with respect to their volatility. 
+Let us review the pricing of caps. 
+We consider a spot date t note that we set to 0 for simplicity.
+We then consider a sequence of reset and settlement dates
+T note, T1, up to Tn, and assume that they're all equidistant with difference given by delta. 
+We're also given a cap rate kappa.
+Recall that the ith caplet that resets the time Ti-1 and settles the time Ti is equivalent to 1 plus delta k kappa times put option on the Ti bond that expires at time Ti-1 
+The price of the ith caplet therefore, is given by by the Q expectation of the discounted payoff of these put options on the Ti bond.
+Now suppose the underline model is a Gaussian HJM Model, and recall the bond put option price formula in such models. 
+That gives us the prize of the ith caplet as shown here where caplet Fi is to stand normal cumulative distribution function. and the parameters d1 and d2 are given  as shown here in terms of the integrated 
+T-bond return volatility, v. 
+Now consider more specifically the following two-factor Gaussian HJM model with the volatility specification as shown here where v1, v2 beta 1 and beta 2 are real parameters to be calibrated to cap market data. 
+Elementary integration shows us that in this case, we obtain the following expression for the integrated volatility terms in the option price formula. 
+We now want to calibrate these two factor Gaussian HJM model to swap and cap data given at the spot date, t note. 
+More specifically, the given data consists of spot swap rates with swaps that pay annual fixed coupons and at-the-money cap quotes where the caps have semi-annual cash flows.
+The procedure is the following, we first estimate the discount curve from the swap data. 
+Second, we then calculate the forward swap rates with semi-annual fixed payments. 
+These correspond to at-the-money cap rates.  
+And then third, we minimize the weighted square cap prize errors for calibrating the volatility parameters, v1, v2, Beta 1, Beta 2. 
+Here is the swap data. 
+We have swaps paying fixed annual coupons with length ranging from 1 year to 30 years. 
+Swap rates are given in this column.
+The first quote is the 6th month simple spot rate.
+For the valuation of the caps in the model, we need the discount curve at the semi-annual frequency. 
+We use the exact methods based on the pseudoinverse to estimate the weighted increments of the discount curve. 
+Delta, as shown here, the estimated discount rates are given in this table. 
+We then compute from this distant curve the 6th month forward swap rates whose first reset date is T note equal to one-half and that have semi-annual fixed payments we derive these swap rates from these well known formulas. 
+The figure on the right hand side shows these forward swap rates as function of their maturity which ranges from 1 year to 30 years. 
+These forward swap rates dive us the at-the-money strikes of the corresponding caps with maturities ranging from 1 to 30 years. 
+The corresponding prizes of the caps are given as nominal prices and equivalently, in terms of their black implied volatilities and in terms of their normal implied volatilities.
+Recall that these caps have semi-annual cash flows. 
+The calibration problem now consists in finding the remaining parameters v1, v2, Beta 1, Beta 2 that we summarize by theta such that the model cap prizes, let me denote by C hat theta, n for the nth cap, are as close as possible to the market cap prices Cn shown on the previous slide. 
+We minimize the mean squared error of the implied volatilities, rather than of the nominal prices. 
+The reason is that the black and normal implied volatilities, they standardize option prizes, they're more robust overtime, and better comparable across maturities and strikes.  
+The problem is that computing implied volatilities involves numerical inversion of the Black or Bachelier formula at each minimization step and that is computationally costly.
+Fortunately there is an easy way out as shown on the following slide. 
+We make use of the vega, the derivative  of the Black or Bachelier cap price, with respect to the volatility. 
+A first-order Taylor expansion of the black price function Cn then, gives us this relation where sigma, hat, theta n denotes the model implied volatility and sigma n is the market implied volatility. 
+We can then express the squared implied volatility error as a weighted squared cap error as shown here. 
+Now the good news is that there exists a close form expression for the vega in the Black and the Bachelier model.
+Recall that the black price of the ith caplet is given as shown here where caplet Fi denotes the standard normal cumulative distribution function and the parameters d1 and d2 are given as shown here and we write Fi, short for the forward rate as shown there.
+Elementary calculus using this identity then, gives us the following expression for the derivative of the caplet price with respect to the volatility parameter sigma, the Black caplet vega. 
+By linearity, the Black cap vega is then simply the sum of the Black caplet vegas as shown here. 
+Similarly, we recall the Bachelier price formula for the ith caplet shown here where caplet Fi is again, the standard normal cumulative distribution function and small fi is the density. 
+The parameter Di stands for this, where Fi is shorthand for the forward rate.
+Elementary calculus, again, using these identities give us the following expression for the derivative of the Bachelier caplet price with respect to the volatility, the Bachelier caplet vega. 
+Linearity gives us the Bachelier cap vega as the sum of the Bachelier caplet vegas.
+Using the Bachelier vegas, the calibration problem now boils down to the weighted least squared problem shown here.
+Using standard optimization libraries such as the Matlab built in fminsearch, we find the following values for the parameters.
+We obtain similar results using Black vegas in stead of Bachelier vegas. 
+On this slide we see the fitted normal and Black implied volatility curves.
+In black, we have the market quotes and in red, the model implied volatilities. 

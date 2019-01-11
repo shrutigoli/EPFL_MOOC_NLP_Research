@@ -1,0 +1,1411 @@
+1
+00:00:03,907 --> 00:00:05,838
+During our learning,
+
+2
+00:00:06,009 --> 00:00:08,582
+we encountered three
+different concepts
+
+3
+00:00:08,640 --> 00:00:12,865
+Function or method overloading;
+
+4
+00:00:12,865 --> 00:00:16,693
+shadowing;
+
+5
+00:00:16,693 --> 00:00:18,487
+qu'on appelle en anglais shadowing
+
+6
+00:00:18,487 --> 00:00:21,591
+and overriding
+
+7
+00:00:21,591 --> 00:00:25,146
+of virtual methods.
+
+8
+00:00:25,146 --> 00:00:27,542
+The latter applies only to virtual
+methods.
+
+9
+00:00:27,542 --> 00:00:31,619
+So for virtual methods, we could
+in principle have all three:
+
+10
+00:00:31,619 --> 00:00:34,709
+overloading, shadowing
+and substitution.
+
+11
+00:00:34,709 --> 00:00:36,799
+What are these exactly?
+
+12
+00:00:36,799 --> 00:00:41,616
+To avoid confusion for some programmers,
+since C++2011,
+
+13
+00:00:41,616 --> 00:00:44,813
+we have two new keywords which I will
+talk about at the end of this episode,
+
+14
+00:00:44,813 --> 00:00:50,204
+namely <i>override</i> and <i>final</i> which
+allow the programmer to specify his intention.
+
+15
+00:00:50,204 --> 00:00:53,138
+Let's go over these three concepts
+in detail to clear up
+
+16
+00:00:53,138 --> 00:00:54,948
+what they do.
+
+17
+00:00:54,948 --> 00:00:58,850
+Before illustrating these concepts
+with an example, let's review their definitions.
+
+18
+00:00:58,850 --> 00:01:03,020
+Function or method overloading happens
+when a function or method
+
+19
+00:01:03,020 --> 00:01:06,388
+has the same name as another, but
+has different parameters,
+
+20
+00:01:06,388 --> 00:01:08,298
+and has the same scope.
+
+21
+00:01:08,298 --> 00:01:12,602
+Careful, in C++, overloading is only
+possible within the same scope.
+
+22
+00:01:12,602 --> 00:01:14,347
+We will come back to this later.
+
+23
+00:01:14,347 --> 00:01:17,844
+Shadowing, or hiding, occurs when
+entities, variables, functions
+
+24
+00:01:17,844 --> 00:01:21,837
+or in the case of object-oriented programming,
+members and methods,
+
+25
+00:01:21,837 --> 00:01:25,005
+have the same name but different
+scopes.
+
+26
+00:01:25,005 --> 00:01:27,867
+Thus, following scoping rules,
+
+27
+00:01:27,867 --> 00:01:30,532
+C++ resolves to the nearest scope,
+
+28
+00:01:30,532 --> 00:01:33,619
+that is, the closest scope hides
+
+29
+00:01:33,619 --> 00:01:36,224
+the entity with a further scope.
+
+30
+00:01:36,224 --> 00:01:43,017
+Note that a single method with the same
+name is enough to shadow all other methods
+
+31
+00:01:43,017 --> 00:01:47,120
+of further scope, independently
+of their parameters
+
+32
+00:01:47,120 --> 00:01:50,518
+since with regards to parameters,
+
+33
+00:01:50,518 --> 00:01:53,584
+we would be in the case of an overload,
+
+34
+00:01:53,584 --> 00:01:56,590
+and overloading only happens
+within one scope.
+
+35
+00:01:56,590 --> 00:02:00,570
+So if we are in another scope, we
+simply need to have the same name
+
+36
+00:02:00,570 --> 00:02:02,982
+to mask all other methods.
+We will come back to this with an example.
+
+37
+00:02:04,929 --> 00:02:08,380
+Finally, overriding is valid only
+
+38
+00:02:08,380 --> 00:02:13,711
+for virtual methods, and the idea is to
+redefine, in a subclass,
+
+39
+00:02:13,711 --> 00:02:17,616
+a virtual method inherited from
+a superclass
+
+40
+00:02:17,616 --> 00:02:19,478
+allowing what is known as
+
+41
+00:02:19,478 --> 00:02:22,113
+dynaming binding, and
+polymorphism.
+
+42
+00:02:22,113 --> 00:02:26,468
+The method of the actual instance will
+be invoked if it is called
+
+43
+00:02:26,468 --> 00:02:30,105
+via a pointer or a reference and, similarly
+to shadowing,
+
+44
+00:02:30,105 --> 00:02:32,573
+if we redefine only one virtual
+method,
+
+45
+00:02:32,573 --> 00:02:34,675
+it will override all the others,
+
+46
+00:02:34,675 --> 00:02:37,820
+even if they don't have the
+same parameters.
+
+47
+00:02:37,820 --> 00:02:42,065
+Only one will be defined, but it will
+simply hide the others.
+
+48
+00:02:42,065 --> 00:02:49,064
+The rules of shadowing also apply to
+overridden functions.
+
+49
+00:02:49,440 --> 00:02:52,860
+Let's review this in detail
+in an example:
+
+50
+00:02:52,860 --> 00:02:56,815
+Imagine that we have three classes
+A, B and C
+
+51
+00:02:56,815 --> 00:03:01,864
+such that B and C both inherit
+from A.
+
+52
+00:03:01,864 --> 00:03:06,769
+These three classes will have a method
+<i>m1</i> which
+
+53
+00:03:06,927 --> 00:03:10,819
+we will overload, override and shadow.
+
+54
+00:03:10,819 --> 00:03:13,127
+To make the example a bit more
+concrete,
+
+55
+00:03:13,127 --> 00:03:16,486
+in the main function, we have an
+instance b of class B
+
+56
+00:03:16,486 --> 00:03:18,416
+and an instance c of class C.
+
+57
+00:03:18,416 --> 00:03:22,585
+We will go over the different ways
+of calling these m1 methods.
+
+58
+00:03:23,062 --> 00:03:28,573
+In class A, we have a first m1 method which
+takes an integer.
+
+59
+00:03:28,573 --> 00:03:31,604
+Each of these methods will simply
+display
+
+60
+00:03:31,604 --> 00:03:34,762
+a message indicating which method
+was called.
+
+61
+00:03:34,762 --> 00:03:39,842
+Moreover, in A, we also have an m1 method
+which has a different list of parameters
+
+62
+00:03:39,842 --> 00:03:41,588
+than the first method.
+
+63
+00:03:41,588 --> 00:03:45,763
+Here, it takes a string instead of an integer.
+
+64
+00:03:45,763 --> 00:03:50,939
+These two m1 methods have the same scope,
+the scope of class A.
+
+65
+00:03:50,939 --> 00:03:54,869
+They have different lists of parameters,
+but the same name.
+
+66
+00:03:54,869 --> 00:03:59,042
+This is therefore a simple case
+of overloading.
+
+67
+00:03:59,042 --> 00:04:05,059
+In class B, we have an override
+of one of the two methods.
+
+68
+00:04:05,059 --> 00:04:09,684
+We override the method which takes
+a string
+
+69
+00:04:09,684 --> 00:04:11,450
+as argument.
+
+70
+00:04:11,450 --> 00:04:15,096
+This m1 method overridden here in
+the B subclass of A
+
+71
+00:04:15,096 --> 00:04:19,728
+thus hides A's m1 method in B.
+
+72
+00:04:19,728 --> 00:04:24,780
+Since it is the only method of the two
+which was overridden in B,
+
+73
+00:04:24,780 --> 00:04:28,854
+based on rules of scope and
+shadowing,
+
+74
+00:04:28,854 --> 00:04:33,458
+this method also masks the other method
+since in class B,
+
+75
+00:04:33,458 --> 00:04:37,678
+we will only have one accessible
+m1 method.
+
+76
+00:04:37,678 --> 00:04:41,304
+Class B will effectively have three m1 methods.
+
+77
+00:04:41,304 --> 00:04:47,186
+Its own m1 method and the two m1 methods
+inherited from the superclass, A.
+
+78
+00:04:47,186 --> 00:04:49,838
+But because of scope resolution rules,
+
+79
+00:04:49,838 --> 00:04:52,763
+when we are in B, we resolve to
+the closest scope,
+
+80
+00:04:52,763 --> 00:04:57,030
+and the only one directly accessible
+is the one that was
+
+81
+00:04:57,030 --> 00:05:02,179
+defined in B, which thus
+hides both of A's methods.
+
+82
+00:05:02,179 --> 00:05:03,875
+Let's look at this in the main.
+
+83
+00:05:03,875 --> 00:05:09,045
+Here, we have our instance b.
+We cannot make a call like this.
+
+84
+00:05:09,045 --> 00:05:14,212
+This is why we commented the m1 method
+that takes an integer
+
+85
+00:05:14,212 --> 00:05:18,559
+since the m1 method taking an
+integer, inherited from A,
+
+86
+00:05:18,559 --> 00:05:23,494
+is hidden by the method in B
+which takes a string.
+
+87
+00:05:23,494 --> 00:05:26,648
+We can indeed call the m1 method
+
+88
+00:05:26,648 --> 00:05:30,145
+which takes a string. This
+poses no problem at all.
+
+89
+00:05:30,145 --> 00:05:33,513
+But we cannot call the method from m1
+taking an integer.
+
+90
+00:05:33,783 --> 00:05:38,471
+We get a message saying that
+this function cannot be called.
+
+91
+00:05:38,471 --> 00:05:42,007
+However, it does exist;
+if we want to call it, we will have to use
+
+92
+00:05:42,007 --> 00:05:43,782
+the scope resolution operator
+
+93
+00:05:43,782 --> 00:05:48,117
+saying "the method m1 of scope of
+class A which belongs
+
+94
+00:05:48,117 --> 00:05:52,062
+to the instance b of subclass B".
+
+95
+00:05:52,062 --> 00:05:58,237
+which does indeed inherit this method from
+class A since B is an A.
+
+96
+00:05:58,237 --> 00:06:00,719
+This method can thus be called here
+
+97
+00:06:00,719 --> 00:06:05,745
+but it will need to be "unhidden"
+using the scope resolution operator.
+
+98
+00:06:07,405 --> 00:06:12,489
+In class C, we have introduced a 
+third method
+
+99
+00:06:12,489 --> 00:06:16,125
+a new method, since we have a third
+type of parameter
+
+100
+00:06:16,125 --> 00:06:22,706
+with a double. This will define a new,
+third m1 method
+
+101
+00:06:22,706 --> 00:06:26,407
+which will, once again, following scoping
+rules,
+
+102
+00:06:26,407 --> 00:06:29,740
+hide both of the methods inherited from A.
+
+103
+00:06:29,875 --> 00:06:35,658
+With the instance c of class C,
+we can call neither
+
+104
+00:06:35,658 --> 00:06:39,002
+the method with the string
+
+105
+00:06:39,002 --> 00:06:41,586
+nor the method with the integer.
+
+106
+00:06:41,586 --> 00:06:47,259
+Careful, this is a trap. This
+call here, c.m1(2) does not invoke
+
+107
+00:06:47,259 --> 00:06:50,423
+the method taking an integer
+since it is hidden.
+
+108
+00:06:50,423 --> 00:06:54,834
+If you execute this code,
+you will get a message
+
+109
+00:06:54,834 --> 00:07:03,977
+saying "C::m1(double)" as it is
+indeed the only method
+
+110
+00:07:03,977 --> 00:07:10,322
+which can be called directly without
+unhiding in C's scope.
+
+111
+00:07:10,322 --> 00:07:14,410
+And an integer can be
+converted to a double,
+
+112
+00:07:14,410 --> 00:07:16,810
+so here, there is a conversion from an
+integer to a double to call
+
+113
+00:07:16,810 --> 00:07:21,387
+the only method which is in C.
+
+114
+00:07:21,387 --> 00:07:25,274
+Of course, as before, we can
+unhide
+
+115
+00:07:25,274 --> 00:07:28,949
+the methods taking a string or an integer.
+
+116
+00:07:28,949 --> 00:07:36,636
+By using the scope resolution operator,
+c.A::m1 with a string,
+
+117
+00:07:36,636 --> 00:07:41,869
+we will of course call A's method, which
+takes a string.
+
+118
+00:07:41,869 --> 00:07:47,579
+This call here, with an integer, will
+now unhide A's m1 method
+
+119
+00:07:47,579 --> 00:07:51,514
+inherited by the subclass C;
+
+120
+00:07:51,514 --> 00:07:55,788
+we will call this method here.
+
+121
+00:07:56,326 --> 00:07:58,999
+That's it for the aspects of
+overloading and shadowing,
+
+122
+00:07:59,333 --> 00:08:01,157
+let's now discuss the overriding aspect.
+
+123
+00:08:01,157 --> 00:08:06,416
+In fact, all of these methods were
+declared as virtual.
+
+124
+00:08:06,416 --> 00:08:09,580
+We simply need to declare, here,
+these methods as virtual
+
+125
+00:08:09,580 --> 00:08:14,740
+to make them virtual automatically
+in the subclasses.
+
+126
+00:08:14,740 --> 00:08:19,572
+Here, since we have exactly the same method,
+the <i>virtual</i> is transitive.
+
+127
+00:08:19,572 --> 00:08:21,900
+It doesn't have to be repeated.
+
+128
+00:08:21,900 --> 00:08:23,551
+However here, we have a new method.
+
+129
+00:08:23,551 --> 00:08:26,882
+So we can define it as virtual or not.
+
+130
+00:08:26,882 --> 00:08:30,288
+All of these methods are declared
+as virtual,
+
+131
+00:08:30,288 --> 00:08:33,351
+so we will have an override.
+
+132
+00:08:33,351 --> 00:08:37,586
+Overriding follows the same rules
+as shadowing.
+
+133
+00:08:37,586 --> 00:08:42,103
+Essentially, dynamic binding will be used
+
+134
+00:08:42,361 --> 00:08:45,297
+if we have pointers or references,
+
+135
+00:08:45,297 --> 00:08:47,518
+which was not the case here.
+
+136
+00:08:47,518 --> 00:08:51,566
+Here, we simply had instances.
+
+137
+00:08:51,566 --> 00:08:54,510
+To observe the effects of overriding
+and dynamic binding,
+
+138
+00:08:54,510 --> 00:08:57,107
+we will need to use pointers.
+
+139
+00:08:57,107 --> 00:09:00,012
+This is what we do in this new
+example.
+
+140
+00:09:00,012 --> 00:09:03,668
+We still have the instances
+b and c of classes
+
+141
+00:09:03,668 --> 00:09:05,634
+B and C, respectively,
+
+142
+00:09:05,634 --> 00:09:11,397
+but we now have a pointer-to-A
+that we name pa.
+
+143
+00:09:11,830 --> 00:09:14,008
+First, pa will point to b
+
+144
+00:09:14,008 --> 00:09:17,300
+and then it will point to c.
+
+145
+00:09:17,300 --> 00:09:19,050
+Here, we make pa point to b.
+
+146
+00:09:19,050 --> 00:09:22,195
+The memory situation is as follows.
+
+147
+00:09:27,101 --> 00:09:31,074
+pa points to b and we call
+the m1 method
+
+148
+00:09:31,074 --> 00:09:34,251
+through this pa pointer.
+
+149
+00:09:34,251 --> 00:09:37,382
+Note that m1 is a virtual method
+
+150
+00:09:37,382 --> 00:09:40,584
+which is overridden in class B.
+
+151
+00:09:40,584 --> 00:09:45,304
+So polymorphism is taken into
+account here.
+
+152
+00:09:45,304 --> 00:09:49,577
+The m1 method from class B
+will indeed be called
+
+153
+00:09:49,577 --> 00:09:54,342
+and will output the message
+"B::m1(string)".
+
+154
+00:09:54,342 --> 00:09:59,169
+However, even though pa points to a B,
+it is still a pointer-to-A.
+
+155
+00:09:59,581 --> 00:10:03,622
+And remember that in C++,
+it is the type that
+
+156
+00:10:03,622 --> 00:10:05,826
+is determining when there is no
+polymorphism;
+
+157
+00:10:05,826 --> 00:10:07,818
+static binding is used.
+
+158
+00:10:07,818 --> 00:10:09,908
+We resolve according to the type.
+
+159
+00:10:09,908 --> 00:10:14,675
+So here, pa is a pointer-to-A and
+as such,
+
+160
+00:10:14,675 --> 00:10:17,176
+can access A's methods.
+
+161
+00:10:17,176 --> 00:10:20,181
+These method calls are in class A.
+
+162
+00:10:20,475 --> 00:10:22,868
+In other words, these calls are
+in the scope of A and so
+
+163
+00:10:22,868 --> 00:10:25,635
+we can absolutely call the m1
+method with an integer,
+
+164
+00:10:25,635 --> 00:10:29,034
+even though pa points to a B.
+
+165
+00:10:29,290 --> 00:10:32,266
+We are in A's scope.
+
+166
+00:10:32,266 --> 00:10:40,523
+So here, it is A's method which will be
+called: "A::m1(int)".
+
+167
+00:10:40,523 --> 00:10:45,775
+Similarly, even if pa points to c,
+even though we point to a C,
+
+168
+00:10:45,775 --> 00:10:47,521
+we are still in the scope of A
+
+169
+00:10:47,521 --> 00:10:50,627
+since we are working with a
+pointer-to-A.
+
+170
+00:10:50,627 --> 00:10:52,925
+Here, we will call the method.
+
+171
+00:10:52,925 --> 00:10:57,532
+Careful, even if we pass a double,
+we are still in A's scope
+
+172
+00:10:57,532 --> 00:11:02,247
+and so we will call the method that
+takes an integer here.
+
+173
+00:11:02,247 --> 00:11:06,773
+This double will be converted to
+an integer to call, within the scope of A,
+
+174
+00:11:06,773 --> 00:11:10,579
+the only method that can be called
+with a double.
+
+175
+00:11:10,579 --> 00:11:13,806
+It is this one, where we convert
+the double to an integer.
+
+176
+00:11:13,806 --> 00:11:16,358
+This is quite possible in C++ and
+it is indeed
+
+177
+00:11:16,364 --> 00:11:18,664
+this method which will be called.
+
+178
+00:11:18,664 --> 00:11:23,261
+The method that is in C is not accessible
+in the scope of A.
+
+179
+00:11:23,261 --> 00:11:28,140
+Though a C is an A, an A is
+definitely not a C.
+
+180
+00:11:28,140 --> 00:11:32,249
+Here, since we are in A's scope,
+it is in this scope that
+
+181
+00:11:32,249 --> 00:11:34,007
+we will resolve the name "m1".
+
+182
+00:11:34,007 --> 00:11:37,235
+So it is indeed m1 with an int
+which will be called and
+
+183
+00:11:37,235 --> 00:11:42,978
+we will get the output for A::m1
+with an int.
+
+184
+00:11:42,978 --> 00:11:45,655
+For the same reasons, we
+absolutely cannot try
+
+185
+00:11:45,655 --> 00:11:49,770
+to unhide the method taking a double
+by trying to use
+
+186
+00:11:49,770 --> 00:11:52,885
+the scope resolution operator on C.
+
+187
+00:11:52,885 --> 00:11:57,198
+This is completely illegal since we
+are passing through a pointer-to-A
+
+188
+00:11:57,198 --> 00:11:59,787
+and an A is not a C.
+
+189
+00:11:59,787 --> 00:12:02,976
+C is an A but A is not a C.
+
+190
+00:12:02,976 --> 00:12:06,989
+A is at the top of the hierarchy.
+
+191
+00:12:06,989 --> 00:12:10,837
+C is an A, but A is
+definitely not a C.
+
+192
+00:12:10,837 --> 00:12:13,941
+So this would not compile.
+It is forbidden by the compiler.
+
+193
+00:12:13,941 --> 00:12:18,056
+It is not A which inherits from C,
+but C which inherits from A.
+
+194
+00:12:18,056 --> 00:12:20,889
+There! All of this is certainly
+rather technical
+
+195
+00:12:20,889 --> 00:12:23,542
+and at first may be a little difficult.
+
+196
+00:12:23,542 --> 00:12:27,091
+You should come back to this episode
+later, once you have
+
+197
+00:12:27,091 --> 00:12:30,874
+had some practice with polymorphism
+and its different aspects:
+
+198
+00:12:30,874 --> 00:12:34,208
+shadowing, overriding, and
+especially overloading
+
+199
+00:12:34,208 --> 00:12:36,903
+the latter of which should not pose
+any more problems.
+
+200
+00:12:36,903 --> 00:12:40,498
+Actually, since these concepts are
+quite complicated,
+
+201
+00:12:40,498 --> 00:12:43,836
+C++ 2011 introduced two
+new keywords
+
+202
+00:12:43,836 --> 00:12:46,732
+to allow the programmer, if he
+so wishes,
+
+203
+00:12:46,732 --> 00:12:49,594
+to clarify his intentions.
+
+204
+00:12:49,594 --> 00:12:54,973
+These keywords are <i>override</i> which
+indicates that we want
+
+205
+00:12:54,973 --> 00:12:58,425
+to override a virtual method inherited
+from a superclass;
+
+206
+00:12:58,425 --> 00:13:03,371
+and <i>final</i> which prevents any
+future override
+
+207
+00:13:03,371 --> 00:13:07,766
+of the associated method in potential
+future subclasses.
+
+208
+00:13:07,766 --> 00:13:10,196
+Let's look at this in detail in an example.
+
+209
+00:13:11,776 --> 00:13:16,292
+Suppose that here, we have a class A which
+contains four methods:
+
+210
+00:13:16,293 --> 00:13:19,171
+a method f1 that is simply defined
+as virtual;
+
+211
+00:13:19,175 --> 00:13:24,590
+a method f2 which is also virtual and
+has the const qualifier,
+
+212
+00:13:24,590 --> 00:13:29,387
+which cannot modify the instance;
+a method f3, which is not virtual;
+
+213
+00:13:29,747 --> 00:13:35,611
+and an f4 method on which we
+add the final qualifier.
+
+214
+00:13:36,007 --> 00:13:41,369
+Then we have a class B which
+inherits from A and will, of course,
+
+215
+00:13:41,369 --> 00:13:46,295
+override and shadow these
+various methods.
+
+216
+00:13:46,295 --> 00:13:51,654
+So we have an override of method
+f1 in class B.
+
+217
+00:13:51,654 --> 00:13:54,577
+The prototypes are identical.
+
+218
+00:13:54,577 --> 00:13:59,092
+So the <i>override</i> keyword
+is used correctly.
+
+219
+00:13:59,092 --> 00:14:02,792
+Indeed, f1 is an override of this
+method.
+
+220
+00:14:02,792 --> 00:14:04,619
+Here, we have another method.
+
+221
+00:14:04,619 --> 00:14:07,428
+I will let you guess what it is.
+
+222
+00:14:09,548 --> 00:14:12,184
+Here, you can see that we have
+a typo.
+
+223
+00:14:12,363 --> 00:14:17,451
+The developer wrote f-lowercase L
+instead of "f1".
+
+224
+00:14:17,451 --> 00:14:20,697
+This, I guarantee, is a rather difficult error
+to find while debugging.
+
+225
+00:14:20,697 --> 00:14:24,560
+Such a small difference between a lowercase
+L and a 1
+
+226
+00:14:24,560 --> 00:14:26,528
+is often hard to spot.
+
+227
+00:14:26,528 --> 00:14:32,121
+So here, if we had forgotten the <i>override</i>
+keyword... 
+
+228
+00:14:32,121 --> 00:14:35,119
+-- of course without this line here --
+
+229
+00:14:35,119 --> 00:14:41,233
+what the person who wrote this in class B wanted
+would have been to override the method f1
+
+230
+00:14:41,233 --> 00:14:45,208
+But instead of overriding the f1 method,
+because of this typo,
+
+231
+00:14:45,208 --> 00:14:50,399
+they would have introduced a new virtual
+method in B.
+
+232
+00:14:50,399 --> 00:14:53,004
+What the <i>override</i> keyword
+allows
+
+233
+00:14:53,004 --> 00:14:56,443
+is to have the compiler check
+for this.
+
+234
+00:14:56,453 --> 00:15:00,948
+As the developer of this class B
+has specified,
+
+235
+00:15:00,978 --> 00:15:04,487
+they want an override of one
+of A's methods.
+
+236
+00:15:04,487 --> 00:15:08,214
+In this case, since there is no fl
+method in A,
+
+237
+00:15:08,214 --> 00:15:11,457
+the compiler will indicate
+that there is an error.
+
+238
+00:15:11,457 --> 00:15:17,065
+This fl method does not override
+any method from A.
+
+239
+00:15:17,065 --> 00:15:21,815
+This protects class B's developer
+
+240
+00:15:21,815 --> 00:15:24,693
+against potential mistakes.
+
+241
+00:15:24,693 --> 00:15:28,008
+Another type of mistake can be seen
+on the f2 method.
+
+242
+00:15:28,008 --> 00:15:34,020
+Class B's developer wants to override
+the f2 method.
+
+243
+00:15:34,020 --> 00:15:37,153
+However here, we will get
+a compilation error.
+
+244
+00:15:37,363 --> 00:15:38,695
+Can you see why?
+
+245
+00:15:40,325 --> 00:15:44,134
+The error here is that the f2 method
+is not const
+
+246
+00:15:44,299 --> 00:15:48,587
+whereas it was defined as const
+in class A.
+
+247
+00:15:49,024 --> 00:15:53,231
+So the f2 method here is a
+different f2 method
+
+248
+00:15:53,472 --> 00:15:56,494
+Be careful! const is completely
+part of the specificity
+
+249
+00:15:56,494 --> 00:15:59,320
+of the method header.
+
+250
+00:15:59,320 --> 00:16:02,966
+The full prototype of the method
+contains const and so here,
+
+251
+00:16:02,966 --> 00:16:04,381
+this is a different f2 method.
+
+252
+00:16:04,381 --> 00:16:05,928
+So the compiler doesn't accept this.
+
+253
+00:16:05,928 --> 00:16:08,592
+This is not an override of the f2 method
+
+254
+00:16:08,592 --> 00:16:11,955
+but a new f2 method.
+
+255
+00:16:11,955 --> 00:16:18,667
+So this is another example of a protection
+against developers' mistakes.
+
+256
+00:16:18,667 --> 00:16:20,217
+Forgetting the const keyword,
+or making a typo.
+
+257
+00:16:20,217 --> 00:16:25,766
+Regarding the f3 method, this
+could be a conception mistake
+
+258
+00:16:25,766 --> 00:16:27,244
+at A's level.
+
+259
+00:16:27,244 --> 00:16:31,279
+Maybe f3 should have been virtual
+and we thought that
+
+260
+00:16:31,279 --> 00:16:35,714
+we could override this
+f3 method.
+
+261
+00:16:35,714 --> 00:16:40,175
+Remember that it is unnecessary to
+repeat the virtual keyword.
+
+262
+00:16:40,175 --> 00:16:43,900
+We could easily, even for a virtual
+method, write this.
+
+263
+00:16:43,900 --> 00:16:49,326
+The developer of class B wants
+to override a virtual method,
+
+264
+00:16:49,468 --> 00:16:50,960
+so they add the override keyword.
+
+265
+00:16:50,960 --> 00:16:55,082
+Here again, they get an error message
+from the compiler saying:
+
+266
+00:16:55,082 --> 00:16:57,438
+"No, careful, you are not doing what you
+think you are doing".
+
+267
+00:16:57,438 --> 00:17:01,566
+This f3 method cannot be overridden
+because
+
+268
+00:17:01,566 --> 00:17:04,256
+it is not a virtual method.
+
+269
+00:17:04,256 --> 00:17:08,138
+So here we have pure shadowing
+without an override.
+
+270
+00:17:08,138 --> 00:17:11,526
+Here is a third case that can
+protect the developer
+
+271
+00:17:11,526 --> 00:17:14,046
+of class B against potential
+errors.
+
+272
+00:17:14,046 --> 00:17:18,446
+Here, the error would come either from
+his interpretation of what class A is
+
+273
+00:17:18,446 --> 00:17:23,763
+or even from the developer of class A who
+may have forgotten the virtual keyword.
+
+274
+00:17:24,463 --> 00:17:27,903
+Finally, the last situation with
+the final keyword.
+
+275
+00:17:27,903 --> 00:17:32,296
+Here, class A's programmer
+prevents any future override
+
+276
+00:17:32,296 --> 00:17:35,252
+of this f4 method.
+
+277
+00:17:35,252 --> 00:17:39,967
+So the developer of class B, a subclass
+of A, cannot
+
+278
+00:17:39,967 --> 00:17:43,905
+override the f4 method.
+
+279
+00:17:43,905 --> 00:17:48,685
+It is <i>final</i> here, meaning
+that we cannot override
+
+280
+00:17:48,685 --> 00:17:50,526
+this f4 method in subclasses.
+
+281
+00:17:50,526 --> 00:17:54,441
+So the compiler would refuse
+to compile this line.
+
+282
+00:17:54,441 --> 00:17:56,149
+That's it for this example.
+
+283
+00:17:56,149 --> 00:18:00,783
+We recommend that you use the 
+override keyword.
+
+284
+00:18:00,783 --> 00:18:02,684
+Even if it a little cumbersome to write.
+
+285
+00:18:02,684 --> 00:18:05,973
+Use it to protect, at first,
+
+286
+00:18:05,973 --> 00:18:09,270
+against potential errors such as the
+ones we have just discussed.
+
+287
+00:18:09,270 --> 00:18:12,928
+Concerning the final keyword, I don't think
+it is essential at this course's level,
+
+288
+00:18:12,928 --> 00:18:16,285
+you can forget about it. In my opinion,
+it is completely useless.
+
+289
+00:18:16,285 --> 00:18:20,326
+Why would we want to prevent anyone
+from overriding these methods?
+
+290
+00:18:20,326 --> 00:18:23,902
+Finally, to be exhaustive, I would
+like to mention
+
+291
+00:18:23,902 --> 00:18:29,474
+that the final keyword can also be used
+to prevent deriving subclasses.
+
+292
+00:18:29,474 --> 00:18:33,027
+That is, to prevent inheriting
+from a class.
+
+293
+00:18:33,027 --> 00:18:36,122
+For example, we could define a Sterile
+class here
+
+294
+00:18:36,122 --> 00:18:38,758
+which cannot have any subclass.
+
+295
+00:18:38,758 --> 00:18:41,703
+By adding the final keyword here.
+
+296
+00:18:41,703 --> 00:18:45,638
+So we would not be able to
+inherit from this Sterile class here.
+
+297
+00:18:45,638 --> 00:18:50,439
+This keyword makes the compiler
+signal an error
+
+298
+00:18:50,439 --> 00:18:55,167
+whenever a subclass tries to inherit
+from this superclass.
+
+299
+00:18:55,167 --> 00:18:59,291
+Here again, I don't think this is very interesting
+at this course's level.
+
+300
+00:18:59,291 --> 00:19:02,243
+For this course, you can
+forget about final
+
+301
+00:19:02,243 --> 00:19:05,414
+But do make sure to write
+override each time
+
+302
+00:19:05,414 --> 00:19:11,368
+that you want to override a virtual method
+inherited from a superclass.

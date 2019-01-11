@@ -1,0 +1,1488 @@
+1
+00:00:00,910 --> 00:00:04,760
+In the last unit you've seen the concept
+of a for expression.
+
+2
+00:00:04,760 --> 00:00:08,160
+What we are going to do now is use for
+expressions
+
+3
+00:00:08,160 --> 00:00:13,059
+in another and interesting application,
+namely, the generation of random values.
+
+4
+00:00:15,130 --> 00:00:21,720
+So far we have seen four expressions
+operating on lists, on sets.
+
+5
+00:00:21,720 --> 00:00:27,050
+in the previous course we have also seen
+them on databases and options.
+
+6
+00:00:27,050 --> 00:00:31,550
+All these things are collections of data
+items in some sense.
+
+7
+00:00:31,550 --> 00:00:34,240
+So the question is are for expressions
+good
+
+8
+00:00:34,240 --> 00:00:39,110
+only for collections and interestingly the
+answer is no.
+
+9
+00:00:39,110 --> 00:00:40,330
+All that is required is some
+
+10
+00:00:40,330 --> 00:00:43,740
+interpretation of the map, flat map, and
+with filter
+
+11
+00:00:43,740 --> 00:00:46,370
+functions that make sense for the type in
+question.
+
+12
+00:00:47,660 --> 00:00:51,990
+There are many domains outside collections
+that have such an interpretation, and an
+
+13
+00:00:51,990 --> 00:00:56,120
+example that we are going to see the now
+are random value generators.
+
+14
+00:00:58,110 --> 00:01:00,400
+So what are random value generators?
+
+15
+00:01:00,400 --> 00:01:02,620
+You know about random numbers from a
+language
+
+16
+00:01:02,620 --> 00:01:05,330
+like java, here you would in port java
+util,
+
+17
+00:01:05,330 --> 00:01:06,640
+to random.
+
+18
+00:01:06,640 --> 00:01:09,920
+Create a new, random number generator,
+take
+
+19
+00:01:09,920 --> 00:01:12,405
+the next random number of the nextInt.
+
+20
+00:01:12,405 --> 00:01:16,030
+My question now is, is there a systematic
+
+21
+00:01:16,030 --> 00:01:19,210
+way to get random values for other
+domains?
+
+22
+00:01:19,210 --> 00:01:21,580
+For instance, we want random booleans,
+random
+
+23
+00:01:21,580 --> 00:01:26,670
+strings, random pairs, lists, sets, or
+trees.
+
+24
+00:01:26,670 --> 00:01:28,790
+So here's a way to do that.
+
+25
+00:01:28,790 --> 00:01:30,920
+We define a trait generator,
+
+26
+00:01:30,920 --> 00:01:36,520
+with some element type T, and that would
+generate random values of type T.
+
+27
+00:01:36,520 --> 00:01:41,230
+Here's the outline of the trait, so it's
+Generator here's the type
+
+28
+00:01:41,230 --> 00:01:46,560
+of values that get generated, and here's
+the function; generate, that does that.
+
+29
+00:01:46,560 --> 00:01:48,860
+Let's look at some instances of this type.
+
+30
+00:01:48,860 --> 00:01:51,800
+The first instance generates random
+integers.
+
+31
+00:01:51,800 --> 00:01:55,080
+So that will now be packaged as follows.
+
+32
+00:01:55,080 --> 00:01:56,640
+the integers generated
+
+33
+00:01:56,640 --> 00:02:00,100
+as a new random generator, of type int.
+
+34
+00:02:00,100 --> 00:02:06,540
+It defers to the Java integer, gen-,
+generator, and its generator method just
+
+35
+00:02:06,540 --> 00:02:09,320
+picks off the next random number from
+
+36
+00:02:09,320 --> 00:02:12,240
+rand, the Java generate random number
+generator.
+
+37
+00:02:13,910 --> 00:02:15,660
+What about Booleans?
+
+38
+00:02:15,660 --> 00:02:20,060
+Well, once we have a generator for
+integers, Booleans is easy.
+
+39
+00:02:20,060 --> 00:02:22,380
+We create a new generator Boolean.
+
+40
+00:02:22,380 --> 00:02:27,410
+Its generator method just generates a
+random number using the integers
+
+41
+00:02:27,410 --> 00:02:31,400
+generator and asks whether that random
+number is greater than 0.
+
+42
+00:02:31,400 --> 00:02:33,220
+If it is, we return true.
+
+43
+00:02:33,220 --> 00:02:34,920
+If not, we return false.
+
+44
+00:02:36,530 --> 00:02:38,030
+What about pairs?
+
+45
+00:02:38,030 --> 00:02:41,810
+Well, here's a generator that gives you
+pairs of integers.
+
+46
+00:02:41,810 --> 00:02:44,370
+Its generate method calls generate twice
+on
+
+47
+00:02:44,370 --> 00:02:47,830
+the integers generator, and packs the
+results
+
+48
+00:02:47,830 --> 00:02:48,330
+in a pair.
+
+49
+00:02:49,930 --> 00:02:53,220
+Now all this works, but it's also a bit
+cumbersome.
+
+50
+00:02:53,220 --> 00:02:56,020
+Each time we have to setup a new anonymous
+class
+
+51
+00:02:56,020 --> 00:02:59,580
+of type generator to find a generate
+method and so on.
+
+52
+00:02:59,580 --> 00:03:02,110
+Question is, can we do it without all that
+boilerplate?
+
+53
+00:03:03,760 --> 00:03:06,869
+Ideally what we would like to write is
+something like this.
+
+54
+00:03:08,000 --> 00:03:13,060
+To get booleans which are, say for x taken
+from the integers then generator,
+
+55
+00:03:13,060 --> 00:03:18,370
+yield x greater than zero.
+Well for pairs we would like to say that,
+
+56
+00:03:18,370 --> 00:03:23,990
+let's have two generators of two arbitrary
+types t and u, call them
+
+57
+00:03:23,990 --> 00:03:30,470
+lower case t and u, let x be taken from t,
+y be taken from u.
+
+58
+00:03:30,470 --> 00:03:32,720
+Return the pair of x and y.
+
+59
+00:03:32,720 --> 00:03:35,090
+As you want to do that, then a good
+
+60
+00:03:35,090 --> 00:03:38,420
+question is, what does the compiler expand
+this to?
+
+61
+00:03:39,490 --> 00:03:41,000
+Here's what it would do.
+
+62
+00:03:41,000 --> 00:03:44,590
+Booleans would be expanded to a call to
+map, and
+
+63
+00:03:44,590 --> 00:03:47,750
+pairs would be expanded to a call to flat
+map
+
+64
+00:03:47,750 --> 00:03:51,750
+followed by a call to map according to the
+expansions
+
+65
+00:03:51,750 --> 00:03:55,150
+of for expressions that we have seen in
+the last unit.
+
+66
+00:03:55,150 --> 00:03:59,280
+So you see that as long as we have map and
+flat map defined
+
+67
+00:03:59,280 --> 00:04:01,910
+on the generator class we can actually
+
+68
+00:04:01,910 --> 00:04:05,490
+use the convenient syntax with four
+expressions.
+
+69
+00:04:05,490 --> 00:04:10,180
+So let's see how we would define map and
+flat map on the generator class.
+
+70
+00:04:10,180 --> 00:04:12,020
+Let's start with map.
+
+71
+00:04:12,020 --> 00:04:13,960
+So here's the type of map.
+
+72
+00:04:13,960 --> 00:04:20,210
+It takes a function from the random value
+type T to a new random value type S.
+
+73
+00:04:20,210 --> 00:04:24,160
+Gives you a generator of S, and the way it
+would do that,
+
+74
+00:04:24,160 --> 00:04:29,780
+it would generate random numbers of type T
+using its own generate method.
+
+75
+00:04:29,780 --> 00:04:30,760
+Then apply
+
+76
+00:04:30,760 --> 00:04:36,250
+f to those random numbers and those give
+you the random numbers on the S type.
+
+77
+00:04:37,380 --> 00:04:41,160
+There's a twist here in the call to
+self.generate.
+
+78
+00:04:41,160 --> 00:04:43,050
+If we had written just generate,
+
+79
+00:04:48,040 --> 00:04:55,320
+that would be according to th Expansion
+rules and scholar, this.generate.
+
+80
+00:04:55,320 --> 00:04:58,620
+But this is this new anonymous class would
+
+81
+00:04:58,620 --> 00:05:01,690
+refer to current method that we define
+here.
+
+82
+00:05:01,690 --> 00:05:03,340
+So it would be a recursive call
+
+83
+00:05:03,340 --> 00:05:06,220
+to the generate method, which would not
+terminate.
+
+84
+00:05:06,220 --> 00:05:08,200
+What we need instead is we want to call
+
+85
+00:05:08,200 --> 00:05:11,620
+the generate method of the object one
+further out.
+
+86
+00:05:11,620 --> 00:05:14,030
+That's this generate method here.
+
+87
+00:05:14,030 --> 00:05:19,640
+And the way that we can achieve that is
+that we define an alias for this
+
+88
+00:05:19,640 --> 00:05:24,810
+value of this object out here using the
+syntax self error.
+
+89
+00:05:24,810 --> 00:05:28,410
+So that would define an alias name for
+what,
+
+90
+00:05:28,410 --> 00:05:32,430
+for the this term of the class over here.
+
+91
+00:05:32,430 --> 00:05:37,910
+So writing then self generate would defer
+to this method over here.
+
+92
+00:05:37,910 --> 00:05:39,070
+Another way that could be
+
+93
+00:05:39,070 --> 00:05:42,870
+achieved in both Java and also Scala would
+be to
+
+94
+00:05:42,870 --> 00:05:47,105
+prefix the this with the name of the
+class, so we could have written
+
+95
+00:05:47,105 --> 00:05:54,960
+generator.this.generate, and that would
+have done the same thing.
+
+96
+00:05:55,990 --> 00:06:00,260
+So the second thing we have to do is
+define flatmap on generators.
+
+97
+00:06:00,260 --> 00:06:04,490
+Here it is.
+again it's useful to compare
+
+98
+00:06:04,490 --> 00:06:11,470
+with map, so flatmap would give us back
+now a generator of S from the function F.
+
+99
+00:06:11,470 --> 00:06:16,998
+So it takes a random value to a whole
+sequence of random values to a generator.
+
+100
+00:06:16,998 --> 00:06:20,560
+And its result type is, again, generator
+of S.
+
+101
+00:06:20,560 --> 00:06:23,860
+Its generate method is implemented, as you
+see here.
+
+102
+00:06:23,860 --> 00:06:26,740
+So, what we would do is: first, generate
+
+103
+00:06:26,740 --> 00:06:30,120
+a random vary of type T using self
+generators
+
+104
+00:06:30,120 --> 00:06:31,380
+as before.
+
+105
+00:06:31,380 --> 00:06:33,470
+Apply the function F to it, so that it now
+
+106
+00:06:33,470 --> 00:06:37,340
+gives us a complete generator on the new
+domains S.
+
+107
+00:06:37,340 --> 00:06:41,760
+And to pick a random value in that domain,
+we invoke generate here again.
+
+108
+00:06:43,130 --> 00:06:45,990
+Now that we have defined the general
+machinery that we needed
+
+109
+00:06:45,990 --> 00:06:50,450
+on class generator, we can look at some
+specific generators again.
+
+110
+00:06:50,450 --> 00:06:54,370
+So booleans, here is our syntax list for.
+
+111
+00:06:54,370 --> 00:06:56,600
+what does that expand to?
+
+112
+00:06:56,600 --> 00:06:59,990
+Well, the compiler would expand it to our
+map, and if you look
+
+113
+00:06:59,990 --> 00:07:06,460
+at the map operation and generator then
+that's what it comes down to.
+
+114
+00:07:06,460 --> 00:07:09,480
+It would say while the function f, that's
+this close
+
+115
+00:07:09,480 --> 00:07:13,250
+right here and you see it here gets
+applied to
+
+116
+00:07:13,250 --> 00:07:17,745
+the generate method from the random number
+generator on the
+
+117
+00:07:17,745 --> 00:07:20,440
+left-hand side of the map, the receiver of
+the map.
+
+118
+00:07:22,160 --> 00:07:27,160
+And that of course can be simplified by
+just doing the so-called beta reduction.
+
+119
+00:07:27,160 --> 00:07:30,400
+So we apply the function to the argument,
+and we'd
+
+120
+00:07:30,400 --> 00:07:34,110
+use it in one step, to what you see here.
+
+121
+00:07:34,110 --> 00:07:38,360
+So that's exactly the Boolean, generator
+for Booleans that we started with.
+
+122
+00:07:39,410 --> 00:07:41,850
+Let's try the same thing with pairs.
+
+123
+00:07:41,850 --> 00:07:47,410
+So here's the, already the expanded syntax
+of the for expression for pairs.
+
+124
+00:07:47,410 --> 00:07:52,700
+if we expand the map then that's what we
+get here.
+
+125
+00:07:52,700 --> 00:07:55,570
+If we expand the flat map we get this
+expression
+
+126
+00:07:55,570 --> 00:07:58,650
+here so lets look at this in a bit more
+detail.
+
+127
+00:07:58,650 --> 00:08:03,160
+We get a generator for pairs from t of t
+and u.
+
+128
+00:08:03,160 --> 00:08:08,900
+Its generator method gives you the
+generator here that does generation
+
+129
+00:08:08,900 --> 00:08:13,070
+of the pairs like that and then we call
+generator again
+
+130
+00:08:13,070 --> 00:08:14,620
+on this method generator.
+
+131
+00:08:15,950 --> 00:08:19,070
+If we simplify that expression then we
+get, again,
+
+132
+00:08:19,070 --> 00:08:22,980
+the expression we started with, a pair
+where we
+
+133
+00:08:22,980 --> 00:08:25,850
+generate on the t and generate a value on
+
+134
+00:08:25,850 --> 00:08:28,710
+the u generator and collect the two in a
+pair.
+
+135
+00:08:29,980 --> 00:08:33,930
+Let's have a look at some of the building
+blocks for generators.
+
+136
+00:08:33,930 --> 00:08:38,720
+A useful, even though very simple building
+block is the single generator
+
+137
+00:08:38,720 --> 00:08:40,990
+That is in the sense a borderline case, in
+that
+
+138
+00:08:40,990 --> 00:08:44,140
+it always gives you back the same random
+value T.
+
+139
+00:08:44,140 --> 00:08:46,810
+So the value is not that random after all.
+
+140
+00:08:46,810 --> 00:08:49,105
+So you get the value that you want
+
+141
+00:08:49,105 --> 00:08:52,970
+to return and generate each time returns
+that value.
+
+142
+00:08:52,970 --> 00:08:57,263
+Another building block is that chose
+generator that would give
+
+143
+00:08:57,263 --> 00:09:00,849
+you an integer in the interval between low
+and high.
+
+144
+00:09:00,849 --> 00:09:03,945
+The way it would do that, it would take an
+arbitrary
+
+145
+00:09:03,945 --> 00:09:07,833
+random value from the integers and would
+normalize it to be in the
+
+146
+00:09:07,833 --> 00:09:12,000
+interval between low and high using this
+modular expression here.
+
+147
+00:09:13,100 --> 00:09:19,290
+The last generator one of can pick an
+arbitrary value from a list a choices.
+
+148
+00:09:19,290 --> 00:09:28,190
+So you can call it for instance like this,
+one of three colors red blue you know,
+
+149
+00:09:30,690 --> 00:09:34,142
+would give you a random color that can be
+red, blue or yellow.
+
+150
+00:09:34,142 --> 00:09:40,410
+OneOf takes a VARARG argument, T star,
+which means that
+
+151
+00:09:40,410 --> 00:09:43,740
+you can give it as many choices as you
+want.
+
+152
+00:09:43,740 --> 00:09:45,480
+And would, what it would do then is it
+
+153
+00:09:45,480 --> 00:09:50,390
+would choose an integer between zero and a
+number
+
+154
+00:09:50,390 --> 00:09:53,000
+of choices that we have passed, and it
+would,
+
+155
+00:09:53,000 --> 00:09:56,150
+you pick the choice, which is at this
+index
+
+156
+00:09:56,150 --> 00:09:59,600
+in the list of choices that are passed by
+t star.
+
+157
+00:10:01,880 --> 00:10:04,560
+So with these building blocks we can now
+set out
+
+158
+00:10:04,560 --> 00:10:09,510
+to write random value generators for some
+more structured types.
+
+159
+00:10:09,510 --> 00:10:11,100
+Let's start with lists.
+
+160
+00:10:11,100 --> 00:10:13,730
+How would you generate a random list?
+
+161
+00:10:13,730 --> 00:10:15,580
+Well one way to do it, is first to flip
+
+162
+00:10:15,580 --> 00:10:19,105
+a coin where the list should be empty or
+not empty.
+
+163
+00:10:19,105 --> 00:10:21,610
+That's done with this generator here,
+because with
+
+164
+00:10:21,610 --> 00:10:24,640
+the Booleans we record the result and it's
+empty.
+
+165
+00:10:24,640 --> 00:10:26,930
+Then, if the coin gave us that the
+
+166
+00:10:26,930 --> 00:10:29,680
+list should be empty, we always return
+
+167
+00:10:29,680 --> 00:10:33,260
+the emptyList, otherwise we return a
+nonEmptyList.
+
+168
+00:10:34,460 --> 00:10:37,290
+So how would we return always the
+emptyList?
+
+169
+00:10:37,290 --> 00:10:42,070
+Well, that's just the generator single
+that always returns a Nil.
+
+170
+00:10:43,100 --> 00:10:46,950
+How would we get a generator that
+generates a nonEmptyList?
+
+171
+00:10:46,950 --> 00:10:52,600
+Well that's another for where we say now
+for, getting a non-empty list of integers,
+
+172
+00:10:52,600 --> 00:10:55,290
+we have to pick a random integer, here
+
+173
+00:10:55,290 --> 00:10:59,300
+in the head and left arrow integers
+generator.
+
+174
+00:10:59,300 --> 00:11:01,940
+And then, we have to follow that with a
+random list.
+
+175
+00:11:01,940 --> 00:11:06,660
+So we have here a call, a recursive call
+to the list generator.
+
+176
+00:11:06,660 --> 00:11:09,880
+The random value that comes out of that is
+called tail.
+
+177
+00:11:09,880 --> 00:11:12,160
+And we, all that is left is that we need
+
+178
+00:11:12,160 --> 00:11:16,770
+to compose the head random integer with
+the tail random list.
+
+179
+00:11:18,780 --> 00:11:20,550
+So, here's an exercise for you.
+
+180
+00:11:20,550 --> 00:11:25,260
+Can you implement a generator that creates
+random Tree objects?
+
+181
+00:11:25,260 --> 00:11:27,420
+Such objects would be type, Tree.
+
+182
+00:11:28,540 --> 00:11:33,150
+and the Tree trait would have two case
+classes, to cases.
+
+183
+00:11:33,150 --> 00:11:37,990
+a Tree could either be an Inner node
+consisting of two sub-trees or it could be
+
+184
+00:11:37,990 --> 00:11:43,940
+a Leaf consisting of an integer.
+So let's open a worksheet
+
+185
+00:11:43,940 --> 00:11:45,950
+to see how we would do this.
+
+186
+00:11:45,950 --> 00:11:50,060
+I've opened the worksheet generators which
+contains the base,
+
+187
+00:11:50,060 --> 00:11:53,649
+some basic generators that need, the
+integers and the booleans.
+
+188
+00:11:55,400 --> 00:12:01,130
+what we will do now is go bottom up, so
+how to do a generator for leafs.
+
+189
+00:12:01,130 --> 00:12:02,670
+Well that's, that one is simple.
+
+190
+00:12:02,670 --> 00:12:05,150
+We just say, well, we need a random
+number.
+
+191
+00:12:05,150 --> 00:12:08,960
+And for each random number that we get, we
+produce a leaf with
+
+192
+00:12:08,960 --> 00:12:12,480
+that random number.
+So that covered leafs.
+
+193
+00:12:12,480 --> 00:12:14,150
+How about inner nodes?
+
+194
+00:12:14,150 --> 00:12:16,410
+Here's a generator for an inner node.
+
+195
+00:12:16,410 --> 00:12:20,740
+What we do is we generate a random tree,
+call it l.
+
+196
+00:12:20,740 --> 00:12:23,690
+Generate a random tree, call it r.
+
+197
+00:12:23,690 --> 00:12:28,770
+And produce a new inner node, call it l,
+inner of l and r.
+
+198
+00:12:28,770 --> 00:12:31,400
+Now finally the trees generator.
+
+199
+00:12:31,400 --> 00:12:34,020
+This, you see here.
+So, as in the
+
+200
+00:12:34,020 --> 00:12:36,800
+case of lists, we flip a coin whether we
+want
+
+201
+00:12:36,800 --> 00:12:39,690
+a leaf or an in and out, that's done here.
+
+202
+00:12:39,690 --> 00:12:43,050
+If we want a leaf then we turn to the
+leafs generator
+
+203
+00:12:43,050 --> 00:12:48,020
+to produce a random value, otherwise we
+return to the inners generator.
+
+204
+00:12:49,150 --> 00:12:51,340
+Let's see how this would work in action.
+
+205
+00:12:51,340 --> 00:12:56,190
+So we take the trees generator and
+generate a random value.
+
+206
+00:12:56,190 --> 00:12:57,620
+So what did we get here?
+
+207
+00:12:57,620 --> 00:12:59,740
+Well, we got a tree that
+
+208
+00:12:59,740 --> 00:13:04,870
+consists of two leaves, and an inner node,
+and then they themselves are
+
+209
+00:13:04,870 --> 00:13:08,860
+the left tree of another, other inner node
+with a leaf on the right.
+
+210
+00:13:08,860 --> 00:13:11,010
+That's just one possible random trees.
+
+211
+00:13:11,010 --> 00:13:16,640
+The next time I run this operation then of
+course I would get a different node.
+
+212
+00:13:16,640 --> 00:13:20,020
+So this time the tree I got was, was much
+smaller.
+
+213
+00:13:20,020 --> 00:13:23,470
+Let's try a third time.
+Now, it was much bigger.
+
+214
+00:13:23,470 --> 00:13:24,830
+So you see, what you get is
+
+215
+00:13:24,830 --> 00:13:27,880
+really real random values in the tree
+domain.
+
+216
+00:13:29,990 --> 00:13:35,090
+An important application of random value
+generators is random testing.
+
+217
+00:13:35,090 --> 00:13:38,160
+So you know about tests, in particular,
+unit tests.
+
+218
+00:13:38,160 --> 00:13:39,340
+They're the ideas.
+
+219
+00:13:39,340 --> 00:13:44,750
+You come up with inputs to a program
+function, or a set of program functions.
+
+220
+00:13:44,750 --> 00:13:48,160
+And then you have an assertion or a post
+condition
+
+221
+00:13:48,160 --> 00:13:51,980
+that should hold when these functions are
+on, on the input.
+
+222
+00:13:51,980 --> 00:13:55,670
+So the post condition is a property of the
+expected result.
+
+223
+00:13:55,670 --> 00:14:01,170
+And then you run the tests to verify that
+the program satisfies the post condition.
+
+224
+00:14:01,170 --> 00:14:04,900
+But the point is, after all the tests
+pass, hopefully, and you
+
+225
+00:14:04,900 --> 00:14:10,290
+only know that the program satisfies the
+post-conditions on these test inputs.
+
+226
+00:14:10,290 --> 00:14:13,190
+There might be others where the program
+still could fail.
+
+227
+00:14:13,190 --> 00:14:16,890
+So typically, you would need to be smart
+about finding
+
+228
+00:14:16,890 --> 00:14:20,760
+a lot of good test inputs that exercise
+the program in
+
+229
+00:14:20,760 --> 00:14:22,530
+all possible program paths.
+
+230
+00:14:23,580 --> 00:14:25,990
+So the question is can we do it without
+
+231
+00:14:25,990 --> 00:14:28,880
+all the hassle of finding all these test
+inputs.
+
+232
+00:14:28,880 --> 00:14:32,170
+Can we do completely without the test
+samples.
+
+233
+00:14:32,170 --> 00:14:35,594
+And the answer is yes in some cases at
+least.
+
+234
+00:14:35,594 --> 00:14:38,678
+If we can simply generate random test
+inputs.
+
+235
+00:14:38,678 --> 00:14:41,604
+So all the hard work of coming up with the
+input
+
+236
+00:14:41,604 --> 00:14:46,240
+values we leave to the random number, to
+the random value generator.
+
+237
+00:14:47,502 --> 00:14:49,420
+So here's an example of how we can do
+
+238
+00:14:49,420 --> 00:14:52,860
+that with the generators that we have
+defined so far.
+
+239
+00:14:52,860 --> 00:14:56,440
+Here is a test function, it takes a
+generator,
+
+240
+00:14:56,440 --> 00:14:59,360
+that it gives us input values in some
+domain
+
+241
+00:14:59,360 --> 00:15:02,580
+T, and it takes the number of times we
+
+242
+00:15:02,580 --> 00:15:07,170
+want to run the test on different randomly
+generated values.
+
+243
+00:15:07,170 --> 00:15:09,800
+And then it takes a test function that
+returns
+
+244
+00:15:09,800 --> 00:15:12,660
+true, or false, or the idea is returns
+true
+
+245
+00:15:12,660 --> 00:15:16,560
+if the test pass and false when it fails.
+
+246
+00:15:16,560 --> 00:15:18,488
+And would it would do then, is it would
+for
+
+247
+00:15:18,488 --> 00:15:23,550
+I from zero to number of times, generate a
+random
+
+248
+00:15:23,550 --> 00:15:27,910
+value and then assert that the test
+function returns true,
+
+249
+00:15:27,910 --> 00:15:30,550
+and if not, we will give you this
+assertion error.
+
+250
+00:15:31,960 --> 00:15:34,230
+If everything goes well, then it would
+print
+
+251
+00:15:34,230 --> 00:15:37,200
+that we have passed the number of times
+test.
+
+252
+00:15:39,160 --> 00:15:44,560
+So here's an use case of this test
+function so we would apply it to
+
+253
+00:15:44,560 --> 00:15:49,780
+the generator that gives us pairs of
+lists, and then the function would say,
+
+254
+00:15:49,780 --> 00:15:57,180
+well, given two randoms lists, xs, ys, two
+arbitrary lists, xs and ys, is the length
+
+255
+00:15:57,180 --> 00:16:03,030
+of the concordination, always longer than
+the length of the list xs itself.
+
+256
+00:16:03,030 --> 00:16:04,250
+Question to you, does that
+
+257
+00:16:04,250 --> 00:16:05,330
+property always hold?
+
+258
+00:16:07,390 --> 00:16:11,480
+Well, one way to answer this question is
+to simply try it out.
+
+259
+00:16:11,480 --> 00:16:13,700
+We have all the random number generators.
+
+260
+00:16:13,700 --> 00:16:14,930
+We have the test function.
+
+261
+00:16:16,300 --> 00:16:22,290
+I have assembled them in another worksheet
+where you see all the generators here,
+
+262
+00:16:22,290 --> 00:16:26,640
+and finally we have the test function that
+you see here at the end.
+
+263
+00:16:26,640 --> 00:16:32,810
+let me just, run this test on pairs of
+lists.
+
+264
+00:16:35,710 --> 00:16:40,040
+And the function would be that, given two
+arbitrary lists,
+
+265
+00:16:40,040 --> 00:16:45,970
+xs and ys.
+We want to postulate that the length of
+
+266
+00:16:45,970 --> 00:16:51,485
+the concatenation is greater than the
+length of just xs.
+
+267
+00:16:51,485 --> 00:16:53,987
+[SOUND]
+
+268
+00:16:55,230 --> 00:16:56,080
+And what do we get?
+
+269
+00:16:56,080 --> 00:16:59,630
+Well, we get a counter example and
+insertion error which says
+
+270
+00:16:59,630 --> 00:17:03,680
+the test failed for and here you have to
+count example.
+
+271
+00:17:03,680 --> 00:17:08,140
+The first is a list consisting of a single
+element, It's,
+
+272
+00:17:08,140 --> 00:17:11,870
+you see that's a random value that we have
+on here.
+
+273
+00:17:11,870 --> 00:17:15,850
+the second list is empty and in that case,
+of course, the length of these two
+
+274
+00:17:15,850 --> 00:17:20,310
+lists is one, and where it's the length of
+xs is also one, so the two lengths
+
+275
+00:17:20,310 --> 00:17:22,930
+are equal and the assertion fails.
+
+276
+00:17:24,290 --> 00:17:25,880
+So the answer to this question here
+
+277
+00:17:25,880 --> 00:17:28,520
+is obviously, the property does not always
+hold.
+
+278
+00:17:28,520 --> 00:17:30,531
+We have just found a counter-example.
+
+279
+00:17:31,720 --> 00:17:37,190
+Now the idea of these random tests and
+random value generators is embodied
+
+280
+00:17:37,190 --> 00:17:41,450
+in a very useful tool that we can use for
+your Scala programs.
+
+281
+00:17:41,450 --> 00:17:45,320
+The tool is called ScalaCheck, and it is
+modeled to
+
+282
+00:17:45,320 --> 00:17:50,590
+a latch degree after a tool called
+QuickCheck, which exists in the, for Haska
+
+283
+00:17:50,590 --> 00:17:53,810
+programs and variance of quick check have
+
+284
+00:17:53,810 --> 00:17:57,350
+been developed for quite a few other
+languages.
+
+285
+00:17:57,350 --> 00:18:00,690
+Alan is one example and in the formal
+scholar check.
+
+286
+00:18:00,690 --> 00:18:01,980
+Also for scala.
+
+287
+00:18:01,980 --> 00:18:06,670
+So the idea is just as you've seen quick
+check would come up with random.
+
+288
+00:18:06,670 --> 00:18:07,860
+Value generators.
+
+289
+00:18:07,860 --> 00:18:10,410
+It's a bit smarter than what you have seen
+in that it
+
+290
+00:18:10,410 --> 00:18:14,670
+can actually generate, sometimes the
+random values if you just give it a type.
+
+291
+00:18:14,670 --> 00:18:19,870
+So it knows how to generate random values
+for types that have a certain form
+
+292
+00:18:19,870 --> 00:18:25,180
+and then you would run tests similarly to
+what you have seen with the test function.
+
+293
+00:18:25,180 --> 00:18:28,050
+Only in scholar check its called for all
+so
+
+294
+00:18:28,050 --> 00:18:30,580
+you would just write for all and then you
+
+295
+00:18:30,580 --> 00:18:32,960
+would have the predicate that says well on
+which
+
+296
+00:18:32,960 --> 00:18:35,560
+domains do you wish to run your test in
+this
+
+297
+00:18:35,560 --> 00:18:37,330
+case two lists of ints.
+
+298
+00:18:37,330 --> 00:18:42,830
+And what property should hold, so that's a
+property that you want to test here.
+
+299
+00:18:42,830 --> 00:18:45,670
+And the test works similarly to what
+you've seen,
+
+300
+00:18:45,670 --> 00:18:48,910
+run a prescribed number of times, which
+you can configure.
+
+301
+00:18:50,180 --> 00:18:53,650
+Scholar check is quite a bit smarter then
+what we've seen also, in
+
+302
+00:18:53,650 --> 00:18:58,670
+the sense that if a test fails, it can
+minimize the counter example.
+
+303
+00:18:58,670 --> 00:19:00,620
+We can take sample you saw was a
+
+304
+00:19:00,620 --> 00:19:03,070
+list with a rather large random number
+that was
+
+305
+00:19:03,070 --> 00:19:07,800
+the first one it found that falsified the
+the test.
+
+306
+00:19:07,800 --> 00:19:10,380
+Whereas what QuickCheck and ScalaCheck
+would do in
+
+307
+00:19:10,380 --> 00:19:13,660
+this case is they would then try
+repeatedly to
+
+308
+00:19:13,660 --> 00:19:16,670
+find smaller and smaller examples I'm told
+the
+
+309
+00:19:16,670 --> 00:19:20,460
+example is something that is essentially a
+local optimum.
+
+310
+00:19:20,460 --> 00:19:25,730
+So, it would, typically, such a small
+example would be easier to understand as
+
+311
+00:19:25,730 --> 00:19:29,710
+a counterexample than just an arbitrary
+random value.
+
+312
+00:19:29,710 --> 00:19:31,500
+If you want to find out more about
+
+313
+00:19:31,500 --> 00:19:35,330
+ScalaCheck, then there's a tutorial on the
+course page.
+
+314
+00:19:35,330 --> 00:19:38,070
+And ScalaCheck will also be used in the
+first
+
+315
+00:19:38,070 --> 00:19:40,890
+assignment that you are going to do in
+this course.
+

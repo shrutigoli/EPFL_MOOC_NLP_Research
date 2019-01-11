@@ -1,0 +1,661 @@
+1
+00:00:04,710 --> 00:00:06,914
+Bonjour, après les moteurs continus, on va
+
+2
+00:00:06,914 --> 00:00:09,420
+parler des moteurs pas-à-pas et des
+encodeurs.
+
+3
+00:00:09,420 --> 00:00:11,404
+Il n'y a pas beaucoup de choses à dire
+
+4
+00:00:11,404 --> 00:00:15,300
+mais ça nous permettra de réviser notre
+expérience en programmation.
+
+5
+00:00:15,300 --> 00:00:19,476
+On va parler des types de moteurs
+pas-à-pas, insister surtout sur
+
+6
+00:00:19,476 --> 00:00:23,716
+les moteurs de type Lavet et parler un
+petit peu des encodeurs.
+
+7
+00:00:23,716 --> 00:00:29,774
+Les moteurs pas-à-pas que vous connaissez
+sont, en général, de type 4 phases et
+
+8
+00:00:29,774 --> 00:00:34,604
+les deux bobines à l'intérieur du moteur
+vont déplacer un
+
+9
+00:00:34,604 --> 00:00:39,747
+aimant ou attirer les pôles métalliques de
+façon à ce
+
+10
+00:00:39,747 --> 00:00:44,850
+que quand vous générez les phases sur le
+moteur,
+
+11
+00:00:44,850 --> 00:00:50,110
+vous avez une rotation dans un sens direct
+ou inverse.
+
+12
+00:00:50,110 --> 00:00:55,410
+Une astuce qui permet d'affiner un petit
+peu la position,
+
+13
+00:00:55,410 --> 00:00:59,580
+c'est de faire des demi-pas, de bouger
+
+14
+00:00:59,580 --> 00:01:05,162
+non-simultanément, dans le fond, les deux
+signaux.
+
+15
+00:01:05,162 --> 00:01:08,903
+Alors si vous avez besoin de moteurs
+pas-à-pas de
+
+16
+00:01:08,903 --> 00:01:13,266
+ce type-là, il faut les interfaces de
+puissance, il faut
+
+17
+00:01:13,266 --> 00:01:17,529
+très souvent des tensions supplémentaires
+donc je ne vais
+
+18
+00:01:17,529 --> 00:01:20,448
+pas m'en occuper, je ne suis pas un
+vendeur de
+
+19
+00:01:20,448 --> 00:01:25,432
+schiltz et vous trouverez des librairies
+associées à cette commande de moteur.
+
+20
+00:01:25,432 --> 00:01:30,675
+Je m'intéresse plutôt à ces moteurs
+pas-à-pas miniatures que l'on trouve aussi
+
+21
+00:01:30,675 --> 00:01:36,020
+dans les montres, qui sont les moteurs
+Lavet, qui ont une construction simplifiée
+
+22
+00:01:36,020 --> 00:01:41,083
+et dans cet exemple-là, ben vous voyez que
+vous avez un petit aimant ici
+
+23
+00:01:41,083 --> 00:01:45,962
+au centre qui va être positionné par deux
+
+24
+00:01:45,962 --> 00:01:50,900
+bobines pour, dans ce cas-là, prendre la
+position verticale
+
+25
+00:01:50,900 --> 00:01:55,892
+mais si maintenant vous coupez le courant
+ici, vous aurez uniquement cette
+
+26
+00:01:55,892 --> 00:02:01,170
+bobine qui va attirer le moteur à 60
+degrés et en 6
+
+27
+00:02:01,170 --> 00:02:06,451
+phases, vous aurez un tour complet.
+Alors la construction
+
+28
+00:02:06,451 --> 00:02:11,090
+est assez jolie, vous les trouvez dans les
+voitures,
+
+29
+00:02:11,090 --> 00:02:14,694
+dans le tableau de bord des voitures, ils
+existent depuis plus
+
+30
+00:02:14,694 --> 00:02:18,250
+de 10 ans donc ça devrait être assez
+facile à en récupérer.
+
+31
+00:02:18,250 --> 00:02:22,075
+Alors c'est l'aspect programmation qui
+nous intéresse.
+
+32
+00:02:22,075 --> 00:02:27,750
+Il nous faut quatre fils que l'on va
+brancher sur le port C en
+
+33
+00:02:27,750 --> 00:02:33,234
+activant ces quatres bits ici en sortie,
+les bits 0, 3 out.
+
+34
+00:02:33,234 --> 00:02:36,117
+Et maintenant, il nous faut définir
+
+35
+00:02:36,117 --> 00:02:42,915
+une table, la table d'avance, qui va
+définir dans le fond les
+
+36
+00:02:42,915 --> 00:02:50,110
+euh, six combinaisons de quatre bits qui
+permettent de faire avancer le moteur.
+
+37
+00:02:50,110 --> 00:02:55,244
+Alors, il suffit de passer un tout petit
+peu de temps à lire la documentation et
+
+38
+00:02:55,244 --> 00:03:00,880
+convertir dans des mots de 4 bits, codés
+en hexadécimal,
+
+39
+00:03:00,880 --> 00:03:05,060
+pour avoir la succession des pas pour que
+ça avance.
+
+40
+00:03:05,060 --> 00:03:09,338
+Si vous intervertissez ces valeurs, et
+bien ça va reculer.
+
+41
+00:03:09,338 --> 00:03:12,066
+Donc si vous voulez avancer et reculer,
+vous avez le
+
+42
+00:03:12,066 --> 00:03:16,090
+choix entre passer entre deux tables mais
+attention à la synchronisation.
+
+43
+00:03:16,090 --> 00:03:23,310
+Vous préférerez vous déplacer dans un sens
+ou dans l'autre avec le pointeur de temps.
+
+44
+00:03:23,310 --> 00:03:25,886
+Alors le programme est trivial,
+
+45
+00:03:25,886 --> 00:03:32,253
+si je veux tester, je fais une boucle for,
+j'avance toutes les 2000 microsecondes
+
+46
+00:03:32,253 --> 00:03:35,795
+euh, les moteurs pas-à-pas, c'est
+intéressant à
+
+47
+00:03:35,795 --> 00:03:39,402
+étudier, ils ont parfois des vitesses où
+
+48
+00:03:39,402 --> 00:03:46,333
+l'impulsion qui le fait tourner le fait
+osciller et il a de la peine, en fait, à
+
+49
+00:03:46,333 --> 00:03:51,110
+se positionner exactement sur la position,
+sur la bonne position avant qu'il
+
+50
+00:03:51,110 --> 00:03:52,830
+y ait l'impulsion suivante.
+
+51
+00:03:52,830 --> 00:03:56,780
+L'autre point d'aujourd'hui, c'est les
+encodeurs.
+
+52
+00:03:56,780 --> 00:04:01,727
+Les encodeurs de souris vont générer un
+signal déphasé, ici
+
+53
+00:04:01,727 --> 00:04:06,746
+ces deux diodes ne sont pas diamétralement
+opposées, il y a un petit
+
+54
+00:04:06,746 --> 00:04:11,820
+décallage qui fait que la séquence reçue
+est décallée, on dit de
+
+55
+00:04:11,820 --> 00:04:17,214
+90 degrés, puisque ceci correspond, pas
+nécessairement
+
+56
+00:04:17,214 --> 00:04:19,790
+à un tour complet mais à une avance
+
+57
+00:04:19,790 --> 00:04:26,780
+d'une dent sur le capteur, sur le disque
+optique.
+
+58
+00:04:26,780 --> 00:04:31,068
+Dans tous les appareils maintenant, le
+potentiomètre a été remplacé par un
+
+59
+00:04:31,068 --> 00:04:36,686
+encodeur qui est en fait une suite de
+balais qui vont générer des
+
+60
+00:04:36,686 --> 00:04:42,910
+signaux déphasés mais attention puisque
+c'est des contacts mécaniques,
+
+61
+00:04:42,910 --> 00:04:45,115
+vous allez avoir des rebonds de contact.
+
+62
+00:04:45,115 --> 00:04:48,246
+Voilà ce que j'ai pu observer sur un
+oscilloscope.
+
+63
+00:04:48,246 --> 00:04:53,187
+Euh, là c'est un petit peu bizarre, j'ai
+de la peine à l'interpréter
+
+64
+00:04:53,187 --> 00:04:58,002
+mais c'est bien ce que verra le processeur
+et il faut le
+
+65
+00:04:58,002 --> 00:05:02,925
+filtrer soit par des instructions qui vont
+décider que cette
+
+66
+00:05:02,925 --> 00:05:08,343
+impulsion est trop courte, soit par un
+condensateur qui ne filtre
+
+67
+00:05:08,343 --> 00:05:09,360
+pas trop.
+
+68
+00:05:09,360 --> 00:05:15,946
+Là, apparemment, il y a quelque chose de,
+de bizarre qui a été mal filtré.
+
+69
+00:05:15,946 --> 00:05:21,871
+Donc euh, la programmation, même si elle
+est facile, l'implémentation
+
+70
+00:05:21,871 --> 00:05:27,660
+complète n'est pas toujours évidente, il
+faut avoir les moyens
+
+71
+00:05:27,660 --> 00:05:32,940
+d'observation de ce qu'il se passe
+exactement au niveau électrique.
+
+72
+00:05:32,940 --> 00:05:33,437
+Alors du
+
+73
+00:05:33,437 --> 00:05:37,830
+point de vue programmation, ben
+typiquement on a une machine d'état.
+
+74
+00:05:37,830 --> 00:05:42,960
+On est dans l'état 0 avec les deux entrées
+qui valent
+
+75
+00:05:42,960 --> 00:05:47,948
+0.
+On passe dans l'état 1 avec 0 qui est à 1,
+
+76
+00:05:47,948 --> 00:05:53,032
+donc l'entrée in0 est à 1 a fait passer
+dans cet
+
+77
+00:05:53,032 --> 00:05:58,534
+état où on va rester jusqu'à ce qu'on
+
+78
+00:05:58,534 --> 00:06:02,898
+ait le in1 qui s'active et cetera.
+Et si
+
+79
+00:06:02,898 --> 00:06:07,908
+maintenant, on change de sens ici, et
+bien,
+
+80
+00:06:07,908 --> 00:06:13,492
+dans la position 3, on va voir que
+
+81
+00:06:13,492 --> 00:06:18,808
+c'est in1 qui s'est activé.
+Et
+
+82
+00:06:18,808 --> 00:06:24,180
+dans cette position 3, on devrait passer
+
+83
+00:06:24,180 --> 00:06:28,149
+à l'état 1, il y a peut-être une
+incohérence entre ces deux dessins mais
+
+84
+00:06:28,149 --> 00:06:33,410
+vous voyez l'esprit.
+Si je tourne dans l'autre sens maintenant,
+
+85
+00:06:33,410 --> 00:06:38,800
+je vais parcourir une fois dans un sens,
+une fois dans l'autre.
+
+86
+00:06:38,800 --> 00:06:44,136
+Alors ceci, par programmation, peut se
+faire assez
+
+87
+00:06:44,136 --> 00:06:49,266
+facilement, il faut naturellement définir
+sur quel bit sont
+
+88
+00:06:49,266 --> 00:06:54,100
+cablés les deux bits 0 et 1.
+Il faut
+
+89
+00:06:54,100 --> 00:06:59,525
+naturellement donner les directions de ces
+bits
+
+90
+00:06:59,525 --> 00:07:04,990
+au niveau des registres de directions.
+Et maintenant,
+
+91
+00:07:04,990 --> 00:07:09,755
+je continue dans un instant, l'algorithme
+
+92
+00:07:09,755 --> 00:07:14,630
+principal qui gère cette machine d'état se
+fait avec
+
+93
+00:07:14,630 --> 00:07:20,306
+un switch next et vous avez un certain
+nombre de cas et là, on
+
+94
+00:07:20,306 --> 00:07:26,030
+s'est arrangé de donner des noms à ces cas
+qui correspondent justement
+
+95
+00:07:26,030 --> 00:07:30,782
+aux états qui ont été définis ici.
+Il y a le cas 0, et 0 il
+
+96
+00:07:30,782 --> 00:07:35,457
+faut mettre une lettre devant.
+Si on est
+
+97
+00:07:35,457 --> 00:07:40,384
+en in0, on va passer dans
+
+98
+00:07:40,384 --> 00:07:42,500
+l'état 1.
+
+99
+00:07:42,500 --> 00:07:45,293
+Donc, on doit incrémenter le compteur
+puisqu'on tourne
+
+100
+00:07:45,293 --> 00:07:47,245
+dans ce sens, on va incrémenter de 1.
+
+101
+00:07:47,245 --> 00:07:52,648
+On incrémente la position et puis on dit
+next, l'état
+
+102
+00:07:52,648 --> 00:07:56,878
+prochain, ça ça fait partie hein, de la
+structure du
+
+103
+00:07:56,878 --> 00:08:01,336
+switch variable next, si cette variable
+next est égale à
+
+104
+00:08:01,336 --> 00:08:05,468
+e1, on verra comment ça a été déclaré, et
+bien,
+
+105
+00:08:05,468 --> 00:08:12,280
+on a fait tout ce qu'il fallait faire, on
+quitte et puis quand on
+
+106
+00:08:12,280 --> 00:08:20,094
+reviendra dans ce switch next, et bien on
+va voir que ce n'est plus le cas 0, 1, on
+
+107
+00:08:20,094 --> 00:08:25,552
+est dans le cas 1 et dans ce cas 1, et
+bien si on voit que le signal
+
+108
+00:08:25,552 --> 00:08:30,630
+est en fait en quelque sorte, on est
+revenu en arrière dans la rotation, on va
+
+109
+00:08:30,630 --> 00:08:35,208
+se trouver dans in0, enfin on va se
+retrouver
+
+110
+00:08:35,208 --> 00:08:40,130
+dans e0 et on va décrémenter le compteur
+de nouveau.
+
+111
+00:08:40,130 --> 00:08:47,501
+Donc on va parcourir ces différents cas et
+la vitesse d'accès est relativement
+
+112
+00:08:47,501 --> 00:08:51,160
+rapide donc on peut trouver des
+algorithmes plus rapides naturellement.
+
+113
+00:08:51,160 --> 00:08:55,268
+Alors les cas e0, e1, e2,
+
+114
+00:08:55,268 --> 00:09:00,330
+e3 ont été déclarés par cette fonction qui
+s'appelle enum.
+
+115
+00:09:00,330 --> 00:09:06,606
+Enum, dans le fond, dit simplement : moi,
+je sais que c'est 0, 1,
+
+116
+00:09:06,606 --> 00:09:13,090
+2, 3 mais l'utilisateur préfère dire e0,
+e1, e2, e3.
+
+117
+00:09:13,090 --> 00:09:16,740
+C'est un peu comme le define, une
+correspondance.
+
+118
+00:09:16,740 --> 00:09:20,395
+Et puis on va, ici, et il y a une variable
+next qui se
+
+119
+00:09:20,395 --> 00:09:24,510
+déclare en même temps et dont la valeur
+initiale est e0.
+
+120
+00:09:24,510 --> 00:09:27,330
+Donc ça, ça fait partie du switch.
+
+121
+00:09:27,330 --> 00:09:31,560
+Maintenant, il nous faut dire que notre
+compteur est
+
+122
+00:09:31,560 --> 00:09:35,698
+à 0 et nous pouvons partir dans la boucle.
+
+123
+00:09:35,698 --> 00:09:41,910
+On va afficher le compteur, ici j'ai
+décidé sur le port C.
+
+124
+00:09:41,910 --> 00:09:46,266
+Est-ce que je peux l'envoyer sur un serial
+print?
+
+125
+00:09:46,266 --> 00:09:50,788
+Le serial print va prendre un certain
+temps donc je risque
+
+126
+00:09:50,788 --> 00:09:54,580
+de perdre des pas et de croire que mon
+programme est faux.
+
+127
+00:09:54,580 --> 00:09:58,008
+Donc il faudra tourner très, très
+lentement si je
+
+128
+00:09:58,008 --> 00:10:02,470
+veux afficher les pas, ici, au niveau du
+serial print.
+
+129
+00:10:02,470 --> 00:10:06,762
+Ici, j'ai décidé qu'en une milliseconde
+
+130
+00:10:06,762 --> 00:10:11,120
+j'avais avantage à échantillonner ces
+entrées.
+
+131
+00:10:11,120 --> 00:10:14,840
+Je peux les échantillonner plus souvent
+mais
+
+132
+00:10:14,840 --> 00:10:18,863
+ça va utiliser de la puissance du
+processeur.
+
+133
+00:10:18,863 --> 00:10:22,770
+Bien, alors voilà, on a vu un petit peu
+qu'il y avait
+
+134
+00:10:22,770 --> 00:10:26,760
+des moteurs 4 phases, qu'il y a des
+moteurs Lavet avec 6 phases,
+
+135
+00:10:26,760 --> 00:10:31,110
+que leur programmation est triviale et
+qu'il y a des encodeurs aussi qui
+
+136
+00:10:31,110 --> 00:10:36,135
+s'utilisent de plus en plus fréquemment et
+qui sont faciles à programmer avec
+
+137
+00:10:36,135 --> 00:10:42,240
+une machine d'état, l'instruction switch
+case.

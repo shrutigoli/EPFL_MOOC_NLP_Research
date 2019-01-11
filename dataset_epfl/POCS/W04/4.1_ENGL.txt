@@ -1,0 +1,113 @@
+In this lecture, 
+I'm going to cover locality.
+Locality is the notion that you would probably intuitively assume is about things being close to each other or not.
+A little focus to some extent on date locality, versus locality of computation.
+Nowadays, in more and more scenarios in computer science, we realize that data governs computation and if we remove computation to better data rather than vice versa.
+Of course, there will be concerns about parallelization, concurrency and networking but we have to worry about computations happening in different places but usually, everything is centered around data.
+Locality in a sense is the aspect of system that most closely relates software systems with the physical world.
+With the world of atoms and matter, etc.
+We can fundamentally only pack so much memory and computing power into a limited space.
+If we build a CPU, there will be gates, transistors inside the CPU and the amount of integration we can do will be limited by physical concerns of the real world.
+As data and computation needs grow, we'll get into locality problems.
+Data, just like computation, takes space inside chips or other devices.
+In a sense we can reduce pretty much any concern about the performance in the systems to locality considerations.
+In computing, essentially all time and energy costs is due to moving data over a distance.
+That's relatively clear if you think about the data transfer, let's say from RAM to a CPU cache.
+Obviously the time this takes is governed by the speed of light and the time it takes to move to see the message from the RAM to the CPU.
+It is in the more abstract sense also truthful computing in general.
+If you figure the gates and the connections in between them inside the CPU, we can think of a computation being governed by the way it travels by some bits that is involved in the computation.
+So even if you got a loop, that means that the bits flow in some sense several ways in circles so to say from the same gates in general we can still think of this as overall time travels governing the time it takes to do the computation.
+Now, there's fundamental limits to shrinking the distances these electrons have to travel.
+There is quantum effect to soon take over as we integrate our chips further, make them smaller.
+So automatically it will not be able to work with messages that are constituted by less than one electron.
+And there's of course, noise, on these very small scales that will require to have more than one electron.
+There is this fundamental failure of Dennard Scaling, that we observe in computer architecture, which is in a sense, more fundamental, less contested and more important than what we sometimes consider the feel of, the upcoming feel of Moore's law.
+So, in Dennard scaling, Dennard's law, refers to the empirical effect over many decades now.
+We've been able to reduce the voltages needed to run our computations with the size integrations that means we double the number of gates, we half the size of each gate needed so overall the space didn't grow and we also halved' the voltages needed so we didn't need more energy.
+Now this Dennard Law is now failing and it's really failing permanently.
+Which means, we still might be able to integrate and decrease sizes for some more time, energies and energy densities increase which means our chips get hotter, and it gets harder to keep them cool.
+That also relates to the fact that only have two or if you like to see at most three dimensions to pack stuff and that means gates in a CPU into space.
+People right now are working on three dimensional chips but already for two dimensional chips, right now with this high integrations cooling is very hard and for three dimensional chips, it gets even harder.
+So cooling becomes a really important challenge apart from the fact that if you are using a lot of energy, that also has a cost.
+Computation links need space.
+Buses and networks increasingly become bottlenecks as we integrate and grow our data and our computation capacities further.
+That means, as we have computers with more and more data at the disposal or storage capacities at their disposal, the relative bandwidths for transferring this data decreases.
+In many, if not in most modern applications we care about.
+Including big data analytics, video streaming, things like this.
+CPUs are now mainly waiting for data to arrive, and one could argue that this should inform and guide us in our design of new hardware.
+But this is not just for two or three dimensional applications of course.
+The solution to this, of course is cache hierarchies, prefetching, etc.
+Now, there's an important notion of memory hierarchies and we should talk about this a little.
+If you think of a computer system, it will have multiple CPUs. maybe with multiple cores.
+Here on this right side we have an example picture where we've got single core CPUs and these CPUs have caches.
+Then there's the anagram that connects to these caches and connects at the same time also to the storage devices.
+They might be storage devices like hard drives, flash drives, etc.
+And they themselves have (inaudible) several layers of (inaudible) including the physical storage device and then a number of caches, potentially.
+It is important to understand and remember that there's vastly different transfer rates and speeds at which these different devices can be accessed for read and write.
+On this slide I've got a number of examples for a specific model and chip and you can see that in all the times it takes to do certain tasks even inside the CPU for different caches really differs by two orders of magnitude basically.
+So if I take the fastest cache and I hit something it means it is in the cache and I don't have to go further to find my data, it takes about four cycles on this chip while having to access the level three cache off that CPU and let's say even on a different CPU on that same main board might take hundreds of cycles.
+Now if we assume that this chip has a (inaudible) frequency of three gHz, then accessing local TRAM which takes, let's say six nanoseconds, takes 180 cycles.
+Accessing or seeking on a hard drive
+10 milliseconds, takes about
+40 million cycles, so we see a vast difference on the magnitude and speed, about seven orders of magnitude between fast caches and hard drives. Of course there's devices that are even slower.
+So there are a number of basic principles to optimize locality that we are going to talk about in this series of videos.
+I have a group of three major ideas here.
+The first is caching, which is about keeping some kind of work inside of data that's frequently used close to where the computation happens.
+Another one is to prefer sequential over random access.
+Physics governs that some data is better read or written sequential than by random access, that's true for many kinds of devices.
+It's very obvious for hard drives or tapes but it's also true for even an ananogram for example.
+In a sense, prefetching connects caching and this notion of sequential over random access in a sense that when you do things like branch prediction.
+If you try to predict what to prefetch into a cache, often enough you try to get more of the same. We try to continue sequential that we have been reading.
+And another, in a sense the final major class of things that you can do for locality is partitioning and dealing with data in a data parallel way.
+Not necessarily using parallelization but basically splitting up the parts and doing divide and conquer.
+We're going to talk in future videos about use cases like out of core algorithms, things like joints and sorting.
+Let's closer into these three strategies and start with caching.
+Caching is really everywhere in systems there's many examples and just some of them are of course, the CPU caches.
+In address translation,memory management, as the translation look at side buffers.
+In networks there's many examples, one is edge caches which are really fundamental to be able to do for example streaming video on the internet in reasonable times.
+Another example are buffers in operating systems, data base management systems, storage device controllers, etc.
+Another example is materialized use in database systems.
+There you can basically take a query and store the query result for future use.
+Caching is actually frequently equated with localities so if you look at our textbook, Salzer and Kaashoek, there's a performance chapter and in there they talk about locality and for them it's just caching and I think there's more to it.
+We mentioned prefetching as one way to do speculative filling of a cache, to have stuff in there that you might use next so that you don't have to wait for it
+How can you do it?
+There's of course different techniques and many of them are trade secrets but often enough there's nothing better that you can do than to assume that some loop is going to continue and you're going to eat more of the stuff that you've been just reading on sequentially from wherever on the next lower level no matter where or how the data is coming from.
+That connects us to sequential access.
+Sequential access is fast than random access in many different kinds of storage devices in the memory technology.
+What does this mean?
+So there is some notion of locality of storage for example in a hard drive, things can be stored sequentially in tracks on disks, on RAM there are gates close to each other that have addresses similar to each other and we're going to talk about sequential access via reading things that are close to each other in physical storage versus random access we have to jump around and go from one
+(inaudible) to the other that are completely unrelated to each other.
+Now in hard drives, it's perfectly clear why sequential access is faster than random access.
+There, we've got a physical read/write head and we've got a rotating disk so that the read/write test has to place itself on the right track on our disks and the disks have to rotate to the right place to be able to start reading a particular address.
+That takes time because we've got mechanical pieces rotating, moving around and that's of course, extremely slow on the time scales that they talk about in the context of computing.
+Now, your seek times in modern disks are on the level of let's say ten milliseconds each time.
+Once you're at the right place, transferring lots and lots of pages of data, very quickly, that's kind of fast.
+We might be reading tens of mega bytes per second, so if we have to randomly jump around for each byte and incur ten milliseconds of sync time, every time, we're going to have horrible access times.
+While, if we get to go to a place and then sequential read basically off the hard drive, that's going to be quite good.
+It is also true for devices that are not like this, that are not physically a rotating disk for example.
+Let's take for example flash and solid state devices.
+They designed model solid state devices in a way that you can only write certain sized blocks.
+This is actually also true for hard drives but you can write only to places that are empty in a sense, and if something is not empty you have to erase it first.
+While you cannot just write individual bytes, let's say, or words to locations but you have to write in blocks.
+Erasure applies to even larger blocks.
+So, we mean if you've got a fragmented solid state drive you must first defragment it, erasing large regions to be able to do this.
+You might have to move useless stuff that you still need around and solid state devices controls have garbage collectors and corresponding caching strategies, etc.
+Counterintuitively it's actually also true for dynamic RAM.
+That means sequential access is preferred over random access for random access memory.
+That's counterintuitive but why is that true? Well, one is if you want to address a consecutive block of memory in random access memory, there are techniques for optimizing this information transfer on the bus this requests to actually use little space you might see "I want to read this range", or "I want to transfer this entire block in random access memory".
+That can be done more efficiently than having to address each individual position.
+Also, if you do random access to DRAM you will have lots of misses in the translation local side buffer while you could do prefetching properly to sequential access.
+Finally, there's partitioning, so we've got a problem that consists of larger pieces of data having to be processed and we can decompose this data into pieces, process each of these pieces independently, without having to look at the other pieces having two local result and then combining these results, that's what they call embarrassingly parallel.
+This means, no communication needed between these pieces of locally (inaudible) these different pieces and process them.
+A more classic example is map/reduce which really relies on the ability to assign map tasks to different pieces and combine their results.
+Of course, that's not applicable everywhere.
+So it's actually a non phenomenon that frequently, when we look at the graph the data gets processed in and by that
+I mean, not simply that our data is graph shaped but there are certain dependencies on aligning our data, relationships between pieces of data that can be resent in different ways.
+For example, as relations, but also as graphs, for example.
+The ace, in this graph is a relatively small diameter, so these are the so called "small world phenomenon"
+"small world graphs" and these graphs have no small cuts that means such problems, and they are very ubiquitous and you'll see this in the next video, they cannot be processed in an embarrassingly parallel fashion.
+And that's very frequent actually.
+To summarize, we've been talking about data locality, its fundamental nature that connects the physical world with software systems, its impact on performance, and arguably, its (inaudible) to care about when you think about performance.
+You can always connect performance with a data locality problem, fundamentally.
+We've talked about three broad strategies for dealing with locality and making things more local.
+These were caching, sequential access preferred and partitioning.

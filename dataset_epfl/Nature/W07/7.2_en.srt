@@ -1,0 +1,1247 @@
+1
+00:00:03,460 --> 00:00:06,750
+Welcome back: Nature, In Code.
+We're in Chapter 7, Lecture 2.
+
+2
+00:00:06,750 --> 00:00:11,310
+So our task is to implement the 
+spatial spread of an infectious disease
+
+3
+00:00:11,310 --> 00:00:13,756
+in JavaScript,
+so let's go ahead and do it.
+
+4
+00:00:13,756 --> 00:00:19,320
+Alright, so here we are with our friend
+the empty document,
+
+5
+00:00:19,320 --> 00:00:22,030
+and we're just going to go ahead
+and get started,
+
+6
+00:00:22,030 --> 00:00:26,490
+so I'm going to again start
+with the doc type HTML, as always,
+
+7
+00:00:26,490 --> 00:00:31,950
+and I'm going to set up my HTML template,
+
+8
+00:00:31,950 --> 00:00:34,630
+so <i>&lt;html&gt; &lt;/html&gt;</i>
+
+9
+00:00:34,630 --> 00:00:38,900
+and then the head tag,
+which is eventually going to contain
+
+10
+00:00:38,900 --> 00:00:42,006
+the d3 library, and the body tag,
+
+11
+00:00:42,006 --> 00:00:45,756
+which is going to contain
+the rest of the code.
+
+12
+00:00:46,580 --> 00:00:49,780
+Okay, I'm going to go ahead
+and save this right now,
+
+13
+00:00:49,780 --> 00:00:53,710
+so that I have
+the proper syntax highlighting;
+
+14
+00:00:53,710 --> 00:00:58,559
+I'm here in code examples.
+I'm going to call this <i>epidemics.html</i>
+
+15
+00:00:59,890 --> 00:01:04,599
+Good, so let's do it
+as we've always done it in the past.
+
+16
+00:01:04,599 --> 00:01:07,412
+We are just going to set up
+a few global variables,
+
+17
+00:01:07,412 --> 00:01:11,960
+and then we're just going to define
+the first function that we need to call.
+
+18
+00:01:11,960 --> 00:01:16,220
+So the global variables are: <i>grid_length</i>,
+
+19
+00:01:16,220 --> 00:01:20,919
+and here I am now being inspired,
+essentially, by what we--
+
+20
+00:01:20,919 --> 00:01:21,785
+Whoops! Sorry.
+
+21
+00:01:21,785 --> 00:01:25,210
+Here first of all, of course,
+we need the script tag.
+
+22
+00:01:25,210 --> 00:01:28,046
+That's why we didn't get
+the syntax highlighting.
+
+23
+00:01:28,046 --> 00:01:32,766
+So we're inspired
+by what we did in Chapter 5,
+
+24
+00:01:32,766 --> 00:01:35,920
+and in Chapter 5 we also had
+a spatial simulation,
+
+25
+00:01:35,920 --> 00:01:40,100
+and as you remember, we had
+to first define the grid length here,
+
+26
+00:01:40,100 --> 00:01:44,820
+which was 100, and this is to span,
+essentially, the size of the grid.
+
+27
+00:01:44,820 --> 00:01:46,650
+We're going to have a squared grid.
+
+28
+00:01:46,650 --> 00:01:49,670
+And then, of course, we need
+that grid variable itself,
+
+29
+00:01:49,670 --> 00:01:52,240
+which is going to hold
+the two-dimensional array--
+
+30
+00:01:52,240 --> 00:01:55,558
+I'm just going to initialize this
+as an empty array here--
+
+31
+00:01:55,558 --> 00:01:59,000
+and then we have
+this concept of a temp grid,
+
+32
+00:01:59,000 --> 00:02:03,590
+where we could store values
+as we're going through each individual,
+
+33
+00:02:03,590 --> 00:02:05,851
+and as we're trying to figure out
+
+34
+00:02:05,851 --> 00:02:09,930
+what the state of the grid will be
+in the next generation.
+
+35
+00:02:09,930 --> 00:02:13,470
+And in order to avoid any complications
+between this time step
+
+36
+00:02:13,470 --> 00:02:16,704
+and the next time step,
+we use this temp grid.
+
+37
+00:02:16,704 --> 00:02:18,600
+If this sounds completely alien to you,
+
+38
+00:02:18,600 --> 00:02:22,757
+please go back to Chapter 5, 
+where we discussed this in great detail.
+
+39
+00:02:22,757 --> 00:02:26,030
+And then I need two variables here 
+for this particular simulation,
+
+40
+00:02:26,030 --> 00:02:28,190
+which is <i>beta</i> and <i>gamma</i>.
+
+41
+00:02:28,190 --> 00:02:30,090
+So these are the transmission
+probabilities,
+
+42
+00:02:30,090 --> 00:02:35,220
+and the recovery probabilities,
+and I'm going to set this here to 0.05,
+
+43
+00:02:35,220 --> 00:02:39,848
+the <i>beta</i>, and the <i>gamma</i> to 0.1.
+
+44
+00:02:40,340 --> 00:02:42,900
+So again, just as a reminder,
+
+45
+00:02:42,900 --> 00:02:49,012
+<i>beta</i> is the per time unit
+and per contact transmission probability.
+
+46
+00:02:49,012 --> 00:02:53,660
+So if an infected individual is 
+connected to a susceptible individual,
+
+47
+00:02:53,660 --> 00:02:58,121
+per times the probability 
+of the infected infecting
+
+48
+00:02:58,121 --> 00:03:02,583
+the susceptible individual is 
+here now 5%, that's <i>beta</i>,
+
+49
+00:03:02,583 --> 00:03:05,394
+and the <i>gamma</i> is
+the per time step probability
+
+50
+00:03:05,394 --> 00:03:07,941
+that an infected individual recovers.
+
+51
+00:03:08,390 --> 00:03:11,294
+Good. So, what else do we need?
+
+52
+00:03:11,294 --> 00:03:14,932
+Well, I think that's about it
+in terms of global variables.
+
+53
+00:03:15,640 --> 00:03:19,420
+So the first thing we need to do,
+as we needed to do in Chapter 5,
+
+54
+00:03:19,420 --> 00:03:22,400
+is to <i>init</i>, or to initialize this grid.
+
+55
+00:03:22,400 --> 00:03:24,760
+So I'm going to call again
+this function <i>init_grid()</i>,
+
+56
+00:03:24,760 --> 00:03:28,336
+and now I have to define it: <i>init_grid</i>
+
+57
+00:03:31,130 --> 00:03:33,869
+And, like in Chapter 5,
+
+58
+00:03:33,869 --> 00:03:37,200
+I'm now simply going
+to set up this nested loop,
+
+59
+00:03:37,200 --> 00:03:42,997
+so <i>for (var i = 0; i &lt; grid_length;</i>
+
+60
+00:03:46,300 --> 00:03:50,431
+and then of course <i>i = i + 1)</i>
+
+61
+00:03:52,390 --> 00:03:55,280
+So the first thing I do here
+is to actually ensure
+
+62
+00:03:55,280 --> 00:03:59,780
+that this grid is indeed
+a two-dimensional array,
+
+63
+00:03:59,780 --> 00:04:03,780
+by setting the <i>i</i> th element of grid
+to an empty array.
+
+64
+00:04:03,780 --> 00:04:05,519
+So now we have
+this two-dimensional array,
+
+65
+00:04:05,519 --> 00:04:10,647
+so now I can go over <i>grid_length</i> again.
+
+66
+00:04:11,385 --> 00:04:15,328
+Okay, let me just copy this,
+and use <i>ii</i> here, as always.
+
+67
+00:04:17,910 --> 00:04:22,690
+And now I'm in a position where
+I can set the cell values,
+
+68
+00:04:22,690 --> 00:04:25,900
+at grid <i>iii</i>.
+
+69
+00:04:25,900 --> 00:04:29,270
+So previously we set those
+to three possible genotypes,
+
+70
+00:04:29,270 --> 00:04:32,842
+A1A1, A1A2, and A2A2.
+
+71
+00:04:32,842 --> 00:04:35,810
+Here the three different states
+are not genetic states,
+
+72
+00:04:35,810 --> 00:04:40,560
+but they're <i>S</i>, <i>I</i> and <i>R</i>,
+so susceptible, infected, or recovered.
+
+73
+00:04:40,560 --> 00:04:43,662
+So I'm going to initialize
+these values here simply to <i>S</i>.
+
+74
+00:04:44,130 --> 00:04:45,911
+Alright and then, I need to make sure
+
+75
+00:04:45,911 --> 00:04:50,377
+I'm going to close
+the curly bracket here.
+
+76
+00:04:50,719 --> 00:04:53,610
+So now each of the individuals,
+
+77
+00:04:53,610 --> 00:04:56,510
+the 10,000 individuals here,
+are susceptible.
+
+78
+00:04:56,510 --> 00:04:59,870
+Now that would be a boring world. 
+Well, it would be a healthy world,
+
+79
+00:04:59,870 --> 00:05:02,220
+but it would be boring
+for the perspective
+
+80
+00:05:02,220 --> 00:05:04,970
+of our example here,
+because we wouldn't get an epidemic,
+
+81
+00:05:04,970 --> 00:05:08,291
+because there are
+no infectious individuals as of yet.
+
+82
+00:05:08,750 --> 00:05:12,830
+So what we want to do is we want 
+to pick now a random individual
+
+83
+00:05:12,830 --> 00:05:17,979
+or a random location on this grid,
+and set its value to <i>i</i>
+
+84
+00:05:17,979 --> 00:05:21,540
+so that this individual
+will be infectious.
+
+85
+00:05:21,540 --> 00:05:23,225
+How do we do this?
+
+86
+00:05:23,700 --> 00:05:28,680
+Well basically we're going
+to pick some individual here,
+
+87
+00:05:28,680 --> 00:05:33,195
+and we have to choose
+the corresponding coordinates here,
+
+88
+00:05:33,195 --> 00:05:37,800
+and then we're going to set
+this poor individual to <i>I</i>.
+
+89
+00:05:37,800 --> 00:05:40,439
+So this individual is now infected.
+
+90
+00:05:40,439 --> 00:05:42,274
+Okay, what values do we need here?
+
+91
+00:05:42,240 --> 00:05:44,900
+Well, we need randomly picked values
+
+92
+00:05:44,900 --> 00:05:48,420
+between zero--
+that's the minimum index of course,
+
+93
+00:05:48,420 --> 00:05:52,210
+and the maximum index 
+of this array is <i>grid_length</i> minus one,
+
+94
+00:05:52,210 --> 00:05:58,885
+and it's minus one, as you know,
+because the index in an array starts at 0.
+
+95
+00:06:00,420 --> 00:06:05,740
+So how do we get an integer value 
+between a minimum and a maximum value?
+
+96
+00:06:05,740 --> 00:06:08,210
+Hm, that should ring a bell.
+
+97
+00:06:08,210 --> 00:06:11,189
+This is something we've used in Chapter 5,
+
+98
+00:06:11,189 --> 00:06:14,485
+where we developed this function
+<i>get_random_int</i>
+
+99
+00:06:14,485 --> 00:06:17,850
+with a min and a max value.
+So you can either copy this function
+
+100
+00:06:17,850 --> 00:06:21,783
+from there, or I'm just going
+to develop it here once again:
+
+101
+00:06:22,260 --> 00:06:27,847
+<i>get_random_int(min, max)</i>
+
+102
+00:06:29,520 --> 00:06:32,070
+So just as as a reminder,
+how do we do this?
+
+103
+00:06:32,070 --> 00:06:36,630
+Well, anything random 
+we will need, eventually,
+
+104
+00:06:36,630 --> 00:06:38,035
+to call <i>Math.random()</i>
+
+105
+00:06:38,035 --> 00:06:41,019
+Now, <i>Math.random()</i> alone here,
+of course, is not nearly sufficient,
+
+106
+00:06:41,019 --> 00:06:42,950
+because it has three problems.
+
+107
+00:06:42,950 --> 00:06:47,010
+First of all, it doesn't return
+an integer, but a floating point number.
+
+108
+00:06:47,010 --> 00:06:52,740
+Second, it only spans from 
+0 to 1, so it only has a range of 1,
+
+109
+00:06:52,740 --> 00:06:55,640
+but here our range could be much larger.
+
+110
+00:06:55,640 --> 00:07:00,910
+And then, finally, it's also placed 
+wrongly-- it starts at zero,
+
+111
+00:07:00,910 --> 00:07:03,820
+but our range actually starts at <i>min</i> here,
+
+112
+00:07:03,820 --> 00:07:06,150
+so we need to fix these three things.
+
+113
+00:07:06,150 --> 00:07:08,090
+How did we do this?
+
+114
+00:07:08,090 --> 00:07:11,650
+Well, the first action item here,
+so to speak,
+
+115
+00:07:11,650 --> 00:07:18,475
+is to multiply this <i>Math.random</i>
+with <i>(max - min + 1)</i>
+
+116
+00:07:18,475 --> 00:07:20,080
+to get the correct range.
+
+117
+00:07:20,080 --> 00:07:24,030
+Why? Because <i>max - min</i>
+exactly gives us the range,
+
+118
+00:07:24,030 --> 00:07:28,875
+so for example if <i>max</i> is 8
+and <i>min</i> is 3 then <i>max - min</i> is 5,
+
+119
+00:07:28,875 --> 00:07:30,400
+which is the correct range,
+
+120
+00:07:30,400 --> 00:07:33,657
+but we want to, of course, include 5,
+
+121
+00:07:33,657 --> 00:07:36,870
+and in order to not lose this max value,
+
+122
+00:07:36,870 --> 00:07:39,690
+we have to add 1, specifically,
+
+123
+00:07:39,690 --> 00:07:45,163
+as we're going to now <i>floor</i>
+this whole term here,
+
+124
+00:07:45,163 --> 00:07:48,280
+because that will give us the integer.
+
+125
+00:07:48,280 --> 00:07:51,280
+And now we have to solve two problems.
+
+126
+00:07:51,280 --> 00:07:53,550
+We have an integer;
+it has the correct range,
+
+127
+00:07:53,550 --> 00:07:57,660
+but it's at the wrong location
+because it starts still at zero,
+
+128
+00:07:57,660 --> 00:07:59,060
+but it should start at <i>min</i>.
+
+129
+00:07:59,060 --> 00:08:02,690
+This is why we're simply going
+to add <i>min</i> here at the end.
+
+130
+00:08:02,690 --> 00:08:06,194
+Alright, so now that we have
+this <i>random_int</i> function,
+
+131
+00:08:06,194 --> 00:08:07,970
+we can use this here.
+
+132
+00:08:07,970 --> 00:08:11,600
+So we're going to call this here
+<i>get_random_int</i>,
+
+133
+00:08:11,600 --> 00:08:15,240
+and the two arguments
+that we want to pass here
+
+134
+00:08:15,240 --> 00:08:17,671
+are the minimum value, which is zero,
+
+135
+00:08:17,671 --> 00:08:22,893
+and the maximum value
+which is <i>grid_length-1</i>
+
+136
+00:08:24,020 --> 00:08:28,438
+And the exact same thing happens here.
+
+137
+00:08:29,350 --> 00:08:32,760
+Okay, we can just copy this,
+move it over here.
+
+138
+00:08:32,760 --> 00:08:34,868
+And by the way, of course
+you may have noticed
+
+139
+00:08:34,868 --> 00:08:39,000
+that this would have technically
+not been necessary right now,
+
+140
+00:08:39,000 --> 00:08:41,900
+because the minimum value
+is actually zero,
+
+141
+00:08:41,900 --> 00:08:44,650
+but nevertheless,
+this should be a generic function
+
+142
+00:08:44,650 --> 00:08:48,904
+that can deal with all kinds
+of <i>min</i> and <i>max</i> values.
+
+143
+00:08:49,730 --> 00:08:53,350
+Good, so now we have this grid,
+it's initialized, everyone's susceptible,
+
+144
+00:08:53,350 --> 00:08:56,685
+there's one poor individual
+that's basically patient zero,
+
+145
+00:08:56,685 --> 00:08:58,620
+and that's now infected.
+
+146
+00:08:58,620 --> 00:09:01,378
+Well, how about we go ahead
+and visualize this.
+
+147
+00:09:01,378 --> 00:09:02,816
+So we need two things.
+
+148
+00:09:02,816 --> 00:09:05,883
+First of all we need
+to call this upgrade--
+
+149
+00:09:05,883 --> 00:09:09,924
+sorry, this <i>draw_grid()</i> function,
+
+150
+00:09:13,000 --> 00:09:15,610
+and we need to pass in
+some parameters here,
+
+151
+00:09:15,610 --> 00:09:17,060
+which we're going to do in a second,
+
+152
+00:09:17,060 --> 00:09:20,152
+but we also need to define this <i>draw_grid</i>,
+
+153
+00:09:20,152 --> 00:09:24,480
+or, rather, copy it over
+from our previous example,
+
+154
+00:09:24,480 --> 00:09:27,480
+and then, of course,
+we also need to load <i>d3</i>.
+
+155
+00:09:27,480 --> 00:09:29,740
+So let's just go ahead and do this.
+
+156
+00:09:29,740 --> 00:09:34,212
+Let me go over here to a browser 
+and if I search for <i>d3</i>,
+
+157
+00:09:34,212 --> 00:09:38,440
+typically the first page
+that should come up is <i>d3.js</i>,
+
+158
+00:09:38,440 --> 00:09:39,770
+which is the home of <i>d3</i>.
+
+159
+00:09:39,770 --> 00:09:41,190
+And again, as we've done before,
+
+160
+00:09:41,190 --> 00:09:46,920
+we can simply copy the snippet here
+to directly link to the latest release,
+
+161
+00:09:46,920 --> 00:09:49,940
+I'm going to copy this,
+going to go over to my code,
+
+162
+00:09:49,940 --> 00:09:53,727
+and I'm going to put this here
+in the head, as we've done before,
+
+163
+00:09:54,970 --> 00:09:57,100
+and then I need this <i>draw_grid</i> function,
+
+164
+00:09:57,100 --> 00:10:01,662
+which we've used before in Chapter 5,
+so you can either copy it from there,
+
+165
+00:10:01,662 --> 00:10:06,130
+or you can once again 
+go to <i>natureincode.com</i>,
+
+166
+00:10:06,130 --> 00:10:10,296
+and click here and see the code in action.
+
+167
+00:10:10,296 --> 00:10:12,850
+And then, for example,
+here in spatial models.
+
+168
+00:10:12,850 --> 00:10:16,735
+Here's the code for the simulation,
+
+169
+00:10:16,735 --> 00:10:19,493
+and here it says, "note the <i>draw_grid</i>
+and <i>update_grid</i> functions
+
+170
+00:10:19,493 --> 00:10:22,280
+are built with <i>d3</i>, and can be found here."
+
+171
+00:10:22,280 --> 00:10:25,365
+So I'm going to just copy this code here,
+
+172
+00:10:25,365 --> 00:10:28,210
+the <i>draw_grid</i> function,
+and the <i>update_grid</i> function.
+
+173
+00:10:28,210 --> 00:10:30,820
+But again, we've already
+used this in Chapter 5,
+
+174
+00:10:30,820 --> 00:10:33,170
+so if you want to,
+you can go and copy this
+
+175
+00:10:33,170 --> 00:10:36,990
+from your HTML files that you developed
+
+176
+00:10:36,990 --> 00:10:40,484
+in the context of Chapter 5,
+the spatial simulation.
+
+177
+00:10:40,484 --> 00:10:41,968
+Okay, so I'm going to copy this here
+
+178
+00:10:41,968 --> 00:10:45,146
+in the body at the top
+of my simulation code here,
+
+179
+00:10:45,146 --> 00:10:49,739
+and what I'm going to do, again,
+is I'm going to indent this correctly,
+
+180
+00:10:49,739 --> 00:10:54,204
+and you may or may not
+want to do this, really up to you.
+
+181
+00:10:54,204 --> 00:10:56,310
+It's just I like to do it.
+
+182
+00:10:56,310 --> 00:11:03,100
+Alright, so observe here that <i>draw_grid</i>
+has two parameters:
+
+183
+00:11:03,100 --> 00:11:08,080
+<i>data</i>, which is the data to be visualized,
+and this is our grid, and <i>colors</i>.
+
+184
+00:11:08,080 --> 00:11:11,950
+And <i>colors</i> Is not necessary.
+There's a default value,
+
+185
+00:11:11,950 --> 00:11:14,800
+and we've used
+these default values before.
+
+186
+00:11:14,800 --> 00:11:18,640
+This happens when you don't pass
+a second argument.
+
+187
+00:11:18,640 --> 00:11:23,737
+And this will then generate
+this blue-black-white color pattern.
+
+188
+00:11:24,300 --> 00:11:26,310
+Here I want to use
+slightly different colors.
+
+189
+00:11:26,310 --> 00:11:29,880
+I want to use grey for the infected.
+I want to use--
+
+190
+00:11:29,880 --> 00:11:32,880
+No, sorry grey
+for the susceptible, indeed,
+
+191
+00:11:32,880 --> 00:11:37,240
+red for the infected,
+and then green for the recovered.
+
+192
+00:11:37,240 --> 00:11:40,975
+And so I'm going to pass
+these color values here as an array.
+
+193
+00:11:41,467 --> 00:11:43,360
+And how this works is as follows.
+
+194
+00:11:43,360 --> 00:11:47,990
+So <i>draw_grid</i> needs first
+the grid, our data,
+
+195
+00:11:48,570 --> 00:11:50,223
+and then this array.
+
+196
+00:11:50,510 --> 00:11:53,622
+And here this array needs
+to be structured in the following way.
+
+197
+00:11:54,390 --> 00:11:59,923
+It basically needs to be a sequence 
+of what is the content of the grid.
+
+198
+00:12:00,870 --> 00:12:06,980
+So for example, we have three types here
+of values in our grid, <i>S</i>, <i>I</i>, and <i>R</i>.
+
+199
+00:12:06,980 --> 00:12:09,810
+So first <i>"S"</i> and then comma.
+
+200
+00:12:09,810 --> 00:12:14,197
+Now what is the color code here for <i>S</i>?
+
+201
+00:12:14,197 --> 00:12:18,470
+So I'm going to use
+the hex color notation,
+
+202
+00:12:18,470 --> 00:12:20,940
+which is basically as follows.
+
+203
+00:12:20,940 --> 00:12:23,230
+You use the hash symbol,
+
+204
+00:12:23,230 --> 00:12:27,179
+and then you have these six values,
+
+205
+00:12:27,179 --> 00:12:31,320
+and because it's hexadecimal,
+it goes from 0 to 9,
+
+206
+00:12:31,320 --> 00:12:35,187
+and then <i>a, b, c, d, e or f.</i>
+
+207
+00:12:35,940 --> 00:12:40,002
+So we have <i>dcdcdc</i>.
+
+208
+00:12:45,900 --> 00:12:48,083
+Then we have <i>I</i>.
+
+209
+00:12:48,083 --> 00:12:53,591
+For <i>I</i> we're going to use <i>c82605</i>.
+
+210
+00:12:56,850 --> 00:12:59,830
+Why? Well, it simply because
+it's a value I've chosen,
+
+211
+00:12:59,830 --> 00:13:02,759
+and we should not forget
+the hashtag here.
+
+212
+00:13:02,759 --> 00:13:06,030
+And then finally for <i>R</i>,
+
+213
+00:13:06,030 --> 00:13:13,046
+we are going to use the value
+of a green, which is 6fc401.
+
+214
+00:13:18,330 --> 00:13:23,470
+So again, you can use any values here
+these color codes that you would like.
+
+215
+00:13:25,120 --> 00:13:27,928
+I recommend you stick with those 
+for the time being,
+
+216
+00:13:27,928 --> 00:13:30,253
+so it actually makes sense,
+what you see in the video,
+
+217
+00:13:30,253 --> 00:13:31,920
+and would you will see in your browser,
+
+218
+00:13:31,920 --> 00:13:34,484
+but if you decide
+you want your own values,
+
+219
+00:13:34,484 --> 00:13:37,650
+you can really just go to any website.
+
+220
+00:13:37,650 --> 00:13:42,138
+So you can, for example,
+get hex color codes.
+
+221
+00:13:42,138 --> 00:13:44,398
+You can search for <i>hex color codes</i>,
+
+222
+00:13:44,398 --> 00:13:46,876
+and then here you have
+an explanation, for example:
+
+223
+00:13:46,876 --> 00:13:51,475
+"A hex triplet is a six-digit, three-byte
+hexadecimal number used in HTML
+
+224
+00:13:51,475 --> 00:13:54,956
+[...] and other computing applications 
+to represent colors."
+
+225
+00:13:54,956 --> 00:13:59,750
+So these triplets will go from--
+
+226
+00:13:59,750 --> 00:14:02,008
+well these duplets, rather.
+
+227
+00:14:02,008 --> 00:14:04,673
+I mean it's a triplet of these two numbers
+
+228
+00:14:04,673 --> 00:14:09,180
+that go from 00 to FF
+in hexadecimal notation.
+
+229
+00:14:09,180 --> 00:14:13,503
+In decimal notation this would be
+zero to 255 as a max value.
+
+230
+00:14:13,503 --> 00:14:15,860
+And so if you, for example,
+click here on the first link,
+
+231
+00:14:15,860 --> 00:14:17,880
+<i>color-hex</i>,
+
+232
+00:14:17,880 --> 00:14:21,500
+you can see here
+users' latest favorite colors,
+
+233
+00:14:21,500 --> 00:14:23,942
+and you can always see this hex code here,
+
+234
+00:14:23,942 --> 00:14:29,090
+so the hash and then these three couples,
+
+235
+00:14:29,090 --> 00:14:31,840
+88, 1a, and 1b,
+
+236
+00:14:31,840 --> 00:14:34,490
+and these are for the corresponding
+bonding color channels,
+
+237
+00:14:34,490 --> 00:14:37,445
+so RGB: red, green, blue.
+
+238
+00:14:37,445 --> 00:14:42,598
+So this is a value 13 here, for example, 
+for red, for the red channel,
+
+239
+00:14:42,598 --> 00:14:48,261
+a value 92 for the green channel,
+
+240
+00:14:48,261 --> 00:14:52,325
+and value 8e for the blue channel.
+
+241
+00:14:52,960 --> 00:14:55,360
+So, by the way, if you just
+want to pick a color,
+
+242
+00:14:55,360 --> 00:14:56,900
+you can, for example, click here,
+
+243
+00:14:56,900 --> 00:14:59,980
+and then you can choose the color band.
+
+244
+00:14:59,980 --> 00:15:03,210
+Let's say you would like to have 
+this blue here, you quite like this blue.
+
+245
+00:15:03,210 --> 00:15:07,546
+So this would be
+the hex color code here: #282bdd.
+
+246
+00:15:08,907 --> 00:15:10,969
+So, back to the code.
+
+247
+00:15:11,430 --> 00:15:15,614
+I think we're all set up.
+We have here our <i>init_grid</i> call.
+
+248
+00:15:15,614 --> 00:15:17,603
+This initializes the grid,
+
+249
+00:15:17,603 --> 00:15:21,054
+puts each individual
+in the susceptible state,
+
+250
+00:15:21,054 --> 00:15:25,510
+then it picks a random individual
+which is going to be patient zero.
+
+251
+00:15:25,510 --> 00:15:29,073
+So we're going to set
+this individual status to <i>"I"</i>,
+
+252
+00:15:29,073 --> 00:15:31,304
+and then the <i>draw_grid</i> function is called,
+
+253
+00:15:31,304 --> 00:15:34,870
+which should now
+draw the grid in the browser.
+
+254
+00:15:34,870 --> 00:15:38,804
+So let's save this,
+and go back here to the browser,
+
+255
+00:15:38,804 --> 00:15:46,011
+and open this file,
+so <i>Open File &gt; epidemics.html &gt; Open</i>
+
+256
+00:15:46,556 --> 00:15:47,800
+And here it is.
+
+257
+00:15:47,800 --> 00:15:54,089
+So we have here a sea
+of 9,999 individuals in grey
+
+258
+00:15:54,089 --> 00:15:57,050
+that are susceptible,
+and here this poor soul,
+
+259
+00:15:57,050 --> 00:16:00,712
+that's patient zero,
+and it's randomly placed on the grid,
+
+260
+00:16:00,712 --> 00:16:03,952
+so if you reload this and out here,
+
+261
+00:16:04,660 --> 00:16:05,821
+now it's here,
+
+262
+00:16:06,240 --> 00:16:07,632
+now it's down here,
+
+263
+00:16:07,960 --> 00:16:08,990
+now it's here and so on.
+
+264
+00:16:08,990 --> 00:16:13,470
+So this is truly
+a randomly chosen individual
+
+265
+00:16:13,470 --> 00:16:15,050
+that is now patient zero.
+
+266
+00:16:15,050 --> 00:16:16,733
+Now nothing's happening at the moment
+
+267
+00:16:16,733 --> 00:16:21,456
+because we haven't now implemented
+the simulation over many time steps,
+
+268
+00:16:21,456 --> 00:16:23,160
+and the infection and the recovery steps,
+
+269
+00:16:23,160 --> 00:16:25,914
+but this we're going to start
+in the next lecture.
+
+270
+00:16:25,914 --> 00:16:27,053
+I'll see you there.

@@ -1,0 +1,222 @@
+In the previous episode, you learned that when we want to generate exceptions in Java, we basically seek to do four things.
+Signalling errors at the place they occur.
+Marking places that we want to make receptive for errors, and associating to each of these places a way of handling these errors.
+This is a big advantage of exception handling
+We separate error handling from the place where they occur.
+Finally, the fourth thing we might want to do is possibly to clean up after each error-aware bloc.
+We will thus have four words in the language that will be dedicated to each of these elementary tasks that we want to take care of.
+In this episode, we will present how to use each of these four words one by one starting of course with the <i>throw</i> keyword which allows us to indicate an error.
+We will say that <i>throw</i>  throws an exception
+The syntax of <i>throw</i> to throw an error, to signal an error, is the following.
+<i>throw</i> then an exception.
+What is an exception?
+It is an object of type Exception.
+The Exception type is a type which exists in the Java API and which is provided by the
+<i>java.lang</i> library that contains many subclasses which we will present in a moment.
+So an exception is an object of type <i>Exception</i> which, when the <i>throw</i> statement is executed, is, so to speak, thrown.
+This means that there is a mechanism which will create such an object that will be able to be handled by the other keywords in the exception handling mechanism.
+This is what it means to
+"throw an exception".
+There is a fairly special treatment of these peculiar objects, these errors to be handled, on the level of the program.
+For example, we could have a line such as this one:
+<i>throw new Exception</i>, so we create a new exception
+Then for example, by calling its constructor taking as parameter a character string indicating an error message, "Quelle Erreur!".
+(TN: means "What an error!").
+This message is now associated to this new instance of the Exception class.
+What does it really mean to
+"throw an exception"?
+It means that the <i>throw</i> statement will skip the normal execution sequence of the program and will jump either to the next <i>catch</i> bloc directly linked to a <i>try</i> bloc.
+We will talk about catch and try in a moment.
+For the moment, the important part to remember is that it will jump to another place in the program.
+Or, if there is no such try/catch bloc, then the program will exit entirely by ending with what we call an exception.
+So <i>throw</i> throws an instance of the Exception class.
+This Exception class is itself a subclass of the Throwable class that inherits from Object.
+Exception is not the only subclass of Throwable that has multiple subclasses whose goal is to indicate different types of possible errors or exceptions.
+For example, there is the Error subclass which has 12 direct subclasses and which serves for example to indicate memory errors.
+The error class serves to indicate fatal errors which are not supposed to be used, to be handled by the programmer with a try/catch bloc.
+On the other hand, we have Exceptions, which must or can be handled by the programmer.
+The Exception class has
+75 direct subclasses among which there are
+74 Checked Exceptions which must be treated by the programmer.
+They indicate exceptional circumstances, often, but not always, errors
+They must thus be handled at the level of the program with a try/catch bloc.
+There is also the RunTimeException subclass, whose treatment is not necessarily handled by the programmer.
+We call these Unchecked Exceptions, and they have 49 direct subclasses to treat different error cases that can be avoided with good programming, such as, for example, indices that exceed an array's length, or divisions by 0, etc.
+This sort of error can be handled by the programmer, but it is not strictly necessary.
+Actually, the next episode will go over these Checked/Unchecked Exceptions and how to handle them.
+At the more general level, right at the top of the hierarchy, the Throwable class offers two constructors, one default constructor and one constructor that allows to indicate an error message in the form of a string.
+It offers, among others, two interesting methods, a <i>getMessage</i> method that allows us to retrieve the error message initialized using this constructor, and a <i>printStackTrace</i> method which allows us to display the stack in the terminal, that is, the sequence of events which led to the error.
+That's it for the <i>throw</i> statement.
+Now, let's move on to the <i>try</i> statement.
+We have seen that if the <i>throw</i> statement is not caught, that is, not handled by a try/catch bloc, the program is ended.
+So in many cases, we will want
+-- especially for Checked Exceptions -- we will want to handle them with an exception-handling bloc.
+This is exactly what try is used for. try makes portions of code compatible with exception handling.
+Suppose that I call a method <i>f</i> which can throw exceptions.
+Either it can throw exceptions directly or it can call methods that call methods that call methods that throw exceptions.
+No matter the depth of the call, in this call to the method <i>f</i>, we have a throw.
+Somewhere below this call, we will have a throw.
+Then, if such an expression if such a call to a method that can throw exceptions is in a bloc that is declared as a try bloc, then we will be able to setup an exception-handling mechanism and so the throw which exists somewhere here, below, will finally jump to the next catch bloc associated to the try bloc in which we are requesting exception handling. catch is thus simply the keyword that is used to introduce the set of instructions we wish to execute in order to handle the exceptions.
+Every try bloc must have at least one catch bloc associated to it.
+We will see in a moment that it can have several.
+These must handle the exceptions thrown in the try bloc.
+If an exception is thrown by a throw statement, but is not intercepted by a catch, if there is no try and no catch corresponding to the exception that is thrown, then the program will halt and indicate that an exception was thrown and it will display where it was thrown, indicating that this exception was thrown but not caught.
+The syntax of a catch bloc starts with the word <i>catch</i> followed, as with method headers, the type and the equivalent of a parameter, in parentheses.
+We will only have one parameter for this catch header.
+Then, behind this, we have the bloc with the instructions that we want to execute for all exceptions of the type we specify.
+It is best to look at an example.
+Here, we have a set of instructions that we want to make aware of exception handling with a try, and right behind it, we will have a catch statement to catch the exceptions of type <i>ArithmeticException</i> and another catch bloc that is also associated to this <i>try</i> bloc to catch very general exceptions of type <i>Exception</i>.
+So here, in this bloc, we could have a variable <i>age</i>, and if the age is too high, then we will throw a very general exception.
+And if the age is lower than 150, we will continue execution.
+We would have another variable, <i>x</i>.
+If <i>x</i> equals 0, then we throw an <i>ArithmeticException</i>
+Otherwise, we continue.
+This <i>ArithmeticException</i> will be intercepted by this catch here.
+We will execute the instructions that are here and display the error message that we had put in the <i>ArithmeticException</i>, then, for example, print the call stack.
+However, if it is this very general exception that is thrown, it is this catch which will be executed.
+At that moment, we will display a message, for example:
+"Who can live to be that old?"
+An important thing to note is that catch blocs associated to a try bloc will be sorted by level of exception, from least to most general.
+We will first have exceptions that are very specific, then the most general exceptions.
+Remember that there is a hierarchy in exceptions, like so.
+The processing in the catch will have to start by the most specific exceptions, then go to more and more general ones.
+If you place catch blocs with the most general exceptions first, you will get a compiler error.
+Now, let's see in detail how all of this is executed.
+What is the flow of execution?
+What do we do in the different possible cases?
+If the exception is thrown; if it is not thrown.
+First, the general principles are as follows.
+A catch bloc is executed only if an exception corresponding to the type specified in the catch is thrown from the corresponding try bloc.
+Otherwise, the catch bloc is simply ignored.
+We will not execute what is in this catch bloc.
+In the absence of a finally, of which we will speak in a moment.
+If the catch bloc is executed, then the execution of the program continues after the catch bloc.
+In no case do we come back to the try.
+We will continue after the catch bloc.
+For example, if we have a try bloc that is made aware of exception handling, in which is executed -- either directly or through a method call -- in which an exception is thrown.
+If this exception is thrown, if this line is actually executed, then at the end of this line, we will jump straight here to the first line of the catch bloc directly following the try bloc and corresponding to the type of the exception.
+Here, where the type corresponds.
+So the exception will be as follows:
+We arrive here.
+We execute this exception throwing
+We jump to this place here if an exception was thrown
+If however no exception was thrown that is, if this line here was not executed, for example, because it was protected by an <i>if</i> whose condition was not true then, we execute the code
+This line is not executed.
+So we continue, of course, by executing the whole bloc.
+Let's suppose that there is no throw farther on.
+Once we arrive at the end of the bloc, here, we will continue with the normal execution of the program.
+We will simply ignore the whole catch bloc that is executed only if an exception of the corresponding type was thrown.
+On the example we had earlier, the flow of execution would be this:
+Suppose that in the beginning, we have an <i>age</i> variable, and that the age, to start off with, is not bigger than or equal to 150.
+The age is lower than 150.
+Thus, we continue.
+We do not go into the if bloc, we do not see the throw, we continue.
+Suppose that we have a variable <i>x</i> here, which is not equal to 0.
+At this point, we continue normally.
+We arrive here.
+So if no exception was thrown,
+"case nÂ°1 : no exception thrown" then we will continue the execution down here.
+This is what happens if the age is under 150 and if x is not equal to 0.
+Now, let's see what happens if, for example, the age is still below 150 but <i>x</i> is 0.
+What will happen is that, since the age is under 150, we do not enter the <i>if</i>, we continue
+Here, since x is worth 0, this condition is verified.
+We execute this throw, which means that, from here, we will plug into the exception that was thrown
+We threw an ArithmeticException, so we will jump to the bloc that catches
+ArithmeticException.
+Here, we will continue the execution by displaying the associated message and by displaying the call trace
+Once we have done all of this, then we will continue with the normal execution after all the catch blocs associated to the relevant try blocs.
+Third and last case, if the age is bigger than or equal to 150.
+What will happen is that we will arrive in this if, whose condition is true so we will execute this exception throwing.
+So here, we throw an object of type Exception.
+Which means that from here, we will jump to the catch that handles Exceptions.
+This flow will continue here by executing the display of
+"Who can live to be that old?"
+Then, as always, the execution will continue normally with the remainder of the program.
+Let's go over a third example where we will put throw, try and catch in one same method.
+This is a special case that can nevertheless be useful.
+So here, we have a <i>lireEntier</i>
+(TN: means "readInteger") method whose goal is to read an integer and return it and that takes as parameter a maximum number of attempts, and whose header must be extended with this syntax, <i>throws Exception</i> which we will explain later on.
+So here, we have the whole body of this method in which, as you can see, we have a try bloc, to try to read an integer from the keyboard.
+We want to read an integer.
+What we will do is intercept any throw that could occur when we try to read this integer, in case the input fails.
+This happens, for example, if the user inputs something else, for example a character string.
+In this case, the input will throw an exception of type InputMismatchException which is defined in the java.util library.
+If the input fails, then an exception of that type will be thrown, so we will jump to the catch, since we had put that in a try bloc.
+This will allow us, for example, to display a message
+"Try again to input an integer."
+Then, with this expression, we clear the input buffer of the characters left by the previous, bad input.
+Finally, we increment the number of tries.
+The program will thus execute in the following way.
+In the beginning, <i>nbEssais</i> has a value of 1 (TN: "nbEssais" means "number of attempts")
+We will be in a loop while the number of attempts is lesser than or equal to the maximum number of attempts we received as a parameter.
+We ask for an integer.
+We try to read an integer and each time this input fails we will jump to the catch bloc which handles the corresponding exception
+So we arrive here at the end of the catch bloc if we had an input error.
+We continue the execution.
+We continue as long as nbEssais has not reached the maximum number of attempts.
+In case the input works, no exception is thrown.
+So the execution continues normally.
+We return the value that was read and we exit the program at that level.
+Finally, if we make so many mistakes that we exceed the maximum number of attempts, the following will happen: we will have another error which will throw the exception which will be caught by this catch here.
+We will increment the number of attempts.
+At the end of the catch, we continue with the normal execution.
+But this time, nbEssais will be larger than maxEssais.
+So we will exit the <i>while</i> loop and continue execution by throwing a new exception this time, and this exception will be passed on higher to other methods that will have called lireEntier and that could possibly catch this exception and handle it.
+Let's end with a few remarks.
+First, since Java 7 there exists something that is called multi-catch.
+We can write: catch Exception1 or Exception2, etc.
+Then, something that I already told you, when you have several catch blocs, you must absolutely always write them from the most specific exception, from the lowest one in the exception hierarchy, to the most general one, that is, the highest one in the inheritance relationship of exceptions.
+Finally, let's end this episode on Java syntax for exception handling by this point number 4, where we might want to cleanup after a catch bloc with the <i>finally</i> keyword which indicates, optionally, what to do after an error-handling bloc.
+This finally keyword thus controls a bloc which is optional and which follows the catch blocs associated to a try and which contains code that should be executed whether an exception was thrown or not.
+The point of this bloc is to clean up, for example to close files, close connections etc.
+In case an exception is thrown, it guarantees that everything is cleaned up.
+As an example, we have a little program here that we can call in different ways.
+This is the first time we use arguments passed manually.
+This allows us, for example, to pass different arguments or even no arguments at all, at the moment we execute this
+Inverse program.
+The way this is done is simply to pass a string array which contains the arguments when we call this program which we will name Inverse.
+Here, we have a try bloc that will try to read the different arguments
+Args here is an array of strings. args[0] is the first element of this array of strings
+Thus it is the first argument passed to the program when we execute it, as I explained earlier.
+We will try to read an integer in this first argument.
+Then, we will divide by b.
+Then, we display 100 times the inverse of this number <i>c</i> that we have just calculated.
+If the first argument that we receive is not an integer, this expression will throw an exception of type NumberFormatException and so this will cause us to jump to the catch bloc corresponding to this type of exception.
+We will indicate, for example,
+"An integer is required!".
+If however we manage to read an integer from this first argument then we pass here, we do this calculation where we risk a division by 0.
+If b equals 0, this division will indeed throw an ArithmeticException. and we will jump to this bloc that reacts to exceptions of type
+ArithmeticException
+If we divide by 0, we will display that the result goes to infinity.
+Then, whatever happens, whether we have an exception here, or an exception there, or nothing at all in this exception-aware bloc, we will execute this mandatory segment.
+We will execute the finally bloc linked to this try bloc.
+Let's look at all this in detail on different ways of calling this program.
+If for example we call our program with 4.1 as an argument, which is of type double, then here, we will not succeed in reading an integer.
+We jump here, we display "Il faut un nombre entier!"
+Since we arrive at the end of the catch bloc, we go on to the finally bloc.
+Here, we write "passage obligÃ©" (TN: means
+"mandatory passage") and we end the program.
+On the other hand, if we passed an integer but that it is worth 0, then we do manage to read an integer, so we continue; here, we divide by 0, which results in an ArithmeticException that is thrown and intercepted by this catch bloc.
+So we display that the result goes to infinity.
+Then we continue, as always, with the finally bloc which indicates that we have a mandatory passage
+Third case: we call our program and pass it an argument which is a non-null integer.
+At that point, we do succeed in reading an integer.
+We continue. We complete the division with no problem.
+So we can display that 100 times its inverse is 25.
+In this case, we also finish by passing by the finally which is executed in any case since we are in a try bloc.
+Here, at the end of the execution of this try bloc, we will continue by executing the finally bloc and displaying that we have a mandatory passage.
+To finish, here is a last example.
+We pass no argument, and so the following happens: we will want to read an integer in the first element of the array A
+But it so happens that there were no arguments passed, so this array is empty
+There isn't even an element at index 0.
+We have an out-of-bounds index and so an exception will be thrown, which is the ArrayIndexOutOfBounds exception.
+So this exception will be thrown, but as you can see, before that, we will have passed by the finally.
+Indeed, here we are in the try bloc and as we will exit it here by throwing an exception; this exception is not caught by any of the catch statements
+However, we pass by the finally bloc.
+We always pass by the finally bloc associated to a try bloc.
+So we display this, before continuing with this exception which is not caught and hence ends the program's execution with a message meaning that the exception was not caught followed by the call trace at the place where this exception was thrown.
+So you can see that regardless of the execution sequence of the try bloc, we always pass by the finally bloc.
+In this case here, such a finally is not very useful.
+But if we had allocated ressources, or opened files in this try bloc, we could guarantee, by closing these resources, by freeing these resources in the finally bloc, we would guarantee that regardless of the execution sequence of this try bloc, the finally bloc will correctly free the resources.
+This is typically what a finally bloc is used for.
+This concludes the episode on exception syntax in Java.

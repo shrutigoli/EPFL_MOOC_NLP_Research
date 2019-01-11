@@ -1,0 +1,177 @@
+During our learning, we encountered three different concepts
+Function or method overloading; shadowing; qu'on appelle en anglais shadowing and overriding of virtual methods.
+The latter applies only to virtual methods.
+So for virtual methods, we could in principle have all three: overloading, shadowing and substitution.
+What are these exactly?
+To avoid confusion for some programmers, since C++2011, we have two new keywords which I will talk about at the end of this episode, namely <i>override</i> and <i>final</i> which allow the programmer to specify his intention.
+Let's go over these three concepts in detail to clear up what they do.
+Before illustrating these concepts with an example, let's review their definitions.
+Function or method overloading happens when a function or method has the same name as another, but has different parameters, and has the same scope.
+Careful, in C++, overloading is only possible within the same scope.
+We will come back to this later.
+Shadowing, or hiding, occurs when entities, variables, functions or in the case of object-oriented programming, members and methods, have the same name but different scopes.
+Thus, following scoping rules,
+C++ resolves to the nearest scope, that is, the closest scope hides the entity with a further scope.
+Note that a single method with the same name is enough to shadow all other methods of further scope, independently of their parameters since with regards to parameters, we would be in the case of an overload, and overloading only happens within one scope.
+So if we are in another scope, we simply need to have the same name to mask all other methods.
+We will come back to this with an example.
+Finally, overriding is valid only for virtual methods, and the idea is to redefine, in a subclass, a virtual method inherited from a superclass allowing what is known as dynaming binding, and polymorphism.
+The method of the actual instance will be invoked if it is called via a pointer or a reference and, similarly to shadowing, if we redefine only one virtual method, it will override all the others, even if they don't have the same parameters.
+Only one will be defined, but it will simply hide the others.
+The rules of shadowing also apply to overridden functions.
+Let's review this in detail in an example:
+Imagine that we have three classes
+A, B and C such that B and C both inherit from A.
+These three classes will have a method
+<i>m1</i> which we will overload, override and shadow.
+To make the example a bit more concrete, in the main function, we have an instance b of class B and an instance c of class C.
+We will go over the different ways of calling these m1 methods.
+In class A, we have a first m1 method which takes an integer.
+Each of these methods will simply display a message indicating which method was called.
+Moreover, in A, we also have an m1 method which has a different list of parameters than the first method.
+Here, it takes a string instead of an integer.
+These two m1 methods have the same scope, the scope of class A.
+They have different lists of parameters, but the same name.
+This is therefore a simple case of overloading.
+In class B, we have an override of one of the two methods.
+We override the method which takes a string as argument.
+This m1 method overridden here in the B subclass of A thus hides A's m1 method in B.
+Since it is the only method of the two which was overridden in B, based on rules of scope and shadowing, this method also masks the other method since in class B, we will only have one accessible m1 method.
+Class B will effectively have three m1 methods.
+Its own m1 method and the two m1 methods inherited from the superclass, A.
+But because of scope resolution rules, when we are in B, we resolve to the closest scope, and the only one directly accessible is the one that was defined in B, which thus hides both of A's methods.
+Let's look at this in the main.
+Here, we have our instance b.
+We cannot make a call like this.
+This is why we commented the m1 method that takes an integer since the m1 method taking an integer, inherited from A, is hidden by the method in B which takes a string.
+We can indeed call the m1 method which takes a string. This poses no problem at all.
+But we cannot call the method from m1 taking an integer.
+We get a message saying that this function cannot be called.
+However, it does exist; if we want to call it, we will have to use the scope resolution operator saying "the method m1 of scope of class A which belongs to the instance b of subclass B". which does indeed inherit this method from class A since B is an A.
+This method can thus be called here but it will need to be "unhidden" using the scope resolution operator.
+In class C, we have introduced a third method a new method, since we have a third type of parameter with a double. This will define a new, third m1 method which will, once again, following scoping rules, hide both of the methods inherited from A.
+With the instance c of class C, we can call neither the method with the string nor the method with the integer.
+Careful, this is a trap. This call here, c.m1(2) does not invoke the method taking an integer since it is hidden.
+If you execute this code, you will get a message saying "C::m1(double)" as it is indeed the only method which can be called directly without unhiding in C's scope.
+And an integer can be converted to a double, so here, there is a conversion from an integer to a double to call the only method which is in C.
+Of course, as before, we can unhide the methods taking a string or an integer.
+By using the scope resolution operator, c.A::m1 with a string, we will of course call A's method, which takes a string.
+This call here, with an integer, will now unhide A's m1 method inherited by the subclass C; we will call this method here.
+That's it for the aspects of overloading and shadowing, let's now discuss the overriding aspect.
+In fact, all of these methods were declared as virtual.
+We simply need to declare, here, these methods as virtual to make them virtual automatically in the subclasses.
+Here, since we have exactly the same method, the <i>virtual</i> is transitive.
+It doesn't have to be repeated.
+However here, we have a new method.
+So we can define it as virtual or not.
+All of these methods are declared as virtual, so we will have an override.
+Overriding follows the same rules as shadowing.
+Essentially, dynamic binding will be used if we have pointers or references, which was not the case here.
+Here, we simply had instances.
+To observe the effects of overriding and dynamic binding, we will need to use pointers.
+This is what we do in this new example.
+We still have the instances b and c of classes
+B and C, respectively, but we now have a pointer-to-A that we name pa.
+First, pa will point to b and then it will point to c.
+Here, we make pa point to b.
+The memory situation is as follows. pa points to b and we call the m1 method through this pa pointer.
+Note that m1 is a virtual method which is overridden in class B.
+So polymorphism is taken into account here.
+The m1 method from class B will indeed be called and will output the message
+"B::m1(string)".
+However, even though pa points to a B, it is still a pointer-to-A.
+And remember that in C++, it is the type that is determining when there is no polymorphism; static binding is used.
+We resolve according to the type.
+So here, pa is a pointer-to-A and as such, can access A's methods.
+These method calls are in class A.
+In other words, these calls are in the scope of A and so we can absolutely call the m1 method with an integer, even though pa points to a B.
+We are in A's scope.
+So here, it is A's method which will be called: "A::m1(int)".
+Similarly, even if pa points to c, even though we point to a C, we are still in the scope of A since we are working with a pointer-to-A.
+Here, we will call the method.
+Careful, even if we pass a double, we are still in A's scope and so we will call the method that takes an integer here.
+This double will be converted to an integer to call, within the scope of A, the only method that can be called with a double.
+It is this one, where we convert the double to an integer.
+This is quite possible in C++ and it is indeed this method which will be called.
+The method that is in C is not accessible in the scope of A.
+Though a C is an A, an A is definitely not a C.
+Here, since we are in A's scope, it is in this scope that we will resolve the name "m1".
+So it is indeed m1 with an int which will be called and we will get the output for A::m1 with an int.
+For the same reasons, we absolutely cannot try to unhide the method taking a double by trying to use the scope resolution operator on C.
+This is completely illegal since we are passing through a pointer-to-A and an A is not a C.
+C is an A but A is not a C.
+A is at the top of the hierarchy.
+C is an A, but A is definitely not a C.
+So this would not compile.
+It is forbidden by the compiler.
+It is not A which inherits from C, but C which inherits from A.
+There! All of this is certainly rather technical and at first may be a little difficult.
+You should come back to this episode later, once you have had some practice with polymorphism and its different aspects: shadowing, overriding, and especially overloading the latter of which should not pose any more problems.
+Actually, since these concepts are quite complicated,
+C++ 2011 introduced two new keywords to allow the programmer, if he so wishes, to clarify his intentions.
+These keywords are <i>override</i> which indicates that we want to override a virtual method inherited from a superclass; and <i>final</i> which prevents any future override of the associated method in potential future subclasses.
+Let's look at this in detail in an example.
+Suppose that here, we have a class A which contains four methods: a method f1 that is simply defined as virtual; a method f2 which is also virtual and has the const qualifier, which cannot modify the instance; a method f3, which is not virtual; and an f4 method on which we add the final qualifier.
+Then we have a class B which inherits from A and will, of course, override and shadow these various methods.
+So we have an override of method f1 in class B.
+The prototypes are identical.
+So the <i>override</i> keyword is used correctly.
+Indeed, f1 is an override of this method.
+Here, we have another method.
+I will let you guess what it is.
+Here, you can see that we have a typo.
+The developer wrote f-lowercase L instead of "f1".
+This, I guarantee, is a rather difficult error to find while debugging.
+Such a small difference between a lowercase
+L and a 1 is often hard to spot.
+So here, if we had forgotten the <i>override</i> keyword... 
+-- of course without this line here -- what the person who wrote this in class B wanted would have been to override the method f1
+But instead of overriding the f1 method, because of this typo, they would have introduced a new virtual method in B.
+What the <i>override</i> keyword allows is to have the compiler check for this.
+As the developer of this class B has specified, they want an override of one of A's methods.
+In this case, since there is no fl method in A, the compiler will indicate that there is an error.
+This fl method does not override any method from A.
+This protects class B's developer against potential mistakes.
+Another type of mistake can be seen on the f2 method.
+Class B's developer wants to override the f2 method.
+However here, we will get a compilation error.
+Can you see why?
+The error here is that the f2 method is not const whereas it was defined as const in class A.
+So the f2 method here is a different f2 method
+Be careful! const is completely part of the specificity of the method header.
+The full prototype of the method contains const and so here, this is a different f2 method.
+So the compiler doesn't accept this.
+This is not an override of the f2 method but a new f2 method.
+So this is another example of a protection against developers' mistakes.
+Forgetting the const keyword, or making a typo.
+Regarding the f3 method, this could be a conception mistake at A's level.
+Maybe f3 should have been virtual and we thought that we could override this f3 method.
+Remember that it is unnecessary to repeat the virtual keyword.
+We could easily, even for a virtual method, write this.
+The developer of class B wants to override a virtual method, so they add the override keyword.
+Here again, they get an error message from the compiler saying:
+"No, careful, you are not doing what you think you are doing".
+This f3 method cannot be overridden because it is not a virtual method.
+So here we have pure shadowing without an override.
+Here is a third case that can protect the developer of class B against potential errors.
+Here, the error would come either from his interpretation of what class A is or even from the developer of class A who may have forgotten the virtual keyword.
+Finally, the last situation with the final keyword.
+Here, class A's programmer prevents any future override of this f4 method.
+So the developer of class B, a subclass of A, cannot override the f4 method.
+It is <i>final</i> here, meaning that we cannot override this f4 method in subclasses.
+So the compiler would refuse to compile this line.
+That's it for this example.
+We recommend that you use the override keyword.
+Even if it a little cumbersome to write.
+Use it to protect, at first, against potential errors such as the ones we have just discussed.
+Concerning the final keyword, I don't think it is essential at this course's level, you can forget about it. In my opinion, it is completely useless.
+Why would we want to prevent anyone from overriding these methods?
+Finally, to be exhaustive, I would like to mention that the final keyword can also be used to prevent deriving subclasses.
+That is, to prevent inheriting from a class.
+For example, we could define a Sterile class here which cannot have any subclass.
+By adding the final keyword here.
+So we would not be able to inherit from this Sterile class here.
+This keyword makes the compiler signal an error whenever a subclass tries to inherit from this superclass.
+Here again, I don't think this is very interesting at this course's level.
+For this course, you can forget about final
+But do make sure to write override each time that you want to override a virtual method inherited from a superclass.

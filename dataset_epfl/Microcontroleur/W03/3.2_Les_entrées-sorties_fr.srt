@@ -1,0 +1,1012 @@
+1
+00:00:04,505 --> 00:00:09,010
+Bonjour, nous continuons le cours
+"comprendre les microcontrôleurs".
+
+2
+00:00:09,010 --> 00:00:13,192
+Et maintenant nous allons parler des
+entrées-sorties et
+
+3
+00:00:13,192 --> 00:00:17,690
+peut-être ce sera enfin l'occasion de les
+comprendre.
+
+4
+00:00:17,690 --> 00:00:20,588
+Je vais commencer par vous faire un petit
+rappel de
+
+5
+00:00:20,588 --> 00:00:25,170
+la manière de travailler avec les
+entrées-sorties avec le système Arduino.
+
+6
+00:00:25,170 --> 00:00:29,590
+Ensuite nous essayerons de regarder en
+détail comment les entrées-sorties
+
+7
+00:00:29,590 --> 00:00:33,220
+sont réalisées à l'intérieur du
+microcontrôleur.
+
+8
+00:00:33,220 --> 00:00:36,101
+Nous regarderons aussi comment
+s'organisent les
+
+9
+00:00:36,101 --> 00:00:39,780
+registres qui permettent d'utiliser les
+entrées-sorties.
+
+10
+00:00:39,780 --> 00:00:41,920
+Et finalement, je donnerai quelques
+exemples.
+
+11
+00:00:41,920 --> 00:00:46,708
+Jusqu'à maintenant, pour les
+entrées-sorties, nous avons utilisé la
+
+12
+00:00:46,708 --> 00:00:54,160
+solution proposée par Arduino, ou par le
+système Wiring dont Arduino est issu.
+
+13
+00:00:54,160 --> 00:01:01,380
+L'idée était de donner un numéro
+arbitraire aux pattes d'entrées-sorties.
+
+14
+00:01:01,380 --> 00:01:04,920
+J'insiste sur le mot arbitraire dans le
+sens
+
+15
+00:01:04,920 --> 00:01:08,730
+qu'il n'y a pas une logique liée aux
+microcontrôleurs.
+
+16
+00:01:08,730 --> 00:01:11,283
+C'est plutôt une logique liée à la carte
+qui
+
+17
+00:01:11,283 --> 00:01:15,410
+a été utilisée pour donner ces numéros de
+pattes d'entrée-sortie.
+
+18
+00:01:15,410 --> 00:01:20,010
+Dans l'environnement logiciel, on a des
+procédures spécifiques
+
+19
+00:01:20,010 --> 00:01:23,340
+qui permettent d'utiliser les
+entrées-sorties.
+
+20
+00:01:23,340 --> 00:01:28,615
+Je mentionne les principales ici : pinMode
+qui permet par exemple ici de dire
+
+21
+00:01:28,615 --> 00:01:33,726
+l'entrée numéro 3, je veux que ce soit une
+sortie, ensuite je peux
+
+22
+00:01:33,726 --> 00:01:39,786
+l'utiliser en écrivant, en donnant
+toujours ce numéro, en donnant le niveau.
+
+23
+00:01:39,786 --> 00:01:45,270
+De la même manière, l'entrée numéro 4 je
+veux que ce soit une entrée
+
+24
+00:01:45,270 --> 00:01:49,900
+et je peux tester cette entrée numéro 4.
+
+25
+00:01:49,900 --> 00:01:55,311
+Les avantages de ce système sont : une
+très grande simplicité, c'est aussi
+
+26
+00:01:55,311 --> 00:01:58,985
+la possibilité d'avoir une certaine
+compatibilité
+
+27
+00:01:58,985 --> 00:02:03,550
+entre des environnement à priori
+totallement différents.
+
+28
+00:02:03,550 --> 00:02:08,993
+Certains pensent même qu'il s'agit de
+l'esperanto des microcontrôleurs.
+
+29
+00:02:08,993 --> 00:02:09,906
+Par contre,
+
+30
+00:02:09,906 --> 00:02:12,550
+ici, nous avons envie de comprendre ce
+
+31
+00:02:12,550 --> 00:02:16,050
+qui se cache derrière ces pattes
+d'entrée-sortie.
+
+32
+00:02:16,050 --> 00:02:23,210
+Dans tous les microcontrôleurs, les pattes
+d'entrée-sortie sont groupées.
+
+33
+00:02:23,210 --> 00:02:27,120
+Elles sont groupées, assez souvent, par
+mots de 8 bits.
+
+34
+00:02:27,120 --> 00:02:33,545
+Parfois par mots de 16 ou 32 bits.
+Et, c'est ce qu'on appelle des ports.
+
+35
+00:02:33,545 --> 00:02:35,760
+Les ports d'entrée-sortie.
+
+36
+00:02:35,760 --> 00:02:41,210
+Ne soyez pas effrayés de ces schémas,
+c'est ce que le fabricant nous donne.
+
+37
+00:02:41,210 --> 00:02:48,388
+On voit ici que ce fabricant-là a décidé
+d'appeler port, port D, port B.
+
+38
+00:02:48,388 --> 00:02:51,740
+Curieusement, il n'y a pas le port A dans
+ce cas-là.
+
+39
+00:02:51,740 --> 00:02:55,553
+D'autres ont utilisé une autre
+terminologie.
+
+40
+00:02:55,553 --> 00:02:58,280
+Ici, P1, avec des petits numéros.
+
+41
+00:02:58,280 --> 00:03:01,400
+Voilà encore une autre manière d'exprimer
+les choses.
+
+42
+00:03:01,400 --> 00:03:04,845
+On remarquera qu'il s'agit ici d'un
+processeur qui fournit
+
+43
+00:03:04,845 --> 00:03:10,210
+des ports avec 16 bits, donc de 0 à 15.
+
+44
+00:03:10,210 --> 00:03:14,700
+Notez aussi ici le terme GPIO, qui est
+extrêmement souvent utilisé.
+
+45
+00:03:14,700 --> 00:03:19,000
+Ça signifie "general purpose input
+output".
+
+46
+00:03:19,000 --> 00:03:23,430
+Donc c'est des pattes d'entrée-sortie à
+usage général.
+
+47
+00:03:23,430 --> 00:03:27,000
+Donc les ports ont des noms qui sont
+donnés
+
+48
+00:03:27,000 --> 00:03:28,640
+par le fabricant.
+
+49
+00:03:28,640 --> 00:03:32,462
+Par exemple, pour les PIC ou pour les AVR,
+c'est
+
+50
+00:03:32,462 --> 00:03:36,530
+les noms PortA, Port B et cetera qui sont
+utilisés.
+
+51
+00:03:36,530 --> 00:03:38,966
+Dans le cas du MSP430, il y a une
+
+52
+00:03:38,966 --> 00:03:42,290
+autre terminologie qui a été choisie par
+le fabricant.
+
+53
+00:03:42,290 --> 00:03:45,930
+Les concepts sont les mêmes, les noms sont
+un petit peu différents.
+
+54
+00:03:45,930 --> 00:03:52,770
+Chaque patte individuelle à l'intérieur du
+port à aussi un nom, qui est évidemment
+
+55
+00:03:52,770 --> 00:03:54,385
+dérivé du nom du port.
+
+56
+00:03:54,385 --> 00:03:59,170
+Pour les AVR, c'est par exemple, PA0, PA1,
+PA2 et cetera.
+
+57
+00:03:59,170 --> 00:04:05,370
+Pour le MSP430, pour éviter de l'appeler
+P1,0 qui aurait pu être interprété comme
+
+58
+00:04:05,370 --> 00:04:11,200
+P10, ils l'ont appelé P1.0, P1.1 et
+cetera.
+
+59
+00:04:11,200 --> 00:04:14,294
+À l'intérieur du microcontrôleur, on
+
+60
+00:04:14,294 --> 00:04:18,322
+trouve des registres spécialisés qui
+permettent
+
+61
+00:04:18,322 --> 00:04:20,390
+de manipuler ces ports.
+
+62
+00:04:20,390 --> 00:04:24,720
+ils ont souvent une certaine euh,
+similitude les uns avec
+
+63
+00:04:24,720 --> 00:04:28,360
+les autres mais ils ne portent pas
+forcément les mêmes noms.
+
+64
+00:04:28,360 --> 00:04:32,635
+Si je prends les trois registres
+fondamentaux dont on parlera tout à
+
+65
+00:04:32,635 --> 00:04:38,178
+l'heure, sur les AVR, ils s'appellent
+PortA, PinA,
+
+66
+00:04:38,178 --> 00:04:43,608
+DDRA, alors que sur les PIC, ils
+s'appelent PortA et également PortA pour
+
+67
+00:04:43,608 --> 00:04:48,415
+l'entrée et TrisA, avec d'ailleurs une
+inversion bit à bit
+
+68
+00:04:48,415 --> 00:04:52,430
+par rapport au DDRA, mais les concepts
+sont les mêmes.
+
+69
+00:04:52,430 --> 00:04:56,880
+Pour les MSP430, ils vont s'appeler P1OUT,
+P1IN,
+
+70
+00:04:56,880 --> 00:05:00,630
+P1DIR, d'une manière qui est très
+systématique et logique.
+
+71
+00:05:00,630 --> 00:05:04,500
+Nous allons essayer maintenant d'y voir
+clair dans ces registres.
+
+72
+00:05:04,500 --> 00:05:09,340
+Je rappelle une chose fondamentale, une
+patte d'entrée-sortie
+
+73
+00:05:09,340 --> 00:05:14,426
+doit précisément pouvoir être à certains
+moments une sortie et
+
+74
+00:05:14,426 --> 00:05:19,740
+pour une sortie on doit pouvoir décider la
+valeur qu'on met dans la sortie.
+
+75
+00:05:19,740 --> 00:05:23,210
+Et cette valeur doit être mémorisée
+ensuite
+
+76
+00:05:23,210 --> 00:05:26,392
+jusqu'à ce qu'une nouvelle valeur soit
+écrite.
+
+77
+00:05:26,392 --> 00:05:28,908
+Il faut donc une bascule, il faut donc un
+
+78
+00:05:28,908 --> 00:05:32,370
+registre pour mémoriser la valeur qui doit
+être sortie.
+
+79
+00:05:32,370 --> 00:05:34,470
+Pour une entrée, la problématique
+
+80
+00:05:34,470 --> 00:05:37,750
+est un petit peu différente, on doit
+pouvoir saisir,
+
+81
+00:05:37,750 --> 00:05:42,120
+photographier, en quelque sorte, la valeur
+à un instant donné.
+
+82
+00:05:42,120 --> 00:05:44,748
+Il faut donc ce qu'on appelle un passeur,
+
+83
+00:05:44,748 --> 00:05:48,332
+"tri-state driver", de telle manière que
+la valeur qui
+
+84
+00:05:48,332 --> 00:05:51,506
+est à l'extérieur, donc sur la patte,
+puisse entrer
+
+85
+00:05:51,506 --> 00:05:54,956
+dans le microcontrôleur et être lue par le
+processeur.
+
+86
+00:05:54,956 --> 00:05:59,592
+Finalement, pour qu'une même patte puisse
+être utilisée tantôt comme
+
+87
+00:05:59,592 --> 00:06:05,070
+une entrée, tantôt comme une sortie, il
+faudra un deuxième passeur
+
+88
+00:06:05,070 --> 00:06:10,170
+qui permettra de valider, ou de ne pas
+valider, la valeur de sortie.
+
+89
+00:06:10,170 --> 00:06:16,330
+Voilà deux schémas internes d'une patte
+d'entrée-sortie d'un microcontrôleur.
+
+90
+00:06:16,330 --> 00:06:19,630
+C'est des schémas qui sont un petit peu
+difficile à comprendre.
+
+91
+00:06:19,630 --> 00:06:21,970
+Celui-ci ici est tout à fait détaillé,
+tout à
+
+92
+00:06:21,970 --> 00:06:24,730
+fait exact et parfaitement bien dessiné
+mais il est tellement
+
+93
+00:06:24,730 --> 00:06:26,780
+complet qu'on n'y comprends pas grand
+chose.
+
+94
+00:06:26,780 --> 00:06:29,403
+Celui-là est simplifié et dessiné d'une
+manière
+
+95
+00:06:29,403 --> 00:06:32,682
+un petit peu incompréhensible puisqu'on a
+à
+
+96
+00:06:32,682 --> 00:06:37,738
+la fois des portes et des transistors, et
+que d'autre part, on ne comprend
+
+97
+00:06:37,738 --> 00:06:41,203
+pas bien pouquoi, ici, ils ont mis une
+porte NAND et ici une porte
+
+98
+00:06:41,203 --> 00:06:44,679
+NOR, il faut analyser la fonctionnalité
+souhaitée
+
+99
+00:06:44,679 --> 00:06:47,525
+pour comprendre la raison de ces portes.
+
+100
+00:06:47,525 --> 00:06:49,791
+Voici un schéma interne,
+
+101
+00:06:49,791 --> 00:06:52,572
+je dirais même un schéma interne
+
+102
+00:06:52,572 --> 00:06:56,780
+simplifié d'une patte d'entrée-sortie d'un
+microcontrôleur.
+
+103
+00:06:56,780 --> 00:06:58,390
+Essayons de le comprendre.
+
+104
+00:06:58,390 --> 00:07:02,570
+Voici ici la patte d'entrée-sortie.
+
+105
+00:07:02,570 --> 00:07:07,545
+Je rappelle qu'une patte doit être tantôt
+une entrée, tantôt une sortie.
+
+106
+00:07:07,545 --> 00:07:11,445
+Lorsqu'il s'agit d'une entrée,
+l'information prendra
+
+107
+00:07:11,445 --> 00:07:14,815
+ce chemin-là, passera à travers ce
+
+108
+00:07:14,815 --> 00:07:21,182
+passeur pour être distribuée sur le bus
+interne du microprocesseur,
+
+109
+00:07:21,182 --> 00:07:27,310
+qui se trouve dans le microcontrôleur.
+Et c'est lorsqu'on va
+
+110
+00:07:27,310 --> 00:07:33,150
+lire ce passeur que l'information sera
+prise en considération.
+
+111
+00:07:33,150 --> 00:07:39,801
+Lorsqu'il s'agit d'une sortie, il faudra
+activer ce passeur.
+
+112
+00:07:39,801 --> 00:07:45,061
+Il est dessiné d'une manière un petit peu
+plus épaisse que l'autre parce que
+
+113
+00:07:45,061 --> 00:07:50,486
+c'est un passeur qui doit être capable de
+tirer d'avantage de courant puisque
+
+114
+00:07:50,486 --> 00:07:55,440
+sa sortie est directement exposée à la
+patte du microcontrôleur.
+
+115
+00:07:55,440 --> 00:08:00,732
+Je profite de dire que la plupart des
+microcontrôleurs sont capables,
+
+116
+00:08:00,732 --> 00:08:06,082
+actuellement, de fournir approximativement
+20 milliAmpères
+
+117
+00:08:06,082 --> 00:08:10,516
+dans les deux sens comme courant de
+sortie.
+
+118
+00:08:10,516 --> 00:08:15,460
+Donc les transistors associés à ce passeur
+doivent être de
+
+119
+00:08:15,460 --> 00:08:20,348
+surface suffisante.
+Alors ce passeur, d'une part il doit être
+
+120
+00:08:20,348 --> 00:08:25,658
+commandé pour savoir s'il est en mode
+haute impédance ou s'il est
+
+121
+00:08:25,658 --> 00:08:31,111
+en mode actif.
+Et naturellement, la valeur doit être mise
+
+122
+00:08:31,111 --> 00:08:35,620
+à l'entrée pour, le cas échéant, être
+transmise à la sortie.
+
+123
+00:08:35,620 --> 00:08:41,380
+On a donc deux bascules.
+La première correspond
+
+124
+00:08:41,380 --> 00:08:47,039
+à une bascule de direction, ici, je l'ai
+appelée
+
+125
+00:08:47,039 --> 00:08:51,810
+du nom P1DIR.
+Lorsque j'écris, dans cette bascule,
+
+126
+00:08:51,810 --> 00:08:56,151
+la valeur va être donnée au passeur.
+Si j'écris un 1 ici,
+
+127
+00:08:56,151 --> 00:09:00,950
+le passeur sera en sortie, ma patte sera
+en sortie.
+
+128
+00:09:00,950 --> 00:09:07,980
+Lorsque j'écris un 0, le passeur devient
+inactif, et alors, l'usage normal, c'est
+
+129
+00:09:07,980 --> 00:09:09,780
+donc de reprendre ce chemin pour que
+
+130
+00:09:09,780 --> 00:09:12,680
+les données puissent entrer dans le
+microcontrôleur.
+
+131
+00:09:12,680 --> 00:09:16,635
+Lorsque j'ai un 1 ici, ce passeur étant
+
+132
+00:09:16,635 --> 00:09:21,580
+actif, je peux passer une valeur sur la
+sortie,
+
+133
+00:09:21,580 --> 00:09:25,570
+qui pourra être un 1 ou un 0, selon ce
+qu'on
+
+134
+00:09:25,570 --> 00:09:31,550
+a écrit dans cette position, qui a pris
+ici le nom P1OUT.
+
+135
+00:09:31,550 --> 00:09:35,210
+En fait, ce schéma n'est pas tout à fait
+complet.
+
+136
+00:09:35,210 --> 00:09:40,750
+J'ai ajouté ici le fait qu'il est possible
+de relire
+
+137
+00:09:40,750 --> 00:09:46,220
+la valeur qu'on transmet à la sortie,
+
+138
+00:09:46,220 --> 00:09:53,626
+qu'on est capable de relire la valeur de
+direction qui choisit le
+
+139
+00:09:53,626 --> 00:09:59,380
+mode de fonctionnement du passeur, ce qui
+facilite sérieusement la programmation.
+
+140
+00:09:59,380 --> 00:10:04,410
+Essayons maintenant de regarder un petit
+peu une représentation logicielle.
+
+141
+00:10:04,410 --> 00:10:12,060
+On a parlé de cette bascule, de ces
+bascules, donc de ce registre P1OUT.
+
+142
+00:10:12,060 --> 00:10:16,155
+On a parlé de P1DIR, également un ensemble
+de
+
+143
+00:10:16,155 --> 00:10:20,100
+bascules qui forment un registre, par
+exemple de 8 bits.
+
+144
+00:10:20,100 --> 00:10:25,480
+Généralement, on va chercher à écrire des
+valeurs
+
+145
+00:10:25,480 --> 00:10:30,320
+dans les bits de P1OUT et de P1DIR.
+
+146
+00:10:30,320 --> 00:10:36,500
+Alors qu'on va plutôt chercher à lire des
+données dans P1IN,
+
+147
+00:10:36,500 --> 00:10:41,200
+qu'on cherche donc à lire les valeurs qui
+se présentent
+
+148
+00:10:41,200 --> 00:10:45,205
+sur les entrées.
+Comme je l'ai dit tout à l'heure, il est
+
+149
+00:10:45,205 --> 00:10:50,640
+aussi possible de relire le registre
+P1OUT, de relire le registre P1DIR pour
+
+150
+00:10:50,640 --> 00:10:56,166
+des raisons de commodité de programmation.
+Si j'essaie maintenant
+
+151
+00:10:56,166 --> 00:11:01,658
+de prendre un bit particulier, par exemple
+ici le bit
+
+152
+00:11:01,658 --> 00:11:06,684
+numéro 6, et de regarder qu'est-ce que
+m'offrent
+
+153
+00:11:06,684 --> 00:11:11,940
+comme combinaisons les deux valeurs qui se
+trouvent ici.
+
+154
+00:11:11,940 --> 00:11:14,540
+J'aurais pû évidemment prendre n'importe
+quel autre bit
+
+155
+00:11:14,540 --> 00:11:16,670
+que le bit numéro 6, c'est juste un
+exemple.
+
+156
+00:11:16,670 --> 00:11:21,400
+Le "Dir" peut prendre la valeur 0 ou la
+valeur 1.
+
+157
+00:11:21,400 --> 00:11:25,990
+Le "Out" peut prendre les valeurs 0 ou les
+valeurs 1.
+
+158
+00:11:25,990 --> 00:11:26,730
+Et je vais,
+
+159
+00:11:26,730 --> 00:11:31,040
+ici, écrire le rôle des pattes dans ces
+différentes combinaisons.
+
+160
+00:11:31,040 --> 00:11:36,216
+Alors, on se souvient que le registre
+"Dir", P1DIR par exemple, permet
+
+161
+00:11:36,216 --> 00:11:41,324
+de dire si c'est une entrée, est-ce qu'il
+est à
+
+162
+00:11:41,324 --> 00:11:46,692
+0, ou au contraire si c'est une sortie
+lorsqu'il est à 1.
+
+163
+00:11:46,692 --> 00:11:51,750
+Par contre, le registre P1OUT n'a pas
+véritablement
+
+164
+00:11:51,750 --> 00:11:56,650
+de signification lorsque "Dir" est à 0
+puisque le passeur de
+
+165
+00:11:56,650 --> 00:12:01,700
+sortie est inactif.
+Par contre, lorsque "Dir" est à 1,
+
+166
+00:12:01,700 --> 00:12:06,650
+alors le "Out" va être transmis à
+l'extérieur : on
+
+167
+00:12:06,650 --> 00:12:11,946
+aura une sortie à 0 lorsque le bit
+correspondant de "Out" est à 0.
+
+168
+00:12:11,946 --> 00:12:16,940
+La même chose pour la valeur 1.
+Il est essentiel de se
+
+169
+00:12:16,940 --> 00:12:21,715
+souvenir de ce tableau parce que on va, en
+fait, tout le temps
+
+170
+00:12:21,715 --> 00:12:24,588
+l'utiliser lorsqu'on va choisir le rôle de
+
+171
+00:12:24,588 --> 00:12:28,390
+patte d'entrée-sortie et leur affecter des
+valeurs.
+
+172
+00:12:28,390 --> 00:12:32,990
+C'est la raison pour laquelle je l'ai
+dessiné une deuxième fois ici.
+
+173
+00:12:32,990 --> 00:12:39,130
+On est donc prêt maintenant à utiliser ces
+registres en C.
+
+174
+00:12:39,130 --> 00:12:41,900
+On va utiliser l'assignation.
+
+175
+00:12:41,900 --> 00:12:47,836
+Je vais placer dans le registre P1DIR,
+dans le registre P1OUT,
+
+176
+00:12:47,836 --> 00:12:53,010
+une valeur, que j'ai ici bêtement écrite
+en binaire.
+
+177
+00:12:53,010 --> 00:12:57,982
+Qu'est-ce que je veux dire par le fait que
+j'ai mis
+
+178
+00:12:57,982 --> 00:13:03,080
+ici des 1 à ces endroits-là et des 0 aux
+autres endroits?
+
+179
+00:13:03,080 --> 00:13:07,200
+C'est que je veux que cette patte-là soit
+une sortie
+
+180
+00:13:07,200 --> 00:13:10,226
+et que cette patte-là soit une sortie.
+
+181
+00:13:10,226 --> 00:13:14,908
+Maintenant, avec cette instruction, pour
+ces deux pattes
+
+182
+00:13:14,908 --> 00:13:17,976
+qui sont en sortie, je mets la valeur 1
+
+183
+00:13:17,976 --> 00:13:24,554
+pour la patte de puissance 6, je mets la
+valeur 0 pour la patte de puissance 0.
+
+184
+00:13:24,554 --> 00:13:28,139
+À noter que ces autres valeurs n'ont pas
+de
+
+185
+00:13:28,139 --> 00:13:32,820
+signification puisque quelle que soit la
+valeur de "Out",
+
+186
+00:13:32,820 --> 00:13:37,384
+lorsque le "Dir" correspondant est à 0, la
+patte est une
+
+187
+00:13:37,384 --> 00:13:41,362
+entrée et à ce moment-là, P1OUT n'a plus
+de rôle à jouer.
+
+188
+00:13:41,362 --> 00:13:44,608
+Donc les deux choses importantes que je
+dis dans
+
+189
+00:13:44,608 --> 00:13:48,349
+cette ligne-là, c'est seulement que ce bit
+est à
+
+190
+00:13:48,349 --> 00:13:55,600
+0, c'est une sortie à 0, que ce bit est à
+1, c'est une sortie qui est à 1.
+
+191
+00:13:55,600 --> 00:13:58,079
+Qu'est-ce qu'il va se passer maintenant
+
+192
+00:13:58,079 --> 00:14:02,785
+pour une entrée?
+On cherche à tester une entrée, on va donc
+
+193
+00:14:02,785 --> 00:14:08,680
+utiliser P1IN.
+Et ici, faute de savoir comment
+
+194
+00:14:08,680 --> 00:14:14,682
+m'y prendre, j'ai maladroitement écrit
+"if" P1IN est égal à cette valeur.
+
+195
+00:14:14,682 --> 00:14:19,758
+En fait, je souhaitais savoir s'il y avait
+un 1 à cet endroit-là.
+
+196
+00:14:19,758 --> 00:14:23,088
+Mais cette instruction est visiblement
+fausse parce
+
+197
+00:14:23,088 --> 00:14:28,516
+que dans ce cas-là, non seulement j'exige
+un 1, ici, dans le bit de
+
+198
+00:14:28,516 --> 00:14:34,452
+puissance 0, 1, 2, 3, mais j'exige aussi
+et à priori ce
+
+199
+00:14:34,452 --> 00:14:40,530
+n'est pas ce que je voulais, un 0 ici, un
+0 là, un 0 là et cetera.
+
+200
+00:14:40,530 --> 00:14:45,550
+Visiblement, cette manière de travailler
+ne convient pas.
+
+201
+00:14:45,550 --> 00:14:48,254
+Il nous manque deux choses : il
+
+202
+00:14:48,254 --> 00:14:52,284
+nous manque l'indépendance des bits et en
+plus,
+
+203
+00:14:52,284 --> 00:14:55,780
+je dirais, il nous manque une bonne
+lisibilité.
+
+204
+00:14:55,780 --> 00:15:01,775
+Ce sera le sujet du prochain chapitre,
+nous apprendrons à écrire
+
+205
+00:15:01,775 --> 00:15:08,165
+proprement ces manipulations de bits à
+l'intérieur de registres en C.
+
+206
+00:15:08,165 --> 00:15:13,520
+Nous avons donc regardé aujourd'hui le
+schéma interne d'une patte d'un
+
+207
+00:15:13,520 --> 00:15:17,126
+microcontrôleur, et nous avons appris à
+reconnaître
+
+208
+00:15:17,126 --> 00:15:19,910
+ces registres : le registre de direction,
+
+209
+00:15:19,910 --> 00:15:27,400
+le registre de sortie et le registre
+d'entrée, qui permet de lire la valeur.

@@ -1,0 +1,1104 @@
+1
+00:00:04,320 --> 00:00:07,323
+This is the last series of episodes
+in this MOOC
+
+2
+00:00:07,323 --> 00:00:11,137
+"Introduction to object-oriented programming
+in C++"!
+
+3
+00:00:11,137 --> 00:00:13,210
+In this last series of episodes,
+
+4
+00:00:13,210 --> 00:00:16,074
+we wished to present you
+a problem in its entirety,
+
+5
+00:00:16,074 --> 00:00:19,400
+a very general problem,
+to make a case study.
+
+6
+00:00:19,400 --> 00:00:22,166
+It will consist in presenting
+different watches:
+
+7
+00:00:22,166 --> 00:00:24,403
+there will be analog watches,
+
+8
+00:00:24,403 --> 00:00:26,781
+digital watches, and watches that
+will be both;
+
+9
+00:00:26,781 --> 00:00:30,768
+watches will have accessories such as
+bracelets (straps), bodies, etc.
+
+10
+00:00:30,768 --> 00:00:34,213
+So a rather general frame which
+could be used for example
+
+11
+00:00:34,213 --> 00:00:37,192
+as management software for a 
+jeweler's or as sales software,
+
+12
+00:00:37,192 --> 00:00:39,028
+or even for printing catalogs.
+
+13
+00:00:39,028 --> 00:00:41,826
+Through this, we will illustrate
+
+14
+00:00:41,826 --> 00:00:45,324
+different concepts presented all
+along this course.
+
+15
+00:00:45,324 --> 00:00:47,940
+The themes we have chosen to
+present to you
+
+16
+00:00:47,940 --> 00:00:50,698
+in these summary episodes
+include first of all
+
+17
+00:00:50,698 --> 00:00:53,274
+the notion of design,
+
+18
+00:00:53,274 --> 00:00:56,732
+to model the problem from
+an object-oriented point of view,
+
+19
+00:00:56,732 --> 00:00:58,845
+which classes have to inherit from
+which other ones,
+
+20
+00:00:58,845 --> 00:01:01,102
+whether some abstract classes
+are needed or not,
+
+21
+00:01:01,102 --> 00:01:04,565
+how to make the calculation
+of the watches' price
+
+22
+00:01:04,565 --> 00:01:07,461
+polymorphic, or how to make
+the output polymorphic.
+
+23
+00:01:07,461 --> 00:01:10,988
+Output will be treated in a
+very specific way,
+
+24
+00:01:10,988 --> 00:01:13,646
+with an overload of the output operator,
+
+25
+00:01:13,646 --> 00:01:16,248
+and then we will review how
+to implement an output
+
+26
+00:01:16,248 --> 00:01:19,261
+that adapts to each of the classes,
+a polymorphic output.
+
+27
+00:01:19,261 --> 00:01:24,221
+We also introduced operator overloading
+with the += operator,
+
+28
+00:01:24,221 --> 00:01:27,136
+which will allow us to add
+components
+
+29
+00:01:27,136 --> 00:01:29,599
+to watches that we want to build.
+
+30
+00:01:29,599 --> 00:01:31,931
+Finaly, we will go over multiple
+inheritance
+
+31
+00:01:31,931 --> 00:01:34,814
+with the different mechanisms,
+the digital mechanism
+
+32
+00:01:34,814 --> 00:01:36,477
+and the analog mechanism,
+
+33
+00:01:36,477 --> 00:01:38,752
+or even double mechanisms,
+
+34
+00:01:38,752 --> 00:01:41,330
+which are both digital
+and analog
+
+35
+00:01:41,330 --> 00:01:44,426
+and we will end with a last episode
+
+36
+00:01:44,426 --> 00:01:48,781
+that will present a problem that
+we have not yet covered in the course,
+
+37
+00:01:48,781 --> 00:01:51,402
+the concept of polymorphic copying,
+
+38
+00:01:51,402 --> 00:01:54,034
+how to copy heterogeneous collections.
+
+39
+00:01:54,034 --> 00:01:57,994
+how do we copy watches that contain
+different components,
+
+40
+00:01:57,994 --> 00:02:00,539
+each behaving in a different way
+
+41
+00:02:00,539 --> 00:02:02,777
+either with regards to the price,
+or the output.
+
+42
+00:02:02,777 --> 00:02:05,881
+This is the menu for this
+final week.
+
+43
+00:02:05,881 --> 00:02:09,952
+But let's start by presenting the problem
+in more detail.
+
+44
+00:02:09,952 --> 00:02:12,505
+We want to model watches,
+
+45
+00:02:12,505 --> 00:02:14,709
+let's say that watches are products,
+
+46
+00:02:14,709 --> 00:02:18,535
+in the sense that a product is something
+that we can sell, that has a price.
+
+47
+00:02:18,955 --> 00:02:22,608
+Besides, watches will have basic
+mechanisms,
+
+48
+00:02:22,608 --> 00:02:25,796
+typically hands to display the time,
+
+49
+00:02:25,796 --> 00:02:28,364
+and will be made of different
+accessories,
+
+50
+00:02:28,364 --> 00:02:32,667
+such as a body, a bracelet,
+the glass, the clasp...
+
+51
+00:02:32,667 --> 00:02:36,156
+The products we discussed earlier
+have a price,
+
+52
+00:02:36,156 --> 00:02:38,909
+and the calculation of this price
+can vary
+
+53
+00:02:38,909 --> 00:02:42,228
+-- this aspect is interesting for
+the design --
+
+54
+00:02:42,228 --> 00:02:46,982
+from a base value which should be
+fixed at the level of the product.
+
+55
+00:02:46,982 --> 00:02:53,471
+All products can be displayed,
+and this output can vary;
+
+56
+00:02:53,471 --> 00:02:56,396
+each product must be displayed
+in its own way
+
+57
+00:02:56,396 --> 00:02:59,092
+Of course, behind these notions of
+"can vary"
+
+58
+00:02:59,092 --> 00:03:03,349
+and "displayed in its own way", we
+have the concept of polymorphism.
+
+59
+00:03:03,889 --> 00:03:08,261
+Then, we have the mechanisms which
+we have just discussed,
+
+60
+00:03:08,261 --> 00:03:11,833
+and the accessories that make
+up the watches,
+
+61
+00:03:11,833 --> 00:03:15,923
+these mechanisms and accessories
+are also products.
+
+62
+00:03:15,923 --> 00:03:20,186
+We have used the
+verb "to be" several times,
+
+63
+00:03:20,186 --> 00:03:24,004
+which refers to inheritance
+relationships.
+
+64
+00:03:24,004 --> 00:03:28,338
+We could for example buy accessories
+or mechanisms separately,
+
+65
+00:03:28,338 --> 00:03:30,881
+so each of these could behave
+like a product,
+
+66
+00:03:30,881 --> 00:03:33,691
+each of these could have its
+own price,
+
+67
+00:03:33,691 --> 00:03:36,772
+and its own way of calculating its price.
+
+68
+00:03:36,772 --> 00:03:39,860
+Fundamentally, there are
+three sorts of mechanisms,
+
+69
+00:03:39,860 --> 00:03:41,707
+mechanisms we will
+refer to as analog,
+
+70
+00:03:41,707 --> 00:03:43,595
+to represent watches with hands,
+
+71
+00:03:43,595 --> 00:03:47,505
+digital watches will have a digital mechanism,
+
+72
+00:03:47,505 --> 00:03:50,896
+and then we will have watches which
+will be both analog
+
+73
+00:03:50,896 --> 00:03:53,755
+and digital.
+
+74
+00:03:53,755 --> 00:03:57,177
+Finally, for these mechanisms that we
+call "double mechanisms",
+
+75
+00:03:57,177 --> 00:03:59,950
+we will suppose that they display
+only one time.
+
+76
+00:03:59,950 --> 00:04:04,841
+So we can say that there is only one
+time associated to a watch here,
+
+77
+00:04:04,841 --> 00:04:07,712
+and that it will have two ways
+of representing it.
+
+78
+00:04:07,712 --> 00:04:09,593
+This is a point of view
+chosen for this exercise,
+
+79
+00:04:09,593 --> 00:04:12,090
+we could of course have chosen
+a different point of view
+
+80
+00:04:12,090 --> 00:04:16,486
+which would consist in associating a time
+to each of the representation mechanisms,
+
+81
+00:04:16,486 --> 00:04:17,865
+either analog or digital,
+
+82
+00:04:17,865 --> 00:04:19,543
+but it is not the point of view
+that we took here.
+
+83
+00:04:19,543 --> 00:04:22,358
+This way, we introduce an interesting
+problem
+
+84
+00:04:22,358 --> 00:04:24,219
+when coding these classes.
+
+85
+00:04:24,219 --> 00:04:26,356
+To summarize, regarding classes,
+
+86
+00:04:26,356 --> 00:04:29,177
+that is, regarding the types of objects
+that we will have in our program,
+
+87
+00:04:29,177 --> 00:04:32,578
+we will have watches ("Montre"), we will have
+products ("Produit"),
+
+88
+00:04:32,578 --> 00:04:36,447
+mechanisms ("Mecanisme")
+and accessories ("Accessoire);
+
+89
+00:04:36,447 --> 00:04:39,414
+accessories can be bodies ("Boitier")
+or bracelets
+
+90
+00:04:39,414 --> 00:04:41,294
+All of these will be classes.
+
+91
+00:04:41,294 --> 00:04:43,993
+Regarding mechanisms, we can have
+analog mechanisms,
+
+92
+00:04:43,993 --> 00:04:47,095
+digital mechanisms, or
+double mechanisms.
+
+93
+00:04:47,742 --> 00:04:49,288
+That is the whole set of classes.
+
+94
+00:04:49,288 --> 00:04:51,356
+Regarding inheritance relationships,
+
+95
+00:04:51,356 --> 00:04:54,501
+we have seen that watches
+are products,
+
+96
+00:04:54,501 --> 00:04:56,750
+so they will inherit from products.
+
+97
+00:04:56,750 --> 00:05:01,948
+We have seen that analog, digital and
+double mechanisms
+
+98
+00:05:01,948 --> 00:05:06,475
+are types of mechanisms, so
+all three classes here
+
+99
+00:05:06,475 --> 00:05:10,620
+will inherit from the mechanism
+class.
+
+100
+00:05:10,620 --> 00:05:14,803
+We have also seen that mechanisms
+and accessories
+
+101
+00:05:14,803 --> 00:05:17,761
+are also products.
+
+102
+00:05:17,761 --> 00:05:23,265
+All of this will lead us to the following
+hierarchic model:
+
+103
+00:05:23,265 --> 00:05:26,150
+right at the top, we have the concept
+of a product;
+
+104
+00:05:26,920 --> 00:05:31,646
+accessories, mechanisms and watches 
+are products (TN: "montre" means "watch")
+
+105
+00:05:31,646 --> 00:05:37,109
+However, a watch will have a mechanism
+and will have accessories,
+
+106
+00:05:37,109 --> 00:05:39,595
+so it will encapsulate these classes.
+
+107
+00:05:39,595 --> 00:05:42,617
+Among the accessories, we have
+bodies (TN: "boitier"), bracelets,
+
+108
+00:05:42,617 --> 00:05:46,407
+clasps, glasses (TN: "fermoir" and "vitre",
+resp.), all of these are accessories.
+
+109
+00:05:46,407 --> 00:05:49,524
+Mechanisms can be analog
+
+110
+00:05:49,524 --> 00:05:52,615
+or digital, they are both mechanisms.
+
+111
+00:05:52,615 --> 00:05:55,963
+Finally, a double mechanism is
+basically a mechanism,
+
+112
+00:05:55,963 --> 00:05:59,653
+but we have decided, as we mentioned
+earlier,
+
+113
+00:05:59,653 --> 00:06:01,860
+that it would indicate only one time,
+
+114
+00:06:01,860 --> 00:06:06,354
+which we will certainly represent at the
+level of the concept of a mechanism,
+
+115
+00:06:06,354 --> 00:06:09,499
+and they will behave both
+
+116
+00:06:09,499 --> 00:06:12,698
+as analog mechanisms and digital
+mechanisms.
+
+117
+00:06:12,698 --> 00:06:15,330
+So naturally we can say that a
+double mechanism
+
+118
+00:06:15,330 --> 00:06:17,405
+is an analog mechanism
+
+119
+00:06:17,405 --> 00:06:20,645
+and at the same time is
+a digital mechanism,
+
+120
+00:06:20,645 --> 00:06:22,941
+all the while being just one
+
+121
+00:06:22,941 --> 00:06:27,272
+-- that was the remark on it having
+only one time --
+
+122
+00:06:27,272 --> 00:06:31,218
+all the while being only one
+mechanism
+
+123
+00:06:31,218 --> 00:06:33,205
+and not two mechanisms.
+
+124
+00:06:33,205 --> 00:06:36,621
+This is the constraint we wanted to
+impose in the design
+
+125
+00:06:36,621 --> 00:06:41,576
+to have virtual inheritance here
+
+126
+00:06:41,576 --> 00:06:44,802
+to make "Mecanisme" a virtual class.
+
+127
+00:06:45,162 --> 00:06:48,016
+Let's see how all of this can be
+translated into code.
+
+128
+00:06:48,016 --> 00:06:50,687
+By the way, we suggest that while
+you watch these videos,
+
+129
+00:06:50,687 --> 00:06:54,002
+you take breaks from time to time
+to write the code yourselves
+
+130
+00:06:54,002 --> 00:06:56,610
+in your favorite development
+environment.
+
+131
+00:06:56,610 --> 00:06:59,462
+First point:
+watches are products.
+
+132
+00:06:59,462 --> 00:07:01,837
+This is translated as a "Montre" class
+
+133
+00:07:01,837 --> 00:07:05,333
+which "is a", 
+which inherits from "Produit".
+
+134
+00:07:05,333 --> 00:07:10,183
+And of course, we introduce a "Produit"
+class, from which "Montre" inherits.
+
+135
+00:07:10,183 --> 00:07:13,662
+And for now, we simply have an
+empty "main".
+
+136
+00:07:13,662 --> 00:07:17,760
+Second point: watches have
+a mechanism,
+
+137
+00:07:17,760 --> 00:07:22,479
+so they will encapsulate a Mecanisme.
+Watches have a mechanism,
+
+138
+00:07:22,479 --> 00:07:26,545
+they are made of, so they have,
+different accessories.
+
+139
+00:07:26,545 --> 00:07:28,652
+So, how do we translate
+"different accessories"?
+
+140
+00:07:28,652 --> 00:07:31,385
+This is simply a collection of
+accessories,
+
+141
+00:07:31,385 --> 00:07:33,815
+a vector of Accessoires.
+
+142
+00:07:33,815 --> 00:07:35,823
+This introduces two new
+classes,
+
+143
+00:07:35,823 --> 00:07:40,270
+a "Mecanisme" class and an
+"Accessoire" class.
+
+144
+00:07:40,830 --> 00:07:44,459
+That said, we know that these 
+"Accessoire" and "Mecanisme" classes
+
+145
+00:07:44,459 --> 00:07:48,190
+are very general classes; we want them
+to be very general
+
+146
+00:07:48,190 --> 00:07:50,765
+to allow them to behave in a
+polymorphic way
+
+147
+00:07:50,765 --> 00:07:53,324
+as we will have several accessories
+such as bracelets,...
+
+148
+00:07:53,324 --> 00:07:54,869
+we will have several mechanisms,
+
+149
+00:07:54,869 --> 00:07:58,090
+and so here we certainly want
+polymorphism,
+
+150
+00:07:58,090 --> 00:08:05,092
+so we will add pointers
+to mechanisms
+
+151
+00:08:05,092 --> 00:08:07,387
+and pointers to accessories.
+
+152
+00:08:07,387 --> 00:08:09,466
+What we are doing right away!
+
+153
+00:08:09,466 --> 00:08:14,042
+In the version presented here,
+we are using C++ 2011 pointers,
+
+154
+00:08:14,042 --> 00:08:16,822
+so-called "smart pointers".
+
+155
+00:08:16,822 --> 00:08:19,293
+So we will have "unique pointers"
+to mechanisms,
+
+156
+00:08:19,293 --> 00:08:21,454
+and similarly, "unique pointers" for
+the accessories,
+
+157
+00:08:21,454 --> 00:08:25,059
+which requires that we include
+the "memory" library
+
+158
+00:08:25,059 --> 00:08:26,709
+(for the "unique pointers").
+
+159
+00:08:26,709 --> 00:08:29,421
+Of course, we included the
+"vector" library as well,
+
+160
+00:08:29,421 --> 00:08:33,009
+for the vectors that
+we need here.
+
+161
+00:08:33,009 --> 00:08:34,487
+And since we have just introduced
+
+162
+00:08:34,487 --> 00:08:36,302
+pointers in the Montre class,
+
+163
+00:08:36,302 --> 00:08:38,318
+we must have the reflex, as
+programmers,
+
+164
+00:08:38,318 --> 00:08:40,095
+to think about
+
+165
+00:08:40,995 --> 00:08:42,990
+-- as soon as we use pointers,
+we should indeed --
+
+166
+00:08:42,990 --> 00:08:46,432
+think about the question of copying:
+"shallow copy" or "deep copy"?..
+
+167
+00:08:46,432 --> 00:08:47,942
+Let's leave this problem aside for a while.
+
+168
+00:08:47,942 --> 00:08:51,161
+we will discuss this in the very last episode.
+
+169
+00:08:51,161 --> 00:08:53,561
+For now, let's just say
+
+170
+00:08:53,561 --> 00:08:59,147
+that we cannot copy watches, nor
+assign a watch,
+
+171
+00:08:59,147 --> 00:09:01,717
+nor use the assignment operator,
+the "operator=".
+
+172
+00:09:01,717 --> 00:09:03,619
+So here, this is the copy constructor,
+
+173
+00:09:03,619 --> 00:09:06,531
+"Montre" in the "Montre" class
+is indeed a constructor.
+
+174
+00:09:06,531 --> 00:09:08,861
+This is the copy constructor
+that we delete,
+
+175
+00:09:08,861 --> 00:09:13,127
+and then the operator= is also deleted;
+
+176
+00:09:13,127 --> 00:09:15,124
+we will come back to this later.
+
+177
+00:09:15,784 --> 00:09:18,643
+Next aspect: products
+have a price
+
+178
+00:09:19,003 --> 00:09:21,312
+So here, we could simply
+encapsulate
+
+179
+00:09:21,312 --> 00:09:24,699
+a price naturally represented
+as a "double",
+
+180
+00:09:24,699 --> 00:09:28,169
+but we have a constraint saying
+that the price can vary,
+
+181
+00:09:28,169 --> 00:09:31,566
+which shows that we will have
+to calculate the price.
+
+182
+00:09:31,566 --> 00:09:34,191
+For example, later on, we will
+decide that the price of a watch
+
+183
+00:09:34,191 --> 00:09:36,053
+is the price of its mechanism
+
+184
+00:09:36,053 --> 00:09:37,934
+and the sum of the prices of its accessories,
+
+185
+00:09:37,934 --> 00:09:41,613
+And so a price can no longer be data
+but shall become a function,
+
+186
+00:09:41,613 --> 00:09:43,972
+which we will represent as
+a method (= member function).
+
+187
+00:09:44,562 --> 00:09:48,946
+Calculating the price of a product
+will not modify the product as such,
+
+188
+00:09:48,946 --> 00:09:51,290
+so the method will be qualified
+as "const".
+
+189
+00:09:51,290 --> 00:09:54,631
+Of course, it returns a price,
+as a "double".
+
+190
+00:09:54,631 --> 00:09:58,389
+Then, we want the price to
+be able to vary,
+
+191
+00:09:58,389 --> 00:10:00,738
+so this means that we will
+want to have
+
+192
+00:10:00,738 --> 00:10:03,099
+a polymorphic behavior here.
+
+193
+00:10:03,749 --> 00:10:07,687
+Let's say that by default,
+we will return the base price,
+
+194
+00:10:07,687 --> 00:10:09,932
+which will be defined here, "base value"
+(TN: "valeur"),
+
+195
+00:10:09,932 --> 00:10:12,452
+what we had called "a price" earlier,
+
+196
+00:10:12,452 --> 00:10:15,403
+will simply become one component of the price,
+its "base value".
+
+197
+00:10:15,403 --> 00:10:19,061
+By default, this "base value" will be the product's price,
+
+198
+00:10:19,061 --> 00:10:21,174
+but perhaps later,
+
+199
+00:10:21,174 --> 00:10:23,316
+in other subclasses of the Produit
+class,
+
+200
+00:10:23,316 --> 00:10:26,993
+it will simply be used to calculate
+the actual price of
+
+201
+00:10:26,993 --> 00:10:30,226
+other products that are subclasses
+of the Produit class.
+
+202
+00:10:30,226 --> 00:10:33,227
+Moreover, all products
+can be displayed.
+
+203
+00:10:33,227 --> 00:10:36,262
+This means, in C++, that we
+will overload
+
+204
+00:10:36,262 --> 00:10:39,853
+the output operator for products.
+
+205
+00:10:40,313 --> 00:10:43,605
+Products can be displayed,
+but each in its own way,
+
+206
+00:10:43,605 --> 00:10:47,191
+meaning that we will have a
+polymorphic behavior
+
+207
+00:10:47,191 --> 00:10:49,663
+-- we will leave this for the next
+episode,
+
+208
+00:10:49,663 --> 00:10:51,676
+we will come back to this in that episode.
+
+209
+00:10:51,676 --> 00:10:53,987
+For now, we will simply
+write a prototype
+
+210
+00:10:53,987 --> 00:10:58,767
+to remember that we want to overload
+the output operator for products.
+
+211
+00:10:58,767 --> 00:11:01,833
+Regarding mechanisms and accessories,
+
+212
+00:11:01,833 --> 00:11:05,284
+we said that mechanisms and accessories
+were products.
+
+213
+00:11:05,284 --> 00:11:08,187
+So here too, we have an
+inheritance relationship:
+
+214
+00:11:08,187 --> 00:11:11,328
+the "Accessoire" class inherits
+from the "Produit" class,
+
+215
+00:11:11,328 --> 00:11:12,903
+which was defined earlier,
+
+216
+00:11:12,903 --> 00:11:16,997
+and the "Mecanisme" class also
+inherits from the "Produit" class.
+
+217
+00:11:17,937 --> 00:11:22,474
+About mechanisms: there are three
+kinds of mechanisms,
+
+218
+00:11:22,474 --> 00:11:26,394
+so here too, these three mechanisms
+are of course mechanisms,
+
+219
+00:11:26,394 --> 00:11:30,136
+so we have "MecanismeAnalogique" which
+is a mechanism,
+
+220
+00:11:30,136 --> 00:11:32,381
+which inherits from "Mecanisme",
+
+221
+00:11:32,381 --> 00:11:35,249
+"MecanismeDigital" which inherits from
+"Mecanisme",
+
+222
+00:11:35,249 --> 00:11:38,617
+and "MecanismeDouble" which inherits
+from "Mecanisme".
+
+223
+00:11:39,477 --> 00:11:42,486
+And finally, concerning "double mechanisms",
+
+224
+00:11:42,486 --> 00:11:45,244
+we will suppose that there is
+only one time
+
+225
+00:11:45,244 --> 00:11:46,963
+for the double mechanism,
+
+226
+00:11:46,963 --> 00:11:48,730
+but that double mechanisms behave
+
+227
+00:11:48,730 --> 00:11:51,963
+both as analog mechanisms and as
+digital mechanisms,
+
+228
+00:11:51,963 --> 00:11:54,371
+which we haven't represented
+here at all,
+
+229
+00:11:54,371 --> 00:11:57,559
+and which will potentially change
+this inheritance relationship,
+
+230
+00:11:57,559 --> 00:11:59,624
+but we will come back to
+this aspect
+
+231
+00:11:59,624 --> 00:12:02,539
+in an episode specifically
+dedicated to it.
+
+232
+00:12:03,159 --> 00:12:07,128
+Voila! This concludes this first episode
+presenting the big picture,
+
+233
+00:12:07,128 --> 00:12:10,123
+the object-oriented design of the problem.
+
+234
+00:12:10,123 --> 00:12:12,142
+The next episode will focus on
+
+235
+00:12:12,142 --> 00:12:15,735
+polymorphic output and on filling
+the "Produit" class.

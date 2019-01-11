@@ -1,0 +1,1459 @@
+1
+00:00:00,000 --> 00:00:05,480
+Hello.
+
+2
+00:00:05,480 --> 00:00:08,378
+Understanding microcontrollers is also
+
+3
+00:00:08,378 --> 00:00:11,000
+about being able to develop applications
+
+4
+00:00:11,000 --> 00:00:13,934
+with microcontrollers, and today
+
+5
+00:00:13,934 --> 00:00:17,390
+we will make a small application.
+
+6
+00:00:17,390 --> 00:00:21,270
+It will give us the opportunity
+to practice
+
+7
+00:00:21,270 --> 00:00:25,428
+the reading of analog values, and also
+
+8
+00:00:25,428 --> 00:00:28,310
+the connection to a serial link.
+
+9
+00:00:28,310 --> 00:00:34,680
+It will be a very simple tester
+and battery charger.
+
+10
+00:00:34,680 --> 00:00:40,530
+To simplify we will use in this project
+an accumulator with a
+
+11
+00:00:40,530 --> 00:00:46,232
+voltage of 1.2 volts, in particular
+the technology
+
+12
+00:00:46,232 --> 00:00:50,696
+M i M h which is still widely used.
+The first thing that interests us
+
+13
+00:00:50,696 --> 00:00:57,142
+is to be able to measure the empty
+voltage of our accumulator,
+
+14
+00:00:57,142 --> 00:01:00,338
+it is usually done with a voltmeter, by
+
+15
+00:01:00,338 --> 00:01:04,120
+measuring the voltage at the
+terminals of the accumulator.
+
+16
+00:01:04,120 --> 00:01:08,720
+This will be easy to do with an
+analog input of a microcontroller.
+
+17
+00:01:08,720 --> 00:01:16,266
+Obviously, it is necessary to charge
+the accumulator, to charge it
+
+18
+00:01:16,266 --> 00:01:21,950
+it is necessary to pass a current from
+the supply, which goes here
+
+19
+00:01:21,950 --> 00:01:26,640
+charging the accumulator,
+a limiting resistor
+
+20
+00:01:26,640 --> 00:01:29,600
+will be used to regulate the current.
+
+21
+00:01:29,600 --> 00:01:35,400
+Obviously what interests us is
+to know the integral of the current,
+
+22
+00:01:35,400 --> 00:01:41,395
+which will represent the energy that
+has been given in charge, which
+
+23
+00:01:41,395 --> 00:01:43,870
+is expressed in ampere hour or
+
+24
+00:01:43,870 --> 00:01:46,420
+obviously more often in milliamperes hour.
+
+25
+00:01:46,420 --> 00:01:48,621
+Then if we want to know the
+
+26
+00:01:48,621 --> 00:01:52,840
+characteristics of this accumulator
+it must be able to unload it.
+
+27
+00:01:52,840 --> 00:01:56,900
+In order to unload it, it will pass
+current this time towards the ground.
+
+28
+00:01:56,900 --> 00:02:02,526
+So, like this. And this time
+the integral of the current will
+
+29
+00:02:02,526 --> 00:02:07,780
+represent the capacity of the
+accumulator. What the accumulator
+
+30
+00:02:07,780 --> 00:02:12,370
+has actually been able to retain
+as electrical energy
+
+31
+00:02:12,370 --> 00:02:17,385
+which was provided to it at the time
+of charging. How to achieve these 3
+
+32
+00:02:17,385 --> 00:02:22,495
+montages with a microcontroller? Here is
+
+33
+00:02:22,495 --> 00:02:27,434
+a solution: we will use an
+
+34
+00:02:27,434 --> 00:02:32,888
+analog input to constantly
+measure voltage at the terminals
+
+35
+00:02:32,888 --> 00:02:38,466
+of our accumulator, and we
+will use here our resistance,
+
+36
+00:02:38,466 --> 00:02:44,039
+the one which is here, the one
+there, there will be only one.
+
+37
+00:02:44,039 --> 00:02:49,692
+And we can use this tab
+to request for the load if we
+
+38
+00:02:49,692 --> 00:02:55,520
+set the state 1 to request the
+discharge if state 0 is set.
+
+39
+00:02:55,520 --> 00:02:58,480
+And obviously when the tensionis read,
+
+40
+00:02:58,480 --> 00:03:01,040
+the high impedance is used so that
+
+41
+00:03:01,040 --> 00:03:04,450
+there is no current that passes
+through this resistance.
+
+42
+00:03:04,450 --> 00:03:08,774
+Obviously it is necessary to
+choose this resistance,
+
+43
+00:03:08,774 --> 00:03:12,220
+the current of output must
+not be exceeded.
+
+44
+00:03:12,220 --> 00:03:16,197
+Remember a microcontroller is able
+
+45
+00:03:16,197 --> 00:03:19,530
+to provide about 30 milliamps.
+
+46
+00:03:19,530 --> 00:03:23,742
+I would even say that, it would have
+to be less
+
+47
+00:03:23,742 --> 00:03:30,650
+than  this value so that the voltage
+drop in the resistor of the transistor
+
+48
+00:03:30,650 --> 00:03:33,832
+remains negligible in order to not
+influence the
+
+49
+00:03:33,832 --> 00:03:37,370
+measurement of the current that
+will be seen just now.
+
+50
+00:03:37,370 --> 00:03:43,258
+Let's start to write a small test
+program, which will measure
+
+51
+00:03:43,258 --> 00:03:48,850
+and display the voltage display,
+let's see if this is really the
+
+52
+00:03:48,850 --> 00:03:53,970
+voltage, so we have our setup where
+we will simply
+
+53
+00:03:53,970 --> 00:03:58,940
+start the serial line to be able to
+communicate with the PC
+
+54
+00:03:58,940 --> 00:04:03,747
+to display the messages on the screen.
+In our
+
+55
+00:04:03,747 --> 00:04:08,868
+main loop, we will read what
+
+56
+00:04:08,868 --> 00:04:13,912
+is an analogue called in
+
+57
+00:04:13,912 --> 00:04:19,070
+this case A5, which is therefore
+the input of the accumulator, and
+
+58
+00:04:19,070 --> 00:04:23,500
+then we will directly display the read value,
+send the corresponding characters
+
+59
+00:04:23,500 --> 00:04:27,760
+on the serial line, then a delay of one
+
+60
+00:04:27,760 --> 00:04:31,920
+cecond to prevent messages from
+reaching on the screen too quickly.
+
+61
+00:04:31,920 --> 00:04:35,310
+Did we really see the tension?
+
+62
+00:04:35,310 --> 00:04:38,959
+Certainly not, we have displayed
+a value between
+
+63
+00:04:38,959 --> 00:04:44,051
+0 and 1023 which corresponds to
+
+64
+00:04:44,051 --> 00:04:49,029
+a voltage value between 0 volts and,
+and what?
+
+65
+00:04:49,029 --> 00:04:54,783
+Well and the supply voltage Vcc
+that is not necessarily
+
+66
+00:04:54,783 --> 00:04:58,920
+very well, let us admit for the
+moment that it is equal to 3.5 volts.
+
+67
+00:04:58,920 --> 00:05:04,529
+This program obviously does not do what
+we are doing yet, but it is very important
+
+68
+00:05:04,529 --> 00:05:07,580
+to do test programs, to test
+
+69
+00:05:07,580 --> 00:05:11,066
+the low-level functions, with this
+program we
+
+70
+00:05:11,066 --> 00:05:14,263
+can convince that the serial line works,
+
+71
+00:05:14,263 --> 00:05:18,490
+that analog reading works,
+it's already very interesting.
+
+72
+00:05:18,490 --> 00:05:21,820
+And, do not forget get the habit
+of keeping
+
+73
+00:05:21,820 --> 00:05:24,558
+these test programs they can still
+
+74
+00:05:24,558 --> 00:05:28,690
+be useful at some point in the
+development process.
+
+75
+00:05:28,690 --> 00:05:29,670
+The first
+
+76
+00:05:29,670 --> 00:05:36,240
+modification of this program is to wish
+to display the voltage in volts.
+
+77
+00:05:36,240 --> 00:05:39,192
+Do you remember the map function
+
+78
+00:05:39,192 --> 00:05:41,710
+that we saw some time ago?
+
+79
+00:05:41,710 --> 00:05:48,000
+We will give it the start for
+the entry and for the exit.
+
+80
+00:05:48,000 --> 00:05:53,070
+We will give the arrival for
+the entry and for the exit.
+
+81
+00:05:53,070 --> 00:05:55,149
+So here MaxConv is
+
+82
+00:05:55,149 --> 00:05:59,208
+the 1023, it is the maximum value that
+
+83
+00:05:59,208 --> 00:06:03,900
+can be read by the converter, and here the
+
+84
+00:06:03,900 --> 00:06:06,571
+2500 it does not correspond to the voltage
+
+85
+00:06:06,571 --> 00:06:09,550
+supply I mentioned just now.
+
+86
+00:06:09,550 --> 00:06:15,155
+But this is what I wanted to choose,
+indeed I added in the setup this
+
+87
+00:06:15,155 --> 00:06:20,594
+line that requests to us internally
+a reference,
+
+88
+00:06:20,594 --> 00:06:25,714
+an internal voltage reference to the
+microcontroller, there are 2 on the msp
+
+89
+00:06:25,714 --> 00:06:30,956
+430, that used at 2.5 volts.
+Therefore after
+
+90
+00:06:30,956 --> 00:06:36,266
+writing this instruction, the values
+​​we read
+
+91
+00:06:36,266 --> 00:06:41,320
+correspond to fractions of this tension.
+
+92
+00:06:41,320 --> 00:06:45,330
+If, for example, I read the value 700,
+
+93
+00:06:45,330 --> 00:06:50,720
+I shall have 700 two thousand two
+hundred and seven hundreths of a millivolt.
+
+94
+00:06:50,720 --> 00:06:55,477
+Note that I used millivolts permanently
+even
+
+95
+00:06:55,477 --> 00:06:58,680
+if, it will be displayed we'll see
+it in volts.
+
+96
+00:06:58,680 --> 00:07:04,894
+So here the tension reading routine, I
+
+97
+00:07:04,894 --> 00:07:10,699
+read well just like before, but I
+apply the map directly to have
+
+98
+00:07:10,699 --> 00:07:13,850
+a value expressed in millivolts.
+
+99
+00:07:13,850 --> 00:07:19,755
+Then it is necessary to display
+the voltage, here is the procedure: then
+
+100
+00:07:19,755 --> 00:07:24,780
+I will display, not the values ​​
+in millivolts, because I prefer to see
+
+101
+00:07:24,780 --> 00:07:29,016
+the volts with the decimal point,
+so I take here the value of
+
+102
+00:07:29,016 --> 00:07:34,117
+the tension I divide by a thousand,
+that is, the volts themselves.
+
+103
+00:07:34,117 --> 00:07:35,990
+I then write a point.
+
+104
+00:07:35,990 --> 00:07:40,892
+I do not want to have then the 3 decimal
+values, 2 are
+
+105
+00:07:40,892 --> 00:07:45,805
+sufficient for me. So I divide
+the value by 10, and I
+
+106
+00:07:45,805 --> 00:07:51,220
+take the module O to have
+exactly the value I want.
+
+107
+00:07:51,220 --> 00:07:59,750
+We could do a little test, we have
+the value 1230 millivolts that comes.
+
+108
+00:07:59,750 --> 00:08:01,136
+I'm posting here that
+
+109
+00:08:01,136 --> 00:08:05,679
+value divided by one  thousand,
+I recall it is an entire division it
+
+110
+00:08:05,679 --> 00:08:10,557
+shows me well the 1. I then display
+the decimal point and
+
+111
+00:08:10,557 --> 00:08:16,322
+I then display the value divided
+by 10, ie 123,
+
+112
+00:08:16,322 --> 00:08:21,868
+module O 100, that is to say 23.
+In the end, I
+
+113
+00:08:21,868 --> 00:08:27,410
+displayed 1 point 23, this
+procedure seems to work.
+
+114
+00:08:27,410 --> 00:08:32,790
+Oh, I still have a doubt. Let's try
+
+115
+00:08:32,790 --> 00:08:37,011
+Again with another value.
+Let's suppose our accumulator has
+
+116
+00:08:37,011 --> 00:08:44,130
+discharged a little, and that the value
+I read is this time of 1090 millivolts.
+
+117
+00:08:44,130 --> 00:08:47,360
+How am I going to post this?
+
+118
+00:08:47,360 --> 00:08:52,020
+Then the value divided by 1000
+will give me 1.
+
+119
+00:08:52,020 --> 00:08:53,364
+The
+
+120
+00:08:53,364 --> 00:08:59,055
+decimal point which is written.
+The value divided
+
+121
+00:08:59,055 --> 00:09:04,294
+by 10, it makes me 109 module O 100,
+it makes
+
+122
+00:09:04,294 --> 00:09:09,740
+me 9 and it shows me 1 point 9 is wrong.
+
+123
+00:09:09,740 --> 00:09:14,974
+This is a trap we have all done
+once or the other.
+
+124
+00:09:14,974 --> 00:09:18,418
+Here is the corrected version,
+I have to display well
+
+125
+00:09:18,418 --> 00:09:22,790
+separately each of the digits
+so that there is no deletion
+
+126
+00:09:22,790 --> 00:09:26,646
+of the non-significant digit.
+Let us now take care
+
+127
+00:09:26,646 --> 00:09:30,440
+of the charge and discharge of
+our accumulator.
+
+128
+00:09:30,440 --> 00:09:36,836
+The program has 3 operating modes,
+the measuring mode, charging mode or
+
+129
+00:09:36,836 --> 00:09:43,572
+recharging and discharging mode.
+And we will define here, what
+
+130
+00:09:43,572 --> 00:09:48,324
+must be put on the corresponding paw,
+the tab
+
+131
+00:09:48,324 --> 00:09:52,684
+PinCharge. It must be
+
+132
+00:09:52,684 --> 00:09:58,371
+output at 1 for the load.
+
+133
+00:09:58,371 --> 00:10:03,095
+It must be output at 0 for
+
+134
+00:10:03,095 --> 00:10:08,768
+discharge and it must remain
+at high impedance, so it
+
+135
+00:10:08,768 --> 00:10:14,986
+must be input for the measurement
+mode. In the initialization,
+
+136
+00:10:14,986 --> 00:10:19,050
+we switch to measuring mode,
+it is the default mode.
+
+137
+00:10:19,050 --> 00:10:23,952
+I would like to add the two
+procedures that will allow me to
+
+138
+00:10:23,952 --> 00:10:29,213
+display the current and display the load.
+
+139
+00:10:29,213 --> 00:10:34,368
+I point out that this burden is a value
+
+140
+00:10:34,368 --> 00:10:40,720
+that will be expressed in mAs since we will
+make the measurements every second
+
+141
+00:10:40,720 --> 00:10:46,710
+and hence these the values ​​
+will become important.
+
+142
+00:10:46,710 --> 00:10:52,470
+We can not use an integer,
+we must use a word of 32 bits.
+
+143
+00:10:52,470 --> 00:10:56,356
+Extreme caution is required when
+writing applications
+
+144
+00:10:56,356 --> 00:10:59,505
+to properly look at the size
+of the variables we
+
+145
+00:10:59,505 --> 00:11:06,660
+need, a byte or char for 8 bits,
+an int for 16 bits or a long in 32 bits.
+
+146
+00:11:06,660 --> 00:11:10,730
+So let's start writing the main loop.
+
+147
+00:11:10,730 --> 00:11:14,299
+It is preceded by the initialization
+of the mode
+
+148
+00:11:14,299 --> 00:11:17,230
+measurement mode, which is
+the default mode.
+
+149
+00:11:17,230 --> 00:11:20,496
+And here, depending on the mode,
+whether we are recharge or if
+
+150
+00:11:20,496 --> 00:11:24,930
+we are in a discharge, we have
+a number of specific things to do,
+
+151
+00:11:24,930 --> 00:11:30,090
+in particular measuring the
+charge current,
+
+152
+00:11:30,090 --> 00:11:35,020
+or the discharge current, the same
+variable was used, it will be the
+
+153
+00:11:35,020 --> 00:11:40,420
+measured voltage divided by the
+resistance when it is discharging mode.
+
+154
+00:11:40,420 --> 00:11:45,940
+On the other hand, the current which will
+pass through the resistor when we are in charging mode,
+
+155
+00:11:45,940 --> 00:11:50,660
+will be the supply voltage minus the
+voltage at the terminals of the accumulator
+
+156
+00:11:50,660 --> 00:11:54,120
+and, to get the current I always
+divide by the resistance.
+
+157
+00:11:54,120 --> 00:11:57,585
+So here, in both, in those two lines,
+
+158
+00:11:57,585 --> 00:12:00,388
+we apply Ohm's law but looking at the
+
+159
+00:12:00,388 --> 00:12:04,221
+the corrresponding scheme which is
+used to properly use the correct
+
+160
+00:12:04,221 --> 00:12:08,420
+tension, knowing of course that
+the resistance always remains the same.
+
+161
+00:12:08,420 --> 00:12:11,876
+In both cases, the value
+
+162
+00:12:11,876 --> 00:12:15,916
+of this charging or discharging
+current will be displayed,
+
+163
+00:12:15,916 --> 00:12:22,180
+then the charge will be calculated
+by integrating the current.
+
+164
+00:12:22,180 --> 00:12:24,460
+In fact, I have to multiply by the time
+but
+
+165
+00:12:24,460 --> 00:12:27,040
+like time, I will arrange that it be a
+
+166
+00:12:27,040 --> 00:12:31,318
+second, I actually do the integration
+of the recharge
+
+167
+00:12:31,318 --> 00:12:36,652
+and I get the mAs unit,
+and this value is displayed.
+
+168
+00:12:36,652 --> 00:12:41,130
+Print ln is just to move to the next line.
+
+169
+00:12:41,130 --> 00:12:46,128
+So let's continue writing this main loop,
+
+170
+00:12:46,128 --> 00:12:49,520
+it is obviously necessary to wait a second,
+
+171
+00:12:49,520 --> 00:12:54,330
+it will correspond to this integration
+to have the measure of the load.
+
+172
+00:12:54,330 --> 00:12:57,294
+And then we have to manage the
+serial line.
+
+173
+00:12:57,294 --> 00:13:01,190
+Did a character come from the serial line?
+
+174
+00:13:01,190 --> 00:13:03,423
+That's the question.
+
+175
+00:13:03,423 --> 00:13:06,272
+If that is the case, we read that
+character and
+
+176
+00:13:06,272 --> 00:13:11,138
+selects according to the character.
+Do we want to take over?
+
+177
+00:13:11,138 --> 00:13:13,470
+Do we want to go to the landfill?
+
+178
+00:13:13,470 --> 00:13:17,980
+Or do we want to return to the default mode,
+which is the measurement mode?
+
+179
+00:13:17,980 --> 00:13:24,590
+We do not forget the break related
+to the switch case structure.
+
+180
+00:13:24,590 --> 00:13:27,349
+Let us ask one small question.
+
+181
+00:13:27,349 --> 00:13:31,316
+Here is the program we have written,
+it measures
+
+182
+00:13:31,316 --> 00:13:36,255
+and displays the voltage, it measures
+and displays the charge
+
+183
+00:13:36,255 --> 00:13:40,782
+and discharge, it waits a second
+and handles
+
+184
+00:13:40,782 --> 00:13:45,214
+the input characters. Do I properly
+
+185
+00:13:45,214 --> 00:13:50,074
+manage the time for the application
+we have?
+
+186
+00:13:50,074 --> 00:13:56,686
+I recall that if one second is not
+one second, our load in mAh and so
+
+187
+00:13:56,686 --> 00:14:04,400
+in mAs will be false. The answer is no.
+
+188
+00:14:04,400 --> 00:14:11,640
+I need my loop to last a second.
+
+189
+00:14:11,640 --> 00:14:17,124
+This instruction lasts a second. It would
+therefore be necessary that everything
+
+190
+00:14:17,124 --> 00:14:22,506
+I wrote in blue takes a negligible
+time compared to
+
+191
+00:14:22,506 --> 00:14:27,396
+the second. So the measure is
+not too long,
+
+192
+00:14:27,396 --> 00:14:32,235
+it can be OK. But the voltage display
+of the
+
+193
+00:14:32,235 --> 00:14:37,172
+load, with the small texts planned
+in our procedures and which we
+
+194
+00:14:37,172 --> 00:14:41,980
+saw just now , in all about sixty
+characters.
+
+195
+00:14:41,980 --> 00:14:48,277
+One character has 9600
+
+196
+00:14:48,277 --> 00:14:57,440
+bits per second that corresponds
+to about one millisecond.
+
+197
+00:14:57,440 --> 00:15:02,221
+I recall that a character is 8 bits
+plus the start bit plus the
+
+198
+00:15:02,221 --> 00:15:07,680
+stop bit, so it is 10, possibly 11 bits
+if we have two stop bits.
+
+199
+00:15:07,680 --> 00:15:13,614
+And if you have 9600 bits per second,
+that's correspond to about 1ms for
+
+200
+00:15:13,614 --> 00:15:14,750
+one character.
+
+201
+00:15:14,750 --> 00:15:20,679
+If I now have 60 characters, it's going
+to be
+
+202
+00:15:20,679 --> 00:15:26,554
+60 ms, this is therefore not quite
+negligible compared to a
+
+203
+00:15:26,554 --> 00:15:30,672
+second, and it would therefore be
+necessary to take account the value
+
+204
+00:15:30,672 --> 00:15:36,390
+of the time by reading the millis
+procedure that is available with Arduino.
+
+205
+00:15:36,390 --> 00:15:39,090
+You will tell me that this assembly
+
+206
+00:15:39,090 --> 00:15:44,507
+is not very interesting because
+charging an accumulator
+
+207
+00:15:44,507 --> 00:15:49,540
+with 20 mA, for example,
+it will take a lot, a lot of time.
+
+208
+00:15:49,540 --> 00:15:51,885
+So if we want a montage that is able
+
+209
+00:15:51,885 --> 00:15:57,140
+to send more current, it would
+obviously need one, an amplification
+
+210
+00:15:57,140 --> 00:16:01,366
+and that, it would require
+transistors and in particular,
+
+211
+00:16:01,366 --> 00:16:04,200
+we would use what is called an
+half-bridge in H so
+
+212
+00:16:04,200 --> 00:16:08,380
+that we can impose a 1, impose
+
+213
+00:16:08,380 --> 00:16:12,020
+a 0 or nothing to impose for reading.
+
+214
+00:16:12,020 --> 00:16:16,032
+There would be another solution,
+it is to use several legs
+
+215
+00:16:16,032 --> 00:16:19,670
+of the microcontroller but
+I highlight the fact
+
+216
+00:16:19,670 --> 00:16:23,595
+that there is resistance for
+each of the legs and that
+
+217
+00:16:23,595 --> 00:16:29,358
+re, put a single resistor and connect
+
+218
+00:16:29,358 --> 00:16:35,011
+the three legs together is possible
+but it is relatively dangerous.
+
+219
+00:16:35,011 --> 00:16:40,321
+If your program has a minor fault
+and two loading tabs do not have
+
+220
+00:16:40,321 --> 00:16:43,252
+the same value, it will be t
+he short circuit with
+
+221
+00:16:43,252 --> 00:16:46,760
+a serious risk of destruction
+of your microcontroller.
+
+222
+00:16:46,760 --> 00:16:51,180
+Another point that could be
+improved in this assembly.
+
+223
+00:16:51,180 --> 00:16:54,832
+In our program, it was written that
+the power
+
+224
+00:16:54,832 --> 00:16:57,430
+supply was 3.5V.
+
+225
+00:16:57,430 --> 00:17:02,850
+If you actually have a well stabilized
+power supply at 3.5V, it's perfect.
+
+226
+00:17:02,850 --> 00:17:04,967
+If this voltage is not equal to
+
+227
+00:17:04,967 --> 00:17:09,072
+3.5V, it will be necessary to
+correct the program, it is annoying.
+
+228
+00:17:09,072 --> 00:17:11,368
+And if the tension is not so well
+
+229
+00:17:11,368 --> 00:17:14,910
+stabilized, we will have false values.
+
+230
+00:17:14,910 --> 00:17:19,040
+Then one solution is to measure
+the power supply.
+
+231
+00:17:19,040 --> 00:17:20,060
+Here we take
+
+232
+00:17:20,060 --> 00:17:26,426
+the VCC, we can not directly
+put it on a reading tab since
+
+233
+00:17:26,426 --> 00:17:30,326
+the voltage will be too close,
+since it will be identical
+
+234
+00:17:30,326 --> 00:17:32,670
+to the VCC and we will not be able
+to measure.
+
+235
+00:17:32,670 --> 00:17:36,318
+So we will use a voltage divider and the
+
+236
+00:17:36,318 --> 00:17:41,550
+the voltage we have here will be
+a fraction of the supply voltage.
+
+237
+00:17:41,550 --> 00:17:45,472
+If we start from the idea of ​​reading
+
+238
+00:17:45,472 --> 00:17:48,710
+between 0 and 2.5V, and that the value of
+
+239
+00:17:48,710 --> 00:17:53,850
+the power supply is of the order of 3.5V,
+it will be possible to use two
+
+240
+00:17:53,850 --> 00:17:58,664
+identical resistances and the
+supply voltage will be measured and
+
+241
+00:17:58,664 --> 00:18:02,770
+it will be multiplied by two
+to obtain a correct result.
+
+242
+00:18:02,770 --> 00:18:06,389
+More precisely, the parameters given to
+
+243
+00:18:06,389 --> 00:18:09,410
+the map procedure we saw earlier.
+
+244
+00:18:09,410 --> 00:18:10,697
+The problem is,
+
+245
+00:18:10,697 --> 00:18:16,464
+these two resistances should be
+relatively precise
+
+246
+00:18:16,464 --> 00:18:20,140
+if we want to have as precise as possible.
+
+247
+00:18:20,140 --> 00:18:26,280
+Are we going to have to buy
+precision resistors for R1 and R2?
+
+248
+00:18:26,280 --> 00:18:28,990
+There is another very elegant solution.
+
+249
+00:18:28,990 --> 00:18:32,284
+With your multimeter, which may not
+be of very good
+
+250
+00:18:32,284 --> 00:18:35,776
+quality, which may not be very
+precise, you have a
+
+251
+00:18:35,776 --> 00:18:38,630
+resolution which is amply sufficient.
+
+252
+00:18:38,630 --> 00:18:42,220
+You can therefore take in the
+small box many
+
+253
+00:18:42,220 --> 00:18:47,768
+resistors noted as having the same
+value but with
+
+254
+00:18:47,768 --> 00:18:52,975
+variations, for example, of 5%
+possible since the most
+
+255
+00:18:52,975 --> 00:18:56,640
+common resistors are actually
+given with an inaccuracy of 5%.
+
+256
+00:18:56,640 --> 00:19:00,856
+But if you have a sufficient stock of
+resistances, you will easily find
+
+257
+00:19:00,856 --> 00:19:06,084
+two resistors that have the same
+value seen by your multimeter.
+
+258
+00:19:06,084 --> 00:19:08,636
+And if they have the same value, no
+
+259
+00:19:08,636 --> 00:19:13,044
+matter what this exact value,
+you will know that your divider
+
+260
+00:19:13,044 --> 00:19:15,975
+of voltage will divide by two and
+you will be able
+
+261
+00:19:15,975 --> 00:19:19,660
+to do the correct calculation
+for the power measurement here.
+
+262
+00:19:19,660 --> 00:19:23,460
+What could be added to this montage?
+
+263
+00:19:23,460 --> 00:19:25,935
+Is it possible to measure
+
+264
+00:19:25,935 --> 00:19:28,610
+the internal resistance of the capacitor?
+
+265
+00:19:28,610 --> 00:19:32,558
+A priori, it seems easy, it is necessary
+to make a measurement of
+
+266
+00:19:32,558 --> 00:19:37,094
+the unladen tension, make a
+measurement with the load, we find
+
+267
+00:19:37,094 --> 00:19:40,802
+a voltage drop between these
+two measurements and we calculate
+
+268
+00:19:40,802 --> 00:19:45,390
+the internal resistance by applying
+Ohm's law since the resistance is known
+
+269
+00:19:45,390 --> 00:19:50,999
+The problem is that this internal
+resistance is extremely low and that
+
+270
+00:19:50,999 --> 00:19:54,676
+there is a risk of having
+too little variation to
+
+271
+00:19:54,676 --> 00:19:58,750
+be reliably measured with
+the installation we have.
+
+272
+00:19:58,750 --> 00:20:02,512
+I recall that we have a 10-bit
+converter, it is supposed to give
+
+273
+00:20:02,512 --> 00:20:07,150
+the per 1000 but in reality, the noises,
+if we doe not extremely
+
+274
+00:20:07,150 --> 00:20:09,670
+pay attention to the realization
+of the editing uh,
+
+275
+00:20:09,670 --> 00:20:12,520
+will make that we have a much
+
+276
+00:20:12,520 --> 00:20:16,466
+greater vagueness than the per 1000
+and, therefore, it will not be easy to
+
+277
+00:20:16,466 --> 00:20:21,338
+measure this internal resistance.
+There would still be a
+
+278
+00:20:21,338 --> 00:20:27,250
+possibility, it would be to do
+what is called oversampling.
+
+279
+00:20:27,250 --> 00:20:33,358
+We could, for example, say: that I measure
+successively the unladen tension and then
+
+280
+00:20:33,358 --> 00:20:36,782
+the tension with a load, I repeat
+
+281
+00:20:36,782 --> 00:20:42,108
+this operation one thousand
+times, I get, I totalize
+
+282
+00:20:42,108 --> 00:20:47,489
+each of the two values ​​and
+we may have at that time
+
+283
+00:20:47,489 --> 00:20:52,800
+a difference between these two means,
+in some way measured
+
+284
+00:20:52,800 --> 00:20:57,864
+which could be significant and
+tell us the internal resistance
+
+285
+00:20:57,864 --> 00:21:00,570
+of the accumulator, which could
+
+286
+00:21:00,570 --> 00:21:04,205
+also indicate the, the state
+of the accumulator.
+
+287
+00:21:04,205 --> 00:21:07,683
+A battery in good condition
+will have a relatively
+
+288
+00:21:07,683 --> 00:21:12,410
+low internal resitance, in
+NiMH technology in any case.
+
+289
+00:21:12,410 --> 00:21:16,425
+What are the possible
+improvements of this assembly?
+
+290
+00:21:16,425 --> 00:21:18,834
+We could, for example, detect the end
+
+291
+00:21:18,834 --> 00:21:22,625
+of the charge, approximately 1.5 or 1.6V.
+
+292
+00:21:22,625 --> 00:21:26,772
+The end of the discharge
+could be detected around 1V.
+
+293
+00:21:26,772 --> 00:21:32,520
+We could also manage several
+accumulators, higher voltages.
+
+294
+00:21:32,520 --> 00:21:36,997
+We could also use the Trickle charging.
+
+295
+00:21:36,997 --> 00:21:41,978
+Yes, it is a technique that compensates
+for the
+
+296
+00:21:41,978 --> 00:21:47,386
+natural discharge from the
+accumulator when it has finished
+
+297
+00:21:47,386 --> 00:21:52,760
+charging by sending a PWM signal,
+which is well known,
+
+298
+00:21:52,760 --> 00:21:57,655
+which corresponds precisely to this
+natural discharge in such a way
+
+299
+00:21:57,655 --> 00:22:01,560
+that if the accumulator remains
+in the charger for a certain
+
+300
+00:22:01,560 --> 00:22:06,790
+time, even a relatively long time,
+it will remain loaded optimally.
+
+301
+00:22:06,790 --> 00:22:09,914
+Of course we could also add LEDs,
+
+302
+00:22:09,914 --> 00:22:13,636
+buttons, a display, what do I know,
+to make a
+
+303
+00:22:13,636 --> 00:22:16,452
+stand-alone device and at
+that time would no longer need
+
+304
+00:22:16,452 --> 00:22:19,940
+the serial line we have until now.
+
+305
+00:22:19,940 --> 00:22:22,692
+So, we realized this
+
+306
+00:22:22,692 --> 00:22:25,310
+small application that had the advantage
+
+307
+00:22:25,310 --> 00:22:27,710
+of being an extremely simple assembly
+since
+
+308
+00:22:27,710 --> 00:22:29,390
+we needed only one
+
+309
+00:22:29,390 --> 00:22:32,010
+resistance in addition to
+our microcontroller.
+
+310
+00:22:32,010 --> 00:22:35,400
+We were able to see how
+to do the analog readings.
+
+311
+00:22:35,400 --> 00:22:40,548
+We were able to see how to use
+the serial line and we were also able
+
+312
+00:22:40,548 --> 00:22:45,760
+to see a number of pitfalls to avoid.
+

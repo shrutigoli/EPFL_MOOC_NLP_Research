@@ -1,0 +1,1239 @@
+1
+00:00:04,339 --> 00:00:06,506
+Dans les séquences vidéo précédentes,
+nous nous sommes interressés
+
+2
+00:00:06,506 --> 00:00:08,062
+à gérer le début de vie d'un objet.
+
+3
+00:00:08,062 --> 00:00:10,977
+Comment initialiser les attributs de vie
+d'un objet lorsqu'on commence
+
+4
+00:00:10,977 --> 00:00:11,927
+à travailler avec.
+
+5
+00:00:11,975 --> 00:00:15,069
+Il est temps maintenant de se préoccuper
+de gérer ce qui se passe
+
+6
+00:00:15,069 --> 00:00:16,256
+en fin de vie d'un objet.
+
+7
+00:00:16,256 --> 00:00:18,266
+Et c'est le sujet de 
+la séquence d'aujourd'hui.
+
+8
+00:00:19,219 --> 00:00:21,675
+Se préoccuper de gérer 
+la fin de vie d'un objet
+
+9
+00:00:21,675 --> 00:00:25,435
+est en fait important lorsque
+cet objet mobilise des ressources.
+
+10
+00:00:25,517 --> 00:00:27,957
+Examinons un cas concret pour commencer,
+
+11
+00:00:28,329 --> 00:00:31,169
+prenons une variante 
+de notre fameuse classe « Rectangle »,
+
+12
+00:00:34,655 --> 00:00:38,125
+dans laquelle les attributs, au lieu 
+d'avoir été déclarés comme des « doubles »,
+
+13
+00:00:40,817 --> 00:00:46,127
+soient maintenant déclarés comme étant
+des « pointeurs » sur des « doubles ».
+
+14
+00:00:50,986 --> 00:00:52,196
+Comme ceci.
+
+15
+00:00:53,013 --> 00:00:55,247
+Et imaginons qu'un 
+des constructeurs de « Rectangle »
+
+16
+00:00:57,807 --> 00:00:59,351
+alloue de la mémoire
+
+17
+00:01:00,811 --> 00:01:03,677
+pour ces 2 attributs au moment 
+de la création de l'objet.
+
+18
+00:01:04,097 --> 00:01:07,857
+Par exemple, on peut imaginer
+
+19
+00:01:07,951 --> 00:01:10,471
+qu'il y ait un constructeur par défaut
+
+20
+00:01:11,487 --> 00:01:13,957
+qui initialiserait l'attribut hauteur
+
+21
+00:01:14,826 --> 00:01:18,756
+en allouant dynamiquement 
+de la mémoire pour un « double »
+
+22
+00:01:21,761 --> 00:01:28,111
+et ferait donc la même chose
+pour la largeur.
+
+23
+00:01:30,962 --> 00:01:33,478
+Cette définition au moyen de pointeurs
+n'est pas forcément
+
+24
+00:01:33,478 --> 00:01:36,040
+la meilleure définition possible
+pour la classe « Rectangle »,
+
+25
+00:01:36,040 --> 00:01:38,870
+nous l'utilisons ici uniquement
+pour avoir un exemple simple.
+
+26
+00:01:39,260 --> 00:01:42,410
+Imaginez maintenant un programme
+qui utiliserait la classe « Rectangle »,
+
+27
+00:01:42,995 --> 00:01:47,565
+on peut imaginer par exemple
+que ça se fasse simplement
+
+28
+00:01:47,572 --> 00:01:50,642
+dans un programme principal,
+on aurait des instructions,
+
+29
+00:01:50,657 --> 00:01:53,074
+puis à un moment donné,
+imaginez que l'on ouvre un bloc,
+
+30
+00:01:53,074 --> 00:01:54,514
+par exemple, dans le cadre d'un « if »,
+
+31
+00:01:54,767 --> 00:01:58,327
+et dans ce bloc, on déclare 
+une variable locale de type « Rectangle »,
+
+32
+00:01:58,978 --> 00:02:02,908
+qui serait typiquement initialisée
+par le constructeur par défaut,
+
+33
+00:02:02,999 --> 00:02:06,509
+et qu'à un moment donné,
+on ferme ce bloc.
+
+34
+00:02:07,916 --> 00:02:11,686
+Si j'exécute ce programme, lorsque 
+j'arrive à ce stade de l'exécution,
+
+35
+00:02:11,692 --> 00:02:17,341
+il y aura réservation d'un espace mémoire
+
+36
+00:02:17,341 --> 00:02:20,205
+pour une variable « r » de type « Rectangle »,
+
+37
+00:02:20,205 --> 00:02:23,684
+laquelle aura en guise d'attribut
+
+38
+00:02:27,004 --> 00:02:30,464
+des champs largeur et hauteur
+dont les valeurs sont des pointeurs
+
+39
+00:02:30,478 --> 00:02:34,388
+vers 2 zones mémoires allouées 
+dynamiquement par le constructeur.
+
+40
+00:02:38,868 --> 00:02:43,388
+Lorsque nous arrivons à ce stade 
+d'exécution du programme,
+
+41
+00:02:44,010 --> 00:02:48,600
+la variable « r », qui était déclarée 
+localement dans ce bloc, n'existe plus
+
+42
+00:02:48,638 --> 00:02:54,008
+et donc n'est plus utilisable
+dans le reste du programme.
+
+43
+00:02:54,122 --> 00:02:55,847
+La question qui se pose est donc :
+
+44
+00:02:55,847 --> 00:02:59,592
+Qu'advient-il des ressources en mémoire
+qui dépendent de cet objet « r »,
+
+45
+00:02:59,592 --> 00:03:01,572
+qui n'est plus utilisé par le programme ?
+
+46
+00:03:02,039 --> 00:03:05,149
+Il est important de libérer 
+les ressources après usage,
+
+47
+00:03:05,149 --> 00:03:07,649
+comme ici ces zones mémoires
+dynamiquement allouées.
+
+48
+00:03:08,025 --> 00:03:11,324
+Nous savons que dans le cadre 
+de l'allocation de mémoire, par exemple,
+
+49
+00:03:11,324 --> 00:03:15,474
+toute zone mémoire allouée 
+dynamiquement au moyen d'un « new »
+
+50
+00:03:15,474 --> 00:03:18,549
+doit être explicitement désallouée
+par le programmeur,
+
+51
+00:03:18,549 --> 00:03:21,022
+au moyen d'une instruction « delete ».
+
+52
+00:03:21,022 --> 00:03:22,203
+Et la question qui se pose,
+
+53
+00:03:22,203 --> 00:03:25,163
+c'est qui va être en charge de ce « delete »
+concrètement, ici ?
+
+54
+00:03:26,046 --> 00:03:29,412
+La solution qui consisterait à permettre
+au programmeur utilisateur
+
+55
+00:03:29,412 --> 00:03:33,561
+de libérer cette mémoire, par exemple,
+ici, lorsqu'on sait qu'on n'a plus besoin
+
+56
+00:03:33,561 --> 00:03:34,931
+d'utiliser la variable « r »,
+
+57
+00:03:35,014 --> 00:03:36,214
+invoquer le « delete »
+
+58
+00:03:40,277 --> 00:03:43,127
+explicitement
+sur chacun des champs,
+
+59
+00:03:43,792 --> 00:03:48,752
+sur chacun des attributs,
+n'est pas une bonne solution.
+
+60
+00:03:49,511 --> 00:03:50,971
+Sauriez-vous dire pourquoi ?
+
+61
+00:03:51,731 --> 00:03:54,334
+Alors ce n'est pas bon effectivement,
+essentiellement parce que
+
+62
+00:03:54,334 --> 00:03:56,258
+c'est un affaiblissement 
+de l'encapsulation ;
+
+63
+00:03:56,258 --> 00:03:58,408
+si je veux avoir le droit de faire ceci,
+
+64
+00:03:58,459 --> 00:04:00,959
+je ne peux plus mettre 
+mes attributs en « private »,
+
+65
+00:04:00,961 --> 00:04:04,001
+Il faut qu'ils soient accessibles
+depuis l'extérieur de la classe,
+
+66
+00:04:04,011 --> 00:04:05,275
+ou alors, l'alternative,
+
+67
+00:04:05,275 --> 00:04:07,295
+je devrais programmer 
+des méthodes publiques,
+
+68
+00:04:07,348 --> 00:04:11,186
+comme un « getter » par exemple,
+qui me livrent le pointeur à libérer.
+
+69
+00:04:11,186 --> 00:04:13,704
+Mais nous avons vu dans notre étude
+de cas sur le morpion
+
+70
+00:04:13,704 --> 00:04:15,804
+que livrer un pointeur 
+par le biais d'un « getter »
+
+71
+00:04:15,806 --> 00:04:17,996
+était un affaiblissement 
+de l'encapsulation
+
+72
+00:04:18,036 --> 00:04:21,809
+quasiment aussi fort que 
+de livrer directement l'attribut
+
+73
+00:04:21,809 --> 00:04:23,189
+en le mettant en « public ».
+
+74
+00:04:23,203 --> 00:04:26,553
+De plus, cette libération 
+explicite des ressources
+
+75
+00:04:26,576 --> 00:04:29,206
+depuis l'extérieur de la classe
+peut être source d'erreur
+
+76
+00:04:29,206 --> 00:04:31,870
+(on peut oublier de libérer 
+certaines ressources),
+
+77
+00:04:31,870 --> 00:04:34,136
+et elle est fastidieuse :
+il faudrait le faire systématiquement.
+
+78
+00:04:34,136 --> 00:04:37,276
+Le faire de cette façon n'est 
+donc clairement pas la bonne solution.
+
+79
+00:04:37,327 --> 00:04:40,955
+Pour que l'on se soit pas obligés
+d'explicitement libérer les ressources
+
+80
+00:04:40,955 --> 00:04:44,155
+nécessitées par un objet 
+en dehors de la classe, comme ceci,
+
+81
+00:04:44,278 --> 00:04:49,398
+C++ offre des méthodes particulières
+que l'on appelle les destructeurs,
+
+82
+00:04:49,398 --> 00:04:53,722
+qui ont la particularité d'être invoqués
+automatiquement en fin de vie
+
+83
+00:04:53,722 --> 00:04:54,530
+de l'instance.
+
+84
+00:04:54,530 --> 00:04:56,887
+Ce qui voudrait dire qu'ici,
+lorsqu'on termine ce bloc,
+
+85
+00:04:56,887 --> 00:04:59,697
+la méthode destructeur serait 
+automatiquement invoquée,
+
+86
+00:04:59,721 --> 00:05:04,771
+permettant justement de libérer 
+ces ressources sans casser l'encapsulation
+
+87
+00:05:04,817 --> 00:05:07,487
+ni passer par les désavantages
+que nous avons vus ici.
+
+88
+00:05:09,056 --> 00:05:12,548
+Il faut savoir que les ressources
+que l'on a besoin de libérer
+
+89
+00:05:12,548 --> 00:05:15,985
+en fin de vie d'un objet ne sont pas 
+forcément des portions de mémoire,
+
+90
+00:05:15,985 --> 00:05:18,159
+comme nous avons eu le cas
+dans le cadre de cet exemple,
+
+91
+00:05:18,159 --> 00:05:21,859
+il peut s'agir d'autre chose,
+comme des fichiers ou des périphériques.
+
+92
+00:05:23,324 --> 00:05:26,674
+Comment s'écrit concrètement
+un destructeur en C++ ?
+
+93
+00:05:27,071 --> 00:05:32,166
+C'est une méthode dont le nom est 
+le même que celui de la classe,
+
+94
+00:05:35,496 --> 00:05:40,516
+mais précédé du symbole tilda (~),
+ce que nous voyons ici.
+
+95
+00:05:41,273 --> 00:05:45,543
+La liste des paramètres est forcément vide
+et dans le corps du destructeur,
+
+96
+00:05:45,543 --> 00:05:48,697
+nous allons mettre toutes les opérations
+de libération nécessaires
+
+97
+00:05:48,697 --> 00:05:50,227
+en fin de vie d'un objet.
+
+98
+00:05:50,281 --> 00:05:54,831
+Il faut noter qu'il n'y a qu'un seul 
+destructeur possible dans la classe,
+
+99
+00:05:54,831 --> 00:05:56,598
+donc pas de surcharge possible.
+
+100
+00:05:57,351 --> 00:06:00,281
+Et si le destructeur n'est pas 
+défini explicitement,
+
+101
+00:06:00,525 --> 00:06:04,055
+alors le compilateur va en générer 
+automatiquement une version minimale
+
+102
+00:06:04,106 --> 00:06:05,216
+par défaut.
+
+103
+00:06:05,831 --> 00:06:07,951
+Pour revenir à notre petit 
+exemple d'introduction,
+
+104
+00:06:07,963 --> 00:06:10,693
+concrètement, comment faire pour 
+programmer le destructeur ?
+
+105
+00:06:10,982 --> 00:06:14,248
+Faisons un peu de place 
+pour écrire notre destructeur,
+
+106
+00:06:14,248 --> 00:06:19,618
+ici, je déclare une méthode destructeur,
+
+107
+00:06:20,865 --> 00:06:24,945
+« tilda », même nom que celui de la classe,
+
+108
+00:06:27,083 --> 00:06:32,143
+une liste de paramètres vides,
+et dans le corps, je me charge
+
+109
+00:06:32,241 --> 00:06:36,261
+des opérations nécessaires 
+pour libérer les ressources.
+
+110
+00:06:47,026 --> 00:06:48,066
+Comme ceci.
+
+111
+00:06:50,344 --> 00:06:52,064
+Et je termine ainsi l'écriture 
+de ma classe.
+
+112
+00:06:53,025 --> 00:06:57,782
+Ce destructeur est donc automatiquement
+invoqué lorsqu'une instance
+
+113
+00:06:57,782 --> 00:06:58,892
+arrive en fin de vie.
+
+114
+00:06:58,892 --> 00:07:01,287
+Typiquement, ici, lorsque 
+nous arrivons à ce stade
+
+115
+00:07:01,287 --> 00:07:02,767
+de l'exécution du programme,
+
+116
+00:07:02,824 --> 00:07:06,794
+vu que cette variable « r » n'est plus définie
+à l'extérieur du bloc,
+
+117
+00:07:06,851 --> 00:07:10,951
+le destructeur est invoqué,
+qui va être en charge de libérer
+
+118
+00:07:10,957 --> 00:07:12,657
+les ressources liées à l'objet.
+
+119
+00:07:15,241 --> 00:07:17,824
+Et ceci, sans avoir eu 
+à casser l'encapsulation
+
+120
+00:07:17,824 --> 00:07:20,674
+comme c'était le cas dans 
+la solution vue précédemment.
+
+121
+00:07:21,469 --> 00:07:25,501
+Si la classe « Rectangle » n'avait pas eu
+d'attribut de type « pointeur »,
+
+122
+00:07:25,501 --> 00:07:29,191
+et surtout si elle n'avait pas fait 
+elle-même d'allocation dynamique
+
+123
+00:07:31,033 --> 00:07:33,843
+des zones mémoires liées à ses attributs,
+
+124
+00:07:33,909 --> 00:07:37,589
+il n'aurait pas été nécessaire 
+de programmer explicitement
+
+125
+00:07:37,600 --> 00:07:39,066
+un destructeur comme ici.
+
+126
+00:07:39,066 --> 00:07:43,456
+Dans ce cas, le compilateur génère
+une version du destructeur par défaut,
+
+127
+00:07:43,510 --> 00:07:45,280
+qui aurait un corps vide,
+
+128
+00:07:45,280 --> 00:07:48,460
+donc nous n'aurions 
+aucune instruction à l'intérieur.
+
+129
+00:07:49,000 --> 00:07:50,751
+La question que nous nous posons 
+maintenant est :
+
+130
+00:07:50,751 --> 00:07:53,640
+Faut-il toujours se contenter 
+de cette version minimale
+
+131
+00:07:53,640 --> 00:07:55,538
+du destructeur par défaut,
+lorsque dans la classe,
+
+132
+00:07:55,538 --> 00:07:57,620
+nous ne faisons aucune allocation 
+de ressource.
+
+133
+00:07:57,620 --> 00:07:59,070
+La réponse dans ce qui suit.
+
+134
+00:07:59,667 --> 00:08:04,147
+Partons à nouveau d'un exemple concret,
+supposons que nous souhaitions compter
+
+135
+00:08:04,882 --> 00:08:08,286
+le nombre d'instances d'une classe, 
+qui sont actives à un moment donné
+
+136
+00:08:08,286 --> 00:08:09,528
+dans un programme.
+
+137
+00:08:09,528 --> 00:08:12,378
+Par exemple, imaginons que 
+nous souhaitions compter le nombre
+
+138
+00:08:12,383 --> 00:08:14,753
+d'instances de « Rectangle » actives
+dans un programme,
+
+139
+00:08:15,191 --> 00:08:19,213
+on peut imaginer que l'on utilise 
+pour le comptage une variable « compteur »
+
+140
+00:08:19,213 --> 00:08:21,693
+dont nous nous préoccuperons 
+de la définition un peu plus tard,
+
+141
+00:08:21,744 --> 00:08:23,618
+et qui fonctionnerait comme ceci.
+
+142
+00:08:23,618 --> 00:08:27,208
+Au départ le compteur est à zéro,
+nous n'avons aucune instance active.
+
+143
+00:08:27,349 --> 00:08:31,638
+Ensuite ici, nous créons 
+une première instance de « Rectangle »
+
+144
+00:08:31,638 --> 00:08:33,357
+au moyen d'un constructeur
+par défaut,
+
+145
+00:08:33,357 --> 00:08:36,347
+et nous voudrions que le compteur
+se mette automatiquement à jour
+
+146
+00:08:36,550 --> 00:08:38,560
+et comptabilise un « Rectangle » actif.
+
+147
+00:08:38,947 --> 00:08:44,167
+Nous avons ici l'ouverture d'un bloc,
+dans lequel nous déclarons
+
+148
+00:08:44,618 --> 00:08:46,248
+un second « Rectangle », « r2 »,
+
+149
+00:08:46,254 --> 00:08:50,040
+et nous aimerions qu'à ce stade
+le compteur vaille 2,
+
+150
+00:08:50,040 --> 00:08:54,050
+puisque nous aurions à ce stade
+2 « Rectangles » actifs, « r2 » et « r1 ».
+
+151
+00:08:54,449 --> 00:08:57,169
+Lorsque nous terminons 
+l'exécution de ce bloc,
+
+152
+00:08:57,169 --> 00:08:59,159
+la variable « r2 » cesse d'exister,
+
+153
+00:08:59,384 --> 00:09:02,514
+donc il n'y a plus qu'une seule 
+instance active de « Rectangle »,
+
+154
+00:09:02,525 --> 00:09:04,575
+qui est l'instance « r1 ».
+
+155
+00:09:04,868 --> 00:09:07,712
+Et nous aimerions que le compteur 
+soit mis proprement à jour,
+
+156
+00:09:07,712 --> 00:09:10,072
+et comptabilise une seule instance active.
+
+157
+00:09:10,321 --> 00:09:13,636
+À la fin du programme,
+nous aimerions à nouveau avoir
+
+158
+00:09:13,636 --> 00:09:17,070
+un comptage à zéro,
+étant donné que ni « r1 » ni « r2 »
+
+159
+00:09:17,070 --> 00:09:19,320
+ne sont plus désormais 
+2 instances actives.
+
+160
+00:09:19,410 --> 00:09:20,760
+Comment procéder ?
+
+161
+00:09:20,901 --> 00:09:23,231
+Pour l'instant, à ce stade 
+de votre apprentissage,
+
+162
+00:09:23,316 --> 00:09:25,263
+pour ce qui est de la variable compteur,
+
+163
+00:09:25,263 --> 00:09:28,174
+nous ne savons guère faire mieux
+que déclarer une variable globale
+
+164
+00:09:28,174 --> 00:09:30,883
+en dehors du « main », ce qui 
+n'est pas une bonne solution
+
+165
+00:09:30,883 --> 00:09:33,603
+et nous aurons l'occasion d'y revenir 
+dans une séquence prochaine.
+
+166
+00:09:33,855 --> 00:09:39,575
+Pour le reste, l'idée est simple,
+le constructeur sera en charge
+
+167
+00:09:39,575 --> 00:09:42,802
+d'incrémenter le compteur : à chaque fois
+que l'on construit un nouveau « Rectangle »,
+
+168
+00:09:42,802 --> 00:09:44,302
+on incrémente le compteur.
+
+169
+00:09:45,327 --> 00:09:46,755
+Si l'on se contente de cela,
+
+170
+00:09:46,755 --> 00:09:49,115
+le comptage ne va pas se faire
+de façon appropriée,
+
+171
+00:09:49,135 --> 00:09:52,640
+parce qu'on se contente d'incrémenter
+le compteur à chaque fois
+
+172
+00:09:52,640 --> 00:09:55,236
+qu'une instance commence son existence,
+
+173
+00:09:55,236 --> 00:09:58,086
+mais à nul endroit,
+nous ne décrémentons le compteur.
+
+174
+00:09:58,240 --> 00:10:01,530
+Ici, typiquement, après la création 
+de la première instance,
+
+175
+00:10:01,650 --> 00:10:03,080
+le compteur vaudra 1,
+
+176
+00:10:03,083 --> 00:10:06,403
+après la création de la seconde instance,
+le compteur vaudra 2,
+
+177
+00:10:06,409 --> 00:10:08,830
+et rien ne viendra décrémenter ce compteur
+
+178
+00:10:08,830 --> 00:10:13,514
+ce qui veut dire qu'à la fin du bloc,
+on aura un comptage erroné de 2 instances
+
+179
+00:10:13,514 --> 00:10:14,447
+au lieu d'une seule,
+
+180
+00:10:14,447 --> 00:10:17,856
+et qu'à la fin du programme, nous aurons 
+toujours un comptage erroné de 2 instances
+
+181
+00:10:17,856 --> 00:10:18,876
+au lieu de zéro.
+
+182
+00:10:19,768 --> 00:10:23,530
+On est donc ici obligés de définir 
+explicitement le destructeur
+
+183
+00:10:23,530 --> 00:10:26,862
+pour faire en sorte que le comptage
+se fasse de façon appropriée,
+
+184
+00:10:26,862 --> 00:10:30,672
+et que la variable compteur 
+soit décrémentée en fin de vie d'un objet.
+
+185
+00:10:31,683 --> 00:10:36,214
+Concrètement, ici, en plus du constructeur
+qui va incrémenter le compteur
+
+186
+00:10:36,214 --> 00:10:38,754
+à chaque fois qu'un « Rectangle » 
+est construit,
+
+187
+00:10:38,787 --> 00:10:42,214
+il faudra, dans le destructeur,
+décrémenter le compteur
+
+188
+00:10:42,214 --> 00:10:45,564
+à chaque fois qu'une instance
+termine son existence.
+
+189
+00:10:46,067 --> 00:10:51,146
+C'est donc typiquement une situation
+où la version par défaut du destructeur,
+
+190
+00:10:51,146 --> 00:10:53,696
+qui aurait un corps vide
+n'est pas satisfaisante,
+
+191
+00:10:53,698 --> 00:10:57,418
+même si la classe ne fait 
+aucune allocation explicite de ressource.
+
+192
+00:10:57,806 --> 00:11:00,206
+Avec cette nouvelle version 
+de la classe « Rectangle »,
+
+193
+00:11:00,206 --> 00:11:02,634
+qui incrémente le compteur 
+dans le constructeur
+
+194
+00:11:02,634 --> 00:11:04,065
+et le décrémente dans le destructeur,
+
+195
+00:11:04,065 --> 00:11:07,305
+nous avons désormais un comptage 
+qui est fait de façon appropriée.
+
+196
+00:11:07,355 --> 00:11:12,115
+Par exemple, ici, lorsque nous atteignons
+ce stade de l'exécution,
+
+197
+00:11:12,158 --> 00:11:16,168
+la variable « r2 » n'est plus définie,
+donc l'objet « r2 » cesse d'exister.
+
+198
+00:11:16,177 --> 00:11:19,293
+Le destructeur va être invoqué 
+automatiquement,
+
+199
+00:11:19,293 --> 00:11:24,113
+et donc le compteur va bien être amené
+à comptabiliser une seule instance.
+
+200
+00:11:24,168 --> 00:11:29,038
+De même, ici, la variable « r1 »
+cesse d'exister, n'est plus définie.
+
+201
+00:11:29,038 --> 00:11:33,738
+Le destructeur est automatiquement 
+invoqué et va ramener le compteur à zéro.
+
+202
+00:11:34,978 --> 00:11:38,135
+Qu'en est-il maintenant de cet exemple
+si nous faisons intervenir aussi
+
+203
+00:11:38,135 --> 00:11:39,735
+les constructeurs de copie ?
+
+204
+00:11:40,820 --> 00:11:43,742
+Par exemple, dans ce bloc,
+au lieu d'avoir uniquement la déclaration
+
+205
+00:11:43,742 --> 00:11:46,532
+d'une instance « r2 » construite au moyen 
+du constructeur par défaut,
+
+206
+00:11:46,668 --> 00:11:50,601
+j'aurais en plus la déclaration
+d'une instance « r3 » construite cette fois
+
+207
+00:11:50,601 --> 00:11:53,220
+au moyen du constructeur de copie.
+
+208
+00:11:53,220 --> 00:11:55,314
+Je le vois parce que l'argument
+passé au constructeur
+
+209
+00:11:55,314 --> 00:11:56,824
+est ici un autre « Rectangle ».
+
+210
+00:11:56,832 --> 00:11:58,352
+Qu'en est-il du comptage ?
+
+211
+00:11:58,355 --> 00:12:01,235
+J'aimerais évidemment ici 
+comptabiliser 3 instances :
+
+212
+00:12:01,311 --> 00:12:02,941
+« r3 », « r2 », « r1 ».
+
+213
+00:12:03,172 --> 00:12:07,542
+Qu'en est-il concrètement de la valeur
+de ce compteur à ces 3 endroits ?
+
+214
+00:12:07,854 --> 00:12:09,803
+Sauriez-vous dire quelle est 
+la valeur du compteur
+
+215
+00:12:09,803 --> 00:12:11,893
+à chacun des endroits où 
+j'ai un point d'interrogation ?
+
+216
+00:12:13,115 --> 00:12:15,359
+Ici, le problème est que 
+dans la classe « Rectangle »
+
+217
+00:12:15,359 --> 00:12:19,639
+nous n'avons fourni aucune définition
+explicite du constructeur de copie.
+
+218
+00:12:19,723 --> 00:12:23,867
+Donc nous utilisons forcément ici
+la version par défaut de ce constructeur,
+
+219
+00:12:23,867 --> 00:12:27,517
+qui évidemment, ne va rien faire 
+par rapport au comptage des instances.
+
+220
+00:12:27,535 --> 00:12:30,775
+Du coup, la copie d'un « Rectangle » échappe
+au compteur d'instances.
+
+221
+00:12:32,105 --> 00:12:35,505
+Ici, typiquement, notre compteur 
+qui valait 2,
+
+222
+00:12:35,747 --> 00:12:38,315
+comme il ne va pas du tout être touché 
+par le constructeur de copie,
+
+223
+00:12:38,315 --> 00:12:39,305
+va rester à 2.
+
+224
+00:12:41,566 --> 00:12:43,146
+Lorsque nous quittons ce bloc,
+
+225
+00:12:44,653 --> 00:12:48,373
+il y a 2 instances qui 
+ne sont plus utilisables,
+
+226
+00:12:48,380 --> 00:12:52,330
+donc le destructeur va être invoqué
+une fois pour « r2 », une fois pour « r3 »,
+
+227
+00:12:52,370 --> 00:12:54,720
+et à chaque fois va décrémenter le compteur.
+
+228
+00:12:54,723 --> 00:12:57,143
+Ce qui veut dire qu'on va décrémenter 
+2 fois le compteur,
+
+229
+00:12:57,271 --> 00:13:00,101
+et sa valeur vaudra ici zéro
+ce qui est erroné
+
+230
+00:13:00,101 --> 00:13:03,601
+puisque nous sommes censés comptabiliser
+toujours cette instance « r1 ».
+
+231
+00:13:03,756 --> 00:13:09,820
+Ici, pour les mêmes raisons, nous allons 
+nous retrouver avec un comptage à - 1,
+
+232
+00:13:09,820 --> 00:13:13,790
+La valeur de notre variable compteur
+vaudra - 1, au lieu de valoir zéro.
+
+233
+00:13:14,444 --> 00:13:17,524
+Pour bien faire, il faudrait donc 
+ajouter au code précédent
+
+234
+00:13:17,532 --> 00:13:20,672
+la définition explicite 
+du constructeur de copie.
+
+235
+00:13:21,088 --> 00:13:26,428
+Une définition explicite, 
+qui se chargerait de l'incrémentation
+
+236
+00:13:26,442 --> 00:13:29,622
+du compteur lorsque l'on crée 
+un nouveau « Rectangle » par copie.
+
+237
+00:13:30,088 --> 00:13:34,558
+À ce moment là, au moment où 
+l'on invoque le constructeur de copie ici,
+
+238
+00:13:34,642 --> 00:13:37,102
+on a bel et bien incrémentation
+de notre compteur,
+
+239
+00:13:37,115 --> 00:13:40,475
+et on a un comptage fait 
+de façon correcte, à 3 ici.
+
+240
+00:13:40,512 --> 00:13:45,911
+Le compteur est décrémenté 2 fois,
+et donc vaudrait 1, ce qui est correct
+
+241
+00:13:45,911 --> 00:13:49,080
+puisqu'on comptabilise désormais
+cette instance « r1 » correctement.
+
+242
+00:13:49,080 --> 00:13:52,960
+Et de même, le comptage ici,
+en fin de course, serait correct.
+
+243
+00:13:53,544 --> 00:13:55,879
+Il résulte de cette discussion
+une règle générale
+
+244
+00:13:55,879 --> 00:13:59,149
+appliquée par tout bon programmeur C++
+et qui est la suivante :
+
+245
+00:13:59,185 --> 00:14:02,588
+si l'on est amené à toucher 
+au destructeur explicitement,
+
+246
+00:14:02,588 --> 00:14:05,908
+au constructeur de copie,
+ou à l'opérateur d'affectation,
+
+247
+00:14:05,924 --> 00:14:08,294
+que nous aurons l'occasion d'aborder 
+dans une séquence suivante,
+
+248
+00:14:08,323 --> 00:14:11,973
+alors on doit certainement 
+également toucher aux 2 autres,
+
+249
+00:14:11,979 --> 00:14:13,894
+On doit prendre l'ensemble comme un tout
+
+250
+00:14:13,894 --> 00:14:16,139
+ou alors en tout cas,
+au moins se poser la question
+
+251
+00:14:16,139 --> 00:14:19,939
+de l'impact de la définition
+de l'un de ces éléments sur les autres.
+
+252
+00:14:22,087 --> 00:14:26,096
+Notez finalement, qu'en C++11,
+et il s'agit là d'une notion avancée
+
+253
+00:14:26,096 --> 00:14:27,680
+qui sort du cadre de ce cours,
+
+254
+00:14:27,680 --> 00:14:30,629
+on peut ajouter à cette liste, 
+destructeur, constructeur de copie
+
+255
+00:14:30,629 --> 00:14:33,839
+et opérateur d'affectation, qu'il s'agit
+de considérer comme un tout,
+
+256
+00:14:33,878 --> 00:14:37,768
+également, le constructeur de déplacement,
+et l'opérateur de déplacement,
+
+257
+00:14:37,882 --> 00:14:40,822
+nous ne les citons ici
+que par soucis de complétude.
+
+258
+00:14:42,105 --> 00:14:46,465
+Ceci termine notre chapitre
+sur la construction/destruction d'objet.
+
+259
+00:14:46,468 --> 00:14:49,935
+Nous aurons l'occasion d'y revenir un peu
+lorsque nous parlerons d'héritage,
+
+260
+00:14:49,935 --> 00:14:53,762
+en attendant, vous allez découvrir
+la notion de surcharge d'opérateur
+
+261
+00:14:53,762 --> 00:14:55,442
+dans nos prochaines séquences.

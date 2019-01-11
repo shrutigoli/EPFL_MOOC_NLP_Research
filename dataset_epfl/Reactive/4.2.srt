@@ -1,0 +1,1686 @@
+1
+00:00:00,630 --> 00:00:02,930
+Now that we know how we can
+
+2
+00:00:02,930 --> 00:00:09,890
+derive observable collections by dualizing
+iterable collections,
+
+3
+00:00:09,890 --> 00:00:12,020
+let's look at some combinators and some
+
+4
+00:00:12,020 --> 00:00:14,860
+operations that we can do on observable
+collections.
+
+5
+00:00:16,220 --> 00:00:19,050
+Here's the list of functions that operate
+
+6
+00:00:19,050 --> 00:00:21,780
+over observable collections, and it should
+come
+
+7
+00:00:21,780 --> 00:00:25,950
+as absolutely no surprise that we see here
+all the kind of, you know,
+
+8
+00:00:25,950 --> 00:00:32,190
+our well-known friends, filter, map,
+takeWhile, and of course, flatMap.
+
+9
+00:00:32,190 --> 00:00:33,960
+Now, the thing is that because
+
+10
+00:00:33,960 --> 00:00:37,280
+we're living in an asynchronous world
+Especially,
+
+11
+00:00:39,920 --> 00:00:46,780
+we'll be a little bit different, than what
+we are used to in iterable collections.
+
+12
+00:00:46,780 --> 00:00:48,980
+So, let's look at that in a little bit
+more detail.
+
+13
+00:00:50,630 --> 00:00:53,340
+Here's map, as a marble diagram.
+
+14
+00:00:53,340 --> 00:00:56,360
+Nothing is different here compared to the
+regular map.
+
+15
+00:00:56,360 --> 00:01:02,010
+We get our input stream of observable
+values and we
+
+16
+00:01:02,010 --> 00:01:05,280
+have our function in this case, again, the
+function that turns
+
+17
+00:01:05,280 --> 00:01:10,890
+coins into diamonds, and out comes an
+observable collection of diamonds.
+
+18
+00:01:10,890 --> 00:01:13,770
+But this run works exactly as you expect.
+
+19
+00:01:13,770 --> 00:01:18,140
+The only difference with iterable is that
+instead of pulling the
+
+20
+00:01:18,140 --> 00:01:23,970
+values from the input collection, the
+input collection values get pushed at you.
+
+21
+00:01:23,970 --> 00:01:29,100
+And then we apply the transformation and
+push the values in the output collection.
+
+22
+00:01:30,850 --> 00:01:36,400
+Now let's look at flatMap.
+FlatMap is quite different than map.
+
+23
+00:01:36,400 --> 00:01:38,920
+Because the problem is this.
+
+24
+00:01:38,920 --> 00:01:43,290
+Here the first value is pushed in the
+input, and
+
+25
+00:01:43,290 --> 00:01:48,490
+flatMap transforms that into another
+stream and start pushing them out.
+
+26
+00:01:48,490 --> 00:01:51,980
+But as flatMap is pushing out the values
+on the
+
+27
+00:01:51,980 --> 00:01:55,860
+output stream, the next value comes in on
+the input stream.
+
+28
+00:01:55,860 --> 00:01:58,002
+Remember, this is asynchronous.
+
+29
+00:01:58,002 --> 00:02:03,390
+So flatMap has no control over when the
+values appear on this input stream.
+
+30
+00:02:03,390 --> 00:02:06,110
+So, when the second value appears, it
+applies the
+
+31
+00:02:06,110 --> 00:02:09,190
+function, and it starts to produce them on
+the output.
+
+32
+00:02:09,190 --> 00:02:13,720
+But as it's doing that, the third value
+might appear on the input stream.
+
+33
+00:02:13,720 --> 00:02:18,040
+And again, flatMap will apply its
+generator function
+
+34
+00:02:18,040 --> 00:02:21,550
+here, and it starts to output all the
+values.
+
+35
+00:02:21,550 --> 00:02:27,110
+So, what you see is that even though all
+the outputs of the red input value here
+
+36
+00:02:27,110 --> 00:02:29,980
+are in the same order, all the values
+corresponding
+
+37
+00:02:29,980 --> 00:02:32,920
+to the green input are in the same order.
+
+38
+00:02:32,920 --> 00:02:35,960
+They are all merged together in here.
+
+39
+00:02:35,960 --> 00:02:41,800
+So, to look at this is we can say that
+flatMap is defined
+
+40
+00:02:41,800 --> 00:02:46,050
+as usual, as map followed by flatten.
+But in this case,
+
+41
+00:02:46,050 --> 00:02:49,310
+flatten really means nondeterministic
+merge.
+
+42
+00:02:49,310 --> 00:02:54,500
+So we have a stream of observables that we
+nondeterministically merge.
+
+43
+00:02:56,300 --> 00:03:00,520
+Here's a simple example that shows the
+merging behavior of
+
+44
+00:03:00,520 --> 00:03:06,200
+flatMap when flatMap is defined using map
+followed by flatten.
+
+45
+00:03:06,200 --> 00:03:11,680
+Let's look at what this example does.
+The first thing we do, is we create
+
+46
+00:03:11,680 --> 00:03:15,400
+an observable stream that quickly fires
+off three, two, and one.
+
+47
+00:03:15,400 --> 00:03:21,210
+You see this stream right here, and you
+see it fires of three, two, and one.
+
+48
+00:03:21,210 --> 00:03:25,460
+On that stream, we call that stream
+excess.
+
+49
+00:03:25,460 --> 00:03:31,144
+We map observable.interval for x seconds,
+so what that will do is it
+
+50
+00:03:31,144 --> 00:03:37,024
+will generate for each input value, it
+will generate a stream that will
+
+51
+00:03:37,024 --> 00:03:42,512
+take at three seconds, respectively two
+seconds, respectively
+
+52
+00:03:42,512 --> 00:03:47,720
+one second.
+So the first stream, that's a three, will
+
+53
+00:03:47,720 --> 00:03:53,810
+wait for three seconds, take, and wait for
+another three seconds, and take again.
+
+54
+00:03:53,810 --> 00:03:55,480
+Same thing for the second stream.
+
+55
+00:03:55,480 --> 00:04:01,090
+It takes at two, waits for two seconds,
+takes, waits for two seconds, and takes.
+
+56
+00:04:01,090 --> 00:04:02,092
+And remember we did a
+
+57
+00:04:02,092 --> 00:04:06,840
+take two here.
+So, this stream only produces two values.
+
+58
+00:04:06,840 --> 00:04:09,210
+And the last one for one.
+
+59
+00:04:09,210 --> 00:04:11,710
+When we merge those what we get is that
+the
+
+60
+00:04:11,710 --> 00:04:17,320
+first value here is the first value from
+the third stream.
+
+61
+00:04:17,320 --> 00:04:19,960
+And what we do is we map that back to the
+
+62
+00:04:19,960 --> 00:04:24,420
+original value such that we can see where
+the values come from.
+
+63
+00:04:24,420 --> 00:04:28,010
+So the output when we merge it is first
+
+64
+00:04:28,010 --> 00:04:34,090
+this guy comes in, then after two seconds
+these two come in in rapid succession.
+
+65
+00:04:34,090 --> 00:04:37,310
+Then we have the first value for three,
+the second
+
+66
+00:04:37,310 --> 00:04:41,640
+value for two and lastly the second value
+for three.
+
+67
+00:04:43,340 --> 00:04:44,250
+Okay.
+
+68
+00:04:44,250 --> 00:04:47,700
+What is this flatten, how is that defined?
+
+69
+00:04:47,700 --> 00:04:52,860
+Well, flatten takes an observable of
+observables and it flattens them.
+
+70
+00:04:52,860 --> 00:04:53,980
+But how does it do that?
+
+71
+00:04:53,980 --> 00:04:58,660
+Well it does that by flattening them
+stream by stream, so pair wise.
+
+72
+00:04:58,660 --> 00:05:01,690
+So we only have to look at merging two
+streams and
+
+73
+00:05:01,690 --> 00:05:04,850
+then we know how we can merge a stream of
+streams.
+
+74
+00:05:04,850 --> 00:05:05,510
+Right?
+
+75
+00:05:05,510 --> 00:05:08,710
+If we know how to merge two streams we can
+just apply
+
+76
+00:05:08,710 --> 00:05:14,370
+that recursively and flatten a stream of
+streams by applying this simple merge.
+
+77
+00:05:16,280 --> 00:05:18,800
+Here's the Marble diagram for merge.
+
+78
+00:05:18,800 --> 00:05:24,390
+You see, there's two streams.
+And the outputs are merged together.
+
+79
+00:05:24,390 --> 00:05:26,220
+One thing to notice is that we have to
+
+80
+00:05:26,220 --> 00:05:31,430
+be careful what we do with the terminating
+conditions.
+
+81
+00:05:31,430 --> 00:05:37,510
+In this case, the first stream arrows out.
+The second stream keeps on going.
+
+82
+00:05:37,510 --> 00:05:40,780
+But what you see is that the merge stream
+stops
+
+83
+00:05:40,780 --> 00:05:44,140
+as soon as one of its input streams has an
+error.
+
+84
+00:05:45,200 --> 00:05:49,380
+And this is behavior that we typically
+have in RX
+
+85
+00:05:49,380 --> 00:05:53,210
+is that whenever we do some kind of
+combination of streams,
+
+86
+00:05:53,210 --> 00:05:56,800
+as soon as any of them has an exception,
+we
+
+87
+00:05:56,800 --> 00:06:02,580
+immediately fill fast and propagate the
+exception to the output stream.
+
+88
+00:06:02,580 --> 00:06:04,830
+And only if all the streams have
+
+89
+00:06:04,830 --> 00:06:09,180
+terminated then the outward stream will
+terminate successfully.
+
+90
+00:06:11,290 --> 00:06:16,810
+The next example we look at is when we
+don't want to merge the output
+
+91
+00:06:16,810 --> 00:06:22,670
+streams, but we want to get them in the
+same order as the original input stream.
+
+92
+00:06:22,670 --> 00:06:25,350
+And here the colors come in handy.
+
+93
+00:06:25,350 --> 00:06:31,780
+In this case, we start with red three,
+green two, and yellow one.
+
+94
+00:06:31,780 --> 00:06:36,840
+And what we want is we want the values in
+the output stream to be in the same order.
+
+95
+00:06:36,840 --> 00:06:42,120
+So we first want to see all the red ones,
+then we want to see all the green ones.
+
+96
+00:06:42,120 --> 00:06:45,810
+And finally, at last, we want to see the
+blue ones.
+
+97
+00:06:47,590 --> 00:06:51,640
+As you can see here, this goal is exactly
+the same as before.
+
+98
+00:06:51,640 --> 00:06:53,420
+We start with our observable three, two,
+one.
+
+99
+00:06:53,420 --> 00:07:00,460
+We map interval of x seconds.
+We then map it to the value itself.
+
+100
+00:07:00,460 --> 00:07:01,890
+And, we only take the first
+
+101
+00:07:01,890 --> 00:07:03,390
+two elements.
+
+102
+00:07:03,390 --> 00:07:07,520
+But, the interesting part happens here
+with the concat.
+
+103
+00:07:07,520 --> 00:07:08,580
+So the concat,
+
+104
+00:07:10,700 --> 00:07:14,330
+what that will do is it will buffer all
+the
+
+105
+00:07:14,330 --> 00:07:18,170
+input values until the right moment when
+you can output them.
+
+106
+00:07:18,170 --> 00:07:23,450
+So, in this case, it will wait until
+outputting the green and
+
+107
+00:07:23,450 --> 00:07:29,220
+blue values, until it has seen all the red
+values, and it will wait
+
+108
+00:07:29,220 --> 00:07:34,580
+to output the blue values until it has
+output all the green values.
+
+109
+00:07:36,190 --> 00:07:41,800
+Now, in general, this concat is a little
+bit dangerous because, you know, it
+
+110
+00:07:41,800 --> 00:07:46,670
+can require arbitrary buffering, because
+you don't know how long it will take.
+
+111
+00:07:46,670 --> 00:07:49,010
+You know, maybe this stream is even
+infinite, so you
+
+112
+00:07:49,010 --> 00:07:55,000
+have to kind of keep them buffered for way
+too long.
+
+113
+00:07:55,000 --> 00:07:57,500
+But as we will see, when the observable
+
+114
+00:07:57,500 --> 00:08:01,270
+streams are generated from a future,
+that's one case
+
+115
+00:08:01,270 --> 00:08:04,540
+where you sometimes want to do concat in
+order to
+
+116
+00:08:04,540 --> 00:08:07,650
+make sure that the values remain in the
+right order.
+
+117
+00:08:10,140 --> 00:08:12,780
+Here's the marble diagram for concat.
+
+118
+00:08:12,780 --> 00:08:15,030
+And in this case, what we do is
+
+119
+00:08:15,030 --> 00:08:19,390
+we show the concat when there's two
+successful terminations.
+
+120
+00:08:19,390 --> 00:08:22,170
+And what we see is that concat only
+
+121
+00:08:22,170 --> 00:08:26,960
+terminates successfully when both input
+streams terminate successfully.
+
+122
+00:08:26,960 --> 00:08:30,730
+And here we will see that it holds onto
+this
+
+123
+00:08:30,730 --> 00:08:36,290
+yellow value until the first string has
+terminated, and then only
+
+124
+00:08:36,290 --> 00:08:38,850
+then outputs the yellow value.
+
+125
+00:08:38,850 --> 00:08:40,990
+And again, you have to be super careful
+
+126
+00:08:40,990 --> 00:08:44,990
+with concat, especially because of this
+buffering behavior.
+
+127
+00:08:47,070 --> 00:08:51,990
+Our previous examples, were a little bit
+artificial so, right
+
+128
+00:08:51,990 --> 00:08:55,830
+now, we're going to look at a more
+realistic example.
+
+129
+00:08:55,830 --> 00:09:00,150
+And, in the exercises, you will write a
+code
+
+130
+00:09:00,150 --> 00:09:04,970
+for this, so I can just leave this here
+unimplemented.
+
+131
+00:09:06,360 --> 00:09:11,590
+The first function that we have, returns
+and observable of EarthQuake.
+
+132
+00:09:11,590 --> 00:09:12,130
+And it does
+
+133
+00:09:12,130 --> 00:09:16,790
+that by calling into the US Geological
+Service web
+
+134
+00:09:16,790 --> 00:09:20,850
+service that gives us a real-time stream
+of earthquakes.
+
+135
+00:09:20,850 --> 00:09:24,485
+Earthquakes, in fact, are a really good
+example of a
+
+136
+00:09:24,485 --> 00:09:28,250
+push-based stream, we are not pulling the
+earth for earthquakes.
+
+137
+00:09:28,250 --> 00:09:31,630
+No, earthquakes happen and they get picked
+up by sensors
+
+138
+00:09:31,630 --> 00:09:34,340
+and then, you know, we, we get them in
+real time.
+
+139
+00:09:34,340 --> 00:09:37,420
+We, we get notified when an earthquake
+happens in real time.
+
+140
+00:09:37,420 --> 00:09:41,220
+And the class for earthquakes has a
+
+141
+00:09:41,220 --> 00:09:44,540
+bunch of information about each
+earthquake, including
+
+142
+00:09:44,540 --> 00:09:47,580
+where the earthquake happened and the
+magnitude
+
+143
+00:09:47,580 --> 00:09:50,379
+of the earthquake, how big the earthquake
+was.
+
+144
+00:09:52,370 --> 00:09:56,460
+And, since the earthquakes, the date that
+comes in as a double for
+
+145
+00:09:56,460 --> 00:10:00,600
+the magnitude, which is not very useful,
+because it's on the Richter scale.
+
+146
+00:10:00,600 --> 00:10:02,840
+That's it's a logarithmic scale.
+
+147
+00:10:02,840 --> 00:10:07,970
+So what we want is we want to make this a
+little bit more readable by mapping the
+
+148
+00:10:07,970 --> 00:10:13,510
+values into a little bit more readable
+notation.
+
+149
+00:10:13,510 --> 00:10:18,000
+So, if you go to Wikipedia and you search
+for earthquake magnitudes.
+
+150
+00:10:18,000 --> 00:10:22,590
+You see that they have this categorization
+that goes from micro to great.
+
+151
+00:10:22,590 --> 00:10:24,570
+And what we are going to do now is we
+
+152
+00:10:24,570 --> 00:10:28,810
+are going to take our stream of
+earthquakes and replace
+
+153
+00:10:28,810 --> 00:10:31,180
+the magnitude as a double.
+
+154
+00:10:31,180 --> 00:10:35,690
+By this enumeration that gives us the more
+readable form of the magnitudes.
+
+155
+00:10:40,310 --> 00:10:44,940
+We start with our sequence of earthquakes,
+and what we're going to
+
+156
+00:10:44,940 --> 00:10:50,550
+do is we're going to project out the
+locations for each earthquake.
+
+157
+00:10:50,550 --> 00:10:54,840
+And then we're going to project out the
+magnitude which was a double.
+
+158
+00:10:59,050 --> 00:11:03,165
+And we're going to replace that by this
+
+159
+00:11:03,165 --> 00:11:05,950
+enum such that we get this more readable
+form.
+
+160
+00:11:06,960 --> 00:11:10,170
+And then what we're going to do is we're
+going
+
+161
+00:11:10,170 --> 00:11:15,690
+to filter out all the earthquakes that
+are, at least, major.
+
+162
+00:11:15,690 --> 00:11:20,290
+Since we now get back a tuple of a
+location and a magnitude.
+
+163
+00:11:20,290 --> 00:11:24,520
+We have to do a pattern match here to see
+that we get the pair, and
+
+164
+00:11:24,520 --> 00:11:27,340
+then we project out the magnitude.
+
+165
+00:11:27,340 --> 00:11:33,030
+And so we can filter out all the
+earthquakes that are not very interesting.
+
+166
+00:11:33,030 --> 00:11:36,570
+And then finally we subscribe to the
+earthquakes.
+
+167
+00:11:36,570 --> 00:11:40,190
+We again have to do a pattern match to
+
+168
+00:11:40,190 --> 00:11:43,270
+get the location and the magnitude and we
+can now
+
+169
+00:11:43,270 --> 00:11:46,740
+print out our real time stream of
+earthquakes where
+
+170
+00:11:46,740 --> 00:11:50,180
+we only see the earthquakes that are at
+least major.
+
+171
+00:11:52,960 --> 00:12:00,310
+Let's try to improve our code even more.
+One of the things that is not so nice
+
+172
+00:12:00,310 --> 00:12:04,890
+about the previous earthquakes is that the
+locations are given in geo-coordinates.
+
+173
+00:12:04,890 --> 00:12:08,250
+So that's lat, long, and altitude.
+
+174
+00:12:08,250 --> 00:12:14,220
+But that, for most people if your not a
+real geek, you know, it doesn't say much.
+
+175
+00:12:14,220 --> 00:12:18,210
+So let's use a Reverse GeoCode service
+that will take a
+
+176
+00:12:18,210 --> 00:12:21,800
+GeoCoordinate and retunrs a Future.
+
+177
+00:12:21,800 --> 00:12:26,060
+With the country information that
+corresponds to that geocode.
+
+178
+00:12:26,060 --> 00:12:30,035
+And here, we're using futures, because
+when we do the reverse
+
+179
+00:12:30,035 --> 00:12:35,010
+geocode, we give it one geocoordinate, and
+we get back one country.
+
+180
+00:12:35,010 --> 00:12:39,480
+So, that's a very, very natural use of a
+future.
+
+181
+00:12:39,480 --> 00:12:44,380
+But what we want to show here, is how you
+can mix futures and observables.
+
+182
+00:12:45,630 --> 00:12:51,200
+So, let's start with this function that
+will return an
+
+183
+00:12:51,200 --> 00:12:57,060
+observable of observables of pairs of
+earthquakes with the
+
+184
+00:12:57,060 --> 00:13:01,240
+country in which that earthquake happened.
+Okay?
+
+185
+00:13:01,240 --> 00:13:03,300
+So what we're going to do is we're going
+
+186
+00:13:03,300 --> 00:13:07,290
+to project for each earthquake in our
+original stream.
+
+187
+00:13:07,290 --> 00:13:11,130
+We're going to take the GeoCoordinates and
+then look
+
+188
+00:13:11,130 --> 00:13:12,790
+up the country.
+
+189
+00:13:12,790 --> 00:13:14,260
+And somehow, we want to kind of,
+
+190
+00:13:14,260 --> 00:13:17,830
+you know, create this double-nested
+observable stream.
+
+191
+00:13:17,830 --> 00:13:22,170
+Yeah, I think about that for a second.
+
+192
+00:13:22,170 --> 00:13:25,510
+Here is how we do that.
+This is our original stream.
+
+193
+00:13:25,510 --> 00:13:26,880
+Now we map over that.
+
+194
+00:13:27,910 --> 00:13:30,440
+Our original stream was a stream of
+earthquakes.
+
+195
+00:13:30,440 --> 00:13:32,790
+So this is of type earthquake.
+
+196
+00:13:32,790 --> 00:13:36,140
+Now what we do, is given the earthquake,
+we can
+
+197
+00:13:36,140 --> 00:13:40,070
+get this location.
+Look-up its reverse geocode.
+
+198
+00:13:40,070 --> 00:13:41,300
+Which gives us a future.
+
+199
+00:13:43,410 --> 00:13:49,110
+Remember future is also a monad, so we can
+map over a future.
+
+200
+00:13:49,110 --> 00:13:54,750
+So we, countries of type future country,
+so we map over country, given
+
+201
+00:13:54,750 --> 00:13:58,560
+the country, and then we pair that up with
+the original earthquake data.
+
+202
+00:13:58,560 --> 00:14:03,650
+So, that one is still here in scope, so we
+pair up the earthquake with its
+
+203
+00:14:03,650 --> 00:14:09,470
+country, okay.
+This guy here is of type future
+
+204
+00:14:09,470 --> 00:14:14,960
+of pair of quake and country and we turn
+that into an observable.
+
+205
+00:14:14,960 --> 00:14:17,170
+So the end result is that we now have an
+
+206
+00:14:17,170 --> 00:14:22,250
+observable of observables that pairs each
+earthquake with its country.
+
+207
+00:14:23,900 --> 00:14:24,500
+Yeah?
+
+208
+00:14:24,500 --> 00:14:28,090
+And this is quite nice that we're using
+Map both on
+
+209
+00:14:28,090 --> 00:14:34,390
+futures and Map on observables in one
+single piece of code.
+
+210
+00:14:35,940 --> 00:14:40,850
+Now just like with our previous artificial
+example We
+
+211
+00:14:40,850 --> 00:14:46,360
+have two possibilities to merge this
+observable of observable list
+
+212
+00:14:46,360 --> 00:14:52,030
+into a single observable stream.
+So, one way to do it is to flatten it.
+
+213
+00:14:52,030 --> 00:14:56,440
+And the second way to do that is to
+concatenate it.
+
+214
+00:14:56,440 --> 00:15:01,340
+Now in this case we probably want to use
+concat and the reason
+
+215
+00:15:01,340 --> 00:15:04,600
+is that the earthquakes come in a certain
+order.
+
+216
+00:15:04,600 --> 00:15:04,880
+Right?
+
+217
+00:15:04,880 --> 00:15:08,340
+Earthquakes happen at a certain time but
+what can happen is that
+
+218
+00:15:08,340 --> 00:15:11,960
+the geocoordinate lookup for one
+earthquake
+
+219
+00:15:11,960 --> 00:15:14,350
+can take longer than for another.
+
+220
+00:15:14,350 --> 00:15:20,260
+And if we Flatten them with merge, then
+the earthquakes can come out of order.
+
+221
+00:15:20,260 --> 00:15:22,410
+Let's see how that works using some
+pictures.
+
+222
+00:15:23,590 --> 00:15:27,240
+Here's an example of merging
+
+223
+00:15:27,240 --> 00:15:30,710
+the Geo, Reverse Geocode look-up for each
+earthquake.
+
+224
+00:15:30,710 --> 00:15:33,340
+So, there's the first earthquake that
+appears.
+
+225
+00:15:33,340 --> 00:15:37,650
+And suppose that looking up the country
+for that one takes a long time.
+
+226
+00:15:37,650 --> 00:15:41,160
+Maybe there's a load balancer in the data
+center that does the
+
+227
+00:15:41,160 --> 00:15:45,520
+reverse geocode look-up, and that one is
+sent to a slow machine.
+
+228
+00:15:45,520 --> 00:15:49,570
+The second earthquake, the reverse geocode
+goes really quick.
+
+229
+00:15:49,570 --> 00:15:53,510
+So that terminates, this is the future of
+country, and
+
+230
+00:15:53,510 --> 00:15:55,780
+so we pair them up here.
+
+231
+00:15:55,780 --> 00:15:59,480
+And then the third earthquake is also
+relatively fast.
+
+232
+00:15:59,480 --> 00:16:03,210
+And now only then, the first earthquake
+appears.
+
+233
+00:16:03,210 --> 00:16:08,400
+So what we see is that the earthquakes
+really happened in the order red, green,
+
+234
+00:16:08,400 --> 00:16:13,460
+blue.
+But after geocode, reverse geocoding, they
+
+235
+00:16:13,460 --> 00:16:18,860
+come out in the order green, blue, red.
+And maybe this is acceptable,
+
+236
+00:16:18,860 --> 00:16:20,580
+but sometimes it's not.
+
+237
+00:16:20,580 --> 00:16:23,579
+And in that case, we want to concatenate
+the results.
+
+238
+00:16:25,610 --> 00:16:30,440
+If we concatenate the result.
+What we do is we buffer the values of
+
+239
+00:16:30,440 --> 00:16:35,880
+every previous earthquake until the
+earlier earthquakes have been geocoded.
+
+240
+00:16:35,880 --> 00:16:41,290
+So in this case, we have to wait until the
+red earthquake returns the geocode
+
+241
+00:16:41,290 --> 00:16:46,020
+for the red earthquake's returns and then
+we can output the green and the blue one.
+
+242
+00:16:47,390 --> 00:16:51,190
+And again, since we know that there's only
+one value
+
+243
+00:16:51,190 --> 00:16:55,500
+here, we can, you know, it doesn't really
+matter that we are
+
+244
+00:16:55,500 --> 00:16:59,200
+waiting for an infinite amount of time,
+because this thing always terminates.
+
+245
+00:17:00,310 --> 00:17:02,850
+Of course, we might need to do something
+with
+
+246
+00:17:02,850 --> 00:17:05,970
+error conditions, but for now, we'll just
+gloss over that.
+
+247
+00:17:09,540 --> 00:17:13,450
+The last operator we're going to look at
+is a very
+
+248
+00:17:13,450 --> 00:17:17,760
+interesting one, namely, groupBy.
+What groupBy does, as you see in the
+
+249
+00:17:17,760 --> 00:17:23,290
+signature below there, it takes an
+observable of T and then
+
+250
+00:17:23,290 --> 00:17:29,310
+it has a key selector that it will use to,
+to select a key,
+
+251
+00:17:29,310 --> 00:17:35,840
+a common key for each value in the stream.
+And what it will return is
+
+252
+00:17:35,840 --> 00:17:41,450
+an observable stream of pairs of the key
+and
+
+253
+00:17:41,450 --> 00:17:46,110
+a nested stream that contains all the
+values T from the original
+
+254
+00:17:46,110 --> 00:17:51,040
+input stream for which the key selector
+maps to this key.
+
+255
+00:17:52,670 --> 00:17:55,470
+Perhaps, that's better explained in the
+picture.
+
+256
+00:17:55,470 --> 00:18:01,180
+So in this case, we're grouping by shape.
+So what we will get is
+
+257
+00:18:01,180 --> 00:18:06,610
+we start with this sequence here, with
+different shapes, circles and triangles.
+
+258
+00:18:06,610 --> 00:18:08,070
+We're grouping by shape.
+
+259
+00:18:08,070 --> 00:18:13,440
+So, we get, in this case, two streams.
+One stream that consists of circles.
+
+260
+00:18:13,440 --> 00:18:16,530
+Another stream that consists of triangles.
+
+261
+00:18:16,530 --> 00:18:21,880
+And then this collection here is actually
+paired with its key.
+
+262
+00:18:21,880 --> 00:18:26,790
+That in this case is circle and in that
+case is a triangle.
+
+263
+00:18:26,790 --> 00:18:26,910
+All
+
+264
+00:18:26,910 --> 00:18:27,515
+right.
+
+265
+00:18:27,515 --> 00:18:32,670
+Now lets now use this group by function to
+group our earthquakes.
+
+266
+00:18:34,750 --> 00:18:40,249
+Let's use groupBy to group by our stream
+of earthquakes
+
+267
+00:18:40,249 --> 00:18:45,096
+with reversed geocode information by
+country.
+
+268
+00:18:45,096 --> 00:18:49,910
+So, what we will do is we will take the
+
+269
+00:18:49,910 --> 00:18:54,220
+stream where we have paired of each
+earthquake with the country.
+
+270
+00:18:54,220 --> 00:18:56,970
+And we will for simplicity just flatten
+it.
+
+271
+00:18:56,970 --> 00:19:00,440
+So, this merged stream has type observable
+
+272
+00:19:00,440 --> 00:19:03,960
+of pairs of earthquake, and country.
+
+273
+00:19:03,960 --> 00:19:05,280
+And what we're going to do is we're going
+
+274
+00:19:05,280 --> 00:19:09,750
+to use the country as the key for grouping
+by.
+
+275
+00:19:09,750 --> 00:19:11,720
+So in this case we will say, we will
+
+276
+00:19:11,720 --> 00:19:16,480
+take this merged stream here and group it
+by country.
+
+277
+00:19:16,480 --> 00:19:16,700
+'Kay?
+
+278
+00:19:16,700 --> 00:19:21,230
+So we have a little better match where we
+project out the country.
+
+279
+00:19:21,230 --> 00:19:25,830
+And the result of this groupBy will be
+this following
+
+280
+00:19:25,830 --> 00:19:30,288
+rather large type.
+So what we get back is an observable.
+
+281
+00:19:30,288 --> 00:19:38,380
+An observable of pairs of country, which
+is the key.
+
+282
+00:19:38,380 --> 00:19:44,780
+And an observable where we get all the
+pairs of the earthquakes with the country.
+
+283
+00:19:44,780 --> 00:19:47,710
+So concretly imagine that we have a stream
+of
+
+284
+00:19:47,710 --> 00:19:51,680
+earthquakes and there's earthquakes in the
+Netherlands and in Switzerland.
+
+285
+00:19:51,680 --> 00:19:54,090
+And we're grouping by country so the
+
+286
+00:19:54,090 --> 00:19:56,710
+first earthquake here happens in the
+Netherlands.
+
+287
+00:19:56,710 --> 00:19:59,500
+So we upgrade the new group with the key
+
+288
+00:19:59,500 --> 00:20:04,700
+Netherlands and we will fire off the first
+value here.
+
+289
+00:20:04,700 --> 00:20:08,550
+Netherlands two, into that stream.
+
+290
+00:20:08,550 --> 00:20:12,250
+Now the second earthquake happens here in
+Switzerland.
+
+291
+00:20:12,250 --> 00:20:14,750
+We didn't have a group for Switzerland
+yet.
+
+292
+00:20:14,750 --> 00:20:18,030
+So we create a new group with key
+Switzerland.
+
+293
+00:20:18,030 --> 00:20:23,980
+And we fire off the pair of the country
+and the earthquake into that stream.
+
+294
+00:20:23,980 --> 00:20:28,670
+And now, the third earthquake comes in
+here for the Netherlands.
+
+295
+00:20:28,670 --> 00:20:33,145
+Since we already had a stream for the
+Netherlands, we will fire this pair
+
+296
+00:20:33,145 --> 00:20:37,310
+up here in the stream for the Netherlands
+and so on and so on.
+
+297
+00:20:37,310 --> 00:20:40,660
+Say, that there's now, an earthquake in
+Belgium.
+
+298
+00:20:40,660 --> 00:20:43,230
+In that case we'll create a new stream and
+fire
+
+299
+00:20:43,230 --> 00:20:48,250
+it in there and as, as new countries come
+in they will get their own stream.
+
+300
+00:20:50,345 --> 00:20:54,800
+We're going to finish off this lesson by
+doing a little bit of analysis of
+
+301
+00:20:54,800 --> 00:20:59,370
+our earthquake stream.
+In particular what we want to do is, we
+
+302
+00:20:59,370 --> 00:21:05,650
+want to compute the running average of the
+magnitudes of the earthquakes per country.
+
+303
+00:21:06,980 --> 00:21:08,150
+How are we going to do that?
+
+304
+00:21:08,150 --> 00:21:11,200
+Well, we have our stream here of
+earthquakes.
+
+305
+00:21:11,200 --> 00:21:15,390
+So that's the stream of earthquakes
+grouped by Country.
+
+306
+00:21:15,390 --> 00:21:18,990
+So, it's an Observable of pairs of
+Countries, with
+
+307
+00:21:18,990 --> 00:21:23,560
+an observable stream of the EarthQuakes,
+with each country.
+
+308
+00:21:23,560 --> 00:21:25,800
+Now imagine that we have another function
+
+309
+00:21:25,800 --> 00:21:30,250
+here runningAverage, which takes a stream
+of doubles
+
+310
+00:21:30,250 --> 00:21:32,770
+and outputs another stream of doubles that
+
+311
+00:21:32,770 --> 00:21:34,750
+is the running average of the input
+stream.
+
+312
+00:21:34,750 --> 00:21:40,800
+So whenever new input value appears, it
+will update the running average and send
+
+313
+00:21:40,800 --> 00:21:46,780
+that to the output stream.
+And the goal of this exercise is to define
+
+314
+00:21:46,780 --> 00:21:51,610
+this function here, or this, this stream
+here that returns an observable of
+
+315
+00:21:54,260 --> 00:21:58,550
+running average of the magnitudes grouped
+by country.
+
+316
+00:21:59,950 --> 00:22:01,380
+Okay?
+
+317
+00:22:01,380 --> 00:22:07,790
+Let's take a few seconds to think which of
+these values is the right one.
+
+318
+00:22:09,990 --> 00:22:12,640
+Okay.
+You had a few seconds to think about it.
+
+319
+00:22:12,640 --> 00:22:14,950
+Let's check them one by one.
+
+320
+00:22:15,960 --> 00:22:21,250
+One of the biggest powerful analysis
+techniques when you look at code like
+
+321
+00:22:21,250 --> 00:22:26,351
+this is to do some kind of type checking.
+And of course in this case, the
+
+322
+00:22:26,351 --> 00:22:26,902
+[UNKNOWN]
+
+323
+00:22:26,902 --> 00:22:28,659
+checker would have already found the ones.
+
+324
+00:22:28,659 --> 00:22:32,710
+But what we're going to do is we're going
+to do this type checking by hand.
+
+325
+00:22:32,710 --> 00:22:34,810
+So let's look at the first case.
+
+326
+00:22:34,810 --> 00:22:37,290
+We start with byCountry, which is an
+
+327
+00:22:37,290 --> 00:22:40,360
+observable stream, so we can map over
+that.
+
+328
+00:22:40,360 --> 00:22:42,230
+So far so good.
+
+329
+00:22:42,230 --> 00:22:47,130
+This observable stream is a type, has
+pairs.
+
+330
+00:22:47,130 --> 00:22:49,430
+So, oh, this looks good because we're
+doing
+
+331
+00:22:49,430 --> 00:22:51,960
+a pattern match on a pair Where the first
+
+332
+00:22:51,960 --> 00:22:54,450
+one is a country.
+Okay, so far so good.
+
+333
+00:22:55,590 --> 00:23:00,650
+Now, we have to return an an observable of
+pairs of countries and something else.
+
+334
+00:23:00,650 --> 00:23:04,340
+Okay, that looks still good because we
+return a country.
+
+335
+00:23:04,340 --> 00:23:07,880
+But now here there's something suspicious
+right?
+
+336
+00:23:07,880 --> 00:23:13,000
+Because we're taking the running average
+of quakes but quakes to
+
+337
+00:23:13,000 --> 00:23:17,520
+take the running average we have to have a
+double, but quakes
+
+338
+00:23:17,520 --> 00:23:26,390
+here is of type observable of EarthQuake
+and Country, so this is completely wrong.
+
+339
+00:23:26,390 --> 00:23:31,510
+Because the type, the expected type, here
+is a double.
+
+340
+00:23:31,510 --> 00:23:35,000
+And what we give it is EarthQuake and
+Country.
+
+341
+00:23:35,000 --> 00:23:41,310
+So this one is clearly, clearly wrong.
+Now let's look at the second one.
+
+342
+00:23:41,310 --> 00:23:43,310
+Again, it starts the same.
+
+343
+00:23:43,310 --> 00:23:50,140
+But now it takes the running average.
+By mapping the magnitude over the quakes.
+
+344
+00:23:50,140 --> 00:23:52,310
+So this is a good attempt, because we're
+looking the
+
+345
+00:23:52,310 --> 00:23:58,410
+magnitude to get a double, but
+unfortunately, quakes, those were pairs.
+
+346
+00:23:58,410 --> 00:24:02,520
+So we cannot take the, the, the, the
+magnitude of these
+
+347
+00:24:02,520 --> 00:24:07,460
+earthquakes, because we first need to kind
+of project out the earthquake.
+
+348
+00:24:07,460 --> 00:24:08,600
+So, we cannot
+
+349
+00:24:08,600 --> 00:24:15,860
+take the magnitude of this pair.
+So, the last one here is the correct one.
+
+350
+00:24:15,860 --> 00:24:22,480
+We get a country and a list of pairs of
+countries and earthquakes.
+
+351
+00:24:22,480 --> 00:24:27,550
+And what we return is the country and the
+running average, where we
+
+352
+00:24:27,550 --> 00:24:33,070
+map the first element here and take the
+magnitude of that.
+
+353
+00:24:33,070 --> 00:24:34,070
+So this
+
+354
+00:24:34,070 --> 00:24:35,530
+one is the correct one.
+

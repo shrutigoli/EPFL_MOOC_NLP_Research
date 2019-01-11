@@ -1,0 +1,47 @@
+We're discussing Butler Lampson's name service and the final design goal for this system is well-defined behavior.
+When two users of the system are trying to update the same mapping at about the same time the final outcome should be well-defined.
+Let's see what that means.
+First of all, an update always has the form of a path like this.
+Now let's see what happens when a user submits this update to the system.
+First, the system identifies in the current directory tree a prefix of the update.
+When I say a prefix I mean a part of the directory tree whose labels and time stamps match exactly a part of the update.
+In this particular example, the entire directory on the left is a prefix of the update on the right.
+Second, the system discards the part of the update that matches the prefix and attaches the rest of the update to the directory tree.
+Suppose a user now submits this update and I am marking it with green to differentiate it from the previous one.
+First, as before the system identifies in the current directory tree a prefix of the update.
+Second, the system examines what happens right below the identified prefix.
+In the directory tree on the left we have a password label with time stamp two.
+In the update on the right we also have a password label but with time stamp three.
+The bigger time stamp wins, so the system detaches from the directory tree and throws away the subtree that starts with a password label.
+Finally, the system discards the part of the update that matches the prefix and attaches the rest to the directory tree.
+Now suppose we swap the order of these two updates.
+So a user first submits the green update.
+First, the system identifies in the directory tree a prefix of the update.
+Second, the system discards the part of the update that matches the prefix and attaches the rest of the directory tree.
+Then a user submits the blue update.
+First, the system identifies in the directory tree a prefix of the update.
+Second, the system examines what happens right below the identified prefix.
+In the directory tree on the left, there is a password label with time stamp three.
+In the update on the right there's also a password label but with time stamp two.
+The bigger time stamp wins so the system simply discards the entire update.
+So, the update semantics of the system are such that whether we first submit the blue or the green update the final outcome is the same.
+This property of a system is called "commutativity".
+We say that updates are commutative when the order in which they are applied does not effect the final outcome.
+Let us look at a couple more examples of updates.
+Suppose a user submits this update.
+The system as before identifies a prefix of the update and attaches the right part of the update to the directory tree.
+Then a user submits this update.
+Again, the system identifies a prefix of the update and attaches the right part of the update to the directory tree.
+Now suppose a user resubmits the last update, the green one.
+The system acts exactly as in the previous examples.
+First, it identifies in the directory tree, a prefix of the update but in this case the prefix comprises the entire update.
+Second, the system discards the part of the update that matches the prefix, that is it discards the entire update.
+So, the update semantics of the system are such that no matter how many times we reapply an update the final outcome is the same.
+This property of a system is called "idempotency".
+We say that updates are idempotent when reapplying an update does not effect the final outcome.
+So, the behavior of the system is well-defined in the sense that updates are commutative and idempotent.
+This means that reapplying or reordering the updates does not change the final outcome.
+Which enables concurrency control.
+When multiple users try to update the same name at about the same time the user with the higher time stamp wins.
+To summarize: we have seen the design of a name service that achieves scalability through hierarchy, reliability through redundancy, performance through caching and well-defined behavior in the form of commutativity and idempotency.
+As we will see in the rest of the course, these are fundamental design patterns that underly the operation of many successful systems.

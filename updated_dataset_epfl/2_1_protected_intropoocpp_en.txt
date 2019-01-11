@@ -1,0 +1,71 @@
+In this episode, we will continue examining the topic of inheritance and will consider in this context 2 concepts that are related: the notion of masking and the notion of protected access rights.
+You have seen that the accessibility of a class's member
+--a data member or a member function (method)-- can either be "public" which means that is visible from anywhere in the code, and is acesssible inside the class it is defined in as well as outside of it.
+If it is "private", its visibility is restrained exclusively to inside the class in which it is defined.
+Now we can wonder:
+"What happens to access rights within an inheritance relationship?"
+Suppose that we have a superclass A from which inherits a subclass B,
+Suppose that inside the superclass A, we have declared a private attribute, just as we have always done for all data members up to now.
+Now, we wonder if in a method of the subclass B for example, a method like this, we have the right to use this data member directly.
+We saw that because of inheritance, the class B disposes indeed of a data member inherited from A.
+But can B access 'a' directly?
+Can B do something like this for example?
+And directly access the inherited data member?
+Actually, because "private" insures that the member 'a' is accessible only from inside its class, this data member is only accessible in the class A.
+We can access this data member directly only in the methods of the class A and nowhere else.
+The answer to our question is thus: "No".
+No, we don't have direct access to 'a' from any method of the class B as this data member is defined as "private" in the superclass.
+This puts us in a delicate situation.
+An object of type B inherits a data member 'a' through inheritance, yet it cannot access this data member directly!
+Since a method of the class B should logically be able to manipulate any data member of the class B, there exists in fact a third access right: the "protected" access right.
+The "protected" access right allows a subclass to directly access the data members it inherits, by insuring that the data member of a class is visible to all the descendants of the class.
+This is specified with the keyword "protected".
+So, by replacing "private" with "protected" here enables that the subclasses can access all the protected members, whether they are data members or member functions, inherited from their parent classes.
+Another example: a subclass "Guerrier" (TN: means "Warrior") inherits from a superclass Personnage (TN: means "Character").
+It thus inherits of a data member that represents
+ its energy level.
+If in the class "Guerrier", we want to write a method "frapper" (TN: means "to hit"), allowing a Guerrier to hit another character and if we decide that the warrior can only hit another character when he has enough energy, then, we are obliged to use the "energy" data member, like this for example.
+The direct access in a method of the "Guerrier" class to a data member inherited from its parent class, is only possible because the data member was declared as "protected".
+Again, if it had been declared "private", this direct access would not have been possible.
+What could then be done for "Guerrier" to access its energy level?
+What is important to grasp is that the access right "protected" simply extends the "private" access right by granting special access rights to all the subclasses, but nowhere else.
+Outside these privileged (sub)classes however, the "protected" member is seen as "private".
+For example, if in the main() function,
+I declare an object of type "Guerrier", and if I try to access its energy level through an access like this, well, this is impossible, as outside the methods of subclasses the data member is seen as private.
+More specifically, a protected data member, will be directly accessible from within subclasses, but only in their own scope.
+Let's start by briefly recalling what the "scope" of a class represents with a simple example, independently of inheritance.
+Suppose that we have a class B where we have defined a private data member, such as  b.
+We know that the data member b is accessible in the scope of B, that is, in every method of the class B.
+More specifically, C++ implements what is called "class scope" which means concretely that this member b will be accessible from anywhere within the scope of B, through any object of type B, be it an object pointed by "this" or any other instance of B.
+This means that in a method of the class B, we are allowed to access b, when writing something like this, implicitly we are working with the data variable b of the considered object.
+It's just like writing something like this.
+We are also allowed to access the member b, via any other instance of the class B.
+That is, for example, if the method "m" took as parameter another object of type B, we would also have the right to access the data member b through this other object of type B.
+So, in the class B, we have the right to access this data member through any object of type B, whether it is "this" or any other B.
+Here, when I say that a data member b is "of B scope",
+I mean that it is only accessible inside the class B and through any object of type B.
+Let's see in a more complicated example what it means for an access right that is this time 'protected' to only be accessible to subclasses "in their own scope".
+Here we have a subclass B that inherits from a superclass A which has a protected data member 'a' and a private data member.
+The protected 'a' is accessible in the subclass B but only in its own scope, that is, inside the class B via any object of type B, be it "this" or any other b.
+On the other hand, the private data member is only accessible in the scope of A, and not inside B.
+Let's examine this with a method 'f' of the class B that takes as parameters an object of type B, an object of type A, and an "int".
+When we write this we are accessing a protected data member 'a' in the scope of B because we are inside B and are accessing 'a' of the current instance.
+We are of course in the scope of B, which makes this possible.
+Here, since it is not possible in the subclass to access a private member of its superclass, this line would lead to an error.
+The access here to a private data member of the superclass via any object of type B is only possible in B, via 'this' as in the case here, or another B.
+Again, attempting access to a private member will result in an error here.
+As we saw that protected members are only accessible in the scope of B, that is to say, inside B and via any object of type B, then this access is possible just like this one.
+All objects through which we access A are in the scope of B.
+This access is therefore possible.
+Finally, in a last example, we try to access the protected members of A but we aren't in the scope of B.
+How is this possible? We are indeed inside B and in a method of B, but we are attempting access to this data member via an object that is not of type B, but of type A.
+Thus, we are outside the scope of B, which prevents this action.
+To take a more concrete example, imagine that we have a class "Personnage" instead of our class A, and which has a protected data member defining the energy level of the character.
+The role of the class B would be played by a subclass "Guerrier" who would be a subclass of "Personnage" and would have a method equivalent to the method "f": a method "frapper" that enables the warrior to hit another character.
+If we would like this method to take into account that the energy level of a character diminishes when a warrior strikes him, we could imagine for example to write something like this.
+However, this would not work; accessing it this way is impossible because of the same rule as that which is applied here, the object "p" which has the same role as "autreA" in the other example, is outside the scope, and is not in the same scope as the object 'this'.
+So now you know the access rights in C++, public members are accessible to all the programmers-users of a given class, contrarily, private members are accessible exclusively to the programmer of the class.
+They represent the internal structure of the class and are modifiable without repercussions on the class users.
+Finally, protected members are accessible to all programmers of extensions that extend the class in question, by adding subclasses.
+Inside these subclasses it is possible to access these protected members.
+This concludes this episode about access rights in the context of a hierarchy of classes.

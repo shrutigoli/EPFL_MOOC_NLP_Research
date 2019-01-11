@@ -1,0 +1,162 @@
+The goal of this episode is to present a few complements regarding objects.
+We know now how to build objects. Now we will focus on the end of these objects' life.
+We will also see that, since objects are manipulated through references, this impacts the way to print, assign and compare them.
+Let us begin with the end of an object's life.
+First of all, what is the end of an object's life?
+In Java, an object reaches the end of its life when the reference associated to it is not usable anymore in the program.
+Let us illustrate this with a simple example.
+This example right here might be a little artificial but should make things clear.
+We can see a "main" method calling an auxiliary method
+"afficherUnRectangle". This method only locally creates a Rectangle-type object "r" initializing it appropriately.
+It then prints this rectangle.
+The reference associated to this object created in the method
+"afficherUnRectangle" is not usable anywhere else.
+We never assign this reference to another more globablly acessible variable.
+Therefore, when the method
+"afficherUnRectangle" has concluded its execution, it is not possible anymore to access the reference locally created inside the method.
+Namely, once the method
+"afficherUnRectangle" has terminated its execution, the "r" object, local to this method, reaches the end of its life since the reference associoated to it cannot be used anywhere.
+Thus, the memory associoated to this object must be retrieved so that it can be available in other programs or portions of the same program.
+In some languages, the memory retrieval must be explicitly supported by the programmer.
+In Java, this is not the case.
+There is a particular program called the "Garbage Collection" tasked with the very reclaiming of the memory associated with these objects which do not need to be used in the program.
+Normally, this "garbage collection" is completely transaprent.
+You do not need to worry about it at this point of your programming learning.
+The "garbage collector" program is thus regularly launched during a program execution in Java.
+What you must remember is that the Java remember does not have to explicitly liberate the memory they are using.
+However, this is not the case in all languages.
+Now, let us move on to the object manipulation via references and the implications this can have.
+Every time we create an object in a Java program, this object is manipulated, as we have seen, via references.
+If we declare a Rectangle-type variable, the situation in the memory is the following.
+Let us call this Rectangle-type variable "rect".
+This variable is actually a reference to an object with its different attributes.
+Now, we are focusing on the following problem.
+We suppose that we wish to create an object "b" from an object "a".
+Both will have the same type.
+However, we wish for "a" and "b" to be distinct objects in the memory.
+How can we do this properly in Java when objects are manipulated via references.
+Let us take a concrete example.
+Here, our "a" is the rectangle "r1".
+From this "r1" rectangle, we wish to create another rectangle
+- thus with the same type. However, we want both objects "r2" and "r1" to be two distincts objects in the memory.
+In Java, if we create a "r2" object from "r1" object using an assignment, the two objects will be not be distinct in the memory.
+Let us see why.
+When we execute this line of code, we have the following situation in the memory after the execution.
+In the "r1" variable, we have a reference to a rectangle object with particular values for its width and height members.
+Then, when we execute this line of code, we will create an "r2" variable.
+Let us call "ref1" the reference contained in "r1".
+Upon this assignment, we will simply copy the value contained in "r1" into "r2"; namely the reference to the same object.
+Concretely, this means that we will point here, on the same object in the memory.
+"r1" and "r2" are NOT two distinct objects in the memory.
+Concretely, this means that any manipulation on "r1" will impact "r2" aswell and vice versa.
+For example, if we change the value of the height of "r2", this will impact "r1" aswell.
+Therefore, if we wish for "r2" to be a copy distinct from "r1" we cannot use the assignment operator in Java.
+Instead, we will use either the copy constructor or the "clone" method which will be discussed later in the course.
+We are talking about it here because this is not systematically the case in all languages.
+In some languages, we can perfectly create two distinct copies through the assignment operator.
+In the previous episodes, we have seen how to write the copy constructor in a class.
+This very copy constructor is used here.
+This constructor creates a rectangle from the values of another rectangle.
+Thus, if we execute this line of code, we are in the same situation as before.
+"r1" is a reference to a particular
+"Rectangle" object.
+When we execute this line of code, we are creating another "Rectangle" object.
+This is thus a distinct object in the memory where we will simply copy, member by member, the values of the first rectangle.
+We can clearly see that this not the same situation as before.
+Here, "r2" and "r1" are indeed two distinct objects in the memory.
+Still regarding objects manipulated through references in Java, let us focus on the implications for the printing of objects.
+If we execute this line of code, what is contained in our "rect" is indeed a reference.
+A reference is sort of like an address which a slightly peculiar format.
+Now, if we try to print the content of our "rect" object through such an instruction.
+This instruction will simply print the content of the "rect" variable.
+What will result is somewhat unnatural and unpleasant to read. We would probably prefear to print the content of a rectangle, that is, the value of its attributes instead of its reference.
+So, what should we do in order to print the content pointed by the reference instead of the reference itself, using exactly this same instruction?
+In order to make this possible, so that such a line of code may print the content pointed by "rect" instead of this eerie referance, we simply need to place, in the "Rectangle" class, a particular method.
+The header of this method is the following.
+This is the "toString() " method with an empty parameter list and returning a character string of the type "string".
+This " toString() " method will actually be automatically be summoned in order to convert this rectangle into its representation as a character string.
+We are the ones deciding what character string will be produced by the "toString()" method.
+Concretely, in the "Rectangle" class, we will place our famous "toString()" method as public since we wish to use from the outisde.
+This "toString()" method will simply build a character string corresponding to the representation we wish to have when the object is provided as argument to "System.out.println", typically.
+Here, we have decided that the string "String" will be built as the concatenation of the "Rectangle" string, the value of the member "hauteur", the value of the member "largeur" separated by this character string here.
+Thus, from now on, every "Rectangle" will have a representation built with the "toString()" method.
+This printing representation will be a character string.
+The execution of this line of code, printing a rectangle with these particular values as attribute, will result in a printing of this kind.
+This printing is much more readable than the previous one.
+The fact that, in Java, objects are manipulated through references impact the assignment and the printing of objects.
+This will also impact the object comparison.
+This is the last point we are now going to examine.
+Let us now suppose that, in a given, program, we create two rectangles
+"r1" and "r2" with the same attribute values.
+The two will thus have the same height and the same width.
+What will happen if we try to compare these two rectangles with the " == " operator.
+Will the values of the attributes be compared or something else?
+In order to answer this question, we have to see what is stored inside the "r1" and "r2" variables.
+We have seen that, when we create a rectangle with this kind of instruction, what we are retrieving in the object variance is a reference on an object.
+We have this in the memory.
+We thus have a "r1" variable containing a reference, an address on a "Rectangle" object.
+Its "hauteur" member is 4.0 and its "largeur" member is 5.0
+The same thing happens upon the execution of the second line.
+We will have an "r2" variable in the memory, containing a reference to a
+"Rectangle" object.
+Its "hauteur" member is 4.0 and its "largeur" member is 5.0
+We can see that each of these "new" will actually create a distinct instance.
+This means that even if these objects have the same attribute values, what will be compared through the " r1 == r2 " comparison is none other than the content of the "r1" and "r2" variables.
+These variables are distinct references pointing on two different memory areas.
+The result of this comparison is the boolean value "false" since we have two distinct references.
+However, in most cases, when we wish to compare objects, we do not wish to compare their addresses but rather their content; if these objects have the same attribute values.
+Thus, this not the good way to reach this result.
+If you have followed our previous
+"MOOC" on the fundamentals of Java programming, you have seen how we proceed in order to compare two character strings.
+In order to compare two strings, we resorted to the "equals" method rather than the " == " operator.
+We use this in case we wish to compare the content of these strings rather than the references to these character strings.
+As a reminder, let us examine the following example.
+The execution of this line will allow us to store  the reference on the character string "Rouge" into the variable "s1".
+After the execution of these lines of code, we will have a variable "s3", the reference on a character string built by concatenation of the content of the variable "s2" and the literal "ge".
+The variable "s3" will thus have the same content as "s1".
+However, they both correspond to disctinct references in the memory.
+Comparing "s1" and "s3" through the
+" == " operator, will compare only the references in these two different values and will thus return "false", even if their content are identical.
+In order to compare their content, we have seen that we needed to resort to a predefined methode for the strings.
+This is the "equals" method. At this point, if we use "equals", we are comparing their content.
+Thus, message "ChaÃ®nes identiques".
+(TN: means "identical strings"). will be printed.
+In order to compare the content of two Rectangle-type objects, we will resort to a similar solution.
+We will thus use an "equals" method.
+The programmer of "Rectangle" will have to define "equals" correctly for rectangles.
+How do we define "equals" so that it returns "true" if and only if the attributes of the rectangles are identical?
+The programmer of the "Rectangle" class must concretely provide a method testing the equality according to the criteria we deem sound for "Rectangle"-type objects.
+When will we consider that two rectangles are equal according to their content?
+One of the possible headers provided by Java in the "Rectangle" class in order to porgram the "equals" method is the following.
+We will more thoroughly on an example how to program this method in the "Rectangle" class.
+The "equals" method is a method of the "Rectangle" class.
+This means that will necessarily be applied on a Rectangle-type object.
+Typically, we can imagine we have declared an "r1" rectangle and initialized it properly.
+If we wish to compare "r1" with another rectangle, we will use the "equals" method.
+This method will compare "r1" with another rectangle provided as argument.
+We imagine, for example, another
+"r2" rectangle previously declared.
+The "equals" method will thus take a rectangle in argument and compare it with a given istance of rectangle.
+It is the programmer's task to give the body of the "equals" method, to give the criteria to according to which two rectangles can be equal.
+The result is a boolean : we expect it to be "true" if the two rectangles are considered equal and "false" otherwise.
+Concretely, we can imagine to program the body of the "equals" method as follows.
+Usually, we take the precaution to test if the instance which we are trying to compare the current instance is "null".
+In this case, we will consider that the comparison fails; our "equals" method will thus return "false".
+A given instance cannot be equal to "null".
+Otherwise, we will return "true" if the height of the current instance has the same value as the height of the rectangle passed as argument.
+And the same for the width.
+Using the "equals" method thus defined on two rectangles with the same values for their height and width will result in the boolean value "true".
+Indeed,
+"r2" is not "null", the values of the heights are identical. and so are the widths.
+In this case, we will have the printing
+"Rectangles identiques" (TN: means "identical Rectangles")
+This was not the case when we compared two rectangles through the " == " operator.
+In Java, the programmer of a class is thus tasked to define an "equals" method if we wish to be able to compare instances according to particular criteria.
+We will go back to this once we have discussed the inheritance and particularly the predefined class "Object".
+For now, just be aware that there can be two possible headers for the "equals" method.
+The one we have just seen where, in a given class called
+"UneClass", we define the "equals" method passing as agument an object of the same type as the class.
+It is also possible to define the "equals" method passing as argument an Object-type object.
+We will go back to this when the time is ripe.
+This concludes our first chapter on the fundamentals of the object-oriented in Java.
+In what comes next, we will open another very important chapter : the inheritance.

@@ -1,0 +1,115 @@
+In this module, we're going to go back about a decade and study the architecture of the first generation internet-scale services.
+Now, these services are tiny by today's standards, but they were quite large at the time.
+They were even described as "giant-scale services".
+And these were services that were designed around the year 2000, just as the first internet bubble was bursting.
+And they had a killer application and that killer application was "search".
+So, today we associate search with Google or Bing, but at the time, the leading search applications were Altavista and Inktomi.
+And Altavista was designed by engineers at DEC, who had access to, what was at the time, one of the largest 64-bit machines available, the ALPHA TurboLaser.
+And they realized that they could actually fit the web in memory.
+And so Altavista, which was the leading search engine before the turn of the century, could actually hold the entire index of the web in memory and serve the entire web, or search application to all the web's client from the memory of that one machine.
+Now unfortunetly this did not scale.
+Around the same time Dave Patterson and Eric Brewer at Berkeley started the Berkeley NOW project:
+Network of Workstations, studying how you can actually put a lot of cheap computers together to build equivalent applications.
+Out of the NOW project came Inktomi.
+Inktomi was a commercial search service, which was competitive with Altavista.
+Today both of them are dead, but in 2001 Eric Brewer wrote some of the experiences associated with the deployment of Inktomi in a paper called "Lessons from Giant Scale Services" and this is actually what we will be covering in this module.
+So, this is what the basic model looks like.
+Now, although some of the elements seem obvious today, this was not obvious at the time.
+Now, the first comment about this figure is the notion of a single-site server.
+A collection of servers actually serves a single function and appears as a single server.
+And the load manager in front of it effectively hides the internal details of that single-site server from the outside world, allowing for horizontal scale out.
+Now, the second comment about this figure is that scale out applies equally to servers and to storage.
+This means the elimination of any notion of centralized storage.
+This also a departure from the Standard Enterprise model.
+Now, let's study load balancing in further detail.
+Now, the purpose of the load manager is to hide the internals of the single-site server.
+And this is realized by combining different mechanisms.
+The first mechanism leverages the level of indirection in DNS by returning different IP addresses for the same DNS name, based on the context of the request or the load or the availability of the independent servers.
+Now, this is, however, only a very coarse-grain mechanism, because of DNS caching, so DNS load balancing is typically used to identify another middle box, another layer that hides the end servers, which is called a layer 4 or 7 load balancer.
+Now, layer 4 and layer 7 load balancers are actually quite different in how they are architected and constructed.
+A layer 4 load balancer maps TCP flows onto different end servers, could either terminate the connection, or simply perform network address translation.
+A more sophisticated layer 7 load balancer actually terminates the HTTP requests, identifies the session cookie of that HTTP request, and uses that cookie to determine the end server.
+With that, you can actually guarantee that different HTTP connections correspond to the same session, will be handled by the same end server, which helps in the design of some of the applications.
+It's actually interesting to study the evolution of the basic model of 2001 with the solutions that we see today.
+My first observation is many of the components are still relevant, if anything, they're as relevant as ever.
+Load managers, for example, play a central role in offloading the traffic from the mega data centers today, by caching some of the critical data in edge locations.
+Beyond that, there have been some changes in the model.
+Significant changes in the assumption that an application will be located in a single site, that has been, in a pretty fundamental way today replaced by the notion that any large application is spread out across multiple locations.
+This has actually significant implications, in particular, around the notion of the CAP theorem, which we will study in the next module.
+But beyond that, there have been other, subtle changes.
+For example, although we still have internal storage, the notion that we would actually use RAID as the building block to ensure the durability of the data, has been replaced by the notion that we would partition and replicate data three ways, within a site, across multiple machines.
+And that's simply a result or consequence of the increase in capacity in disk drives and the increase MTTRs associate with the repair of a disk drive in a RAID group.
+You can actually get much faster behavior by replicating the data across all of the machines of the cluster, rather than within a single computer.
+And finally, in the original diagram, we had a concept of an optional blackplane, which was used as a high-bandwidth exchange mechanism between computers.
+For example, as a storage fabric or a compute fabric.
+The idea was to provide scalable bi-section bandwidth to allow servers to communicate with each other efficiently.
+Now, the requirement has not changed, and it's actually more present than ever.
+However, the implementation has evolved into IP based fabrics, which can be efficiently realized using commodity components and factories
+And what you see on screen is the new Tor spine architecture, that is the standard in today's mega data centers.
+Now, to be fair, none of these changes invalidate the original model, if anything they are incremental evolutions that were necessary to keep these servers scaling with technology trends and in a cost-effective way.
+Now, giant-scale services introduce actually a new form of metrics.
+If you remember our module on redundancy in fault tolerance, we introduced a fundamental availability and downtime metric.
+The fact that downtime lowers the ratio of the MTTR over the sum of the MTTR and the MTTF.
+And that metric makes a lot of sense if you think about a single server that is serving a particular application, but it makes a lot less sense if you have hundreds of servers that are independently operating in a co-operative fashion in order to provide an answer to an internet-scale service.
+And those new metrics were actually introduced by Eric Brewer as yield and harvest.
+So first, the yield is the ratio between the number of queries completed and the number of queries offered.
+And note that the yield metric is not just a metric of fault tolerance, in that it is not only impacted by failure.
+Instead, the yield is a metric that characterizes whether a site is overloaded or not in its given state.
+And the nice thing about that metric is that it's an end to end metric, which cloud providers can and actually do measure.
+Now, the second metric is called the harvest.
+And it is a different metric that makes the observation that not all data is necessarily available by the cloud service at any given point in time.
+And it's based on the insight that many queries can actually return with a partial dataset.
+Take, for example, search.
+It's okay to return search results that only considered
+95 percent of the dataset.
+And it's actually preferable to return a good enough answer quickly, than to delay a response or have to tell the user that the site is, overall, not available.
+And so the harvest metric measures what fraction of the complete data that should be considered, was actually considered, on average, for each query.
+Now, very much like the fault tolerance model led to a specific design process, the harvest and yield metrics lead to their own design process and have design implications.
+For example, many web services today define yield with a latency bound in mind.
+A hundred milliseconds, or one second, for example, for search.
+Now this in turn has an impact on the harvest, since the dataset may not be processed in time.
+A great example, where harvest and yield are taken into consideration is the design and implementation of an ad serving service.
+Of course, you want to serve ads, and of course you want to serve them quickly, and so you want to maximize your yield under some SLA constraint.
+You also want to personalize the ad, but it's okay to only personlize it to the extent that you don't violate the SLA.
+Which means that the harvest metric may be compromized to maintain the yield.
+So, this is a great example of how both harvest and yield can help with the design of a cloud service that we can effectively get more effective ads.
+Or it's a terrible one, depending on your point of view.
+Now the concept of harvest and yields are actually linked, because of a related principle, called the DQ "Principle".
+Now, I'm going to put "principle" here in quotes, because this is not really a principle at all, but more an observation that has led to a useful generalization.
+And the intuition is that every system has a bottleneck.
+And it's typically the network link for frontend servers, and it's typically the disk for backend servers.
+If every system, or every component in the datacenter system has a bottleneck, the implication is that the capacity of each system is actually very stable for any given service.
+And that it is the product of the amount of data consumed by each query with the query rate.
+So the DQ "Principle" states that D, which is the amount of data per query times Q which is the query rate, is a constant.
+So, think about the DQ value as a metric for the capacity of a site.
+If you add servers, you increase your DQ capacity.
+If you lose servers, you correspondingly decrease DQ capacity.
+If you have to take servers offline, for any reason, your DQ capacity also goes down.
+Of course, the DQ value can have a direct impact on either the harvest or the yield of the service.
+And here are some examples.
+If you lose one server out of <i>n</i>, the load would have to be redirected to <i>n</i> - 1 servers.
+And this can potentially overload the remaining servers by the ratio of <i>n</i> over <i>n</i> - 1.
+Same observation holds if you lose <i>k</i> servers.
+And at some point the load will exceed the DQ capacity that is remaining and this will in turn reduce your yield.
+Now the similar argument could also hold if you assume that the data is spread out across the servers and the data is not replicated.
+Your harvest is then reduced proportionally based on the number of available servers.
+Now, this might sound trivial, and in some ways it is somewhat obvious in retrospect, the main value of the DQ principle and the harvest and yield metrics, is that they allow you to reason about the implication of certain operations.
+Consider here, the case where a site needs to be upgraded and all the servers need to be rebooted.
+Now, the picture shows three different scenarios.
+The first one is a fast reboot.
+Now, during the reboot, no queries can be served.
+Of course, this impacts your yield.
+The second scenario is the rolling upgrade, where servers are upgraded one at a time.
+Now, during a rolling upgrade, a fraction of the data is unavailable, unless you're replicating it, and this would obviously impact your harvest.
+And the final model is what Eric Brewer called the "Big Flip".
+The idea here is to steer all the new traffic through one half of the nodes, and then upgrade the nodes while they are not serving traffic.
+Your DQ value goes down by 50 percent during the entire operation, but if you replicate the entire dataset on the half of the remaining servers, it will not impact your harvest.
+And as long as your DQ capacity remains sufficiently large, it will also not impact your yield.
+Now, of course, this is the best case, if you're not replicating the data, your harvest will go down by up to 50 percent.
+And if you're overloading it, your yield will go down by up to 50 percent, if you're actually overloaded, and the Big Flip is the technique they used actually to upgrade the servers, and in one case to move from one location to another location as they were operating the Inktomi search service in production.
+Time to wrap up this module on internet scale services.
+We saw the basic model of 2001.
+Since then, if anything, things have gotten larger but also simpler, internally.
+We also saw some new metrics, the concept of yield, harvest and the DQ "Principle", as more applicable to internet-scale services than the classic metrics of fault tolerance.
+What we have not talked about is any notion of consistency of the data that is being served.
+That's the topic of the next module on the CAP theorem.

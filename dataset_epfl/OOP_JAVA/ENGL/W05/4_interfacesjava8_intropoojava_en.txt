@@ -1,0 +1,149 @@
+As outlined in a previous video, the concept of interfaces has received important additions since Java 8.
+The point of this video is to show you these new concepts and particularly the notion of interface default methods.
+We have seen that, up until Java 7 included, an interface could contain constants as well as abstract method signature.
+This is of course still possible for interfaces in
+Java 8, but it is now also possible to give these methods a body.
+We can give a default definition to an interface's methods, this is a noteworthy addition.
+It is also possible to give, to define inside an interface a number of static methods, in the same way we define static methods in a class.
+In this video, we will mostly show this part, that is, default methods in an interface.
+The second part is the subject of a
+PDF supplement that you can find on the class' website.
+To illustrate the notion of default methods in an interface, let us start with an example.
+We will of course use our famous example of game characters.
+Suppose we now wish to model the fact that certain characters are able to ride mounts.
+This means that these characters would not be able to have features relative to the fact that they are riding a mount.
+For example, is a character that is riding a mount allowed to dismount during gameplay?
+How will they move around while on this mount?
+And so on.
+Where to put these features in our design ?
+Suppose now that in our game, only rogues and warriors are able to ride mounts.
+It does not make sense, in this case, to put features related to riding in the Personnage (="Character") class.
+Here, it would not make sense to put a 'seDeplace' (="moves") method indicating how a character moves with a mount in the Personnage class, and neither would putting a 'peutDescendre'
+(="can dismount") method in Personnage indicating if a character is allowed to get off his mount or not.
+Why?
+Well, simply because the wizard is not able to ride a mount, and so it does not make sense to make him inherit methods 'seDeplace' and 'peutDescendre'.
+Hence it is normal, here, to rather put these methods in an interface, here the interface
+'Chevauchant' (="Riding").
+We would put in that interface methods typically relative to moving around with a mount, or to check how we can use this mount, for example if we can dismount or not.
+Here is what the 'Chevauchant' interface could look like.
+This interface could contain the signature of a 'seDeplace' method, which would be used to indicate how moving while riding would work, as well as a method 'peutDescendre' returning a boolean and indicating whether or not one can dismount.
+You can see that this is the same as what was shown for interfaces in Java versions before Java 8.
+We have here two abstract method statements: each class that we would like to be instantiable and which would implement the Chevauchant interface will necessarily provide a concrete implementation of these two methods just to be instantiable.
+Let's see what it is possible to do from Java 8, and let us suppose that in most cases a character riding a mount cannot dismount.
+Well since Java 8, it is possible to specify this behaviour inside the interface.
+This is done by giving a default definition to the 'peutDescendre' method.
+In practice, this means that this method can now have a body.
+This body simply consists of returning false, which indicates that one cannot dismount.
+Every interface method which contains a body, that is, a concrete definition such as this example, must be prefixed with "default", without it the compiler will call you out by telling you that an abstract method cannot have a body.
+Remember, every method header is automatically abstract inside an interface, even if this modifier, the 'abstract' modifier, is not explicitely written.
+The formal syntax for the declaration of a method with a default definition in an interface is simply as follows: you have the reserved keyword
+'default' followed by the concrete definition of the method, thsi definition is done in exactly the same way as what you do inside a class, you put a header followed by a body inside braces.
+Of course, this addition raises new problems.
+We will see in the next part what the usage rules for methods with a default definition are.
+Are we allowed to redefine them?
+How do classes which implement interfaces with default methods use said methods?
+But above all we will see how to solve any ambiguities that can result from using these default definitions.
+For example, suppose we have an interface I with a default definition for a given method, and suppose that a class C which implements interface I also contains a method with the same signature but potentially another definition.
+Thus, we potentially have a conflict.
+Another example: suppose we have this time two interfaces, with each one containing a default definition for a same signature method.
+Here, interface I1 has the method M with a default definition, similarly, interface I2 contains a default definition for method M, too.
+What happens if a class implements both interfaces?
+Here, again, we have a potential conflict.
+Four fundamental rules govern the use of default methods in interfaces.
+We will now show them to you.
+The first rule is that default method definitions are inherited.
+Recall that we defined the 'Chevauchant' interface as follows : this interface had an abstract method 'seDeplace' as well as a default definition of a
+'peutDescendre' method, returning false to indicate that the default behaviour of a mounted character was never dismounting.
+It is entirely possible to define a sub-interface, here sub-interface 'Cavalier' (="Rider"), of the 'Chevauchant' interface, which does not explicitely redefine the 'peutDescendre' method.
+If a rider has as default behaviour never dismounting, then the definition inherited from super-interface 'Chevauchant' is enough, and in that case, we do not redefine that method and keep the inherited one.
+You will have realised that it is possible to implement in a sub-interface, here 'Cavalier', a default definition for an abstract method, which was abstract in 'Chevauchant', from which it inherits.
+This is the case here with method 'seDeplace'; a rider has a concrete definition of the 'seDeplace' method, which was not the case in super-interface 'Chevauchant'.
+A rider goes at a trot.
+Here, a class implementing the 'Cavalier' class would have a 'peutDescendre' method whose default definition returns false, and a 'seDeplace' method which has the default behaviour, that is, going at a trot.
+We have said it wasn't necessary to redefine a 'peutDescendre' method in 'Cavalier' if we are satisfait with the default definition inherit from above, but, of course, if we are not satisfied with it, nothing is stopping us from redefining what was inherited, just like we did for classes, so here, for example, we can imagine an alternative design of the 'Cavalier' interface, which would have not only a default definition of 'seDeplace', but also a redefinition of the
+'peutDescendre' method which would this time, for example, return true, indicating that a rider has as default behaviour the ability to dismount.
+Rule number two: a class which implements an interface is not required to give concrete definitions for methods having default definitions in the interface.
+For example, suppose the 'Guerrier' (="Warrior") class implements the 'Cavalier' interface, this interface had two methods,
+'seDeplace' and 'peutDescendre', which had both default definitions; in this case the 'Guerrier' class can be instantiated as is, it does not have to redefine these two methods.
+This is the main reason for the existence of default methods in interfaces.
+Indeed, Java's API contains numerous predefined interfaces implemented by a number of classes.
+Before Java 8, it wasn't possible, without default methods, to edit an external interface by adding a method, without having to change all classes implementing this interface.
+In concrete terms, suppose we have in the API an interface I, with a number of methods.
+Keeping it simple, here, two methods, m1 and m2; suppose that a lot of classes implement this interface.
+We take two here, as an example.
+So, classes C1 and C2, both implementing interface I.
+Both class here are not abstract, which means that we want them to be instantiable; for them to be instantiable, they must necessarily give a concrete definition of methods m1 and m2; so if these classes exist and are compilable, it is because they have a concrete definition of the methods given by the implemented interface.
+So, same here for m2.
+And we would need to do the same in the interface, in the class, sorry, C2.
+Now, suppose that, our needs evolving with time, we realize interface I also needs a method m3.
+What happens to existing code?
+Well, simply, if we write it like this, the existing code does not compile any more.
+Classes C1 and C2 are not abstract, and so, like what we did for m1 and m2, we would need to edit these classes to give a concrete definition to m3.
+Being able to give a default definition for method m3, lets us work around this problem.
+According to this rule, a class implementing an interface is not obligated to redefine a method which has a default definition, and in this case there is no need to define m3 inside the classes so that these classes stay compilable and instantiable.
+The two rules we just examined determine how we can write and use interface methods, with default definitions.
+Let us now look at the two rules relative to potntial conflicts, as shown before.
+To begin with, what happens if a class implementing an interface defines a methods which already had a default definition in the interface?
+For example, suppose the 'Guerrier' class implements the 'Cavalier' interface, which contains a default definition of the 'seDeplace' method.
+Suppose that same class, 'Guerrier', already has an alternative definition of the 'seDeplace' method, here by inheritance from the 'Personnage' class.
+Here, we are in a slightly different context than that of our introductory example, we have a design in which a general method, 'seDeplace', is present from the start in the superclass 'Personnage'.
+The question is: how to solve the ambiguity between this general
+'seDeplace' method, and the one with the same name in interface 'Chevauchant'?
+Will the warrior move by running, or at a trot?
+Well, the rule chosen by Java, is that methods from classes have priority, have precedence, over any default definitions in an interface.
+Here, if I declare an instance of the
+'Guerrier' type, and invoke the 'seDeplace' methoed, in this instance, the definition from the class will be chosen, and so the warrior will move by running.
+Of course, if we rather want the interface's method to be used, it is completely possible to specify that.
+To do that, the 'seDeplace' method must be redefined in the 'Guerrier' class, and it must specify that the method from the interface is to be used.
+So, here, the method 'seDeplace' is is redefined in the 'Guerrier' class, it is redefined such as to invoke the method, the default definition of the
+'seDeplace' method, as it was defined in the 'Cavalier' interface.
+To invoke a method with a default definition in an interface, we put the name of the interface, then a dot, then the reserved keyword
+'super', another dot, and the name of the method with the default definition.
+Note here the usage of reserved keyword 'super'.
+This keyword is used to differenciate between invoking a method with a default definition and invoking a static method from the interface.
+For example, it is possible to declare an interface like this, putting in it methods with default definitions, which we now know how to do, but also to put in static methods, in the same way we can put static methods in a class.
+Suppose a class C implements interface I, if we want to invoke a method from the interface inside one of C's methods, we proceed as follows.
+So, to invoke the static method, we put the name of the interface, then a dot, then the name of the static method.
+To invoke the method with default definition, we use the name of the interface, followed by 'super', then the name of the method with default definition.
+Note the distinction, here: to invoke a static method of an interface, we put the name of the interface, then the name of the method; it is exactly the same syntax as the one used to invoke a static member from a class.
+However, to invoke a method with a default definition, we insert the reserved keyword 'super'.
+Remember that static interface are the subject of a PDF complement on the course website.
+Small remark, here, before continuing, these two interface methods cannot have the same name.
+The compiler does not accept an interface method with the same signature to be at the same time static and also have a default definition.
+What happens, now, if a class implements two interfaces, with both containing a default definition for the same method?
+Here, for example, we have two interfaces:
+'Dragonnier' (="Dragon Rider"), and
+'se tÃ©lÃ©porte' (="teleports").
+Both of these interfaces have a default definition for a 'seDeplace' method, with exactly the same signature in both cases.
+We have here a class, 'Mage Ultime'
+(="Ultimate Mage"), which implements both interfaces; when we invoke the 'seDeplace' method on an instance of 'Mage ultime', which one of the two methods is invoked?
+We have here a conflict.
+The rule adopted by Java to solve such situations is that classes which implement conflicting interfaces are required to remove the ambiguity themselves.
+For example, the 'Ultimate Mage' class, which implements both conflicting interfaces, must redefine the 'seDeplace' method, to specify which of the two it wants to use,
+Which of the two default definitions, from the interfaces, it will use.
+Here the choice is made, towards the default definition contained in the 'Dragonnier' interface.
+The 'seDeplace' method from 'Mage Ultime' is redefined such as to invoke the
+'seDeplace' method as it was default defined in the 'Dragonnier' interface.
+Nothing prevents us, of course, from choosing instead the 'seDeplace' method from the 'se tÃ©lÃ©porte' interface.
+In this case, the 'seDeplace' method is redefined in
+'Mage ultime' such as to choose the 'seDeplace' method as it is defined in the
+'se tÃ©lÃ©porte' interface.
+A lot of other implementations are, of course, possible; and nothing prevents the 'Mage ultime' class from redefining the 'seDeplace' method such as to use the default definitions from both interfaces.
+Here you have an example of a definition of 'seDeplace' which calls, in certain conditions, 'seDeplace' from the 'se tÃ©lÃ©porte'; and in other conditions the 'seDeplace' method from 'Dragonnier'.
+If the ultimate mage can dismount, then they move by teleporting, otherwise, well, they move like a dragon rider.
+With the introduction of default definitions in interfaces, their content is now very close to that of abstract classes.
+We can now indeed put inside an interface not only abstract methods, which was already the case before
+Java 8, and we can also add methods which now have a concrete definition by default.
+That puts them very close to the concept of abstract class.
+We can thus ask ourselves when to choose on option over another.
+Well, one of the biggest differences is that an interface cannot specify a state, it cannot contains attributes.
+For example, it is not possible to define what the rider's mount is in the 'Cavalier' interface.
+Here, I cannot put an attribute like
+'Monture' (="Mount") in 'Cavalier'.
+Being able to specify an attribute would let us specify a state for the rider: depending on which mount they are riding, they would be in such or such state; this is not possible in an interface.
+The other difference, which is inherent to the notion of state, is the lack of constructor; it is inherent to the notion of state, since the constructor is used to initialise attributes, but there are none.
+To sum up, though, no state, no constructor.
+The general rule one should follow is that if what we want to modelise is a behavioural, functional aspect, like moving around, independent of state, of an object, then we will favour using interfaces.
+The implements relation is much more flexible, less restricting than that of inheritance while designing.
+Remember finally that the main point of default definitions for methods in interfaces, is not to copy multiple inheritance, or to bring an alternative to abstract classes, but it is to allow adding new methods to existing interfaces, without penalising existing code, that is, without having to edit a class implementing those interfaces.
+And this concludes this video on post Java 7 interface specificities.

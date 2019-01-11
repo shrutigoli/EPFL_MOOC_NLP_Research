@@ -1,0 +1,1215 @@
+1
+00:00:04,269 --> 00:00:05,716
+Dans les séquences vidéo précédentes,
+
+2
+00:00:05,716 --> 00:00:08,366
+nous vous avons présenté le problème 
+général de l'étude de cas
+
+3
+00:00:08,371 --> 00:00:09,962
+à laquelle nous nous intéressons ici,
+
+4
+00:00:09,962 --> 00:00:12,762
+à savoir modéliser des montres
+avec différents mécanismes,
+
+5
+00:00:12,762 --> 00:00:14,152
+différents accessoires.
+
+6
+00:00:14,191 --> 00:00:16,398
+Puis nous avons abordé 
+le problème plus spécifique
+
+7
+00:00:16,398 --> 00:00:18,840
+de la surcharge des opérateurs d'affichage
+
+8
+00:00:18,840 --> 00:00:21,540
+et comment faire 
+de l'affichage polymorphique.
+
+9
+00:00:21,540 --> 00:00:23,700
+Nous avons aussi complété 
+la classe « Produit ».
+
+10
+00:00:23,916 --> 00:00:26,084
+Dans cette séquence vidéo-ci,
+nous allons nous intéresser
+
+11
+00:00:26,084 --> 00:00:29,433
+à la surcharge d'un autre opérateur,
+par exemple ici l'opérateur « += »,
+
+12
+00:00:29,433 --> 00:00:31,266
+et puis nous allons construire 
+une première version
+
+13
+00:00:31,266 --> 00:00:33,316
+réellement opérationnelle du programme.
+
+14
+00:00:33,647 --> 00:00:36,522
+Commençons donc par ajouter
+un opérateur « += »
+
+15
+00:00:36,522 --> 00:00:38,362
+à la classe « Montre »,
+qui je vous le rappelle,
+
+16
+00:00:38,364 --> 00:00:40,694
+héritait de « Produit »,
+
+17
+00:00:40,854 --> 00:00:44,576
+et avait un mécanisme,
+plus exactement un pointeur
+
+18
+00:00:44,576 --> 00:00:46,636
+sur un mécanisme
+pour le polymorphisme,
+
+19
+00:00:46,661 --> 00:00:52,491
+et surtout un tableau dynamique
+de pointeur sur des accessoires,
+
+20
+00:00:52,495 --> 00:00:54,925
+que l'on a appellé ici « accessoires ».
+
+21
+00:00:54,931 --> 00:01:00,051
+L'idée est donc que l'on puisse rajouter
+des éléments à ce tableau dynamique
+
+22
+00:01:00,065 --> 00:01:03,835
+en faisant par exemple pour 
+une montre instance de la classe « Montre »,
+
+23
+00:01:03,853 --> 00:01:07,384
+« montre += new Bracelet (...); »,
+
+24
+00:01:07,384 --> 00:01:11,213
+où je vous rappelle que 
+« Bracelet » est une sous-classe « d'« Accessoire » ».
+
+25
+00:01:11,213 --> 00:01:16,633
+Donc on voudrait que ceci rajoute 
+un nouveau pointeur sur un « Bracelet »,
+
+26
+00:01:16,660 --> 00:01:20,200
+à la collection de pointeurs
+sur des « Accessoires ».
+
+27
+00:01:20,208 --> 00:01:22,853
+Un « Bracelet » étant un « Accessoire »,
+
+28
+00:01:23,923 --> 00:01:29,403
+un pointeur sur un « Bracelet » peut être mis
+dans un pointeur sur un « Accessoire ».
+
+29
+00:01:29,445 --> 00:01:32,075
+Voilà donc l'idée de cet opérateur « += ».
+
+30
+00:01:32,496 --> 00:01:35,676
+Le prototype de cet opérateur
+va donc être le suivant :
+
+31
+00:01:35,681 --> 00:01:38,403
+nous n'allons pas utiliser 
+sa valeur de retour,
+
+32
+00:01:38,403 --> 00:01:40,911
+nous n'allons jamais écrire 
+des choses de type
+
+33
+00:01:40,911 --> 00:01:44,591
+« z = (montre += new Bracelet (...)); »,
+
+34
+00:01:44,607 --> 00:01:46,929
+donc ici un type de retour « void »,
+
+35
+00:01:46,929 --> 00:01:49,919
+c'est l'opérateur « += » de la classe « Montre »
+
+36
+00:01:49,944 --> 00:01:53,414
+et cet opérateur doit donc recevoir ici
+
+37
+00:01:53,425 --> 00:01:56,646
+un pointeur sur un « Accessoire »,
+
+38
+00:01:56,646 --> 00:01:59,086
+donc ici « new » va renvoyer 
+un pointeur à la C,
+
+39
+00:01:59,123 --> 00:02:03,052
+et on veut le voir comme un pointeur 
+sur un « Accessoire »,
+
+40
+00:02:03,052 --> 00:02:06,495
+donc ici de façon très générale,
+ce sera un pointeur sur un « Accessoire »,
+
+41
+00:02:06,495 --> 00:02:09,810
+ici on a ajouté un « Bracelet »,
+mais on pourrait ajouter un « Fermoir »,
+
+42
+00:02:09,810 --> 00:02:13,760
+un « Boitier », n'importe quelle sous-classe
+de la classe « Accessoire ».
+
+43
+00:02:14,330 --> 00:02:16,700
+Voyons maintenant comment 
+écrire sa définition.
+
+44
+00:02:16,713 --> 00:02:20,533
+Ce pointeur sur un « Accessoire »,
+« p_accessoire », que l'on a reçu,
+
+45
+00:02:20,533 --> 00:02:24,667
+on veut simplement l'ajouter
+au tableau dynamique des accessoires
+
+46
+00:02:24,667 --> 00:02:27,488
+stockés dans la Montre,
+
+47
+00:02:27,488 --> 00:02:32,003
+et donc on va simplement faire
+un « push_back » de ce pointeur,
+
+48
+00:02:32,003 --> 00:02:35,288
+mais ici comme on a reçu 
+un pointeur à la C,
+
+49
+00:02:35,288 --> 00:02:38,336
+on va au passage transformer 
+le pointeur à la C
+
+50
+00:02:38,336 --> 00:02:39,956
+en un « unique_ptr »,
+
+51
+00:02:39,960 --> 00:02:44,820
+donc on fait ici un « unique_ptr »
+qui transforme ce pointeur à la C
+
+52
+00:02:44,838 --> 00:02:46,058
+« p_accessoire » reçu,
+
+53
+00:02:46,074 --> 00:02:50,599
+et que l'on rajoute « push_back »
+à la fin du tableau « Accessoire »,
+
+54
+00:02:50,599 --> 00:02:54,099
+dans lequel sont stockés
+tous les accessoires de la montre.
+
+55
+00:02:55,028 --> 00:02:57,436
+Voilà pour cette surcharge, 
+somme toute assez simple,
+
+56
+00:02:57,436 --> 00:03:00,125
+de l'opérateur « += » qui 
+nous offre maintenant
+
+57
+00:03:00,125 --> 00:03:04,895
+une écriture très compacte pour rajouter 
+des accessoires à une montre.
+
+58
+00:03:05,272 --> 00:03:07,688
+Essayons maintenant de faire 
+une première version
+
+59
+00:03:07,688 --> 00:03:09,338
+opérationnelle du programme,
+
+60
+00:03:09,340 --> 00:03:12,220
+essayons de finaliser ce que 
+nous avons écrit jusqu'ici,
+
+61
+00:03:12,349 --> 00:03:15,571
+et pour le moment
+sans aucun mécanisme,
+
+62
+00:03:15,571 --> 00:03:17,566
+et sans faire de copie de montres,
+
+63
+00:03:17,566 --> 00:03:21,436
+nous laissons ces 2 points pour 
+les 2 prochaines séquences vidéo.
+
+64
+00:03:21,741 --> 00:03:24,911
+Pour pouvoir finaliser le programme
+que nous avons jusqu'à maintenant,
+
+65
+00:03:24,911 --> 00:03:27,681
+il nous faudrait quelques accessoires
+un peu plus concrets,
+
+66
+00:03:27,681 --> 00:03:29,891
+il faudrait terminer la classe « Montre »,
+
+67
+00:03:29,900 --> 00:03:32,340
+qui pour l'instant n'est pas encore
+tout à fait opérationnelle,
+
+68
+00:03:32,342 --> 00:03:36,320
+et bien sûr utiliser tout ceci
+dans un « main » typique.
+
+69
+00:03:36,320 --> 00:03:38,760
+Nous allons reprendre ces points 
+les un après les autres,
+
+70
+00:03:38,765 --> 00:03:41,311
+à commencer par quelques accessoires,
+
+71
+00:03:41,311 --> 00:03:46,551
+pour rappel, nous avons 
+une classe « Accessoire », qui est un « Produit »,
+
+72
+00:03:46,555 --> 00:03:51,335
+et décidons par exemple que nous ayons
+au niveau des accessoires
+
+73
+00:03:51,344 --> 00:03:53,874
+un nom pour pouvoir les désigner.
+
+74
+00:03:53,931 --> 00:03:57,806
+Pour ceci, on va dire qu'on a un nom
+qui ne changera pas
+
+75
+00:03:57,806 --> 00:04:01,386
+une fois qu'il aura été fixé 
+par le constructeur.
+
+76
+00:04:01,797 --> 00:04:05,087
+Et nous allons ajouter un constructeur
+à la classe « Accessoire »,
+
+77
+00:04:05,365 --> 00:04:09,375
+qui prendra un nom pour pouvoir
+nommer cet accessoire.
+
+78
+00:04:09,460 --> 00:04:13,590
+Et il ne faut pas oublier que tout produit
+peut être vendu et a donc un prix,
+
+79
+00:04:13,610 --> 00:04:16,088
+et recevra donc un second paramètre
+
+80
+00:04:16,088 --> 00:04:20,568
+pour pouvoir initialiser 
+le prix du produit.
+
+81
+00:04:21,361 --> 00:04:24,889
+La section « liste d'initialisation »
+du constructeur « Accessoire »
+
+82
+00:04:24,889 --> 00:04:29,519
+va commencer par appeler le constructeur
+de la super-classe « Produit »,
+
+83
+00:04:29,527 --> 00:04:33,747
+en passant ici le paramètre 
+prix de base que l'on a reçu,
+
+84
+00:04:33,943 --> 00:04:39,263
+et ensuite on initialisera 
+l'attribut « nom » avec le nom reçu.
+
+85
+00:04:39,289 --> 00:04:43,757
+Voilà pour le constructeur qu'on a décidé
+de donner à tout les accessoires.
+
+86
+00:04:43,757 --> 00:04:47,333
+Et décidons maintenant d'une façon
+d'afficher les accessoires,
+
+87
+00:04:47,333 --> 00:04:50,852
+car je vous rappelle que tous les produits
+sont capables de s'afficher
+
+88
+00:04:50,852 --> 00:04:52,462
+de façon polymorphique.
+
+89
+00:04:52,468 --> 00:04:55,698
+Nous allons donc ici redéfinir 
+la méthode afficher
+
+90
+00:04:55,702 --> 00:04:58,272
+que nous avons héritée de « Produit »,
+
+91
+00:04:58,279 --> 00:05:02,969
+on dit qu'on la redéfinit en ajoutant
+le mot clé « override ».
+
+92
+00:05:02,980 --> 00:05:07,150
+Et décidons qu'ils s'affichent 
+en indiquant le nom et leur prix.
+
+93
+00:05:07,158 --> 00:05:09,648
+Donc on va afficher simplement le nom,
+
+94
+00:05:09,656 --> 00:05:11,406
+puis on va indiquer qu'il coûte,
+
+95
+00:05:11,421 --> 00:05:15,531
+et nous savons déjà afficher le prix
+en appelant directement
+
+96
+00:05:15,545 --> 00:05:19,065
+la méthode afficher 
+de la super-classe « Produit ».
+
+97
+00:05:19,076 --> 00:05:21,756
+Ici, on utilise l'opérateur 
+de résolution de portée
+
+98
+00:05:21,767 --> 00:05:25,754
+pour démasquer la méthode afficher
+héritée de la super-classe « Produit »,
+
+99
+00:05:25,754 --> 00:05:29,564
+parce que bien sûr si on écrit « afficher »
+tout seul, sans démasquage,
+
+100
+00:05:29,577 --> 00:05:32,959
+ce sera la méthode « afficher »
+de la classe en question
+
+101
+00:05:32,959 --> 00:05:36,969
+et on aurait ici une récursion infinie,
+« afficher » s'appelerait elle-même,
+
+102
+00:05:36,973 --> 00:05:40,433
+et donc pour, dans la méthode « afficher »
+de la classe « Accessoire »,
+
+103
+00:05:40,443 --> 00:05:43,688
+appeler la méthode « afficher » héritée
+de la super-classe « Produit »,
+
+104
+00:05:43,688 --> 00:05:46,958
+il faut ici démasquer 
+cette méthode « afficher ».
+
+105
+00:05:47,645 --> 00:05:50,876
+Enfin, comme nous avons un comportement
+que l'on souhaite polymorphique,
+
+106
+00:05:50,876 --> 00:05:52,356
+avec des méthodes virtuelles,
+
+107
+00:05:52,356 --> 00:05:56,287
+on oublie pas de rajouter 
+le destructeur polymorphique,
+
+108
+00:05:56,287 --> 00:05:57,597
+le destructeur virtuel,
+
+109
+00:05:57,603 --> 00:06:00,673
+pour la classe dont on souhaite avoir
+un comportement polymorphique,
+
+110
+00:06:00,702 --> 00:06:03,132
+de sorte que si on a 
+des sous-classes qui héritent,
+
+111
+00:06:03,132 --> 00:06:04,982
+et c'est ce qui sera le cas d'« Accessoire »,
+
+112
+00:06:04,982 --> 00:06:08,892
+qui ont besoin d'avoir un destructeur
+qui fait des comportements particuliers,
+
+113
+00:06:08,893 --> 00:06:13,719
+ce soit effectivement leur destructeur
+qui soit appelé de façon polymorphique,
+
+114
+00:06:13,719 --> 00:06:16,579
+et non pas le destructeur 
+de la classe « Accessoire ».
+
+115
+00:06:17,251 --> 00:06:20,268
+Décidons enfin que le prix des accessoires
+
+116
+00:06:20,268 --> 00:06:23,756
+est le même que le prix 
+d'un produit usuel,
+
+117
+00:06:23,756 --> 00:06:26,399
+c'est-à-dire un produit général
+tel que nous l'avons conçu
+
+118
+00:06:26,399 --> 00:06:27,999
+tout en haut de la hiérarchie.
+
+119
+00:06:28,011 --> 00:06:31,021
+À ce moment là, nous n'avons rien à faire,
+
+120
+00:06:31,042 --> 00:06:34,197
+puisque la méthode « prix »
+que nous avons héritée
+
+121
+00:06:34,197 --> 00:06:36,527
+de la classe « Produit » suffit ici,
+
+122
+00:06:36,527 --> 00:06:40,557
+et on n'a pas besoin de la redéfinir
+dans la classe « Accessoire ».
+
+123
+00:06:40,800 --> 00:06:43,352
+Nous avons donc ici une classe « Accessoire »
+
+124
+00:06:43,352 --> 00:06:46,762
+tout à fait opérationnelle et 
+qui correspond à ce que nous souhaitons.
+
+125
+00:06:46,859 --> 00:06:49,179
+Définissons maintenant 
+quelques accessoires,
+
+126
+00:06:49,185 --> 00:06:53,005
+par exemple un « Bracelet »,
+un « Bracelet » est un « Accessoire »,
+
+127
+00:06:53,005 --> 00:06:55,935
+donc on va avoir ici 
+une relation d'héritage.
+
+128
+00:06:56,000 --> 00:07:00,220
+Au niveau des accessoires, admettons 
+que l'on souhaite que leur nom,
+
+129
+00:07:00,225 --> 00:07:02,565
+je vous rappelle que 
+les accessoires ont un nom,
+
+130
+00:07:02,565 --> 00:07:05,036
+donc tous les accessoires 
+vont hériter ce nom.
+
+131
+00:07:05,036 --> 00:07:07,992
+Admettons que l'on souhaite donc
+que chacun des accessoires
+
+132
+00:07:07,992 --> 00:07:11,289
+ait ainsi un nom 
+qui marque ce qu'ils sont,
+
+133
+00:07:11,289 --> 00:07:14,189
+par exemple le nom d'un bracelet
+va commencer par « bracelet »,
+
+134
+00:07:14,189 --> 00:07:16,829
+le nom d'un fermoir 
+va commencer par « fermoir ».
+
+135
+00:07:16,957 --> 00:07:19,597
+On va donc forcer ceci 
+au niveau du constructeur,
+
+136
+00:07:19,769 --> 00:07:22,839
+par exemple pour la sous-classe « Bracelet »
+de la classe « Accessoire »,
+
+137
+00:07:22,842 --> 00:07:28,652
+on recevra le nom, qui sera le complément
+qu'on va rajouter derrière « bracelet »,
+
+138
+00:07:28,657 --> 00:07:31,757
+par exemple « en cuir »,
+
+139
+00:07:32,864 --> 00:07:36,334
+pour que le nom complet soit 
+« bracelet en cuir ».
+
+140
+00:07:36,805 --> 00:07:39,485
+Et puis comme deuxième paramètre, le prix,
+
+141
+00:07:40,072 --> 00:07:43,782
+que nous passons aussi 
+au constructeur de la super-classe,
+
+142
+00:07:43,786 --> 00:07:46,406
+dans la section liste d'initialisation.
+
+143
+00:07:46,435 --> 00:07:48,585
+Et puis toutes ces classes 
+pouvant potentiellement
+
+144
+00:07:48,597 --> 00:07:50,548
+avoir des sous-classes polymorphiques,
+
+145
+00:07:50,548 --> 00:07:52,788
+nous n'oublions pas le destructeur virtuel.
+
+146
+00:07:53,032 --> 00:07:56,652
+De même, on pourrait définir un fermoir,
+qui hérite d'« Accessoire »,
+
+147
+00:07:56,703 --> 00:07:58,459
+dans lequel on définit un constructeur
+
+148
+00:07:58,459 --> 00:08:01,339
+qui prend un complément du nom 
+« fermoir » et qui prend un prix,
+
+149
+00:08:01,358 --> 00:08:04,528
+pour pouvoir appeler le constructeur
+de la super-classe « Accessoire »,
+
+150
+00:08:04,538 --> 00:08:07,207
+où le nom complet sera donc 
+« fermoir » avec ce complément
+
+151
+00:08:07,207 --> 00:08:08,714
+qu'on a reçu comme premier paramètre,
+
+152
+00:08:08,714 --> 00:08:12,194
+et comme deuxième paramètre,
+le prix que nous avons reçu,
+
+153
+00:08:12,441 --> 00:08:14,521
+avec toujours le destructeur virtuel.
+
+154
+00:08:15,265 --> 00:08:18,085
+Voilà, nous en avons terminé
+avec les accessoires,
+
+155
+00:08:18,085 --> 00:08:21,015
+essayons aussi de rendre 
+la classe « Montre » utilisable
+
+156
+00:08:21,032 --> 00:08:23,392
+sans les mécanismes et sans la copie,
+
+157
+00:08:23,405 --> 00:08:25,365
+que nous laissons de côté
+pour le moment.
+
+158
+00:08:25,613 --> 00:08:29,639
+Nous avons à ce stade définit simplement
+le contenu de la classe « Montre »,
+
+159
+00:08:29,639 --> 00:08:31,589
+nous avons empêché la copie,
+
+160
+00:08:31,592 --> 00:08:35,118
+et nous avons ajouté l'opérateur « += »,
+
+161
+00:08:35,118 --> 00:08:38,788
+qui nous permet de rajouter 
+des accessoires à nos montres.
+
+162
+00:08:38,965 --> 00:08:43,905
+Pour rendre cette classe opérationnelle,
+il faut au moins lui ajouter un constructeur,
+
+163
+00:08:43,907 --> 00:08:47,642
+puisque, comme nous avons 
+touché ici au constructeur,
+
+164
+00:08:47,642 --> 00:08:51,762
+le constructeur par défaut, 
+fournit par défaut, ne l'est plus,
+
+165
+00:08:51,762 --> 00:08:54,782
+nous n'avons plus le constructeur 
+par défaut, par défaut,
+
+166
+00:08:54,782 --> 00:08:57,822
+il faut donc au moins le rajouter ici.
+
+167
+00:08:57,851 --> 00:09:00,580
+Evidemment le constructeur 
+par défaut ne fera rien
+
+168
+00:09:00,580 --> 00:09:03,490
+au niveau de l'initialisation
+des mécanismes,
+
+169
+00:09:03,490 --> 00:09:06,657
+et donc à ce moment là,
+nous allons simplement commenter,
+
+170
+00:09:06,657 --> 00:09:10,417
+pour éviter tout problème avec
+l'utilisation ici d'un pointeur
+
+171
+00:09:10,417 --> 00:09:12,076
+qui ne serait pas initialisé ;
+
+172
+00:09:12,076 --> 00:09:14,555
+nous allons donc simplement 
+commenter cette ligne,
+
+173
+00:09:14,555 --> 00:09:17,065
+et le constructeur par défaut,
+
+174
+00:09:17,071 --> 00:09:21,366
+en ce qui concerne le vecteur
+de pointeur sur des accessoires,
+
+175
+00:09:21,366 --> 00:09:22,901
+va créer un vecteur nul,
+
+176
+00:09:22,901 --> 00:09:24,761
+et donc là, il n'y a pas de soucis,
+
+177
+00:09:24,778 --> 00:09:29,548
+vecteur nul que nous pourrons ensuite 
+remplir à l'aide de notre opérateur « += ».
+
+178
+00:09:29,559 --> 00:09:32,999
+Donc le constructeur par défaut 
+nous va bien, si tant est que
+
+179
+00:09:33,003 --> 00:09:34,638
+nous n'ayons pas ce pointeur,
+
+180
+00:09:34,638 --> 00:09:36,459
+donc nous allons le commenter 
+pour l'instant,
+
+181
+00:09:36,459 --> 00:09:39,069
+jusqu'à ce que nous y revenions 
+dans une séquence ultérieure.
+
+182
+00:09:39,078 --> 00:09:41,198
+Voilà pour la construction des montres.
+
+183
+00:09:41,199 --> 00:09:43,953
+Décidons ensuite du calcul 
+du prix des montres,
+
+184
+00:09:43,953 --> 00:09:48,183
+et admettons que ce soit la somme 
+des prix de ses accessoires.
+
+185
+00:09:48,195 --> 00:09:51,235
+Pour ceci, nous allons redéfinir 
+la méthode prix,
+
+186
+00:09:51,254 --> 00:09:54,493
+nous « override »
+cette méthode prix virtuelle,
+
+187
+00:09:54,493 --> 00:09:56,463
+héritée de la super-classe « Produit ».
+
+188
+00:09:56,655 --> 00:10:02,901
+Nous allons donc décider qu'au départ
+le prix d'un montre est le prix de base,
+
+189
+00:10:02,901 --> 00:10:07,251
+que nous récupérons au travers de
+la méthode prix d'origine,
+
+190
+00:10:07,252 --> 00:10:09,522
+héritée de la super-classe « Produit »,
+
+191
+00:10:10,119 --> 00:10:13,699
+puis à ce prix de départ,
+nous allons rajouter
+
+192
+00:10:13,707 --> 00:10:17,206
+l'ensemble des prix 
+des différents accessoires.
+
+193
+00:10:17,206 --> 00:10:20,486
+Pour ceci, nous parcourons 
+la liste des accessoires,
+
+194
+00:10:20,498 --> 00:10:24,948
+je vous rappelle que pour parcourir
+un tableau de « unique_ptr »,
+
+195
+00:10:24,964 --> 00:10:29,224
+il faut absolument utiliser cette syntaxe,
+passer par des références,
+
+196
+00:10:29,424 --> 00:10:34,947
+ici, il se trouve que récupérer le prix
+ne modifie pas les instances parcourue,
+
+197
+00:10:34,947 --> 00:10:37,717
+on va donc utiliser 
+une référence constante.
+
+198
+00:10:37,870 --> 00:10:41,027
+On va faire ici une boucle qui parcourt
+par référence constante
+
+199
+00:10:41,027 --> 00:10:45,547
+les « unique_ptr » de ce tableau 
+dynamique d'accessoires.
+
+200
+00:10:45,547 --> 00:10:50,865
+Et nous rajoutons au prix,
+que nous avons au départ initialisé,
+
+201
+00:10:50,868 --> 00:10:54,538
+à chaque fois le prix,
+c'est-à-dire l'appel à la méthode prix
+
+202
+00:10:54,558 --> 00:10:57,911
+de l'objet pointé au travers
+de « p_acc » ici,
+
+203
+00:10:57,911 --> 00:11:00,696
+donc de l'accessoire pointé 
+au travers de ce pointeur,
+
+204
+00:11:00,696 --> 00:11:03,777
+c'est comme ceci qu'on écrit
+l'appel à la méthode prix
+
+205
+00:11:03,777 --> 00:11:06,427
+de quelque chose qui est
+un pointeur sur un objet
+
+206
+00:11:06,435 --> 00:11:08,475
+ayant une telle méthode.
+
+207
+00:11:08,513 --> 00:11:12,483
+Et enfin on retourne le prix
+que l'on vient de calculer.
+
+208
+00:11:13,142 --> 00:11:16,523
+Décidons enfin comment 
+afficher les montres,
+
+209
+00:11:16,523 --> 00:11:19,412
+et par exemple nous décidons
+d'avoir un message pour dire
+
+210
+00:11:19,412 --> 00:11:24,662
+qu'un montre est composée de :
+la liste de ses différents accessoires...
+
+211
+00:11:24,662 --> 00:11:28,687
+Et puis à la fin on affiche
+le prix total de la montre.
+
+212
+00:11:28,687 --> 00:11:33,551
+Et donc on va aussi ici redéfinir 
+la méthode afficher virtuelle
+
+213
+00:11:33,551 --> 00:11:36,701
+héritée de la super-classe « Produit »,
+
+214
+00:11:36,711 --> 00:11:40,231
+et on rappelle ici que nous sommes 
+en train de la redéfinir,
+
+215
+00:11:40,341 --> 00:11:44,171
+en commençant l'affichage
+par « Une montre composée de »,
+
+216
+00:11:44,191 --> 00:11:49,729
+et ensuite en parcourant l'ensemble
+des accessoires de la montre,
+
+217
+00:11:49,729 --> 00:11:52,686
+pour chacun des accessoires,
+on affiche cette petite étoile,
+
+218
+00:11:52,686 --> 00:11:57,206
+et puis on affiche ici 
+l'accessoire en question.
+
+219
+00:11:57,454 --> 00:11:58,764
+Une question ici :
+
+220
+00:11:58,764 --> 00:12:00,349
+Est-ce qu'on a le droit d'écrire ceci ?
+
+221
+00:12:00,349 --> 00:12:01,759
+Est-ce que ceci compile ?
+
+222
+00:12:01,759 --> 00:12:05,327
+Est-ce qu'on a surchargé 
+l'opérateur d'affichage pour ceci ?
+
+223
+00:12:07,553 --> 00:12:09,302
+Oui, c'est correct et ça compile.
+
+224
+00:12:09,302 --> 00:12:13,067
+Et enfin on termine par l'affichage
+du message prix total,
+
+225
+00:12:13,067 --> 00:12:16,670
+et l'appel ici à la méthode prix
+de la montre,
+
+226
+00:12:16,670 --> 00:12:20,350
+qui va donc nous calculer le prix total,
+comme expliqué précédemment.
+
+227
+00:12:21,900 --> 00:12:24,003
+Enfin, pour avoir un programme exécutable,
+
+228
+00:12:24,003 --> 00:12:27,483
+il faut bien un « main », que nous allons 
+donc ici utiliser pour tester
+
+229
+00:12:27,485 --> 00:12:30,239
+les implémentations des objets
+que nous venons de créer.
+
+230
+00:12:30,659 --> 00:12:33,570
+Pour ceci, dans le « main »,
+nous allons déclarer une montre,
+
+231
+00:12:33,570 --> 00:12:35,100
+nous pouvons tout à fait
+faire ceci
+
+232
+00:12:35,100 --> 00:12:38,385
+puisque nous avons un constructeur 
+par défaut à ce stade là.
+
+233
+00:12:38,391 --> 00:12:44,121
+Ensuite, dans la montre, nous ajoutons
+différents accessoires, comme ceci,
+
+234
+00:12:44,148 --> 00:12:49,748
+chacun des accessoire a son constructeur
+avec le nom ou le complément du nom,
+
+235
+00:12:49,751 --> 00:12:51,279
+et son prix.
+
+236
+00:12:51,279 --> 00:12:53,769
+Donc on ajoute par exemple,
+comme ça, 4 accessoires,
+
+237
+00:12:53,788 --> 00:12:58,248
+et enfin on affiche un message
+pour afficher la montre ici,
+
+238
+00:12:58,357 --> 00:13:01,467
+avec l'opérateur d'affichage 
+que nous avons vu précédemment,
+
+239
+00:13:01,474 --> 00:13:03,784
+lequel opérateur d'affichage,
+nous venons de le voir,
+
+240
+00:13:03,805 --> 00:13:05,954
+va appeler la méthode prix.
+
+241
+00:13:05,954 --> 00:13:09,284
+L'exécution de ce programme va donc 
+conduire au résultat suivant,
+
+242
+00:13:09,300 --> 00:13:11,467
+on va d'abord afficher 
+le message « Montre m : »,
+
+243
+00:13:11,467 --> 00:13:15,196
+puis ensuite on va rentrer dans 
+l'opérateur surchargé pour les produits,
+
+244
+00:13:15,196 --> 00:13:17,992
+mais avec un appel 
+de la méthode affichée polymorphique,
+
+245
+00:13:17,992 --> 00:13:18,860
+pour les montres,
+
+246
+00:13:18,860 --> 00:13:21,910
+qui va donc nous afficher
+« Une montre composée de : »,
+
+247
+00:13:21,912 --> 00:13:24,442
+et ensuite une boucle 
+sur ses différents accessoires,
+
+248
+00:13:24,451 --> 00:13:28,271
+et puis qui termine par
+l'affichage du prix total,
+
+249
+00:13:28,292 --> 00:13:31,162
+somme des prix des différents accessoires.
+
+250
+00:13:31,217 --> 00:13:32,443
+Pour ceux qui le souhaitent,
+
+251
+00:13:32,443 --> 00:13:35,113
+l'entièreté du code est disponible
+sur le site du cours.
+
+252
+00:13:35,429 --> 00:13:38,669
+Ceci termine la présentation
+de cette première version
+
+253
+00:13:38,679 --> 00:13:40,349
+opérationnelle de notre code.
+
+254
+00:13:40,359 --> 00:13:43,769
+Reste encore 2 chapitres à aborder
+dans les 2 séquences vidéo suivantes,
+
+255
+00:13:43,987 --> 00:13:47,524
+tout d'abord tous ces mécanismes,
+avec l'héritage multiple,
+
+256
+00:13:47,524 --> 00:13:50,208
+et puis enfin la notion de 
+copie d'une montre,
+
+257
+00:13:50,208 --> 00:13:53,988
+comment faire une copie profonde
+des différents accessoires d'une montre.

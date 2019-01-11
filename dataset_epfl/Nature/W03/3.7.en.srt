@@ -1,0 +1,1327 @@
+1
+00:00:03,101 --> 00:00:04,920
+Welcome back, <i>Nature, In Code</i>.
+
+2
+00:00:04,920 --> 00:00:07,098
+We're in Chapter 3, Lecture 7.
+
+3
+00:00:07,160 --> 00:00:09,210
+We now have everything in place
+
+4
+00:00:09,210 --> 00:00:12,776
+to start implementing Genetic Drift
+in JavaScript.
+
+5
+00:00:12,776 --> 00:00:14,331
+Let's go ahead and do it.
+
+6
+00:00:14,359 --> 00:00:18,020
+I'm going to start a new file here,
+a new html file.
+
+7
+00:00:18,020 --> 00:00:19,941
+I'm going to do this from scratch.
+
+8
+00:00:19,941 --> 00:00:23,770
+I'm going to use 
+the doc type html here at the top.
+
+9
+00:00:23,783 --> 00:00:26,783
+Whoops! h-t-m-l.
+
+10
+00:00:27,854 --> 00:00:31,249
+Then I'm going to setup my <i>html</i> tag
+
+11
+00:00:32,240 --> 00:00:36,223
+and I'm going to divide this here
+as always
+
+12
+00:00:36,308 --> 00:00:40,876
+into <i>head</i> and a <i>body</i>.
+
+13
+00:00:44,327 --> 00:00:48,125
+Then I'm going to indent this as always.
+
+14
+00:00:50,007 --> 00:00:53,887
+Here in the <i>head</i>, 
+I'm going to define my script.
+
+15
+00:00:54,370 --> 00:00:57,128
+Script and slash script.
+
+16
+00:00:57,128 --> 00:00:59,907
+This is where I'm going to put
+my JavaScript.
+
+17
+00:01:01,647 --> 00:01:03,872
+Let me just go ahead
+and save this right away.
+
+18
+00:01:03,975 --> 00:01:06,255
+<i>File</i> &gt; <i>Save As...</i>
+
+19
+00:01:08,211 --> 00:01:10,252
+in the code examples here,
+
+20
+00:01:10,984 --> 00:01:17,874
+and I'm going to save this
+as <i>genetic_drift</i>.
+
+21
+00:01:19,934 --> 00:01:21,595
+Alright, saved.
+
+22
+00:01:21,657 --> 00:01:22,894
+Good.
+
+23
+00:01:23,735 --> 00:01:26,416
+Syntax highlighting kicking in here.
+So, we're all set.
+
+24
+00:01:26,416 --> 00:01:30,207
+Alright, so how are we now 
+going to implement Genetic Drift?
+
+25
+00:01:30,847 --> 00:01:34,969
+Well, let's see. Let's first think about
+which variables we have to define,
+
+26
+00:01:34,969 --> 00:01:36,557
+values that we need to work with.
+
+27
+00:01:36,557 --> 00:01:41,148
+Obviously we need to keep track
+of the allele frequencies.
+
+28
+00:01:41,148 --> 00:01:42,909
+We have this variable <i>p</i>.
+
+29
+00:01:42,909 --> 00:01:46,226
+I'm going to initialize this as 0.5
+
+30
+00:01:46,226 --> 00:01:49,317
+just as the example
+in the previous lecture.
+
+31
+00:01:50,197 --> 00:01:53,147
+I'm actually not going to bother now
+to define <i>q</i>
+
+32
+00:01:53,297 --> 00:01:58,749
+because <i>q</i> can always be calculated
+as <i>1 - p</i>, so we're fine with this <i>p</i>.
+
+33
+00:01:59,110 --> 00:02:04,758
+The other variable that I obviously need
+is that of the population size.
+
+34
+00:02:04,806 --> 00:02:06,972
+I'm going to use a capital <i>N</i> here.
+
+35
+00:02:06,972 --> 00:02:10,842
+because that's the way
+we usually denote this.
+
+36
+00:02:10,842 --> 00:02:15,333
+And let's say I'm goinf to define this
+as 1000 for example.
+
+37
+00:02:15,333 --> 00:02:16,898
+So this is a finite population size,
+
+38
+00:02:16,898 --> 00:02:21,159
+not quite as small as the one we used
+in the previous example
+
+39
+00:02:21,159 --> 00:02:25,158
+but fairly small population here,
+a thousand individuals.
+
+40
+00:02:25,220 --> 00:02:28,890
+So what I'd like to do now
+is basically from this population
+
+41
+00:02:28,890 --> 00:02:31,730
+I would like to now understand
+
+42
+00:02:31,730 --> 00:02:37,112
+what is the allele makeup
+in the next generation.
+
+43
+00:02:37,184 --> 00:02:43,014
+Notice that we now stopped caring about
+how exactly those alleles are packaged
+
+44
+00:02:43,014 --> 00:02:45,254
+into the three different genotypes.
+
+45
+00:02:45,254 --> 00:02:48,765
+We're not really more interested
+in the evolution per se,
+
+46
+00:02:48,765 --> 00:02:52,945
+which is as per our working definition,
+
+47
+00:02:52,945 --> 00:02:55,056
+the change in allele frequencies over time
+
+48
+00:02:55,056 --> 00:02:58,596
+so we're now simply going to keep track
+of the alleles,
+
+49
+00:02:58,596 --> 00:03:00,395
+not of the genotypes anymore.
+
+50
+00:03:00,395 --> 00:03:05,376
+And so now I have to calculate
+the next generation from this.
+
+51
+00:03:06,686 --> 00:03:09,847
+As in the Hardy-Weinberg example,
+
+52
+00:03:09,847 --> 00:03:13,415
+I'm going to define a function, 
+<i>next_generation</i>.
+
+53
+00:03:14,117 --> 00:03:16,375
+Now, as you may recall
+
+54
+00:03:16,375 --> 00:03:20,146
+the <i>next generation</i> function 
+Hardy-Weinberg was pretty simple.
+
+55
+00:03:20,146 --> 00:03:22,666
+We actually kept track 
+of the genotype frequencies,
+
+56
+00:03:22,666 --> 00:03:27,416
+and we could just calculate them based 
+on the <i>p</i> 's and <i>q</i> values that we have.
+
+57
+00:03:27,416 --> 00:03:30,282
+Here, it's a little bit more complicated
+
+58
+00:03:30,912 --> 00:03:36,972
+because we now have to simulate 
+this random picking of alleles
+
+59
+00:03:36,972 --> 00:03:38,746
+from the gamete pool.
+
+60
+00:03:38,839 --> 00:03:43,099
+And we'll do this basically the same way
+that we flipped a coin.
+
+61
+00:03:43,099 --> 00:03:46,869
+This is why we did all these 
+coin flipping exercise in the first place.
+
+62
+00:03:46,869 --> 00:03:54,249
+I'm going to draw basically 2N alleles
+from this infinite,
+
+63
+00:03:54,249 --> 00:03:57,119
+or almost infinitely-sized gamete pool
+
+64
+00:03:57,148 --> 00:04:01,149
+So I'm going to basically first find 
+this variable draws
+
+65
+00:04:01,149 --> 00:04:03,498
+in a number of draws
+that I'm going to make,
+
+66
+00:04:03,578 --> 00:04:06,680
+which is of course <i>2 x N</i>,
+
+67
+00:04:06,680 --> 00:04:09,598
+because that's the number of alleles 
+that we need to draw.
+
+68
+00:04:10,461 --> 00:04:13,301
+I'm going to keep track 
+of the alleles here
+
+69
+00:04:13,301 --> 00:04:14,373
+the ones that I draw.
+
+70
+00:04:14,373 --> 00:04:16,585
+I need to keep track of how many I draw.
+
+71
+00:04:16,585 --> 00:04:20,195
+Those two counters, 
+I'm just going to name <i>a1</i>, <i>a2</i>,
+
+72
+00:04:20,545 --> 00:04:25,574
+and I'm obviously going 
+to initialize those at zero
+
+73
+00:04:25,698 --> 00:04:28,300
+whenever I start new generation.
+
+74
+00:04:29,160 --> 00:04:34,809
+Now what I have to do is
+I have to implement this coin flipping.
+
+75
+00:04:36,325 --> 00:04:37,869
+Let's go ahead and do this.
+
+76
+00:04:37,965 --> 00:04:41,806
+We want to do this draws many times.
+
+77
+00:04:41,806 --> 00:04:45,424
+However many times we have here 
+in draws, we want to do this.
+
+78
+00:04:45,424 --> 00:04:49,615
+This, of course, calls for a loop,
+so let's implement this loop.
+
+79
+00:04:50,576 --> 00:04:53,426
+As always, we use the same construct,
+
+80
+00:04:53,434 --> 00:04:59,457
+so I'm going to define here 
+this initialization variable.
+
+81
+00:04:59,457 --> 00:05:04,167
+Then I'm going to say as long as
+<i>i</i> is smaller than <i>draws</i>,
+
+82
+00:05:04,770 --> 00:05:07,675
+and then of course I have to make sure
+I increment the <i>i</i>
+
+83
+00:05:07,720 --> 00:05:09,665
+to avoid an infinite loop.
+
+84
+00:05:11,445 --> 00:05:12,874
+Good.
+
+85
+00:05:14,519 --> 00:05:17,454
+We're going to use 
+our old friend here, <i>Math.random</i>.
+
+86
+00:05:17,552 --> 00:05:23,455
+We're going to draw a random number--
+this is our coin flipper now.
+
+87
+00:05:23,455 --> 00:05:27,235
+And, as you may recall,
+in the coin flipping example
+
+88
+00:05:27,235 --> 00:05:28,600
+we did something like this.
+
+89
+00:05:28,600 --> 00:05:35,709
+<i>If Math.random is smaller
+or equal to 0.5</i>
+
+90
+00:05:37,116 --> 00:05:39,482
+then we would do something,
+
+91
+00:05:39,548 --> 00:05:42,454
+which is keep track 
+of how often this happened.
+
+92
+00:05:43,337 --> 00:05:45,466
+We could, in principle, do the same here
+
+93
+00:05:45,466 --> 00:05:48,341
+because we know in fact
+
+94
+00:05:49,524 --> 00:05:55,375
+that the probability of picking an <i>a1</i>
+is exactly 0.5.
+
+95
+00:05:55,495 --> 00:05:58,074
+So it is like flipping a fair coin.
+
+96
+00:05:58,125 --> 00:06:00,585
+What I'm going to do here
+is I'm simply going to say,
+
+97
+00:06:00,585 --> 00:06:03,853
+okay, if that happens 
+in half of the time on average,
+
+98
+00:06:03,858 --> 00:06:07,686
+then I'm going to increase 
+this <i>a1</i> counter here by 1.
+
+99
+00:06:08,599 --> 00:06:10,579
+And if it doesn't happen,
+
+100
+00:06:10,579 --> 00:06:14,970
+if the other side comes up,
+or if I pick the other allele,
+
+101
+00:06:14,970 --> 00:06:20,230
+then obviously
+I have to increase this by 1, the <i>a2</i>.
+
+102
+00:06:20,740 --> 00:06:22,966
+I'd increase the <i>a2</i> by 1.
+
+103
+00:06:23,411 --> 00:06:24,869
+And that's basically it.
+
+104
+00:06:24,869 --> 00:06:29,771
+So you can see, this is roughly identical
+to the coin flipping example.
+
+105
+00:06:29,940 --> 00:06:32,260
+Then at the end, once I've done this--
+
+106
+00:06:32,260 --> 00:06:35,091
+so, my four loop ends here,
+
+107
+00:06:35,091 --> 00:06:39,010
+and this is another reason why 
+it's nice to indent things properly,
+
+108
+00:06:39,010 --> 00:06:42,071
+so you can exactly see
+
+109
+00:06:42,071 --> 00:06:44,881
+which curly bracket closes which one.
+
+110
+00:06:44,881 --> 00:06:48,701
+Because, as you've noticed, 
+as our code gets more complex,
+
+111
+00:06:48,701 --> 00:06:50,451
+we have these levels of nesting.
+
+112
+00:06:50,451 --> 00:06:55,061
+We have a function here 
+that has this function body.
+
+113
+00:06:55,061 --> 00:06:58,071
+And in the function body,
+we have a <i>for</i> loop.
+
+114
+00:06:58,071 --> 00:07:02,601
+And in the <i>for</i> loop
+we have <i>if</i> and <i>else</i>,
+
+115
+00:07:02,601 --> 00:07:05,266
+and this is why you now have
+this nesting here
+
+116
+00:07:05,266 --> 00:07:10,821
+where you have three parenthesis here,
+three curly brackets, closing.
+
+117
+00:07:10,821 --> 00:07:13,540
+And if you wouldn't do proper indentation,
+
+118
+00:07:13,540 --> 00:07:17,248
+it would be very hard to see 
+which one is which.
+
+119
+00:07:18,132 --> 00:07:21,374
+And so here it's very easy to see,
+this one is this...
+
+120
+00:07:21,374 --> 00:07:24,244
+so this one must be the next level,
+which is this,
+
+121
+00:07:24,244 --> 00:07:28,544
+and this one must correspond
+to the function closing.
+
+122
+00:07:29,014 --> 00:07:34,482
+I strongly advise you 
+to use this indentation all the time.
+
+123
+00:07:35,025 --> 00:07:40,894
+So, anyway, here after the <i>for</i> loop
+we have now picked our alleles
+
+124
+00:07:40,894 --> 00:07:44,254
+so we can now calculate 
+the new allele frequencies.
+
+125
+00:07:44,254 --> 00:07:47,550
+So our new <i>p</i> here 
+is essentially going to be,
+
+126
+00:07:47,550 --> 00:07:52,910
+however many <i>a1</i> 's we picked, 
+divided by the number of alleles,
+
+127
+00:07:53,110 --> 00:07:56,707
+which is stored 
+in this variable <i>draws;</i> it's <i>2N</i>.
+
+128
+00:07:57,459 --> 00:07:59,829
+And that is pretty much it.
+
+129
+00:08:00,219 --> 00:08:06,119
+So now, the only issue that we have here
+is something wrong with this code
+
+130
+00:08:06,119 --> 00:08:08,150
+if we want to do this multiple times.
+
+131
+00:08:08,150 --> 00:08:11,218
+This code will now work one time,
+
+132
+00:08:11,218 --> 00:08:15,720
+because we have here 
+a fair coin basically that we implemented
+
+133
+00:08:15,720 --> 00:08:17,650
+with a 50% probability.
+
+134
+00:08:17,650 --> 00:08:21,581
+But of course, 
+as we've seen in the previous lecture,
+
+135
+00:08:21,581 --> 00:08:26,930
+we expect the <i>p</i> value 
+to change, in fact, over time.
+
+136
+00:08:27,250 --> 00:08:30,521
+And so the probability 
+that I will pick in <i>a1</i>
+
+137
+00:08:30,521 --> 00:08:33,878
+will not remain 50% all of the time.
+
+138
+00:08:34,228 --> 00:08:35,450
+It will change.
+
+139
+00:08:35,880 --> 00:08:40,383
+So what I have to do here
+is I have to replace this 0.5 here
+
+140
+00:08:40,383 --> 00:08:43,991
+that I hard coded here,
+this fair coin, by <i>p</i>.
+
+141
+00:08:44,591 --> 00:08:46,283
+That's very important.
+
+142
+00:08:48,152 --> 00:08:52,643
+Because basically it now means
+that I am picking an <i>a1</i> allele
+
+143
+00:08:52,643 --> 00:08:57,384
+with the probability
+that equals this <i>p</i> value,
+
+144
+00:08:57,384 --> 00:09:00,773
+this current frequency of the <i>a1</i> allele.
+
+145
+00:09:00,773 --> 00:09:02,202
+And that's of course, correct.
+
+146
+00:09:02,202 --> 00:09:04,998
+If <i>p</i>, for example, were 0.2,
+
+147
+00:09:04,998 --> 00:09:08,473
+so 20% of the alleles were <i>a1</i>,
+
+148
+00:09:08,534 --> 00:09:11,676
+then I would pick an <i>a1</i> allele 
+from the gamete pool
+
+149
+00:09:11,676 --> 00:09:13,926
+with a probability of 20%.
+
+150
+00:09:13,926 --> 00:09:18,348
+And this condition here is true
+in exactly 20% of the time,
+
+151
+00:09:18,348 --> 00:09:21,838
+if <i>Math.random</i> is smaller or equal to 0.2
+
+152
+00:09:21,838 --> 00:09:27,040
+So whatever <i>p</i> is, this will be
+the correct statement here
+
+153
+00:09:27,132 --> 00:09:34,022
+simply because we have to pick
+the <i>a1</i> allele according to its frequency.
+
+154
+00:09:35,362 --> 00:09:38,732
+Good. So this is now a generic 
+next generation function
+
+155
+00:09:38,774 --> 00:09:40,050
+for genetic drift.
+
+156
+00:09:40,955 --> 00:09:42,299
+Why don't we test this?
+
+157
+00:09:42,299 --> 00:09:46,969
+Why don't we go ahead now
+and basically do this a couple of times?
+
+158
+00:09:46,969 --> 00:09:50,429
+So let's say we want to call this function
+maybe a thousand times.
+
+159
+00:09:50,429 --> 00:09:55,470
+We're going to build thousand generations,
+one after the other.
+
+160
+00:09:55,470 --> 00:09:57,838
+Again, I'm going to do this 
+many, many times,
+
+161
+00:09:57,838 --> 00:09:59,083
+so this calls <i>for</i> loops.
+
+162
+00:09:59,083 --> 00:10:01,272
+I'm going to have another loop here.
+
+163
+00:10:01,652 --> 00:10:05,193
+Again, I'm setting up this variable 
+for this particular loop
+
+164
+00:10:05,193 --> 00:10:09,624
+and then I'm going to say,
+<i>i</i> smaller than 1000,
+
+165
+00:10:10,379 --> 00:10:13,609
+then I have to obviously 
+make sure that is--
+
+166
+00:10:13,609 --> 00:10:16,051
+again, I always increase 
+this counter here,
+
+167
+00:10:16,051 --> 00:10:18,273
+otherwise I create infinite loops.
+
+168
+00:10:18,593 --> 00:10:23,492
+And then, I'm basically just going 
+to call this function <i>next_generation</i>.
+
+169
+00:10:23,492 --> 00:10:27,146
+This function now gets called 
+a thousand times.
+
+170
+00:10:29,187 --> 00:10:33,024
+Now I'm really curious 
+how does this <i>p</i> change over time.
+
+171
+00:10:33,414 --> 00:10:37,315
+Let's go ahead and basically output this
+every time we call,
+
+172
+00:10:37,315 --> 00:10:39,384
+after we've called 
+this next generation function.
+
+173
+00:10:39,764 --> 00:10:44,380
+Let's take a look what this <i>p</i> value now,
+what value it has.
+
+174
+00:10:45,338 --> 00:10:51,430
+So <i>console.log(p)</i>
+and in principle, of course,
+
+175
+00:10:51,440 --> 00:10:54,533
+I could also do this a little nicer
+by saying,
+
+176
+00:10:57,897 --> 00:11:00,725
+let's say, <i>generation</i>...
+
+177
+00:11:01,153 --> 00:11:04,573
+Let's not only output the <i>p</i>
+
+178
+00:11:04,573 --> 00:11:10,309
+but let's output first 
+the generation that we're in
+
+179
+00:11:10,309 --> 00:11:14,428
+which is <i>i</i>, then let's output <i>p</i>.
+
+180
+00:11:14,428 --> 00:11:19,121
+And you know what, let's also output <i>q</i>,
+which is of course just <i>1 - p</i>.
+
+181
+00:11:19,190 --> 00:11:21,561
+So we're outputting three values namely,
+
+182
+00:11:21,677 --> 00:11:25,260
+what's the generation were at,
+what's the <i>p</i> value,
+
+183
+00:11:25,660 --> 00:11:29,141
+and what's the corresponding <i>q</i> value.
+
+184
+00:11:29,738 --> 00:11:32,022
+One more thing I want to do,
+
+185
+00:11:32,022 --> 00:11:35,021
+just so that I can change this easily 
+in the future.
+
+186
+00:11:35,021 --> 00:11:37,317
+Here we have thousand now,
+hard coded.
+
+187
+00:11:37,317 --> 00:11:42,901
+Why don't we store this variable--
+this value in a variable
+
+188
+00:11:42,901 --> 00:11:45,500
+so that we can later easily change it.
+
+189
+00:11:45,500 --> 00:11:47,219
+I'm going to go ahead,
+
+190
+00:11:47,219 --> 00:11:49,371
+I'm going to define 
+a new variable up here,
+
+191
+00:11:49,371 --> 00:11:53,962
+<i>var generations = 1000;</i>
+
+192
+00:11:54,002 --> 00:11:57,252
+Then here, I'm going to replace 
+this hard coded 1000
+
+193
+00:11:57,252 --> 00:11:59,372
+simply by the variable <i>generations</i>.
+
+194
+00:11:59,451 --> 00:12:03,650
+Now I can easily change this value
+up here.
+
+195
+00:12:04,290 --> 00:12:09,862
+Good. So let's save this
+and then let's go over to the browser
+
+196
+00:12:09,862 --> 00:12:13,303
+and take a look at this code,
+how it performs.
+
+197
+00:12:14,272 --> 00:12:15,977
+So I'm here in the browser.
+
+198
+00:12:15,977 --> 00:12:19,271
+I'm going to open this file,
+<i>Open File</i>,
+
+199
+00:12:19,994 --> 00:12:23,895
+here's my genetic drift,
+and I'm going to open this.
+
+200
+00:12:24,730 --> 00:12:28,404
+Of course I need to open 
+the JavaScript Console as well
+
+201
+00:12:28,404 --> 00:12:32,728
+So, as always here in Chrome,
+it's <i>View</i> &gt; <i>Developer JavaScript Console</i>.
+
+202
+00:12:34,198 --> 00:12:39,000
+Here you can see what's happening,
+in fact, a lot is happening.
+
+203
+00:12:39,000 --> 00:12:41,630
+So let's scroll all the way to the top.
+
+204
+00:12:42,270 --> 00:12:45,751
+We started at 0.5 and 0.5.
+
+205
+00:12:45,751 --> 00:12:49,880
+As you can see, 
+this changed relatively quickly,
+
+206
+00:12:49,880 --> 00:12:55,882
+and our <i>p</i> seems to have gone down
+quite a bit over a few generations.
+
+207
+00:12:55,882 --> 00:12:59,071
+But then after a while, 
+it has actually come back up.
+
+208
+00:12:59,071 --> 00:13:04,911
+So down here you can see
+that's it's again now above 0.5 and so on.
+
+209
+00:13:04,911 --> 00:13:06,932
+You can now scroll through this
+
+210
+00:13:06,932 --> 00:13:11,351
+and you can follow 
+how this <i>p</i> changes over time.
+
+211
+00:13:11,791 --> 00:13:15,282
+And then at the end, for example,
+you can see here after 1000 generations,
+
+212
+00:13:15,282 --> 00:13:19,112
+we are at roughly 65%, 35%.
+
+213
+00:13:19,532 --> 00:13:23,846
+So this is now genetic drift,
+implemented in JavaScript.
+
+214
+00:13:23,846 --> 00:13:25,992
+You can see a lot of evolution 
+going on here,
+
+215
+00:13:25,992 --> 00:13:31,012
+according to our working definition
+of change of allele frequencies
+
+216
+00:13:31,012 --> 00:13:32,762
+in a population over time.
+
+217
+00:13:32,762 --> 00:13:38,278
+Because this was so much fun,
+let's just go ahead and reload this.
+
+218
+00:13:38,345 --> 00:13:41,683
+Interesting. So what's happening here?
+
+219
+00:13:41,683 --> 00:13:44,233
+We have a 1 and we have a 0.
+
+220
+00:13:44,233 --> 00:13:46,274
+Let's scroll up a little bit.
+
+221
+00:13:46,794 --> 00:13:48,609
+That wasn't always the case.
+
+222
+00:13:48,609 --> 00:13:51,790
+We started at 0.5, so that all seems good.
+
+223
+00:13:52,970 --> 00:13:54,967
+Then we scroll down...
+
+224
+00:13:56,809 --> 00:13:58,906
+Hmmm... interesting.
+
+225
+00:13:59,038 --> 00:14:03,577
+Look at this. Something seems to be
+happening here around generation 700.
+
+226
+00:14:03,937 --> 00:14:08,997
+We somehow... very large <i>p</i> values
+and then <i>p</i> goes to 1
+
+227
+00:14:08,997 --> 00:14:13,422
+and <i>q</i> goes to 0.
+
+228
+00:14:13,682 --> 00:14:16,193
+That is interesting.
+
+229
+00:14:16,743 --> 00:14:20,733
+Well, let's reload this again 
+and see what happens.
+
+230
+00:14:21,803 --> 00:14:22,813
+Hmmm, same thing.
+
+231
+00:14:22,813 --> 00:14:27,113
+Except now, it looks like <i>p</i> went to 0
+and <i>q</i> went to 1.
+
+232
+00:14:27,263 --> 00:14:28,572
+Let's reload this again.
+
+233
+00:14:28,771 --> 00:14:32,551
+We didn't have this problem here.
+Reload it again.
+
+234
+00:14:32,685 --> 00:14:34,184
+Not here either.
+
+235
+00:14:34,821 --> 00:14:36,330
+Not here either.
+
+236
+00:14:37,070 --> 00:14:42,650
+So this seems to happen occasionally
+when I reload these simulations.
+
+237
+00:14:42,870 --> 00:14:47,149
+Not very often, 
+but occasionally it happens.
+
+238
+00:14:47,349 --> 00:14:50,012
+Here again, 1 and 0.
+
+239
+00:14:50,552 --> 00:14:54,974
+And here it seems like this occurred 
+actually quite early here.
+
+240
+00:14:54,974 --> 00:14:56,666
+Oh yeah, that's actually very early.
+
+241
+00:14:56,666 --> 00:15:00,747
+Look at this, around generation 340,
+it happened.
+
+242
+00:15:00,780 --> 00:15:02,456
+So what is this?
+
+243
+00:15:02,616 --> 00:15:06,946
+This is actually a key aspect
+of genetic drift,
+
+244
+00:15:06,946 --> 00:15:09,726
+really a kind of almost 
+the most important.
+
+245
+00:15:10,296 --> 00:15:15,496
+What happens here is essentially 
+that the <i>a1</i> allele goes to fixation.
+
+246
+00:15:15,836 --> 00:15:20,782
+Or could differently in this case,
+the <i>a2</i> allele gets lost.
+
+247
+00:15:21,252 --> 00:15:23,555
+We lose it in the population.
+
+248
+00:15:24,125 --> 00:15:26,796
+This can happen because of genetic drift.
+
+249
+00:15:26,796 --> 00:15:32,003
+Just like it can theoretically happen
+that when you flip a fair coin 10 times
+
+250
+00:15:32,003 --> 00:15:36,411
+all the coins, all sides come up
+as heads or tails.
+
+251
+00:15:37,471 --> 00:15:41,408
+And here of course, at this point,
+this one generation here
+
+252
+00:15:41,408 --> 00:15:46,429
+before it happened,
+this is not a fair coin at all.
+
+253
+00:15:46,429 --> 00:15:48,860
+This is an extremely biased coin,
+
+254
+00:15:48,860 --> 00:15:51,830
+and so it is not surprising
+that this happens.
+
+255
+00:15:52,893 --> 00:15:54,800
+But this is one of the key outcomes.
+
+256
+00:15:54,800 --> 00:16:01,675
+You can actually lose alleles
+in a population because of genetic drift,
+
+257
+00:16:01,675 --> 00:16:06,983
+and we've seen this happening here 
+a couple of times, not always.
+
+258
+00:16:07,173 --> 00:16:10,400
+And as we now investigate 
+in future lectures,
+
+259
+00:16:10,840 --> 00:16:16,767
+this process very much depends
+on the population size itself.
+
+260
+00:16:17,277 --> 00:16:21,107
+One more thing. 
+I get this ugly rounding error here,
+
+261
+00:16:21,167 --> 00:16:23,236
+so I don't like this.
+
+262
+00:16:23,236 --> 00:16:28,850
+Why don't we use our old friend
+the <i>round number function</i>
+
+263
+00:16:28,850 --> 00:16:34,667
+that we developed earlier, to get rid
+of these ugly rounding errors here.
+
+264
+00:16:34,667 --> 00:16:36,718
+So I'm going to go back to the code,
+
+265
+00:16:36,745 --> 00:16:43,090
+and I'm going to open the file
+where I defined this round number.
+
+266
+00:16:43,183 --> 00:16:50,632
+So I'm going to open this file
+which was in first example,
+
+267
+00:16:50,632 --> 00:16:52,860
+if I'm not completely mistaken.
+
+268
+00:16:52,979 --> 00:16:57,637
+Open... yup, here it is,
+our friend round number.
+
+269
+00:16:57,853 --> 00:17:00,797
+So I'm going to copy this
+
+270
+00:17:01,407 --> 00:17:08,633
+and then going to go back 
+to my other file, <i>genetic_drift</i>
+
+271
+00:17:08,633 --> 00:17:17,102
+and I'm going to just put it up here 
+for clarity, the round number.
+
+272
+00:17:17,822 --> 00:17:21,251
+Then here, as I'm outputting <i>p</i> and <i>1 - p</i>,
+
+273
+00:17:21,251 --> 00:17:23,380
+I don't want to output this straight away.
+
+274
+00:17:23,380 --> 00:17:28,397
+I needed to pass through round number--
+
+275
+00:17:28,985 --> 00:17:32,754
+<i>round_number(p)</i>.
+
+276
+00:17:33,258 --> 00:17:37,254
+Then I'm going to say, 
+<i>four digits after the decimal point.</i>
+
+277
+00:17:38,261 --> 00:17:44,160
+Same thing here. I'm just going to pass
+this <i>1 - p</i> to <i>round_number</i> first.
+
+278
+00:17:44,550 --> 00:17:49,601
+So <i>1 - p</i>, 4 digits 
+after the decimal point.
+
+279
+00:17:49,668 --> 00:17:53,908
+I'm going to save this,
+I'm going to go back to Chrome.
+
+280
+00:17:54,228 --> 00:17:57,339
+I'm going to reload this--
+looks much nicer now.
+
+281
+00:17:57,929 --> 00:18:02,618
+So we've now implemented genetic drift
+in JavaScript, which is pretty cool.
+
+282
+00:18:02,618 --> 00:18:05,169
+The next lecture actually 
+is going to be even better.
+
+283
+00:18:05,169 --> 00:18:09,398
+Because now we will start visualizing
+these results.
+
+284
+00:18:09,398 --> 00:18:14,557
+It's handy to be able to look through
+the values in a browser,
+
+285
+00:18:14,557 --> 00:18:16,907
+in the JavaScript Console in the browser.
+
+286
+00:18:16,907 --> 00:18:20,423
+But really, we'd like to visualize now
+what's going on.
+
+287
+00:18:20,423 --> 00:18:22,306
+And int the next lecture
+
+288
+00:18:22,306 --> 00:18:26,307
+we will start visualizing our results
+using JavaScript.
+
+289
+00:18:26,307 --> 00:18:27,726
+So I'll see you there.

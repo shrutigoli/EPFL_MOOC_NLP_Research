@@ -1,0 +1,171 @@
+In this video, we are going to discuss a concrete example of an out-of-core algorithm.
+That means an algorithm that is going to work with large amounts of data and where concerns about memory locality are highly relevant.
+We're going to talk about join processing.
+In general by a join of two relations, let's say R and S, we think of trying to consider all pairs of tuples from the first relation, R and the second relation, S that match a join condition.
+And those pairs, for which this join condition is true, we output.
+So, you see this in tuple quote in a couple of the slides.
+So, we loop away each tuple in R and each tuple in S, and we test the join condition.
+And if the join condition is true, in this case some particular field in tuple of R and another field in tuple of S match, then we add the result.
+Now, conceptually here for each tuple in the outer relation, we scan the the entire inner relation.
+The outer relation being the outer loop of these nested loops.
+Now, let's assume an example, where we've got, let's say,
+1,000 pages of R tuples and 500 pages of S tuples.
+And in each page, let's say we've got 100 R tuples.
+So, why this page-based abstraction?
+Well, we think of data coming from our hard drive, it's too large to make memory a priority, let's say, and this example is, of course, small and there would be enough memory but with transferring the data from main memory to RAM, the process concepts the data there we will not think in more detail about caches, etc.
+So, essentially it's the cost of transferring the data from this into random access memory.
+And we're going to see that in this case, the cost of this overall joint processing is dominated by the cost of transfers from the disk and to the disk.
+The cost of these seeks and transfers, it dominates what the CPU does, because the CPU has to do relatively easy things here.
+So, in this example, conceptually we're going to read all the data of R ones that means we're going to read
+1,000 pages.
+And we're going to read, for each tuple in R that is 100 times, because there are 100 tuples in each page times 1,000 there's 1,000 pages of R.
+For each of those tuples in R, we have to make a complete loop of S,
+S is 500 pages.
+That means for each of these loops we'll read 500 pages.
+So, overall the cost is about
+50 million IOs.
+That of course is quite huge given these small relations.
+Now, one immediate improvement you can do is to make this page-oriented.
+That means we are going to still have the same looping structure.
+We read over each tuple of R, by reading R page by page, that means we read a page from R, we loophole every tuple of R in there, and then we go to the next page of R.
+And in the inner loop we're going to, again, read S page by page and in each page read the tuples and compare them.
+We're not going to do this for each entire page of R, we're going to make a single scan of S and compare all the tuples in that page of R with the tuples in that scan of S.
+So, on a high level,
+R is still the outer relation,
+S is the inner relation, but the looping structure has changed a bit.
+That means S a scan of R over S, we're not just comparing a single R tuple to all of these S tuples, but we're comparing all of the R tuples in the page that we have not buffered in main memory to S.
+How much main memory does this need?
+Conceptually it needs space for one page of R and one page of S.
+The page for S is raised very quickly, very frequently, and only after we've done a complete scan of S you're going to read a new page of R.
+The cost of that is, of course, greatly reduced, it's going to be the cost of reading R completely once,
+1,000 pages plus 1,000 times 500 pages, the number of pages in R times the number of pages in S, which is, of course, 100 times faster than the first solution.
+Well, even with such a nested loops join, we can do better.
+And a famous technique here is the so-called block nested loops join.
+And that's a technique that's actually implemented in real relation database systems, and in some cases, actually the best technique to use.
+Beating other things that might sound more sophisticated like, let's say for example, hash joins, or sort-merge joins.
+Now, how does that block nested loop join work?
+So, the idea is as follows:
+We've got main memory at the granularity of a number of certain pages, right?
+And let's say we've got P number of pages of main memory available to process this join.
+So, we're going to partition this into a certain amount of pages for R and a certain number of pages for S.
+And then we're going in each step read as many pages, new pages, into this R buffer or S buffer, whenever something's exhausted.
+How are we going to do this?
+Let's assume R is still the outer relation.
+We're going to assign a number of pages to R, as we said, we're going to enter it or R by reading many page of R at once together.
+And then we're going to make a scan of S, by reading as many pages with results for S at once into S, compare them to all the R tuples occuring in this big, big R buffer that consists of several pages now.
+And then you're going to take the next chunk of S, put into the buffer.
+Compare to all the R tuples in that big R buffer until we've done the complete scan of S and then we take a new complete chunk of R tuples and put into the R buffer, replacing all the old R tuples.
+And then again make a complete scan of S.
+Now, how do we decide how to split the main memory buffers?
+We will assign, assuming that you want to have out buffer, one page is out-buffer, and of the remaining pages, one is the import buffer of S and all the rest, for the import buffer of R.
+The reason for this will become clear a bit later.
+So, how do we calculate the cost of this join operation in numbers of IOs?
+It means in number of pages read from this.
+Conceptually, we need to make a single complete scan of the outer relation, R.
+And for each of these big chunks of outer relation tuples.
+That means, every time we fill a block of R, and then make a complete scan of the inner relation, we have to calculate these correspondingly.
+That means the number of outer blocks times the number of pages in the inner relation, because we make a complete scan of this inner relation.
+Then for other blocks it's the number of pages of the outer relation, divided by the block size available for R.
+So, for example, if you assign 100 pages to R in main memory, and the page number of R is over 1,000 we will need 10 iterations of S.
+That means, the number of the blocks will be ten, the size of the other blocks will be 100, that multiplies up to 1,000 pages an hour.
+And for these ten times, we fill some part,
+100 pages actually into the main memory block.
+We will have to make a complete scan of the inner relation.
+That means we have to count that many pages there are in the inner relation.
+Now, that's the number of IOs.
+We have, of course, abstracted away from real costs.
+Real costs also involve CPU costs, but that might be completely dominated by hard drive costs, particular you mightn't believe this, that you actually do the CPU computations while data is being fetched from the disk, but the other big important thing you have to keep in mind is the number of seeks involved.
+The number of times you have to place or read/write it in the hard drive to a different position, just be able to again to do a sequential scan.
+So, how many sequential scans do we have there?
+Conceptually, we have about two--
+Actually we've got exactly two times the number of scans we do of the inner relation.
+That means two times the number of all the blocks.
+Why is that?
+Well, every time you have to read an outer block you have to move to the right position in R, read that piece of R into main memory and then move to the beginning of S and make a sequential scan of all of S.
+And again, we jump to the next position in R to read one big outer block, then we jump again to the beginning of S and read S entirely.
+That means, two times the number of outer blocks that's the number of seeks.
+So, we could calculate the overall cost of accessing the hard drive, which might be quite accurate as an estimation of the overall cost of the join, as the cost of the seeks plus the cost for the transfers.
+The cost of the transfers, IOs, is the cost that is given by the formula here on this slide.
+Now, how do you minimize that cost?
+You do this by assigning as many main memory pages as possible to the outer relation, all but one of those input pages.
+That way, you minimize the number of iterations you have to do over S.
+You minimize the number of outer blocks needed scanned.
+And that way you minimize the number of iterations of S.
+It's worth noting that this analysis changes if, you have to assume that S in a join edition is expensive enough that the CPU cannot always keep up with the sequential reads in that case.
+You might actually partition the data differently for example, assigning equally many memory buffers to R and S.
+One further comment also is that you would like to make the outer relation the smaller relation.
+That yet is another strategy to minimize the number of iterations used overall.
+That means R would by a smaller relation.
+Now let's look at another important join operation, in database systems, the so-called grace hash-join.
+This is actually a sophisticated technique that is more complicated than what you might assume.
+It's not simply a join operation that consists of looping our old tuples of one relation and then making a lookup in a hash index for the other relation.
+It works as follows:
+It consists conceptually of three phases.
+In the first phase, we take one of the relations, let's call it R, and scan it completely.
+And as we make the scan, we create an in-memory hash table of that relation on the join condition, or on the columns that we will join on.
+As we fill up the buffers for the packets of the hash table, we will have to write it out to disk.
+And you create as many partitions as there are buffer pages available for hash buckets in the hash structure.
+So, I'll make a complete scan of the first relation, and build a hash table on disk for that relation.
+Then I'll do the same thing independently for the second relation, using the same hash function on the join column of the other relation.
+This, of course, assumes that you actually do an equal join, that means we compare by equality of two columns of the two relations.
+It would not work, for example, for an unequal join, where we test, for example, for less than.
+For such a join condition, we would really have to resort to the block-nested loop join.
+But for an equal join, this works.
+So, we use one hash function to hash the two relations into two hash tables that we then write out to disk.
+So, we will have, let's say,
+B main memory buffers, we will assign one page for reading in the input, step by step, we will have B minus 1, all the other pages available for hash buckets.
+So, we'll have a hash function that hashes the tuples into B minus 1 buckets.
+Whenever one of these bucket pages fills up, we write it out and you produce 
+B minus 1 partitions on disk.
+So, we're reading the relations and we're writing them out again back to disk.
+That's the first two phases, so to say, it's used for both relations.
+And then we're going to start reading in again the two relations, partition by partition, it means we read in the first partition of the first relation and the second relation, then the second partition of the first relation and the second relation etc.
+And as we do this, so to say, in parallel read the corresponding partitions of the two relations we take one relation's partition, and we hash it into main memory using a different hash function.
+Of course, if you use the same hash functions, we would map that partition all to the same bucket, which is, of course, useless.
+But now we're going to use so to say, a different hash function to create a higher resolution hash table in memory.
+How do we do this?
+Well, we're going to use essentially all the available main memory for this hash table.
+Let's say, all but one page.
+And that remaining page we will then use to make a scan of the second relation's partition, the corresponding partition.
+And as we scan over the second relation for the corresponding partition, we compare the tuples we see with the hash table.
+That means we do an in-memory hash lookup to find the matching tuples.
+That way we actually pass the join condition.
+Once we have completely done this and have produced the tuples we wanted to produce, we're going to take the second partition.
+That means, for the first relation, we make a scan of the second partition, we build an in-memory hash table using B minus 1 buckets for that first relation and then we make a scan of the second partition of the second relation and compare the tuples with the corresponding hash table that has been produced for the first relation.
+And we do the same thing for the third partition and the fourth partition etc. until you've exhausted the relations.
+So that's how we do this.
+So, there are actually several phases and there's two different ways we use hashing to produce our join results.
+The analysis of the hash-join is a bit more complicated but one important thing has to be seen.
+We will use essentially B,
+B minus 1, to be exact.
+Different main memory buffers are for pages for creating a hash table.
+That means, that way we can split up the relations into B minus 1 parts, hopefully of equal size if the hash function is good.
+Let's assume that.
+And then the second phase, you're going to have to fit the smaller relations, let's assume you do this for the smaller relations.
+Partition entirely into main memory.
+That means we have to have enough main memory then you can do the hash table for that partition of the smaller relation.
+And then you scan the corresponding partition of the other relation to compare.
+But this means that the size of the smaller relation has to be upper-bounded by, essentially, B squared.
+We take the relation, we split it into about B equally-sized parts, and each of these parts has to fit down to the hash table into main memory.
+Again, into these B pages.
+Let's assume that the hash table doesn't take more space than actually, just simply the relation partition here.
+It means that the relations are bounded by B squared, or in other words, that B has to be at least the square root of the smaller relation's size.
+So, if that is not true, that means we have less main memory than that, we, in practice, cannot use the hash-join.
+There are some refinements that work different and again allows to work with larger data.
+There's all kinds of tricks and refinements, but ultimately this is not a big constraint, because given the gigabytes of RAM that we now have, squaring that is actually quite large data.
+So, if you think about the cost of this, the cost is basically in this partitioning phase two times complete scans of both relations, and in this matching phase, we are reading the partitions in, and that's again just the cost of reading both partitions in.
+That means, overall, the cost in terms of IOs, pages read and written, is just three times the size of the two relations.
+If you think about the seeks, it's more difficult to analyze, because it depends on how we write out the buckets.
+The seeks can be considerable.
+But, overall, this cost is really linear in terms of transfers.
+That's at least true if you don't have large sets of tuples that all agree on this jointly.
+Because then, of course, in the worst case, we have to produce a contracting-sized output.
+And, of course, that's not being dominated by this linearly sized upper bound on the transfers.
+In summary, we've talked about two joins.
+There's others like the sort-merge join that I don't want to talk about now, but talk about the block-nested loop join and the hash-join, they're both quite nice examples of outer-core algorithms where locality concerns come into play.
+In both cases, there is a lot to be thought about in terms of how to optimize sequential access.
+Both algorithms do a lot about this.
+You probably don't want to call the kind of buffering to caching, because in a sense they have complete control over what data is put into main memory, and it's not just opportunistically reused as you would do in caching usually.
+However, the second algorithm, the hash-join, also makes important use of partitioning strategies to kind of divide and conquer to make the problems simpler.
+You can do the hash-join, partition by partition, the final phase, completely without having to look at the other partitions.
+So, really have achieved these kind of embarrassing data parallelism that we have mentioned.

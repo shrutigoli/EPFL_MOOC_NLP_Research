@@ -1,0 +1,119 @@
+Welcome back. Nature, In Code. We're in chapter five, lecture seven.
+So we just finished the
+implementation of the spatial model. It works nicely. 
+It looks beautiful but 
+I'm going to delve a little deeper into one of the observations that we made, which is that we seem to be losing heterozygotes. We get these clusters of homozygotes, but the heterozygote counts seem to be going down.
+What is this? Where does this come from and how can we quantify this, a little better?
+So if we look at the simulation here, what we can see very quickly when we reload this is that we very quickly seem
+to be getting these white and black clusters here, and those are clusters of A1A1 and A2A2 homozygotes. 
+And in particular when we look here in the console are these absolute numbers of the heterozygotes, you can see that those go down relatively quickly for example here around 3,000.
+Now, recall that we started them at Hardy Weinberg frequencies with a one milli frequency of .5, 10,000 individuals, so are 5,000 heterozygotes in the very beginning.
+But very quickly, this number drops down to about 3,000 individuals.
+And it would keep going down until eventually all heterozygotes will be gone.
+So what is driving this?
+Well, we will make the observation here that we get these clusters in white and these are A1A1 homozygotes and here, the A2A2 homozygotes.
+And we basically observed that because we have a limited mating distance here, individuals are much more likely to mate with the same genotype that's in the vicinity
+And so, of course, it's not easy to see if A1A1 mates with A1A1, it can only ever produce A1A1.
+Same with A2A2, if A2A2 mates with A2A2, it can only ever produce A2A2. However if heterozygotes mate with each other,
+A1A2 with A1A2, you get all three possible outcomes, all three possible genotypes.
+And so that is driving the heterozygotes down and we can ask ourselves, "Okay, but we still at Hardy Weinberg Frequencies and what is exactly a good quantitative measure of this observation?" So let's find out.
+So we seem to be losing heterozygosity and we can measure this with the so called F statistics.
+Now, what is the F statistic? 
+Very generally,
+this is about expected and observed value. 
+You have some expected value.
+You have some served value and so now you divide this difference by the expected value.
+So concretely when we care about heterozygosity here, this is the expected heterozygosity minus the observed heterozygosity and then divided by the expected heterozygosity. 
+So why this formula?
+What does it stand for?
+Well, it's actually a very generic formula if you think about it, and you use this type of formula all the time unknowingly in your head, because essentially what this formula says right, is that you have some expected value, so E here, and then you have some observed value, let's say this is less. 
+So this is the observed value and as a consequence
+I'm going to draw this here in red.
+You have something that is
+missing, E-O, so the expected minus what you're actually observing.
+So this is the missing value, but now it's relatively difficult
+to make much sense of this missing value in absolute terms.
+It only makes sense if you put it in the perspective of what you expected in the first place.
+And this is what this formula captures, so let me give you an example that's completely outside of biology that's related to everyday usage, for example money.
+Let's say you expect a payment of $100, and now-- say this is the expected and now you're getting your
+ payment back but it's only $80.
+In other words, the expected minus observed value here is $20, right. 
+That's what's missing. 
+So $20 is that a lot or not a lot?
+Well, on the face of it, it is a lot but we have to put it in a context, right. I mean here, you're basically missing 20% of your payment.
+That's quite large. 
+So you know, something to be worried about.
+On the other hand let's say you would be expecting a payment
+for some reason, don't ask me why, of $100 million, okay,
+$100 million and now you're getting only "$99,999,980."
+So you get the idea.
+The quantity E minus O here is the same. The difference is you're missing $20, but now in the context of the expectation of the $100 million, that's probably not going to keep you awake at night.
+So it is simply a way to quantify what is missing, what is the difference between the expected and the observed in the context of the overall expected value.
+All right, so with this knowledge in hand, we can easily now calculate the F statistics and print it into the console.
+So currently, we're calling this print data function
+in run generation and if we look at the print data function, it's here. What it does is it simply counts all the three genotypes, basically the absolute number of the three genotypes.
+And then it output those here and also outputs the generation counter.
+So here we can add some code to calculate the F statistics because here we have all the information we need.
+We know exactly how many genotypes there are.
+All right, so first of all, we need to figure out what is the actual population size at the moment?
+So we are going to say here var N equals A1A1
+plus A1A2 plus A2A2, and of course, there would be another to do this namely, simply multiply grid lengths times grid length and this if of course also the population size but we can do it like this here. This should be exactly the same number.
+And now we can calculate the observed heterozygosity, right, because we know the number, the absolute number of A1A2 genotypes. We know the population size,
+ so we can simply say,
+Ho, so the observed heterozygosity, simply the A1A2 genotypes divide by the total number of genotypes.
+And that is now our observed heterozygosity.
+Okay, so that's the first bit that we need.
+Now, what's the second information that we need?
+Well, we need the expected heterozygosity.
+So the expected heterozygosity as you know, that's the one that we would expect on the Hardy Weinberg
+Frequencies, and that is going to be
+2PQ has we've learned much earlier.
+And we know P, we know Q.
+Q is simply 1 minus P, but how do we know P?
+Well, we know the number of
+A1A1 genotypes and we know the number of A1A2 genotypes.
+And so we can now simply calculate P by saying, and I'm going to use here a local variable.
+Okay, it's twice the number of A1A1 genotypes, because each A1A1 genotypes has two A1 alleles, okay, plus the A1A2 genotypes.
+Here, each A1A2 genotype provides one--
+I'm going to put this in parentheses, provides one A1 allele.
+So I'm just going to put all of these in parentheses just to be clear about the order even though this wouldn't be necessary.
+The inner one wouldn't be necessary.
+So these are now the absolute numbers of A1 alleles that we have in this population, right, two per A1A1 genotype and one per A1A2 genotype.
+How many alleles do we have in this population?
+Well, simply we have 2N, so 2 times N alleles.
+So this is our P and therefore our expected heterozygosity,
+HE
+ with these numbers is 2PQ.
+So 2 times P times Q, which is 1 minus P.
+All right, now, we have everything we need.
+We simply need to define here a variable that I'm going to call F or the F statistics and that is simply as we just learned the expected minus the observed divided by the expected value,
+HE.
+So now we can simply log this console, "F = " + F, then you strain the incantation here.
+All right, so let's save this, and first, what we're actually going to do, I want to make sure you know what to expect under completely random circumstances with global mating. 
+So let's put the max mating distance value here back to 50 so that we get global mating.
+All right, save and then let's go back to the browser and reload this here.
+And so here we can now see that F hovers zero.
+Sometimes it's slightly negative, sometimes it's slightly positive, but it hovers around zero and what that means is that the expected and the observed are essentially identical.
+Small of course differences due to stsarcastic effect, but the 
+F statistics is essentially zero.
+And so that's exactly what we would expect.
+The genotype frequencies are always at Hardy Weinberg Frequencies here.
+The P values may have of course changed over time
+and they eventually will, because this is still a finite population size, and so we're going to lose one of the two alleles.
+But as we do this the genotypes remain in
+Hardy Weinberg Frequencies.
+Now, let's go back to the code and set max mating distance back to one so that we get this really one severe limitation in the mating distance and therefore a lot of inbreeding.
+I'm going to save this and now we're going to reload this.
+So now, we get these islands here of homozygotes, and as we can see here very quickly this F statistics goes up about .3 or even higher eventually.
+So that means there's roughly 30% difference in the expected and in the observed value.
+And so this is now a good quantitative measure for the extent
+ to which heterozygosity is reduced.
+Here we can now see this goes very quickly to relatively high values and here we can see this visually, but we didn't quite have, you know, the quantitative means to capture this. 
+This F statistics now says here over a third of the heterozygosity is essentially missing due to inbreeding.
+All right, so this concludes this lecture and this chapter, so you implemented a spatial explicit individual based sarcastic simulation for population genetic process in java script.
+So, well done.
+One of the effects as we saw of space considerations in particular limited mating distances, which is what happens in the real world is the effect of inbreeding and its consequence, the reduction in heterozygosity.
+And heterozygosity is an important measure in an evolutionary sense, because it is a measure of genetic variation.
+So the bigger picture here is now we've learned about the three forces that can affect evolution, genetic drift, mutation and now spatial considerations. 
+I also want to mention that inbreeding is by no means the only effect of spatial considerations, but I wanted to focus here on this one because it is an important one.
+So, we have so far not spoken about the queen of the four forces, of evolution and that is natural selection, but we'll get to it right away in the next chapter. So I'll see you there.

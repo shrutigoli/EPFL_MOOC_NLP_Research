@@ -1,0 +1,1244 @@
+1
+00:00:03,166 --> 00:00:04,528
+Welcome back,
+Nature, In Code.
+
+2
+00:00:04,679 --> 00:00:06,493
+We are in Chapter 6, Lecture 8.
+
+3
+00:00:06,712 --> 00:00:10,113
+We just learned about negative 
+frequency dependent selection.
+
+4
+00:00:10,279 --> 00:00:12,797
+Which is what occurs for 
+example when host... 
+
+5
+00:00:12,968 --> 00:00:15,514
+...and parasites co-evolve 
+with each other.
+
+6
+00:00:15,742 --> 00:00:18,682
+And so in this lecture 
+we will start...
+
+7
+00:00:18,846 --> 00:00:20,704
+...implementing a host 
+parasite system...
+
+8
+00:00:20,926 --> 00:00:22,985
+in Java script, so let's get going.
+
+9
+00:00:23,158 --> 00:00:25,771
+So this is our fitness 
+model if you will.
+
+10
+00:00:26,276 --> 00:00:30,081
+Again this is called the 
+matching alleles model.
+
+11
+00:00:30,633 --> 00:00:32,117
+Matching alleles.
+
+12
+00:00:32,569 --> 00:00:33,024
+Why?
+
+13
+00:00:33,206 --> 00:00:35,742
+Because we have two alleles, A1, A2 
+
+14
+00:00:35,929 --> 00:00:38,879
+...and if the parasite matches 
+the allele of the host...
+
+15
+00:00:39,050 --> 00:00:40,628
+...then there is infection.
+
+16
+00:00:40,803 --> 00:00:41,970
+The parasite can infect.
+
+17
+00:00:42,676 --> 00:00:45,423
+This will be bad for the 
+host so the host...
+
+18
+00:00:45,640 --> 00:00:49,100
+...will have a reduction in fitness 
+so reduction...
+
+19
+00:00:49,300 --> 00:00:53,229
+...of this default value 1 of sh, 
+so that's the selection.
+
+20
+00:00:53,430 --> 00:00:56,509
+...coefficient in the host, and the parasite 
+will have the maximum fitness 1.
+
+21
+00:00:56,716 --> 00:00:58,741
+the maximum fitness 1.
+
+22
+00:00:58,970 --> 00:01:02,659
+Vise versa if there is no match, 
+there is no infection.
+
+23
+00:01:02,805 --> 00:01:05,744
+This will be great for the host so 
+the host will have a maximum... 
+
+24
+00:01:05,894 --> 00:01:08,894
+...fitness of 1 and the parasite 
+will have a reduced fitness.
+
+25
+00:01:09,810 --> 00:01:12,885
+So the fitness will be reduced 
+by this factor sp...
+
+26
+00:01:13,060 --> 00:01:16,035
+...which is the selection coefficient
+for the parasite.
+
+27
+00:01:16,206 --> 00:01:19,196
+So our job is now to implement 
+this model...
+
+28
+00:01:19,371 --> 00:01:22,346
+ ...in Java script, 
+let's go ahead and do that.
+
+29
+00:01:22,563 --> 00:01:27,052
+Alright, so here we are, text editor,
+empty file, let's start from scratch.
+
+30
+00:01:27,504 --> 00:01:30,522
+As always we will define 
+the doc type...
+
+31
+00:01:30,727 --> 00:01:36,695
+...doc type html, then i 
+set up the html tag...
+
+32
+00:01:36,882 --> 00:01:47,081
+and within the html tag we have 
+the head, and the body...
+
+33
+00:01:48,034 --> 00:01:52,926
+and once again this will be a simulation 
+with some output, visual output...
+
+34
+00:01:53,100 --> 00:01:56,821
+using the three, so I'm gonna develop my 
+code here in the script tag, directly.
+
+35
+00:01:57,076 --> 00:02:00,076
+here in the script tag, directly.
+
+36
+00:02:01,391 --> 00:02:06,278
+We will get the D3 the necessary 
+library later on .
+
+37
+00:02:07,240 --> 00:02:10,434
+And before I get started, 
+I want to save this file right away, ..
+
+38
+00:02:10,616 --> 00:02:15,308
+...so save as I'm gonna go here to codec samples, 
+you should go where ever you.
+
+39
+00:02:17,106 --> 00:02:23,288
+store your code and I'm gonna 
+save this as co-evolution.html.
+
+40
+00:02:24,054 --> 00:02:25,543
+Alright, good!
+
+41
+00:02:25,712 --> 00:02:26,741
+So let's get started.
+
+42
+00:02:27,233 --> 00:02:30,233
+Now how are we going to do this?
+
+43
+00:02:30,607 --> 00:02:33,447
+Well we'll do this as always, I'll think 
+about a few variables that I'll probably...
+
+44
+00:02:33,618 --> 00:02:36,967
+...need then I will just start with the first 
+function that I probably want to call.
+
+45
+00:02:37,125 --> 00:02:39,971
+So what kind of variables 
+do I need here?
+
+46
+00:02:40,122 --> 00:02:43,367
+Well, we are going to keep track of 
+genotype frequencies that we wanna plot...
+
+47
+00:02:44,492 --> 00:02:47,109
+so I'm gonna need this data array 
+where I'm going to store all the values...
+
+48
+00:02:47,288 --> 00:02:50,063
+store all the values,
+that will eventually be plotted.
+
+49
+00:02:51,302 --> 00:02:56,529
+Okay, I'm gonna plot genotype or 
+allele frequencies over time.
+
+50
+00:02:56,962 --> 00:03:02,546
+For how long? 
+Well let's say for 400 generations.
+
+51
+00:03:03,006 --> 00:03:06,400
+So I'm gonna define this generations variable 
+that you can change if you want to.
+
+52
+00:03:06,612 --> 00:03:07,899
+if you want to.
+
+53
+00:03:08,048 --> 00:03:12,852
+Okay, so I have four different genotypes 
+that I want to keep track of.
+
+54
+00:03:13,018 --> 00:03:17,113
+So I have two in the host, A1 and A2 and 
+I have two in the parasites.
+
+55
+00:03:17,372 --> 00:03:20,372
+two in the parasites.
+
+56
+00:03:20,547 --> 00:03:26,590
+So what I'm gonna do is I'm gonna 
+generate here or create host... 
+
+57
+00:03:26,765 --> 00:03:33,429
+frequencies array and this array 
+will have two values and that is...
+
+58
+00:03:33,617 --> 00:03:38,339
+the frequency of the A1 and 
+the frequency of the A2 genotypes.
+
+59
+00:03:38,787 --> 00:03:45,397
+So I'm gonna initialize this at  zero zero, 
+just to also show... 
+
+60
+00:03:45,572 --> 00:03:47,682
+...that there will be 
+two values in here.
+
+61
+00:03:47,858 --> 00:03:50,175
+Obviously those should 
+not be both zero, 
+
+62
+00:03:50,365 --> 00:03:53,327
+...but you know
+as an initialization it's okay.
+
+63
+00:03:53,897 --> 00:03:58,374
+Same for the parasites I'm going 
+to say here, parasite frequencies...
+
+64
+00:03:58,587 --> 00:04:01,587
+ and I'm actually going 
+to initialize those...
+
+65
+00:04:01,831 --> 00:04:04,328
+...oops, at zero and zero.
+
+66
+00:04:06,409 --> 00:04:06,831
+Good!
+
+67
+00:04:07,016 --> 00:04:10,797
+And then the only other two variable 
+I think I need are the selection coefficients.
+
+68
+00:04:10,981 --> 00:04:12,069
+ coefficients.
+
+69
+00:04:12,212 --> 00:04:16,369
+So for the host's selection coefficient 
+I'm going to set it at 0.2, 
+
+70
+00:04:16,544 --> 00:04:20,446
+...by the way of host
+parasite interactions...
+
+71
+00:04:21,558 --> 00:04:23,106
+interactions particularly
+in the context
+
+72
+00:04:23,275 --> 00:04:27,015
+...of the evolutionary dynamics, 
+this is what we would call "virulence".
+
+73
+00:04:28,066 --> 00:04:31,855
+And then I'm gonna set sp, 
+the selection coefficient of the parasite 
+
+74
+00:04:32,017 --> 00:04:36,544
+to some value i'm gonna use a higher 
+value here, we can change these later...
+
+75
+00:04:36,707 --> 00:04:38,107
+we can change these later
+
+76
+00:04:38,271 --> 00:04:42,887
+...but I'm generally thinking that, 
+when a parasite infects a host that's usually bad...
+
+77
+00:04:44,250 --> 00:04:46,161
+...for a host but it is not usually the end of a host, 
+I mean not always, it can be...
+
+78
+00:04:48,531 --> 00:04:49,083
+of a host, i mean not always,
+it can be, but not always.
+
+79
+00:04:49,660 --> 00:04:54,874
+Whereas for parasites in fact if they 
+cannot infect a host that's usually...
+
+80
+00:04:55,160 --> 00:04:58,508
+very bad to the extent that is could 
+actually be a fitness cost of 1.
+
+81
+00:04:58,802 --> 00:05:01,972
+But we are now just going to set 
+it to 0.5, just want to make sure... 
+
+82
+00:05:02,185 --> 00:05:07,621
+it's a really high fitness cost here of 
+not being able to infect a host. 
+
+83
+00:05:08,486 --> 00:05:09,006
+Good!
+
+84
+00:05:09,604 --> 00:05:14,868
+So what will be the first, 
+the first function that I would want to call?
+
+85
+00:05:15,120 --> 00:05:18,607
+Well I would probably want to 
+initialize these frequencies here.
+
+86
+00:05:18,760 --> 00:05:27,791
+So I'm gonna call a function, 
+initialize, initialize frequencies.
+
+87
+00:05:29,498 --> 00:05:31,509
+Frequencies, okay.
+
+88
+00:05:32,573 --> 00:05:36,745
+For this function, I haven't defined yet 
+so I'm gonna go ahead and do this.
+
+89
+00:05:37,500 --> 00:05:40,658
+So function, 
+initialize frequencies.
+
+90
+00:05:41,771 --> 00:05:42,792
+What should this do?
+
+91
+00:05:42,988 --> 00:05:45,996
+It should obviously initialize the 
+frequencies of the host and the parasite.
+
+92
+00:05:46,216 --> 00:05:48,403
+and the parasite.
+
+93
+00:05:48,587 --> 00:05:53,458
+Alright, so let's just 
+initialize these at random values.
+
+94
+00:05:54,763 --> 00:05:58,980
+So, for example, I could pick a random 
+value for the A1 host frequency...
+
+95
+00:05:59,180 --> 00:06:04,692
+so you know for example 
+var A1 host frequency.
+
+96
+00:06:04,968 --> 00:06:08,746
+I could set this to a random number 
+between 0 and 1 and of course...
+
+97
+00:06:09,025 --> 00:06:13,093
+...our good old friend math random 
+is perfectly suited for this.
+
+98
+00:06:14,172 --> 00:06:14,881
+Good!
+
+99
+00:06:15,073 --> 00:06:18,526
+So now I have the A1 
+host frequency.
+
+100
+00:06:19,254 --> 00:06:22,809
+So this is the frequency that I 
+would like to have stored here...
+
+101
+00:06:23,020 --> 00:06:25,362
+ in this first position
+in this array.
+
+102
+00:06:25,562 --> 00:06:28,562
+The second element is 
+for the A1 host frequency.
+
+103
+00:06:29,652 --> 00:06:34,194
+Alright, so that means, 
+host frequencies...
+
+104
+00:06:34,369 --> 00:06:37,850
+ I'm just going to copy these...
+to avoid spelling mistakes.
+
+105
+00:06:38,231 --> 00:06:41,822
+The first element which 
+as of course index 0...
+
+106
+00:06:42,035 --> 00:06:47,329
+...is exactly now this value, okay.
+
+107
+00:06:50,432 --> 00:06:54,723
+So that's great but again keep in mind 
+that these two arrays here just only keep...
+
+108
+00:06:54,882 --> 00:06:59,214
+track of the current frequencies 
+of the current four genotypes.
+
+109
+00:06:59,373 --> 00:07:00,848
+four genotypes.
+
+110
+00:07:00,993 --> 00:07:04,463
+That's why they have only 4 elements, 
+two here and two here...
+
+111
+00:07:04,663 --> 00:07:08,973
+...but of course I wanna keep track 
+also over all these values over time...
+
+112
+00:07:09,170 --> 00:07:11,432
+...in particular here 
+over 400 generations.
+
+113
+00:07:11,885 --> 00:07:15,158
+So I have to push these 
+values into the data array.
+
+114
+00:07:16,002 --> 00:07:19,773
+So what I would like to have here 
+eventually, I'd like to have...
+
+115
+00:07:19,948 --> 00:07:22,433
+four arrays in this data array.
+
+116
+00:07:22,775 --> 00:07:26,354
+Each of these four arrays keeping track 
+of the corresponding four genotypes.
+
+117
+00:07:26,537 --> 00:07:27,799
+four genotypes.
+
+118
+00:07:27,981 --> 00:07:31,334
+So that I'm getting four lines 
+when I'm going to plot this.
+
+119
+00:07:31,903 --> 00:07:36,115
+So what that means is I need to 
+push something here into data...
+
+120
+00:07:36,290 --> 00:07:39,207
+...so data push, okay.
+
+121
+00:07:39,688 --> 00:07:41,150
+What would I like to push?
+
+122
+00:07:41,616 --> 00:07:44,317
+Well, it should be an array right,  
+should be an array...
+
+123
+00:07:44,492 --> 00:07:47,854
+...and then I could add this value to 
+this array and then it consequently...
+
+124
+00:07:48,016 --> 00:07:52,877
+...and then I could add this value to 
+this array and then it consequently...
+
+125
+00:07:53,126 --> 00:07:57,594
+...be filling up this array and I 
+would do this now for the A2 host...
+
+126
+00:07:57,794 --> 00:08:01,017
+..for the A1 parasite and 
+for the A2 parasite as well.
+
+127
+00:08:01,329 --> 00:08:04,194
+But rather than pushing an 
+empty array then adding a value.
+
+128
+00:08:04,395 --> 00:08:08,164
+As you know you can also 
+initialize arrays with a value in there.
+
+129
+00:08:08,538 --> 00:08:14,038
+So I'm just gonna say, okay, I'm gonna 
+put this A1 host frequency value...
+
+130
+00:08:14,251 --> 00:08:18,386
+...in there as the first value of this array, 
+so I don't have to push an...
+
+131
+00:08:18,553 --> 00:08:22,961
+...empty array I can already put 
+in the first element of this array.
+
+132
+00:08:23,135 --> 00:08:25,424
+Alright, so I hope you 
+understand how this works.
+
+133
+00:08:25,600 --> 00:08:28,779
+We're getting here a random value for 
+the A1 host frequency and then we are... 
+
+134
+00:08:28,943 --> 00:08:32,184
+...going to store this in the array that 
+keeps track of the frequencies at each... 
+
+135
+00:08:32,358 --> 00:08:36,650
+...moment and ultimately we 
+store this in this data array here...
+
+136
+00:08:36,826 --> 00:08:41,313
+that keeps track 
+of all the data over the p...
+
+137
+00:08:41,483 --> 00:08:44,160
+ entire simulation,
+so we can plot it later.
+
+138
+00:08:45,009 --> 00:08:50,214
+Now that I actually look at this, 
+it does look a bit verbose.
+
+139
+00:08:50,407 --> 00:08:53,431
+But I wanted to be sure I did 
+this the verbose way first, 
+
+140
+00:08:53,593 --> 00:08:55,419
+...so that you understand 
+what's going on...
+
+141
+00:08:55,581 --> 00:08:58,519
+but you can see here that 
+we are actually utilizing...
+
+142
+00:08:58,707 --> 00:09:03,865
+some kind of variable here  
+that is not really necessary...
+
+143
+00:09:04,058 --> 00:09:08,382
+...and so I'm gonna
+change this slightly here.
+
+144
+00:09:08,824 --> 00:09:13,307
+I'm basically going to get 
+rid of this A1 host frequency... 
+
+145
+00:09:13,494 --> 00:09:15,566
+variable here, local variable.
+
+146
+00:09:15,735 --> 00:09:18,504
+It really seems quite unnecessary, 
+I'm simply going to say...
+
+147
+00:09:18,654 --> 00:09:22,240
+host frequency 0
+equals math random.
+
+148
+00:09:23,980 --> 00:09:27,752
+So I'm just going to replace this 
+directly with math random.
+
+149
+00:09:28,909 --> 00:09:33,612
+Okay, math random, so I 
+don't need this line anymore...
+
+150
+00:09:33,849 --> 00:09:39,284
+and now here, I don't have this 
+variable A1 host frequency anymore..
+
+151
+00:09:39,448 --> 00:09:43,569
+but we know it's stored 
+in this array here.
+
+152
+00:09:43,742 --> 00:09:48,375
+So I'm simply going to replace 
+the A1 host frequency variable...
+
+153
+00:09:48,600 --> 00:09:52,366
+ which I don't have anymore, 
+with this host frequency 0.
+
+154
+00:09:52,892 --> 00:09:57,546
+Okay now that's now shorter, 
+it is actually quite dense and it may...
+
+155
+00:09:57,746 --> 00:10:01,632
+ be confusing if I, if I hadn't 
+done this first step of using this...
+
+156
+00:10:01,773 --> 00:10:05,915
+intermediary variable, but now that I have
+used it first then removed it...
+
+157
+00:10:06,090 --> 00:10:09,872
+I hope it's very clear now to 
+you how this exactly works.
+
+158
+00:10:10,315 --> 00:10:13,658
+And so this is for the A1 host so now I can do.
+
+159
+00:10:13,871 --> 00:10:17,352
+ the exact same thing 
+for the A2 host frequency...
+
+160
+00:10:17,525 --> 00:10:24,663
+So, host frequencies, frequencies 1, 
+so that's now the second value here right.
+
+161
+00:10:24,840 --> 00:10:26,140
+Here, right?
+
+162
+00:10:26,322 --> 00:10:29,403
+The element with index 1, this is were I 
+keep track of the A2 host genotype.
+
+163
+00:10:29,625 --> 00:10:31,766
+host genotype.
+What is this?
+
+164
+00:10:31,943 --> 00:10:36,846
+Well is simply 1- host frequency 0 because 
+the two need to add up to one.
+
+165
+00:10:37,014 --> 00:10:38,426
+add up to one.
+
+166
+00:10:38,598 --> 00:10:43,621
+So they are now both random values 
+the first one directly through...
+
+167
+00:10:43,808 --> 00:10:47,965
+...math random, and the other one 
+simply one minus that value.
+
+168
+00:10:49,363 --> 00:10:54,135
+Good, and now I need to push 
+this also into this data array...
+
+169
+00:10:54,310 --> 00:10:56,798
+...and I'm going to use 
+the exact same line except...
+
+170
+00:10:56,985 --> 00:10:59,985
+ I'm now referencing host 
+frequencies element with...
+
+171
+00:11:00,276 --> 00:11:01,701
+index 1.
+
+172
+00:11:02,127 --> 00:11:06,243
+So that's for the two initial 
+host frequencies all set up.
+
+173
+00:11:06,503 --> 00:11:11,558
+Now we can essentially just copy
+these lines here and paste them...
+
+174
+00:11:11,733 --> 00:11:16,582
+and now replace the host 
+here with parasite, okay.
+
+175
+00:11:16,773 --> 00:11:20,880
+So this is parasite frequencies, 
+0=math random...
+
+176
+00:11:21,055 --> 00:11:25,934
+so the A1 frequency of the parasite
+is a random number. 
+
+177
+00:11:26,148 --> 00:11:31,112
+Then we are gonna push,
+data push, parasite frequency 0.
+
+178
+00:11:31,308 --> 00:11:34,036
+So we are gonna push this
+value here into an array
+
+179
+00:11:34,204 --> 00:11:36,304
+and then the array into data.
+
+180
+00:11:36,460 --> 00:11:40,529
+So the exact same logic is
+above and then here same thing.
+
+181
+00:11:41,041 --> 00:11:45,652
+Parasite frequency is 1, so this
+is the A2 parasite genotype is
+
+182
+00:11:45,827 --> 00:11:49,090
+1 minus parasite
+frequency zero.
+
+183
+00:11:49,277 --> 00:11:52,351
+So these need to add up to 1 as well
+of course and then we are gonna
+
+184
+00:11:52,601 --> 00:11:57,031
+push into data this array which
+already has the parasite
+
+185
+00:11:57,200 --> 00:12:01,850
+frequencies 1 and that's of course
+again the A2 parasite genotype.
+
+186
+00:12:02,192 --> 00:12:10,994
+So this is now how we set up
+the frequencies in our array.
+
+187
+00:12:12,970 --> 00:12:13,446
+Good!
+
+188
+00:12:13,709 --> 00:12:18,930
+So this is the initialization, 
+I think this works great.
+
+189
+00:12:19,525 --> 00:12:22,878
+No what do we need to
+do after we initialize this?
+
+190
+00:12:23,393 --> 00:12:26,577
+Well we wanna run this
+simulation for a couple 
+
+191
+00:12:26,752 --> 00:12:30,202
+of generations so, we are gonna
+use here the for loop and this is
+
+192
+00:12:30,352 --> 00:12:32,864
+now totally old news for you.
+
+193
+00:12:33,022 --> 00:12:38,976
+So var i=0, i smaller than
+generations and of course
+
+194
+00:12:39,139 --> 00:12:47,192
+ the increment, alright.
+And now we are going to say
+
+195
+00:12:48,062 --> 00:12:52,013
+we would like to do a couple
+of things in each generation.
+
+196
+00:12:52,192 --> 00:12:54,104
+What is it that we want to do?
+
+197
+00:12:54,494 --> 00:12:56,624
+Well we wanna have
+two processes really.
+
+198
+00:12:56,802 --> 00:13:01,624
+On the one hand, selection
+needs to act on the host, depending 
+
+199
+00:13:01,849 --> 00:13:06,890
+on the fitness values that we
+defined and of course importantly
+
+200
+00:13:07,327 --> 00:13:08,925
+on the genotype frequencies.
+
+201
+00:13:09,820 --> 00:13:12,363
+Then we also want to do
+the same with the parasites.
+
+202
+00:13:12,538 --> 00:13:16,201
+We want selection to act
+on the parasite genotypes 
+
+203
+00:13:16,388 --> 00:13:18,299
+and again the fitness
+there will 
+
+204
+00:13:18,499 --> 00:13:21,499
+depend crucially
+on the genotype frequencies.
+
+205
+00:13:21,710 --> 00:13:24,909
+But so these are two things we will
+have to do and we will just call 
+
+206
+00:13:25,184 --> 00:13:29,978
+two functions host selection
+and parasite selection.
+
+207
+00:13:30,726 --> 00:13:33,734
+So these will happen in each
+generation  for the four genotype
+
+208
+00:13:33,922 --> 00:13:36,922
+and this is where we calculate
+the new frequencies
+
+209
+00:13:37,118 --> 00:13:40,043
+for the four possible genotypes.
+
+210
+00:13:40,280 --> 00:13:42,691
+So then once we have done this,
+we do this in the next
+
+211
+00:13:42,842 --> 00:13:43,904
+lecture to implement
+
+212
+00:13:44,092 --> 00:13:47,067
+those two methods, but
+once we have done that
+
+213
+00:13:47,450 --> 00:13:52,759
+ then we basically wanna push
+these values into our data array
+
+214
+00:13:52,947 --> 00:13:58,954
+So, recall that the data array
+itself now has four arrays
+
+215
+00:13:59,129 --> 00:14:02,672
+and these arrays
+keep track of the A1
+
+216
+00:14:02,921 --> 00:14:08,743
+host genotype, the A2 host
+genotype, the A1 parasite genotype
+
+217
+00:14:08,918 --> 00:14:11,842
+and the A2 parasite
+genotype in that order.
+
+218
+00:14:12,016 --> 00:14:14,601
+So what we are going to do
+is we are going to say alright
+
+219
+00:14:14,764 --> 00:14:18,519
+data, the first array,
+so the one with index zero.
+
+220
+00:14:18,975 --> 00:14:24,577
+This is the that holds the values
+for the A1 host genotype.
+
+221
+00:14:24,750 --> 00:14:30,559
+So we are gonna push into this
+array whatever we currently have
+
+222
+00:14:30,759 --> 00:14:35,303
+in fact, here in this host
+frequencies array at
+
+223
+00:14:35,455 --> 00:14:38,470
+the first element, because
+that is exactly, oops sorry,
+
+224
+00:14:38,645 --> 00:14:42,698
+that was copied in
+the wrong parentheses.
+
+225
+00:14:43,062 --> 00:14:48,296
+Exactly what we have here in host
+frequency zero which is where we
+
+226
+00:14:48,496 --> 00:14:51,555
+currently store the A1
+host genotype.
+
+227
+00:14:52,042 --> 00:14:56,839
+So this we're gonna to push into the
+first of the four arrays in data.
+
+228
+00:14:58,576 --> 00:15:02,117
+So the second array
+in data, so data 1.
+
+229
+00:15:02,841 --> 00:15:04,446
+What are we going to push in there?
+
+230
+00:15:04,626 --> 00:15:09,689
+Well correspondingly we are
+going to push host frequencies 1
+
+231
+00:15:09,876 --> 00:15:13,734
+cause that's were we store
+the A2 host genotype.
+
+232
+00:15:15,224 --> 00:15:19,278
+And so on, so data 2, so
+the third array within data.
+
+233
+00:15:20,019 --> 00:15:21,184
+What do we push there?
+
+234
+00:15:22,057 --> 00:15:25,750
+Well we want to push
+the parasite frequencies 
+
+235
+00:15:25,954 --> 00:15:29,824
+and particularly the element 0
+
+236
+00:15:29,999 --> 00:15:33,724
+which contains the A1
+parasite genotype frequency.
+
+237
+00:15:34,145 --> 00:15:36,754
+And then finally last but not least,
+I'm gonna copy
+
+238
+00:15:36,910 --> 00:15:38,710
+but then you get the idea.
+
+239
+00:15:38,900 --> 00:15:44,508
+In data 3, we are going to push the
+parasite frequencies element
+
+240
+00:15:44,686 --> 00:15:48,929
+with index 1, so that's the A2
+parasite genotypes.
+
+241
+00:15:49,116 --> 00:15:52,147
+So after we have executed these
+two functions, which we have
+
+242
+00:15:52,334 --> 00:15:53,796
+yet to define.
+
+243
+00:15:53,960 --> 00:15:57,033
+We would have updated the host
+and parasite frequencies
+
+244
+00:15:57,242 --> 00:16:00,537
+and we need to make sure we push
+those into the corresponding
+
+245
+00:16:00,696 --> 00:16:05,094
+data arrays, so that after we have
+all the generations we have all
+
+246
+00:16:05,294 --> 00:16:10,231
+the necessary data, in the data
+array and we can easily plot this.
+
+247
+00:16:10,531 --> 00:16:14,019
+And we would of course plot
+this using our good old friend
+
+248
+00:16:14,182 --> 00:16:17,757
+the draw line chart function which
+we have used many, many times before
+
+249
+00:16:17,927 --> 00:16:22,037
+starting in chapter 3,
+so draw line chart
+
+250
+00:16:22,287 --> 00:16:29,093
+and here what we're gonna do
+is pass in data as always.
+
+251
+00:16:30,006 --> 00:16:33,511
+On the X-axis we are going to say
+generation because we are simply
+
+252
+00:16:33,699 --> 00:16:35,774
+plotting the generations
+on the X-axis.
+
+253
+00:16:36,043 --> 00:16:41,478
+The Y-axis we are gonna simply say p
+because these are the frequencies
+
+254
+00:16:41,666 --> 00:16:45,720
+and we don't need a legend, so I'm
+gonna pass in here an empty array.
+
+255
+00:16:46,174 --> 00:16:51,082
+Alright so now what remains to be
+done is to implement these two
+
+256
+00:16:51,248 --> 00:16:54,960
+functions and also get the draw
+line chart in the D3 library.
+
+257
+00:16:51,826 --> 00:16:54,751
+...and also get the draw line chart 
+in the D3 library.
+
+258
+00:16:55,140 --> 00:16:58,140
+So let's do that in the next
+lecture, I'll see you there.
+

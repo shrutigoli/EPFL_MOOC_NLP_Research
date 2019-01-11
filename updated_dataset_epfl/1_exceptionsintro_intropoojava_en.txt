@@ -1,0 +1,134 @@
+The exception handling is an important chapter for basic programming.
+It renders our programs sturdier and more resistant towards abnormal or error situations.
+Exception handling is not per se a concept of object-oriented programming. However, its implementation resorts to the use of these concepts.
+The goal of this episode is to present the fundamental aspects of exception handling in Java.
+In this chapter, we will discuss how to handle errors or abnormal situations in a program.
+We will see that exception handling let us anticipate the errors and abnormal situations.
+Thus, we will be able to react appropriately.
+Let us begin by illustrating the usefulness of exception handling through a simple example.
+We wish to code a function "f" which calculates the inverse of a given number.
+We wish for this function to handle the case where the entered value is 0 as an abnormal situation, an error situation.
+We also wonder how to handle the error itself.
+Here is our first attempt :
+We can have it so that, in case the entered value is 0, we return a value chosen in advance.
+To mimic the fact that this result would be close to infinity, we could decide
+-- in an arbitrary way -- to return the biggest "double" possible.
+In Java, there are other predefined values to mimic the infinity (such as "infinity").
+However, this is not our point here.
+Unfortunately, this way to proceed is not satisdactory at all.
+Firstly, this does not let the user know that his input has resulted in an abnormal situation for the function "f" since "x" is 0.
+Here, the user is never warned of this fact.
+Also, the returned result is necessarily inexact.
+The use of this "f" resorts to an arbitrary convention which is not necessarily known by other programmers.
+Here, the choice of the return value is such a convention.
+To overcome this lack of information that the user of the function "f" is facing when we are divide by 0, we could imagine to have our function "f" print an error message whenever the entered value is 0.
+We would have our function print that there is an error situation : a division by 0.
+However, this does not solve all the problems of the previous version. Indeed, we still have no idea what we should return in an error situation.
+This solution can also face criticism since it triggers so-called
+"edge effects".
+This means that the function "f", which is only supposed to return the inverse of a number is now generating printings in the terminal; this is not its usual task!
+Indeed, let us imagine we are using
+"f"  within a graphical program.
+In this case, we do not want for an abnormal situation to be reported by a message on the terminal but rather by the opening of an alert window, for example.
+Finally, even though the function "f" is the juncture of the program where the error is detected, it might not be the place to handle this situation properly.
+Indeed, a division by 0 could be harmful enough to require the program to be stopped.
+Also, it is possible for a division by 0 to be handled according to the context of utilization.
+This means that it is the juncture of the program calling the function "f", informed of the context, that could give the appropriate measures in case there is a division by 0.
+A last option would be to rewrite the function "f" so that it rather returns an error code indicating if the division has been computed correctly.
+Then, it will return the result of the division only in a normal situation, when there is no error with the parameter.
+This way to proceed is better than the previous ones.
+Indeed, this way, the function calling "f" is able to decide what to do in case of error.
+The function "f" itself should not be the one taking this decision; it should simply inform its caller upon the execution.
+Then, the caller will decide what to do in case of error.
+Unfortunately, this way to proceed renders the use of the function much less intuitive.
+Instead of writing something simple which would mean let us store into "y" the result of the inversion of "x" computed by the method "f", we should resort to more complex instructions.
+First, we should know that "f" returns an error code and that the normal utilization result is stored in the second parameter.
+This is clearly less intuitive than this way of writing things.
+Moreover, when a method calls another which then calls another and so on, each call could potentially result in an error code.
+In this case, we must then handle the combinations of all these error codes. Obviously, this quickly becomes unpleasant.
+Now, we wish to get our hands on a mechanism which would let us report an error situation without triggering any of these undesired edge effects.
+We also wish to possess a mechanism letting us handle the error at another place than the one where it is detected.
+This should all be done while keeping utilization flexibility, an intuitive intuition of the different functionalities we wish to have in our programs.
+Execption handling meets all our needs.
+At the place where the error is detected, we will be able to trigger an "exception".
+This "exception" can then be handled at another place in the program.
+Also, we are not compelled to explicitly integrate any error code in the different functionalities we wish to implement.
+The mechanism of exception handling works according to the three points developped here.
+Whenever an error or abnormal situation is detected somewhere in the program, we will warn the rest of the program by "throwing an object" containing all the useful informations so that we can potentially handle this error or abormal situation elsewhere in the program.
+"Throwing" or "triggering an exception" concretely means creating an object which becomes available for the rest of the program.
+This object can then be "caught", which means "used", elsewhere in program so that we can handle this abnormal situation, completely or partialy.
+Finally, if the "thrown object" is never "caught", it will trigger the stop of the program.
+An unhandled thrown exception always triggers the stopping of the program.
+Let us illustrate this with a concrete example.
+Let us imagine, for example, that we have a main program working with temperatures.
+These temperatures are aquired through, for example, a meter.
+These temperatures are then stored in an array. Our program's task is to draw a graphic of the inverse of all the aquired temperatures.
+Let us imagine these temperatures are aquired through a not fully reliable meter.
+Therefore, every once in a while, it could fail to measure the temperature correctly and would, for instance, add null values into our temperature array.
+The main program realizes its processing by calling another function called "graphiqueInverse"
+(TN: means "invertPlot").
+This function will iterate on all the temperatures of a provided array and display the graph of their inverse.
+This method thus resorts to another method which calculates the inverse of a double.
+The method "inverse" is absolutely not aware of its utilization context.
+It does know not what to do if the provided value is zero.
+It corresponds to this value in the array.
+However, the main program knows in what context this method is called and is therefore able to solve the problem.
+For example, it could decide that if the display of the temperatures has failed, which means that the aquired temperatures were corrputed, then we must recover them anew.
+The idea motivating exception handling is that the part of the program detecting an abnormal situation, while remaining unable to treat it locally, will report it to the rest of the program by "throwing an exception".
+The "exception" is a particular object provided to the rest of the program.
+If this thrown object is not caught anywhere else in the program, its execution will be canceled : we could not handle the error.
+Obviously we can also have another part of the program, aware of the error's context,
+"catch" this object and dealing with it appropriately.
+The main program will have to show that it is receptive to the "thrown" objects, and that it can receive with them.
+In this case, it will be able to "catch" the object and deal with it if, of course, the object has been thrown during the execution of the receptive block.
+In order to develop such a process, we need to realize four elementary tasks.
+The first is the signalment of an error.
+This is what our "inverse" method was doing when it was "throwing" an object to warn the rest of the program of this abnormal situation.
+The error signalement was thus what was going on at this step of our example.
+The second task is to mark the areas receptive to the errors.
+This is what our main program was doing here to indicate it is able to "catch" and deal with such an object corresponding to an abnormal sitatuion.
+To each area receptive to errors, abnormal situations, we need to provide a tool to actually deal with these errors.
+This means "catching" the object and dealing with it.
+In our example, each receptive block has been provided with a set of instructions able to deal with the object, catching it.
+Finally, in certain cases, it can be necessary to do some cleaning after a block receptive to errors.
+For example, we could need to liberate some resources which have been used but not properly liberated due to an abnormal situation.
+To each of these four tasks, there is a coresponding Java keyword.
+In order to to report the error, we use the keyword "throw".
+In order to make the areas receptive to erros, we use "try".
+In order to provide the block receptive to errors wich a handling bock, we use the keyword "catch".
+And finally, in order to make some room, we use the keyword "finally".
+The detailed description on the use of these keywords will be presented in the next episode.
+To make things clear, the program area detecting the error will "throw" the object thanks to the reserved keyword "throw".
+Later, we will see what is "thrown" exactly.
+The area receptive to the throw objects is delimited with the reserved keyword "try".
+This means each block receptive to errors is indicated with this keyword.
+Then, to each of these blocks, we must associate a block able to deal with the error.
+The error will be caught with the keyword "catch".
+As said, we will see the precise syntax in the following episodes.
+As you have probably noticed through our little example, the reporting of the errors thanks to the keyword "throw" and the solving of these mistakes through the blocks "try" and "catch" generally happen at distinct areas in the code.
+Actually, this is precisely the appeal of exception handling.
+In our example, the "throw" is placed in the "inverse" method.
+The blocks "try" and "catch" are placed in the main program.
+In the next episodes, we will see that to each "try", a "catch" must be associated or possibly even several "catch" blocks.
+To sum up, an exception is thus a way to report an event requiring particular attention in the program
+This event can be a severe mistake requiring for the whole program to be stopped or simply an unusual situation which we will solve appropriately.
+This was the case in our previous example.
+There, a division by zero corresponded to an unusual situation.
+Here, it does not correspond to a dramatic situation and can be solved, for example, by retaking the measures without having to shut down the program.
+Exception handling will be a tool letting us improve the sturdiness of our programs and will make it possible to separate the code dedicated to error handling from the code realizing the other processing happening in a normal situation.
+Exception handling will also let us force an answer to particular errors.
+For example, here, with an unusual situation we need to solve appropriately.
+Unlike the solution presented at the beginning of this sequence, where we were dealing the abornoam situations so that the methods of functions return error codes, exception handling provides quite a few advantages.
+Among the most important is that the writing will be easier, more intuitive, more readable.
+For example, our method calculating the inverse can still be used in a very natural way.
+Thus, it is not necessary to pollute the code by adding other parameters solely dedicated to error handling.
+The propagation of the exception to higher call levels will be done automatically.
+It is thus not necessary for every intermediate call level to deal with the error.
+For example, if the exception thrown by the "inverse" method is not caught by the calling method, named "graphiqueInverse", the object will be automatically thorwn to the upper call level which will then be able to deal with it like the main program.
+An error can now occur at any call level while still being carried over to the rest of the program.
+As we have just seen, exception handling presents many an advantage in order to solve error situations, abnormal situations in our program.
+However, the underlying mechanisms do come with a certain cost.
+Thus arises a methodological rule which will be discussed in the following episodes.
+The rule is this the following:
+If an error can be dealt with locally
+(this means that, at a certain place, we are fully informed on how to solve the error), then we should immediately do it locally without using the mechanism of exceptions.

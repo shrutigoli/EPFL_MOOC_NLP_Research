@@ -1,0 +1,63 @@
+Let's study the decomposition LLáµ€ with the example of a tridiagonal matrix.
+So the matrix A is the tridiagonal matrix with 2's on the main diagonal,
+-1 on the diagonal subdiagonal and -1 on the diagonal superdiagonal.
+We will first show that this matrix A is symmetric and positive definite, we know that ithere is a decomposition LLáµ€, where L is a lower triangular matrix, and consequently Láµ€ is an upper matrix, moreover, the coefficients on the diagonal of L are stricly positive.
+I will note those entries L1, L2, until LN and so for Láµ€ I will also have
+L1, L2, ..., LN.
+The matrix L is lower triangular, so there are 0's in the upper triangular part, and so here 0's on the lower triangular part of Láµ€.
+Actually, the lower part of L reduces to a subdiagonal.
+The subdiagonal of L has coefficients m1, m2, until m(N-1) and so Láµ€ is reduced to a superdiagonal m1, m2, until m(N-1).
+Here is L(N-1).
+First of all, let's show that this matrix A is indeed symmetric positive definite.
+We take any x in â„�á´º and compute xáµ€Ax,
+So xáµ€ is the vector with entries x1, x2, until xN, laying down.
+We have the matrix A, with 2 on the diagonal, 
+-1 on the subdiagonal, 
+-1 on the superdiagonal, and the vector x, x1, x2, ..., xN.
+If I do the computation of xáµ€Ax
+I obtain
+2*x1Â² plus
+2*x2Â² donc il y a <i>2x1Â²</i>, then, here I have -x1*x2, donc j'ai <i>- x1 x2</i>, et en fait, j'ai
+-2*x1*x2+2*x2Â²,
+-2*x2*x3, 
++2*x3Â², until the end, where there is -2*x(N-1)*xN, and the last term will be 2xNÂ².
+I'd like to show that xáµ€Ax is nonnegative, so a possibility is to make squares appear,
+2x1Â² is x1Â²+x1Â²,
+We have the double product -2*x1*x2, and I have x2Â², so I can keep this term, 
+I observe a square, then I'll have x2Â²-2*x2*x3+x3Â², and so on until the last term which will be here x(N-1)Â²+2*x(N-1)xN+xNÂ², and again xNÂ².
+So observe now that squares appear, x1Â²+(x1-x2)Â²
++(x2-x3)Â² + ... etc...
+(x(N-1)-xN)Â²+xNÂ².
+So xáµ€Ax is indeed a sum of squares, so this term is nonnegative.
+Moreover, xáµ€Ax =0 if and only if all those terms are 0, since they are squares.
+So I'll have x1=0, if x1=0 I'll get x2=0, and so on until I get xN=0.
+Obviously this matrix is symmetric, so I've shown that this matrix A is sdp.
+Let's move to the Cholesky decomposition algorithm.
+I told you that we have to identify
+the coefficients of A and LLáµ€ in the right order, so I will start with the first column.
+The entries of the first column of A will give me the coefficients of the first column of L, indeed the coefficient 2 here is the entry 1,1 of the matrix A,
+I must do the inner produt between the first line and the first column, so I get 2=L1Â², so L1=âˆš2.
+I continue, I get the coefficients of the second line and first column, 
+-1 equals the second line times the first column, m1*L1.
+I get m1=-1/L1.
+And so on
+I identify the coefficiens here of the second column of A, with the coefficients of the second column of the product LLáµ€, and I'll get the coefficients of the second column of L.
+I continue, 
+I have 2, the entry 2,2 of the matrix A which equals the inner product of this line with this column, which is m1Â²+L2Â²,
+I get L2 = âˆš(2 - m1Â²), and so on.
+Now I can write the LLáµ€ decomposition algorithm.
+Â« Algorithm Â»
+This algorithm uses the vector L, the vector of entries 
+L1, L2, ..., LN, the vector m, which is the vector with entries m1, m2 until m(N-1). et le vecteur <i><b>u</b></i>, qui est -- et c'est tout <i>(<b>u</b> barrÃ©)</i>.
+So I initialize the algorithm, the initialization is 
+L1=âˆš2, and then I do a loop for i from 1 to N-1,
+From L1, I will compute m1, from Li I will compute mi, which equals -1/Li.
+Then I am able to compute l(i+1) which equals âˆš(2 - mi)Â².
+That is our algorithm, as previously, we can check several things.
+The first one is: is there is division by 0 or a negative square root?
+- the square root of a negative number.
+The answer is no.
+Why? Since the matrix is sdp, it is regular, and what I did not mention is, that if this this matrix is symmetric positive definite, then all the principal submatrix are also regular.
+Finally if you get the square root of a negative number, then by contraposition, then the matrix A isn't symmetric positive definite.
+So there are no divisions by 0 and no square root of negative numbers.
+The number of operations is still O(N), which means it's doubled each time we double N, simply because there is only one loop from 1 to N.

@@ -1,0 +1,935 @@
+1
+00:00:31,611 --> 00:00:33,249
+Bonjour et bienvenue dans cette leçon
+
+2
+00:00:33,434 --> 00:00:36,612
+consacrée à l’interaction
+entre couches de données géoréférencées.
+
+3
+00:00:37,194 --> 00:00:38,640
+Cette interaction entre couches
+
+4
+00:00:38,839 --> 00:00:41,089
+fait appel au concept 
+de superpositions spatiales
+
+5
+00:00:41,618 --> 00:00:43,370
+ou "spatial overlay" en anglais,
+
+6
+00:00:43,766 --> 00:00:45,814
+auxquelles sont liées 
+un ensemble de méthodes
+
+7
+00:00:45,976 --> 00:00:47,366
+qui permettent 
+le transfert de données
+
+8
+00:00:47,528 --> 00:00:50,718
+entre objets de différents types 
+et stockés dans différentes couches 
+
+9
+00:00:51,062 --> 00:00:54,350
+ceci en fonction de leurs relations
+spatiales les uns avec les autres.
+
+10
+00:00:54,999 --> 00:00:56,758
+Nous allons commencer 
+par l'interaction,
+
+11
+00:00:56,937 --> 00:01:00,020
+entre données de type raster
+et données de type vectoriel.
+
+12
+00:01:01,003 --> 00:01:03,606
+Les buts de cette leçon 
+sont de brièvement introduire 
+
+13
+00:01:03,797 --> 00:01:04,890
+la notion d'interaction
+
+14
+00:01:05,134 --> 00:01:07,097
+et de différencier 
+les types d'interaction
+
+15
+00:01:07,275 --> 00:01:09,532
+entre une couche qui stocke 
+de l'information vectorielle 
+
+16
+00:01:09,725 --> 00:01:12,333
+à une couche qui stocke 
+de l'information de type image.
+
+17
+00:01:13,012 --> 00:01:15,097
+Après cette leçon, 
+vous devriez être capable 
+
+18
+00:01:15,259 --> 00:01:18,008
+de distinguer les deux types 
+d'interaction raster-vecteur 
+
+19
+00:01:18,185 --> 00:01:19,406
+que nous allons décrire 
+
+20
+00:01:19,972 --> 00:01:21,924
+et de les mettre en oeuvre  
+dans le logiciel QGIS 
+
+21
+00:01:22,101 --> 00:01:24,169
+en suivant les instructions 
+qui vont suivre.
+
+22
+00:01:34,450 --> 00:01:37,438
+La superposition spatiale 
+est la fonction emblématique 
+
+23
+00:01:37,610 --> 00:01:39,383
+des systèmes d'information géographique.
+
+24
+00:01:39,724 --> 00:01:41,949
+C'est elle seule 
+qui symbolise l'originalité 
+
+25
+00:01:42,146 --> 00:01:44,746
+de ces systèmes d’information 
+par rapport aux autres
+
+26
+00:01:44,916 --> 00:01:47,304
+et surtout qui leur confère 
+toute leur puissance.
+
+27
+00:01:47,905 --> 00:01:48,917
+En effet, 
+
+28
+00:01:49,113 --> 00:01:51,653
+l'analyse de phénomènes 
+distribués dans l'espace géographique
+
+29
+00:01:51,825 --> 00:01:52,751
+requiert souvent 
+
+30
+00:01:53,055 --> 00:01:55,273
+que l'on recoure simultanément 
+à des informations 
+
+31
+00:01:55,458 --> 00:01:57,071
+provenant de couches distinctes.
+
+32
+00:01:57,921 --> 00:01:59,687
+Cela peut être le cas par exemple,
+
+33
+00:01:59,858 --> 00:02:03,011
+si l'on désire calculer la somme
+du nombre d'habitants par département,
+
+34
+00:02:03,311 --> 00:02:05,060
+ces derniers étant des polygones,
+
+35
+00:02:05,460 --> 00:02:08,771
+alors que la donnée de population
+est stockée dans une couche distincte
+
+36
+00:02:08,952 --> 00:02:12,027
+contenant leur capitale, 
+soit une série de centroïdes.
+
+37
+00:02:13,182 --> 00:02:16,434
+L'interaction rendue possible 
+par la superposition spatiale 
+
+38
+00:02:16,780 --> 00:02:18,791
+peut permettre 
+le transfert de données
+
+39
+00:02:19,001 --> 00:02:21,460
+depuis une couche source
+vers une couche cible
+
+40
+00:02:21,771 --> 00:02:23,899
+en mettant en oeuvre 
+une méthode spécifique 
+
+41
+00:02:24,103 --> 00:02:26,602
+induite partiellement 
+par les types de couches considérés,
+
+42
+00:02:26,868 --> 00:02:28,516
+comme nous le verrons un peu plus loin.
+
+43
+00:02:28,998 --> 00:02:31,067
+L'interaction spatiale peut avoir lieu,
+
+44
+00:02:31,254 --> 00:02:33,295
+entre plusieurs couches 
+de type vectoriel,
+
+45
+00:02:33,504 --> 00:02:36,261
+entre des couches raster 
+et des couches vectorielles
+
+46
+00:02:36,613 --> 00:02:39,554
+ou entre plusieurs couches 
+de type raster.
+
+47
+00:02:40,514 --> 00:02:43,220
+Les contraintes à la mise en œuvre
+de l'interaction spatiale 
+
+48
+00:02:43,584 --> 00:02:47,291
+sont l'utilisation d'un système
+de projection de coordonnées identique
+
+49
+00:02:48,097 --> 00:02:50,560
+et une couverture spatiale commune.
+
+50
+00:02:59,086 --> 00:03:02,163
+Dans le cas de l'interaction 
+vecteur-raster 
+
+51
+00:03:02,363 --> 00:03:03,915
+que nous examinons dans cette leçon,
+
+52
+00:03:04,103 --> 00:03:06,086
+le premier type 
+de transfert d'information 
+
+53
+00:03:06,266 --> 00:03:09,156
+que nous distinguons est celui
+de l'extraction d'une variable z 
+
+54
+00:03:09,423 --> 00:03:11,166
+stockée dans les pixels d'un raster 
+
+55
+00:03:11,350 --> 00:03:14,588
+et de sa copie dans une série 
+d'objets vectoriels ponctuels
+
+56
+00:03:14,825 --> 00:03:16,223
+spatialement distribués
+
+57
+00:03:16,417 --> 00:03:19,328
+et stockés dans une couche 
+vectorielle superposée.
+
+58
+00:03:20,492 --> 00:03:23,721
+Cette mise en oeuvre typique 
+du concept de coïncidence spatiale 
+
+59
+00:03:24,146 --> 00:03:26,132
+permet par exemple 
+de connaître l'altitude 
+
+60
+00:03:26,320 --> 00:03:27,554
+d'une série de points de mesure
+
+61
+00:03:27,726 --> 00:03:29,566
+qui sont répartis 
+dans un massif montagneux,
+
+62
+00:03:29,737 --> 00:03:32,066
+comme illustré ici à l'écran.
+
+63
+00:03:32,982 --> 00:03:36,018
+Dans QGIS, c'est l'extension 
+"point sampling tool"
+
+64
+00:03:36,506 --> 00:03:38,530
+qui permet d'effectuer 
+ce type d'opération.
+
+65
+00:03:38,996 --> 00:03:41,169
+Voyons maintenant 
+comment elle fonctionne.
+
+66
+00:03:42,437 --> 00:03:43,761
+Dans le projet QGIS, 
+
+67
+00:03:43,961 --> 00:03:47,080
+on a à disposition un fichier raster
+du modèle numérique de terrain
+
+68
+00:03:47,592 --> 00:03:48,663
+et un fichier vectoriel 
+
+69
+00:03:48,840 --> 00:03:51,679
+contenant les points pour lesquels 
+on veut extraire l'altitude.
+
+70
+00:03:52,607 --> 00:03:54,659
+Afin de pouvoir 
+combiner les deux couches,
+
+71
+00:03:54,929 --> 00:03:56,472
+il faut commencer par s'assurer 
+
+72
+00:03:56,647 --> 00:03:58,933
+qu'elles sont dans le même système 
+de projection.
+
+73
+00:03:59,821 --> 00:04:02,605
+Pour cela, on peut faire
+un clic droit sur la couche raster,
+
+74
+00:04:02,791 --> 00:04:05,732
+puis définir le SRC d'une couche,
+
+75
+00:04:06,273 --> 00:04:10,771
+on choisit le système 
+de projection suisse CH1903/LV03
+
+76
+00:04:11,665 --> 00:04:14,716
+et on fait ensuite la même chose 
+pour le fichier vectoriel. 
+
+77
+00:04:16,613 --> 00:04:19,800
+Maintenant que les deux couches sont
+bien dans le même système de projection
+
+78
+00:04:19,983 --> 00:04:23,278
+nous allons pouvoir extraire l'altitude
+pour les points qui nous intéressent.
+
+79
+00:04:24,082 --> 00:04:28,156
+Pour l'instant, la couche "points"
+ne contient qu'un seul attribut :
+
+80
+00:04:28,582 --> 00:04:30,004
+c'est son identifiant.
+
+81
+00:04:30,422 --> 00:04:32,899
+Nous allons rajouter 
+une colonne altitude 
+
+82
+00:04:33,100 --> 00:04:35,484
+en utilisant l'outil 
+"point sampling tool".
+
+83
+00:04:36,072 --> 00:04:37,980
+Cet outil est une extension de QGIS 
+
+84
+00:04:38,175 --> 00:04:39,929
+et il faut donc commencer 
+par l'installer.
+
+85
+00:04:40,548 --> 00:04:42,910
+En allant dans le menu "extensions",
+
+86
+00:04:43,582 --> 00:04:45,426
+"installer", "gérer les extensions"
+
+87
+00:04:46,027 --> 00:04:48,664
+on peut rechercher 
+l'outil "point sampling tool" 
+
+88
+00:04:48,874 --> 00:04:51,125
+dans la barre de recherche 
+puis cliquer sur l'outil 
+
+89
+00:04:51,329 --> 00:04:52,849
+lorsqu'il apparaît dans la liste,
+
+90
+00:04:53,182 --> 00:04:55,896
+puis demander "installer l'extension".
+
+91
+00:04:56,644 --> 00:04:58,720
+L'extension est ainsi 
+automatiquement installée 
+
+92
+00:04:58,908 --> 00:05:00,945
+et on peut cliquer sur "fermer". 
+
+93
+00:05:02,375 --> 00:05:04,148
+L'outil a été installé 
+
+94
+00:05:04,335 --> 00:05:09,097
+sous le menu "extensions", 
+"analyses", "point sampling tool". 
+
+95
+00:05:10,025 --> 00:05:11,550
+Sous l'onglet "général", 
+
+96
+00:05:11,734 --> 00:05:14,760
+il faut commencer par définir 
+la couche contenant les points.
+
+97
+00:05:15,401 --> 00:05:17,683
+Dans notre cas, 
+c'est la couche nommée "points".
+
+98
+00:05:18,643 --> 00:05:22,196
+On doit ensuite choisir les couches
+dont on veut récupérer les valeurs.
+
+99
+00:05:22,528 --> 00:05:25,061
+Dans notre cas, 
+on sélectionne donc le fichier raster 
+
+100
+00:05:25,263 --> 00:05:26,724
+du modèle numérique de terrain.
+
+101
+00:05:27,394 --> 00:05:30,357
+À ce stade, on coche également
+le fichier vectoriel "points"
+
+102
+00:05:31,019 --> 00:05:33,418
+pour pouvoir récupérer 
+des attributs de ce fichier, 
+
+103
+00:05:33,605 --> 00:05:35,804
+dans notre cas l'identifiant du point.
+
+104
+00:05:36,283 --> 00:05:37,677
+Sous l'onglet "field", 
+
+105
+00:05:37,877 --> 00:05:39,160
+on a un aperçu des colonnes 
+
+106
+00:05:39,356 --> 00:05:41,379
+qui seront présentes 
+dans le fichier résultat.
+
+107
+00:05:41,790 --> 00:05:43,790
+On verra donc 
+l'identifiant des points 
+
+108
+00:05:43,965 --> 00:05:46,217
+et la valeur extraite 
+du modèle numérique d'altitude.
+
+109
+00:05:47,093 --> 00:05:50,431
+Nous allons renommer 
+cette dernière colonne "altitude".
+
+110
+00:05:51,568 --> 00:05:53,593
+Nous revenons ensuite 
+dans l'onglet "général" 
+
+111
+00:05:53,780 --> 00:05:55,980
+pour définir le nom du fichier résultat
+
+112
+00:05:56,182 --> 00:05:58,337
+et l'emplacement 
+où on désire l'enregistrer,
+
+113
+00:05:58,537 --> 00:06:00,995
+on peut ensuite cliquer sur OK.
+
+114
+00:06:03,307 --> 00:06:05,785
+La couche de résultats 
+a été chargée dans le projet.
+
+115
+00:06:06,339 --> 00:06:07,271
+On retrouve bien 
+
+116
+00:06:07,470 --> 00:06:09,907
+tous les points pour lesquels 
+on voulait extraire l'altitude
+
+117
+00:06:10,169 --> 00:06:11,894
+et si on ouvre la table d'attributs, 
+
+118
+00:06:12,104 --> 00:06:14,687
+on constate maintenant
+la présence d'une colonne "altitude" 
+
+119
+00:06:14,870 --> 00:06:17,278
+qui nous donne 
+l'information recherchée. 
+
+120
+00:06:30,290 --> 00:06:32,403
+Le second type 
+de transfert d'information
+
+121
+00:06:32,582 --> 00:06:35,035
+entre une couche raster 
+et une couche de type vectoriel 
+
+122
+00:06:35,222 --> 00:06:37,426
+est celui de l'extraction 
+d'une statistique
+
+123
+00:06:37,752 --> 00:06:40,194
+des valeurs stockées
+dans les pixels d'une couche raster
+
+124
+00:06:40,383 --> 00:06:41,941
+et qui doit être rapportée
+
+125
+00:06:42,141 --> 00:06:44,892
+au niveau de polygones superposés
+pour les caractériser.
+
+126
+00:06:45,947 --> 00:06:49,072
+Ces statistiques peuvent être 
+la somme de la variable d'intérêt,
+
+127
+00:06:49,509 --> 00:06:53,016
+son maximum, son minimum, 
+son écart type, sa médiane, etc.
+
+128
+00:06:54,489 --> 00:06:55,534
+Ici par exemple, 
+
+129
+00:06:55,721 --> 00:06:58,424
+nous souhaitons calculer 
+la moyenne des précipitations
+
+130
+00:06:58,595 --> 00:07:00,985
+par région administrative au Kenya.
+
+131
+00:07:01,684 --> 00:07:03,348
+Pour effectuer ce type d'opération,
+
+132
+00:07:03,523 --> 00:07:06,914
+QGIS possède un outil 
+appelé "statistiques de zones". 
+
+133
+00:07:08,000 --> 00:07:08,969
+Dans le projet QGIS, 
+
+134
+00:07:09,180 --> 00:07:11,765
+nous avons un fichier raster
+avec les précipitations 
+
+135
+00:07:11,961 --> 00:07:15,899
+et un fichier vectoriel de polygones
+avec la délimitation des pays africains.
+
+136
+00:07:16,451 --> 00:07:17,799
+Nous allons afficher également
+
+137
+00:07:17,976 --> 00:07:21,026
+les polygones des contours 
+des régions administratives du Kenya
+
+138
+00:07:21,251 --> 00:07:24,184
+pour lesquelles on aimerait
+connaître les précipitations moyennes. 
+
+139
+00:07:24,843 --> 00:07:27,648
+Ce fichier contient pour l'instant 
+uniquement deux attributs : 
+
+140
+00:07:27,996 --> 00:07:30,215
+l'identifiant et 
+le nom de chaque région.
+
+141
+00:07:32,188 --> 00:07:34,293
+Pour calculer la moyenne 
+des précipitations, 
+
+142
+00:07:34,508 --> 00:07:37,020
+nous allons utiliser 
+l'outil "statistiques de zones".
+
+143
+00:07:38,014 --> 00:07:39,922
+Cet outil est une extension
+
+144
+00:07:40,085 --> 00:07:42,046
+et il faut donc 
+commencer par l'installer. 
+
+145
+00:07:42,233 --> 00:07:45,977
+Dans le menu "extensions", 
+"installer", "gérer des extensions",
+
+146
+00:07:46,984 --> 00:07:50,729
+on peut rechercher "statistiques 
+de zones" puis cocher la petite case.
+
+147
+00:07:51,912 --> 00:07:53,896
+L'extension est ainsi installée
+
+148
+00:07:54,096 --> 00:07:55,901
+et on peut cliquer sur "fermer". 
+
+149
+00:07:57,106 --> 00:07:59,292
+Cette extension 
+a été installée dans le menu 
+
+150
+00:07:59,485 --> 00:08:01,491
+raster "statistiques de zones".
+
+151
+00:08:01,952 --> 00:08:05,122
+Il va permettre de calculer la moyenne 
+et la somme des précipitations 
+
+152
+00:08:05,313 --> 00:08:08,190
+pour chaque polygone 
+des régions administratives du Kenya.
+
+153
+00:08:08,992 --> 00:08:10,316
+Sous "couche raster", 
+
+154
+00:08:10,495 --> 00:08:13,494
+nous définissons la couche raster 
+contenant les valeurs sur lesquelles, 
+
+155
+00:08:13,683 --> 00:08:15,587
+nous voulons calculer les statistiques. 
+
+156
+00:08:16,001 --> 00:08:18,649
+Dans notre cas, 
+c'est le fichier de précipitations. 
+
+157
+00:08:19,872 --> 00:08:22,737
+Sous "couche de polygone"
+contenant les zones,
+
+158
+00:08:23,052 --> 00:08:26,147
+nous choisissons les régions 
+administratives du Kenya. 
+
+159
+00:08:26,997 --> 00:08:29,403
+Les résultats seront 
+directement ajoutés 
+
+160
+00:08:29,590 --> 00:08:32,170
+comme nouvel attribut de la couche 
+contenant les polygones.
+
+161
+00:08:32,859 --> 00:08:35,343
+On peut si on le désire 
+définir un éventuel préfixe 
+
+162
+00:08:35,518 --> 00:08:37,827
+qui sera placé devant le nom 
+de chaque colonne. 
+
+163
+00:08:38,576 --> 00:08:42,584
+Ici, nous allons mettre le préfixe 
+"prec" pour précipitations.
+
+164
+00:08:43,105 --> 00:08:44,984
+On peut ensuite cliquer sur OK. 
+
+165
+00:08:47,227 --> 00:08:48,779
+Une fois que le calcul est terminé,
+
+166
+00:08:48,973 --> 00:08:52,170
+on peut retourner à notre fichier 
+vectoriel des divisions administratives
+
+167
+00:08:52,332 --> 00:08:53,908
+et ouvrir la table d'attributs. 
+
+168
+00:08:54,542 --> 00:08:57,206
+On constate que 3 nouvelles
+colonnes ont été ajoutées, 
+
+169
+00:08:57,881 --> 00:09:00,109
+commençant toutes par le préfixe "prec".
+
+170
+00:09:00,994 --> 00:09:03,247
+La première contient 
+le nombre de valeurs 
+
+171
+00:09:03,427 --> 00:09:05,078
+qui étaient présentes 
+dans chaque polygone
+
+172
+00:09:05,253 --> 00:09:06,756
+donc le nombre de pixels.
+
+173
+00:09:07,454 --> 00:09:10,379
+La deuxième colonne 
+contient la somme des précipitations
+
+174
+00:09:11,002 --> 00:09:14,429
+et la dernière colonne contient
+la moyenne que nous voulions connaître.
+
+175
+00:09:16,986 --> 00:09:19,752
+On peut maintenant
+représenter chaque région du Kenya 
+
+176
+00:09:19,936 --> 00:09:22,478
+avec une couleur en fonction
+des précipitations moyennes. 
+
+177
+00:09:23,006 --> 00:09:24,058
+Pour cela, 
+
+178
+00:09:24,263 --> 00:09:26,764
+il faut aller dans les propriétés 
+de la couche vectorielle,
+
+179
+00:09:26,931 --> 00:09:28,272
+dans l'onglet "style".
+
+180
+00:09:28,477 --> 00:09:30,314
+On choisit un style gradué 
+
+181
+00:09:30,510 --> 00:09:33,374
+sur la colonne "precmean".
+
+182
+00:09:34,990 --> 00:09:37,007
+On peut choisir 
+une palette de couleurs adaptée
+
+183
+00:09:37,199 --> 00:09:39,986
+et une mise en classe 
+ou discrétisation 
+
+184
+00:09:40,211 --> 00:09:41,776
+basée sur les sols naturels. 
+
+185
+00:09:42,081 --> 00:09:45,629
+On clique ensuite sur OK 
+et on obtient la carte désirée.
+
+186
+00:09:56,072 --> 00:09:57,847
+Nous avons vu dans cette leçon,
+
+187
+00:09:58,022 --> 00:10:00,780
+que l'analyse de phénomènes
+géoréférencés requiert souvent 
+
+188
+00:10:00,980 --> 00:10:03,805
+que l'on combine des informations
+provenant de couches distinctes.
+
+189
+00:10:04,145 --> 00:10:06,390
+Parmi les types 
+d'interactions spatiales possibles 
+
+190
+00:10:06,578 --> 00:10:08,363
+dans ce premier module 
+sur l'interaction
+
+191
+00:10:08,694 --> 00:10:10,448
+nous nous sommes penchés 
+sur l'interaction 
+
+192
+00:10:10,631 --> 00:10:11,995
+entre une couche de type raster 
+
+193
+00:10:12,176 --> 00:10:14,711
+et une couche stockant
+de l'information vectorielle. 
+
+194
+00:10:15,813 --> 00:10:18,891
+Nous avons vu que QGIS
+permet d'effectuer ce type d'opération
+
+195
+00:10:19,108 --> 00:10:21,275
+avec l'extension "point sampling tool"
+
+196
+00:10:21,451 --> 00:10:24,358
+pour le transfert de données 
+entre une couche en mode image 
+
+197
+00:10:24,675 --> 00:10:27,017
+et une distribution 
+de centroïdes superposés.
+
+198
+00:10:28,012 --> 00:10:30,787
+Et c'est l'extension
+"statistiques de zones" de QGIS 
+
+199
+00:10:30,981 --> 00:10:34,725
+qui permet de calculer des statistiques
+sur les valeurs d'une couche raster
+
+200
+00:10:35,107 --> 00:10:38,994
+rapportées dans des zones définies
+par un fichier de polygones superposés.
+

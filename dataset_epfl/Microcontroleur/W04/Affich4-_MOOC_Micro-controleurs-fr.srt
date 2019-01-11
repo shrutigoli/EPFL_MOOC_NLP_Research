@@ -1,0 +1,1351 @@
+1
+00:00:04,103 --> 00:00:04,774
+Bonjour,
+
+2
+00:00:05,166 --> 00:00:07,064
+on va faire aujourd'hui
+une jolie application
+
+3
+00:00:07,101 --> 00:00:09,070
+avec un affichage à 4 digits.
+
+4
+00:00:09,578 --> 00:00:10,904
+On a déjà vu comment écrire
+
+5
+00:00:10,954 --> 00:00:14,357
+sur un affichage avec un seul digit ;
+
+6
+00:00:14,789 --> 00:00:16,183
+on va en mettre quatre,
+
+7
+00:00:16,735 --> 00:00:19,935
+comprendre comment balayer
+cet affichage
+
+8
+00:00:20,323 --> 00:00:21,970
+et afficher des nombres.
+
+9
+00:00:22,961 --> 00:00:24,697
+Sur cette vidéo, vous voyez
+
+10
+00:00:24,897 --> 00:00:26,936
+comment se fait le balayage :
+
+11
+00:00:27,297 --> 00:00:29,037
+si on accélère la vitesse,
+
+12
+00:00:29,489 --> 00:00:31,832
+avec la persistance rétinienne
+
+13
+00:00:32,185 --> 00:00:35,068
+on verra 4 chiffres en continu,
+
+14
+00:00:35,805 --> 00:00:37,902
+mais avec une intensité réduite.
+
+15
+00:00:38,299 --> 00:00:39,579
+Ce avec quoi on travaille,
+
+16
+00:00:39,679 --> 00:00:40,960
+c'est un affichage
+
+17
+00:00:41,479 --> 00:00:45,026
+dont les segments sont reliés
+par des fils
+
+18
+00:00:45,479 --> 00:00:48,356
+sur des ports du processeur.
+
+19
+00:00:48,964 --> 00:00:51,576
+Alors, on avait vu ce processeur
+
+20
+00:00:51,623 --> 00:00:52,899
+comme un ensemble de piles
+
+21
+00:00:52,999 --> 00:00:53,869
+à la Arduino.
+
+22
+00:00:54,473 --> 00:00:56,886
+Maintenant, on va s'intéresser
+
+23
+00:00:57,508 --> 00:00:58,973
+à ce qui se passe vraiment
+
+24
+00:00:59,041 --> 00:01:01,866
+au niveau de l'Atmega328
+
+25
+00:01:02,166 --> 00:01:04,620
+dans lequel les ports sont des noeuds
+
+26
+00:01:04,820 --> 00:01:06,051
+de 8 bits.
+
+27
+00:01:06,317 --> 00:01:09,129
+Il y a le PORTD, il y a le PORTB,
+
+28
+00:01:09,529 --> 00:01:11,777
+et on va connecter notre affichage
+
+29
+00:01:12,177 --> 00:01:13,272
+sur ces ports,
+
+30
+00:01:13,964 --> 00:01:16,645
+qu'Arduino décrit dans le fond
+
+31
+00:01:16,745 --> 00:01:19,082
+par des numéros de pins,
+
+32
+00:01:19,274 --> 00:01:20,963
+et vous vous souvenez de la pin 13
+
+33
+00:01:21,025 --> 00:01:23,855
+sur laquelle il y a une petite LED
+qui est allumée.
+
+34
+00:01:25,081 --> 00:01:26,557
+Notre affichage,
+
+35
+00:01:27,653 --> 00:01:30,524
+on va le voir comme un mot binaire
+
+36
+00:01:31,501 --> 00:01:34,804
+avec les bits 0, 1, 2, 3
+
+37
+00:01:35,325 --> 00:01:37,952
+qui correspondent aux segments,
+
+38
+00:01:38,576 --> 00:01:40,987
+et c'est l'ordre habituel
+
+39
+00:01:41,087 --> 00:01:45,617
+que l'on utilise pour décrire un digit.
+
+40
+00:01:46,653 --> 00:01:48,732
+Ce mot binaire, maintenant,
+
+41
+00:01:48,832 --> 00:01:50,997
+on avait défini un vecteur,
+
+42
+00:01:51,787 --> 00:01:55,367
+ce mot binaire va correspondre
+
+43
+00:01:55,405 --> 00:01:56,331
+à un digit.
+
+44
+00:01:57,280 --> 00:01:59,375
+On reverra le digit 7 tout à l'heure
+
+45
+00:01:59,425 --> 00:02:00,914
+qui sera codé
+
+46
+00:02:01,014 --> 00:02:02,449
+par un certain nombre de bits.
+
+47
+00:02:03,683 --> 00:02:04,569
+Alors maintenant,
+
+48
+00:02:04,669 --> 00:02:07,325
+on doit exécuter le câblage
+
+49
+00:02:07,667 --> 00:02:10,339
+sur les deux ports
+
+50
+00:02:10,439 --> 00:02:12,446
+et on va définir les choses
+
+51
+00:02:12,746 --> 00:02:14,907
+de façon indépendante d'Arduino
+
+52
+00:02:15,537 --> 00:02:18,107
+en utilisant les instructions du C.
+
+53
+00:02:19,029 --> 00:02:20,188
+Et on va devoir dire
+
+54
+00:02:20,238 --> 00:02:22,884
+que a est connecté sur cette pin,
+
+55
+00:02:23,229 --> 00:02:25,766
+que b est connecté sur cette pin
+
+56
+00:02:25,866 --> 00:02:27,629
+qui est dans un autre port,
+
+57
+00:02:28,460 --> 00:02:31,309
+et vous me direz : Mais ce câblage,
+il est quand même un petit peu bizarre.
+
+58
+00:02:32,116 --> 00:02:35,507
+Non, parce qu'au niveau du processeur
+
+59
+00:02:35,807 --> 00:02:39,686
+il peut y avoir des bits
+dans des ports
+
+60
+00:02:40,086 --> 00:02:42,642
+qui ont des fonctions particulières
+
+61
+00:02:42,742 --> 00:02:45,629
+en liaison avec des interruptions,
+
+62
+00:02:45,729 --> 00:02:46,831
+avec des timers,
+
+63
+00:02:46,931 --> 00:02:49,464
+avec des commandes de moteurs.
+
+64
+00:02:49,764 --> 00:02:52,105
+Donc on peut être amené à réserver,
+
+65
+00:02:52,180 --> 00:02:52,965
+typiquement dire :
+
+66
+00:02:53,027 --> 00:02:54,397
+Je ne touche pas le bit 13
+
+67
+00:02:54,564 --> 00:02:56,405
+parce que c'est pratique de pouvoir
+
+68
+00:02:56,467 --> 00:02:57,824
+faire clignoter ma petite LED
+
+69
+00:02:57,924 --> 00:02:58,792
+quand j'en ai envie.
+
+70
+00:03:00,266 --> 00:03:01,709
+Et maintenant,
+il y a une autre contrainte
+
+71
+00:03:01,734 --> 00:03:03,068
+du point de vue câblage :
+
+72
+00:03:03,698 --> 00:03:06,148
+ces signaux sont arrangés
+d'une certaine façon
+
+73
+00:03:06,198 --> 00:03:07,250
+autour de l'affichage,
+
+74
+00:03:07,765 --> 00:03:09,814
+ils sont arrangés d'une certaine façon
+
+75
+00:03:09,837 --> 00:03:11,231
+autour du processeur.
+
+76
+00:03:12,116 --> 00:03:14,082
+Vous avez parfois vu de ces jouets
+
+77
+00:03:14,182 --> 00:03:16,853
+qui sont faits avec
+du circuit imprimé simple face ;
+
+78
+00:03:17,718 --> 00:03:20,003
+si vous pouvez utiliser
+du simple face
+
+79
+00:03:20,041 --> 00:03:21,818
+votre circuit imprimé va coûter
+
+80
+00:03:21,918 --> 00:03:23,074
+dix centimes de moins,
+
+81
+00:03:23,374 --> 00:03:24,952
+si vous en fabriquez cent mille
+
+82
+00:03:25,052 --> 00:03:26,593
+c'est dix mille francs d'économies
+
+83
+00:03:26,634 --> 00:03:28,208
+pour l'industrie,
+
+84
+00:03:28,670 --> 00:03:30,602
+ça vaut la peine de réfléchir
+un petit peu
+
+85
+00:03:30,702 --> 00:03:34,464
+à comment mélanger ce câblage
+différemment
+
+86
+00:03:34,764 --> 00:03:37,949
+pour que le circuit imprimé soit
+plus simple.
+
+87
+00:03:39,190 --> 00:03:40,312
+Maintenant notre problème,
+
+88
+00:03:40,375 --> 00:03:43,522
+c'est de copier les bits qui, en fait,
+
+89
+00:03:43,800 --> 00:03:46,578
+vont être déclarés dans une fonction,
+
+90
+00:03:46,958 --> 00:03:51,143
+les faire passer dans les ports
+du processeur,
+
+91
+00:03:51,643 --> 00:03:55,152
+où le câblage, dans le fond, va
+
+92
+00:03:55,352 --> 00:03:59,805
+les amener sur les pins de l'affichage.
+
+93
+00:04:01,979 --> 00:04:03,969
+On doit écrire dans ces ports
+
+94
+00:04:04,069 --> 00:04:06,788
+à partir d'un mot binaire,
+
+95
+00:04:08,002 --> 00:04:10,426
+activer un bit à 0 ou à 1,
+
+96
+00:04:11,216 --> 00:04:12,655
+on a vu que ça se fait très bien
+
+97
+00:04:12,755 --> 00:04:14,200
+avec un digitalWrite,
+
+98
+00:04:14,967 --> 00:04:16,316
+ça se fait aussi en C
+
+99
+00:04:16,416 --> 00:04:18,761
+avec bitSet et bitClear
+
+100
+00:04:18,795 --> 00:04:20,612
+qui sont vraiment les instructions
+
+101
+00:04:20,912 --> 00:04:22,532
+au niveau du processeur
+
+102
+00:04:22,832 --> 00:04:24,345
+qui vont s'exécuter
+
+103
+00:04:25,863 --> 00:04:28,900
+dix fois plus rapidement
+que le digitalWrite.
+
+104
+00:04:29,587 --> 00:04:30,867
+Donc dans un bitSet,
+
+105
+00:04:30,967 --> 00:04:33,092
+on dit de quel port il s'agit
+
+106
+00:04:33,355 --> 00:04:34,787
+ou position mémoire,
+
+107
+00:04:35,454 --> 00:04:38,185
+on dit quel est le numéro du bit
+
+108
+00:04:38,999 --> 00:04:41,287
+et on va pouvoir activer.
+
+109
+00:04:41,976 --> 00:04:44,656
+Maintenant il faut qu'on puisse tester
+
+110
+00:04:44,956 --> 00:04:48,380
+le bit du digit qui représente
+un segment
+
+111
+00:04:49,140 --> 00:04:54,033
+pour savoir s'il faudrait écrire
+un 1 ou un 0, allumer ou éteindre.
+
+112
+00:04:51,780 --> 00:04:54,780
+
+
+113
+00:04:54,902 --> 00:04:56,634
+Le digitalRead,
+
+114
+00:04:57,959 --> 00:04:59,979
+on l'a utilisé pour tester
+
+115
+00:05:00,079 --> 00:05:04,048
+un bouton poussoir à 1 ou à 0
+
+116
+00:05:05,069 --> 00:05:08,054
+mais il n'existe pas
+pour des positions mémoire
+
+117
+00:05:08,154 --> 00:05:09,435
+et ici on est
+
+118
+00:05:09,735 --> 00:05:11,802
+dans une variable en mémoire.
+
+119
+00:05:12,701 --> 00:05:14,044
+Le bitTest,
+
+120
+00:05:14,083 --> 00:05:18,806
+est-ce que ça a été prévu par le C ?
+
+121
+00:05:19,863 --> 00:05:21,492
+Non, ça n'existe pas,
+
+122
+00:05:21,592 --> 00:05:23,665
+même au niveau de l'assembleur
+
+123
+00:05:24,171 --> 00:05:26,957
+c'est associé à des sauts
+conditionnels
+
+124
+00:05:27,057 --> 00:05:28,996
+pour ceux qui connaissent
+l'assembleur.
+
+125
+00:05:30,630 --> 00:05:31,840
+Il nous reste une solution,
+
+126
+00:05:31,940 --> 00:05:34,121
+c'est de faire un ET logique
+
+127
+00:05:34,849 --> 00:05:36,036
+avec un mot binaire,
+
+128
+00:05:36,136 --> 00:05:37,790
+ça on vous l'a bien expliqué,
+
+129
+00:05:39,042 --> 00:05:43,269
+qui a un seul 1 en position 5 ;
+
+130
+00:05:44,868 --> 00:05:49,905
+et puis on va faire le calcul variable
+
+131
+00:05:50,613 --> 00:05:52,184
+qui est digit ici
+
+132
+00:05:52,384 --> 00:05:53,824
+avec notre mask
+
+133
+00:05:54,427 --> 00:05:56,314
+et on va pouvoir écrire maintenant :
+
+134
+00:05:57,248 --> 00:06:00,795
+"if" notre digit, 7 par exemple,
+
+135
+00:06:00,995 --> 00:06:06,058
+avec son bit, on s'intéresse
+à son bit en position 5,
+
+136
+00:06:08,754 --> 00:06:12,081
+on va activer le bon port, le bon bit,
+
+137
+00:06:12,698 --> 00:06:17,854
+et puis autrement on va désactiver
+le bon bit dans le bon port.
+
+138
+00:06:18,620 --> 00:06:19,939
+Donc on se retrouve maintenant
+
+139
+00:06:19,976 --> 00:06:23,055
+à devoir gérer tous les chiffres
+
+140
+00:06:23,787 --> 00:06:28,655
+dans une table
+qui est une table de bytes,
+
+141
+00:06:28,855 --> 00:06:30,850
+mais dans ces bytes,
+
+142
+00:06:30,900 --> 00:06:32,671
+contrairement à ce qu'on avait déjà vu,
+
+143
+00:06:33,324 --> 00:06:37,591
+chaque bit correspond à un segment.
+
+144
+00:06:38,314 --> 00:06:41,326
+Et c'est la fonction copyDigit,
+
+145
+00:06:42,058 --> 00:06:47,457
+le paramètre sera le numéro du digit.
+
+146
+00:06:47,857 --> 00:06:50,872
+Et maintenant
+pour afficher le premier bit,
+
+147
+00:06:51,246 --> 00:06:52,930
+par exemple dans un 0
+
+148
+00:06:53,030 --> 00:06:54,162
+ce bit est allumé,
+
+149
+00:06:54,773 --> 00:06:58,918
+on va dire : Si dans mon digit 0
+
+150
+00:06:59,835 --> 00:07:05,046
+j'ai le bit 0 qui est à 1,
+
+151
+00:07:05,878 --> 00:07:10,156
+et bien je vais activer sur le PORTD
+la pin 7.
+
+152
+00:07:10,206 --> 00:07:12,026
+Donc il faut garder présent
+
+153
+00:07:13,078 --> 00:07:15,159
+le schéma de câblage,
+
+154
+00:07:15,459 --> 00:07:19,062
+et ici on décrit le schéma de câblage,
+
+155
+00:07:19,891 --> 00:07:21,917
+on décide les connexions,
+
+156
+00:07:22,442 --> 00:07:26,432
+on décide
+si le segment est allumé ou éteint
+
+157
+00:07:26,956 --> 00:07:28,766
+quand on a un 1,
+
+158
+00:07:28,966 --> 00:07:34,987
+on va toujours ici représenter
+le 1 comme étant l'état allumé,
+
+159
+00:07:35,287 --> 00:07:37,630
+mais ici, on pourra décider
+
+160
+00:07:37,930 --> 00:07:41,356
+si il faut un 0 ou un "éteindre"
+
+161
+00:07:41,556 --> 00:07:43,751
+pour activer la diode lumineuse
+
+162
+00:07:43,797 --> 00:07:45,547
+à l'intérieur du segment.
+
+163
+00:07:46,131 --> 00:07:48,037
+Alors maintenant, si on veut afficher
+
+164
+00:07:48,437 --> 00:07:50,654
+les chiffres 1, 2, 3, 4
+
+165
+00:07:51,418 --> 00:07:54,322
+pour vérifier
+que tous les segments sont corrects,
+
+166
+00:07:54,054 --> 00:07:57,054
+
+
+167
+00:07:54,808 --> 00:07:57,350
+on fait
+la petite boucle "for" habituelle
+
+168
+00:07:57,650 --> 00:07:59,970
+de 0 à 9,
+
+169
+00:08:00,439 --> 00:08:03,485
+on copie le digit i,
+
+170
+00:08:03,907 --> 00:08:09,116
+et on passe à travers cette table
+
+171
+00:08:10,092 --> 00:08:11,020
+et on attend
+
+172
+00:08:11,056 --> 00:08:12,292
+avant de passer au suivant.
+
+173
+00:08:12,996 --> 00:08:14,100
+Alors cette table,
+
+174
+00:08:14,423 --> 00:08:16,148
+est-ce qu'on peut en faire une boucle ?
+
+175
+00:08:16,699 --> 00:08:19,092
+Là on voit bien que ça incrémente,
+
+176
+00:08:19,397 --> 00:08:22,133
+mais ici on parcourt
+
+177
+00:08:24,366 --> 00:08:26,852
+les pins du processeur
+
+178
+00:08:27,343 --> 00:08:28,726
+d'une façon aléatoire.
+
+179
+00:08:28,859 --> 00:08:31,661
+Néanmoins, c'est extrêmement rapide
+
+180
+00:08:31,759 --> 00:08:36,940
+puisque chaque fois, on a
+deux, trois instructions par ligne.
+
+181
+00:08:35,161 --> 00:08:37,018
+
+
+182
+00:08:37,540 --> 00:08:38,301
+Bien, maintenant
+
+183
+00:08:38,401 --> 00:08:41,395
+si on veut balayer notre affichage,
+
+184
+00:08:41,495 --> 00:08:43,679
+on voudrait afficher 4 digits,
+
+185
+00:08:43,979 --> 00:08:47,696
+dans des modules qui existent
+
+186
+00:08:47,996 --> 00:08:51,424
+tous ces segments sont câblés
+en parallèle.
+
+187
+00:08:52,138 --> 00:08:53,878
+Mais il y a une entrée
+
+188
+00:08:54,078 --> 00:08:56,301
+pour chaque digit de sélection
+
+189
+00:08:56,941 --> 00:08:58,578
+et on va balayer,
+
+190
+00:08:58,678 --> 00:09:01,968
+c'est à dire qu'on va sélectionner
+le premier digit,
+
+191
+00:09:02,018 --> 00:09:04,990
+après avoir préparé la valeur
+
+192
+00:09:05,390 --> 00:09:08,574
+sur le port des segments
+
+193
+00:09:09,602 --> 00:09:12,374
+et puis ensuite on va désélectionner,
+
+194
+00:09:12,960 --> 00:09:15,501
+sélectionner le suivant, et caetera.
+
+195
+00:09:16,465 --> 00:09:18,258
+Et il faudra faire attention
+
+196
+00:09:18,358 --> 00:09:21,000
+qu'au moment de la commutation
+
+197
+00:09:21,835 --> 00:09:24,558
+on ne voit pas un petit début :
+
+198
+00:09:24,658 --> 00:09:26,527
+si j'avance ici la sélection,
+
+199
+00:09:26,627 --> 00:09:31,116
+je pourrai afficher pendant
+quelques micro-secondes
+
+200
+00:09:31,915 --> 00:09:33,434
+le chiffre précédent.
+
+201
+00:09:37,604 --> 00:09:38,889
+Le programme qu'il faut écrire
+
+202
+00:09:39,571 --> 00:09:41,623
+à partir de ce que l'on vient de voir
+
+203
+00:09:41,723 --> 00:09:45,216
+c'est de dire : pour sélectionner
+le digit 1
+
+204
+00:09:46,953 --> 00:09:49,623
+je dois faire un bitSet du bon port,
+
+205
+00:09:48,616 --> 00:09:51,616
+
+
+206
+00:09:49,723 --> 00:09:51,744
+donc là on va regarder
+comment c'est câblé,
+
+207
+00:09:52,422 --> 00:09:54,621
+pour le désélectionner : Off,
+
+208
+00:09:55,830 --> 00:09:57,650
+je dois faire un bitClear -
+
+209
+00:09:58,628 --> 00:10:00,051
+je m'excuse, il y a une petite erreur
+
+210
+00:10:00,251 --> 00:10:03,239
+qui m'a échappé : Clear -
+
+211
+00:10:06,059 --> 00:10:08,167
+et puis maintenant, pour afficher
+
+212
+00:10:08,467 --> 00:10:10,832
+mon nombre 1234,
+
+213
+00:10:12,428 --> 00:10:15,745
+je copie le digit 1,
+
+214
+00:10:17,040 --> 00:10:20,735
+j'active, j'attends, je désactive.
+
+215
+00:10:21,800 --> 00:10:23,551
+Ensuite je passe au digit 2 :
+
+216
+00:10:23,851 --> 00:10:26,023
+j'active, j'attends, je désactive
+
+217
+00:10:26,223 --> 00:10:27,234
+et caetera.
+
+218
+00:10:27,889 --> 00:10:29,387
+Si mon delai est de l'ordre
+
+219
+00:10:29,437 --> 00:10:31,097
+de cinq millisecondes,
+
+220
+00:10:31,777 --> 00:10:35,207
+j'ai quatre delais
+pour balayer mon chiffre
+
+221
+00:10:35,257 --> 00:10:36,722
+cela va faire vingt millisecondes,
+
+222
+00:10:36,772 --> 00:10:38,994
+donc cinquante fois par seconde
+
+223
+00:10:39,667 --> 00:10:42,284
+l'affichage sera régénéré
+
+224
+00:10:43,045 --> 00:10:47,128
+et je verrai le nombre
+qui m'intéresse.
+
+225
+00:10:48,106 --> 00:10:49,597
+Au niveau du setup,
+
+226
+00:10:50,377 --> 00:10:53,119
+évitons des pinmode
+
+227
+00:10:53,619 --> 00:10:59,583
+puisque si je reviens
+à notre schéma ici,
+
+228
+00:11:00,696 --> 00:11:01,495
+et bien on voit
+
+229
+00:11:01,595 --> 00:11:03,632
+que tous ces bits sont à 1,
+
+230
+00:11:04,447 --> 00:11:06,198
+que tous ces bits sont à 0,
+
+231
+00:11:06,864 --> 00:11:09,529
+et la direction va intervenir
+
+232
+00:11:09,629 --> 00:11:12,211
+avec le registre de direction,
+
+233
+00:11:12,975 --> 00:11:14,450
+pour dire que... 
+
+234
+00:11:14,998 --> 00:11:16,977
+Là aussi je me suis trompé,
+
+235
+00:11:17,515 --> 00:11:21,946
+ce ne sont pas les ports, ce sont
+les data direction register,
+
+236
+00:11:23,108 --> 00:11:25,718
+que je crois qu'on ne vous a
+pas encore bien expliqués,
+
+237
+00:11:27,198 --> 00:11:28,362
+DDRD.
+
+238
+00:11:31,237 --> 00:11:33,046
+Il nous reste le problème d'afficher
+
+239
+00:11:33,146 --> 00:11:34,633
+un chiffre, un nombre,
+
+240
+00:11:34,833 --> 00:11:35,960
+qui a été mémorisé
+
+241
+00:11:36,060 --> 00:11:38,055
+et pas simplement 1234 ;
+
+242
+00:11:38,385 --> 00:11:41,736
+ce nombre se trouve dans une variable.
+
+243
+00:11:45,206 --> 00:11:48,382
+On a décidé de balayer d'abord,
+
+244
+00:11:48,482 --> 00:11:49,992
+d'afficher d'abord celui-ci
+
+245
+00:11:50,092 --> 00:11:51,320
+et ensuite les suivants,
+
+246
+00:11:51,620 --> 00:11:53,662
+donc notre première opération,
+
+247
+00:11:53,762 --> 00:11:55,487
+c'est de récupérer
+
+248
+00:11:55,974 --> 00:11:57,439
+dans un mot de 8 bits
+
+249
+00:11:57,739 --> 00:11:59,215
+le premier digit,
+
+250
+00:11:59,515 --> 00:12:01,247
+et pour ça on peut très simplement
+
+251
+00:12:01,347 --> 00:12:03,468
+le décaler de 12 positions,
+
+252
+00:12:04,165 --> 00:12:05,533
+en prenant le nombre.
+
+253
+00:12:05,578 --> 00:12:08,240
+Donc au niveau de notre procédure
+
+254
+00:12:08,340 --> 00:12:10,032
+qui affiche un nombre,
+
+255
+00:12:10,678 --> 00:12:12,453
+ce nombre sera un nombre entier
+
+256
+00:12:12,491 --> 00:12:13,674
+que j'appelle "nombre",
+
+257
+00:12:14,220 --> 00:12:16,097
+la première opération sera de dire :
+
+258
+00:12:16,197 --> 00:12:18,298
+je vais copier le digit,
+
+259
+00:12:19,012 --> 00:12:22,729
+que la valeur de ce digit de 1 à 9
+
+260
+00:12:23,629 --> 00:12:27,913
+je le trouve dans la variable nombre
+
+261
+00:12:28,013 --> 00:12:29,696
+qui a été décalée de 12,
+
+262
+00:12:30,410 --> 00:12:33,510
+j'ai un 0 qui a été injecté
+
+263
+00:12:33,810 --> 00:12:35,887
+en analysant le décalage,
+
+264
+00:12:36,604 --> 00:12:38,625
+je vais sélectionner mon digit.
+
+265
+00:12:39,004 --> 00:12:41,502
+Là j'ai déjà regroupé
+les trois instructions
+
+266
+00:12:41,602 --> 00:12:42,865
+qu'on a vues tout à l'heure.
+
+267
+00:12:43,165 --> 00:12:44,740
+Et maintenant l'opération suivante,
+
+268
+00:12:44,790 --> 00:12:46,921
+c'est de dire : pour le digit 2,
+
+269
+00:12:47,455 --> 00:12:49,432
+je dois me décaler de 8,
+
+270
+00:12:49,732 --> 00:12:50,766
+puis après de 4,
+
+271
+00:12:50,866 --> 00:12:53,014
+et puis après de 1 avec des mask,
+
+272
+00:12:53,536 --> 00:12:55,475
+et bien c'est beaucoup plus simple
+de dire :
+
+273
+00:12:56,240 --> 00:13:00,166
+au lieu de faire un truc spécial
+pour le deuxième digit,
+
+274
+00:13:00,771 --> 00:13:02,501
+je décale le tout
+
+275
+00:13:03,117 --> 00:13:06,042
+de quatre bits à gauche,
+
+276
+00:13:06,510 --> 00:13:09,472
+et je me retrouve dans la situation
+
+277
+00:13:09,907 --> 00:13:14,054
+où le chiffre à afficher se trouve
+tout à gauche
+
+278
+00:13:14,354 --> 00:13:16,028
+et je dois le décaler de 12.
+
+279
+00:13:16,528 --> 00:13:18,511
+Donc je me retrouve
+après avoir écrit :
+
+280
+00:13:18,611 --> 00:13:22,388
+nombre décalé de 4 à gauche,
+
+281
+00:13:22,890 --> 00:13:25,613
+dans la situation où je peux
+
+282
+00:13:25,713 --> 00:13:29,605
+réutiliser mon copyDigit
+avec le décalage de 12,
+
+283
+00:13:30,094 --> 00:13:31,577
+je fais quatre fois ça
+
+284
+00:13:31,977 --> 00:13:33,521
+et mon nombre est affiché.
+
+285
+00:13:34,437 --> 00:13:35,518
+Alors attention,
+
+286
+00:13:35,718 --> 00:13:38,597
+on travaille ici avec des nombres BCD.
+
+287
+00:13:40,040 --> 00:13:44,417
+Si votre application travaille
+avec des nombres binaires,
+
+288
+00:13:45,732 --> 00:13:48,094
+ils seront affichés en hexadécimal.
+
+289
+00:13:48,838 --> 00:13:52,772
+et la conversation de binaire en BCD
+
+290
+00:13:53,436 --> 00:13:55,734
+est quelque chose que...
+
+291
+00:13:55,821 --> 00:13:57,467
+Il y a des programmes qui existent
+
+292
+00:13:57,567 --> 00:13:59,740
+qui sont en fait faciles à écrire
+
+293
+00:13:59,840 --> 00:14:01,666
+si on a compris la procédure.
+
+294
+00:14:02,199 --> 00:14:03,685
+Autre chose importante,
+
+295
+00:14:03,885 --> 00:14:07,681
+on remarque ici qu'on a une attente
+de cinq millisecondes,
+
+296
+00:14:08,411 --> 00:14:09,968
+et ensuite on passe rapidement
+
+297
+00:14:10,005 --> 00:14:12,185
+de nouveau à une attente
+de cinq millisecondes ;
+
+298
+00:14:12,845 --> 00:14:15,460
+si on veut surveiller les moustaches
+d'un robot par exemple
+
+299
+00:14:15,510 --> 00:14:17,336
+tout en affichant un nombre,
+
+300
+00:14:17,858 --> 00:14:20,085
+et bien on pourra le faire ici
+
+301
+00:14:20,210 --> 00:14:21,765
+avant de retourner dans la boucle
+
+302
+00:14:22,553 --> 00:14:23,963
+toutes les cinq millisecondes,
+
+303
+00:14:24,063 --> 00:14:26,413
+ce qui peut être
+tout à fait accessible,
+
+304
+00:14:27,958 --> 00:14:29,266
+ou bien si on doit faire
+
+305
+00:14:29,366 --> 00:14:32,653
+une surveillance plus rapide
+que toutes les cinq millisecondes,
+
+306
+00:14:33,767 --> 00:14:35,354
+il faudra modifier
+
+307
+00:14:35,454 --> 00:14:36,778
+ce programme d'attente
+
+308
+00:14:37,095 --> 00:14:39,703
+pour dire : au lieu d'attendre
+cinq millisecondes,
+
+309
+00:14:39,803 --> 00:14:42,903
+on va attendre
+cinq fois une milliseconde,
+
+310
+00:14:43,319 --> 00:14:45,135
+et chaque milliseconde aller vérifier
+
+311
+00:14:45,235 --> 00:14:48,105
+si il y a d'autres tâches à exécuter.
+
+312
+00:14:48,605 --> 00:14:52,739
+Donc cette notion d'algorithme,
+
+313
+00:14:52,839 --> 00:14:53,645
+de fonction,
+
+314
+00:14:53,707 --> 00:14:55,022
+qui sont bloquantes ou pas,
+
+315
+00:14:55,609 --> 00:14:57,749
+c'est assez important à comprendre
+
+316
+00:14:58,202 --> 00:14:59,133
+et on y revient.
+
+317
+00:15:00,011 --> 00:15:02,922
+Bien, on a vu des exemples
+de manipulation de bits,
+
+318
+00:15:03,222 --> 00:15:06,253
+on a vu comment décrire le câblage
+
+319
+00:15:06,878 --> 00:15:09,077
+d'une façon qui soit claire
+
+320
+00:15:09,377 --> 00:15:12,059
+et qui se documente par elle-même,
+
+321
+00:15:12,789 --> 00:15:15,259
+on a vu comment balayer un affichage,
+
+322
+00:15:15,909 --> 00:15:17,735
+et puis on a vu aussi
+
+323
+00:15:17,785 --> 00:15:21,699
+comment transmettre un nombre
+
+324
+00:15:22,178 --> 00:15:25,763
+par petites portions à cet affichage.
+

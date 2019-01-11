@@ -1,0 +1,60 @@
+I will now present a finite difference method which allow us to compute an approximation of the solution u of our toy problem, the elastic rope problem.
+Firstly, I will subdivide the interval [0,1] which models the rope into sub-intervals.
+So I cut the rope into 2, then 4, then 8.
+I can write x_1 the first point and x_N the last point inside the rope.
+Here N is a positive integer which should be large, and I write h = 1 over
+N plus 1 the step size, which should be small if N is large.
+N will approach infinity, and h will approach 0.
+Therefore, in the middle I have a point x_i, to its left x_i minus h, that is x_i-1 and to its right x_i plus h, that is x_i+1. x_0 coincides with
+0 and x_N+1 with 1, hence I have x_i equal to h times i for i starting at 0 up to N+1.
+The goal of the method is the following: the goal of the numerical method is to present a scheme which will allow us to compute values u_i, approximations of u at point x_i, which I do not know.
+I recall that u(x) is the displacement of the elastic rope
+I don't know u(x),
+I will approximate u(x_i) by u_i, for all i from 1 up to N.
+Here I can draw a picture, when the x_i are equidistant separated by h, the distance between two consecutive points.
+I now want to present the numerical scheme.
+The differential equation is the following: minus the second derivative of u with respect to x equal to f (x): here I write it down: -u''(x) = f(x).
+Which is satisfied for all x in the interval [0,1].
+I can write it at points x_i
+-u''(x_i) = f(x_i) and this is true for all interior nodes with i from 1 up to N.
+I use a centered finite difference formula to approximate the second derivative.
+We saw it in chapter 2.
+The second derivative in node x_i can be approximated by minus 2 times the value in x_i of u, with u evaluated in x_i minus h, but x_i minus h is x_i-1; and the value if u in x_i plus h that is x_i+1.
+All this divided by h squared. 
+There is a minus sign in front of the second derivative and this term is equal to f evaluated in x_i. 
+Of course, as I approximated the second derivative with this finite difference formula 
+I have a remainder  which is a term of order h^2, this remainder term will be divided by 4
+each time h is divided by 2, assuming that u is 4 times continuously differentiable. 
+We know that this O(h^2) term involves the fourth derivatives of u in the interval [0,1].
+This was discussed in chapter 2.
+Now I can write a scheme:
+A numerical scheme is something
+I will be able to implement on a computer, which will allow me to compute the approximations u_i.
+So to obtain this scheme,
+I replace u at node x_i, which is unknown, by its approximation u_i, which will be computed thanks to a computer. 
+The same thing for u evaluated in x_i-1 by u_i-1 and u in x_i+1 by u_i+1.
+Therefore I have the following scheme:
+I have two times u_i, on the left minus u_i-1 and u_i+1 on the right, all this divided by the square of h, this must be equal to f evaluated in x_i, and I discard the O(h^2) term, since it don't know how to implement it. these relations must be satisfied for all i from 1 to N, for i=1 to N.
+Et vous voyez ici dans cette expression
+When choosing the index i = 1
+I have u_1, here u_2 and here u_0, so what is u_0 worth? u_0 is the displacement of the rope in x_0, which is zero.
+Hence I write that u_0 = 0.
+The same on the right end, the displacement of the rope in x_n+1 is zero which allows me to write u_n+1 = 0.
+Now I have my numerical scheme which allows me to approximate u in x_i with u_i, for all i from 1 to N.
+This scheme is equivalent to solving a linear system.
+This system can be written the following way: a matrix which I call A and the vector of unknowns named u.
+So the vector of unknowns is simply u_1, u_2, up to u_N.
+Donc ici U1 U2 ... jusquâ€™Ã  U N and on the right hand side, the vector, which is known, contains the forces applied in x_1, x_2 up to x_N.
+I call this vector f. 
+I state that this scheme corresponds to solving a linear system. 
+So, I still need to define what this matrix A contains.
+You see here that on each line, there is 1 / h^2, so this can be a factor in front,
+I look at the first line for the index i = 1: u_0 = 0, I have 2 u_1 minus u_2 divided by h squared, which equals f (x_1), so, the first line is 2 and -1.
+The second line is (- u_1 + 2u_2 - u_3)/h^2 = f(x_2).
+Therefore on the second line I will write -1, 2 and -1, and so on up to the line one before last:
+-1, 2 and -1 again and then -1 and 2 on the last line.
+I obtain a tridiagonal matrix, on the diagonal we have 2s, and on the off diagonals we have -1s. et sur la sur-diagonale vous avez aussi un -1
+So now I can compute approximations of u_1, u_2 up to u_N of u at the nodes x_1, x_2, up to x_N, provided I solve this linear system. et je prÃ©tends que la matrice A cette matrice qui contient 1 sur hÂ²
+2 sur la diagonale et - 1 sur la sur et la sous-diagonales
+The matrix A is tridiagonal, symmetric and positive definite, so I can use a cholesky factorization
+A = L times the transpose of L to solve this system A u = f.

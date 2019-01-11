@@ -1,0 +1,50 @@
+Let's look a bit more into eventual consistency.
+Specifically, in this lecture
+I will talk about causal consistency, and their realization using vector clocks.
+So there is an important system that you should know about, called Dynamo, which was implemented by Amazon, which is also the foundation and the driving force behind this shopping cart example that I talked about in the previous lecture.
+Conceptually, causal consistency is the following:
+A system provides causal consistency if the memory operations that potentially are causally related are seen by every node of the system in the same order.
+So that means if I've got a process A that makes a change, and communicates with a process B, then process B has to start from there, and basically start from the values written by this previous process.
+And this propagates, transitively, so to say.
+And you can implement causality, causal consistency, using vector clocks.
+Let me say that this is not enough to ensure eventual consistency, because all that it ensures is that certain things are not really inconsistent, but it doesn't guarantee that ultimately everything is propagated everywhere, but that's only a small step from causal consistency.
+Also, in general, causal consistency, mechanisms using vector clocks, might lead to conflicts that then have to be resolved using application-specific semantics.
+For example, the shopping cart example, these vector clocks will tell us that there is a conflict, but then we have to decide, and that's going to be application-specific, how to resolve them, and that's separate from the vector clocks themselves.
+So how do vector clocks work, in general?
+In general, we will have a vector of, basically, pairs, and each pair has the information of, identity of a server, and a logical timestamp.
+So a vector consists of several such pairs, and such a vector is basically associated with a data value, but it's not global to a data value, so if we've got multiple replicas of that data value, at different machines, then at any point in time there might be different vectors associated with each of those.
+So now let's assume that we are at timepoint zero, nothing interesting has happened yet, of course our data values have some value, and now data value D1 is actually written to by server X.
+So, initially, this is the first timestamp, the entry to this , so to say, entry vector, this pair Sx, and logical complement we want is the initial value.
+So this means Sx has written.
+Now let's assume that
+Sx makes a second write, still in the same process, to D1 and it changes this value, copies this value to D2, in general writes to D2.
+Now, we will create this vector clock and tree for D2, which is Sx, so the x is written, and the increment-- whenever we make a local write the local server's vector clock by one, so we now have the timestamp 2.
+Now assume that we're now communicating this value to server Y, and server Y is going to, itself, write the value.
+So we're going to extend this vector clock for this value, let's say we write to D3, by adding for Sy a logical timestamp 1.
+So we'll now have the vector
+Sx with timestamp 2, and Sy with timestamp 1.
+These could be the same value D2, but that server is different, that doesn't matter, but D2 has communicated some information to D3, potentially the value of D2.
+Based on this, the decision was made to write particularity D3, so we have to basically infect the vector of D3 with the information that what happens here happens after logical timestamp 2 at server X.
+So we have to record that the relevant last-seen timestamp of server X was 2, and the last-seen timestamp of server Y is 1.
+Now let's assume that independently, after Sx has written its second logical timestamp to D2, some data is communicated to a new server, Sz, and a value is written to D4, then we also have to expand the logical vector clock for D4 there, and we get Sx 2 and Sz 1, assuming that's the first logical timestamp for Sz.
+Now, let's assume now we want to reconcile this information, that means we send to some server two values, or we communicate from both Sy and from Sz to a single server.
+Let's assume that server is Sx again.
+Some information sent from both, the vector clocks have communicated, and they're basically now aggregate these vector clocks, we have to combine them.
+So Sx writes a new value.
+It sees Xx 2 and Sx 2 from the different vector clocks of Sy and Sz, and itself, it's going to increment it to the next vector clock time, which is free.
+And it has to combine Sy 1 and Sz 1.
+This is a conflict, because it cannot order, relative to each other, the changes made by Sy and Sz, they are independent from each other, so to say.
+So we need to invoke a conflict resolution mechanism that decides what to do with this value now.
+Now, what does conflict resolution mean in the context of this example that we discussed before, of the shopping cart at Amazon?
+We could think of, and model this as the shopping cart, consisting of a number of products, these are the different objects, and values being either serial 1-bits that say whether it's in the shopping cart or not.
+Let's assume that for now.
+Well, then, an inconsistency could arise if a particular product is in the shopping cart in one browser but is not in the other, so we have, for example, in Sy, set the bit to 1, and in Sz we have set the bit to 0.
+And then we would need a conflict resolution mechanism to make a decision about this, and in the case of shopping carts, it may be not so critical.
+We could either ask the user, or we could, for example, use a physical timestamp, an actual timestamp, to decide what is newer, that might be acceptable, but not in practice, given that users are very slow, and might not be able to click at the same point in time, into two different browsers.
+But overall things are quite clear.
+On the other hand, it might also be that both Sy and Sz have both set to speak to the same value.
+It's still a conflict in the viewpoint of the vector clock, because the vector clock doesn't know.
+But a conflict resolution mechanism, given the application semantics, might easily be able to tell no, that's not a problem, there's no conflict, resolution's very easy, the biggest one in both cases the new bit is 1.
+Now, how do we achieve eventual consistency, given this protocol?
+Well all that is left to be done is that servers that hold replicas of the same object talk to each other from time to time, so that their vector clocks are merged and, if there's a conflict, it gets resolved.
+So, ultimately, after some time, all machines will have the same values for each object.

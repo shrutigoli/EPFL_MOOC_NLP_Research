@@ -1,0 +1,244 @@
+Welcome back, Nature in Code.
+We are in Chapter 7, lecture 7.
+This is the final lecture of this chapter and in it, we are going to reason quantitatively about the outbreak size of epidemics. my notion, observing our simulations in the browser, was that the outbreaks are in average larger in the small world contact network as opposed to the completely local contact network.
+So let's find out.
+All right. So here's our code.
+We have down here this
+"set interval" method that we set up so that we can actually visualize things in a meaningful way.
+So we were basically artificially slowing down the call of these of this function here.
+Now, we don't need this anymore, actually now on a bunch of simulations and then calculate the outbreak size.
+So how many people got infected in total and then calculate the average.
+So I'm going to get rid of this "set interval" here.
+We don't need that anymore.
+We also don't need that anymore, as a consequence, so we're gonna get rid of that, and also in fact we don't need to draw anything anymore, so we can go to wherever we call this <i>draw_grid</i> function here, we don't need this anymore.
+If you want to, you can get rid of all the-- of all the D3 code, because we're not visualizing, but I'm just gonna leave it in here for now, we don't need it, but I'm gonna leave it in here.
+Okay, but now I kind of lost the pacemaker here, of this simulation.
+So,I will now need to implement this again by hand.
+And so I'm gonna go ahead and do this and I am going to define a function that I'm gonna call <i>run_simulation</i>.
+"Run simulation".
+So what it will do one simulation run needs to first <i>init_grid</i> and by the way, since I'm doing this here we can also get rid of the
+"init grid" up here.
+We don't need this anymore.
+So let's remove this as well.
+You remove some of the lines here.
+Okay.
+All right, function <i>run_simulation</i>, it should certainly call <i>init_grid</i>, and then I would like to run the simulation for as long as there are infected individuals there.
+Once we don't have any infected individuals anymore, that means everyone, whoever was infected, has recovered and nothing is going to happen anymore.
+So this is the point where we can stop.
+So basically,
+I want to keep the simulation running while I have infected individuals in the simulation.
+So what I'm gonna do is,
+I'm gonna set up <i>while</i> loop.
+So "while", and here I'm gonna call a function that I will have to define.
+<i>get_number_of_infected</i>.
+So this is a function that will get me the number of infected individuals in the population.
+I have to define this.
+But while this is larger than zero,
+I wanna keep the simulation running.
+In other words,
+I will call, I will keep on calling this function <i>run_time_step</i>.
+All right, so that will be a <i>run_simulation</i> function, so now what I need to do is,
+I need to now define this 
+<i>get_number_of_infected</i>.
+So let me do this here
+I'm gonna define a function,
+<i>get_number_of_infected</i>.
+All right, so how can we do this?
+Well, I'm going to implement kind of a brute force approach here.
+I'm simply going to go through all the cells in the grid and whenever I encounter an infected individual,
+I'm gonna keep track of the number of infected so here I'm gonna do this, and first of all,
+I am gonna set up a counter and then I'm gonna go through the grid.
+So using the 2 loops for "var i = 0",
+"i &lt; grid_length".
+And "i = i + 1", and then the exact same thing, of course for an inner loop, except, that we now need "iis".
+"ii &lt; grid_length" and finally "ii = ii + 1".
+So now I can simply say, if the individual here, on this particular cell grid [i] [ii], is actually an infected individual, so, '== "I"', double equal, of course, then I'm going to add 1 to the counter.
+So, "counter = counter + 1", and all I need to do at the end is to return the counter.
+Now and just to be clear.
+This is not the most performant way to do this.
+I could, of course, keep track of the state, "i", simply, whenever I call the <i>try_recovery</i> or to <i>try_infection</i>, and an individual moves from the S-Class to the I-class,
+I could simply increase the infected counters, sort of a global infected counter and when an infected individual recovers
+I could decrease it.
+The point for me here is not to actually write the most performant JavaScript code.
+It's simply to write these kinds of expressions here, loops, and "if statements" and so on, over and over again, this is some of the concepts of spaced repetition where if you learn something and you do something repeatedly with some space in between, you will have a much better long-term memory of this and so, for me, the goal for you is not to write the most performant JavaScript code, but to really completely feel at ease with this type of code, being able to think in terms of a raise in 2 dimensional raise and how you loop iterate through these arrays and do calculations on the elements in this array.
+So this is really the goal here, this is why I do this brute force approach here.
+But of course in the works.
+It's just not as fast as it could be, but so far we haven't really encountered any speed bottlenecks anyways.
+So this is now a great function. it gets the numbers of infected individuals at each time that I want to, in the population. however, is not very generic.
+What if I want to get the number of the susceptible individuals or the number of the recovered individuals?
+I could of course write three functions.
+Two more functions like this and I could call them
+<i>get_number_of_susceptibles</i> and 
+<i>get_number_of_recovered</i>, but the only thing that will change here is this state,
+So it seems like
+I can make this more generic, and I can do this by saying, by renaming this function to <i>get_number_in_state</i>. and then I would simply have to pass the state here as an argument.
+So I am defining the state as a parameter and a function.
+Really now, this counter should be called <i>number_in_state</i>.
+Because that is a effectively what it is capturing, so I'm going to replace "counter" with <i>number_in_state</i> here and here, and here of course.
+And so now I'm testing for equality the equality here not with an "I", but with whatever was passed as state.
+Now this is a much more generic function.
+I still do like the fact that I can just call a function called <i>get_number_of_infected</i>.
+It's it feels very natural, more natural than saying <i>get_number_in_state I</i>.
+So I'd like to kind o keep this function name, but I also prefer this function here to remain as generic as it is, so, what's the solution to this problem?
+Well, the solution is an intermediary function or a helper function.
+It's just a regular function, but it doesn't do much other than calling another function, so I'm gonna define here, this function <i>get_number_of_infected</i>, because I like the sound of it, it just feels very natural to use it,
+And it simply calls
+<i>get_number_in_state("I")</i>.
+And of course it does not only call this function.
+It also then returns the value that 
+<i>get_number_in_state</i> itself returns.
+So this is how it works.
+You call a <i>get_number_of_infected</i> well this gets called, this gets executed, so we go here through all the cells, check for state "I", then return a value and then we returned this value to work when <i>number_of_infected</i> was called. and so I can now basically copy this function twice and rename it here,
+<i>Get_number_of_susceptibles</i> for example, "susceptibles".
+So then I would simply return 
+<i>get_number_in_state("S")</i>.
+And finally <i>get_number_of_recovered</i>.
+"Recovered".
+And this would simply return 
+<i>get_number_in_state</i>.
+Okay, I am gonna save this, all right, so what next?
+Well, I do now have this <i>run simulation</i>, but of course it doesn't just run on its own.
+I need to call it and I, in fact,
+I don't want to call this only once,
+I want to call this many times, because I want to run many simulations and then calculate the outbreak size and then get the average, ultimately.
+So, I am going to do this down here,
+I'm gonna set up a loop.
+That loop will run, iterate 4.
+Well, let's define a variable that
+I'm going to call <i>number_of_simulations</i>
+I have not defined this yet, but I will in a second.
+<i>number_of_simulations</i>.
+And then of course '"I" = "I" + 1', and this is how many times
+I'm going to call this function,
+<i>run_simulation</i>.
+Okay, so I'm going to set this up here,
+"var number_of_simulations =" let's say, "100".
+All right, so I'm going to run simulations here a hundred times, but of course,
+I want to keep track of the total outbreak size in each simulation.
+So how did I get this?
+Well, it turns out that there's a handy method already and it's called
+<i>Get_number_of_recovered</i> so why is that?
+Well, in order for any individual to be in the recovered state, it had to be in the infected state before and so at the end of the simulation when we are out of infected, there are a number of recovered individuals in the population, and all of those have been infected.
+So this is really my outbreak size.
+So, I can easily calculate this by simply calling this function.
+But then what am I gonna do with this number?
+Well, I should probably stored it somewhere in an array so I am going to set up here an array called <i>Data</i>.
+Okay, just an empty array.
+And so what I'm gonna do here right after I call <i>run_simulation</i>,
+I'm gonna say, all right, I'm gonna push into this array the number of recovered individuals.
+Because that's the outbreak size,
+So <i>get_number_of_recovered</i>.
+All right.
+And you know what,
+I want to be a good citizen here and I don't want to have these global variables all over the place, so I'm going to cut those and
+I'm gonna move those up to where have the other variables.
+So, here. I am going to put them here.
+All right.
+Okay.
+So we are going back down here.
+I now have this loop.
+It will run a hundred times and then it will push the outbreak size into this data array.
+So what it could do now as a first step is
+I could simply log the content of this data race or <i>console.log (data)</i>. and then I can save this and go to our browser.
+Here still the the visual simulation.
+We won't need this anymore, but we will need to take a look at the JavaScript console.
+So I am going to reload this.
+And so now, this may take a few seconds, because it's running a hundred fairly complicated simulations and so here is the result.
+So you can see here that you have many simulations that only have one or two infected individuals in total.
+So at the end of course they are all recovered so these we've seen in the visual simulations before.
+These are the outbreaks that immediately fizzle out.
+Then there are some that are only 10 or 11 or so, or just a handful, but there are some here that in fact many that are over 6,000 and some even a little larger. so let me just reload this again just to see if there was a fluke here.
+Again, this will maybe take a few seconds, and now we have the results here.
+So, same thing, a lot of one and two outbreak sizes, but many that are over 6,000.
+So, recall that were still in the situation here of small world.
+So now I'd like to compare itself and not have in a small world.
+So if we go back to our code, the small world comes about up here, in the <i>expose_neighbors</i> function, where we have this if <i>math random</i> is smaller than 0.01, then we do this, we collect or rather we calculate these two random integer numbers to point to a random individual and then we try to infect this random individual rather than the local neighbors.
+So we could essentially set this to zero here and then it would, there would be no long distance transmission events and so there would be no small world.
+But rather then setting this here, we are going to replaced this here with a variable that I will call
+<i>rewiring_probability</i>.
+<i>rewiring</i>
+<i>probability.</i>
+And this is currently not defined, so we should of course do this and this is gonna be a global variable.
+Then I am going to set up here with the parameters.
+So, "var <i>rewiring_probability</i> = 0". and so if I wanted this to be a small world contact network,
+I could just set this to 0.01, for example, but now I a simply want to set this to zero, so that we can see what happens is the contact network is completely local.
+So let me save this and go back to the browser and then reload this and take a look here at the JavaScript console.
+And here I can see similar outcomes, so lots of simulations with just one patient zero that immediately recovers before it can infect other individuals but there are also large outbreaks.
+But it seems like the large outbreaks here are more often sort of in the 1,000 perhaps occasionally 
+2,000 or 3,000, but I don't see any 6,000 for example, which is what we had before and I'm gonna reload this once again.
+Wait a few seconds.
+And here, same kind of result.
+I do see a few fairly large outbreaks but none in the 6,000 range. so I think I've already confirmed here my notion quantitatively that indeed the outbreaks are on average smaller in this completely local network as opposed to the small world network.
+But you know that would be nice to quantify this and even more and rather than looking at the numbers here, why don't we just calculate the average in our code?
+So back in our code, what we need to do is we need a function that calculates the average of the elements that we have here in this array.
+So why don't we do that?
+I am going to define a function here that I am going to call
+<i>calculate_average_size</i>. so function <i>calculate_average_size</i>.
+And this will calculate the average size of the data array so I'm going to defined this here as a parameter "data" and of course I will have to pass this array as an argument, and then and simply calculating the average, so that's quite easy.
+As you know, the average is simply at the means so I have to sum up all the values and then divide by the number of values so <i>var sum equals zero</i> and then I'm gonna iterate or disarray so "for (var i equals 0";
+"i &lt; data.length" so however many elements we have in this array and then "i ++".
+So "i++"? why?
+This is a completely new notation
+I'll explain this in a second, but this is identical to 
+"i=i+1".
+0kay, curly brackets.
+Well, you are learning new things, even in the last lecture of the course.
+So here we can now simply say,
+I am going to add to some the ith element of data, so "sum plus +=data [i]"
+So once again you may be wondering,
+"Wait,what is this +=?"
+I've never seen this.
+This corresponds to "sum = sum + data" .
+And again, I am gonna also explain this in a second.
+So at the end we have the sum, so all we need to do is you need to <i>return</i> the division of sum divided by however many elements we have in data.
+So <i>data.length</i> and that is now calculate average size function that works.
+And so here now in <i>console.log</i>, rather than logging the data we are simply first passing the data through <i>calculate_average_size</i> which will then return the average size of the data rate.
+So let's save this, go back into the browser and take a look.
+So we're still in the completely local world here, so we're gonna reload this, this will take some time.
+And here you can now see the average size, so I'm gonna repeat this again and so we'll see this over and over again.
+So the average seems to be somewhere around 300, 400 individuals infected in the completely local contact network.
+All right, there seems to be a relatively consistent range somewhere between 300 and 400.
+So now we're gonna go back to our code and we're gonna set this whole thing to a small world network by simply changing this rewiring probability now to 0.01. okay save and go back to the browser and I will rerun this and take a look at the average here.
+So this will take a few seconds.
+So over 2.5 thousand seems to be the range here and that is, of course, quite a change.
+So I'm going to reload this a couple of times so that you see the values.
+So we seem to be consistently over 2.5 thousand individuals, even a bit more, so very clearly, the average outbreak size is about 6 to 7 times larger than what we observe in the completely local network and so now we have proof, if you will, that this is really the case if our intuition was correct.
+The average outbreak sizes in the small world network is indeed much larger.
+All else is equal, we simply rewired a few edges here and there and it has dramatic consequences. and this is why the small world network idea is so important.
+So I wanna go back to the code one last time and simply take a look at these new notations here
+"i + +" and "+ =". what is this? well, the idea is simple, rather than having to write "i = i + x", which is something that we do all the time. Right?
+We simply want to add some value here.
+"x" to an existing value.
+So this is how we do it and we've done it all the time and this works, of course, great.
+But there is also a shortcut and that shortcut is "+ =".
+So that simply means
+"add 'x' to 'i'" and store this in <i>i</i>.
+And this is not only true for "+", you can also use the "- =" and this simply means "subtract 
+"X" to "i" and store it in <i>i</i>".
+You can do the "x =".
+So this means "multiply "X" with "i" and store it in <i>i</i>. and of course also the "/ =".
+So this is a very handy shortcut and this is what we are using here instead of writing "sum + sum + data [i]" if it is really the "+" case, there is in fact an even shorter version of this if it just so happens that "X=1".
+So for simply adding 1 to a value, which we do all the time, in the loops, for example, then there's an even shorter version that is simple "i + +".
+So "i + +" is the same as writing "i = i + 1", which is the same as writing "i + = 1".
+So this is kind of a shortcut of the shortcut, in the extreme case where you are simply adding 1 to a value and this is something we do quite often as we iterate through an array.
+And so you'll see this all the time, for example, in four loops and I want to show you this.
+Now, I don't necessarily think this is the best way to write it,
+I actually think this is-- it doesn't really take much longer and it's a very instructive way of seeing what's going on.
+You take this value, you add one and then the result of this is going to be stored in "i".
+Again, this is,
+I think especially for a beginner much easier to understand than, what on earth is this "i + +"?
+But, I wanted to let you know that these shortcuts exist, because you see them all over the place,
+If you look at other people's JavaScript code so gonna remove this because this is not part of the code.
+I am going to save this code and with that we've come to the end of this lecture and to the end of this chapter.
+All right, that's it.
+We're at the end of this course.
+Congratulations you made it all the way through and you now have the basic programming skills to reason about the world and in particular also to reason about nature and evolutionary biology and infectious diseases and so on.
+This is an incredibly powerful skill and I'm very glad you now have it.
+Now, we should be clear, coding is a lifelong learning experience.
+It doesn't stop here.
+This is just a beginning.
+Even if technological development would stop tomorrow, it would remain a lifelong learning experience, but of course we all know it won't stop and it will indeed accelerate, but you now have the basic skills to keep on top of these developments.
+Soo once again, congratulations.
+If you have the time, please occasionally visit <i>natureincode.com</i>
+I keep updating the page, I keep adding examples from various fields, not just natural sciences also the social sciences, and I hope you will enjoy this as well.
+So, good luck and perhaps see you around.

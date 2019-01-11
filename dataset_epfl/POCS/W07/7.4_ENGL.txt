@@ -1,0 +1,127 @@
+Welcome back.
+We're still talking about virtualization and virtual machines, but no longer about the nuts and bolts of building a VMM or how to multiplex resources, but instead about one of the fundamental problems associated with virtualization, which is the problem of resource management in a layer environment.
+And this module is a case study.
+We're going to go over some of the architecture and some of the results of a system called DISCO.
+This is a project I worked on in the late '90s at Stanford.
+This was influential because it was one of the first papers to propose the use of virtual machines in the modern era.
+But if you actually look at DISCO's contribution, and I don't suggest you read the paper, you'll see that many of its contributions are actually in the area of resource management.
+How to efficiently manage resources in an environment that no longer runs a single operating system but multiple operating system instances.
+The approaches that were proposed in DISCO have found their way into commercial projects.
+In particular, ESX server uses a memory resource management technique or set of techniques that are improvements upon the base approach that was suggested in DISCO.
+And that is the system that you will be reading about in Carl Waldspurger's paper on memory resource management.
+So let's go back to the late '90s and at the time, one of the big areas of research in academia was in building highly-scalable shared memory multiprocessors.
+So the idea was to aggregate a very large number of resources together both CPU and memory.
+You had an interconnect to connect all these processing elements together and DISCO was actually the piece of system software running throughout the machine providing the abstraction of virtual machines so that you could actually run a cluster of virtual machines on these highly-scalable shared memory multiprocessors.
+Now, there are a number of challenges associated with that when it comes to memory resource management.
+The first one was to avoid having unnecessary replication of memory.
+Memory is a precious resource even on a scalable multiprocessor.
+It certainly was at the time.
+So it's important to avoid unnecessary replication of information.
+You wanted to be able to take advantage of the tight coupling that is enabled by the shared memory hardware.
+And then there's a second class of optimization, which I will not talk about, which is you want to ensure that the memory that is used is whenever possible local to the CPU as opposed to remote.
+So you want to optimize the locality from a ccNUMA perspective.
+Now the mechanism that we're using here obviously is the fact that there is an additional level of indirection.
+You will recall from the previous module, this chart, that talks about the relationship between virtual addressees, guest-physical addressees and host-physical addressees and the composed mapping being inserted into the TLB.
+Now what's important about this is this obviously is one of the key responsibilities of the VMM, is to manage these mappings correctly.
+But it's also one of the most important leverage points because the VMM can actually change any point in time the mapping between guest-physical addressees and host-physical addressees without impacting the operation or the execution of the virtual machine.
+And that is precisely the mechanism that we will use and take advantage of in order to optimize for memory.
+So again, classically, we take advantage of adding another level of indirection into the system in order to optimize its performance and its execution.
+Now memory is a particularly-known challenge and in particular when the memory is over-committed.
+Of course, if you have enough host-physical memory to run the aggregate of all virtual machines, things are not that complicated.
+But things become very interesting if you actually have a collection of virtual machines which in aggregate require more physical memory than the host actually has.
+Now this is a known problem.
+It's actually a known hard problem and if you look at the literature of virtual machines on main-frames.
+There is a well-known problem that was diagnosed way back probably as early as the 1960s which is known as <i>The Double Swapping Problem</i>.
+And so let's try to think about what this actually means because it's interesting to just think about the complications that arise in a layered system.
+So, assume the virtual machine monitor is under memory pressure.
+So, we're running out of host-physical memory because the aggregate of the virtual machines requires more memory than we actually have.
+Now if you think about the VMM being an operating system, the VMM can actually swap memory in and out onto disc.
+And this is actually what it does.
+The VMM has the ability to swap.
+So let's assume the case where the VMM is under memory pressure and swaps a page.
+Let's call this page X.
+Later, let's assume that an operating system running in a virtual machine becomes itself under memory pressure because each virtual machine is configured with some amount of guest-physical memory.
+So, the operating system also has the ability to swap and it decides to swap that same page X.
+Now it turns out that that page X is actually not in memory.
+It's already on disc but the operating system because it's a layered system does not know that the page is on disc.
+And so in order to swap the page onto disc it first has to bring that page in a very gratuitous way back from disc.
+So if you actually think about the set of interactions that are going on and the amount of traffic going to and from the disc, you end up having to bring a page back from disc onto memory-only to swap it back onto disc.
+Obviously, this is grossly inefficient.
+And this is a known notorious problem in mainframes.
+Now the double swapping problem is hard.
+You'll get an appreciation of it in reading Carl Waldspurger's paper.
+But in DISCO, we actually focused on a first-order problem which is that of the global use and efficient use of memory in a workload that can be partitioned into multiple virtual machines.
+So what we're seeing on the left is a configuration of that workload with a number of processes, these are the orange boxes.
+Running on top of a single operating system running on top of the hardware.
+And we compare that with the behavior of that same workload running on top of a virtual machine monitor in a collection of virtual machines.
+So the processes could be partitioned into the various virtual machines.
+And we actually assume from the CPU perspective that the workload can actually be partitioned in a relatively straightforward manner.
+But what we see here is that there's one data structure that gets replicated in an unnecessary manner and that is the buffer cache.
+And the buffer cache defines the set of memory resources managed by the operating system which are the cache of the file system pages that have been read from disc.
+The picture on the left, there's only one buffer cache.
+So there's only one copy of pages read from disc and memory.
+Whereas, in the picture on the right you have four virtual machines, four operating systems and therefore, four buffer caches, which may each independently store in their memory the same resources.
+And the buffer cache is actually a critically important aspect of a workload and a computer system.
+As a matter of fact, a significant fraction of the memory is typically dedicated to the buffer cache.
+And so the question that we're asking in DISCO is, how can we transparently share the buffer caches without having to involve the OS?
+How do we basically get the same level of memory efficiency when it comes to the buffer cache in both configurations?
+Now the solution that we came up with is to transparently share physical memory between virtual machines.
+We leveraged on the fact that there's an additional level of indirection between your guest-physical and host-physical memory.
+And furthermore, we take advantage of the fact that that relationship could either be a writable, read-write topomapping or it could actually be a read-only relationship.
+So you can transparently share two pages that can only be read by two different virtual machines that are using the same physical resources.
+Specifically we're using this technique in two instances in DISCO.
+We interpose on DMA to disc traffic and we interpose on network traffic in order to identify pages that are known to be identical because of the relationship between these pages and the IO subsystem.
+So let me first give you a perspective on how this works for discs.
+What we see here is a picture of two virtual machines.
+Both are reading and writing to their own disc but this disc is actually structured as a hierarchy with a shared base disc that is shared between multiple virtual machines and a Delta Disc which contains the unique elements of each disc.
+And each virtual machine has a unique Delta Disc where you store the writes but each virtual machine can transparently share some of the resources of the underlying base disc.
+So, let's take the case where we have end copies of a nearly identical file system.
+So most of the time, the operating system will be reading from the base disc.
+And whenever the operating system reads from the base disc what DISCO does, is associate that page with a particular offset in the base disc.
+And to then make that page read-only.
+By doing that, you can actually avoid subsequent reads to the actual
+IO subsystem because the second virtual machine wants to read to the same page we obviously look up the offset, see if it's in the map and if that is the case, we simply can have the two virtual machines point to the same location rather than having to go to disc.
+So this actually saves IO and also saves memory.
+Now whenever you transparently share, you need to be able to undo the mechanism that enables the transparent sharing.
+And that is what we in systems typically call copy-on-write.
+Now there are two layers in which copy-on-write applies.
+This is one of the very useful and generically useful techniques.
+We apply copy-on-write to the memory subsystem.
+So if a virtual machine actually decides to write to that page, change the content of that page, obviously the other virtual machine should not see the changes and so that triggers a page fault because the mapping is read-only and then we allocate at this point a new distinct page for the virtual machine that did the copying.
+And then the second case where we have copy-on-write is obviously to the disc itself.
+If you issue a SCSI write command which means the virtual machine wants to write to a particular offset or a particular sector on the disc, then we store the changes in the Delta Disc we keep the base disc unmodified and then subsequent IO to that location in the disc will actually be served by the Delta Disc.
+So a very simple technique you interpose on DMA and through that you actually reduce the memory footprint of virtual machines that have the same base file system, which is the common use case is you're running 22 copies of Windows, and these 22 copies of Windows actually are all running the same
+Windows based file system and therefore you can have a significant degree of sharing in your environment.
+Now the second mechanism that we use is the interposition on networking and for that
+I want to give you just a little bit of background because this is generically useful on how virtual machines communicate with each other and how they communicate with the rest of the world.
+And the basic observation is very simple.
+Which is modern operating systems all have a built-in networking stack.
+And so DISCO actually doesn't try to have it's own networking stack.
+Instead DISCO simply exports and emulates the abstraction of an Ethernet NIC to each virtual machine and then
+DISCO implements the abstraction of a software Ethernet switch that can forward Ethernet packets between VM and with the rest of the world.
+And so virtual machines communicate totally and absolutely like real machines.
+So DISCO's Ethernet switch does have a twist and that twist is that it can remap the fraction of an Ethernet packet that straddles an entire page.
+We actually take advantage of that not only to reduce the amount of CPU cycles required to communicate between virtual machines but also the amount of memory that is used.
+In particular, we're using it in the context of higher level networking protocol such as NFS which allow clients and servers to share the same network file system.
+So if you look at the picture on the left, what you see is the relationship between an NFS server and an NFS client.
+And we're illustrating what happens when there is the reply from a read request back to the client.
+So the server sends and creates a packet.
+The payload of that packet comes directly from the file system buffer cache and DISCO's Ethernet switch is intelligent enough to remap that page rather than to copy the content.
+But this is only one half of the answer.
+The second half of the answer is that the operating system when it receives the packet tends to actually copy the content from its intermediate location which is in the buffer that it received into its final location which is in its file system buffer cache.
+And so the normal implementation of an operating system actually does a regular call at that point.
+We actually had to make a very small modification to IRIX to change this call into a hypercall.
+So we basically asked the hypervisor to do a copying using the memory subsystem, a transparent copy using the memory subsystem semantically equivalent but without requiring copying of data rather than actually doing the copy byte by byte.
+And when you put this together, you actually have a solution in which you can transparently share your file system buffer cache between the NFS client and the NFS server.
+Now if you actually think about the problem that I described, and you fast forward back until today, so 15 years later, this problem is actually surprisingly as important as ever.
+And that is because the size of the VM keeps increasing.
+The density of virtual machines keep increasing.
+When people are running desktops on servers, which is popular in some use cases in the enterprise today, you often see 100, 200, 300 virtual machines running on the same high-density server.
+So you have a tremendous amount of density and sharing opportunities.
+And the memory resource management is extremely important in the context of migration of virtual machine because the memory of the virtual machine is the single largest resource that needs to be shuffled around over the network and an efficient handle on the memory sharing opportunities reduces the costs of migration in a significant manner.
+Now the case study that I described, describes an early system if anything the first system that actually tried to transparently share memory.
+It's preliminary and it's naive in a number of ways.
+It only works when you already know that the content is going to be the same and also it does not solve some of the harder problems, in particular, the double buffering problem.
+Those are key improvements that you will hopefully get an appreciation for in reading Carl Waldspurger's paper which is on the reading list for this week.
+And this wraps our module on memory resource management.
+Thank you very much.

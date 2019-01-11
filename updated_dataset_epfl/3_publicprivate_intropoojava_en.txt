@@ -1,0 +1,131 @@
+In the last episode, we learned how to code declarations of classes how to define their data members and methods, that is, on this graph summarizing
+OOP, essentially this axe that we have examined in the last video.
+But how do we in Java materialize the notion of interface, the visible part of the class, and the implementation part of the class, that is hidden.
+How do we implement this axe of the chart?
+This will be the topic of this video.
+Concretely, if we look at the class Rectangle from before we decided to have a method surface that was part of the interface and that could be used anywhere in the program and we also have two private data members "largeur" and "hauteur".
+In Java, the private components are declared like this.
+We will add the keyword "private" before each data member or method that we want to hide, making them inaccessible outside the class.
+These members will therefore not be in the interface.
+Inaccessible from outside a class simply means that if, for example, in the method main or in another class we wrote this,
+(we declare an instance of the class Rectangle, and we try to directly access the height like this) in this case the compiler will return an error message saying that the field "hauteur" is declared private in Rectangle.
+Note that if nothing is specified, like for this method surface, then it will have a default access that I will elaborate on in a few minutes.
+So we saw that to declare the private implementation part, we use the keyword private, and inversely for the public interface that we want to have available externally, and accessible from all the other classes we use the keyword public.
+So the method surface, being part of the interface of Rectangle, we will add "public" before the header and definition of the method surface.
+If I take up the last example of a method main, that declared an instance rect of the class Rectangle, this instance would be able to invoke the method surface and store the return value in a variable.
+This is possible because the method surface is declared public.
+If it had been declared private, then I couldn't have done this manipulation: accessing surface outside of the class Rectangle.
+I would like to remind you of some programming guidelines, and important principles in OOP.
+One is to declare all the data members private, even if there are some exceptions that we will not consider here, and are not important in this context.
+Thus it is absolutely indespensable to not have any data member public and declare private any method used internally to modularize the class implementation, and only have a few hand-picked public methods in the interface.
+The core of a good conception is to make the right choices for the public methods.
+A small technical annex on access rights: programs in Java are usually organized around the notion of "packages" that is not presented in the introductory videos but is presented in the course complements.
+Even if you don't declare a package, you are, in fact, in a default package.
+If you don't declare a data member or method private, then this member is actually accessible in any class that belongs to the package.
+It's as if it were declared public for the entire package and private for everything outside the package.
+This is what is called
+"friendly access rights".
+If for example, in a default package, you have a class Rectangle that contains a data member "hauteur" but isn't declared private or public, and in the same package, you also have a class Dessin that uses the class Rectangle, then this class Dessin will have access to "hauteur" and to any other data members and methods that are declared without access rights because Dessin is in the same package.
+Thus Dessin can directly access the member variable "hauteur" of the Rectangle rect, which I find is not great.
+That is why we recommend that you explicitly specify public before each data member and methods that you want to have in the interface.
+These will be public, not only for this package, but also for other packages.
+Everything private will be reserved for the implementation details.
+So this is all I want to say on packages.
+It's a technical aspect of Java that is perhaps a bit premature for this course.
+That said, you could say that if all the data members are private, how will I be able to use them?
+For example, if we wanted to modify the height of my rectangle, this in itself being debatable.
+Do we really want to change
+But let it be so.
+Suppose that we want to access the height of the rectangle just to know its value.
+How can we obtain the values of the dimensions of the rectangle if they are private data members if we can't access them outside the class?
+I can't do something like this: declare a new rectangle and try to print its height.
+This is something that I cannot do because the variables are private.
+To solve this problem, we will include in the interface a few methods necessary to this end
+[called setters and getters] so for example a method to modify the height, a method to access the width, etc.
+For example, here, we want a method that returns the value of hauteur and we would write something like this with a method getHauteur.
+I would like to insist on this important aspect of writing a program, that you don't have to systematically include methods to modify or even to access the data members of a class, but you have to decide which variables can be modified or accessed from outside through methods like these.
+Methods that only access the value of the variable are called "accessors".
+And methods that modify the values of the data members are "mutators".
+Accessors, also called "get methods" or
+"getters", return the data member's value.
+So if we need to access the value of the data member "hauteur",
+"hauteur", being of type double, the method will return a value of the same type a double, with "double getHauteur", and we will write "return hauteur".
+Recall that all methods of a class can access the data members of the class, so here it is the height of the current instance (that called the method).
+In the same way, we can declare an accessor for the width.
+Mutators, also called "set methods" or
+"setters" modify the data members by assigning them a value.
+To do this, they have to first receive the value from outside, and this received value will then be assigned to the variable.
+So this value is received as parameter and doesn't return anything, because its purpose is not to return something but to assign a value.
+So for example, value of the parameter
+"h" is copied to the variable "hauteur", and likewise, the value of the parameter "l" is copied to the variable "largeur".
+Let's illustrate this with an example.
+We have as before, a class
+Exemple, with its method main where we use the instance rect1 of the class Rectangle, that has in its interface a method surface, as well as two get methods.
+Here an accessor getHauteur that doesn't take any arguments because it doesn't need any values, however, it returns a double,
+(double because the value of the returned variable is a double). hauteur and largeur are as before in the implementation part and are declared private.
+Similarly, we have an accessor for the width, and in the public part we also have a mutator setHauteur, that receives the value to assign the data member from outside, through the parameter h.
+To use these methods, for example in the method main, we will, for instance, call getHauteur which will return the height of the instance rect1.
+We will have assigned beforehand the value 3 to the height of rect1 by writing "rect1.setHauteur(3)".
+The value 3 will then be copied into the data member "hauteur" of rect1.
+Likewise invoking setLargeur on rect1 will sett the width of rect1.
+Another comment students frequently make is
+"Why do we have to do all this?
+It's too complicated to write all this!"
+"Why not keep largeur and hauteur public?"
+"Like this, we can use them however we want!"
+But it's using them in whatever way that's exactly the problem!
+For example in this case, if I declare an instance rect1 of Rectangle,
+I could very well assign the invalid value -36 to its height.
+While, if instead of assigning this value to the data member,
+I had passed it to the method setHauteur, we could have had in this method a mechanism to verify whether the value is positive and valid, and in this case, assign the value, or if the value is negative or zero, then to, for example, report the error.
+Using this set method allows for a verification process that guarantees the validity of the data.
+Suppose that we also have a data member a bit more complex, here, a String "label", for example, that contains some information and that we use externally by writing for example "rect.label.length" using methods associated with the type String.
+Suppose now, that we write
+400 lines of code like this directly accessing "label".
+If the class programmer decides to substitute the String with an ArrayList, we would have to throw 400 lines out and write everything from scratch.
+But if we had only used the interface, which isn't supposed to change, and that we do not access the class fields directly, but only through the interface, then if the class programmer changes the String to an ArrayList, our 400 lines will not be effected because they respect the class interface.
+It's for these two fundamental reasons: the ability to verify the values assigned to different fields, and the ability to modify the program independently (modularization) that we recommend to use getters and setters and to not put data members in the interface, but to have the exclusively in the public part of the class.
+It's clear that doing this in small exercises doesn't make much sense, but does in a big project.
+Moreover, it is in this context that
+OOP was invented.
+And so it is with this objective in mind that we learn these principles.
+So follow these guidelines, and try to separate to the maximum members constituting the interface from those that are implementation details.
+To close, let's examine another technical aspect: shadowing.
+Shadowing occurs when an identifier, a name, for one variable shadows a name used for another variable.
+This happens typically in OOP, when a parameter, such as "hauteur" in the method setHauteur, hides the data member for height "hauteur".
+In this context, we would like to designate the data member with this "hauteur" and the parameter with this other  "hauteur".
+But in this situation, the compiler will not know the difference and so writing this is not correct.
+So what to do?
+Well we can simply use different names, like we did before, with h being the name of the parameter.
+In that case there isn't any ambiguity.
+Or else you can use a technique which removes the ambiguity by by resorting to the keyword "this" to refer to the current instance, so "this = current instance".
+In the last example, to illustrate, if we call the parameter of the method "hauteur", then we will have to unmask the name "hauteur" referring to the data member by saying "this.hauteur" meaning "this current instance's hauteur" so "this.hauteur" designates this height.
+In this situation, it is obligatory to put "this", but I recommend to avoid this kind of situation, by choosing different names, that are clear and avoid any ambiguity.
+Let's summarize what we have learned about access rights as well as the scope of data members and methods of a class.
+We saw that the keywords "private" and "public" determine the access rights. private defines what constitutes the hidden implementation details, only accessible from within a class, while "public" defines what is part of the interface, accessible from outside the class, from the main, and other classes.
+So here the scope of the data members is limited to the class, x and y are accessible anywhere in "MaClasse" and particularly in any method of this class.
+For example, here "y" refers to the data member of the instance that the method would apply to.
+Shadowing can also occur here, if we reuse the name of the data member, like here with the parameter.
+So then, because of scope resolution, x will locally refer to the parameter x.
+So if we want to refer to the data member x, we have to use the word "this" to unmask x.
+"this.x" then refers to the instance to which the method is applied.
+Let's end this video, with another technical aspect: how objects are represented in memory.
+This technical aspect is nevertheless important when writing code.
+I recall, like we saw earlier, in the first course on programming, that objects like Strings or arrays, are represented in the memory through references.
+For example, if I declare a
+String v initialized at "Welcome", then we can see the storage like this, v is a reference to a certain memory location where the value "Welcome" is stored.
+In the same manner, if I declare
+2 Rectangles, rect1 and rect2, in the memory I would have
+2 references to 2 memory locations that effectively contain its height and its width.
+Now if we assign the values 3 and 4 to rect1's height and width, and also initialize the dimensions of rect2, for example 11.3 and 2.7.
+We will have this depiction of the memory, with objects being in fact references to locations where their values are really stored.
+This is paramount to know when comparing objects, because we have to know if we are comparing the references or their values?
+At this stage, we are only comparing references if we don't do anything.
+If we copy an object into another we are in fact doing this, with rect2 = rect1.
+And if I print an object, only the reference will be displayed even if we wanted the real values displayed.
+We will come back to this aspect later in the course.
+Variables being references, they can also be a reference to no object,
+In this case we would use the keyword "null".
+So for instance, I can declare here an instance rect of the class Rectangle and say it is null, which means that it is a reference to nowhere, which can be represented like this.
+So we can frequently see this kind of code: if rect == null then do something, such as assigning it a new rectangle.
+Or else you can have, if rect is not null, than in this case use it for example to call the method surface.

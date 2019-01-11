@@ -1,0 +1,134 @@
+Welcome back.
+Nature, In Code
+Weâ€™re in chapter seven, lecture five and we just started an epidemic.
+And you can tell that
+Iâ€™m extremely excited about this.
+Now in the real world,
+I wouldnâ€™t be excited at all.
+But here in the computer, in our simulation
+That's quite alright.
+It is very exciting.
+But we've seen that there's one crucial step missing and that is that of recovery.
+This is what we're going to implement right now.
+So, here we're back in our code.
+This seems to work all well.
+So we have all these functions here.
+And here is the core of it.
+The "run time step" function that sets up the "temp grid" and then exposes the neighbours if they're infected and, finally, moves the statuses over from the "temp grid" into the "grid".
+So, we do have the exposure function here.
+But what we donâ€™t have is
+If there's an infected individual we may expose the neighbours.
+But there's also the chance that an individual recovers.
+Whatâ€™s missing here really is that we need to give these individuals a chance to recover.
+So, Iâ€™m simply going to now call a function here
+"try recovery" as well, so "try recovery".
+Again, we need to pass in the co-ordinates, so that this function will know which individual tries to recover.
+And then Iâ€™m going to implement this function
+ â€œtry recovery"
+Iâ€™m going to do this down here.
+It doesnâ€™t matter where we do it.
+But I already have the
+"try infection" function here
+So, Iâ€™m going to implement the â€œtry recoveryâ€� function as well.
+Now we donâ€™t need to go through all the neighbours because recovery is now something that really affects only one individual.
+So, we can basically use this exact same logic here
+We can say, ok, if the individual is indeed infected at the moment.
+So, here weâ€™re not testing for susceptibility weâ€™re actually testing for infectiousness.
+So if this individual is infected then with a certain probability it will recover.
+So, if â€œMath randomâ€� is now smaller than â€œgammaâ€�
+OK? not "beta",
+"gamma" is the recovery probability.
+Then set the corresponding
+"temp grid" individual 
+So "temp grid, i, ii" to "R".
+So, this is virtually the same function.
+It's just named differently.
+And here it just checks for status "S", here it checks for status "I", the condition here.
+The probability of something happening, is "beta" here,
+It's "gamma" here .
+And what happens is this individual moves from susceptible to infected.
+Whereas this individual moves from infected to recovered.
+And that's pretty much it.
+So, by the way
+I don't know if you noticed but in principle we're doing a double-check right, we are testing here that the individual is infected in the first place.
+Otherwise, there can be no recovery.
+But, in fact we're already testing this up here.
+And that's fine.
+I mean, in principle it is a double-check.
+And one of them is, in principle, unnecessary.
+But, I certainly would like to keep them here in any case.
+But, certainly, also, here it seems like it's a good place just to double-check, and to make this method stand alone. 
+Because this method cannot be 100% certain that whoever calls this method has already checked whether the corresponding individual is indeed infected.
+So, this is an extra step that, in principle, would be unnecessary, but I still think it's good practice here in this case.
+So with that out of the way.
+Let's save this and let's go over to browser.
+Where we have our poor fully infected population, and let's reload this.
+So, now what you see here is a real infection.
+So, these individuals in red are obviously infected and they will expose the grey individuals nearby and because of that, the epidemic keeps spreading but everyone in the back eventually recovers.
+And now this process will at some point stop because essentially we are running out of susceptibles.
+Now, it's happened.
+Let me reload this again.
+So here it's starting and it's slowly spreading out, and it does so at the edges, because that's where the susceptibles are.
+It can't, obviously, the green individuals here have recovered, they cannot be infected any more.
+And here, again, eventually the infection will run out of susceptibles.
+So, that's a key observation here.
+Another observation that you
+I'm sure have noticed, is that we have these small islands these small clusters of grey meaning susceptible individuals.
+Why is that the case?
+Well, essentially these individuals probably just lucked out.
+I mean, I'm sure some of them here, well, it's guaranteed in fact that each inidvidual here that has green neighbours has at somepoint been surrounded by red neighbours because the green individuals, all of them, were red before.
+It just so happened that they recovered before they had a chance to infect the susceptible individuals.
+So all of these individuals just got lucky.
+There are some here in these larger clusters that got very lucky in the sense that, there, all their neighbours got lucky in the first place by not being infected even though they were exposed.
+And so there are few individuals that indeed were never ever exposed but that's very very rare.
+Most of them were exposed but just by chance they didn't get infected.
+Now, another observation is in fact that this recovery may die out.
+It could be that these infected individuals all recover before they have a chance to infect new individuals.
+This is not happening here.
+Let's see, maybe it's happening here
+No, it's not happening.
+Well, maybe we should just go back to the code and increase our probability of recovery a little bit.
+So let's go back to our code.
+And go up here where we have the global variables.
+And here we have "gamma".
+That's the probability of recovery.
+Let's set this to "0.15" instead of just "0.1".
+So now there's much faster recovery and it may be that now the infection will die out earlier. Let's see.
+So, yep, here it just happened.
+You saw this.
+You saw a few dots here in red, but then they recovered too fast before new individuals could be infected, and, of course, once the last infected individual recovers there's no more infection.
+Let me just reload this.
+Here, no, it almost died out.
+Let's see, it looks like this could keep going for quite a while.
+Now it's a bit harder because it's now on two fronts.
+One here, one here, one down here.
+And this probably just keeps going.
+But you can already see there are potentially very large clusters now here of susceptibles, because it locally died out before it could start an infection here.
+Now let's see where this is going.
+This is an interesting case.
+So this one died out.
+It looks like it's dying out here.
+So you can see here the consequence of this now is that the outbreak size for the number of individuals that got infected in total is now smaller
+It's probably, I don't know,
+I'd say around a third here of the total population.
+Let's do this one more time.
+One more time where it doesn't die out.
+So, here we have a cluster it's growing on three fronts.
+And now it's only growing on two it seems.
+One here to the left, one to the right.
+The one here died out.
+The one here died out as well.
+So, now you can see this is a farly "small" outbreak that basically stopped itself so to speak.
+So this is the consequences of a really fine balance between this probability of infection and the probability of recovery.
+And if the recovery rate is very low compared to the infection rate then pretty much everyone will get infected.
+But if it's relatively high compared to the infection rate, then there's probability these outbreaks will stop on their own because the infected individuals will eventually recover before they get a chance to infect new individuals and this is exactly what happens here.
+So, it's a constant race between recovery and infection.
+So, this concludes our simulations of this standard situation.
+What I want to do though is I want to take one more shot at this and modify something which can have which is a small modification but it can actually have huge consequences.
+That modification is that we're going to modify the contact network.
+So, at the moment we asssume that each individual has exactly eight contacts or neighbours
+The slight modification that we're going to make now is occasionally, very rarely, a contact is being made between two individuals that are potentially very far away.
+So, "long distance" contact.
+And you can think of this as someone gets on a plane, travels to some other place and then has contacts there.
+This is, now, something we can implement very easily with the code we have in place and as we'll see in the next lecture this will have rather dramatic consequences.
+So, I'll see you in the next lecture.

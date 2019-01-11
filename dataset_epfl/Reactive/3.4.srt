@@ -1,0 +1,1433 @@
+1
+00:00:00,810 --> 00:00:06,480
+We've seen quite a few examples of using
+futures but what we want to do in this
+
+2
+00:00:06,480 --> 00:00:12,500
+lesson is to write code that uses futures
+
+3
+00:00:12,500 --> 00:00:19,370
+in slightly more interesting ways.
+So not just using flat map.
+
+4
+00:00:19,370 --> 00:00:21,390
+But, using more interesting ways.
+
+5
+00:00:21,390 --> 00:00:26,130
+We want to write real programs on
+computations that return Futures.
+
+6
+00:00:27,710 --> 00:00:31,380
+Here's our familiar example of using
+Futures to read
+
+7
+00:00:31,380 --> 00:00:35,440
+from memory and send a packet to Europe
+and back.
+
+8
+00:00:35,440 --> 00:00:39,250
+And, in this case, we're using flatMap to
+compose
+
+9
+00:00:39,250 --> 00:00:42,950
+the readFromMemory call with the send to
+Europe call.
+
+10
+00:00:44,520 --> 00:00:49,440
+Of course we know that we can write this
+using for-comprehensions as follows.
+
+11
+00:00:49,440 --> 00:00:52,250
+So we read from memory and we send the
+packet.
+
+12
+00:00:54,190 --> 00:00:58,110
+But now imagine that we want to do
+something slightly more complicated.
+
+13
+00:00:59,230 --> 00:01:02,430
+that we want to do something that involves
+control flow.
+
+14
+00:01:02,430 --> 00:01:04,150
+In that case.
+
+15
+00:01:04,150 --> 00:01:10,170
+Loads, flatmap and comprehensions are not
+the most convenient tools.
+
+16
+00:01:10,170 --> 00:01:14,310
+And since we want to be real functional
+programmers, we're going to look
+
+17
+00:01:14,310 --> 00:01:19,640
+at some more power tools that we can use
+to write codes involving futures.
+
+18
+00:01:21,010 --> 00:01:25,060
+The challenge that we're giving ourselves
+is to implement the call on method.
+
+19
+00:01:26,290 --> 00:01:32,970
+This method takes a, an integer and a,
+call
+
+20
+00:01:32,970 --> 00:01:38,640
+by name future, a lazy, a block, a lazy
+future and returns a future.
+
+21
+00:01:38,640 --> 00:01:44,930
+And what we want to do is we want to retry
+this computation at most m times.
+
+22
+00:01:46,110 --> 00:01:49,340
+So, as soon as it succeeds, we want to
+return it.
+
+23
+00:01:49,340 --> 00:01:54,340
+But otherwise we want to keep trying, keep
+trying, up to n times.
+
+24
+00:01:54,340 --> 00:01:58,830
+And since we want to rerun the future
+every time.
+
+25
+00:01:58,830 --> 00:02:01,720
+Because of course, if we would not do
+that, remember the
+
+26
+00:02:01,720 --> 00:02:06,420
+future, once it's has completed it will
+always return the same result.
+
+27
+00:02:06,420 --> 00:02:10,930
+We have to pass it here.
+As a call by name parameter.
+
+28
+00:02:10,930 --> 00:02:11,290
+So this
+
+29
+00:02:11,290 --> 00:02:12,750
+is super important.
+
+30
+00:02:12,750 --> 00:02:16,110
+If you would not do this then the future
+would
+
+31
+00:02:16,110 --> 00:02:19,310
+be eagerly evaluated and you would always
+get the same result.
+
+32
+00:02:20,680 --> 00:02:25,400
+So, what we want to do is to run this
+computation at most n times.
+
+33
+00:02:25,400 --> 00:02:30,740
+How do we do that?
+Well, here's a way to use recursion.
+
+34
+00:02:30,740 --> 00:02:36,890
+What we do is, we just recurse over the
+number of times.
+
+35
+00:02:36,890 --> 00:02:42,370
+If we have zero times left, well, then we
+obviously have failed.
+
+36
+00:02:42,370 --> 00:02:47,090
+So we return a Future that is failed, with
+an exception.
+
+37
+00:02:47,090 --> 00:02:50,730
+Sorry we couldn't you know, make this
+thing succeed.
+
+38
+00:02:52,140 --> 00:02:57,260
+Otherwise, we use our friend, fallbackTo.
+We execute
+
+39
+00:02:57,260 --> 00:03:02,180
+the Future, and only if it fails, we call
+
+40
+00:03:02,180 --> 00:03:06,750
+retry recursively.
+And notice that.
+
+41
+00:03:06,750 --> 00:03:11,300
+Because of the laziness here, because of
+the call by name, everything works out.
+
+42
+00:03:11,300 --> 00:03:14,060
+Fallback took also a call by name
+
+43
+00:03:14,060 --> 00:03:16,960
+parameter so it only evaluates its
+argument if
+
+44
+00:03:16,960 --> 00:03:22,080
+this one failed, and now we call retry
+again with a call by name parameter.
+
+45
+00:03:22,080 --> 00:03:25,699
+So all the laziness exactly works out.
+
+46
+00:03:27,240 --> 00:03:34,140
+Now, some guy called Erik Meijer once said
+that recursion
+
+47
+00:03:34,140 --> 00:03:38,530
+is the GOTO of Functional Programming.
+And, guess what we are doing here?
+
+48
+00:03:38,530 --> 00:03:40,240
+We are using recursion.
+
+49
+00:03:40,240 --> 00:03:46,900
+And that guy Erik Meijer happens to be me.
+So I really am not allowed
+
+50
+00:03:46,900 --> 00:03:51,770
+to write recursion programs, because
+otherwise I would contradict myself.
+
+51
+00:03:51,770 --> 00:03:52,480
+So,
+
+52
+00:03:52,480 --> 00:03:55,220
+let's see if we can write this without
+recursion.
+
+53
+00:03:58,020 --> 00:04:02,950
+As true functional programmers, we all
+know that instead of recursion, we
+
+54
+00:04:02,950 --> 00:04:07,730
+should use fold.
+Fold right, fold left or any of the
+
+55
+00:04:07,730 --> 00:04:14,640
+variations of fold.
+I found it, I had a tip from Richard Bird.
+
+56
+00:04:14,640 --> 00:04:18,530
+This is the real hero of list programming.
+
+57
+00:04:18,530 --> 00:04:24,000
+And he has a nice tip to remember what
+fold left and fold right means.
+
+58
+00:04:24,000 --> 00:04:26,710
+If you look at the wind, if you say, today
+there's
+
+59
+00:04:26,710 --> 00:04:31,000
+a northern wind, it means that the wind
+comes from the north.
+
+60
+00:04:31,000 --> 00:04:34,050
+And this is the same with fold left and
+fold right.
+
+61
+00:04:34,050 --> 00:04:37,890
+The fold right comes from the right.
+So here you see the arrow.
+
+62
+00:04:37,890 --> 00:04:40,450
+Fold right comes from the right.
+
+63
+00:04:40,450 --> 00:04:45,500
+And conversely, fold left comes from the
+left.
+
+64
+00:04:45,500 --> 00:04:49,550
+So if we have a list a, b, c.
+And we
+
+65
+00:04:49,550 --> 00:04:53,210
+fold right with a seat value and a
+function.
+
+66
+00:04:53,210 --> 00:04:54,530
+We come from the right.
+
+67
+00:04:54,530 --> 00:04:56,740
+So we start the seat value.
+
+68
+00:04:56,740 --> 00:05:00,850
+Then we take the last value of the list,
+we apply the function.
+
+69
+00:05:00,850 --> 00:05:05,410
+Then we take b, apply the function and
+finally we apply a.
+
+70
+00:05:05,410 --> 00:05:09,380
+So here you see fold right comes from
+right to left.
+
+71
+00:05:09,380 --> 00:05:13,950
+Starting with the seat, applying f.
+To each element in the list.
+
+72
+00:05:15,050 --> 00:05:18,810
+And here you see fold left coming from the
+other side.
+
+73
+00:05:18,810 --> 00:05:23,520
+Starting with the seat and applying the
+function to each subsequent element.
+
+74
+00:05:24,710 --> 00:05:28,730
+Alright, so what we're going to do, is
+we're going to now
+
+75
+00:05:28,730 --> 00:05:34,070
+try to write our retry function using fold
+left and fold right.
+
+76
+00:05:35,150 --> 00:05:36,500
+This is what we're going to do.
+
+77
+00:05:36,500 --> 00:05:40,230
+So let's look at here, this is the trick
+that we're going
+
+78
+00:05:40,230 --> 00:05:41,010
+to do.
+
+79
+00:05:41,010 --> 00:05:46,890
+Say that we want to do retry three of our
+future block.
+
+80
+00:05:46,890 --> 00:05:51,530
+What we want to do is we want to unfold
+that into the following quote.
+
+81
+00:05:51,530 --> 00:05:56,220
+So we want to do failed recoverWith.
+The first copy of the block.
+
+82
+00:05:57,810 --> 00:06:02,200
+Recover with second.
+Recover with third.
+
+83
+00:06:02,200 --> 00:06:05,860
+And as you see.
+This is a fold
+
+84
+00:06:05,860 --> 00:06:09,240
+left because we are starting on the left
+
+85
+00:06:09,240 --> 00:06:12,070
+and you see that the brackets are like
+this.
+
+86
+00:06:12,070 --> 00:06:15,140
+So how do we write this as a fold left?
+
+87
+00:06:15,140 --> 00:06:20,690
+Well first of all, we need to create a
+list with three copies of the block
+
+88
+00:06:20,690 --> 00:06:25,800
+and we need to make sure that those
+futures here are not evaluated.
+
+89
+00:06:25,800 --> 00:06:30,460
+So we, we create a list of, alright well
+we shouldn't a create of three copies.
+
+90
+00:06:30,460 --> 00:06:30,830
+We,
+
+91
+00:06:30,830 --> 00:06:34,280
+as we should create a list of.
+Number of times.
+
+92
+00:06:34,280 --> 00:06:37,360
+So we create a list of number of times,
+and
+
+93
+00:06:37,360 --> 00:06:39,910
+then we map that, the block over that, so
+now
+
+94
+00:06:39,910 --> 00:06:43,630
+we have a nice list with copies of the
+block,
+
+95
+00:06:43,630 --> 00:06:47,400
+and then we do our foldLeft here with the
+recoverWith.
+
+96
+00:06:48,510 --> 00:06:52,230
+to run over that, and you will see when
+you
+
+97
+00:06:52,230 --> 00:06:56,420
+execute this, when you unfold this, it
+will actually unfold
+
+98
+00:06:56,420 --> 00:06:57,550
+exactly into this.
+
+99
+00:06:59,040 --> 00:07:02,530
+Now, let's try to do that with the
+foldRight, what we
+
+100
+00:07:02,530 --> 00:07:05,645
+want to do here, is we want to achieve the
+full
+
+101
+00:07:05,645 --> 00:07:06,850
+[INAUDIBLE].
+
+102
+00:07:06,850 --> 00:07:10,020
+In this case, we want to start on the
+right.
+
+103
+00:07:11,040 --> 00:07:15,720
+And then, build up our code like this.
+
+104
+00:07:15,720 --> 00:07:19,310
+We want to have failed, or but, we want to
+build
+
+105
+00:07:19,310 --> 00:07:21,860
+it from the right to the left as you see
+the braces.
+
+106
+00:07:21,860 --> 00:07:25,110
+But really we're reading the code from
+left to right so.
+
+107
+00:07:25,110 --> 00:07:28,260
+We want to have block one and then if that
+
+108
+00:07:28,260 --> 00:07:31,740
+fails, we want to fall back to the second
+try.
+
+109
+00:07:31,740 --> 00:07:35,370
+If that fails, we want to fall back to the
+third try, et cetera.
+
+110
+00:07:35,370 --> 00:07:39,070
+And then, of course, in general, number of
+times.
+
+111
+00:07:39,070 --> 00:07:43,790
+So here we do the same thing, we create
+the list, we map the block over it.
+
+112
+00:07:43,790 --> 00:07:46,880
+Being careful that the block get not
+executed.
+
+113
+00:07:46,880 --> 00:07:50,760
+And then we do the fold right over here.
+
+114
+00:07:50,760 --> 00:07:57,160
+Now notice that in this case, we start
+with a seat that is a function,
+
+115
+00:07:57,160 --> 00:08:00,780
+okay?
+And whenever we now
+
+116
+00:08:03,230 --> 00:08:07,820
+Combine the two, so this is our
+accumulator and this the block.
+
+117
+00:08:07,820 --> 00:08:13,940
+The accumulator is a function.
+It's a function from unit to future.
+
+118
+00:08:15,010 --> 00:08:19,890
+And what do we do?
+Well we do the fallback and in this case
+
+119
+00:08:19,890 --> 00:08:25,470
+since the fallback here is in, inside A, a
+block.
+
+120
+00:08:25,470 --> 00:08:28,270
+We have to reduce the type here
+
+121
+00:08:28,270 --> 00:08:33,580
+from a unit to future to a future but that
+gets
+
+122
+00:08:33,580 --> 00:08:38,730
+captured in the fall back block so that's
+all lazy just lazy enough.
+
+123
+00:08:38,730 --> 00:08:43,800
+So this code is quite subtle and I advice
+you to kind of go grab a cup
+
+124
+00:08:43,800 --> 00:08:49,150
+of coffee or a pot of tea or you know a
+few snacks.
+
+125
+00:08:49,150 --> 00:08:53,600
+And study this code at your own time and
+really
+
+126
+00:08:53,600 --> 00:08:59,780
+convince yourself that when you execute
+this, that the result is this.
+
+127
+00:09:01,330 --> 00:09:07,760
+The previous two attempts to use fold left
+and fold right were not.
+
+128
+00:09:09,180 --> 00:09:13,210
+I think, our best examples of writing
+code.
+
+129
+00:09:13,210 --> 00:09:17,190
+If you're a real great programmer, you
+should write baby code.
+
+130
+00:09:17,190 --> 00:09:18,640
+You should never write code
+
+131
+00:09:18,640 --> 00:09:23,240
+to where you have to think very, very long
+To do something simple.
+
+132
+00:09:23,240 --> 00:09:28,810
+And writing this retry with fold left or,
+or fold right.
+
+133
+00:09:28,810 --> 00:09:31,090
+I mean, it required us to think about that
+
+134
+00:09:31,090 --> 00:09:33,350
+for a long time where it should be really
+simple.
+
+135
+00:09:33,350 --> 00:09:37,200
+You intuitively feel that you should be
+very simple.
+
+136
+00:09:37,200 --> 00:09:40,250
+But instead we came up with this.
+
+137
+00:09:40,250 --> 00:09:42,960
+You know, really complicated solution.
+
+138
+00:09:44,250 --> 00:09:45,000
+And that's not good.
+
+139
+00:09:45,000 --> 00:09:48,650
+So remember, great programmers write baby
+code.
+
+140
+00:09:48,650 --> 00:09:52,160
+And what we try to do there was definitely
+not baby code.
+
+141
+00:09:52,160 --> 00:09:54,040
+So we were really not good programmers.
+
+142
+00:09:55,060 --> 00:10:02,060
+And one way to write good code, or baby
+code, is to go in the opposite direction.
+
+143
+00:10:02,060 --> 00:10:02,800
+So.
+
+144
+00:10:02,800 --> 00:10:09,760
+Instead of making effects, explicit.
+We want to make effects, implicit.
+
+145
+00:10:09,760 --> 00:10:14,660
+Because sometimes that makes life more
+makes
+
+146
+00:10:14,660 --> 00:10:19,390
+life easier.
+And, so what we are trying to do is we are
+
+147
+00:10:19,390 --> 00:10:25,630
+going to see if we can make this effect of
+latency our future.
+
+148
+00:10:25,630 --> 00:10:30,400
+If we can make that implicit, okay?
+So, we want to take
+
+149
+00:10:30,400 --> 00:10:34,990
+the function of type T to future of S, and
+we really
+
+150
+00:10:34,990 --> 00:10:40,820
+want to treat that as if we had a function
+from T to try of S.
+
+151
+00:10:40,820 --> 00:10:45,420
+Or, even better, we want to turn that into
+function of
+
+152
+00:10:45,420 --> 00:10:50,320
+type T to S.
+So, I should be careful there what I say.
+
+153
+00:10:50,320 --> 00:10:54,010
+We're not going to turn that into a
+function from T to S.
+
+154
+00:10:54,010 --> 00:10:56,250
+But we want to hide the effects.
+
+155
+00:10:56,250 --> 00:11:00,020
+We want to say, yeah we know that we are
+in the context where the
+
+156
+00:11:00,020 --> 00:11:01,950
+effect is future.
+
+157
+00:11:01,950 --> 00:11:05,740
+So I don't want to deal with it, I want to
+have that implicit.
+
+158
+00:11:05,740 --> 00:11:06,250
+So again.
+
+159
+00:11:07,410 --> 00:11:10,120
+We say one thing but we really want
+another thing.
+
+160
+00:11:11,350 --> 00:11:12,940
+Is this possible?
+
+161
+00:11:12,940 --> 00:11:16,190
+It turns out that this is in-fact
+possible.
+
+162
+00:11:17,440 --> 00:11:20,620
+And to do this, you have to import some
+scala magics.
+
+163
+00:11:20,620 --> 00:11:26,400
+So you import the scala.async.Async.
+type,
+
+164
+00:11:26,400 --> 00:11:31,010
+and what you get in that case, is two
+functions.
+
+165
+00:11:31,010 --> 00:11:36,860
+One is here, the async, which takes a
+body, a call by name block.
+
+166
+00:11:37,880 --> 00:11:43,140
+And an implicit ExecutionContext, and it
+returns a Future of T.
+
+167
+00:11:43,140 --> 00:11:48,820
+So think of this as just another.
+Factory methods for future.
+
+168
+00:11:48,820 --> 00:11:51,590
+Remember we had the factory method future
+that also
+
+169
+00:11:51,590 --> 00:11:57,550
+took a called by name body and then
+execution context and returned a future.
+
+170
+00:11:57,550 --> 00:11:59,100
+So, this is very similar.
+
+171
+00:12:00,280 --> 00:12:07,940
+The big difference is that for async is
+that if you are inside an async block.
+
+172
+00:12:07,940 --> 00:12:15,090
+You can use this function here await, that
+turns a future into a t.
+
+173
+00:12:16,540 --> 00:12:19,880
+And we saw before, when you do that, you
+were blocking.
+
+174
+00:12:19,880 --> 00:12:23,510
+But in this case, it does that without
+blocking.
+
+175
+00:12:23,510 --> 00:12:25,990
+And that's the magic of the async await.
+
+176
+00:12:25,990 --> 00:12:29,140
+So what this does is there's a, is a
+
+177
+00:12:29,140 --> 00:12:34,000
+magic compiler transformation that allows
+you to wait, without blocking.
+
+178
+00:12:34,000 --> 00:12:36,120
+So, it allows you to kind of treat a
+
+179
+00:12:36,120 --> 00:12:41,600
+future as a regular value without
+blocking, but the
+
+180
+00:12:41,600 --> 00:12:45,940
+great thing is that you can now write
+regular control flow.
+
+181
+00:12:45,940 --> 00:12:51,880
+Inside this async block and now you can
+write super, super natural code.
+
+182
+00:12:51,880 --> 00:12:55,200
+And lets have a look how are retry
+
+183
+00:12:55,200 --> 00:12:58,500
+function will look using this async await
+feature.
+
+184
+00:13:00,060 --> 00:13:03,180
+There's a little bit of small print
+because as
+
+185
+00:13:03,180 --> 00:13:06,920
+I said, it relies on some, on compiler
+magic.
+
+186
+00:13:06,920 --> 00:13:08,200
+And the main.
+
+187
+00:13:09,430 --> 00:13:16,400
+restriction is that you cannot use await
+inside a try/catch block.
+
+188
+00:13:16,400 --> 00:13:21,430
+Which means that if a, if a future can
+fail, we have to use our
+
+189
+00:13:21,430 --> 00:13:26,990
+try constructor that takes a future of t
+into a future of try of t.
+
+190
+00:13:26,990 --> 00:13:32,780
+To make sure that there's no exceptions,
+but that the exceptions are materialized.
+
+191
+00:13:32,780 --> 00:13:36,460
+And that's also the reason that I gave you
+this exercise a
+
+192
+00:13:36,460 --> 00:13:40,430
+few lessons ago.
+Okay, that was exactly such that we could
+
+193
+00:13:40,430 --> 00:13:46,470
+then use async await and use that
+constructor function for try.
+
+194
+00:13:47,650 --> 00:13:53,150
+Here's how we can write our retry function
+using the magic of async
+
+195
+00:13:53,150 --> 00:13:58,020
+await.
+What we do, here is our signature,
+
+196
+00:13:58,020 --> 00:14:06,930
+we get the number of times that we want to
+retry, and our block of futures.
+
+197
+00:14:08,210 --> 00:14:11,950
+And, we want to return a future.
+How do we do that?
+
+198
+00:14:11,950 --> 00:14:17,690
+Well, we enter the async block, and inside
+here we can now write
+
+199
+00:14:17,690 --> 00:14:23,030
+regular control flow.
+And the way we do it is like any normal
+
+200
+00:14:23,030 --> 00:14:24,460
+programmer would do it.
+
+201
+00:14:24,460 --> 00:14:27,470
+We declare a variable, we start with the
+
+202
+00:14:27,470 --> 00:14:30,360
+result to be failure because we might not
+be
+
+203
+00:14:30,360 --> 00:14:34,070
+able to you know, execute the block
+without
+
+204
+00:14:34,070 --> 00:14:37,280
+failing, and then we do a simple loop
+here.
+
+205
+00:14:37,280 --> 00:14:45,760
+As long as we have not gotten success, and
+we still have tries left, we await.
+
+206
+00:14:45,760 --> 00:14:48,530
+The result of the block.
+And we increase
+
+207
+00:14:48,530 --> 00:14:50,510
+the counter and we loop here.
+
+208
+00:14:50,510 --> 00:14:56,320
+But remember the small print, that you
+could not await in, with a Try Catch.
+
+209
+00:14:56,320 --> 00:15:01,690
+So what we have to do here is we have to
+materialize the exceptions in our Future,
+
+210
+00:15:01,690 --> 00:15:08,058
+by using the constructor function that we
+did a few lessons ago.
+
+211
+00:15:08,058 --> 00:15:11,170
+So the constructor function that took a
+Future of
+
+212
+00:15:11,170 --> 00:15:13,750
+T and returned a Future of Try of T.
+
+213
+00:15:15,480 --> 00:15:18,930
+This is what I would call baby code,
+right?
+
+214
+00:15:18,930 --> 00:15:23,240
+Everybody can understand this code and
+it's obviously correct.
+
+215
+00:15:23,240 --> 00:15:28,640
+And the nice thing is that even though it
+uses mutable state inside, on the outside.
+
+216
+00:15:28,640 --> 00:15:30,710
+It's purely functional, right?
+
+217
+00:15:30,710 --> 00:15:34,930
+It gives you a number of times.
+It gives you a called by name future.
+
+218
+00:15:34,930 --> 00:15:38,200
+And it will retry this at most number of
+times.
+
+219
+00:15:39,200 --> 00:15:40,510
+But thanks to the magic of
+
+220
+00:15:40,510 --> 00:15:43,210
+async, you can write the code in the
+
+221
+00:15:43,210 --> 00:15:48,160
+most natural way and sometime writing
+imperative control flow.
+
+222
+00:15:48,160 --> 00:15:49,420
+Is the most natural way.
+
+223
+00:15:51,240 --> 00:15:54,450
+Let's right.
+Some other examples using await.
+
+224
+00:15:54,450 --> 00:15:57,530
+Here's how you would write filter using
+await.
+
+225
+00:15:57,530 --> 00:16:01,330
+So, filter as the return of future.
+
+226
+00:16:01,330 --> 00:16:06,140
+So, whenever you have a function that
+needs to return a future.
+
+227
+00:16:06,140 --> 00:16:06,760
+Think
+
+228
+00:16:06,760 --> 00:16:10,260
+about.
+If you can use async, okay?
+
+229
+00:16:10,260 --> 00:16:16,630
+Because async is an extremely powerful way
+to create futures.
+
+230
+00:16:16,630 --> 00:16:18,340
+Here is how we do filter.
+
+231
+00:16:19,400 --> 00:16:25,670
+Filter is defined on future of t and we
+need to apply a
+
+232
+00:16:25,670 --> 00:16:31,490
+predicate from t to Boolean.
+So we need to go from future of t to t.
+
+233
+00:16:31,490 --> 00:16:31,830
+How can
+
+234
+00:16:31,830 --> 00:16:34,650
+we do that?
+Well using await.
+
+235
+00:16:34,650 --> 00:16:41,980
+So we just await ourselves, future of T.
+Now this guy's of type T.
+
+236
+00:16:41,980 --> 00:16:44,080
+Then we check the predicate.
+
+237
+00:16:44,080 --> 00:16:48,430
+If the predicate halts we return, the
+value.
+
+238
+00:16:48,430 --> 00:16:52,850
+And if the predicate does not halt we, we
+throw an exception.
+
+239
+00:16:52,850 --> 00:16:57,430
+Because there is no value and the future.
+
+240
+00:16:57,430 --> 00:17:04,360
+Well, the way we represent the empty
+future is by exception.
+
+241
+00:17:04,360 --> 00:17:05,040
+Okay?
+
+242
+00:17:05,040 --> 00:17:10,120
+So this I believe is the most natural way
+you can write filter.
+
+243
+00:17:12,450 --> 00:17:16,260
+As a quiz, we will write flatMap using
+async await.
+
+244
+00:17:17,680 --> 00:17:21,900
+So, just remind us again, what is the type
+of flatMap?
+
+245
+00:17:21,900 --> 00:17:25,560
+Well, flatMap was defined on type Future
+of T.
+
+246
+00:17:25,560 --> 00:17:28,780
+It takes a function from T to Future of S.
+
+247
+00:17:28,780 --> 00:17:33,450
+And it has to return a Future of S.
+Here are four possibilities.
+
+248
+00:17:34,700 --> 00:17:39,130
+Take your time, pick the right one, and
+
+249
+00:17:39,130 --> 00:17:41,560
+then we will discuss this after a few
+seconds.
+
+250
+00:17:44,980 --> 00:17:46,070
+Okay.
+
+251
+00:17:46,070 --> 00:17:50,526
+Maybe your, the impression that you get is
+that this looks a little bit like
+
+252
+00:17:50,526 --> 00:17:51,918
+[UNKNOWN].
+
+253
+00:17:51,918 --> 00:17:54,198
+Async, await, curlies.
+
+254
+00:17:55,250 --> 00:17:58,620
+So let's use our power tool of checking
+the types.
+
+255
+00:17:59,780 --> 00:18:03,010
+If the types don't work, the function is
+definitely wrong.
+
+256
+00:18:03,010 --> 00:18:06,840
+So let's go and look at the types for each
+of those.
+
+257
+00:18:07,910 --> 00:18:12,550
+First of all, the this, is of type future
+of t.
+
+258
+00:18:12,550 --> 00:18:14,780
+And f takes a t.
+
+259
+00:18:14,780 --> 00:18:17,130
+So here this can
+
+260
+00:18:17,130 --> 00:18:21,925
+never be right because there, it's a type
+error here.
+
+261
+00:18:21,925 --> 00:18:28,030
+F expects a t, we give it a future of t
+so, that's wrong.
+
+262
+00:18:29,750 --> 00:18:30,920
+Same here.
+
+263
+00:18:30,920 --> 00:18:34,180
+We cannot call f on this even though we do
+
+264
+00:18:34,180 --> 00:18:37,820
+it inside an async so this guy goes away
+as well.
+
+265
+00:18:39,150 --> 00:18:41,120
+This one looks a little bit better.
+
+266
+00:18:41,120 --> 00:18:42,290
+So what we do here
+
+267
+00:18:42,290 --> 00:18:46,920
+is we await this so now the result of that
+
+268
+00:18:46,920 --> 00:18:51,800
+expression is of type T.
+Remember, await strips off a level of
+
+269
+00:18:51,800 --> 00:18:58,290
+future we call f, which is great so now we
+get the future of S.
+
+270
+00:18:58,290 --> 00:19:03,530
+But, now if we do this in an async, the
+
+271
+00:19:03,530 --> 00:19:07,560
+result type of this thing will be future
+of future
+
+272
+00:19:07,560 --> 00:19:08,060
+of t.
+
+273
+00:19:09,150 --> 00:19:15,920
+Because, if we remember correctly, the
+async takes a value of type t.
+
+274
+00:19:15,920 --> 00:19:19,640
+And returns that into a type of future of
+t.
+
+275
+00:19:19,640 --> 00:19:26,170
+so, this run is also not correct.
+So now that means,
+
+276
+00:19:26,170 --> 00:19:31,330
+hopefully that the last option here d is
+correct.
+
+277
+00:19:32,800 --> 00:19:35,950
+It looks very elegant so let's check if
+it's
+
+278
+00:19:35,950 --> 00:19:40,330
+type checks and let's convince ourselves
+that it actually works.
+
+279
+00:19:40,330 --> 00:19:47,698
+This is of type future of t, when we await
+this, we get a value of type t.
+
+280
+00:19:47,698 --> 00:19:52,800
+We call f.
+Which gives us something of type
+
+281
+00:19:52,800 --> 00:19:58,070
+future of s, which we await, which gives
+
+282
+00:19:58,070 --> 00:20:03,590
+us something of type s, and the async
+turns that into a future of s.
+
+283
+00:20:05,510 --> 00:20:09,630
+So it's type correct, but it's also
+exactly.
+
+284
+00:20:09,630 --> 00:20:12,210
+What flatMap needs to do, right?
+
+285
+00:20:12,210 --> 00:20:17,860
+Because the async awaits, will propagate
+all the exceptions for us.
+
+286
+00:20:17,860 --> 00:20:20,360
+So, we only have to concentrate on the
+happy part.
+
+287
+00:20:21,490 --> 00:20:23,840
+But unlike flatMap.
+
+288
+00:20:23,840 --> 00:20:25,870
+Here, we can just write regular control
+
+289
+00:20:25,870 --> 00:20:29,240
+flow because we have eliminated the
+effect.
+
+290
+00:20:29,240 --> 00:20:35,420
+You know, temporarily by entering this
+async block and then using await.
+
+291
+00:20:35,420 --> 00:20:38,020
+So this is the power of async await, that
+
+292
+00:20:38,020 --> 00:20:40,660
+we can write just regular code where we
+use
+
+293
+00:20:40,660 --> 00:20:46,880
+the await to kind of, you know, get the f,
+the, the T out of the future like this.
+
+294
+00:20:49,870 --> 00:20:53,970
+How would filter look like, without using
+await?
+
+295
+00:20:53,970 --> 00:21:00,590
+If you go to the scala implement the, the
+implementation of future on github.
+
+296
+00:21:00,590 --> 00:21:03,540
+Then you will see this code, or if you
+download
+
+297
+00:21:03,540 --> 00:21:06,830
+the jar with the source code, you will see
+this code.
+
+298
+00:21:06,830 --> 00:21:10,550
+So, and this code doesn't look too
+complicated but
+
+299
+00:21:10,550 --> 00:21:15,430
+not nearly as elegant as the
+implementation using await.
+
+300
+00:21:15,430 --> 00:21:19,240
+And one thing that this code uses is this
+type future.
+
+301
+00:21:19,240 --> 00:21:21,850
+future, this type Promise here.
+
+302
+00:21:21,850 --> 00:21:24,730
+And that will be the topic of our next
+lesson.
+

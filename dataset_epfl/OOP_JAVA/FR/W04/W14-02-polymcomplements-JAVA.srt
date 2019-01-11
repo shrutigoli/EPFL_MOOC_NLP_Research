@@ -1,0 +1,1154 @@
+1
+00:00:04,019 --> 00:00:06,933
+Le but de cette séquence est de présenter
+divers petits compléments
+
+2
+00:00:06,933 --> 00:00:09,608
+en relation avec le polymorphisme 
+et l'héritage.
+
+3
+00:00:09,856 --> 00:00:12,706
+Le premier point abordé est 
+qu'en est-il du polymorphisme
+
+4
+00:00:12,726 --> 00:00:14,827
+dans le cadre de la construction 
+des objets ?
+
+5
+00:00:15,160 --> 00:00:17,670
+Les constructeurs sont des méthodes 
+un peu particulières
+
+6
+00:00:17,676 --> 00:00:20,473
+dans le sens où elles sont 
+spécifiquement dédiées
+
+7
+00:00:20,473 --> 00:00:23,270
+à la construction de l'instance 
+courante d'une classe.
+
+8
+00:00:23,270 --> 00:00:26,069
+Il n'est pas prévu qu'ils aient 
+un comportement polymorphique.
+
+9
+00:00:26,239 --> 00:00:29,542
+Imaginer un constructeur polymorphique
+voudrait dire que ce dernier
+
+10
+00:00:29,542 --> 00:00:33,582
+serait dédié à initialiser des objets
+autres que l'instance courante ;
+
+11
+00:00:33,582 --> 00:00:34,900
+des objets de type sous-classe,
+
+12
+00:00:34,900 --> 00:00:36,908
+par exemple, 
+ce qui n'a pas vraiment de sens.
+
+13
+00:00:36,908 --> 00:00:40,176
+Rien n'empêche cependant d'invoquer
+une méthode polymorphique
+
+14
+00:00:40,176 --> 00:00:41,671
+dans le corps d'un constructeur.
+
+15
+00:00:42,031 --> 00:00:44,036
+Mais ceci est cependant déconseillé.
+
+16
+00:00:44,234 --> 00:00:47,233
+En effet, comme nous allons voir 
+sur l'exemple suivant,
+
+17
+00:00:47,233 --> 00:00:49,520
+la méthode agit alors sur un objet
+
+18
+00:00:49,520 --> 00:00:52,207
+qui n'est peut-être 
+que partiellement initialisé.
+
+19
+00:00:52,207 --> 00:00:55,534
+Nous avons dans cet exemple 
+le cas d'une super-classe <i>A</i>,
+
+20
+00:00:56,552 --> 00:01:01,111
+qui contient un constructeur par défaut
+et également une méthode abstraite,
+
+21
+00:01:01,111 --> 00:01:04,291
+c'est-à-dire une méthode sans corps <i>m</i>.
+
+22
+00:01:05,057 --> 00:01:08,627
+Il se trouve que le constructeur 
+invoque la méthode <i>m</i>.
+
+23
+00:01:09,010 --> 00:01:11,972
+Rappelons qu'une classe abstraite 
+ne peut jamais être instanciée,
+
+24
+00:01:11,972 --> 00:01:15,732
+ce qui signifie 
+que l'on ne peut jamais appeler
+
+25
+00:01:15,732 --> 00:01:19,492
+le constructeur de la classe <i>A</i>
+comme ceci,
+
+26
+00:01:21,742 --> 00:01:23,254
+du fait que la classe est abstraite.
+
+27
+00:01:23,347 --> 00:01:26,257
+Invoquer une méthode abstraite 
+dont le constructeur de <i>A</i>,
+
+28
+00:01:26,296 --> 00:01:29,026
+c'est-à-dire une méthode sans corps,
+ne pose pas problème
+
+29
+00:01:29,028 --> 00:01:31,753
+parce qu'on ne va jamais appeler 
+ce constructeur
+
+30
+00:01:31,753 --> 00:01:34,068
+pour instancier un objet de type <i>A</i>,
+
+31
+00:01:34,068 --> 00:01:37,204
+c'est-à-dire un objet pour lequel <i>m</i>
+n'a pas de définition concrète.
+
+32
+00:01:37,605 --> 00:01:39,375
+Ceci est donc tout à fait licite.
+
+33
+00:01:39,578 --> 00:01:44,210
+Concrètement, la méthode <i>m</i> ne sera invoquée
+que si le constructeur d'une sous-classe
+
+34
+00:01:44,210 --> 00:01:46,540
+invoque ce constructeur de la super-classe
+
+35
+00:01:46,598 --> 00:01:50,548
+et que cette sous-classe a 
+une définition concrète de la méthode <i>m</i>.
+
+36
+00:01:50,581 --> 00:01:53,581
+Nous en avons un exemple ici, 
+au travers de la classe <i>B</i>
+
+37
+00:01:53,664 --> 00:01:58,034
+La classe <i>B</i> hérite de <i>A</i>
+et redéfinit concrètement la méthode <i>m</i>.
+
+38
+00:01:58,416 --> 00:02:02,856
+La redéfinition consiste simplement
+à afficher un message qui comporte
+
+39
+00:02:02,858 --> 00:02:06,472
+la valeur de l'attribut <i>b</i> de la classe <i>B</i>.
+La classe <i>B</i> est instanciable,
+
+40
+00:02:06,472 --> 00:02:11,576
+puisqu'elle redéfinit toutes les méthodes 
+abstraites héritées de plus haut,
+
+41
+00:02:11,576 --> 00:02:13,700
+en l'occurrence, 
+il ne s'agit que de la méthode <i>m</i>.
+
+42
+00:02:13,714 --> 00:02:17,404
+Voyons donc ce qui se passe 
+lorsque nous créons une instance de <i>B</i>.
+
+43
+00:02:18,063 --> 00:02:22,403
+L'instance est crée ici au moyen 
+du constructeur par défaut de la classe <i>B</i>.
+
+44
+00:02:22,509 --> 00:02:26,133
+Nous savons que tout constructeur 
+de sous-classe doit nécessairement invoquer
+
+45
+00:02:26,133 --> 00:02:29,940
+un constructeur de la super-classe,
+lorsqu'il n'y a pas d'appel explicite
+
+46
+00:02:29,940 --> 00:02:32,015
+à un constructeur via la tournure super,
+
+47
+00:02:32,015 --> 00:02:36,095
+alors nous savons qu'il y a un appel 
+implicite au constructeur par défaut.
+
+48
+00:02:37,188 --> 00:02:40,988
+Cet appel se fait pour initialiser 
+une instance courante
+
+49
+00:02:44,874 --> 00:02:46,044
+qui est un <i>B</i>.
+
+50
+00:02:48,622 --> 00:02:51,696
+Au moment de l'appel à <i>m</i>
+dans le constructeur de <i>A</i>,
+
+51
+00:02:51,696 --> 00:02:53,760
+puisqu'il y a nécessairement
+
+52
+00:02:53,760 --> 00:02:57,844
+résolution dynamique des liens en Java,
+la méthode va être choisie
+
+53
+00:02:57,844 --> 00:03:01,055
+en fonction de la nature réelle 
+de l'instance
+
+54
+00:03:01,055 --> 00:03:04,266
+et c'est donc cette méthode <i>m</i>
+qui va être appelée.
+
+55
+00:03:04,266 --> 00:03:05,949
+Rappelez-vous qu'à ce stade,
+
+56
+00:03:05,949 --> 00:03:07,742
+nous ne sommes pas encore passés 
+par l'instruction
+
+57
+00:03:07,742 --> 00:03:12,227
+qui consiste à initialiser l'attribut <i>b</i> de <i>B</i>
+avec une valeur particulière.
+
+58
+00:03:12,254 --> 00:03:16,064
+Par conséquent, l'attribut <i>b</i> a la valeur
+qui est donnée par défaut
+
+59
+00:03:16,072 --> 00:03:19,332
+avant toute initialisation explicite, 
+qui est la valeur zéro.
+
+60
+00:03:19,588 --> 00:03:25,448
+Ceci signifie que lorsque la méthode <i>m</i> 
+s'exécute, l'attribut <i>b</i> a pour valeur zéro
+
+61
+00:03:25,448 --> 00:03:29,683
+et donc que la construction d'un <i>B</i>
+va résulter dans l'affichage, du message
+
+62
+00:03:29,699 --> 00:03:31,049
+" b vaut : 0 "
+
+63
+00:03:31,084 --> 00:03:36,434
+Si pour nous, l'objet <i>B</i> n'est proprement initialisé
+que si son attribut <i>b</i> vaut 1,
+
+64
+00:03:36,929 --> 00:03:41,101
+alors nous voyons bien que la méthode <i>m</i>
+est en train de travailler sur un objet
+
+65
+00:03:41,101 --> 00:03:43,041
+qui est partiellement initialisé.
+
+66
+00:03:43,401 --> 00:03:46,877
+D'où le conseil de départ :
+ne pas invoquer de méthode polymorphique
+
+67
+00:03:46,877 --> 00:03:49,597
+dans le corps des constructeurs.
+
+68
+00:03:49,849 --> 00:03:52,749
+Passons maintenant au point suivant,
+tout à fait indépendant du premier.
+
+69
+00:03:52,827 --> 00:03:55,922
+Vous vous rappelez sans doute des méthodes 
+<i>toString</i> et <i>equals</i> que vous avez appris
+
+70
+00:03:55,922 --> 00:03:57,105
+à écrire pour des classes.
+
+71
+00:03:57,105 --> 00:03:58,891
+Mais d'où viennent exactement 
+ces méthodes ?
+
+72
+00:03:58,891 --> 00:04:00,147
+C'est ce que nous allons voir.
+
+73
+00:04:00,147 --> 00:04:02,701
+Rappelez-vous par exemple 
+de la méthode <i>toString</i>,
+
+74
+00:04:02,701 --> 00:04:05,861
+cette dernière vous était imposée
+avec un en-tête particulier.
+
+75
+00:04:05,870 --> 00:04:09,060
+Elle permettait, lorsqu'elle était présente 
+dans une classe, de définir
+
+76
+00:04:09,122 --> 00:04:12,732
+un format d'affichage de l'objet 
+sous la forme d'une chaîne de caractères.
+
+77
+00:04:12,806 --> 00:04:15,650
+Cette méthode <i>toString</i> permet de produire
+des affichages plus explicites
+
+78
+00:04:15,650 --> 00:04:17,844
+pour des objets ;
+
+79
+00:04:17,844 --> 00:04:21,340
+Or il se trouve que <i>toString</i> n'est autre
+qu'une redéfinition d'une méthode
+
+80
+00:04:21,340 --> 00:04:23,900
+existant plus haut 
+dans la hiérarchie de classe.
+
+81
+00:04:24,445 --> 00:04:26,375
+Mais que veut dire plus haut,
+puisqu'ici par exemple,
+
+82
+00:04:26,375 --> 00:04:28,615
+la classe rectangle n'hérite de personne.
+
+83
+00:04:28,907 --> 00:04:31,674
+Alors c'est vrai qu'elle n'hérite 
+de personne <i>explicitement</i>,
+
+84
+00:04:31,674 --> 00:04:36,404
+mais en Java, toutes les classes 
+que vous écrivez
+
+85
+00:04:36,404 --> 00:04:38,228
+héritent d'une super-classe universelle
+qui est la super-classe <i>Object</i>.
+
+86
+00:04:38,286 --> 00:04:44,006
+Et ceci sans que vous ayez à écrire
+explicitement un lien d'héritage
+
+87
+00:04:46,531 --> 00:04:48,125
+Cette écriture n'est pas nécessaire,
+
+88
+00:04:48,125 --> 00:04:50,155
+mais le lien d'héritage existe bel et bien.
+
+89
+00:04:50,579 --> 00:04:52,879
+En Java, donc, 
+toute classe que vous définissez,
+
+90
+00:04:52,879 --> 00:04:57,719
+si elle n'hérite d'aucune classe 
+explicitement, hérite de <i>Object</i>.
+
+91
+00:04:57,948 --> 00:05:01,998
+On peut donc affecter une instance
+de n'importe quelle classe
+
+92
+00:05:02,237 --> 00:05:04,467
+à une variable de type <i>Object</i>.
+
+93
+00:05:05,327 --> 00:05:09,216
+La super-classe <i>Object</i> contient notamment
+la définition par défaut
+
+94
+00:05:09,216 --> 00:05:12,316
+d'un certain nombre de méthodes
+utiles à tous les objets possibles,
+
+95
+00:05:12,414 --> 00:05:15,274
+par exemple <i>toString</i>, <i>equals</i> ou <i>clone</i>.
+
+96
+00:05:15,460 --> 00:05:19,413
+C'est par exemple la définition par défaut 
+de <i>toString</i> qui permet de réaliser
+
+97
+00:05:19,413 --> 00:05:24,433
+des affichages d'objets, sous la forme 
+d'une représentation de leurs références,
+
+98
+00:05:24,439 --> 00:05:27,114
+donc, quelque chose d'un peu étrange 
+que nous avons déjà eu l'occasion
+
+99
+00:05:27,114 --> 00:05:28,839
+de croiser précédemment,
+
+100
+00:05:28,839 --> 00:05:32,466
+et la définition par défaut de <i>equals</i>
+qui se trouve dans la super-classe <i>Object</i>
+
+101
+00:05:32,466 --> 00:05:37,636
+se contente de comparer les références,
+en comparant 2 objets au moyen de <i>==</i>.
+
+102
+00:05:37,966 --> 00:05:40,510
+Dans la plupart des cas, 
+ces définitions par défaut
+
+103
+00:05:40,510 --> 00:05:43,304
+ne sont pas satisfaisantes 
+pour vos propres classes,
+
+104
+00:05:43,304 --> 00:05:46,447
+et vous êtes amenés donc à les redéfinir,
+
+105
+00:05:46,447 --> 00:05:49,590
+pour permettre par exemple 
+un affichage plus explicite,
+
+106
+00:05:49,590 --> 00:05:52,735
+une comparaison qui compare les contenus
+ou une copie correcte de vos objets.
+
+107
+00:05:52,735 --> 00:05:55,635
+Lorsque nous avons écrit 
+la méthode <i>toString</i>
+
+108
+00:05:55,635 --> 00:05:57,935
+dans la classe ectangle 
+de notre exemple précédent,
+
+109
+00:05:57,935 --> 00:06:00,722
+nous étions, en réalité, 
+en train de redéfinir
+
+110
+00:06:00,722 --> 00:06:03,509
+la méthode <i>toString</i> 
+héritée de <i>Object</i>.
+
+111
+00:06:03,509 --> 00:06:06,297
+De nombreuses classes prédéfinies 
+redéfinissent ces méthodes,
+
+112
+00:06:06,297 --> 00:06:09,438
+et typiquement, la classe <i>String</i> 
+redéfinit la méthode <i>toString</i>,
+
+113
+00:06:09,438 --> 00:06:12,579
+redéfinit la méthode <i>equals</i>.
+
+114
+00:06:12,579 --> 00:06:15,720
+Revenons au cas de la méthode <i>equals</i>
+telle que nous l'avons écrite jusqu'ici,
+
+115
+00:06:15,720 --> 00:06:17,240
+dans les séquences précédentes.
+
+116
+00:06:17,470 --> 00:06:20,368
+À votre avis, est-ce que cette entête 
+de la méthode <i>equals</i>
+
+117
+00:06:20,368 --> 00:06:23,948
+correspond à une redéfinition
+de celle héritée de <i>Object</i> ?
+
+118
+00:06:24,899 --> 00:06:28,119
+La réponse est évidemment non.
+La classe <i>Object</i> ne peut pas
+
+119
+00:06:28,119 --> 00:06:29,903
+avoir connaissance 
+de toutes les sous-classes
+
+120
+00:06:29,903 --> 00:06:31,077
+qui vont en dériver.
+
+121
+00:06:31,177 --> 00:06:33,542
+L'entête de la méthode <i>equals</i> 
+tel que présent
+
+122
+00:06:33,542 --> 00:06:35,417
+dans la super-classe <i>Object</i> 
+est le suivant :
+
+123
+00:06:35,417 --> 00:06:38,140
+ce qui signifie concrètement, 
+que l'argument attendu
+
+124
+00:06:38,140 --> 00:06:42,443
+par <i>equals</i> est de type <i>Object</i>,
+
+125
+00:06:42,443 --> 00:06:46,796
+et non pas de type <i>UneClasse</i> tel que 
+nous l'avions vu précédemment.
+
+126
+00:06:46,796 --> 00:06:52,383
+Nous avions donc ici, dans la méthode 
+<i>equals</i> de la classe Rectangle,
+
+127
+00:06:52,383 --> 00:06:54,833
+un paramètre de type Rectangle.
+
+128
+00:06:56,236 --> 00:06:58,355
+Les méthodes <i>equals</i> 
+que nous avons rédigées
+
+129
+00:06:58,355 --> 00:07:00,724
+jusqu'ici ne sont donc pas 
+des redéfinitions
+
+130
+00:07:00,724 --> 00:07:05,623
+de la méthode <i>equals</i> héritée de <i>Object</i>,
+il s'agit plutôt de surcharges.
+
+131
+00:07:06,901 --> 00:07:10,002
+On parle de redéfinition, 
+" overriding " en anglais,
+
+132
+00:07:10,002 --> 00:07:13,103
+lorsqu'une méthode d'une sous classe
+
+133
+00:07:13,103 --> 00:07:16,205
+définit une méthode déjà présente 
+dans la super-classe,
+
+134
+00:07:16,210 --> 00:07:20,918
+une méthode avec exactement le même nom,
+avec une liste de paramètres
+
+135
+00:07:20,918 --> 00:07:24,888
+et leurs types identiques,
+et avec des types de retour compatibles.
+
+136
+00:07:25,596 --> 00:07:28,446
+Ce que l'on entend par compatible :
+pour des types de base,
+
+137
+00:07:28,446 --> 00:07:40,208
+c'est qu'ils soient identiques, pour 
+des types définis par le biais de classes,
+
+138
+00:07:40,208 --> 00:07:44,577
+ces types seront compatibles 
+s'il existe une relation d'héritage.
+
+139
+00:07:47,287 --> 00:07:50,527
+Par exemple, si je dispose 
+d'une super-classe <i>A</i>
+
+140
+00:07:50,561 --> 00:07:52,981
+qui définirait une méthode <i>m</i>,
+
+141
+00:07:53,463 --> 00:07:56,043
+retournant un objet de type <i>A</i>.
+
+142
+00:07:56,447 --> 00:07:59,542
+S'il existe une sous-classe <i>B</i> 
+héritant de <i>A</i>,
+
+143
+00:07:59,542 --> 00:08:04,382
+qui elle définit une méthode <i>m</i>,
+mais cette fois-ci retournant un <i>B</i>,
+
+144
+00:08:04,582 --> 00:08:08,482
+comme <i>B</i> hérite de <i>A</i>, on considère que 
+le type est compatible dans ce cas,
+
+145
+00:08:08,490 --> 00:08:12,300
+et donc ceci est aussi considéré 
+comme une redéfinition.
+
+146
+00:08:12,556 --> 00:08:15,855
+Si ces conditions ne sont pas réunies 
+et qu'on a uniquement
+
+147
+00:08:15,855 --> 00:08:20,855
+le nom de la méthode qui est identique,
+on parle de surcharge, " overloading ".
+
+148
+00:08:21,775 --> 00:08:25,044
+Définir la méthode <i>equals</i> par surcharge, 
+comme nous l'avons fait
+
+149
+00:08:25,044 --> 00:08:27,433
+dans les séquences précédentes,
+peut parfaitement fonctionner,
+
+150
+00:08:27,433 --> 00:08:31,584
+simplement en Java, il est plutôt conseillé
+de procéder par redéfinition,
+
+151
+00:08:32,094 --> 00:08:34,497
+et ce, parce que certaines méthodes 
+de l'API de Java,
+
+152
+00:08:34,497 --> 00:08:36,370
+typiquement des méthodes qui travaillent
+
+153
+00:08:36,370 --> 00:08:38,174
+sur ce qu'on appelle 
+des collections de données,
+
+154
+00:08:38,174 --> 00:08:39,588
+par exemple des méthodes allant chercher
+
+155
+00:08:39,588 --> 00:08:43,983
+une valeur dans une collection,
+vont utiliser implicitement
+
+156
+00:08:43,983 --> 00:08:46,052
+la méthode <i>equals</i>
+qui est exactement cette entête.
+
+157
+00:08:46,052 --> 00:08:48,309
+Si elle n'est pas présente 
+dans une classe à vous
+
+158
+00:08:48,309 --> 00:08:50,196
+et que vous utilisez cette méthode,
+
+159
+00:08:50,196 --> 00:08:53,473
+elle va utiliser la méthode par défaut 
+héritée de <i>Object</i>
+
+160
+00:08:53,473 --> 00:08:56,350
+qui n'est pas satisfaisante 
+dans la plupart des cas.
+
+161
+00:08:56,350 --> 00:09:00,029
+Alors comment procéder si l'on veut 
+vraiment redéfinir la méthode <i>equals</i>
+
+162
+00:09:00,029 --> 00:09:02,839
+héritée de <i>Object</i> plutôt que 
+de surcharger cette méthode,
+
+163
+00:09:02,886 --> 00:09:08,040
+nous vous présentons une façon possible 
+de redéfinir la méthode <i>equals</i>,
+
+164
+00:09:08,040 --> 00:09:11,250
+une façon assez typique, que vous pouvez 
+rencontrer dans la littérature.
+
+165
+00:09:11,278 --> 00:09:14,525
+Sachez qu'il existe d'autres façons 
+de rédiger cette méthode <i>equals</i>,
+
+166
+00:09:14,525 --> 00:09:16,822
+c'est une variante parmi d'autres.
+
+167
+00:09:16,822 --> 00:09:18,980
+La difficulté principale 
+que nous avons à affronter
+
+168
+00:09:18,980 --> 00:09:21,208
+lorsque nous voulons redéfinir
+la méthode <i>equals</i>
+
+169
+00:09:21,208 --> 00:09:23,554
+est que désormais, 
+elle peut prendre en paramètre
+
+170
+00:09:23,554 --> 00:09:27,564
+n'importe quel type d'objet.
+Lorsque nous utilisions la surcharge,
+
+171
+00:09:31,911 --> 00:09:34,091
+le paramètre était de même type
+
+172
+00:09:37,005 --> 00:09:40,615
+que la classe dans laquelle 
+on définissait la surcharge, donc ici ceci
+
+173
+00:09:44,939 --> 00:09:49,079
+et donc l'invocation de la méthode <i>equals</i>
+sur autre chose qu'un Rectangle,
+
+174
+00:09:53,005 --> 00:09:58,089
+par exemple une chaîne de caractères, 
+ferait réagir le compilateur
+
+175
+00:09:58,089 --> 00:09:59,643
+s'il n'y avait que la surcharge :
+
+176
+00:09:59,643 --> 00:10:01,343
+le compilateur vous dirait :
+
+177
+00:10:01,343 --> 00:10:03,665
+" j'attends une chaîne de caractères, 
+et vous me donnez un rectangle ".
+
+178
+00:10:03,665 --> 00:10:09,817
+En revanche, avec une redéfinition,
+cette écriture devient tout à fait licite,
+
+179
+00:10:09,817 --> 00:10:13,787
+le compilateur ne va rien dire, 
+va parfaitement l'accepter.
+
+180
+00:10:16,050 --> 00:10:23,210
+Pourquoi ? Parce que un objet 
+de type <i>String</i> est un <i>Object</i> par héritage
+
+181
+00:10:23,278 --> 00:10:27,808
+Et du coup, ceci est parfaitement licite,
+je peux une <i>String</i> dans un <i>Object</i>.
+
+182
+00:10:28,583 --> 00:10:32,147
+À noter que si l'on ne redéfinit pas 
+la méthode <i>equals</i> dans la classe Rectangle
+
+183
+00:10:32,147 --> 00:10:35,927
+au moment de faire ce genre d'invocation, 
+on utiliserait la méthode <i>equals</i>,
+
+184
+00:10:35,929 --> 00:10:39,550
+telle que définie dans la classe <i>Object</i>,
+laquelle compare uniquement les références
+
+185
+00:10:39,550 --> 00:10:41,767
+et qui ne fait pas forcément 
+les traitements
+
+186
+00:10:41,767 --> 00:10:43,984
+que l'on souhaiterait voir mis en œuvres
+
+187
+00:10:43,984 --> 00:10:46,203
+pour la comparaison d'un rectangle
+avec un autre objet.
+
+188
+00:10:46,768 --> 00:10:49,848
+C'est donc au programmeur 
+de la méthode <i>equals</i>
+
+189
+00:10:49,848 --> 00:10:52,288
+de définir correctement 
+le corps de sa méthode
+
+190
+00:10:52,288 --> 00:10:55,559
+de sorte à ce que la comparaison 
+avec d'autres types d'objets
+
+191
+00:10:55,559 --> 00:10:58,939
+que des rectangles se fasse correctement, 
+typiquement retourne <i>false</i>.
+
+192
+00:10:59,040 --> 00:11:02,220
+On a envie qu'un rectangle 
+soit comparable à un autre rectangle,
+
+193
+00:11:02,220 --> 00:11:04,240
+et pas à un objet d'un autre type.
+
+194
+00:11:04,240 --> 00:11:07,477
+Pour garantir qu'un rectangle 
+ne puisse être égal
+
+195
+00:11:07,477 --> 00:11:10,214
+qu'à un autre rectangle strictement parlé,
+
+196
+00:11:10,214 --> 00:11:14,020
+il faut tester si l'objet passé 
+en paramètre est de la même classe
+
+197
+00:11:14,020 --> 00:11:16,016
+que la classe Rectangle.
+
+198
+00:11:16,016 --> 00:11:19,502
+Ceci peut se faire au moyen 
+d'une méthode <i>getClass</i>
+
+199
+00:11:19,502 --> 00:11:22,148
+à nouveau héritée de <i>Object</i>.
+
+200
+00:11:22,148 --> 00:11:26,476
+Par cette tournure, on peut tester 
+si la classe de l'autre objet
+
+201
+00:11:26,810 --> 00:11:29,650
+est la même que la classe 
+de l'instance courante.
+
+202
+00:11:30,116 --> 00:11:32,476
+Et si tel n'est pas le cas, 
+on retourne <i>false</i>.
+
+203
+00:11:33,518 --> 00:11:36,838
+Pour résumer, lorsqu'on veut redéfinir 
+la méthode <i>equals</i>,
+
+204
+00:11:36,842 --> 00:11:39,614
+on commence, comme nous le faisions 
+pour la surcharge,
+
+205
+00:11:39,614 --> 00:11:43,684
+par tester si le paramètre ne vaut pas 
+la valeur <i>null</i> :
+
+206
+00:11:43,684 --> 00:11:48,764
+s'il vaut <i>null</i>, on retourne <i>false</i>,
+sinon, là est la nouveauté,
+
+207
+00:11:48,864 --> 00:11:52,726
+on teste si l'autre objet 
+est de même classe que l'objet courant,
+
+208
+00:11:53,064 --> 00:11:55,938
+si tel n'est pas le cas, 
+on retourne à nouveau <i>false</i>,
+
+209
+00:11:55,938 --> 00:11:59,622
+Et sinon, s'il est garanti que <i>autreObjet</i> 
+n'est pas <i>null</i>,
+
+210
+00:11:59,622 --> 00:12:05,164
+que le rectangle passé en paramètre
+est bien de classe Rectangle,
+
+211
+00:12:05,164 --> 00:12:08,294
+on peut procéder à la comparaison
+attribut par attribut,
+
+212
+00:12:08,294 --> 00:12:11,424
+comme nous le faisons 
+dans le cadre de la surcharge.
+
+213
+00:12:11,424 --> 00:12:14,554
+Mais là, nous avons de nouveau 
+une petite difficulté à affronter :
+
+214
+00:12:14,600 --> 00:12:17,992
+en effet, si je veux comparer 
+attribut par attribut,
+
+215
+00:12:17,992 --> 00:12:19,844
+il faut que je teste 
+si la largeur de l'objet courant
+
+216
+00:12:19,844 --> 00:12:22,378
+vaut la même valeur que 
+la largeur de <i>autreObjet</i>,
+
+217
+00:12:22,378 --> 00:12:24,912
+et que la hauteur de l'objet courant
+
+218
+00:12:24,912 --> 00:12:27,447
+vaille la même valeur 
+que la hauteur de l'autre objet.
+
+219
+00:12:27,447 --> 00:12:31,207
+Or, <i>autreObjet</i> est de type <i>Object</i>,
+ce qui ne garanti pas la présence
+
+220
+00:12:31,371 --> 00:12:33,291
+des attributs largeur et hauteur.
+
+221
+00:12:33,747 --> 00:12:37,497
+Nous savons bien que <i>autreObjet</i>
+contient bel et bien un Rectangle,
+
+222
+00:12:37,502 --> 00:12:40,592
+la précaution que nous avons prise
+ici nous le garanti.
+
+223
+00:12:40,635 --> 00:12:43,755
+Cependant, si l'on écrit
+quelque chose comme ceci,
+
+224
+00:12:45,666 --> 00:12:50,014
+donc si l'on essaie de comparer 
+la largeur de l'objet courant
+
+225
+00:12:51,014 --> 00:12:52,882
+avec la largeur de l'autre objet,
+
+226
+00:12:54,182 --> 00:12:56,522
+en utilisant directement cette tournure,
+
+227
+00:12:58,703 --> 00:13:00,851
+le compilateur va émettre 
+un message d'erreur,
+
+228
+00:13:00,851 --> 00:13:04,182
+en vous disant que <i>autreObjet</i> 
+est de type <i>Object</i>,
+
+229
+00:13:04,182 --> 00:13:06,903
+lequel ne contient pas de champs largeur.
+
+230
+00:13:06,903 --> 00:13:10,844
+Ici, nous convertissons <i>autreObjet</i> 
+en Rectangle, on parle de transtypage,
+
+231
+00:13:10,979 --> 00:13:16,549
+pour garantir au compilateur qu'il est
+possible d'accéder au champs largeur.
+
+232
+00:13:16,882 --> 00:13:20,827
+Ceci va parfaitement fonctionner ici,
+parce que nous avons bel et bien garanti
+
+233
+00:13:20,827 --> 00:13:26,607
+dans la chaîne d'exécution que <i>autreObjet</i>
+va contenir un objet de type rectangle.
+
+234
+00:13:26,897 --> 00:13:29,323
+Si l'on essaie de faire un transtypage,
+
+235
+00:13:29,323 --> 00:13:31,749
+alors que <i>autreObjet</i> 
+ne contient pas un Rectangle,
+
+236
+00:13:31,749 --> 00:13:34,175
+on aurait un message d'erreur 
+au moment de l'exécution.
+
+237
+00:13:34,175 --> 00:13:35,610
+Mais ça n'est pas le cas ici.
+
+238
+00:13:35,610 --> 00:13:39,037
+Donc, globalement voici comment 
+on peut s'y prendre
+
+239
+00:13:39,037 --> 00:13:41,554
+pour redéfinir la méthode <i>equals</i>
+
+240
+00:13:41,554 --> 00:13:43,724
+avec les nouveaux écueils qui se présentent
+
+241
+00:13:43,724 --> 00:13:46,164
+lorsqu'on fait de la redéfinition
+plutôt que de la surcharge.
+
+242
+00:13:46,164 --> 00:13:49,236
+Et ceci termine 
+notre petite séquence de complément.

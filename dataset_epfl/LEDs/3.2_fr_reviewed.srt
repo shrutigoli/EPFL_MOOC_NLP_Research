@@ -1,0 +1,1053 @@
+1
+00:00:00,025 --> 00:00:10,025
+[AUDIO_VIDE]
+
+2
+00:00:13,160 --> 00:00:14,870
+Bonjour, pour utiliser au mieux
+
+3
+00:00:14,870 --> 00:00:19,700
+les micro contrôleurs pour commander des
+enseignes et afficheurs à LED il faut bien
+
+4
+00:00:19,700 --> 00:00:23,870
+connaître comment fonctionnent
+les broches d'entrée et sortie.
+
+5
+00:00:23,870 --> 00:00:27,220
+C'est ce que nous allons voir,
+en regardant tout d'abord,
+
+6
+00:00:27,220 --> 00:00:32,480
+exactement, les différents rôles
+possibles des broches d'entrée et sortie,
+
+7
+00:00:32,480 --> 00:00:34,560
+en regardant ensuite comment s'organisent,
+
+8
+00:00:34,560 --> 00:00:39,660
+en interne, les registres, et nous
+prendrons le cas de l'AVR et du MSP430.
+
+9
+00:00:39,660 --> 00:00:44,800
+Nous apprendrons aussi à tirer
+partie des opérations logiques
+
+10
+00:00:44,800 --> 00:00:48,860
+en C pour agir sur un bit à la fois.
+
+11
+00:00:48,860 --> 00:00:52,720
+Et finalement, nous regarderons comment
+écrire proprement les constantes,
+
+12
+00:00:52,720 --> 00:00:55,820
+pour rendre nos programmes
+aussi lisibles que possible.
+
+13
+00:00:55,820 --> 00:01:01,310
+Les micro contrôleurs ont donc des
+broches, utilisées en entrée et en sortie,
+
+14
+00:01:01,310 --> 00:01:06,600
+on les appelle parfois des GPIO,
+General Purpose Input Output,
+
+15
+00:01:06,600 --> 00:01:10,620
+donc des entrées et
+sorties à usage général.
+
+16
+00:01:11,690 --> 00:01:16,710
+Avec la librairie Arduino,
+le choix du mode de
+
+17
+00:01:16,710 --> 00:01:22,090
+fonctionnement d'une broche se
+fait par pinMode, la lecture
+
+18
+00:01:22,090 --> 00:01:27,160
+se fait par digitalRead,
+et l'écriture se fait par digitalWrite.
+
+19
+00:01:28,400 --> 00:01:33,190
+Cette librairie a justement pour rôle de
+cacher ce qui se passe à l'intérieur du
+
+20
+00:01:33,190 --> 00:01:36,880
+micro contrôleur, et c'est ce que
+nous voulons découvrir aujourd'hui.
+
+21
+00:01:36,880 --> 00:01:40,050
+Ces procédures Arduino ont
+l'avantage d'être simples,
+
+22
+00:01:40,050 --> 00:01:41,380
+mais ne sont pas toujours optimales.
+
+23
+00:01:42,540 --> 00:01:48,060
+Par exemple, l'accès ne se fait
+qu'une seule broche à la fois, le
+
+24
+00:01:48,060 --> 00:01:53,320
+temps d'exécution est souvent important,
+et la taille mémoire est peu optimale.
+
+25
+00:01:54,410 --> 00:01:58,200
+On va chercher à faire mieux pour
+nos enseignes et afficheurs à LED.
+
+26
+00:01:59,640 --> 00:02:03,850
+Regardons en détail les différents
+rôles possibles des broches.
+
+27
+00:02:03,850 --> 00:02:05,310
+Une broche peut être une entrée.
+
+28
+00:02:06,480 --> 00:02:08,600
+Elle est naturellement à haute impédance,
+
+29
+00:02:08,600 --> 00:02:11,550
+à cause de l'utilisation
+de la technologie CMOS.
+
+30
+00:02:11,550 --> 00:02:17,140
+Dans beaucoup de cas, il est nécessaire
+d'avoir une résistance de tirage.
+
+31
+00:02:17,140 --> 00:02:21,492
+Par exemple un tirage vers le haut,
+appelé, pull-up, en anglais.
+
+32
+00:02:21,492 --> 00:02:24,850
+Prenons l'exemple d'un interrupteur,
+
+33
+00:02:24,850 --> 00:02:27,470
+connecté à la broche
+d'un micro contrôleur.
+
+34
+00:02:27,470 --> 00:02:31,920
+Lorsque l'interrupteur est fermé,
+avec ce schéma, ici, nous avons,
+
+35
+00:02:31,920 --> 00:02:35,260
+d'une manière fiable, un zéro,
+sur la broche du micro contrôleur.
+
+36
+00:02:36,440 --> 00:02:42,040
+Et lorsque l'interrupteur est ouvert,
+on a en fait un état à haute impédance,
+
+37
+00:02:42,040 --> 00:02:45,330
+on ne sait pas quelle valeur
+se trouve sur l'entrée.
+
+38
+00:02:46,600 --> 00:02:51,690
+Les micro contrôleurs étant réalisés
+en technologie CMOS, cette haute
+
+39
+00:02:51,690 --> 00:02:58,680
+impédance de l'entrée a pour conséquence
+que on ne sait pas la valeur, zéro ou 1,
+
+40
+00:02:58,680 --> 00:03:03,550
+qu'on va lire à un instant donné,
+dans le cas où l'interrupteur est ouvert.
+
+41
+00:03:04,840 --> 00:03:09,950
+Alors, on a l'habitude d'ajouter une
+résistance, qui tire vers le haut,
+
+42
+00:03:09,950 --> 00:03:13,690
+de telle manière que,
+lorsque l'interrupteur est ouvert,
+
+43
+00:03:13,690 --> 00:03:16,460
+on ait un état, 1,
+qui arrive sur l'entrée.
+
+44
+00:03:16,460 --> 00:03:20,990
+À noter que la plupart des micro
+contrôleurs modernes peuvent
+
+45
+00:03:20,990 --> 00:03:25,980
+intégrer cette résistance, il est possible
+de l'enclencher par programmation,
+
+46
+00:03:25,980 --> 00:03:30,280
+pour ne pas avoir besoin de
+l'implémenter à l'extérieur.
+
+47
+00:03:30,280 --> 00:03:34,120
+Certains micro contrôleurs
+offrent ce même mécanisme,
+
+48
+00:03:34,120 --> 00:03:37,640
+mais à tirage vers le bas,
+Pull-down Resister.
+
+49
+00:03:38,930 --> 00:03:42,640
+Maintenant, lorsqu'une broche est une
+sortie, eh bien elle peut prendre l'état
+
+50
+00:03:42,640 --> 00:03:47,550
+logique, zéro, ou l'état logique 1.
+
+51
+00:03:47,550 --> 00:03:52,040
+À zéro, un transistor de type NMOS
+va tirer la broche vers le zéro.
+
+52
+00:03:52,040 --> 00:03:57,464
+À 1, c'est un transistor PMOS qui
+va tirer la broche vers le 1.
+
+53
+00:03:58,890 --> 00:04:03,510
+À l'intérieur des micro contrôleurs,
+les broches ne sont pas indépendantes.
+
+54
+00:04:03,510 --> 00:04:06,050
+Elles sont regroupées par ports,
+
+55
+00:04:06,050 --> 00:04:10,670
+et ces ports ont généralement huit bits,
+parfois 16 ou même 32 bits.
+
+56
+00:04:12,040 --> 00:04:14,950
+Un port peut éventuellement
+être incomplet, sur un modèle
+
+57
+00:04:14,950 --> 00:04:19,900
+donné de micro contrôleur, en fonction
+du nombre de broches à disposition.
+
+58
+00:04:19,900 --> 00:04:24,230
+Les noms des ports dépendent des
+familles de micro contrôleurs.
+
+59
+00:04:24,230 --> 00:04:26,730
+On accède aux broches et à leur rôle,
+
+60
+00:04:26,730 --> 00:04:30,460
+à leur fonction, par des registres
+internes aux micro contrôleurs.
+
+61
+00:04:31,770 --> 00:04:36,250
+Par exemple, sur le micro contrôleur PIC,
+il y a un registre qui s'appelle PORT A,
+
+62
+00:04:36,250 --> 00:04:39,040
+un registre qui s'appelle
+TRIS ; sur les AVR,
+
+63
+00:04:39,040 --> 00:04:44,420
+les registres correspondants
+s'appellent PORT A, DDR A,
+
+64
+00:04:44,420 --> 00:04:50,671
+plus PIN A ; encore des noms
+différents pour les MSP 430,
+
+65
+00:04:50,671 --> 00:04:54,620
+P1DIR, P1OUT, P1IN, P1REN.
+
+66
+00:04:54,620 --> 00:05:01,000
+On a souvent les mêmes concepts qui
+s'appliquent à des noms différents.
+
+67
+00:05:01,000 --> 00:05:02,350
+Essayons d'y voir un petit peu plus clair.
+
+68
+00:05:03,650 --> 00:05:06,040
+Prenons l'exemple du micro contrôleur AVR,
+
+69
+00:05:06,040 --> 00:05:10,650
+les ports s'appellent,
+PORT A, PORT B, etc.
+
+70
+00:05:12,820 --> 00:05:15,490
+Je noterai dans mes exemples
+ce qui correspond au PORT A.
+
+71
+00:05:16,870 --> 00:05:21,680
+Les huit broches du
+PORT A s'appellent PA0, PA1, etc.
+
+72
+00:05:21,680 --> 00:05:22,520
+jusqu'à PA7.
+
+73
+00:05:23,680 --> 00:05:26,630
+Trois registres sont utilisés
+pour piloter chaque port.
+
+74
+00:05:26,630 --> 00:05:32,310
+Le premier s'appelle DDR A, ça signifie,
+
+75
+00:05:32,310 --> 00:05:38,330
+Data Direction Register, c'est donc
+le registre qui permet de fixer la
+
+76
+00:05:38,330 --> 00:05:44,250
+direction de la broche, c'est-à-dire de
+dire si c'est une entrée ou une sortie.
+
+77
+00:05:44,250 --> 00:05:48,710
+Le deuxième registre s'appelle PORT A,
+c'est le registre de sortie,
+
+78
+00:05:48,710 --> 00:05:51,340
+lorsqu'une broche est utilisée en sortie.
+
+79
+00:05:51,340 --> 00:05:55,460
+C'est ce registre qui sera
+utilisé pour donner la valeur.
+
+80
+00:05:55,460 --> 00:05:58,730
+PIN A, lui,
+n'est pas à proprement parler un registre.
+
+81
+00:05:58,730 --> 00:06:03,030
+C'est une adresse dans laquelle on
+peut lire l'état de chaque broche.
+
+82
+00:06:04,130 --> 00:06:07,870
+Regardons plus en détail comment
+utiliser les deux registres,
+
+83
+00:06:07,870 --> 00:06:12,180
+DDR A et PORT A,
+pour utiliser une entrée ou une sortie.
+
+84
+00:06:13,800 --> 00:06:18,970
+Il faut donc bien comprendre que nous
+avons un registre huit bits, DDR A,
+
+85
+00:06:18,970 --> 00:06:23,870
+un registre huit bits,
+PORT A ; ces deux bits
+
+86
+00:06:23,870 --> 00:06:28,610
+correspondent à la broche PA0,
+ces deux à PA1, PA2.
+
+87
+00:06:28,610 --> 00:06:34,320
+Par exemple, ici,
+c'est le bit numéro six, PA6.
+
+88
+00:06:34,320 --> 00:06:35,750
+On a une valeur dans DDR,
+
+89
+00:06:35,750 --> 00:06:40,090
+une valeur dans PORT,
+voilà les combinaisons qu'on peut avoir.
+
+90
+00:06:41,090 --> 00:06:49,500
+Lorsque DDR est à zéro, on a une entrée,
+lorsque DDR est à 1, on a une sortie.
+
+91
+00:06:49,500 --> 00:06:56,130
+Maintenant, dans le cas d'une entrée, si
+PORT est à zéro, c'est une entrée normale,
+
+92
+00:06:56,130 --> 00:07:03,270
+à haute impédance, mais si PORT prend la
+valeur 1, alors un pull-up est rajouté.
+
+93
+00:07:03,270 --> 00:07:07,180
+Dans le cas de l'utilisation d'une
+broche comment une sortie, eh bien,
+
+94
+00:07:07,180 --> 00:07:12,420
+tout naturellement, la valeur du PORT
+va se transmettre sur la sortie,
+
+95
+00:07:12,420 --> 00:07:15,270
+un 1 donnera une sortie à 1.
+
+96
+00:07:15,270 --> 00:07:19,570
+Ces deux registres sont
+bel et bien des registres,
+
+97
+00:07:19,570 --> 00:07:23,500
+qui mémorisent les valeurs
+; on peut les écrire,
+
+98
+00:07:23,500 --> 00:07:27,320
+depuis un programme, on peut également
+les lire, pour contrôler la valeur.
+
+99
+00:07:28,610 --> 00:07:34,783
+Pour ce qui est de PIN A,
+on ne peut que lire, et lorsqu'on lit,
+
+100
+00:07:34,783 --> 00:07:39,640
+les valeurs sur PA0, PA1 etc.
+
+101
+00:07:39,640 --> 00:07:44,320
+jusqu'à PA7,
+viennent se placer dans PIN A.
+
+102
+00:07:44,320 --> 00:07:48,340
+Sur les MSP430,
+les ports s'appellent P1, P2 etc.
+
+103
+00:07:48,340 --> 00:07:51,610
+Je prendrai l'exemple avec P1.
+
+104
+00:07:51,610 --> 00:07:58,577
+Les broches de P1 s'appellent P1.0,
+P1.1 etc.
+
+105
+00:07:58,577 --> 00:08:01,000
+jusqu'à P1.7.
+
+106
+00:08:01,000 --> 00:08:04,318
+Quatre registres sont utilisés
+pour piloter chaque port.
+
+107
+00:08:04,318 --> 00:08:07,770
+Le registre P1DIR,
+
+108
+00:08:07,770 --> 00:08:12,640
+c'est le registre de direction, il est
+tout à fait équivalent au, DDR, des AVR.
+
+109
+00:08:12,640 --> 00:08:17,160
+Le registre, P1OUT,
+c'est le registre de sortie.
+
+110
+00:08:17,160 --> 00:08:19,820
+Il est équivalent au PORT A des AVR.
+
+111
+00:08:21,480 --> 00:08:25,670
+P1IN a également la même
+fonctionnalité que PIN A des AVR,
+
+112
+00:08:25,670 --> 00:08:29,400
+il donne l'état de chaque broche.
+
+113
+00:08:29,400 --> 00:08:33,378
+Par contre, il y a un registre
+supplémentaire, qui s'appelle P1REN,
+
+114
+00:08:33,378 --> 00:08:40,200
+comme Resister Enable,
+enclenchement d'une résistance de tirage.
+
+115
+00:08:41,340 --> 00:08:45,550
+Voilà les fonctions possibles des broches,
+en fonction de ces entrées,
+
+116
+00:08:48,190 --> 00:08:53,700
+lorsque DIR est à 1, on a une sortie,
+qui peut prendre la valeur zéro,
+
+117
+00:08:53,700 --> 00:08:58,210
+ou la valeur 1 ; lorsque DIR est à zéro,
+
+118
+00:08:58,210 --> 00:09:04,080
+on a tous les cas possibles des entrées,
+et c'est Resister Enable
+
+119
+00:09:04,080 --> 00:09:09,360
+qui détermine si on a une entrée normale
+à haute impédance, lorsque c'est un zéro,
+
+120
+00:09:09,360 --> 00:09:14,510
+ou si l'on a une résistance de tirage,
+lorsque REN est à 1.
+
+121
+00:09:14,510 --> 00:09:19,200
+Et alors le tirage peut être vers le haut,
+ou vers le bas,
+
+122
+00:09:19,200 --> 00:09:22,090
+selon la valeur de registre P1OUT.
+
+123
+00:09:22,090 --> 00:09:27,320
+À noter que cette table est incomplète,
+que les autres combinaisons ne doivent,
+
+124
+00:09:27,320 --> 00:09:29,530
+en principe, pas être utilisées.
+
+125
+00:09:29,530 --> 00:09:34,710
+Donc, pratiquement, pour lire et écrire
+sur un port, il faut initialiser
+
+126
+00:09:34,710 --> 00:09:40,880
+le registre de direction, ici,
+on aura une sortie sur le bit zéro
+
+127
+00:09:40,880 --> 00:09:45,960
+et sur le bit 6, des entrées sur les
+autres bits, on pourra éventuellement
+
+128
+00:09:45,960 --> 00:09:50,600
+enclencher les résistances de tirage,
+et ensuite on pourra, en permanence,
+
+129
+00:09:50,600 --> 00:09:56,150
+lire, dans une variable ce
+qu'il y a sur les broches,
+
+130
+00:09:56,150 --> 00:09:59,790
+que ce soit d'ailleurs utilisé en entrée
+ou en sortie, on On peut toujours lire la
+
+131
+00:09:59,790 --> 00:10:03,510
+valeur, mais c'est généralement lorsque
+c'est une entrée qui nous intéresse.
+
+132
+00:10:05,240 --> 00:10:06,190
+Pour une écriture,
+
+133
+00:10:06,190 --> 00:10:10,790
+eh bien on prend une valeur, une valeur
+de 8 bits qu'on va placer dans P1OUT.
+
+134
+00:10:12,380 --> 00:10:15,970
+On a compris que les broches des
+microcontrôleurs sont regroupées
+
+135
+00:10:15,970 --> 00:10:17,190
+par ports.
+
+136
+00:10:17,190 --> 00:10:22,310
+Mais alors comment les utiliser
+individuellement, un bit à la fois?
+
+137
+00:10:22,310 --> 00:10:26,510
+Eh bien nous allons utiliser les
+opérations logiques du langage C.
+
+138
+00:10:26,510 --> 00:10:33,340
+Nous avons à disposition le ET logique,
+le OU logique et l'inversion logique.
+
+139
+00:10:34,850 --> 00:10:41,080
+Le OU logique est représenté par la barre
+verticale, ce symbole & correspond au
+
+140
+00:10:41,080 --> 00:10:46,980
+ET logique et le tilde ici
+correspond à l'inversion logique.
+
+141
+00:10:48,210 --> 00:10:53,810
+Regardons comment un bit peut être
+mis à 1 à l'intérieur d'un port.
+
+142
+00:10:53,810 --> 00:10:56,430
+Il suffit d'exécuter cette instruction.
+
+143
+00:10:57,680 --> 00:10:59,530
+Comment est-ce que cela fonctionne?
+
+144
+00:10:59,530 --> 00:11:05,780
+Au départ, nous avons des valeurs que nous
+ne connaissons pas à l'intérieur de P1OUT.
+
+145
+00:11:05,780 --> 00:11:12,480
+Nous souhaitons qu'après l'opération
+se trouve la valeur logique 1.
+
+146
+00:11:12,480 --> 00:11:19,990
+Eh bien en réalisant le OU logique
+entre cette opérande et cette opérande,
+
+147
+00:11:19,990 --> 00:11:26,080
+on obtient bien ici un 1 et ici
+une conservation de chaque valeur.
+
+148
+00:11:27,730 --> 00:11:31,990
+Il est également possible de
+mettre plusieurs bits à 1 en
+
+149
+00:11:31,990 --> 00:11:33,710
+une seule instruction.
+
+150
+00:11:33,710 --> 00:11:39,440
+Ici le bit 6 et le bit 1 sont mis
+à 1 par l'opération logique OU.
+
+151
+00:11:40,680 --> 00:11:42,310
+C'est similaire pour la mise à 0.
+
+152
+00:11:42,310 --> 00:11:46,910
+C'est la fonction logique
+ET qui sera utilisée,
+
+153
+00:11:46,910 --> 00:11:51,960
+mais cette fois avec un
+0 lorsqu'on veut faire
+
+154
+00:11:51,960 --> 00:11:57,290
+passer le 0 et un 1 lorsqu'on
+veut maintenir l'ancienne valeur.
+
+155
+00:11:58,420 --> 00:12:01,070
+C'est lié aux propriétés
+de l'algèbre de Boole.
+
+156
+00:12:01,070 --> 00:12:05,440
+Et de nouveau, c'est possible d'agir
+sur plusieurs bits à la fois.
+
+157
+00:12:05,440 --> 00:12:12,200
+À noter que ce type d'écriture
+est assez peu lisible.
+
+158
+00:12:12,200 --> 00:12:16,310
+Cherchons une meilleure solution
+pour écrire ces opérations.
+
+159
+00:12:18,180 --> 00:12:23,705
+Les opérations setbit et clearbit
+s'utilisent généralement avec des sorties,
+
+160
+00:12:23,705 --> 00:12:26,395
+mais il ne faut pas aussi
+oublier les entrées.
+
+161
+00:12:26,395 --> 00:12:29,115
+Nous devons tester un bit.
+
+162
+00:12:30,655 --> 00:12:35,435
+La situation se présente de la
+manière suivante : on a 8 bits.
+
+163
+00:12:35,435 --> 00:12:39,815
+Le bit qui nous intéresse
+peut être à 0 ou à 1.
+
+164
+00:12:39,815 --> 00:12:43,470
+Comment faire pour cacher les autres bits?
+
+165
+00:12:43,470 --> 00:12:48,450
+Eh bien on va utiliser l'opération
+logique ET que nous voyons ici.
+
+166
+00:12:50,020 --> 00:12:54,420
+Ces valeurs-là vont disparaître
+grâce au ET logique.
+
+167
+00:12:54,420 --> 00:12:58,840
+Cette valeur va être conservée
+grâce à la présence du 1,
+
+168
+00:12:58,840 --> 00:13:01,010
+tout comme celle-ci va être conservée.
+
+169
+00:13:02,440 --> 00:13:09,020
+Le résultat final sera une valeur
+complètement nulle dans le cas du 0,
+
+170
+00:13:09,020 --> 00:13:15,590
+une valeur non nulle dans le cas du
+1 ; et ça correspond parfaitement à
+
+171
+00:13:15,590 --> 00:13:20,900
+ce qu'on veut en C puisqu'une valeur nulle
+est considérée comme une condition fausse
+
+172
+00:13:20,900 --> 00:13:24,580
+alors qu'une valeur non nulle est
+considérée comme une valeur vraie.
+
+173
+00:13:25,740 --> 00:13:30,046
+Donc par exemple,
+nous pourrons utiliser dans un if : if
+
+174
+00:13:30,046 --> 00:13:35,430
+P1IN & cette valeur,
+et nous testons le bit en question.
+
+175
+00:13:36,620 --> 00:13:42,010
+Pour mettre à 1 le bit 6, on peut écrire
+l'instruction de cette manière-là.
+
+176
+00:13:42,010 --> 00:13:44,870
+Aux décimales,
+c'est particulièrement peu lisible.
+
+177
+00:13:44,870 --> 00:13:46,810
+Pour ceux qui connaissent
+bien l'hexadécimal,
+
+178
+00:13:46,810 --> 00:13:52,730
+c'est un peu plus lisible avec cette
+notation, 0x signifiant hexadécimal.
+
+179
+00:13:54,470 --> 00:13:58,700
+Certains compilateurs permettent d'écrire
+la valeur en binaire, mais attention,
+
+180
+00:13:58,700 --> 00:14:00,400
+c'est pas toujours le cas.
+
+181
+00:14:00,400 --> 00:14:03,400
+Mais il y a une notation
+beaucoup plus intéressante
+
+182
+00:14:03,400 --> 00:14:07,990
+qui consiste à utiliser
+l'opérateur de décalage.
+
+183
+00:14:07,990 --> 00:14:12,220
+Ici on prend la valeur 1 qui se
+trouve donc normalement ici et on la
+
+184
+00:14:12,220 --> 00:14:15,540
+décale de 6 pour la mettre à cette place.
+
+185
+00:14:15,540 --> 00:14:18,450
+Et le gros avantage c'est que
+cette notation fait apparaître
+
+186
+00:14:19,550 --> 00:14:22,460
+le chiffre 6 qui est le
+rond du bit concerné.
+
+187
+00:14:22,460 --> 00:14:26,800
+À noter que ces quatre instructions
+
+188
+00:14:26,800 --> 00:14:30,985
+sont compilées exactement de la
+même manière par le compilateur.
+
+189
+00:14:30,985 --> 00:14:36,395
+Cette valeur-là étant une constante, elle
+est évidemment calculée par le compilateur
+
+190
+00:14:36,395 --> 00:14:39,675
+et non pas calculée au moment de
+l'exécution par le microcontrôleur.
+
+191
+00:14:40,715 --> 00:14:45,325
+On peut même d'ailleurs ajouter que les
+compilateurs modernes réalisent que
+
+192
+00:14:45,325 --> 00:14:50,420
+ces instructions sont en
+fait la mise à 1 d'un bit
+
+193
+00:14:50,420 --> 00:14:55,710
+dans un champ de bit et elles utilisent
+les instructions assembleurs spécifiques
+
+194
+00:14:55,710 --> 00:14:57,620
+qui existent sur tous les
+processeurs modernes.
+
+195
+00:14:58,770 --> 00:15:03,030
+Pour la mise à 0,
+on va utiliser la même notation qu'ici,
+
+196
+00:15:03,030 --> 00:15:05,490
+mais en utilisant l'opérateur d'inversion.
+
+197
+00:15:05,490 --> 00:15:10,420
+Et c'est ainsi qu'on va pouvoir se
+souvenir que pour faire un bit set,
+
+198
+00:15:11,490 --> 00:15:18,470
+on fait le OU égal ; lorsqu'on veut un
+bit clear, on utilise ET égal tilde.
+
+199
+00:15:20,180 --> 00:15:24,210
+Je profite de l'occasion pour parler
+du dernier opérateur disponible
+
+200
+00:15:24,210 --> 00:15:29,040
+en C qui est le OU exclusif
+sur un champ de bits.
+
+201
+00:15:29,040 --> 00:15:33,610
+On pourra par exemple l'utiliser pour
+inverser la valeur binaire dans un
+
+202
+00:15:33,610 --> 00:15:38,870
+registre P1OUT ^= (1<<6).
+
+203
+00:15:38,870 --> 00:15:44,150
+Pour rendre plus lisibles nos programmes,
+
+204
+00:15:45,430 --> 00:15:49,230
+nous utiliserons volontiers
+le dièse define du C.
+
+205
+00:15:49,230 --> 00:15:54,790
+Il s'agit donc d'un ordre de remplacement
+qui est donné au préprocesseur,
+
+206
+00:15:54,790 --> 00:15:57,410
+qui s'exécute avant la
+compilation elle-même.
+
+207
+00:15:57,410 --> 00:16:01,440
+De cette manière, lorsqu'on écrira
+dans un programme ClockSet,
+
+208
+00:16:02,880 --> 00:16:08,380
+qui montre que j'ai l'intention de passer
+le signal d'horloge Clock à la valeur 1,
+
+209
+00:16:08,380 --> 00:16:13,520
+cette expression remplacera le ClockSet.
+
+210
+00:16:14,550 --> 00:16:20,520
+Idem pour le ClockClear, ici un clear bit.
+
+211
+00:16:20,520 --> 00:16:24,790
+On pourra par exemple aussi
+l'utiliser pour gérer une Led.
+
+212
+00:16:25,810 --> 00:16:30,520
+Allumer, éteindre ou
+changer l'état d'une Led
+
+213
+00:16:30,520 --> 00:16:36,120
+avec un set bit,
+un clear bit et un toggle bit.
+
+214
+00:16:36,120 --> 00:16:39,980
+Nous avons vu le rôle exact
+des broches d'entrée sortie
+
+215
+00:16:39,980 --> 00:16:44,860
+et comment elles sont regroupées en ports
+à l'intérieur des microcontrôleurs.
+
+216
+00:16:44,860 --> 00:16:49,270
+Nous avons vu les registres qui
+permettent de les manipuler sur un AVR
+
+217
+00:16:49,270 --> 00:16:50,010
+ou sur un MSP430.
+
+218
+00:16:51,640 --> 00:16:57,025
+Nous avons vu les opérations logiques
+qu'il est possible d'utiliser.
+
+219
+00:16:57,025 --> 00:17:00,025
+Nous pourrons donc
+maintenant utiliser au mieux
+
+220
+00:17:00,025 --> 00:17:03,615
+nos ports d'entrée sortie pour nos
+enseignes et afficheurs à Led.

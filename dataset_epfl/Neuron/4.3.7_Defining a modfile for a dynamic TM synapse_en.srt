@@ -1,0 +1,1018 @@
+1
+00:00:05,445 --> 00:00:07,307
+Hi and welcome to
+our second tutorial
+
+2
+00:00:07,494 --> 00:00:09,444
+on modeling synapse dynamics.
+
+3
+00:00:09,663 --> 00:00:13,075
+We'll continue where we left off
+modeling the glutamate receptor
+
+4
+00:00:13,296 --> 00:00:16,483
+in the previous tutorial,
+and interactively augmented
+
+5
+00:00:16,690 --> 00:00:20,140
+with the model of short term
+depression and facilitation.
+
+6
+00:00:21,423 --> 00:00:24,523
+In the previous lecture,
+my colleague (INAUDIBLE)
+
+7
+00:00:24,708 --> 00:00:29,620
+described for you a model of
+short term synaptic dynamics.
+
+8
+00:00:29,835 --> 00:00:35,885
+Facilitation and depression.
+
+9
+00:00:36,296 --> 00:00:39,683
+The commonly used model for
+facilitation and depression
+
+10
+00:00:39,869 --> 00:00:42,869
+is the Tsodyks and Markram model.
+
+11
+00:00:43,666 --> 00:00:46,803
+As it was described previously,
+the model accounts for
+
+12
+00:00:47,010 --> 00:00:52,035
+the dynamics of
+a reserve vesicle pool.
+
+13
+00:00:53,875 --> 00:01:01,037
+In particular, the "Docked" vesicles
+form the readily releasable pool.
+
+14
+00:01:01,498 --> 00:01:03,423
+In the Tsodyks Markram model
+
+15
+00:01:03,615 --> 00:01:07,203
+R refers to
+the fraction of available
+
+16
+00:01:07,429 --> 00:01:12,004
+vesicles in the readily
+releasable pool.
+
+17
+00:01:14,366 --> 00:01:22,491
+And U(se) refers to
+the running probability of release.
+
+18
+00:01:23,102 --> 00:01:31,489
+These two variables, R and U(se),
+make up the state variables
+
+19
+00:01:32,502 --> 00:01:35,502
+of the Tsodyks Markram model.
+
+20
+00:01:35,781 --> 00:01:42,519
+The R variable accounts
+for synaptic depression
+
+21
+00:01:42,739 --> 00:01:45,989
+whereas the facilitation aspect
+of the model is accounted for
+
+22
+00:01:46,176 --> 00:01:48,001
+in the second differential equation
+
+23
+00:01:48,185 --> 00:01:51,748
+in the dynamic of
+the release probability.
+
+24
+00:01:51,966 --> 00:01:56,191
+Now, let's implement the various
+components of this mathematical
+
+25
+00:01:56,378 --> 00:01:58,903
+formulation of
+the Tsodyks Markram model
+
+26
+00:01:59,110 --> 00:02:02,072
+into a NEURON and model file.
+
+27
+00:02:02,263 --> 00:02:04,525
+The model we will implement
+today is based on
+
+28
+00:02:04,726 --> 00:02:09,101
+the Tsodyks Markram model
+for short term facilitation
+
+29
+00:02:09,288 --> 00:02:14,175
+and depression, as it is described
+in the Fuhrmann 2001 publication
+
+30
+00:02:14,386 --> 00:02:16,186
+here.
+
+31
+00:02:16,611 --> 00:02:19,361
+In this tutorial, we're going
+to learn how to implement
+
+32
+00:02:19,569 --> 00:02:23,982
+the mathematical formulations of
+the model into NMODL syntax
+
+33
+00:02:24,180 --> 00:02:25,392
+and therefore gain a deeper
+
+34
+00:02:25,590 --> 00:02:27,365
+appreciation of
+the different components
+
+35
+00:02:27,540 --> 00:02:31,327
+of the NMODL language,
+and also a deeper understanding
+
+36
+00:02:31,519 --> 00:02:35,157
+of this widely used formulation
+of synapse dynamics.
+
+37
+00:02:35,361 --> 00:02:40,561
+To begin, let's start where we left
+off with the MOD file
+
+38
+00:02:40,781 --> 00:02:43,781
+for the simple AMPA
+and NMDA receptor.
+
+39
+00:02:44,901 --> 00:02:51,201
+If we go to our Jupyter home space,
+and go into the mechanisms directory
+
+40
+00:02:51,402 --> 00:02:58,490
+let's create a copy of the previous
+MOD file which we will then
+
+41
+00:02:58,689 --> 00:03:00,139
+subsequently modify.
+
+42
+00:03:00,333 --> 00:03:09,233
+So, we duplicate, then we rename,
+let's call it the Tsodyks Markram
+
+43
+00:03:09,418 --> 00:03:11,818
+AMPA and NMDA synapse.
+
+44
+00:03:12,010 --> 00:03:14,523
+Now, we can edit the file.
+
+45
+00:03:14,714 --> 00:03:19,039
+First let's update the comments.
+
+46
+00:03:28,651 --> 00:03:33,238
+Now that we've updated
+the comments in the preambule 
+
+47
+00:03:33,437 --> 00:03:36,737
+let's start adding the required
+components to implement
+
+48
+00:03:36,975 --> 00:03:38,487
+this addition to the model.
+
+49
+00:03:38,684 --> 00:03:42,246
+First, we should
+rename the point process.
+
+50
+00:03:42,451 --> 00:03:45,651
+This is the unique name given
+to the model which we'll then
+
+51
+00:03:45,856 --> 00:03:48,756
+employ in the Jupyter
+Python Interpreter to
+
+52
+00:03:48,956 --> 00:03:51,656
+create an instance of the model.
+
+53
+00:03:51,876 --> 00:03:59,388
+Here we will give it the name
+"TsodyksMarkram_AMPA_NMDA".
+
+54
+00:04:00,028 --> 00:04:03,403
+Now let's add the additional
+required parameters.
+
+55
+00:04:08,443 --> 00:04:11,443
+The Tsodyks Markram
+model has three parameters.
+
+56
+00:04:11,851 --> 00:04:15,476
+A time constant for
+recovery from depression
+
+57
+00:04:17,614 --> 00:04:22,352
+a time constant for relaxation
+from facilitation
+
+58
+00:04:25,224 --> 00:04:30,949
+and a baseline release probability
+in the absence of facilitation.
+
+59
+00:04:33,004 --> 00:04:37,391
+Now, let's add these parameters
+into our NMODL file.
+
+60
+00:04:37,628 --> 00:04:41,540
+We can add these parameters of
+the Tsodyks Markram model
+
+61
+00:04:42,070 --> 00:04:43,257
+as follows.
+
+62
+00:04:43,459 --> 00:04:48,184
+First, the time constant of
+recovery from depression:
+
+63
+00:04:48,506 --> 00:04:51,868
+we'll give it an intermediate
+value of 200 and the unit
+
+64
+00:04:52,056 --> 00:04:55,056
+of that value is milliseconds.
+
+65
+00:04:55,276 --> 00:05:04,789
+Here a comment, time constant
+of recovery from depression.
+
+66
+00:05:05,019 --> 00:05:08,406
+Next, the second parameter
+is the time constant
+
+67
+00:05:08,627 --> 00:05:12,052
+of relaxation from facilitation.
+
+68
+00:05:12,352 --> 00:05:17,602
+We'll also give that a time constant
+for 200ms, these are default values
+
+69
+00:05:17,800 --> 00:05:20,800
+and they can be overridden
+then in the Python Interpreter.
+
+70
+00:05:22,086 --> 00:05:25,086
+And the final
+parameter is "U1".
+
+71
+00:05:26,357 --> 00:05:29,357
+We will give it an intermediate
+value of 0.5
+
+72
+00:05:29,567 --> 00:05:33,667
+it's a dimensional's quantity
+and it is the baseline
+
+73
+00:05:33,878 --> 00:05:37,328
+release probability.
+
+74
+00:05:38,547 --> 00:05:41,047
+Next we should add
+the additional state variables
+
+75
+00:05:41,246 --> 00:05:43,296
+for the Tsodyks Markram model.
+
+76
+00:05:43,490 --> 00:05:45,928
+Let's add them here.
+
+77
+00:05:50,007 --> 00:05:52,382
+The state variables of
+the Tsodyks Markram model
+
+78
+00:05:52,577 --> 00:05:57,939
+are the variables of the first order
+
+79
+00:05:58,135 --> 00:06:00,123
+time derivative on
+the left hand side
+
+80
+00:06:00,319 --> 00:06:02,982
+that is R, the fraction of available
+
+81
+00:06:03,183 --> 00:06:06,183
+vesicles in the readily
+releasable pool
+
+82
+00:06:06,408 --> 00:06:12,033
+and U(se), the running value
+of the release probability.
+
+83
+00:06:13,379 --> 00:06:19,266
+We can add the state variables
+U(se) and R as follows.
+
+84
+00:06:20,010 --> 00:06:23,010
+Simply declare them.
+
+85
+00:06:24,190 --> 00:06:27,827
+Give them a comment as to
+their purpose and you're done.
+
+86
+00:06:28,296 --> 00:06:32,183
+In the assigned block of the synapse
+no additional modification
+
+87
+00:06:32,372 --> 00:06:34,397
+are required.
+
+88
+00:06:34,801 --> 00:06:36,764
+Since we've added
+two new state variables
+
+89
+00:06:36,962 --> 00:06:39,824
+we need to also declare
+their initial conditions.
+
+90
+00:06:40,014 --> 00:06:45,376
+Here we give R the value of
+a completely recovered
+
+91
+00:06:45,600 --> 00:06:48,288
+readily releasable pool,
+that is that
+
+92
+00:06:48,506 --> 00:06:51,669
+the fraction of available
+vesicles is equal to one
+
+93
+00:06:51,855 --> 00:07:00,117
+and the release probability we give
+it its fully relaxed value of zero.
+
+94
+00:07:01,385 --> 00:07:04,460
+For the break point block
+no additional modifications
+
+95
+00:07:04,682 --> 00:07:10,257
+are required except to model
+the sub-block, defining the ODEs.
+
+96
+00:07:10,796 --> 00:07:13,246
+The ODEs are defined in this block.
+
+97
+00:07:13,433 --> 00:07:15,471
+Let's recap
+the mathematical expression
+
+98
+00:07:15,660 --> 00:07:17,522
+for the Tsodyks Markram model.
+
+99
+00:07:17,724 --> 00:07:23,874
+This system of two ODEs has both
+a time continuous component
+
+100
+00:07:24,492 --> 00:07:29,317
+as shown here,
+and as shown here,
+
+101
+00:07:29,865 --> 00:07:32,865
+and event triggered components.
+
+102
+00:07:34,040 --> 00:07:38,990
+As shown here,
+and here.
+
+103
+00:07:39,941 --> 00:07:42,178
+These two components will
+be treated separately
+
+104
+00:07:42,371 --> 00:07:44,458
+in the NMODL file.
+
+105
+00:07:44,672 --> 00:07:50,034
+First let's consider the time
+continuous components.
+
+106
+00:07:50,973 --> 00:07:54,710
+An ODE, a first order linear ODE for
+
+107
+00:07:54,896 --> 00:07:58,609
+the fraction of
+the available vesicles
+
+108
+00:07:58,779 --> 00:08:03,954
+and likewise for the running
+value of the release probability.
+
+109
+00:08:04,420 --> 00:08:06,695
+In the ODE's block we define only
+
+110
+00:08:06,893 --> 00:08:09,893
+the dynamics of the time
+continuous component.
+
+111
+00:08:10,108 --> 00:08:13,508
+That is, R prime,
+the time derivative of R
+
+112
+00:08:13,787 --> 00:08:19,174
+is equal to 1-R,
+divided by tau_recovery
+
+113
+00:08:19,403 --> 00:08:25,903
+this results in an exponential
+relaxation of R towards 1
+
+114
+00:08:26,105 --> 00:08:30,643
+that is an exponential recovery with
+time constant of tau_recovery.
+
+115
+00:08:31,835 --> 00:08:34,947
+And secondly,
+the continuous dynamics
+
+116
+00:08:35,162 --> 00:08:37,437
+of the running
+release probability
+
+117
+00:08:37,657 --> 00:08:39,244
+U(se).
+
+118
+00:08:39,511 --> 00:08:41,599
+That is the time
+derivative of the U(se)
+
+119
+00:08:41,797 --> 00:08:47,147
+is equal to -U(se) over
+tau_facilitation.
+
+120
+00:08:47,930 --> 00:08:54,492
+This shows that U(se) exponentially
+relaxes to a value of zero.
+
+121
+00:08:54,706 --> 00:08:57,706
+With a time constant of "tau_facil".
+
+122
+00:08:58,277 --> 00:09:02,302
+Finally we must augment
+the "NET_RECEIVE" block
+
+123
+00:09:02,505 --> 00:09:04,592
+this is the piece of code that is
+
+124
+00:09:04,770 --> 00:09:07,770
+executed for each
+pre-synaptic spike event.
+
+125
+00:09:08,153 --> 00:09:12,965
+First we must define a local
+variable for the derived quantity A
+
+126
+00:09:13,156 --> 00:09:16,156
+which is the scalar
+of the synaptic response as
+
+127
+00:09:16,360 --> 00:09:21,598
+a function of the least probability
+and fraction of available vesicles.
+
+128
+00:09:23,282 --> 00:09:27,707
+Now, let's define the pre-synaptic
+spike triggered updates
+
+129
+00:09:27,897 --> 00:09:32,097
+of the release probability and
+fraction of available vesicles.
+
+130
+00:09:32,328 --> 00:09:36,753
+Now, let's consider the event
+triggered portions of this system
+
+131
+00:09:36,945 --> 00:09:38,645
+of ODEs.
+
+132
+00:09:43,147 --> 00:09:47,097
+This term in the differential
+equation for the fraction
+
+133
+00:09:47,325 --> 00:09:53,350
+of readily releasable vesicles
+is an event triggered component
+
+134
+00:09:53,528 --> 00:09:57,878
+as it can be seen by the delta
+function with respect to time
+
+135
+00:09:58,103 --> 00:10:00,041
+of the pre-synaptic spike.
+
+136
+00:10:00,845 --> 00:10:06,495
+The meaning of this is that
+at the arrival time of
+
+137
+00:10:06,671 --> 00:10:09,671
+the pre-synaptic spike
+
+138
+00:10:11,618 --> 00:10:14,618
+the fraction of available
+vesicles is decreased
+
+139
+00:10:14,841 --> 00:10:19,303
+by an amount proportional to
+the current fraction of
+
+140
+00:10:19,514 --> 00:10:23,139
+available vesicles and their
+probability that they release.
+
+141
+00:10:23,514 --> 00:10:27,014
+The decrease is indicated
+by the minus sign.
+
+142
+00:10:28,251 --> 00:10:31,976
+Likewise, the differential equation
+for the release probability
+
+143
+00:10:32,173 --> 00:10:36,073
+also contains a spike
+triggered term.
+
+144
+00:10:36,329 --> 00:10:41,329
+The meaning of this term
+is that following a spike
+
+145
+00:10:41,545 --> 00:10:45,483
+the value of the release
+probability takes on U1
+
+146
+00:10:46,483 --> 00:10:50,870
+if the running value of
+the release probability is zero.
+
+147
+00:10:51,047 --> 00:10:54,660
+However, this model
+accounts for facilitation in that
+
+148
+00:10:54,925 --> 00:10:57,463
+should the current running
+value of the release probability
+
+149
+00:10:57,653 --> 00:11:03,078
+be greater than zero, then
+the value of the release probability
+
+150
+00:11:03,274 --> 00:11:10,261
+will be incremented beyond
+the baseline value of U1.
+
+151
+00:11:11,921 --> 00:11:16,896
+This term ensures that the value
+of the release probability
+
+152
+00:11:17,097 --> 00:11:19,522
+never exceeds one.
+
+153
+00:11:19,901 --> 00:11:23,526
+The first update to compute is
+the update of the running value
+
+154
+00:11:23,768 --> 00:11:26,768
+of the release probability,
+U(se).
+
+155
+00:11:26,976 --> 00:11:30,576
+That is updated according
+to the expression given
+
+156
+00:11:31,168 --> 00:11:36,030
+U goes to U(se) plus
+the additional delta term
+
+157
+00:11:36,237 --> 00:11:42,112
+in the ODE, U1 times one,
+minus U(se).
+
+158
+00:11:42,913 --> 00:11:45,825
+The next update to compute
+is the update of the fraction of
+
+159
+00:11:46,034 --> 00:11:47,659
+available vesicles.
+
+160
+00:11:47,875 --> 00:11:55,412
+Here, R goes to R minus U(se)
+times R.
+
+161
+00:11:55,603 --> 00:12:00,278
+The fraction of available vesicles R
+is reduced by an amount
+
+162
+00:12:00,479 --> 00:12:03,454
+proportional to the currently
+available vesicles
+
+163
+00:12:03,657 --> 00:12:06,595
+and the fraction of those
+vesicles that are released.
+
+164
+00:12:06,834 --> 00:12:09,896
+The final step is
+to compute the factor A
+
+165
+00:12:10,118 --> 00:12:14,243
+which modulates the synaptic weight.
+
+166
+00:12:14,583 --> 00:12:24,808
+We insert this term here,
+here, here, and here
+
+167
+00:12:25,510 --> 00:12:28,422
+because it modulates, as we said,
+the synaptic weight
+
+168
+00:12:28,639 --> 00:12:31,177
+so it should modulate each
+of these cases where 
+
+169
+00:12:31,404 --> 00:12:32,754
+weight appears.
+
+170
+00:12:32,958 --> 00:12:35,958
+And now, what value does A take on?
+
+171
+00:12:36,356 --> 00:12:41,843
+This system of differential
+equations describes the evolution of
+
+172
+00:12:42,055 --> 00:12:46,318
+the fraction of available vesicles
+
+173
+00:12:48,609 --> 00:12:53,746
+and the running release probability
+as a function of time.
+
+174
+00:12:54,463 --> 00:13:02,113
+For a series of pre-synaptic spikes
+arriving at times as indicated here.
+
+175
+00:13:05,497 --> 00:13:11,334
+These traces give you the evolution
+of the respected state variables.
+
+176
+00:13:13,609 --> 00:13:19,884
+To compute the modulation of
+the synaptic conductance
+
+177
+00:13:23,006 --> 00:13:26,543
+as a function of these
+running R and U values
+
+178
+00:13:27,058 --> 00:13:32,521
+we multiply the overall synaptic
+conductance by a factor A,
+
+179
+00:13:33,084 --> 00:13:37,634
+which is the fraction of vesicles
+available in the readily
+
+180
+00:13:37,881 --> 00:13:39,731
+releasable pool
+
+181
+00:13:39,986 --> 00:13:45,123
+times the running value
+of the release probability.
+
+182
+00:13:45,494 --> 00:13:54,144
+Interestingly, this product
+is also the amount
+
+183
+00:13:54,515 --> 00:14:01,552
+by which R is deprecated for
+each incoming pre-synaptic spike.
+
+184
+00:14:02,922 --> 00:14:08,260
+Also note, that as T
+is time dependent and U(se)
+
+185
+00:14:08,464 --> 00:14:10,151
+is time dependent
+
+186
+00:14:10,552 --> 00:14:15,340
+the value of A is
+also time dependent
+
+187
+00:14:17,498 --> 00:14:20,961
+and takes on specific values
+
+188
+00:14:24,954 --> 00:14:28,691
+at each point in time when
+a pre-synaptic spike occurs
+
+189
+00:14:28,918 --> 00:14:36,580
+according to the running value of R
+and U(se) at the time of the spike.
+
+190
+00:14:37,299 --> 00:14:40,562
+Now we add this A term
+into the "NET_RECEIVE" block.
+
+191
+00:14:40,802 --> 00:14:43,227
+U(se) times R.
+
+192
+00:14:43,441 --> 00:14:47,354
+Now take note, one tricky aspect
+of the Tsodyks Markram is where
+
+193
+00:14:47,554 --> 00:14:49,104
+"A" should be computed.
+
+194
+00:14:49,281 --> 00:14:55,793
+Depending on if you were
+to compute "A" here, or here, or here
+
+195
+00:14:56,634 --> 00:15:00,222
+the value, or magnitude of
+the synaptic transmission event
+
+196
+00:15:00,429 --> 00:15:01,654
+can be different.
+
+197
+00:15:01,848 --> 00:15:04,798
+It turns out that the correct
+interpretation is to compute
+
+198
+00:15:05,021 --> 00:15:06,558
+"A" here
+
+199
+00:15:06,759 --> 00:15:10,571
+after the U(se) has been updated
+with facilitatory mechanisms
+
+200
+00:15:10,763 --> 00:15:14,451
+but before the fraction of
+readily releasable vesicles
+
+201
+00:15:14,636 --> 00:15:17,636
+has been depleted by
+the release event.
+
+202
+00:15:18,721 --> 00:15:22,983
+Intuitively this makes sense
+in so far as the fraction
+
+203
+00:15:23,203 --> 00:15:27,265
+of readily releasable vesicles that
+is depleted is actually equal to A.
+
+204
+00:15:27,613 --> 00:15:32,313
+That is the readily releasable pool
+is depleted by exactly those
+
+205
+00:15:32,498 --> 00:15:36,385
+vesicles which mediate
+the synaptic response.
+
+206
+00:15:38,518 --> 00:15:41,356
+Now, we're almost done,
+the only remaining thing to do
+
+207
+00:15:41,591 --> 00:15:48,104
+is to go back up to the top
+to the NEURON block
+
+208
+00:15:48,321 --> 00:15:52,796
+and declare the additional
+parameters such that they can
+
+209
+00:15:53,036 --> 00:15:57,123
+be configured by the user,
+that is tau_recovery
+
+210
+00:15:57,331 --> 00:16:00,756
+tau_facilitation, and U1.
+
+211
+00:16:01,010 --> 00:16:05,260
+With that we've completed
+our new MOD file of the AMPA
+
+212
+00:16:05,465 --> 00:16:08,840
+and NMDA glutamate receptor,
+incorporating
+
+213
+00:16:09,050 --> 00:16:11,062
+Tsodyks Markram
+short term dynamics.
+
+214
+00:16:11,243 --> 00:16:14,243
+Let's save the file.
+

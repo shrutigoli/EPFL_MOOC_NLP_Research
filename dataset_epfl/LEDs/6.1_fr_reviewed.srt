@@ -1,0 +1,795 @@
+1
+00:00:00,025 --> 00:00:10,025
+[AUDIO_VIDE]
+
+2
+00:00:12,610 --> 00:00:13,840
+Bonjour.
+
+3
+00:00:13,840 --> 00:00:19,140
+Nous allons voir comment nous sommes
+limités parfois par les microcontrôleurs
+
+4
+00:00:19,140 --> 00:00:23,160
+lorsque nous devons piloter des matrices
+de grande taille et comment la technique
+
+5
+00:00:23,160 --> 00:00:30,430
+du DMA, accès direct en mémoire,
+permet de repousser un peu ces limites.
+
+6
+00:00:30,430 --> 00:00:34,650
+Nous allons voir l'architecture du DMA,
+nous allons tenter d'écrire un
+
+7
+00:00:34,650 --> 00:00:39,300
+programme très simple mettant en œuvre
+du DMA et nous allons voir comment
+
+8
+00:00:39,300 --> 00:00:42,570
+cela peut s'appliquer au
+pilotage de matrices de LED.
+
+9
+00:00:44,740 --> 00:00:47,450
+On comprend que des matrices
+comportant beaucoup de LED
+
+10
+00:00:47,450 --> 00:00:50,900
+exigent des vitesses de
+rafraîchissement extrêmement élevées.
+
+11
+00:00:50,900 --> 00:00:54,470
+Naturellement on va pouvoir utiliser des
+microcontrôleurs dont la fréquence du
+
+12
+00:00:54,470 --> 00:00:58,810
+processeur est plus élevée pour
+avoir des débits plus importants,
+
+13
+00:00:58,810 --> 00:01:03,970
+mais la technique qu'on appelle
+l'accès direct en mémoire
+
+14
+00:01:03,970 --> 00:01:07,440
+permet de repousser encore un
+peu plus loin cette limite.
+
+15
+00:01:08,830 --> 00:01:11,670
+Quelle est l'idée qui se
+cache derrière le DMA?
+
+16
+00:01:11,670 --> 00:01:15,340
+C'est de ne pas avoir à
+exécuter des instructions
+
+17
+00:01:17,230 --> 00:01:20,680
+du processeur pour chaque
+transfert de données.
+
+18
+00:01:22,140 --> 00:01:24,520
+C'est une idée qui n'est pas nouvelle.
+
+19
+00:01:24,520 --> 00:01:29,950
+Je me souviens qu'en 1981,
+le circuit Intel 8253 est sorti.
+
+20
+00:01:29,950 --> 00:01:32,830
+Et ce qui est amusant,
+
+21
+00:01:32,830 --> 00:01:37,780
+c'est qu'on retrouve des traces de
+ce circuit dans des PC récents.
+
+22
+00:01:37,780 --> 00:01:42,550
+Donc, c'est une technologie qui a survécu
+et que vous utilisez régulièrement
+
+23
+00:01:42,550 --> 00:01:43,470
+dans vos ordinateurs.
+
+24
+00:01:45,160 --> 00:01:49,790
+Regardons d'un peu plus près
+l'architecture d'un système informatique.
+
+25
+00:01:49,790 --> 00:01:53,400
+On se souvient qu'il y a le
+processeur cadencé par son horloge,
+
+26
+00:01:53,400 --> 00:01:58,790
+qu'il va placer des adresses sur
+le bus d'adresses pour pouvoir
+
+27
+00:01:58,790 --> 00:02:03,940
+échanger des données avec des
+mémoires du type mémoire morte
+
+28
+00:02:03,940 --> 00:02:08,830
+ou mémoire vive ainsi qu'avec
+des circuits d'entrées-sorties.
+
+29
+00:02:08,830 --> 00:02:13,150
+Admettons qu'on souhaite transférer
+des données depuis la mémoire
+
+30
+00:02:13,150 --> 00:02:14,370
+jusque sur les sorties.
+
+31
+00:02:15,530 --> 00:02:21,620
+il va falloir charger en
+mémoire morte une instruction
+
+32
+00:02:21,620 --> 00:02:27,066
+qui va donner l'ordre d'aller
+chercher en mémoire vive une donnée,
+
+33
+00:02:27,066 --> 00:02:33,990
+puis d'adresser en écriture
+le circuit de sortie.
+
+34
+00:02:33,990 --> 00:02:36,480
+On voit que c'est relativement compliqué.
+
+35
+00:02:37,720 --> 00:02:45,070
+L'architecture du DMA permet
+de libérer le processeur,
+
+36
+00:02:45,070 --> 00:02:50,020
+c'est le DMA qui prend le
+contrôle et qui va lui-même
+
+37
+00:02:50,020 --> 00:02:54,510
+adresser la mémoire vive au bon endroit,
+chercher des données,
+
+38
+00:02:54,510 --> 00:02:59,510
+et les réécrire directement
+sur les entrées et sorties.
+
+39
+00:03:00,740 --> 00:03:08,310
+Donc, on a un accès direct en mémoire,
+Direct Memory Access en anglais.
+
+40
+00:03:08,310 --> 00:03:11,500
+Ce système peut paraître
+extrêmement simple.
+
+41
+00:03:11,500 --> 00:03:14,029
+il n'est en effet pas très
+compliqué sur le principe.
+
+42
+00:03:15,050 --> 00:03:20,420
+Par contre, il amène généralement
+à des programmes complexes
+
+43
+00:03:20,420 --> 00:03:26,250
+parce que la documentation de
+ces circuits DMA est compliquée,
+
+44
+00:03:26,250 --> 00:03:30,420
+énormément de modes différents
+sont fournis par les fabricants,
+
+45
+00:03:30,420 --> 00:03:34,550
+et finalement on se retrouve dans
+une situation où on a des programmes
+
+46
+00:03:34,550 --> 00:03:37,190
+relativement compliqués et
+difficiles à mettre au point.
+
+47
+00:03:38,200 --> 00:03:41,520
+Tous les microcontrôleurs
+n'offrent pas du DMA.
+
+48
+00:03:41,520 --> 00:03:46,050
+Certains microcontrôleurs offrent des
+DMA relativement limités à certains
+
+49
+00:03:46,050 --> 00:03:50,220
+périphériques, c'est le cas de certains
+microcontrôleurs de la famille MSP430.
+
+50
+00:03:50,220 --> 00:03:56,625
+Par contre, dans une bonne partie des
+processeurs de la famille des processeurs
+
+51
+00:03:56,625 --> 00:04:02,765
+ARM, on trouve des DMA relativement
+complexes et qui sont assez puissants.
+
+52
+00:04:02,765 --> 00:04:05,115
+Mais il y a également d'autres
+processeurs comme par exemple PIC32
+
+53
+00:04:06,145 --> 00:04:08,815
+qui ont également des circuits DMA.
+
+54
+00:04:10,465 --> 00:04:14,950
+J'ai essayé de réaliser un
+programme le plus simple possible.
+
+55
+00:04:14,950 --> 00:04:16,650
+Il a l'air simple ici,
+
+56
+00:04:16,650 --> 00:04:22,500
+mais vous ne voyez malheureusement que
+l'appel d'un certain nombre de procédures.
+
+57
+00:04:22,500 --> 00:04:24,920
+Essayons d'en comprendre le rôle.
+
+58
+00:04:24,920 --> 00:04:28,700
+Tout d'abord ici, HAL_Init( ).
+
+59
+00:04:28,700 --> 00:04:34,620
+Ce programme est écrit pour un
+processeur STM30 de STMicroelectronics
+
+60
+00:04:34,620 --> 00:04:40,040
+et ils ont un hardware abstraction layer,
+une couche
+
+61
+00:04:40,040 --> 00:04:45,420
+d'abstraction matérielle qui permet de
+simplifier la gestion des périphériques.
+
+62
+00:04:45,420 --> 00:04:48,540
+Et ici, on doit initialiser ce module.
+
+63
+00:04:48,540 --> 00:04:54,235
+Puis ensuite, on va appeler une procédure
+qui va initialiser les périphériques,
+
+64
+00:04:54,235 --> 00:04:59,265
+rien de très particulier,
+on va mettre ici un seul port en sortie.
+
+65
+00:04:59,265 --> 00:05:03,795
+On va également créer une trame
+en mémoire qui sera envoyée
+
+66
+00:05:03,795 --> 00:05:08,415
+sur notre unique sortie et là où ça
+devient relativement intéressant,
+
+67
+00:05:08,415 --> 00:05:13,220
+c'est c'est InitDMA,
+et il y aura également InitTimer,
+
+68
+00:05:13,220 --> 00:05:18,580
+et ces deux procédures vont permettre
+au mécanisme d'accès direct en mémoire
+
+69
+00:05:18,580 --> 00:05:23,670
+de s'exécuter et de s'exécuter
+avec un bon timing,
+
+70
+00:05:23,670 --> 00:05:29,610
+avec une gestion temporelle liée
+aux contraintes de la matrice.
+
+71
+00:05:31,315 --> 00:05:35,995
+Tentons de regarder un peu plus en
+détail cette procédure d'initialisation
+
+72
+00:05:35,995 --> 00:05:37,475
+de l'accès direct en mémoire.
+
+73
+00:05:37,475 --> 00:05:42,315
+Tout d'abord,
+il faut que l'horloge du DMA,
+
+74
+00:05:42,315 --> 00:05:46,715
+on a utilisé le DMA numéro 2,
+soit enclenchée.
+
+75
+00:05:47,885 --> 00:05:52,670
+On a choisi un canal parce que le système
+
+76
+00:05:52,670 --> 00:05:57,140
+permet d'avoir plusieurs
+canaux de DMA simultanés.
+
+77
+00:05:58,330 --> 00:06:06,070
+On indique qu'on souhaite faire de l'accès
+depuis une mémoire vers un périphérique.
+
+78
+00:06:06,070 --> 00:06:10,340
+Donc, on va bien faire sortir
+des données de microcontrôleurs,
+
+79
+00:06:10,340 --> 00:06:12,699
+données qui sont stockées en mémoire vive.
+
+80
+00:06:14,040 --> 00:06:19,940
+On va demander que pour la mémoire,
+
+81
+00:06:19,940 --> 00:06:24,918
+on ait incrémentation
+automatique MINC_ENABLE,
+
+82
+00:06:24,918 --> 00:06:30,050
+c'est-à-dire qu'on ira envoyer la
+donnée qui se trouve à une adresse,
+
+83
+00:06:30,050 --> 00:06:32,825
+puis à l'adresse suivante,
+puis à l'adresse suivante, etc.
+
+84
+00:06:34,055 --> 00:06:39,395
+Alors que pour les périphériques,
+on aura le mode d'incrémentation qui sera
+
+85
+00:06:39,395 --> 00:06:45,325
+désélectionné, donc on écrira
+toujours sur le même périphérique.
+
+86
+00:06:45,325 --> 00:06:49,845
+Par ailleurs, on signale au système
+qu'on veut transférer des caractères,
+
+87
+00:06:49,845 --> 00:06:54,270
+donc il y a un alignement qui doit se
+faire avec des caractères, donc des mots 8
+
+88
+00:06:54,270 --> 00:06:58,430
+bits et non pas des mots de 16 bits ou des
+mots de 32 bits puisque le processeur ARM
+
+89
+00:06:58,430 --> 00:07:04,360
+est capable de manipuler des octets, des
+mots de 16 bits et des mots de 32 bits.
+
+90
+00:07:04,360 --> 00:07:06,390
+Même chose pour l'alignement,
+
+91
+00:07:06,390 --> 00:07:10,740
+donc périphérique et mémoire
+toujours des octets.
+
+92
+00:07:10,740 --> 00:07:13,350
+On choisit le mode normal du DMA,
+
+93
+00:07:13,350 --> 00:07:17,620
+il y a plusieurs modes,
+on lui donne une priorité maximale.
+
+94
+00:07:17,620 --> 00:07:22,130
+Dans ce cas, on est tout seuls à utiliser
+du DMA, ce n'est pas un vrai problème.
+
+95
+00:07:22,130 --> 00:07:25,780
+Ensuite, on va décider de ne pas utiliser
+
+96
+00:07:25,780 --> 00:07:28,910
+le mode qui correspond à
+l'enclenchement d'un FIFO,
+
+97
+00:07:28,910 --> 00:07:34,060
+ça veut dire First In First Out, il s'agit
+donc d'une mémoire tampon, d'un buffer.
+
+98
+00:07:34,060 --> 00:07:37,220
+Et on ne l'utilise pas dans ce cas là.
+
+99
+00:07:37,220 --> 00:07:40,598
+Ici, on va dire que les
+transferts se font single,
+
+100
+00:07:40,598 --> 00:07:46,620
+c'est-à-dire un seul caractère,
+un seul octet à la fois,
+
+101
+00:07:46,620 --> 00:07:52,950
+et finalement donc tant pour la
+mémoire que pour les périphériques.
+
+102
+00:07:52,950 --> 00:07:55,690
+Donc voilà un certain nombre de
+réglages qu'il faut connaître,
+
+103
+00:07:55,690 --> 00:07:56,930
+qu'il faut comprendre.
+
+104
+00:07:56,930 --> 00:08:01,060
+C'est facile de décrire ce programme,
+c'est un peu plus difficile de l'écrire.
+
+105
+00:08:01,060 --> 00:08:03,010
+Et généralement d'ailleurs,
+on ne va pas l'écrire soi-même,
+
+106
+00:08:03,010 --> 00:08:06,210
+on va essayer de reprendre des
+exemples fournis par les fabricants
+
+107
+00:08:06,210 --> 00:08:08,770
+et de l'adapter à ce
+qu'on cherche à faire.
+
+108
+00:08:08,770 --> 00:08:12,570
+Finalement, on va créer ce qu'ils
+appellent une instance de DMA
+
+109
+00:08:12,570 --> 00:08:16,660
+et l'initialiser,
+ce qui va permettre de préparer
+
+110
+00:08:16,660 --> 00:08:20,450
+à l'activité notre système
+d'accès direct en mémoire.
+
+111
+00:08:20,450 --> 00:08:22,880
+Mais il reste encore son cadencement.
+
+112
+00:08:22,880 --> 00:08:25,920
+Dans ce cas là,
+le cadencement est assuré par un Timer.
+
+113
+00:08:25,920 --> 00:08:30,490
+Donc on va de nouveau enclencher l'horloge
+du Timer numéro un qu'on a choisi
+
+114
+00:08:30,490 --> 00:08:36,880
+d'utiliser, on va lui préciser comme
+on a l'habitude sa prédivision,
+
+115
+00:08:36,880 --> 00:08:43,705
+son mode de travail COUNTERMODE_UP,
+sa période, la division de l'horloge,
+
+116
+00:08:43,705 --> 00:08:49,585
+le fait qu'on va répéter à l'infini, et on
+
+117
+00:08:49,585 --> 00:08:53,915
+va de nouveau initialiser une instance du
+Timer comme on l'avait fait pour le DMA.
+
+118
+00:08:53,915 --> 00:08:59,385
+Et finalement, ces dernières instructions
+ici vont permettre d'enclencher
+
+119
+00:08:59,385 --> 00:09:03,370
+les transferts DMA qui sont
+cadencés par le Timer.
+
+120
+00:09:03,370 --> 00:09:07,860
+Et vous avez remarqué tout
+à l'heure que la boucle
+
+121
+00:09:07,860 --> 00:09:13,220
+principale du programme était totalement
+vide, et on va avoir des données qui
+
+122
+00:09:13,220 --> 00:09:17,680
+étaient placées dans une zone mémoire,
+donc une trame,
+
+123
+00:09:17,680 --> 00:09:25,130
+qui vont être envoyées sur une sortie du
+microcontrôleur sans aucune intervention
+
+124
+00:09:25,130 --> 00:09:29,870
+du processeur, donc le programme pourra
+faire tout autre chose en même temps.
+
+125
+00:09:29,870 --> 00:09:34,620
+Le DMA se produit de manière indépendante
+et à une vitesse extrêmement intéressante.
+
+126
+00:09:36,130 --> 00:09:40,560
+Comment appliquer ce DMA au
+pilotage des matrices de LED?
+
+127
+00:09:40,560 --> 00:09:43,670
+On se souvient qu'on utilise
+des registres série-parallèles
+
+128
+00:09:43,670 --> 00:09:46,770
+qui nécessitent l'envoi de signaux de
+données mais également d'horloges.
+
+129
+00:09:46,770 --> 00:09:52,470
+Vous vous souvenez par exemple du
+timing ici d'un afficheur multiplexé.
+
+130
+00:09:52,470 --> 00:09:55,970
+On a des données avec une horloge
+qui passe de 0 à 1, de 0 à 1,
+
+131
+00:09:55,970 --> 00:09:58,820
+de 0 à 1 pour chaque donnée.
+
+132
+00:10:00,120 --> 00:10:06,260
+On va effectivement pouvoir écrire
+par exemple en mémoire différentes
+
+133
+00:10:06,260 --> 00:10:10,880
+données à envoyer suivies
+de l'horloge à l'état 0 des
+
+134
+00:10:12,010 --> 00:10:17,560
+mêmes données suivies de
+l'horloge à l'état 1,
+
+135
+00:10:17,560 --> 00:10:23,270
+puis d'une nouvelle série de
+données avec l'horloge à 0 et les
+
+136
+00:10:24,380 --> 00:10:29,360
+mêmes données à l'état 1 pour l'horloge.
+
+137
+00:10:29,360 --> 00:10:34,390
+On va donc placer tout cela en
+mémoire et ensuite demander l'envoi
+
+138
+00:10:34,390 --> 00:10:36,030
+de toutes ces données par DMA.
+
+139
+00:10:36,030 --> 00:10:41,130
+Cela semble un peu fastidieux,
+mais une fois qu'on a écrit la procédure,
+
+140
+00:10:41,130 --> 00:10:43,969
+ça peut s'exécuter extrêmement rapidement
+et c'est ça qui est intéressant.
+
+141
+00:10:44,990 --> 00:10:51,560
+Donc, les horloges peuvent être placées en
+mémoire comme les données sont placées.
+
+142
+00:10:51,560 --> 00:10:54,250
+A noter que certains microcontrôleurs
+
+143
+00:10:54,250 --> 00:10:58,370
+offrent des circuits programmables
+capables de générer de telles horloges.
+
+144
+00:10:58,370 --> 00:11:02,850
+Cela pourrait éventuellement simplifier
+la génération en mémoire et surtout
+
+145
+00:11:02,850 --> 00:11:05,710
+économiser aussi un peu
+de place en mémoire vive.
+
+146
+00:11:07,140 --> 00:11:11,090
+Ensuite, évidemment les détails de cette
+programmation sont relativement complexes.
+
+147
+00:11:11,090 --> 00:11:14,190
+On trouve de jolis exemples sur Internet,
+
+148
+00:11:14,190 --> 00:11:18,630
+des hackers en particulier qui ont
+réalisé des projets de ce type-là
+
+149
+00:11:18,630 --> 00:11:23,490
+en utilisant le DMA en particulier
+des microcontrôleurs SDM32.
+
+150
+00:11:23,490 --> 00:11:27,840
+Je ne souhaite pas aller plus
+loin dans l'explication du DMA,
+
+151
+00:11:27,840 --> 00:11:29,860
+c'est un domaine relativement complexe.
+
+152
+00:11:30,920 --> 00:11:36,055
+On a vu donc que les limites
+du microcontrôleur peuvent
+
+153
+00:11:36,055 --> 00:11:41,330
+être dépassées par l'usage de
+l'accès direct en mémoire qui permet
+
+154
+00:11:41,330 --> 00:11:47,510
+d'éviter les cycles des instructions
+sur les bus de données et d'adresses.
+
+155
+00:11:47,510 --> 00:11:51,550
+On a vu avec un exemple simple qu'il
+aboutissait quand même à des programmes
+
+156
+00:11:51,550 --> 00:11:54,230
+relativement compliqués
+et difficiles à écrire.
+
+157
+00:11:54,230 --> 00:11:57,410
+Mais vous allez trouver sur
+Internet de jolies applications,
+
+158
+00:11:57,410 --> 00:12:01,570
+en particulier qui ont été
+faites par des hackers
+
+159
+00:12:01,570 --> 00:12:05,680
+qui donnent de jolis projets en
+particulier avec les microcontrôleurs
+
+160
+00:12:05,680 --> 00:12:10,510
+SDM32 et qui permettent de piloter des
+afficheurs relativement grands avec des
+
+161
+00:12:10,510 --> 00:12:14,820
+processeurs à faible coût avec des
+performances tout à fait intéressantes.
+
+162
+00:12:14,820 --> 00:12:19,590
+A noter qu'il y a quand même une
+limite qu'on ne pourra pas dépasser.
+
+163
+00:12:19,590 --> 00:12:22,360
+Et si on veut aller encore
+plus loin que le DMA,
+
+164
+00:12:22,360 --> 00:12:27,460
+il va falloir utiliser des circuits
+logiques programmables, les fameuses FPGA,
+
+165
+00:12:27,460 --> 00:12:29,810
+et c'est ce que nous allons voir
+dans une des prochaines leçons.

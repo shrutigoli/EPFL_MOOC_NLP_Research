@@ -1,0 +1,117 @@
+Welcome back nature in code 
+We're in chapter 7 lecture 3.
+We just initialized our population.
+We have this huge population of lots and lots of susceptible individuals and one single infected individual patient zero.
+So the epidemic now start, let's implement the simulation.
+This is where we left off.
+We have the call to init grid and then we draw the grid after initialization.
+We saw that this works.
+And now, what we need to do is we need to calculate the new state of the population, so to speak at each time step and then we'd like to visualize this and as before,
+We're gonna used to set in thrall method to actually slow down this process.
+Otherwise everything will would be calculated too fast and we wouldn't really see anything meaningful if you would visualize this
+So we use this set inter wall as we've used it in Chapter 5 and you may recall that this method takes 2 arguments to first as the function to be called.
+So this is the simulate and visualize function which we actually will have to define, but I'm which is gonna call it simulated and visualize and then the second argument is the number in milliseconds 40 interwall.
+We're gonna say okay 50 milliseconds then call dysfunction then wait 50 male seconds then call function and so on and so that, that's I think a good enough large enough slow down for us to see meaningfully what's going on.
+So what we have to do now is to simply implement this function simulated visualize, so I'm just gonna copy the name here simulated visualize parentheses.
+We have no parameters to simulate and visualize as before it simply this 2 things, it calls a function that off all the simulation so run time step we should probably call this.
+We will have to implement this.
+So this is where all the calculations will occur and then we simply need to draw the grid again and to do this, we'll use the upgrade grid function, which is at this is essentially exactly identical.
+So you can copy does draw grid line from here pasted here.
+And then just simply changed in the name here from draw grids to update grid and now we have the same color codes.
+So this should work just fine.
+Of course most of the work is still ahead.
+We actually have to implement the simulation and this the meat is here in the runtime step function.
+So let's go ahead and define this function.
+And I'm just gonna go ahead and do this here so function 
+Run time step, oops, step.
+Okay,
+So in this function.
+We need to define what should happen at each time step
+So generally there should be a couple of things that happen at each time step, perhaps most important actually beyond the infection in the cover is to make sure that we do things correctly with our temp grid and recall why we have a temp grid.
+We have a temporary so that we can store to future state or next time step state of of the population in a temporary structure.
+Otherwise if we wouldn't do this then the future state of certain individuals would already effect the current state of other individuals and this is something that can lead to very subtle subtle effects that are essentially not showing what do you want to show, but they're actually simply an expression of this mismatch between the timing and we talked a little bit about this in Chapter 5 and because this is again the same kind of simulation where he sort of go through each cell on the grid and then you effect start affecting other individuals on the grid.
+You wanna make sure that we have this temporary grid in order.
+So what we'll do is we will basically each time said.
+First, create a copy of the grid and this copy will be the the temp grid then we'll do whatever we need to do with infection recovery and so on updating the temp grid and then we will copy the values back from the temp grid.
+So let's go ahead and do this,
+So first of all, let's create a copy of the grid into the 10th grid.
+So what we'll do is that we can basically take this code here from in its grid. 
+We copied and we pasted here, so this goes first over a great length here and then this says grid I equals an empty race, so this sets up to 2 dimensional rate.
+Right this is great.
+We simply need to adapt this for temp grid.
+So now it's setting up a 
+2 dimensional temp grid and here in the inner loop goes again over grid length.
+So now what I need to do is 
+I simply need to say well,
+I'd like to store into temp grid
+I I I whatever I have in grid.
+I I I.
+All right, so that's the first step .
+Now, that I have is temp grid in place,
+I can now go through each individual in the grid and do the things I need to do so.
+What I'd like to do first is I'd like to expose susceptible individuals if they're in contact with other individuals.
+So before we do this,
+What is actually mean?
+What does it mean for an individual to be in contact with other individuals. which individuals are those individuals?
+So let's find out.
+So what does it mean to be in contact with other individuals?
+Well, imagine.
+Here we have our own world again as a great and we have here focal individual that is infected.
+What does it mean concretely?
+Who is this individual going to expose?
+Well let's think about the real world here.
+So for example if you have to flu.
+Who are you going to expose?
+Are you going to expose everyone who lives in the same country as you do?
+No, of course not, you have to be in some meaningful contact that allows the transmission of infectious material.
+So in the case of flu, you would probably have to be in close proximity to individuals to infect them.
+You can take the case of the disease like measles, measles is known to be able to remain airborne for quite awhile and remain infectious.
+So if you have to measles, which I hope you never will.
+And you are in the room, then you will deposit infectious material in that room and this material will remain airborne for a couple hours.
+So you could leave this room and someone else could come in 2 hours later and still get infected by you, if you will.
+And so here there wouldn't be any physical proximity you could indeed be far away at this point and you wouldn't know this person. but he would still have infected this person.
+And then of course there's things like HIV-AIDS, which are, which can be transmitted sexually.
+And so there would have to be a sexual contact.
+And so this really depends on the specifics of the biology of the pathogen in the example here for simplicity and we're simply going to assume that the neighbors are to contacts.
+So here we have this individual, this individual has 8 ajacent neighbors right this one this one this one this one this one so infectious material can be transmitted to these contacts and now it simply depends what status these individuals individuals are in for example this individual here could be infected already.
+But maybe this one here wouldn't.
+And this one here wouldn't let this one here when as well.
+So they are all susceptible.
+But maybe there are 2 other individuals down here that are actually infected.
+So in this concrete case what that would mean is only these 5 individuals here could become infected, simply because they did these 3 individuals here are already infected.
+And in fact some of these could of course also at some point be recovered.
+And then also, there could be no transmission because we assumed that recovered individuals cannot become infected again. so every individual short has 8 contacts but of course only those that are susceptible can become newly infected and the maximum number here is 8.
+Now that also means that you are not only hit able to infect
+8 other people around you.
+But it also means that you can potentially be exposed to up to 8 by up to 8 people right I mean if you, for example, now consider this poor fellow here even if the remaining neighbors here are all susceptible.
+If you look at, if you look at this individual here.
+It is now being exposed by 4 individuals and I'm gonna just draw these here in these contacts here in black.
+So these are four contacts here in the vicinity of this individual among the 8 contacts here that are actually infectious and so this individual will have quite the exposure, but this could of course be even stronger.
+It could be that all the surrounding individuals are in fact infected and then the probability of this individual also becoming infected in the near future is a very high, so this is what it means to have a contact.
+Okay, so now with this knowledge of contacts.
+We now have everything we need to know about how to implement this
+. So, let's go ahead and do this so I need to go through each individual , so I'm going to use these 2 loops here first this looped and then the I loop the inner loop.
+Okay, so now going through each individual here, I have the coordinates I and II and now I can simply say well if an individual here is actually infected then I'm gonna exposed the neighbors, the way it I'm gonna do this is simply by saying okay if grid I II is indeed infected.
+So if the value here.
+And of course double equal is I then 
+I'm gonna call a function and
+I'm gonna call this function exposed neighbors I could of course also implement this right here, but I think this is a great example of outsourcing this neighbors neighbors expose neighbors and 
+I'm gonna pass I and II as arguments because this function needs to know where we currently are.
+So o exposed neighbors I and II, and we will implement this function shortly, but you know,
+Lets say, we have this implemented so it the neighbors have been exposed have potentially been infected and again we would actually have infected the individuals on the grid, because that would lead to the subtle errors but we infected the the individuals on the temp grid, so now the temp grid really contains the up to date version of the grid as it should look like at the next time steps.
+So the last thing for us to do here in this runtime so function is to move these values now back from temp grid into grid.
+So essentially the reverse of this.
+So we can simply copy here.
+The 2 loops once again. Okay. 
+Closing here to first one closing here the second one and now we simply do the reverse.
+So we said okay in grade I I I I would like to have whatever I currently have in temp grid.
+I I I
+And so now you can see these 3 steps right so here in this Nested loop
+What we do is we set up the temp grid by simply storing the grid values into temp grid.
+Now temp grid is an exact replica of grid.
+Then here we're gonna do whatever we need to do in order to get an infectious disease process going on, so here concretely we will expose to neighbors and we will infect them if necessary.
+But this we will do on temp grid so as to not get these strange effects.
+And then we will finally bring these values back because temp grid now has the up to date version of the grid, now the grid grid is still the same grid that it was before, up here, so we need to store these values back into grid
+And that's what this 3rd nested loop does here.
+All right.
+So with all of this in place, we're pretty much ready and now the only thing that we need to do is we need to implement this method expose neighbors and this will do in the next lecture I'll see you there.

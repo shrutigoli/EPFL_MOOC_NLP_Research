@@ -1,0 +1,1294 @@
+1
+00:00:04,570 --> 00:00:09,486
+Last week, we talked about how x-rays--
+the mechanism by which the x-rays
+
+2
+00:00:09,486 --> 00:00:12,474
+are being absorbed in the tissue
+when we have established
+
+3
+00:00:12,474 --> 00:00:15,883
+that absorption of x-rays
+is the major contrast in x-ray imaging.
+
+4
+00:00:16,223 --> 00:00:19,560
+So, this week, we're going to talk
+about how we generate images
+
+5
+00:00:19,560 --> 00:00:21,697
+from this absorption data
+
+6
+00:00:23,437 --> 00:00:25,467
+in the real world.
+
+7
+00:00:25,647 --> 00:00:31,330
+We'll first talk about some complications
+that arise in the real world,
+
+8
+00:00:31,330 --> 00:00:34,318
+and then we'll talk
+about the reconstruction algorithm
+
+9
+00:00:34,318 --> 00:00:37,801
+that is needed in the second half
+of this week's lectures.
+
+10
+00:00:38,101 --> 00:00:41,602
+But first, I'd want to start out
+with the underlying technique,
+
+11
+00:00:41,602 --> 00:00:44,261
+showing some examples--
+this is computed tomography
+
+12
+00:00:44,261 --> 00:00:45,751
+that we're talking about.
+
+13
+00:00:45,751 --> 00:00:48,201
+It was invented in the early '70s.
+
+14
+00:00:48,481 --> 00:00:52,752
+And what we're looking at here
+is an example of the use
+
+15
+00:00:52,752 --> 00:00:57,893
+of computed tomography--
+we have a CT scan here
+
+16
+00:00:59,153 --> 00:01:00,623
+of the abdomen.
+
+17
+00:01:00,623 --> 00:01:03,366
+We see a lesion here, before therapy
+and after therapy--
+
+18
+00:01:03,366 --> 00:01:05,736
+how the lesion has disappeared.
+
+19
+00:01:08,123 --> 00:01:12,054
+Now, here's an example of a CT--
+early one, 1972--
+
+20
+00:01:12,704 --> 00:01:16,367
+and you can appreciate the difference
+in quality of the images
+
+21
+00:01:16,367 --> 00:01:19,272
+compared to contemporary CT
+with this early one.
+
+22
+00:01:19,272 --> 00:01:22,458
+One has to really put an arrow
+to highlight the lesion here--
+
+23
+00:01:22,458 --> 00:01:27,309
+this is a cranial CT, that of a head,
+and the lesion-- it's really not apparent
+
+24
+00:01:28,129 --> 00:01:30,269
+what generated that lesion.
+
+25
+00:01:31,881 --> 00:01:37,714
+CT was developed by Godfrey Hounsfield--
+he developed the mathematical algorithm,
+
+26
+00:01:37,714 --> 00:01:43,357
+an engineer, and Allan Cormack,
+a physicist, he is shown here--
+
+27
+00:01:43,357 --> 00:01:47,857
+and they received the Nobel Prize
+for physiology and medicine.
+
+28
+00:01:49,510 --> 00:01:52,931
+This is what a CT scanner looks like--
+I wanted to show it to you
+
+29
+00:01:52,931 --> 00:01:55,546
+so that we have an idea 
+what we are talking about.
+
+30
+00:01:55,546 --> 00:01:59,326
+This is the scanner-- 
+is in this enclosure, here--
+
+31
+00:01:59,326 --> 00:02:02,432
+this is the patient bed--
+you would lie on this patient bed,
+
+32
+00:02:02,432 --> 00:02:07,172
+it would be lifted, and then entered
+into this hole here
+
+33
+00:02:07,172 --> 00:02:10,574
+where the scanning is taking place.
+
+34
+00:02:10,574 --> 00:02:13,415
+Here would be the head, the head
+would be inserted in here.
+
+35
+00:02:13,415 --> 00:02:18,228
+And of course, we don't want to show
+to the patients all the technical insides,
+
+36
+00:02:18,228 --> 00:02:23,201
+so, there's a nice cover covering up
+the machinery that's behind it.
+
+37
+00:02:24,090 --> 00:02:26,561
+And now, we're looking here
+in this video--
+
+38
+00:02:26,561 --> 00:02:29,989
+we're looking actually
+at what's in the machinery.
+
+39
+00:02:30,645 --> 00:02:33,545
+As you can see, there's something 
+turning inside--
+
+40
+00:02:33,545 --> 00:02:36,943
+what we're looking at here is the inside--
+that is this cover here is lifted,
+
+41
+00:02:36,943 --> 00:02:39,571
+you see the cover is up here,
+and now you see this turning,
+
+42
+00:02:39,571 --> 00:02:44,256
+and quite an amazing noise 
+as the machinery, the scanner
+
+43
+00:02:44,256 --> 00:02:48,722
+is being turned for producing the scan.
+
+44
+00:02:49,412 --> 00:02:53,601
+So, this is obviously what we don't want
+the patient neither to hear nor to see--
+
+45
+00:02:53,601 --> 00:02:57,093
+this would be intimidating and people
+would have much more trouble
+
+46
+00:02:57,093 --> 00:02:59,903
+complying with the requirements
+of the scan.
+
+47
+00:03:00,113 --> 00:03:05,163
+In the lectures of this week, 
+we will discuss the reason behind
+
+48
+00:03:05,163 --> 00:03:10,353
+why this machine is turning,
+how this is used for generating images.
+
+49
+00:03:11,382 --> 00:03:14,033
+CT is not only used for human patients.
+
+50
+00:03:14,033 --> 00:03:16,973
+It's also used in research 
+for animal models.
+
+51
+00:03:17,223 --> 00:03:20,023
+Here, I wanted to give you some examples.
+
+52
+00:03:20,343 --> 00:03:23,059
+We'll first talk about the scanner itself.
+
+53
+00:03:23,059 --> 00:03:26,846
+You can see this is how the scan--
+here's the enclosure of the scanner.
+
+54
+00:03:26,846 --> 00:03:31,359
+Here's the person, here's the opening--
+this volunteer, here, would be
+
+55
+00:03:31,359 --> 00:03:34,214
+on the patient bed, here, and inserted
+into the scanner.
+
+56
+00:03:34,214 --> 00:03:36,594
+Clearly, the opening here is not adequate
+
+57
+00:03:36,594 --> 00:03:41,264
+for the subject--for the rodent--
+
+58
+00:03:41,834 --> 00:03:44,872
+so the scanner has been adapted
+for the smaller geometry--
+
+59
+00:03:44,872 --> 00:03:49,392
+we're taking advantage
+of having a closer proximity
+
+60
+00:03:49,392 --> 00:03:51,993
+of the detectors to the subject.
+
+61
+00:03:53,272 --> 00:03:57,144
+Now, here are some MicroCT examples,
+some images.
+
+62
+00:03:57,144 --> 00:04:01,012
+And MicroCT means really, CT
+with high spatial resolution--
+
+63
+00:04:01,012 --> 00:04:05,989
+we're talking, typically, here,
+of 50 microns spatial resolution--
+
+64
+00:04:05,989 --> 00:04:07,731
+in-plane resolution.
+
+65
+00:04:08,831 --> 00:04:11,031
+The first image is of the abdomen.
+
+66
+00:04:11,031 --> 00:04:14,448
+We can see here the abdomen,
+we see some lesions here,
+
+67
+00:04:14,448 --> 00:04:18,259
+we have the heart here,
+and some other organs.
+
+68
+00:04:18,709 --> 00:04:21,767
+This is a MicroCT of the rat's spine.
+
+69
+00:04:21,767 --> 00:04:23,526
+We see the spinal cord here,
+
+70
+00:04:23,526 --> 00:04:27,126
+and the disks surrounding it.
+
+71
+00:04:27,906 --> 00:04:31,318
+This is an example of kidneys
+with IV contrast.
+
+72
+00:04:32,580 --> 00:04:37,584
+We have the CT scan,
+and then we can see
+
+73
+00:04:37,584 --> 00:04:40,299
+the vessels very bright--
+they have contrast agents in them--
+
+74
+00:04:40,299 --> 00:04:42,879
+that's what we have discussed last week.
+
+75
+00:04:42,879 --> 00:04:46,260
+We can see the contrast 
+enhances the kidneys.
+
+76
+00:04:46,260 --> 00:04:49,989
+So, this is intravenous contrast 
+that highlights the blood flow
+
+77
+00:04:49,989 --> 00:04:51,671
+in the kidneys.
+
+78
+00:04:52,391 --> 00:04:55,229
+This example, here, is of the heart
+and lungs.
+
+79
+00:04:55,229 --> 00:04:59,202
+We have the lungs here in dark, obviously,
+they have low CT numbers.
+
+80
+00:04:59,522 --> 00:05:03,212
+We have the heart here, here's the spine,
+and these white dots--
+
+81
+00:05:03,212 --> 00:05:04,802
+can you guess what they are?
+
+82
+00:05:05,482 --> 00:05:09,173
+They are the rib cage of this rodent.
+
+83
+00:05:09,732 --> 00:05:15,139
+And if we select the display
+to select the highest absorption,
+
+84
+00:05:15,139 --> 00:05:17,831
+we are obviously going to look
+for high electron density,
+
+85
+00:05:17,831 --> 00:05:19,378
+that is, for calcium.
+
+86
+00:05:19,378 --> 00:05:22,947
+This is the bone--and so this
+is a very nice, high resolution image
+
+87
+00:05:22,947 --> 00:05:27,248
+of the full body skeleton of a rodent
+
+88
+00:05:27,248 --> 00:05:28,978
+in this example.
+
+89
+00:05:30,098 --> 00:05:34,614
+The use of intravenous contrast agents
+can be used to depict blood vessels.
+
+90
+00:05:34,614 --> 00:05:38,167
+The change in contrast 
+can be extracted from the images.
+
+91
+00:05:38,167 --> 00:05:41,701
+It's color coded in this image in red,
+so we see the vasculature.
+
+92
+00:05:41,701 --> 00:05:46,492
+And this is superimposed on a image
+that's been thresholded for the skeleton.
+
+93
+00:05:46,492 --> 00:05:50,097
+So, we see the skeleton of the animal
+and the vasculature
+
+94
+00:05:50,097 --> 00:05:53,156
+where the contrast agent
+has been going into.
+
+95
+00:05:53,156 --> 00:05:58,789
+So, this is a way to illustrate
+the architecture of the blood vessels
+
+96
+00:05:58,789 --> 00:06:02,113
+in the animal, superimposed 
+on normal anatomy,
+
+97
+00:06:02,113 --> 00:06:04,214
+so we can recognize where they are.
+
+98
+00:06:05,875 --> 00:06:09,605
+Before we go to the reconstruction
+of the images, I want to discuss
+
+99
+00:06:11,055 --> 00:06:13,806
+what the absorption 
+that we've discussed last week--
+
+100
+00:06:13,806 --> 00:06:15,939
+what that means in the real world.
+
+101
+00:06:15,939 --> 00:06:17,444
+We're going to mainly be talking
+
+102
+00:06:17,444 --> 00:06:20,929
+about the linear 
+attenuation coefficient <i>μ</i>, here.
+
+103
+00:06:21,279 --> 00:06:22,460
+Let's go back.
+
+104
+00:06:22,860 --> 00:06:26,137
+And we'll assume here, 
+we have a tissue of thickness <i>dx</i>--
+
+105
+00:06:26,137 --> 00:06:29,506
+this is a very small thickness--
+you can imagine it's a micron,
+
+106
+00:06:30,836 --> 00:06:33,088
+nanometer, something like that.
+
+107
+00:06:33,088 --> 00:06:34,816
+Just very, very small.
+
+108
+00:06:35,656 --> 00:06:39,435
+We then have a number of photons, <i>n</i>,
+that come to this slice,
+
+109
+00:06:39,435 --> 00:06:44,813
+and then we have a number of photons
+<i>n - dn</i>, that pass through the slice.
+
+110
+00:06:44,813 --> 00:06:50,187
+So, <i>dn</i> photons here, in this example,
+are being absorbed by this tissue layer
+
+111
+00:06:50,187 --> 00:06:52,662
+of thickness <i>dx</i>.
+
+112
+00:06:54,262 --> 00:06:57,583
+We've had talked last week
+about the linear attenuation coefficient,
+
+113
+00:06:57,583 --> 00:07:00,140
+which has units of one over centimeter.
+
+114
+00:07:00,140 --> 00:07:03,570
+And if we assumed 
+that over the thickness of <i>dx</i>, here,
+
+115
+00:07:03,570 --> 00:07:05,880
+which is a good and fair assumption,
+
+116
+00:07:05,880 --> 00:07:08,732
+we have seen
+that the number of photons
+
+117
+00:07:08,732 --> 00:07:14,495
+at the position <i>x</i> is given by the number
+of photons impacting the layer <i>N_0</i>
+
+118
+00:07:14,495 --> 00:07:17,307
+times e to the <i>- μ x</i>.
+
+119
+00:07:17,307 --> 00:07:19,663
+Now, if <i>dx</i> is very small, 
+we can always assume
+
+120
+00:07:19,663 --> 00:07:22,444
+that <i>μ</i> is constant in <i>x.</i>
+
+121
+00:07:23,454 --> 00:07:26,998
+The measurements so that we want--
+for which we want to reconstruct,
+
+122
+00:07:26,998 --> 00:07:31,201
+is a two-dimensional image
+of the linear attenuation coefficient,
+
+123
+00:07:31,201 --> 00:07:35,019
+so I'll write it here as the function <i>μ</i>
+of <i>x</i> and <i>y</i>.
+
+124
+00:07:36,271 --> 00:07:39,374
+But what is actually measured
+is the number of photons
+
+125
+00:07:39,374 --> 00:07:41,103
+that arrive in the detector.
+
+126
+00:07:41,613 --> 00:07:45,081
+So, how is the link
+between those two measurements--
+
+127
+00:07:45,081 --> 00:07:46,601
+let's look at that.
+
+128
+00:07:46,601 --> 00:07:50,530
+Well, it's actually a simple logarithm--
+so the logarithm of the measured photons
+
+129
+00:07:50,530 --> 00:07:56,270
+divided by the photons impacting the layer
+that is equal to <i>- μ x</i>.
+
+130
+00:07:56,270 --> 00:07:59,716
+And since we know <i>x</i>, we can, 
+in this simple example,
+
+131
+00:07:59,716 --> 00:08:02,855
+we can infer the linear attenuation
+coefficient.
+
+132
+00:08:04,819 --> 00:08:08,388
+This, here, is the example,
+for a homogeneous object
+
+133
+00:08:08,388 --> 00:08:09,953
+with thickness <i>x</i>, here.
+
+134
+00:08:09,953 --> 00:08:13,777
+So, we have assumed here that this
+is <i>x</i>, for this example.
+
+135
+00:08:15,620 --> 00:08:20,320
+Now, contrast is well defined 
+for monochromatic x-rays.
+
+136
+00:08:20,678 --> 00:08:24,928
+We have the linear attenuation coefficient
+for a certain photon energy
+
+137
+00:08:24,928 --> 00:08:28,057
+in kiloelectron volts-- 
+that is a well defined parameter--
+
+138
+00:08:28,557 --> 00:08:31,873
+and so, we get
+a very well defined contrast.
+
+139
+00:08:32,343 --> 00:08:35,420
+But, we have seen that the linear
+attenuation coefficient
+
+140
+00:08:35,420 --> 00:08:39,332
+depends on the photon energy,
+it depends on the atomic number,
+
+141
+00:08:39,332 --> 00:08:41,722
+and it depends on the electron density.
+
+142
+00:08:43,435 --> 00:08:47,455
+This has some consequences in real life.
+
+143
+00:08:47,455 --> 00:08:50,707
+And one of the consequences
+is beam hardening,
+
+144
+00:08:50,707 --> 00:08:54,362
+and the other one is depth dependent
+contrast.
+
+145
+00:08:55,541 --> 00:08:58,601
+And this you can imagine
+in the following way.
+
+146
+00:08:59,781 --> 00:09:04,088
+When the photons arrive at the tissue,
+they have a certain spectrum of energy,
+
+147
+00:09:04,088 --> 00:09:08,009
+and this spectrum of energy
+has different absorption,
+
+148
+00:09:08,009 --> 00:09:11,922
+so, the linear attenuation coefficient
+depends on the energy of the photon in <i>μ</i>.
+
+149
+00:09:12,386 --> 00:09:18,162
+And so, we have a higher absorption,
+typically, at the lower energies--
+
+150
+00:09:18,162 --> 00:09:20,554
+so that means that the [inaudible]
+being removed
+
+151
+00:09:20,854 --> 00:09:25,473
+and the energy of the photons 
+that pass deeper into tissue,
+
+152
+00:09:25,473 --> 00:09:29,733
+the average energy, increases,
+and that's what's called beam hardening.
+
+153
+00:09:29,733 --> 00:09:34,425
+And that is because the <i>μ</i> is dependent
+on the photon energy,
+
+154
+00:09:34,425 --> 00:09:38,498
+we are getting a depth dependent contrast.
+
+155
+00:09:39,907 --> 00:09:42,274
+So, let's look at this in the real world.
+
+156
+00:09:42,274 --> 00:09:46,574
+And we will first focus 
+on the energy spectrum of an x-ray tube--
+
+157
+00:09:46,574 --> 00:09:48,416
+what this really looks like.
+
+158
+00:09:49,526 --> 00:09:52,515
+So, this is the relative output 
+on the <i>y</i> axis--
+
+159
+00:09:52,515 --> 00:09:56,260
+on the <i>x</i> axis, we have the photon energy
+in kiloelectron volts,
+
+160
+00:09:56,260 --> 00:10:00,362
+and we have the distribution
+of the density of the photons
+
+161
+00:10:00,362 --> 00:10:03,217
+for a given energy window plotted here.
+
+162
+00:10:03,907 --> 00:10:07,646
+What we have first, is the bremsstrahlung
+continuum.
+
+163
+00:10:07,646 --> 00:10:12,423
+Remember, we had talked two weeks ago
+how x-rays are being generated--
+
+164
+00:10:12,423 --> 00:10:15,255
+they are generated, primarily,
+by bremsstrahlung,
+
+165
+00:10:15,255 --> 00:10:19,384
+and we cannot predict exactly
+what the energy--
+
+166
+00:10:20,194 --> 00:10:22,954
+the precise energy is, 
+so, there is a continuum--
+
+167
+00:10:22,954 --> 00:10:26,642
+a distribution of photon energies
+that are given.
+
+168
+00:10:27,634 --> 00:10:30,274
+We have also characteristic x-rays--
+
+169
+00:10:30,274 --> 00:10:32,986
+that is, when we remove 
+an inner shell electron--
+
+170
+00:10:32,986 --> 00:10:34,851
+so called radiation spikes,
+
+171
+00:10:34,851 --> 00:10:38,211
+or characteristic x-rays, 
+or fluorescent x-rays--
+
+172
+00:10:38,211 --> 00:10:42,298
+and this is the interaction
+with orbital electrons--
+
+173
+00:10:42,678 --> 00:10:47,083
+and here we have the K_α_1,
+α_2, and the K_β lines, here,
+
+174
+00:10:47,083 --> 00:10:48,658
+for tungsten.
+
+175
+00:10:50,611 --> 00:10:54,645
+What we do know, there is one fundamental
+constant that is fixed,
+
+176
+00:10:54,645 --> 00:10:58,201
+and that is the maximum photon energy--
+this photon energy, here,
+
+177
+00:10:58,201 --> 00:11:02,714
+in this example, is 90 kiloelectron
+volts-- it is given by the voltage
+
+178
+00:11:02,714 --> 00:11:06,412
+applied on the x-ray tube
+across the anode and cathode,
+
+179
+00:11:06,412 --> 00:11:10,930
+in this case, it was 90 kiloelectron 
+volts-- so, this is a fundamental limit--
+
+180
+00:11:10,930 --> 00:11:14,708
+it is defined by the operator,
+we can set it in the scanner,
+
+181
+00:11:15,698 --> 00:11:18,642
+but this is the maximum that we have.
+
+182
+00:11:18,642 --> 00:11:21,213
+We cannot have a photon energy
+that's higher than that.
+
+183
+00:11:21,213 --> 00:11:24,823
+Comes simply from the fact 
+that this photon energy is,
+
+184
+00:11:24,823 --> 00:11:29,734
+when an electron impacts the anode target,
+
+185
+00:11:29,734 --> 00:11:31,904
+loses all its energy at once
+
+186
+00:11:31,904 --> 00:11:33,825
+into a single photon.
+
+187
+00:11:34,985 --> 00:11:39,229
+So, what we have is the total intensity--
+that is total number of photons
+
+188
+00:11:39,229 --> 00:11:42,993
+that are being produced--
+is the integral of this function, here,
+
+189
+00:11:42,993 --> 00:11:47,153
+from zero to infinity,
+of the relative output, here,
+
+190
+00:11:47,153 --> 00:11:52,859
+that's the intensity as a function
+of the energy integrated over the energy.
+
+191
+00:11:53,949 --> 00:11:56,319
+This is a complex function-- 
+we don't really have
+
+192
+00:11:56,319 --> 00:11:58,732
+a good mathematical or physical model
+
+193
+00:11:58,732 --> 00:12:02,692
+to model it, so what we are looking at
+
+194
+00:12:02,692 --> 00:12:05,631
+is to characterize it in a simpler way.
+
+195
+00:12:06,751 --> 00:12:11,390
+And the way this is done is to define
+a effective photon energy--
+
+196
+00:12:11,390 --> 00:12:12,695
+E effective.
+
+197
+00:12:12,695 --> 00:12:15,911
+It kind of corresponds to the medium
+
+198
+00:12:15,911 --> 00:12:19,041
+or median energy of the photons
+
+199
+00:12:19,041 --> 00:12:21,716
+that are seen by the subject.
+
+200
+00:12:21,716 --> 00:12:26,203
+So, the effective energy, in this example,
+would possibly be something like this,
+
+201
+00:12:28,773 --> 00:12:31,681
+from the x-rays that are leaving
+the x-ray tube.
+
+202
+00:12:32,467 --> 00:12:34,443
+Now, here's a term that I need 
+to introduce--
+
+203
+00:12:34,443 --> 00:12:37,918
+that I'd like to introduce,
+that is the term of soft x-rays.
+
+204
+00:12:37,918 --> 00:12:41,359
+They are soft, because they have
+low energy.
+
+205
+00:12:41,359 --> 00:12:47,168
+They are called soft, because they
+don't penetrate very deep into the tissue.
+
+206
+00:12:48,278 --> 00:12:52,951
+And, in contrast, we have the hard x-rays-- 
+they are high energy,
+
+207
+00:12:52,951 --> 00:12:56,830
+they are more penetrating,
+that's why they are called hard x-rays.
+
+208
+00:12:58,309 --> 00:13:01,188
+Now, if we think about the process
+of bremsstrahlung,
+
+209
+00:13:01,188 --> 00:13:06,710
+the minimal energy of a photon
+that is produced is close to zero.
+
+210
+00:13:06,710 --> 00:13:11,527
+So, in theory, it's possible to produce
+very soft x-rays within x-ray tubes.
+
+211
+00:13:11,527 --> 00:13:13,444
+But that's not what we see here
+in this graph.
+
+212
+00:13:13,444 --> 00:13:16,906
+We see the energy drop off here to zero
+at around 10 keV.
+
+213
+00:13:18,315 --> 00:13:21,582
+What we do have is a filtering
+of the instrument--
+
+214
+00:13:21,582 --> 00:13:24,866
+remember, the x-rays are produced
+in vacuum-- in an x-ray tube--
+
+215
+00:13:24,866 --> 00:13:28,507
+we have a glass there where the x-rays
+are being allowed to pass
+
+216
+00:13:28,507 --> 00:13:30,011
+towards the subject.
+
+217
+00:13:30,011 --> 00:13:33,513
+And that glass filters 
+the very soft x-rays,
+
+218
+00:13:33,513 --> 00:13:35,047
+and nothing goes through.
+
+219
+00:13:35,047 --> 00:13:39,490
+So, we're having this instrument 
+filtering, here, from the glass,
+
+220
+00:13:39,490 --> 00:13:43,970
+for example, that removes photons--
+and one consequence of that
+
+221
+00:13:43,970 --> 00:13:48,947
+is that the effective energy
+is actually shifted to higher energies.
+
+222
+00:13:48,947 --> 00:13:53,731
+So, the overall x-ray spectrum,
+or the x-rays that impact the patient
+
+223
+00:13:53,731 --> 00:13:55,614
+are becoming harder.
+
+224
+00:13:56,554 --> 00:13:59,867
+So, this increase in effective energy
+
+225
+00:13:59,867 --> 00:14:03,647
+is filtering of soft x-rays
+
+226
+00:14:03,647 --> 00:14:07,619
+is done by the instrument, 
+and this removal will lead
+
+227
+00:14:07,619 --> 00:14:11,621
+to an x-ray spectrum that's shifted
+
+228
+00:14:11,621 --> 00:14:13,701
+to higher energies, and therefore,
+
+229
+00:14:13,701 --> 00:14:15,454
+harder x-rays.
+
+230
+00:14:17,037 --> 00:14:22,086
+So, what is the consequence
+of energy dependent absorption?
+
+231
+00:14:23,667 --> 00:14:26,553
+So, we have a similar consequence
+to what we just discussed
+
+232
+00:14:26,553 --> 00:14:28,931
+with the instrument in the tissue.
+
+233
+00:14:29,651 --> 00:14:32,070
+Let's look at the linear attenuation
+coefficient, here.
+
+234
+00:14:32,070 --> 00:14:34,895
+We have the x-ray energy from zero
+to a hundred kiloelectron volts
+
+235
+00:14:34,895 --> 00:14:36,244
+on the x-axis.
+
+236
+00:14:36,624 --> 00:14:39,950
+And we have a logarithmic scale
+of the linear attenuation coefficient
+
+237
+00:14:39,950 --> 00:14:41,397
+on the y-axis.
+
+238
+00:14:41,837 --> 00:14:45,715
+In the ranges that we are concerned
+for x-ray imaging, for CT imaging,
+
+239
+00:14:45,715 --> 00:14:49,509
+we're dealing only with a photoelectric
+effect and the Compton effect.
+
+240
+00:14:50,987 --> 00:14:56,571
+Now, as we can see, at low energies,
+we have a stronger dominance
+
+241
+00:14:56,571 --> 00:15:00,133
+of the photoelectric effect--
+so the linear attenuation coefficient
+
+242
+00:15:00,133 --> 00:15:03,492
+increases quite substantially 
+at low energies.
+
+243
+00:15:04,316 --> 00:15:08,810
+Now, what does this mean
+for the real world?
+
+244
+00:15:11,143 --> 00:15:14,105
+Let's look what we would have, ideally--
+ideally, we would have
+
+245
+00:15:14,105 --> 00:15:15,556
+monochromatic x-rays.
+
+246
+00:15:15,556 --> 00:15:19,073
+The monochromatic x-rays--
+we would be at this position--
+
+247
+00:15:19,073 --> 00:15:23,719
+we would have 
+a uniform absorption of the x-ray;
+
+248
+00:15:23,719 --> 00:15:25,859
+the photon energy does not change.
+
+249
+00:15:26,149 --> 00:15:29,074
+But in reality, we have polychromatic
+
+250
+00:15:29,074 --> 00:15:33,104
+multi-energetic x-rays.
+
+251
+00:15:34,434 --> 00:15:39,321
+So, the consequence is that we have--
+the absorption is not uniform--
+
+252
+00:15:39,321 --> 00:15:41,113
+with photon energy.
+
+253
+00:15:41,113 --> 00:15:45,237
+Here, clearly, the linear attenuation
+coefficient is not uniform, so it changes.
+
+254
+00:15:46,237 --> 00:15:49,959
+The contrast, therefore, changes
+with large objects and with depth.
+
+255
+00:15:50,594 --> 00:15:56,052
+Another consequence is we have excessive
+radiation dose to superficial tissue.
+
+256
+00:15:56,662 --> 00:15:58,395
+So, let's talk about first consequence:
+
+257
+00:15:58,395 --> 00:16:00,451
+contrast changes with large objects.
+
+258
+00:16:01,191 --> 00:16:05,391
+We have, as the x-rays impact--
+let's say we have a distribution
+
+259
+00:16:05,391 --> 00:16:07,618
+of x-ray energies over this range--
+
+260
+00:16:07,618 --> 00:16:11,608
+we have, first, a removal of the intensity
+
+261
+00:16:11,608 --> 00:16:14,689
+at the low photon energy--
+so, we have a contribution
+
+262
+00:16:14,689 --> 00:16:18,492
+of the photoelectric effect
+to the contrast mechanism.
+
+263
+00:16:18,792 --> 00:16:24,256
+As the x-ray beam traverses the tissue,
+these photons are preferentially removed,
+
+264
+00:16:24,256 --> 00:16:28,822
+and so we have an increase in contribution
+of Compton effect
+
+265
+00:16:28,822 --> 00:16:32,568
+to the absorption of x-rays.
+
+266
+00:16:32,568 --> 00:16:35,770
+So, we have a shift from photoelectric
+effect to Compton effect.
+
+267
+00:16:36,200 --> 00:16:40,439
+Obviously, if you imagine that this
+is skin here, then we are looking, here,
+
+268
+00:16:40,439 --> 00:16:46,383
+at a removal of the photons, primarily
+in the superficial tissues, skin, fat,
+
+269
+00:16:46,383 --> 00:16:48,608
+and so on, and therefore,
+
+270
+00:16:48,608 --> 00:16:52,068
+a higher radiation dose to these tissues.
+
+271
+00:16:53,648 --> 00:16:56,267
+How can we mitigate this effect?
+
+272
+00:16:56,997 --> 00:17:02,159
+So, the solution is actually 
+to reduce the photon intensity
+
+273
+00:17:02,159 --> 00:17:05,642
+for soft x-rays, that is, 
+for low energies, in this range here--
+
+274
+00:17:05,642 --> 00:17:11,862
+we'd like to have not too much energy
+here, and this can be, for example, done
+
+275
+00:17:11,862 --> 00:17:15,098
+with inserting 
+a 3 millimeter aluminum plate,
+
+276
+00:17:15,098 --> 00:17:20,238
+which eliminates 90% 
+of the 20 keV photons.

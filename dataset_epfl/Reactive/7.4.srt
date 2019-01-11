@@ -1,0 +1,1346 @@
+1
+00:00:00,750 --> 00:00:02,460
+In the past lectures, we have seen
+
+2
+00:00:02,460 --> 00:00:06,260
+how actors collaborate to achieve a common
+task,
+
+3
+00:00:06,260 --> 00:00:09,990
+but now we will look a bit more in detail
+on how to compose them.
+
+4
+00:00:11,570 --> 00:00:15,290
+The type of an object describes how that
+object looks
+
+5
+00:00:15,290 --> 00:00:17,650
+like from the outside, what you can do
+with it.
+
+6
+00:00:19,200 --> 00:00:21,400
+When looking at an actor, the role of the
+
+7
+00:00:21,400 --> 00:00:24,810
+type is played by the set of messages it
+accepts.
+
+8
+00:00:26,080 --> 00:00:31,310
+The set of messages is not bound to the
+name of the actor, and hence the
+
+9
+00:00:31,310 --> 00:00:37,570
+type described by it is not nominal, and
+actor's type is structural.
+
+10
+00:00:37,570 --> 00:00:41,580
+Since an actor can change its behavior
+over time the structure can
+
+11
+00:00:41,580 --> 00:00:45,460
+also change, and that means that the type
+of the actor could change.
+
+12
+00:00:46,720 --> 00:00:49,750
+In terms of a protocol which exchange with
+it.
+
+13
+00:00:51,120 --> 00:00:52,570
+If you look at the types appearing in
+
+14
+00:00:52,570 --> 00:00:56,420
+actor implementations, we have seen two
+main methods.
+
+15
+00:00:56,420 --> 00:00:59,810
+First is sending a message, that's the
+tail.
+
+16
+00:00:59,810 --> 00:01:02,190
+And it has signature any to unit.
+
+17
+00:01:02,190 --> 00:01:06,460
+And the second is the behavior inside the
+actor, which is a partial function.
+
+18
+00:01:06,460 --> 00:01:08,180
+Again from any to unit.
+
+19
+00:01:09,390 --> 00:01:12,620
+These types do not restrict what you can
+send.
+
+20
+00:01:14,070 --> 00:01:16,230
+In a sense, you could say that actors
+
+21
+00:01:16,230 --> 00:01:18,510
+are not usefully typed.
+
+22
+00:01:18,510 --> 00:01:21,960
+As represented for example in Scala and
+Akka.
+
+23
+00:01:21,960 --> 00:01:25,840
+But it should be noted that this
+limitation is not fundamental.
+
+24
+00:01:25,840 --> 00:01:29,159
+While it is true that an actor can change
+its behavior
+
+25
+00:01:29,159 --> 00:01:33,860
+arbitrarily in principle, most Actors you
+write will not do that.
+
+26
+00:01:33,860 --> 00:01:36,540
+They will either always accept the same
+set of
+
+27
+00:01:36,540 --> 00:01:41,320
+messages, at least the types or it might
+change.
+
+28
+00:01:41,320 --> 00:01:46,730
+But then the total sets of all messages
+ever accepted will be bounded.
+
+29
+00:01:47,840 --> 00:01:50,860
+In all actors we have seen so far, we
+defined the
+
+30
+00:01:50,860 --> 00:01:55,130
+complete set of messages they accept in
+their companion object for example.
+
+31
+00:01:56,950 --> 00:02:01,670
+This makes it possible to statically
+verify that when you send a message to
+
+32
+00:02:01,670 --> 00:02:05,604
+an actor, it could in principal at some
+point, have a chance to handle it.
+
+33
+00:02:07,640 --> 00:02:09,830
+Means you could reject a large number of
+errors.
+
+34
+00:02:10,960 --> 00:02:11,900
+This is tried out.
+
+35
+00:02:11,900 --> 00:02:15,700
+There is an experimental implementation of
+typed channels.
+
+36
+00:02:15,700 --> 00:02:20,790
+In Haskell there's cloud Haskell with
+typed channels between actors as well.
+
+37
+00:02:20,790 --> 00:02:24,080
+I think we will see some development in
+that area.
+
+38
+00:02:25,870 --> 00:02:29,240
+However, the type system will never allow
+us
+
+39
+00:02:29,240 --> 00:02:33,960
+to express which state an actor currently
+is in.
+
+40
+00:02:33,960 --> 00:02:37,510
+So we can deal with the complete set of
+messages, but we
+
+41
+00:02:37,510 --> 00:02:40,150
+cannot statically determine whether an
+actor
+
+42
+00:02:40,150 --> 00:02:43,250
+will process a given message for example.
+
+43
+00:02:43,250 --> 00:02:44,810
+There are many reasons for that.
+
+44
+00:02:44,810 --> 00:02:48,550
+One of them is that delivery is not
+guaranteed, for example.
+
+45
+00:02:48,550 --> 00:02:53,770
+Another one is that actors may interact
+with several different parties
+
+46
+00:02:53,770 --> 00:02:59,106
+and if we have here, for example, Alice
+
+47
+00:02:59,106 --> 00:03:05,770
+and Bob both talking to Charlie.
+
+48
+00:03:06,920 --> 00:03:14,100
+Then Bob may send a message changing the
+state, so that when Alice sends a message,
+
+49
+00:03:14,100 --> 00:03:18,940
+that might find Charlie in a state which
+is not suitable for that message anymore.
+
+50
+00:03:18,940 --> 00:03:24,310
+And since this can happen concurrently, it
+is not known statically at compile time.
+
+51
+00:03:24,310 --> 00:03:27,000
+So the compiler will not be able to catch
+those kinds of mistakes.
+
+52
+00:03:28,440 --> 00:03:32,850
+However, having fully typed Actors is
+something which we do not
+
+53
+00:03:32,850 --> 00:03:35,690
+have yet, so let us use what we have right
+now.
+
+54
+00:03:37,260 --> 00:03:39,930
+Given that sending a message to an Actor
+does not
+
+55
+00:03:39,930 --> 00:03:44,100
+return anything and the types currently
+are not really restricted.
+
+56
+00:03:45,140 --> 00:03:48,470
+It is obvious that Actors cannot be
+composed like functions.
+
+57
+00:03:50,010 --> 00:03:55,550
+Instead we have seen that actors
+collaborate like human organizations.
+
+58
+00:03:55,550 --> 00:04:00,280
+You can split down a task into sub tasks
+and have each actor
+
+59
+00:04:00,280 --> 00:04:06,160
+perform its own part, and then the results
+are taken together, they are composed,
+
+60
+00:04:06,160 --> 00:04:12,010
+and reply to the client which asks for the
+operation to be performed.
+
+61
+00:04:12,010 --> 00:04:15,820
+This means that actors are not composed
+like functions,
+
+62
+00:04:15,820 --> 00:04:21,920
+they're composed at the protocol level.
+This gives the actor the possibility
+
+63
+00:04:21,920 --> 00:04:26,710
+to do everything you can think of
+conceptually using function composition.
+
+64
+00:04:26,710 --> 00:04:30,450
+So you can translate the values passed
+into a function.
+
+65
+00:04:30,450 --> 00:04:35,740
+You can translate its return value.
+And the same thing you can do with
+
+66
+00:04:35,740 --> 00:04:41,650
+messages flying back and forth.
+You can also call multiple actors and
+
+67
+00:04:41,650 --> 00:04:43,440
+then aggregate the results.
+
+68
+00:04:43,440 --> 00:04:47,220
+But what protocol composition can do
+which,
+
+69
+00:04:47,220 --> 00:04:50,710
+function composition cannot do, is, for
+example, to
+
+70
+00:04:50,710 --> 00:04:53,700
+alter the frequency with which an actor is
+
+71
+00:04:53,700 --> 00:04:57,300
+called, or the precise timing of the
+calls.
+
+72
+00:04:57,300 --> 00:05:01,680
+Or perhaps dropping messages, injecting
+new messages.
+
+73
+00:05:03,160 --> 00:05:07,180
+There is a lot more freedom here but this
+freedom is
+
+74
+00:05:07,180 --> 00:05:09,120
+bought by list type safety.
+
+75
+00:05:10,770 --> 00:05:13,780
+Let us now look at a few patterns of what
+you can do.
+
+76
+00:05:15,060 --> 00:05:19,310
+The most fundamental pattern is one which
+we have seen since
+
+77
+00:05:19,310 --> 00:05:24,560
+two weeks ago, reappearing everywhere, and
+that is the request-reply pattern.
+
+78
+00:05:25,790 --> 00:05:28,150
+It is so common that in Akka the
+
+79
+00:05:28,150 --> 00:05:31,590
+sender reference is kept exactly for that
+purpose.
+
+80
+00:05:31,590 --> 00:05:32,660
+Because you
+
+81
+00:05:32,660 --> 00:05:34,880
+so often need to reply.
+
+82
+00:05:34,880 --> 00:05:37,640
+And for that you need to know to whom to
+reply.
+
+83
+00:05:39,600 --> 00:05:46,520
+Let us say that Alice wants to know
+something
+
+84
+00:05:48,770 --> 00:05:54,510
+of Bob, and sends a message.
+Together
+
+85
+00:05:54,510 --> 00:05:59,030
+with the sender information, this enables
+Bob to reply.
+
+86
+00:06:00,290 --> 00:06:05,330
+But we have seen other uses, for example
+Bob could forward the message to
+
+87
+00:06:10,700 --> 00:06:15,300
+Charlie for example.
+So it's basically this.
+
+88
+00:06:17,550 --> 00:06:21,100
+And forwarding means that the sender
+reference stays the same.
+
+89
+00:06:21,100 --> 00:06:26,580
+So the sender of that message here, will
+not be Bob, it will be Alice.
+
+90
+00:06:26,580 --> 00:06:31,170
+And then the reply from Charlie, goes
+directly back to Alice.
+
+91
+00:06:32,270 --> 00:06:36,320
+This means the fact that simply putting
+the sender reference in the
+
+92
+00:06:36,320 --> 00:06:41,810
+message and letting it travel with it
+allows dynamic composition of actors.
+
+93
+00:06:41,810 --> 00:06:42,700
+Bob can decide
+
+94
+00:06:42,700 --> 00:06:46,330
+dynamically whom shall handle the request.
+
+95
+00:06:46,330 --> 00:06:49,670
+Then the reply will go back to the one
+requesting it.
+
+96
+00:06:51,540 --> 00:06:57,980
+We could also take an ActorRef and wrap it
+inside another actor, say here, this
+
+97
+00:06:57,980 --> 00:07:04,450
+AuditTrail, which does nothing but forward
+all messages to the target, like so.
+
+98
+00:07:04,450 --> 00:07:08,620
+But it's, logs every message which it has
+forwarded,
+
+99
+00:07:08,620 --> 00:07:10,990
+to leave this audit trail.
+
+100
+00:07:10,990 --> 00:07:13,210
+These interceptors are trivial to make
+
+101
+00:07:13,210 --> 00:07:18,150
+precisely because messages are not typed
+specifically.
+
+102
+00:07:18,150 --> 00:07:21,740
+We can just pass along anything that might
+be sent.
+
+103
+00:07:24,090 --> 00:07:30,220
+Another useful pattern is the one where
+you expect exactly one reply.
+
+104
+00:07:30,220 --> 00:07:34,640
+We call this, the ask pattern.
+You ask a question, you get one reply.
+
+105
+00:07:36,020 --> 00:07:38,870
+This is also pretty common, which is why
+
+106
+00:07:38,870 --> 00:07:42,260
+it is implemented as a pattern within
+akka.
+
+107
+00:07:43,300 --> 00:07:46,260
+Importing this gives you an implicit
+conversion
+
+108
+00:07:46,260 --> 00:07:49,140
+on ActorRefs, which gives it this question
+
+109
+00:07:49,140 --> 00:07:50,230
+mark operator here.
+
+110
+00:07:51,300 --> 00:07:56,550
+We pronounce this, user service ask
+FindByEmail in this case.
+
+111
+00:07:57,770 --> 00:08:01,950
+The actor which we are looking at here
+might be a part of
+
+112
+00:08:01,950 --> 00:08:06,170
+a blog management system and it has a
+reference to the user service.
+
+113
+00:08:07,380 --> 00:08:11,340
+And you can ask this PostsByEmail actor to
+find
+
+114
+00:08:11,340 --> 00:08:14,330
+all the posts which have been posted from
+a certain
+
+115
+00:08:14,330 --> 00:08:15,010
+email address.
+
+116
+00:08:16,240 --> 00:08:21,110
+Unfortunately, the user service does not
+offer this kind of information directly.
+
+117
+00:08:21,110 --> 00:08:23,000
+So we write a little actor, which
+
+118
+00:08:23,000 --> 00:08:26,020
+transforms what the user service can give
+us.
+
+119
+00:08:27,190 --> 00:08:33,440
+So when we get a request with an email in
+it we ask FindByEmail everything you know
+
+120
+00:08:33,440 --> 00:08:39,180
+about that user.
+And this returns a future.
+
+121
+00:08:39,180 --> 00:08:39,410
+Since
+
+122
+00:08:39,410 --> 00:08:43,710
+Actors are not usefully typed as we've
+seen.
+
+123
+00:08:43,710 --> 00:08:45,990
+This is a future of any.
+
+124
+00:08:45,990 --> 00:08:49,530
+But we expect back actually a user info.
+
+125
+00:08:49,530 --> 00:08:53,980
+There is an operation map to, which takes
+a type, and
+
+126
+00:08:53,980 --> 00:08:58,680
+that will, under the hood, transform the
+future, doing a checked cost.
+
+127
+00:09:00,160 --> 00:09:03,850
+So after this, we have a future of
+UserInfo.
+
+128
+00:09:03,850 --> 00:09:04,640
+Then we can map
+
+129
+00:09:04,640 --> 00:09:06,860
+that and take this info.
+
+130
+00:09:06,860 --> 00:09:10,340
+And look at it, for example might have a
+list of posts, which we
+
+131
+00:09:10,340 --> 00:09:14,440
+filter, whether the email matches, and
+this
+
+132
+00:09:14,440 --> 00:09:16,820
+filter list then goes into the result.
+
+133
+00:09:18,620 --> 00:09:23,140
+So this has been transformed into a future
+of result, now.
+
+134
+00:09:23,140 --> 00:09:26,390
+And then at the end we pipe it back to the
+sender.
+
+135
+00:09:26,390 --> 00:09:28,280
+We have seen that before.
+
+136
+00:09:28,280 --> 00:09:29,870
+The line here,
+
+137
+00:09:29,870 --> 00:09:35,150
+takes all errors which might occur, and
+takes them, this is, this
+
+138
+00:09:35,150 --> 00:09:39,320
+is throwable, this is an exception, and
+wraps them in a failure message.
+
+139
+00:09:39,320 --> 00:09:43,310
+Let's say failure was also a message,
+defined by PostsByEmail.
+
+140
+00:09:44,610 --> 00:09:49,870
+And this is done such that pipeTo always
+sends a normal message, so, either
+
+141
+00:09:49,870 --> 00:09:54,980
+a result or a failure, back to the sender.
+Which are the pieces that can
+
+142
+00:09:54,980 --> 00:09:58,990
+go wrong here?
+We have this ask operation.
+
+143
+00:10:00,040 --> 00:10:05,050
+We have seen that actors only can send
+messages to ActorRef.
+
+144
+00:10:05,050 --> 00:10:09,440
+And there is not really an explicit
+ActorRef to reply to in this case.
+
+145
+00:10:10,470 --> 00:10:14,300
+What the ask operator does is, it creates
+
+146
+00:10:14,300 --> 00:10:19,910
+a little, very small tiny light weight
+pseudo actor,
+
+147
+00:10:19,910 --> 00:10:23,350
+which just is an actor if linked to a
+promise.
+
+148
+00:10:25,240 --> 00:10:29,480
+This actor of course has a name and
+everything, it needs to be registered.
+
+149
+00:10:29,480 --> 00:10:33,800
+So it also needs to be garbage collected
+when it is no longer needed.
+
+150
+00:10:33,800 --> 00:10:35,830
+Unfortunately, that is not very easy to
+
+151
+00:10:35,830 --> 00:10:39,970
+determine, because actors are also
+location transparent.
+
+152
+00:10:39,970 --> 00:10:45,030
+So for example, user service might be on a
+remote system, and we do not know
+
+153
+00:10:45,030 --> 00:10:47,490
+when or if it will reply.
+
+154
+00:10:47,490 --> 00:10:51,300
+For this reason, the ask operation takes
+an implicit
+
+155
+00:10:51,300 --> 00:10:53,920
+time out, which we have set to three
+seconds here.
+
+156
+00:10:55,220 --> 00:10:58,620
+After these three seconds, the future will
+
+157
+00:10:58,620 --> 00:11:01,560
+be completed with an ask timeout
+exception.
+
+158
+00:11:01,560 --> 00:11:03,760
+And this little pseudo actor will be
+stopped.
+
+159
+00:11:04,780 --> 00:11:07,000
+So this is the first thing which could go
+wrong.
+
+160
+00:11:07,000 --> 00:11:09,210
+We could see an ask timeout exception
+here.
+
+161
+00:11:10,620 --> 00:11:13,630
+Map to does a checked cast.
+
+162
+00:11:13,630 --> 00:11:18,922
+So if the reply was not of type UserInfo,
+then we will find a class
+
+163
+00:11:18,922 --> 00:11:24,930
+cast exception in this future, so it will
+propagated here.
+
+164
+00:11:24,930 --> 00:11:27,830
+And then finally, within the map, whatever
+goes wrong
+
+165
+00:11:27,830 --> 00:11:31,620
+here, would also end up in the recover
+case.
+
+166
+00:11:33,870 --> 00:11:39,510
+You will find this sequence of steps quite
+common when transforming another
+
+167
+00:11:39,510 --> 00:11:45,310
+Actor in this kind of façade fashion.
+
+168
+00:11:45,310 --> 00:11:50,490
+An alternative to this pattern would be to
+spawn an Actor, of course.
+
+169
+00:11:50,490 --> 00:11:54,860
+So when we get an email, we could create a
+little customer Actor
+
+170
+00:11:54,860 --> 00:11:59,160
+which uses tell to communicate with the
+user service, and then the user service
+
+171
+00:11:59,160 --> 00:12:00,500
+sends back.
+
+172
+00:12:00,500 --> 00:12:04,660
+And this Actor would then reply to the
+original sender.
+
+173
+00:12:04,660 --> 00:12:09,670
+The ask operation here is just an
+optimized form of this.
+
+174
+00:12:09,670 --> 00:12:12,490
+The actor which is created in this case,
+
+175
+00:12:12,490 --> 00:12:16,380
+consumes less resources than a real actor
+would.
+
+176
+00:12:16,380 --> 00:12:18,560
+Even though a real actor is really cheap,
+but if
+
+177
+00:12:18,560 --> 00:12:22,950
+you do this million times per second, then
+the difference matters.
+
+178
+00:12:22,950 --> 00:12:24,540
+Another consideration
+
+179
+00:12:24,540 --> 00:12:29,380
+is that this code is fairly clear.
+We
+
+180
+00:12:29,380 --> 00:12:34,550
+ask this of some other actor then we make
+sure it has the right type.
+
+181
+00:12:34,550 --> 00:12:39,260
+We transform it catch errors, and pipe it
+back.
+
+182
+00:12:39,260 --> 00:12:45,140
+So if it is this kind of easy
+transformation then ask is fine.
+
+183
+00:12:45,140 --> 00:12:49,500
+If you find yourself writing very
+complicated expressions in here,
+
+184
+00:12:49,500 --> 00:12:55,190
+or multiple steps with different futures
+and the error recovery paths
+
+185
+00:12:55,190 --> 00:13:00,570
+get ever more convoluted, then it is for
+sure time to switch to a customer actor.
+
+186
+00:13:02,060 --> 00:13:08,360
+The third possibility, is to keep track of
+who the original sender was, but including
+
+187
+00:13:08,360 --> 00:13:13,590
+this information in the message which
+travels to the user service and back.
+
+188
+00:13:13,590 --> 00:13:14,560
+If you are designing your
+
+189
+00:13:14,560 --> 00:13:19,020
+own system from scratch, that might be the
+most efficient way to do it.
+
+190
+00:13:19,020 --> 00:13:22,410
+But, if you need to work with a user
+service, in this case, which
+
+191
+00:13:22,410 --> 00:13:26,780
+you cannot modify, then you need to use
+ask or or a customer actor.
+
+192
+00:13:28,500 --> 00:13:32,010
+Another use case where the ask pattern
+comes in handy
+
+193
+00:13:32,010 --> 00:13:36,880
+is if you need to aggregate results from
+multiple other actors.
+
+194
+00:13:36,880 --> 00:13:40,630
+So let's say this is a blog PostSummary
+actor, and when
+
+195
+00:13:40,630 --> 00:13:45,990
+it gets a request for a certain postID
+with user and password, then we
+
+196
+00:13:45,990 --> 00:13:50,770
+generate three requests.
+First we ask for the status of the post.
+
+197
+00:13:52,200 --> 00:13:54,130
+Our sub publisher actor.
+
+198
+00:13:54,130 --> 00:13:57,080
+This result will be some kind of post
+status.
+
+199
+00:13:57,080 --> 00:14:03,210
+Then we're we retrieve the text from the
+post store by issuing a get request.
+
+200
+00:14:03,210 --> 00:14:06,240
+But then we also ask the authentication
+service
+
+201
+00:14:06,240 --> 00:14:09,910
+whether this user and password is a valid
+combination and
+
+202
+00:14:09,910 --> 00:14:14,320
+whether that user is authorized to see
+this kind of information.
+
+203
+00:14:15,550 --> 00:14:19,490
+We use a for comprehension to tie these
+three futures together.
+
+204
+00:14:20,600 --> 00:14:24,460
+And when all of them are successful this
+code will run.
+
+205
+00:14:25,490 --> 00:14:28,390
+So we check whether the authentication was
+successful.
+
+206
+00:14:28,390 --> 00:14:30,660
+In that case we send back the result.
+
+207
+00:14:30,660 --> 00:14:31,510
+Otherwise it gives
+
+208
+00:14:31,510 --> 00:14:33,190
+a failure, saying, not authorized.
+
+209
+00:14:36,470 --> 00:14:38,150
+This is a transformed future.
+
+210
+00:14:38,150 --> 00:14:40,938
+We started out with a future here, and
+then the, this is
+
+211
+00:14:40,938 --> 00:14:45,630
+translated to flat map and map of futures,
+and this yields a future.
+
+212
+00:14:46,740 --> 00:14:51,780
+We have a response here which is a future
+of result or failure.
+
+213
+00:14:51,780 --> 00:14:55,620
+And this response is then piped back to
+the sender eventually.
+
+214
+00:14:55,620 --> 00:14:56,120
+This
+
+215
+00:14:57,760 --> 00:15:03,100
+is an extremely common pattern if you are
+running, like, a web store or some big
+
+216
+00:15:03,100 --> 00:15:07,334
+website, and the user requests, for
+example, his
+
+217
+00:15:07,334 --> 00:15:10,980
+own home page on some social network, for
+example.
+
+218
+00:15:10,980 --> 00:15:15,530
+There will be possibly hundreds of such
+requests involved in
+
+219
+00:15:15,530 --> 00:15:20,300
+answering this one Get operation from the
+client's web browser.
+
+220
+00:15:22,430 --> 00:15:27,650
+But an actor is not limited to
+transforming the values which travel.
+
+221
+00:15:27,650 --> 00:15:33,350
+It also can transform, for example, the
+lifecycle monitoring, or the semantics
+
+222
+00:15:33,350 --> 00:15:38,853
+of how an actor works.
+For example, let's say we have, a
+
+223
+00:15:38,853 --> 00:15:44,531
+FileWorker
+
+224
+00:15:44,531 --> 00:15:47,540
+here, which is an actor
+
+225
+00:15:47,540 --> 00:15:52,580
+which can write things to files.
+And let's say we have a request here.
+
+226
+00:15:57,090 --> 00:15:58,590
+To write something.
+
+227
+00:15:58,590 --> 00:16:01,760
+The File Worker will try to do that but
+
+228
+00:16:01,760 --> 00:16:05,660
+we know that during IO many things can go
+wrong.
+
+229
+00:16:05,660 --> 00:16:08,000
+So this write just might fail.
+
+230
+00:16:08,000 --> 00:16:12,720
+Then of course there will be an exception
+and the supervisor will handle it.
+
+231
+00:16:12,720 --> 00:16:16,610
+But even though the file worker might be
+restarted, for example
+
+232
+00:16:17,630 --> 00:16:21,950
+there would be no reply to this request,
+because the processing failed.
+
+233
+00:16:21,950 --> 00:16:22,150
+And the
+
+234
+00:16:22,150 --> 00:16:26,550
+only way for the client to determine that
+it was not successful, is to
+
+235
+00:16:26,550 --> 00:16:30,910
+wait for a timeout to happen.
+That can take a lot of time, because you
+
+236
+00:16:30,910 --> 00:16:35,415
+need to foresee; IO operations could take
+some seconds, and then a reasonable
+
+237
+00:16:35,415 --> 00:16:41,110
+timeout window would be impractically
+long.
+
+238
+00:16:41,110 --> 00:16:47,200
+What we can do is to wrap this
+FileWorker's function in another actor.
+
+239
+00:16:50,480 --> 00:16:51,640
+Let's call it FileWriter.
+
+240
+00:16:53,980 --> 00:16:56,230
+And then the write does not go here
+anymore.
+
+241
+00:17:00,250 --> 00:17:01,370
+It is sent here.
+
+242
+00:17:05,172 --> 00:17:09,870
+The FileWriter will create a worker and
+supervise it
+
+243
+00:17:09,870 --> 00:17:14,970
+and monitor it.
+And then, well, successful results could
+
+244
+00:17:14,970 --> 00:17:22,420
+come back, or it might fail, or terminate
+before sending a successful result.
+
+245
+00:17:22,420 --> 00:17:26,690
+No matter what, the FileWriter itself did
+not perform the
+
+246
+00:17:26,690 --> 00:17:30,070
+risky part, so it is a lot less likely to
+fail.
+
+247
+00:17:32,140 --> 00:17:36,790
+Therefore the writer, very likely can
+respond,
+
+248
+00:17:38,800 --> 00:17:40,100
+done or failed,
+
+249
+00:17:43,500 --> 00:17:46,888
+making the interaction with this
+FileWorker more safe.
+
+250
+00:17:48,460 --> 00:17:51,410
+Here I have sketched this out a bit in
+code.
+
+251
+00:17:51,410 --> 00:17:56,490
+We have the FileWriter, and when it gets
+it a write command, it will
+
+252
+00:17:56,490 --> 00:18:02,490
+create a new FileWorker for the file, and
+tell it to respond.
+
+253
+00:18:02,490 --> 00:18:05,500
+To self, so, to the FileWriter.
+
+254
+00:18:05,500 --> 00:18:09,190
+Then we watch it, and we also need to keep
+track
+
+255
+00:18:09,190 --> 00:18:13,500
+of for whom this particular worker is
+performing the work.
+
+256
+00:18:13,500 --> 00:18:16,770
+So we can send back the done or failed
+messages.
+
+257
+00:18:17,930 --> 00:18:21,240
+Then, if anything goes wrong, we have a
+stopping strategy.
+
+258
+00:18:22,430 --> 00:18:25,740
+That means that the worker will not be
+restarted.
+
+259
+00:18:26,760 --> 00:18:33,250
+And in the end we either get a done
+message, or the actor terminates.
+
+260
+00:18:33,250 --> 00:18:34,520
+Whichever happens first
+
+261
+00:18:34,520 --> 00:18:37,430
+will be successful, because we look into
+the map
+
+262
+00:18:37,430 --> 00:18:40,600
+for the sender, this is now the worker
+actor
+
+263
+00:18:40,600 --> 00:18:43,580
+and if there is still contents in the map,
+
+264
+00:18:43,580 --> 00:18:46,630
+then we send the done message and remove
+this one.
+
+265
+00:18:47,710 --> 00:18:51,500
+This means that when it terminates later
+this one won't find anything anymore.
+
+266
+00:18:52,660 --> 00:18:55,340
+But if it terminates without having sent a
+
+267
+00:18:55,340 --> 00:18:59,100
+done message, we send a failed to the
+client.
+
+268
+00:19:00,870 --> 00:19:05,700
+Using ephemeral actors which are created
+per request is a quite
+
+269
+00:19:05,700 --> 00:19:10,850
+common pattern, especially if the work to
+be performed is risky.
+
+270
+00:19:13,400 --> 00:19:16,110
+We have seen a few patterns of how you can
+compose
+
+271
+00:19:16,110 --> 00:19:21,120
+actors, to translate values going in and
+out, or to validate requests.
+
+272
+00:19:22,220 --> 00:19:25,080
+But it is easy to imagine many more of
+these.
+
+273
+00:19:25,080 --> 00:19:29,410
+For example, rate limitations, or also
+access control.
+
+274
+00:19:29,410 --> 00:19:34,980
+These are things which with normal method
+calls are hard to implement.
+
+275
+00:19:34,980 --> 00:19:38,970
+Or for example, access control needs to
+use
+
+276
+00:19:38,970 --> 00:19:44,300
+aspect oriented programming, for example,
+to insert it around method calls.
+
+277
+00:19:44,300 --> 00:19:47,780
+Since actors are purely based on
+asynchronous message
+
+278
+00:19:47,780 --> 00:19:51,370
+passing we have many more possibilities on
+how
+
+279
+00:19:51,370 --> 00:19:54,510
+to compose them on protocol level to
+achieve
+
+280
+00:19:54,510 --> 00:19:58,424
+these things, for example, without using
+aspect-oriented programming.
+
+281
+00:20:00,260 --> 00:20:04,430
+On the other hand this great flexibility
+is part of the reason
+
+282
+00:20:04,430 --> 00:20:10,450
+why actors are not as usefully typed or as
+strictly typed as method calls.
+

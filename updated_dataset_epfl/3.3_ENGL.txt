@@ -1,0 +1,61 @@
+We will now discuss the design of name service proposed by Butler-Lampson in a classic paper from 1986.
+We are studying this for two reasons: first, as a name service design it is arguably the most complete one that has been proposed.
+Second, as a system design in general it is one of the most elegant ones.
+And we will recognize in it a fundamental design patterns that underly many successful systems.
+The basic design goals of this system are scalability, reliability, performance, and well-defined behavior.
+We will examine them one by one.
+The first design goal is scalability.
+Which informally is the ability to accommodate growth.
+Our system should be able to store mappings for an arbitrary number of names and it should continue to function well in the face of growth.
+Let's see how this is achieved.
+The role of a name service also called a directory service is to implement the general naming scheme, that is map general names to values.
+The names that Butler-Lampson had in mind when he proposed his design involve an entity and a property of that entity.
+For example, "Katerina's lab" is a name and its value is "Network Architecture".
+"Katerina's office" is another name and its value is "BC120".
+Moreover, the name "Katerina's lab" involves "Katerina" who is an entity and her "lab" which is a property of "Katerina".
+A directory is organized as a tree.
+Each arch in the tree is assigned a label.
+Also each node in the tree is assigned a time stamp and we will later see the role of these time stamps.
+At the second highest level of the tree, right below the root, the labels correspond to entities.
+At the next level down, the labels correspond to properties.
+And at the bottom level, the labels correspond to values.
+For example, "Lampson" is an entity, 
+"Password" is a property of "Lampson" and "vnxm56" is the value of Lampson's Password.
+To accommodate growth we cannot put all the entities, properties, and values in the world into a single directory.
+So we have multiple directories.
+And the directories themselves are organized in a tree.
+Since we have multiple directories we need a way to tell them apart.
+And for that we use directory identifies that are globally unique.
+We also use directory names that are unique locally, that is within their parent directory.
+Let me pause here.
+I just mentioned two different ways to refer to a directory, using a directory identifier like "311" and using a directory name like
+"DEC" or "IBM" or "SRC".
+Do not be confused by the fact that one is called a directory identifier whereas the other is called a directory name.
+Both of these are names; they're different ways to refer to directories.
+The fundamental difference between a directory identifier like "311" and a directory name like "SRC" or "DEC" is that the former is globally unique whereas the latter unique within their parent directory.
+For example, "IBM" could also have a child directory named "SRC".
+So, we have global directory identifiers and local directory names, what about the labels?
+Labels like "Lampson" and "Password" are also name and they are local, that is they are unique only in the context of their parent node.
+In other words, each directory has its own private name space.
+When new nodes and labels are added to one directory the other directories are not effected.
+We said that the role of a name service is to map names to values but what kind of names?
+I have already mentioned three different kinds of names to you: directory identifiers, directory names, and labels.
+The names that we can look up in the name service belong to yet another kind.
+Let's see a few examples.
+A name that we can look up in the name service consists of multiple pieces.
+It starts with a global directory identifier, like "999" which corresponds to the root of the directory tree.
+Potentially followed by local directory names like "DEC" and "SRC".
+Followed by an entity label like "Lampson" and then a property label like "Password".
+This name specifies a node in the directory tree.
+The value of the name is the label associated with the child of the specified node.
+Lets's look at a second example.
+Here the node specified by the name has two children, in this case the value of the name is the set of labels associated with the children of the specified node.
+And let's look at a third example.
+Here the node specified by the name is the root of a three level subtree.
+In this case the value of the name is the entire subtree rooted at the specified node.
+The fact that each directory has its own name space enables distributed growth.
+For example, directory 311 may be stored in DEC infrastructure and managed by DEC personnel.
+While directory 552 is delegated to IBM and directory 935 is delegated to a particular subdivision of IBM.
+So, scalability is achieved through hierarchy.
+Each directory has its own name space and potentially its own administrator.
+This enables distributed growth in the sense that administrators can add depth or breadth to the hierarchy without having to coordinate with each other.

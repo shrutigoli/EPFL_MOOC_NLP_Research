@@ -1,0 +1,74 @@
+Hello, we've already talked about the functions, today we will go into details, to better clarify the writing conventions, the difference between define and functions, speak of the internal execution and see the different types of functions.
+Concerning the rules of writing, the habit is to have the constants in uppercase, and we have already seen OUTPUT, HIGH,
+I do not really respect this Convention, since, with explicit names, it's pretty heavy as a writing.
+The variables, the rule is to have the lower case, we already saw the
+I in the for loops, counter, max level, some prefer to put underlines, it's up to you to decide. On the definition side, we have a first letter that is capitalized, and the definitions apply to the hardware. On the functions side, there are also capital letters in the first position, but they are, a function that will designate an action.
+So here I insist, and I will insist, the definitions are concerning the hardware, the functions concerns the functionality.
+And, in some languages, there is a subtle difference between procedures and functions, C, does not make that difference.
+So, I come back again: define to describe the material, function for functionality,
+I take an example, with a simple robot.
+This simple robot has two engines, if you look at the rear of the engine, where the wires leave, you have a plus and a minus, and if you send the current on the plus, all the engines of the same manufacturer, will turn in the same direction.
+So I define here, the plus of my motor, will be on pin 4, the minus on pin 3.
+And now, for the engine to advance, that is for this motor to rotate in the direction that will advance the robot,
+I must put on fuse 4 a 0, on fuse 3, a 1.
+And this will not be accepted by the compiler, since, I did not put capital letters as it is recognized.
+So now I will define the same thing for the left engine, but the left engine, for it to move, I will have to swap here, these two definitions, the motors are symmetrical.
+So on the right engine,
+If the positive fuse must be at 0, well, on the left engine, the positive fuse will have to be at 1.
+Then, you can grope, and then get out the soldering iron, to move the wires, but see that if we think well, we will have something that is, correct, that will react according to the definition of the material.
+And now if we want to move the robot, and well there is an action, which requires to have both engines that are advancing, we have defined what made them advance,
+There is no need to worry about the wiring and the hardware.
+So now we can add a function that is to make a round trip, with a certain duration that will fix the distance of travel.
+Let's continue, we wait, we move back, we wait, the duration being a parameter of this function.
+And in the main program, and well, we're going to have, make a round-trip, the duration of action, and of course, it is a quite simplified case, which clearly shows the hierarchy of functions.
+What we have just done is descending programming, we started from the material to go towards complexity.
+In real cases, one is concerned first, of the application, its specifications, the structure of the main program, system calls that we will use, which themselves, will make calls to simpler functions, which will rely on the hardware, therefore, top-down, or bottom-up, these are the two options.
+How does it work internally?
+The program has been stored in memory, and
+You have an address counter, the PC, which points the instruction that will be executed.
+This address counter increases each time the instruction has been executed, and during execution of the program, we will refer to the arithmetic unit, we'll access the variables to do the function that interests you.
+You come across an instruction that will allow you to make a loop, in assembler it is called Jump, Jump A1.
+The effect of this instruction, well, it will be to copy the value A1 which is found in the instruction in the PC, which will return to the address 3A1, to re-execute the loop.
+Well, now, if we have a function call, it's a little different, the instruction is Call in assembler, and at the memory, the compiler reserved a place for the functions, following the program.
+So we have the program, it continues with the functions, and I call the first function which is in 7,1F, so the PC will be loaded by the 3F instruction, so it will continue its execution, in 7, 1F.
+And now, what is important is to return to the main program, in assembler, it is the instruction Return, Ret, which is used, and at this moment, how do you know where to go?
+So there is a small additional operation characteristic of Call, which is to save in the PC the return address, which will be 3A2, the next address.
+The PC increases as soon as it has read the instruction, so we saved the instruction that would have been executed if it was not a Call.
+And, the Return instruction, will have the effect of
+SavePC in the PC and the execution will continue.
+So now, in every function, you may need variables, and here you may need to use variable i, which will occupy this position.
+You can have here another function, which will also need a variable counter that I call j, which I call k, which I could call i.
+Why reserve another memory location, a new memory position, in each function?
+At the moment of access here, this variable j, we could very well access the same memory position, which had been used by another function, since it will not run at the same time.
+Thus, we distinguish between local variables, and global variables that are used by the program, defined at the beginning of the program, while the local variables are defined at the beginning of the functions.
+And now what is still happening is that when you call a function, for example, the delay function, there is a parameter, which is the duration of the delay, which has been prepared in the program and thus the function will need.
+Then, this parameter can be transferred as a global variable, it can be transferred as a local variable, but, the parameter we put in a function, we will save it with the return address, in what is called, the stack, in the background.
+And this stack, with the address counter, that is what is being prepared, at the moment of the function call, so that the function can work with this data set and return to the program, possibly with the addition of data.
+So let's take examples, starting with the simplest things.
+You have the function
+"Blink once", you call it by,
+Blink once, there are no parameters that will be transferred, on the stack, the parenthesis is empty.
+You have the function BlinkXtimes, there you have a parameter and it is necessary to say what will be the name of this parameter, but it is a local name, it's a name used only in that.
+On the other hand, it was necessary to specify the size to be reserved in the
+Stack, to transfer this parameter, and, when we call, and well, we have blinked so many times, the parameter one constant or one variable, but, of type byte, if we put a number too big here, the compiler should grumble.
+Then you can have two parameters, which do not necessarily have the same type, want to blink x times, with a certain period.
+We'll give the byte type for the number of times, the byte type for the period, and we will have both parameters.
+And we can test now, this program, we must always test the functions when they were written, with a small loop, we blink three times, and then we do nothing.
+If you delete this while, what happens?
+You blink three times, blink three times, blink three times, you feel that your program is wrong.
+A delay must be added here, so that after each blinking three times, well, you have a space that allows you to verify the start of the function call.
+So now we can have an output parameter, that is, the function has prepared, has calculated a value that must return to the main program.
+And, it will be necessary to reserve space in memory, to say what is the result, and there may be local variables that need to be declared.
+So an example to illustrate things, here I rely on something we had already seen, read the pushbutton, read a pushbutton.
+One can make a function of it, what we read is
+Activated pushbutton, inactivated, it is actually a Boolean variable. It can be written like that, even if it's not usual.
+And then this function, will make the state of the pusher, pressed or not pressed, and, it is the return statement, in the background, that allows to point out this fact.
+So if we had a function a bit more complex here, and well, we could define a boolean variable, statePush to describe the state of the Pusher, it is the state of our pusher with the digitalRead, and
+I will return the variable that has been declared. So this is where you should see it clearly, we reserved space,for something that will be returned that will be of the same
+Boolean type, and, as can be stated, we can declare a variable that will be returned, which must be, of course, of the same type.
+At the call level, well, we write if Push On, parentheses, since we did not send parameters, but you remember the define, with the define, this parenthesis isn't there, the behavior will be exactly the same, so when you call the actions, you have to know whether they were defined by a define, or by a function.
+Here, I took a Boolean example which is a little unusual, but it was so that we would cling to something known. The example that is explained to you very often, is the multiplication, where you are told: you want to multiply two numbers a, b, and then it will give a result; Then, you need to naturally define a equal 3, b equal 4, and say what are their types. So these are global variables, and so now, at the time of the call for multiplication, well, it will be necessary to repeat this type. And now I can return this value, by writing return, a times b; but
+I need to warn the compiler, to reserve space, for this value a times b. So we're going to put here, the whole type, and here is a function that will pass in its most simplest form.
+If now I want to introduce a variable, and
+I say, I will, define that the product is a variable of type c, I will calculate c equal at times b, and I will return the result c, and finish my function. Well, we have seen how a function is run and we highlighted, the importance of defining clear names, in French, English, in a mixture, I think it is very difficult to define clear names.
+So we can now use the functions in our next examples.

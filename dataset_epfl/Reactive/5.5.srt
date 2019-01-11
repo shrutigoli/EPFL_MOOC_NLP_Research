@@ -1,0 +1,1139 @@
+1
+00:00:01,150 --> 00:00:03,730
+You have seen now all that you need to
+know in order to
+
+2
+00:00:03,730 --> 00:00:09,390
+write actors, and have them interact with
+each other, but one thing is missing.
+
+3
+00:00:09,390 --> 00:00:14,620
+Testing actors is integral to developing
+them as we will see.
+
+4
+00:00:14,620 --> 00:00:17,330
+You will notice, when testing them, when
+you have,
+
+5
+00:00:17,330 --> 00:00:20,840
+for example, chosen a messaging pattern
+which does not
+
+6
+00:00:20,840 --> 00:00:23,970
+lend itself well to testing, and that
+might be
+
+7
+00:00:23,970 --> 00:00:26,195
+a hint that the design is also not so
+
+8
+00:00:26,195 --> 00:00:28,860
+well-suited for production.
+
+9
+00:00:28,860 --> 00:00:33,470
+For example, if you couple components too
+tightly, you will notice during testing.
+
+10
+00:00:34,900 --> 00:00:37,300
+Therefore, we will look now at the tools
+
+11
+00:00:37,300 --> 00:00:39,930
+available in the Akka toolbelt for this
+purpose.
+
+12
+00:00:41,830 --> 00:00:45,060
+The first thing to note about actors,
+remember,
+
+13
+00:00:45,060 --> 00:00:49,100
+is that they only interact using message
+passing.
+
+14
+00:00:49,100 --> 00:00:51,640
+There is no way to reach into them and
+
+15
+00:00:51,640 --> 00:00:55,120
+to check their current behavior without
+sending a message.
+
+16
+00:00:55,120 --> 00:00:57,690
+And all you can ever get is a message
+back.
+
+17
+00:00:58,950 --> 00:01:00,840
+This is what I mean when I say
+
+18
+00:01:00,840 --> 00:01:05,150
+that tests can only verify externally
+observable effects.
+
+19
+00:01:06,370 --> 00:01:13,250
+An example, this actor called Toggle has
+two states, happy and sad.
+
+20
+00:01:14,610 --> 00:01:17,180
+You can ask this actor how it feels right
+now, and
+
+21
+00:01:17,180 --> 00:01:20,190
+it will reply with either happy or sad.
+
+22
+00:01:20,190 --> 00:01:22,670
+And on each reply it will switch its
+behavior.
+
+23
+00:01:24,170 --> 00:01:25,510
+How do you test this actor?
+
+24
+00:01:26,960 --> 00:01:29,580
+Well, there is only one way to do it.
+
+25
+00:01:29,580 --> 00:01:34,420
+We must send it, how are you messages, and
+then we must observe
+
+26
+00:01:34,420 --> 00:01:38,430
+which replies we get back, and they should
+alternate between happy and sad.
+
+27
+00:01:39,980 --> 00:01:42,230
+Akka comes with a test kit, which makes
+this
+
+28
+00:01:42,230 --> 00:01:43,340
+task quite easy.
+
+29
+00:01:44,490 --> 00:01:48,202
+The central piece in it is called Test
+Probe.
+
+30
+00:01:48,202 --> 00:01:52,500
+A Test Probe is like a little remote
+controlled actor.
+
+31
+00:01:52,500 --> 00:01:56,100
+It's only purpose is to buffer incoming
+messages in an internal
+
+32
+00:01:56,100 --> 00:01:59,900
+queue so that they can be inspected from
+the test procedure.
+
+33
+00:02:01,180 --> 00:02:03,570
+When we write a test, we need to start the
+
+34
+00:02:03,570 --> 00:02:07,260
+whole system, and we cannot use the
+Akka.main class for
+
+35
+00:02:07,260 --> 00:02:09,340
+this purpose, which we have used so far.
+
+36
+00:02:10,610 --> 00:02:14,350
+Here you can see how to explicitly create
+an Actor System.
+
+37
+00:02:14,350 --> 00:02:17,560
+Like actors, Actor Systems also have
+names.
+
+38
+00:02:17,560 --> 00:02:18,670
+We call this TestSys.
+
+39
+00:02:20,130 --> 00:02:22,510
+Then we make this system implicitly
+available.
+
+40
+00:02:24,790 --> 00:02:27,780
+The second step is to create our actor on
+the test.
+
+41
+00:02:29,900 --> 00:02:34,990
+We create a Toggle, and then we create a
+Test Probe.
+
+42
+00:02:34,990 --> 00:02:40,380
+Creating a test probe also creates this
+little actor inside for which it
+
+43
+00:02:40,380 --> 00:02:44,310
+needs the system, and the system is picked
+up implicitly in this case.
+
+44
+00:02:45,530 --> 00:02:47,860
+Now we have two actors, the actor on the
+test,
+
+45
+00:02:47,860 --> 00:02:50,670
+and the probe, and they can have a little
+chat.
+
+46
+00:02:52,070 --> 00:02:56,450
+The probe sends to the toggle, how are
+you, and
+
+47
+00:02:56,450 --> 00:03:00,380
+then the probe expects the reply back,
+happy.
+
+48
+00:03:01,600 --> 00:03:05,620
+When we do the same thing again, the
+expected reply will be sad.
+
+49
+00:03:07,130 --> 00:03:11,850
+When we try to send something which the
+actor does not handle we did
+
+50
+00:03:11,850 --> 00:03:16,170
+not foresee a case for that, so the actor
+will not react to this.
+
+51
+00:03:16,170 --> 00:03:18,570
+So we do not expect a message.
+
+52
+00:03:18,570 --> 00:03:21,870
+And we wait for one second, that should be
+enough to verify
+
+53
+00:03:21,870 --> 00:03:23,690
+that no response is received.
+
+54
+00:03:25,550 --> 00:03:29,150
+Since we created the Actor System in this
+test, we
+
+55
+00:03:29,150 --> 00:03:32,140
+also need to make sure to properly shut it
+down.
+
+56
+00:03:32,140 --> 00:03:36,210
+Because otherwise the threads, which it
+creates, will keep running.
+
+57
+00:03:37,840 --> 00:03:43,340
+You might have wondered about
+system.actorOf because so far
+
+58
+00:03:43,340 --> 00:03:47,040
+we have only seen context of actorOf, and
+the
+
+59
+00:03:47,040 --> 00:03:49,900
+context was that one of an actor meaning
+
+60
+00:03:49,900 --> 00:03:52,515
+that only an actor can create another
+actor.
+
+61
+00:03:52,515 --> 00:03:57,620
+System.actorOf does the same thing behind
+the scenes.
+
+62
+00:03:57,620 --> 00:04:03,150
+The Actor System comes with a so-called
+guardian actor and system actorOf
+
+63
+00:04:03,150 --> 00:04:07,590
+sends a request to that guardian actor to
+create this actor for us.
+
+64
+00:04:09,610 --> 00:04:12,870
+The Test Probe is a little actor which is
+driven from the
+
+65
+00:04:12,870 --> 00:04:17,760
+outside but we can also use the test probe
+from the inside.
+
+66
+00:04:17,760 --> 00:04:21,320
+We can run a test in the context of a
+probe.
+
+67
+00:04:21,320 --> 00:04:26,520
+This is done by using the test kit class,
+which is initialized with an Actor System.
+
+68
+00:04:28,190 --> 00:04:33,180
+Inside of this class the system is
+available with the name system.
+
+69
+00:04:34,740 --> 00:04:40,194
+The trait with implicit sender makes the
+internal Small actor
+
+70
+00:04:40,194 --> 00:04:45,170
+available implicitly, so that it will be
+picked up here, where we sent messages.
+
+71
+00:04:46,540 --> 00:04:53,182
+The sender, which is picked up
+automatically here, is named
+
+72
+00:04:53,182 --> 00:04:59,780
+testActor, and is an actor ref, which you
+
+73
+00:04:59,780 --> 00:05:03,170
+can also use in this test if you need to
+send it explicitly.
+
+74
+00:05:04,660 --> 00:05:07,050
+The second thing to notice as, is that
+
+75
+00:05:07,050 --> 00:05:13,080
+we use expect message without a leading
+probe dot.
+
+76
+00:05:13,080 --> 00:05:17,200
+This is because expect message is a method
+on TestKit.
+
+77
+00:05:17,200 --> 00:05:19,510
+So it is directly available here.
+
+78
+00:05:19,510 --> 00:05:24,830
+But then the test runs in exactly the same
+fashion, and at the end we
+
+79
+00:05:24,830 --> 00:05:26,430
+still need to shut down the system.
+
+80
+00:05:28,200 --> 00:05:32,600
+Some of the actors which you want to test
+will have external dependencies.
+
+81
+00:05:32,600 --> 00:05:37,070
+For example, they need to talk to a
+database or a web service of
+
+82
+00:05:37,070 --> 00:05:42,480
+some sort, and you do not want to use
+those real ones for testing.
+
+83
+00:05:43,830 --> 00:05:46,460
+The traditional solution to this problem
+is
+
+84
+00:05:46,460 --> 00:05:50,310
+to use dependency injection, to use
+different,
+
+85
+00:05:50,310 --> 00:05:53,540
+for example, database handles during
+tests,
+
+86
+00:05:53,540 --> 00:05:56,490
+during staging and then in production.
+
+87
+00:05:56,490 --> 00:05:59,050
+You can use the same approach with actors.
+
+88
+00:05:59,050 --> 00:06:01,910
+You could use, for example, Akka together
+with Spring.
+
+89
+00:06:02,920 --> 00:06:05,010
+If you Google it you will find how to do
+that.
+
+90
+00:06:06,460 --> 00:06:08,540
+We will look at a very simple solution
+
+91
+00:06:08,540 --> 00:06:12,274
+here which is to simply add overridable
+factory methods.
+
+92
+00:06:13,830 --> 00:06:15,960
+For example let's
+
+93
+00:06:15,960 --> 00:06:18,030
+look at the Receptionist.
+
+94
+00:06:18,030 --> 00:06:21,650
+The Receptionist needs to create a
+controller in,
+
+95
+00:06:21,650 --> 00:06:25,280
+under certain circumstances, and if we
+hard wire
+
+96
+00:06:25,280 --> 00:06:30,520
+the props controller in the actor of call,
+we cannot stub it out in a test.
+
+97
+00:06:31,560 --> 00:06:33,310
+What we can simply do is to add a
+
+98
+00:06:33,310 --> 00:06:38,540
+method, controllerProps, which gives these
+props with the known behavior.
+
+99
+00:06:39,550 --> 00:06:41,290
+And this allows us to override
+
+100
+00:06:41,290 --> 00:06:45,840
+this method in a test to create a
+different actor which, for
+
+101
+00:06:45,840 --> 00:06:49,180
+example, does not really go to the Web to
+retrieve the links.
+
+102
+00:06:50,340 --> 00:06:56,760
+Or, talking about that, if we look at the
+Getter, the Getter used WebClient get URL,
+
+103
+00:06:56,760 --> 00:06:58,810
+if we want to switch out the WebClient
+
+104
+00:06:58,810 --> 00:07:02,622
+from the real one which I've renamed
+AsyncWebClient here.
+
+105
+00:07:02,622 --> 00:07:06,810
+To a fake one, we can just insert this
+method as shown, and
+
+106
+00:07:06,810 --> 00:07:08,230
+then the test can override it.
+
+107
+00:07:10,850 --> 00:07:12,650
+Let us look at this in practice.
+
+108
+00:07:13,890 --> 00:07:19,160
+I have renamed the web client object to
+AsyncWebClient, and
+
+109
+00:07:19,160 --> 00:07:23,600
+factored out the interface WebClient here
+with the get method.
+
+110
+00:07:28,840 --> 00:07:35,430
+Within the getter, this def gives the
+AsyncWebClient which is used here.
+
+111
+00:07:37,880 --> 00:07:41,909
+Next, I have prepared some code to fake a
+web client.
+
+112
+00:07:43,270 --> 00:07:49,010
+First, we start out at a certain link and
+we take the
+
+113
+00:07:49,010 --> 00:07:55,040
+actual html document, which shall live at
+this link, from this body's map here.
+
+114
+00:07:55,040 --> 00:08:01,050
+And there is a links map, which for this
+link also has the desired output
+
+115
+00:08:01,050 --> 00:08:06,624
+of the getter, the sequence of links
+encountered.
+
+116
+00:08:06,624 --> 00:08:12,300
+Then, we create a FakeWebClient which
+implements the WebClient interface.
+
+117
+00:08:12,300 --> 00:08:16,610
+When we get a URL we look simply in the
+bodies
+
+118
+00:08:16,610 --> 00:08:21,519
+map and if there is none, we give a
+BadStatus(404), not found.
+
+119
+00:08:22,680 --> 00:08:25,830
+If there is one we give it a successful
+future with the body.
+
+120
+00:08:30,250 --> 00:08:35,290
+We can inject this into a getter as shown
+here in the fakeGetter method.
+
+121
+00:08:35,290 --> 00:08:37,630
+This returns props describing how to
+
+122
+00:08:37,630 --> 00:08:41,640
+create a getter which uses the
+FakeWebClient.
+
+123
+00:08:41,640 --> 00:08:44,340
+We say props, new getter, and then we
+
+124
+00:08:44,340 --> 00:08:48,860
+override in an anonymous class definition
+what client
+
+125
+00:08:48,860 --> 00:08:53,620
+means, and we say this shall be the fake
+web client, instead of the real one.
+
+126
+00:08:56,050 --> 00:08:59,030
+Before we can test the getter, we need one
+more thing.
+
+127
+00:09:00,290 --> 00:09:03,040
+The getter actor sends to its parent.
+
+128
+00:09:03,040 --> 00:09:06,930
+And that is what we want to verify, but
+the parent
+
+129
+00:09:06,930 --> 00:09:11,370
+is something, if we have the system create
+a getter for us,
+
+130
+00:09:11,370 --> 00:09:13,580
+then that would be the guardian, and that
+would not be
+
+131
+00:09:13,580 --> 00:09:18,350
+very useful because we cannot monitor what
+gets sent to the guardian.
+
+132
+00:09:18,350 --> 00:09:21,630
+Therefore, we need to create a StepParent
+for
+
+133
+00:09:21,630 --> 00:09:22,780
+the getter.
+
+134
+00:09:22,780 --> 00:09:26,780
+The StepParent is an actor which takes a
+description of how to
+
+135
+00:09:26,780 --> 00:09:32,880
+create a child and the probe to which all
+messages shall be forwarded.
+
+136
+00:09:32,880 --> 00:09:35,410
+It then creates the child, and whenever it
+
+137
+00:09:35,410 --> 00:09:40,010
+receives a message, it sends to the probe
+with
+
+138
+00:09:40,010 --> 00:09:43,050
+the tell method, to send the message, and
+
+139
+00:09:43,050 --> 00:09:46,810
+to keep the original sender so that what
+arrives
+
+140
+00:09:46,810 --> 00:09:50,700
+at the probe seems to come from the
+original sender.
+
+141
+00:09:50,700 --> 00:09:53,940
+So it's, will seem to come from the
+getter, in that case.
+
+142
+00:09:57,310 --> 00:10:00,350
+Before using that on the real getter, let
+
+143
+00:10:00,350 --> 00:10:03,630
+me show you a slight variation of this
+pattern.
+
+144
+00:10:03,630 --> 00:10:06,480
+If we want to inspect all the messages
+
+145
+00:10:06,480 --> 00:10:09,680
+which are exchanged between a child and a
+parent,
+
+146
+00:10:09,680 --> 00:10:13,590
+in both ways, then we could create a
+FosterParent,
+
+147
+00:10:13,590 --> 00:10:17,072
+which mediates between the child and its
+real parent.
+
+148
+00:10:17,072 --> 00:10:19,440
+The FosterParent again gets the
+description of
+
+149
+00:10:19,440 --> 00:10:21,920
+how to create the child and the probe.
+
+150
+00:10:21,920 --> 00:10:22,350
+Now it
+
+151
+00:10:22,350 --> 00:10:27,005
+needs to remember the child actor ref
+because whenever the
+
+152
+00:10:27,005 --> 00:10:33,320
+context.parent sends a message, then in
+addition
+
+153
+00:10:33,320 --> 00:10:38,710
+to forwarding the message to the probe, we
+also forward the message to the child.
+
+154
+00:10:38,710 --> 00:10:42,660
+This forward here is the same as shown
+previously, so it
+
+155
+00:10:42,660 --> 00:10:46,650
+will use tell with the current sender as
+the sender argument.
+
+156
+00:10:48,760 --> 00:10:54,200
+If we receive a message from another
+actor, presumably from the child, then we
+
+157
+00:10:54,200 --> 00:10:58,810
+send it to the probe as well, but we
+forward it also to the parent.
+
+158
+00:10:58,810 --> 00:11:03,562
+This way, this FosterParent is nearly
+completely transparent
+
+159
+00:11:03,562 --> 00:11:07,210
+for all messages sent between parent and
+child.
+
+160
+00:11:08,970 --> 00:11:14,230
+The only thing which does not quite work
+is if one of those two would expose
+
+161
+00:11:14,230 --> 00:11:19,230
+the ref of this foster parent to external
+actors, because for that we do
+
+162
+00:11:19,230 --> 00:11:23,560
+not have the necessary logic to find out
+where the message should have gone.
+
+163
+00:11:26,310 --> 00:11:30,190
+Now we are ready to write the Getter
+specification.
+
+164
+00:11:30,190 --> 00:11:35,290
+Class GetterSpec extends TestKit with an
+ActorSystem with an appropriate
+
+165
+00:11:35,290 --> 00:11:40,180
+name, and I am using Scala Test with the
+WordSpecLike.
+
+166
+00:11:40,180 --> 00:11:43,050
+BeforeAndAfterAll is needed so that after
+the tests
+
+167
+00:11:43,050 --> 00:11:45,800
+have run we can shut down the system.
+
+168
+00:11:45,800 --> 00:11:51,480
+An ImplicitSender is needed, as you have
+seen so that messages sent will have
+
+169
+00:11:51,480 --> 00:11:52,190
+the right sender.
+
+170
+00:11:56,090 --> 00:12:00,210
+Here we have the specification of the
+Getter and it has two
+
+171
+00:12:00,210 --> 00:12:06,090
+test cases, and the first one we create a
+StepParent for a fakeGetter.
+
+172
+00:12:06,090 --> 00:12:08,350
+Which starts at the first link of depth
+two.
+
+173
+00:12:09,560 --> 00:12:13,800
+And we want to verify that we get the
+right response.
+
+174
+00:12:13,800 --> 00:12:18,580
+The name we give to this test case, main
+actor, is rightBody.
+
+175
+00:12:18,580 --> 00:12:20,410
+So we can see if something goes wrong.
+
+176
+00:12:22,270 --> 00:12:24,310
+We look into the links map.
+
+177
+00:12:24,310 --> 00:12:26,950
+Which we have in the test case for the
+first link.
+
+178
+00:12:26,950 --> 00:12:28,660
+And for all links we expect, we
+
+179
+00:12:28,660 --> 00:12:32,760
+say, expect message, controller.Check,
+link at depth two.
+
+180
+00:12:34,690 --> 00:12:40,154
+And finally, the getter must terminate the
+exchange by saying, getter.done.
+
+181
+00:12:41,610 --> 00:12:46,230
+In the second test case, we try to
+retrieve a URL which does not exist, and
+
+182
+00:12:46,230 --> 00:12:49,930
+we only expect Getter.Done.
+
+183
+00:12:49,930 --> 00:12:52,750
+If you installed the Scala test plugin for
+the
+
+184
+00:12:52,750 --> 00:12:55,920
+Scala IDE, then with a right click in the
+Context
+
+185
+00:12:55,920 --> 00:13:00,920
+menu under Run As there is Scala test
+file,
+
+186
+00:13:00,920 --> 00:13:03,250
+if you click on it the test will be run.
+
+187
+00:13:03,250 --> 00:13:07,370
+And we see the bar is green, everything
+has worked.
+
+188
+00:13:11,160 --> 00:13:15,820
+Another example we can look at is how to
+test the Receptionist in isolation.
+
+189
+00:13:17,300 --> 00:13:22,180
+For that, we need to create a
+FakeController.
+
+190
+00:13:22,180 --> 00:13:25,340
+The FakeController here will be an actor,
+which
+
+191
+00:13:25,340 --> 00:13:28,390
+when it receives a check, will just sleep
+
+192
+00:13:28,390 --> 00:13:32,120
+for one second, simulating that something
+takes, takes
+
+193
+00:13:32,120 --> 00:13:35,470
+time, and then it will send back the
+result.
+
+194
+00:13:37,730 --> 00:13:43,600
+But wait a second, did I just say sleep?
+Actors shall not sleep, so let's fix this.
+
+195
+00:13:43,600 --> 00:13:44,100
+We
+
+196
+00:13:46,510 --> 00:13:48,410
+can replace this by the scheduler.
+
+197
+00:14:01,350 --> 00:14:05,480
+Much better.
+This is just test code, you might say.
+
+198
+00:14:05,480 --> 00:14:10,890
+But remember you need to think that actors
+should never block
+
+199
+00:14:10,890 --> 00:14:14,920
+and not practicing it anywhere is a good
+way to achieve that.
+
+200
+00:14:18,070 --> 00:14:22,450
+We wired this FakeController into a
+FakeReceptionist.
+
+201
+00:14:22,450 --> 00:14:27,360
+Again by saying Props new Receptionist,
+and then in an anonymous class, we
+
+202
+00:14:27,360 --> 00:14:32,730
+override the controller props to be
+pointing to this Fake Controller instead.
+
+203
+00:14:35,290 --> 00:14:39,150
+The Receptionist Spec works in the same
+way as
+
+204
+00:14:39,150 --> 00:14:42,970
+the Getter spec by using a TestKit with an
+ActorSystem.
+
+205
+00:14:42,970 --> 00:14:45,520
+This time, with a different name, to make
+it clear which
+
+206
+00:14:45,520 --> 00:14:49,460
+test is currently running, WordSpecLike,
+BeforeAndAfterAll,
+
+207
+00:14:49,460 --> 00:14:51,580
+with the shutdown, and the ImplicitSender.
+
+208
+00:14:52,970 --> 00:14:55,080
+And here, we have the test cases.
+
+209
+00:14:57,760 --> 00:15:04,630
+In the first test case, we verify that the
+result is returned as specified.
+
+210
+00:15:04,630 --> 00:15:11,920
+We create a receptionist, using the fake
+one, and we send it a get for my URL.
+
+211
+00:15:11,920 --> 00:15:15,460
+This is tested completely in isolation, it
+will
+
+212
+00:15:15,460 --> 00:15:18,430
+not call any getter, so any string will
+do.
+
+213
+00:15:19,680 --> 00:15:23,290
+We expect back the message that the result
+for this myURL
+
+214
+00:15:23,290 --> 00:15:29,510
+is exactly the set with just myURL in it.
+The other thing we are going to test
+
+215
+00:15:29,510 --> 00:15:36,420
+is that the Receptionist properly queues
+and rejects requests as we have designed.
+
+216
+00:15:36,420 --> 00:15:41,000
+So again we create one with the name
+rejectFlood and we send it
+
+217
+00:15:41,000 --> 00:15:46,240
+five requests, each with a different
+string so that we can disambiguate them.
+
+218
+00:15:47,360 --> 00:15:48,650
+First, we expect
+
+219
+00:15:48,650 --> 00:15:53,220
+the failed for the last one, where the
+queue should be full and then
+
+220
+00:15:53,220 --> 00:15:57,400
+we expect the other ones exactly in the
+order in which we sent them.
+
+221
+00:15:59,050 --> 00:16:00,090
+Running this test
+
+222
+00:16:06,830 --> 00:16:09,250
+will take a little longer because we built
+in the
+
+223
+00:16:09,250 --> 00:16:12,780
+one second delay but the bar is green,
+everything worked.
+
+224
+00:16:15,690 --> 00:16:18,240
+When testing Actor Hierarchies.
+
+225
+00:16:18,240 --> 00:16:21,140
+So you have collaborating actors which
+work
+
+226
+00:16:21,140 --> 00:16:23,970
+together and some are parents of others,
+
+227
+00:16:25,330 --> 00:16:30,210
+you will of course want to test each actor
+in isolation as much as possible.
+
+228
+00:16:30,210 --> 00:16:35,120
+But what you should also do is to work
+your way up the hierarchy by starting out
+
+229
+00:16:35,120 --> 00:16:40,710
+from the leaves and then spawning the
+supervisor which will create the children
+
+230
+00:16:40,710 --> 00:16:44,920
+actors in the test, testing them all
+together.
+
+231
+00:16:44,920 --> 00:16:48,150
+This is more integration testing of your
+actors,
+
+232
+00:16:48,150 --> 00:16:51,730
+and since you go from the leaves outwards,
+
+233
+00:16:51,730 --> 00:16:54,360
+you're adding shells on top of what you
+
+234
+00:16:54,360 --> 00:16:58,650
+currently have, I call this Reverse Onion
+Testing.
+
+235
+00:16:58,650 --> 00:17:01,000
+It's like not peeling back the onion
+
+236
+00:17:01,000 --> 00:17:03,590
+layers, it's like putting them onto the
+onion.
+
+237
+00:17:05,040 --> 00:17:05,890
+With the techniques
+
+238
+00:17:05,890 --> 00:17:08,070
+shown in this lecture, you should be all
+
+239
+00:17:08,070 --> 00:17:13,020
+set to begin the exercises, and
+successfully complete them.
+
+240
+00:17:13,020 --> 00:17:14,160
+I wish you the best of luck.
+

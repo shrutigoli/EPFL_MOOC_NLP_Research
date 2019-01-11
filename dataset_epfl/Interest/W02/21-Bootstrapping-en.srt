@@ -1,0 +1,710 @@
+1
+00:00:05,588 --> 00:00:06,663
+In this part,
+
+2
+00:00:06,917 --> 00:00:09,368
+we learn how to estimate 
+the term structure
+
+3
+00:00:09,938 --> 00:00:13,450
+from a given set of market quotes
+ on instruments including
+
+4
+00:00:13,650 --> 00:00:18,038
+coupon bonds, LIBOR, forward rates,
+and swap rates.
+
+5
+00:00:20,040 --> 00:00:23,365
+We will distinguish between exact
+methods
+
+6
+00:00:23,565 --> 00:00:25,477
+and smoothing methods.
+
+7
+00:00:26,997 --> 00:00:30,847
+Exact methods will give us discount
+curves
+
+8
+00:00:31,047 --> 00:00:34,897
+that exactly reproduce
+the market data.
+
+9
+00:00:35,615 --> 00:00:39,015
+But this comes at the cost of 
+somewhat irregular forward curves.
+
+10
+00:00:40,675 --> 00:00:42,763
+If we insist on the regular
+forward curves
+
+11
+00:00:42,963 --> 00:00:44,775
+we use a smoothing method
+
+12
+00:00:45,455 --> 00:00:48,567
+which gives us
+smooth yield curves.
+
+13
+00:00:49,150 --> 00:00:52,987
+But at the cost of not exactly
+matching the market data.
+
+14
+00:00:55,355 --> 00:01:00,018
+We will eventually see what PCA,
+Principal Component Analysis
+
+15
+00:01:00,518 --> 00:01:04,155
+tells us about the basic shapes
+of the yield curve.
+
+16
+00:01:06,697 --> 00:01:09,922
+We now start with
+the bootstrapping method,
+
+17
+00:01:10,367 --> 00:01:12,279
+which is an exact method.
+
+18
+00:01:13,722 --> 00:01:15,659
+It is a very simple method
+
+19
+00:01:15,859 --> 00:01:18,972
+and it is most used
+among trading desks.
+
+20
+00:01:20,247 --> 00:01:22,784
+The idea is to build up
+the term structure
+
+21
+00:01:22,984 --> 00:01:25,984
+from shorter maturities
+to longer maturities.
+
+22
+00:01:27,264 --> 00:01:29,064
+And it is most instructive
+
+23
+00:01:29,264 --> 00:01:32,764
+to learn about the Bootstraping
+method from an example.
+
+24
+00:01:33,554 --> 00:01:37,491
+We look at this following data
+from the U.S market
+
+25
+00:01:38,454 --> 00:01:42,004
+on October 1st, 2012.
+
+26
+00:01:42,469 --> 00:01:47,294
+We are given LIBOR rates, futures
+rates, and swap rates.
+
+27
+00:01:49,394 --> 00:01:52,757
+The day count convention is actual
+by 360.
+
+28
+00:01:54,296 --> 00:01:57,896
+The aim is to find the discount
+curve
+
+29
+00:01:58,495 --> 00:02:00,870
+for all the reset cash flow dates
+
+30
+00:02:01,390 --> 00:02:04,140
+ that exactly matches these quotes.
+
+31
+00:02:05,001 --> 00:02:09,539
+Let's look at the first block of 
+market data, the LIBOR rates.
+
+32
+00:02:11,324 --> 00:02:15,911
+They're given for overnight, 1 month,
+and 3 months maturities.
+
+33
+00:02:16,977 --> 00:02:19,239
+We denote these maturity dates
+
+34
+00:02:19,439 --> 00:02:22,439
+by S-1, S-2, and S-3.
+
+35
+00:02:23,320 --> 00:02:25,733
+In terms of the day count convention,
+
+36
+00:02:26,394 --> 00:02:29,794
+the year fractions are given here.
+
+37
+00:02:30,555 --> 00:02:35,942
+The corresponding zero coupon bond 
+prices are given in this 1 to 1 relation.
+
+38
+00:02:38,787 --> 00:02:41,025
+The next block contains
+
+39
+00:02:41,922 --> 00:02:44,422
+quotes on futures prices.
+
+40
+00:02:45,913 --> 00:02:50,875
+Recall that the futures price for
+a maturity date Ti+1
+
+41
+00:02:51,075 --> 00:02:56,363
+is quoted as:
+100 x (1 - the futures rate)
+
+42
+00:02:57,722 --> 00:03:01,010
+which is the futures rate
+
+43
+00:03:01,357 --> 00:03:04,120
+for the period with reset date
+
+44
+00:03:04,320 --> 00:03:06,432
+Ti and maturity date Ti+1.
+
+45
+00:03:07,524 --> 00:03:09,436
+We have 5 futures prices.
+
+46
+00:03:09,993 --> 00:03:13,293
+The reset date for 
+the first futures is
+
+47
+00:03:14,239 --> 00:03:17,977
+T-1 is equal to the 
+19th of December, 2012.
+
+48
+00:03:18,672 --> 00:03:22,897
+We use futures rates as proxies
+for forward rates
+
+49
+00:03:24,447 --> 00:03:25,809
+as shown here.
+
+50
+00:03:27,282 --> 00:03:29,607
+When looking at the maturity
+spectrum,
+
+51
+00:03:30,407 --> 00:03:33,407
+notice that we have a
+maturity overlap
+
+52
+00:03:34,121 --> 00:03:35,683
+as shown here.
+
+53
+00:03:35,883 --> 00:03:39,271
+The first reset date of the
+first futures contract
+
+54
+00:03:39,586 --> 00:03:42,411
+lies between S-2 and S-3
+
+55
+00:03:42,650 --> 00:03:45,938
+the maturities of the LIBOR rates.
+
+56
+00:03:46,824 --> 00:03:49,512
+From this, we get
+
+57
+00:03:51,784 --> 00:03:54,784
+The LIBOR rate for T-1
+
+58
+00:03:55,234 --> 00:03:57,234
+by linearly interpolating
+
+59
+00:03:57,915 --> 00:04:01,615
+The S-2 LIBOR, and 
+the S-3 LIBOR rates.
+
+60
+00:04:03,892 --> 00:04:07,980
+From the T-1 LIBOR rate, 
+we then get the T-1 bond
+
+61
+00:04:09,310 --> 00:04:12,073
+and then we derive the T-2 bond
+
+62
+00:04:12,950 --> 00:04:15,625
+using this formula
+
+63
+00:04:15,930 --> 00:04:18,230
+which relates forward rates
+
+64
+00:04:19,017 --> 00:04:21,979
+to ratios of zero coupon bonds.
+
+65
+00:04:22,964 --> 00:04:25,889
+By iterative usage of this formula,
+
+66
+00:04:26,089 --> 00:04:29,852
+We eventually get the T-3, T-4, T-5
+
+67
+00:04:30,234 --> 00:04:33,122
+and T-6 zero coupon bond prices.
+
+68
+00:04:34,782 --> 00:04:38,732
+The third block contains swap
+rates
+
+69
+00:04:39,279 --> 00:04:41,117
+for 9 different lengths.
+
+70
+00:04:41,826 --> 00:04:47,464
+These swaps pay annual coupons at
+the following 30 dates.
+
+71
+00:04:50,763 --> 00:04:53,238
+The dates marked in red,
+
+72
+00:04:53,578 --> 00:04:56,428
+are the dates on which
+
+73
+00:04:57,041 --> 00:05:00,316
+the 9 swaps mature.
+
+74
+00:05:01,322 --> 00:05:05,072
+For these 9 dates, we are
+given swap rates.
+
+75
+00:05:07,469 --> 00:05:09,332
+What we will do next is
+
+76
+00:05:09,618 --> 00:05:11,993
+we will use linear interpolation
+
+77
+00:05:12,660 --> 00:05:15,273
+to get swap rates for
+the black dates
+
+78
+00:05:15,473 --> 00:05:19,223
+U-6, U-8, U-9, and so on
+and so forth.
+
+79
+00:05:21,347 --> 00:05:23,947
+We will get the swap rate for U-1
+
+80
+00:05:24,352 --> 00:05:26,940
+as shown on the following page.
+
+81
+00:05:28,087 --> 00:05:31,025
+Again we note that there is
+a maturity overlap
+
+82
+00:05:31,733 --> 00:05:35,283
+and U-1 falls between T-4 and T-5
+
+83
+00:05:36,235 --> 00:05:40,023
+which are maturity dates
+of the futures.
+
+84
+00:05:41,529 --> 00:05:45,504
+From the futures quotes, we derived
+the corresponding
+
+85
+00:05:46,450 --> 00:05:48,462
+zero coupon bond prices.
+
+86
+00:05:49,944 --> 00:05:54,069
+So we are given the T-4 bond
+and the T-5 bond prices.
+
+87
+00:05:55,177 --> 00:06:00,827
+From these, we infer the T-4 and the
+T-5 simple spot rates
+
+88
+00:06:01,324 --> 00:06:03,511
+and then we use linear interpolation
+
+89
+00:06:04,270 --> 00:06:06,632
+of these 2 simple spot rates
+
+90
+00:06:07,236 --> 00:06:10,648
+to get the simple spot rate
+with maturity U-1.
+
+91
+00:06:12,721 --> 00:06:16,084
+The simple spot rate with
+maturity U-1
+
+92
+00:06:16,904 --> 00:06:19,979
+gives us the U-1 bond price,
+
+93
+00:06:20,179 --> 00:06:23,504
+and then we can use the swap rate
+formula
+
+94
+00:06:23,987 --> 00:06:28,887
+which relates the swap rate
+for maturity U-2
+
+95
+00:06:30,380 --> 00:06:33,367
+to the U-1 and U-2 bond prices.
+
+96
+00:06:34,376 --> 00:06:37,151
+We can solve this equation
+
+97
+00:06:37,483 --> 00:06:40,358
+for the U-2 bond price
+as shown here.
+
+98
+00:06:42,033 --> 00:06:44,758
+For the remaining cash flow dates
+
+99
+00:06:45,715 --> 00:06:48,715
+we use linear interpolation
+
+100
+00:06:49,500 --> 00:06:53,100
+to obtain the corresponding
+swap rates.
+
+101
+00:06:54,910 --> 00:06:58,685
+We can then invert the swap rate
+formula
+
+102
+00:06:59,630 --> 00:07:04,517
+to derive iteratively the U-n
+bond price
+
+103
+00:07:06,837 --> 00:07:10,762
+in terms of the previous bond prices
+
+104
+00:07:11,415 --> 00:07:16,890
+and the corresponding swap rates
+as shown here.
+
+105
+00:07:18,761 --> 00:07:22,586
+We eventually obtain the U-n bond
+prices
+
+106
+00:07:22,984 --> 00:07:25,459
+for all the remaining maturities
+
+107
+00:07:26,272 --> 00:07:28,984
+n from 3 to 30.
+
+108
+00:07:30,466 --> 00:07:34,191
+Setting the initial value of the 
+discount curve equal to 1
+
+109
+00:07:35,100 --> 00:07:38,900
+we thus have constructed
+the discount curve
+
+110
+00:07:39,689 --> 00:07:42,689
+for 40 maturity time points
+
+111
+00:07:43,027 --> 00:07:45,127
+as shown here.
+
+112
+00:07:46,754 --> 00:07:49,829
+Recall that the blue maturities
+
+113
+00:07:50,029 --> 00:07:52,029
+S-1, S-2, S-3
+
+114
+00:07:53,269 --> 00:07:55,481
+correspond to the LIBOR rates.
+
+115
+00:07:56,412 --> 00:07:59,674
+The red maturities T-1 up to T-6
+
+116
+00:07:59,978 --> 00:08:02,978
+correspond to the futures rate,
+
+117
+00:08:03,664 --> 00:08:07,064
+and the green maturities U-1
+up to U-30
+
+118
+00:08:07,600 --> 00:08:10,238
+correspond to the swap rates.
+
+119
+00:08:11,493 --> 00:08:15,656
+We also see again the overlap
+of these maturity spectra.
+
+120
+00:08:17,312 --> 00:08:20,499
+The T maturities overlap
+with the S maturities
+
+121
+00:08:22,444 --> 00:08:25,619
+and the green swap maturities 
+overlap
+
+122
+00:08:25,819 --> 00:08:28,894
+with the red T maturities.
+
+123
+00:08:30,348 --> 00:08:34,123
+The figure on the left hand side
+shows us the discount curve
+
+124
+00:08:35,193 --> 00:08:37,755
+as a function of time to maturity.
+
+125
+00:08:38,633 --> 00:08:41,583
+We see that the bulk of 
+the maturity dates
+
+126
+00:08:43,047 --> 00:08:46,384
+correspond to the swap contracts.
+
+127
+00:08:47,889 --> 00:08:50,477
+If we zoom in to the first 3 years
+
+128
+00:08:50,968 --> 00:08:53,006
+this is what we see on
+the right hand side.
+
+129
+00:08:53,658 --> 00:08:56,296
+We see the short end
+of the discount curve.
+
+130
+00:08:56,937 --> 00:09:00,199
+So here we can nicely distinguish
+between
+
+131
+00:09:00,399 --> 00:09:05,124
+the LIBOR maturity dates, the futures
+reset and maturity dates,
+
+132
+00:09:05,682 --> 00:09:09,957
+and then the first cash flow dates
+of the swap contracts.
+
+133
+00:09:12,335 --> 00:09:15,960
+The figure on the left hand side
+shows 3 curves.
+
+134
+00:09:16,692 --> 00:09:19,392
+The first curve is the yield curve,
+
+135
+00:09:19,953 --> 00:09:22,228
+that corresponds to the discount
+curve.
+
+136
+00:09:23,341 --> 00:09:26,353
+The second curve is
+
+137
+00:09:27,748 --> 00:09:31,161
+the curve of simple spot rates
+
+138
+00:09:31,944 --> 00:09:35,832
+both of which look decently smooth.
+
+139
+00:09:37,145 --> 00:09:39,507
+But if we look at the forward curve,
+
+140
+00:09:41,465 --> 00:09:43,327
+this is the middle curve here,
+
+141
+00:09:44,810 --> 00:09:47,085
+we see some saw tooth.
+
+142
+00:09:48,400 --> 00:09:51,837
+If we again zoom in to the first
+3 years,
+
+143
+00:09:52,960 --> 00:09:55,347
+this is what is shown on
+the right hand side,
+
+144
+00:09:57,195 --> 00:10:00,358
+we see irregularities also showing
+up here.
+
+145
+00:10:03,581 --> 00:10:04,681
+So in sum
+
+146
+00:10:05,641 --> 00:10:08,466
+the bootstrapping gives us
+
+147
+00:10:08,986 --> 00:10:10,673
+an entire term structure
+
+148
+00:10:11,366 --> 00:10:13,766
+from relatively few instruments.
+
+149
+00:10:13,966 --> 00:10:16,853
+We had 3 LIBOR, 
+5 futures contracts,
+
+150
+00:10:17,053 --> 00:10:19,691
+and 9 swap contracts.
+
+151
+00:10:20,732 --> 00:10:24,632
+The method exactly reconstructs
+these market prices
+
+152
+00:10:25,647 --> 00:10:28,797
+and this is desirable for interest
+rate risk management
+
+153
+00:10:28,997 --> 00:10:29,997
+and trading desks
+
+154
+00:10:30,480 --> 00:10:33,480
+because they have to marked
+to market their books.
+
+155
+00:10:34,183 --> 00:10:37,570
+But the implied forward curve
+is irregular
+
+156
+00:10:38,666 --> 00:10:41,578
+and sensitive to bond price
+variations.
+
+157
+00:10:42,499 --> 00:10:45,012
+Bootstrapping is an example
+
+158
+00:10:45,564 --> 00:10:47,952
+of an exact estimation method.
+

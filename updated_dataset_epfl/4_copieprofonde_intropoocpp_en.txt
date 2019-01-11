@@ -1,0 +1,108 @@
+When we introduced the constructors topic, we saw that these methods were so important that C++ provided a default version.
+This is the case notably with the copy constructor.
+We also saw that the default copy constructor made what is called a shallow copy, which is sufficient in most cases, but not all.
+In other cases we have to do what is called a "deep copy".
+This is the topic of this video.
+Let me remind you that in C++ there are special methods that enable an object to be initialized at the start of its life: "constructors", that copy an object into another:
+"copy constructors", or that free up resources associated with an object: "destructors".
+We will only look at the bare-bone default versions of these methods, in particular for the copy constructors.
+We saw in a previous episode on the
+"counting instances example" that the minimal default versions of the constructor and destructor methods were not always adapted to the situation.
+We also saw that when it was necessary to define one explicitly, well, we had to consider the explicit definition of all the others as well.
+We will now study another example connected to a default copy constructor that makes a shallow copy and we will see this shallow copy can cause a certain number of problems in particular when we have data members that are " pointers".
+Let's start by defining what a shallow copy does: in essence, it copies member to member each data member.
+Suppose we have our favorite class: Rectangle, and that in a code, we declare
+2 objects of type Rectangle.
+A Rectangle r1 has its width and height initialized by constructors in the class Rectangle and a 2nd object r2,
+of the same type, which we created and initialized by copying the Rectangle r1.
+Suppose that in the constructor used, the first argument corresponds to the height and the second to the width.
+Hence r1 is an object in the memory that has 2 data members, width and height, initialized like this.
+Suppose that in this class Rectangle, no copy constructor is explicitly defined, which means that the moment we execute this line, it's the default copy constructor that is called.
+If we assume that this is the data member height of r1 and this is its width, the execution of the default copy constructor will result in the creation of the rectangle r2 whose data members would have been shallow copied from those of r1.
+This means concretely that the value of the data member height of r2 will be copied from the value of the data member of the same name in r1, and likewise for the height.
+The default copy constructor therefore copies superficially, that is to say, makes a shallow copy of the data members.
+When the data members are "pointers", contrarily to the example in front of us, well, shallow copy, can then become the root of several problems, which we will now review.
+Let's take another example, that of a class Rectangle in which we have chosen to have width and height implemented with pointers that point to the values stored as doubles instead of just having doubles.
+Of course this implementation is not very smart, does not really make sense, but let's examine this simple example for the sake of illustrating our point
+The constructor of the class Rectangle is in charge of dynamically allocating memory in order to store the width and height of an instance of Rectangle.
+To recall, this expression allows memory to be allocated dynamically for a double, while the code is being executed, and to store the value "l".
+What is returned by this instruction is the address of the allocateddouble, which is stored in the "largeur" data member, which is effectively a pointer, an address.
+So by using this definition of the class Rectangle, it is possible in another part of the code to declare an initialization of a rectangle by using the provided constructor like here, the result of which corresponds to the construction of an object in the memory whose 2 data-members "largeur" and "hauteur" are addresses of doubles that point to the actuall width and height of the rectangle.
+In C++, he who allocates is responsible for deallocating.
+Here, the class Rectangle is in charge of allocating memory space when a rectangle is created.
+This class therefore, when an object ceases to exist, deallocate this space, and this is done of course by the destructors of Rectangle.
+You will also note that in this definition of the class Rectangle, the constructor is explicitly defined and the destructor is also explicitly defined but the copy constructor is not explicitly defined, which means that the default version would be used implicitly.
+Suppose now that a programmer wants to use the class Rectangle and so he defines a member function
+"afficher_largeur" (TN: means "print_width") that takes as parameter a rectangle and the goal of which it is to print the width.
+So the programmer could decide in one section of the program to declare an object of type
+Rectangle that would be created with a constructor that we presented in the last slide and then invoke the function
+"afficher_largeur" on this Rectangle to print its width.
+To recall, as we have seen, the object "r" appears like this.
+Its members "largeur" and "hauteur" are addresses that point to
+2 memory locations that contain the values for the width and the height.
+This is what is constructed when this line is executed.
+We would then also like to display the width of the new rectangle and to take this risk of getting a bad surprise.
+We might risk making the discovery
+that the object "r" was manipulated in this display.
+But what happened here, when this function "afficher_largeur", which is supposed to simply display the width of our rectangle, was run?
+If we scrutinize the header of this function, we see that the parameter, the rectangle whose value we want to display, is in fact passed "by value".
+This means concretely that when this line of code is run, the value of "r" will be copied into "tmp" because we are passing by value, and the code of this function is run on this copy "tmp".
+Who is in charge of carrying out the copy of Rectangle "r" into Rectangle "tmp"?
+Well, its indeed the copy constructor of the Rectangle class which is responsible for the copy.
+This constructor however is not defined explicitly, which means the default copy constructor is called.
+And it's this default constructor that makes a shallow copy.
+So, at the execution of this line of code, an object "tmp" will be created from the object "r" by copying it with the default copy constructor.
+This means that "tmp" will appear like this.
+The default constructor copies member to member the values of the different data members.
+Suppose that the 1st attribute contains the value "addresse1", and the 2nd "addresse2".
+If they are copied shallow, which means concretely that the 2 fields of the object "tmp" point to the same memory location as those of the object "r".
+The body of the function "afficher_largeur" can be executed of course, because in the object "tmp" we can access through the pointer to the width field "largeur" which is the same as that of "r" and in this case it displays the desired values.
+However, farther along, things don't go as well.
+Indeed, the parameter "tmp" in the function "afficher_largeur" is a local object in the function and which cannot be used outside of the function.
+This means that when we finish executing the function "afficher_largeur", this object "tmp" is not needed anymore, and so the destructor will automatically be invoked on "tmp".
+To recall, the destructor of the class
+Rectangle was responsible for deallocating the memory space associated with the object's data members.
+So in our example, this means that the moment the function "afficher_largeur" has finished executing, the destructor is invoked on the object "tmp" which will deallocate memory associated with its data members.
+Unfortunately however, the memory deallocated in the destruction of "tmp" is the same as that pointed to by the object "r", which still exists even after
+"afficher_largeur" has finished running!
+In reality, there is no reason why printing the width of a rectangle should cause the destruction of the memory associated with that rectangle!
+However, this is nevertheless what happens here, and this means very concretely, that we we are using the rectangle here to carry out its manipulation, which in principle, should not have been obstructed by the getting its width before.
+Well, we are actually working with a corrupted object because the memory associated with it was deallocated.
+To summarize our example, calling the function "afficher_largeur" by passing as parameter a rectangle "r" results in "r" being copied "tmp" with passing by value.
+When the function "afficher_largeur" finishes executing,
+"tmp", being used locally, is destroyed automatically by a destructor of the class Rectangle.
+This destructor will free the memory pointed to by the fields width and height of "tmp" which is the same memory, as that pointed to by the width and height of "r".
+In this way, using "r" after having invoked the function "afficher_largeur" exposes us to several dangers.
+We can see the contents of "r" eradically change, we can risk exposing ourselves to a "segmentation fault", for instance if the object "r" is destructed afterwards.
+The corruption of "r" following the destruction of the object "tmp" is closely related to the fact that these 2 objects refer to the same memory location, though this shouldn't be the case.
+"r" and "tmp" point to the same memory because as we have seen before,
+"tmp" was the result of a "shallow copy".
+To avoid this problem, the copy should do what we call a "deep copy", which doesn't simply copy the addresses, but rather copies what the addresses point to.
+This means that we don't want there to be a link between "tmp" and the memory pointed to by "r".
+We want to instead create from "r" an object "tmp" that points to a separate memory location, and that would have the same values as the original object, "r".
+In this way, the destruction off "tmp", at the end of the execution of the function "afficher_largeur", would only affect the fields pointed to by "tmp" and therefore would not modify those pointed to by "r", which could safely continue to be used .
+The default copy constructor, that only makes a memberwise copy, is not adapted.
+We therefore need to redefine the copy constructor by ourselves so that it makes a deep copy that copies the memory pointed to.
+So we want the constructor to duplicate the memory pointed to by a rectangle "r" whose data members point to doubles.
+We want the copied object "tmp" to be completely independent whose data member values are new addresses pointing to doubles of the same value as those of the original object "r".
+Thus the copy being completely independent of the original object, its destruction would have no incidence on the original object.
+The copy constructor should therefore be written as to duplicate the locations pointed to.
+Creating a copy "tmp" of the object "r" by using this copy constructor is equivalent to the following situation the memory: the object "tmp" would have a field width,
+"largeur", whose value would be a new address, the address of a newly allocated object.
+Thus the contents referenced to would be obtained by copying what the original object pointed to and likewise for the height
+"hauteur".
+So if we want to analyse this more closely,
+"obj" is the object we wish to make a copy of, this expression "obj.largeur" will give us the value of the address, the value pointed to by the address, which corresponds to the value pointed to by the original object.
+The instruction "new double" allocates a new memory location for the field "largeur" whose value is that of the original object.
+So here is how we should rewrite this class Rectangle so as to avoid problems associated with shallow copying when data-members are pointers.
+We have seen that a constructor that takes care of allocating memory and a destructor that deallocates are not enough, but but that we have to also define a copy constructor that makes a deep copy, one that doesn't simply copy addresses, but duplicates the memory pointed to.
+Strictly speaking, we should also redefine the assignment operator, "operator=", which, as we have seen in previous episodes, is closely related to the copy constructor.
+The default version of the "operator=" in effect also makes a shallow copy.
+Thus, if we do not define it correctly, we expose ourselves to the same problems as forgetting to correctly redefine the copy constructor.
+So, here is the approach to a class that has data members that are pointers.
+Remember the deep copy and at least ask yourself:
+"Do I have to redefine the copy constructor in order that it makes a copy of the memory space pointed to, or not?"
+If we redefine the copy constructor, also think about the overload of the assignement operator, "operator=", that also has to be defined appropriately.
+And when we make a deep copy, we frequently have to use new memory space and in this case, also think about modifiying the destructor.
+Finally, a small reminder when we redefine the copy constructor in the context of a inheritance relationship, that is, in a subclass.
+Make sure that the subclass copy constructor invokes the superclass copy constructor, otherwise it's the default constructor of the superclass that is called, which can cause the program to act strangely.

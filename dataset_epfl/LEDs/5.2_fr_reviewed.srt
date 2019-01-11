@@ -1,0 +1,713 @@
+1
+00:00:00,025 --> 00:00:10,025
+[AUDIO_VIDE]
+
+2
+00:00:11,860 --> 00:00:16,740
+Bonjour, la leçon que nous allons
+étudier s'intéresse aux timers.
+
+3
+00:00:16,740 --> 00:00:20,620
+Au cours de cette leçon, nous verrons
+comment est géré le temps dans les
+
+4
+00:00:20,620 --> 00:00:26,650
+applications des micro contrôleurs, puis
+l'étude de la structure interne du timer
+
+5
+00:00:26,650 --> 00:00:32,330
+nous permettra de comprendre le rôle,
+et le fonctionnement, du bloc prédivision,
+
+6
+00:00:32,330 --> 00:00:35,880
+du registre de comparaison
+et de la logique de gestion.
+
+7
+00:00:37,605 --> 00:00:40,575
+Nous ferons une mise en œuvre
+des timers sur les MSP430,
+
+8
+00:00:40,575 --> 00:00:44,065
+et les interruptions liées au timer.
+
+9
+00:00:44,065 --> 00:00:48,655
+Les enseignes et afficheurs à LED,
+comme beaucoup d'applications des micro
+
+10
+00:00:48,655 --> 00:00:53,863
+contrôleurs, nécessitent une gestion
+complexe et précise du temps.
+
+11
+00:00:53,863 --> 00:00:58,130
+Gérer ce temps,
+en utilisant uniquement que
+
+12
+00:00:58,130 --> 00:01:03,250
+les instructions du processeur,
+s'avère une tâche bien difficile.
+
+13
+00:01:03,250 --> 00:01:08,580
+Heureusement, des circuits spécialisés,
+comme les timers, peuvent nous aider.
+
+14
+00:01:08,580 --> 00:01:13,200
+Nous avons vu, dans le chapitre de la
+modulation des largeurs d'impulsions,
+
+15
+00:01:13,200 --> 00:01:17,740
+que ce schéma nous permet
+de générer un signal, PWM.
+
+16
+00:01:17,740 --> 00:01:24,530
+En effet, le compteur binaire, modulo 256,
+est cadencé par cette horloge.
+
+17
+00:01:24,530 --> 00:01:30,550
+À chaque passage du
+compteur à la valeur zéro,
+
+18
+00:01:30,550 --> 00:01:35,550
+la bascule de sortie, PWM, est mise à, 1.
+
+19
+00:01:35,550 --> 00:01:42,970
+Lorsque le contenu du compteur est égal
+au contenu du registre de comparaison,
+
+20
+00:01:42,970 --> 00:01:48,190
+la sortie de la bascule,
+PWM, est mise à, zéro.
+
+21
+00:01:48,190 --> 00:01:51,380
+Nous voyons bien que l'élément central
+
+22
+00:01:51,380 --> 00:01:54,940
+de ce schéma est le
+compteur binaire que voici.
+
+23
+00:01:56,510 --> 00:02:00,270
+Ce schéma indique un compteur binaire,
+modulo 2.
+
+24
+00:02:00,270 --> 00:02:06,380
+Nous remarquons que la fréquence
+de la sortie, en bleu, ici,
+
+25
+00:02:06,380 --> 00:02:12,060
+est la moitié de la fréquence à l'entrée.
+
+26
+00:02:12,060 --> 00:02:16,650
+Nous avons donc une division de fréquence.
+
+27
+00:02:16,650 --> 00:02:22,160
+Si nous associons trois compteurs
+binaires, modulo 2, comme indiqué
+
+28
+00:02:23,630 --> 00:02:27,820
+sur ce schéma,
+nous ferons un compteur, modulo 8.
+
+29
+00:02:27,820 --> 00:02:29,880
+Le diagramme du temps
+
+30
+00:02:30,970 --> 00:02:35,770
+montre que nous avons en sortie
+des fréquences sous multiples.
+
+31
+00:02:36,980 --> 00:02:39,440
+Ici, nous aurons une fréquence, F zéro,
+
+32
+00:02:39,440 --> 00:02:43,880
+divisé par deux, F zéro, divisé par
+quatre, F zéro, divisé par huit.
+
+33
+00:02:43,880 --> 00:02:49,240
+F zéro, étant la fréquence du signal
+d'entrée sur le premier compteur.
+
+34
+00:02:50,240 --> 00:02:53,420
+Cette figure nous présente la
+structure interne d'un timer.
+
+35
+00:02:54,510 --> 00:03:00,430
+Nous avons le compteur binaire,
+modulo n, le bloc prédivision,
+
+36
+00:03:01,610 --> 00:03:05,490
+la logique des gestions,
+et le registre de comparaison.
+
+37
+00:03:06,640 --> 00:03:11,580
+Cette figure nous donne un exemple
+de la structure d'un prédiviseur.
+
+38
+00:03:11,580 --> 00:03:13,670
+Ce multiplexeur permet de choisir,
+
+39
+00:03:13,670 --> 00:03:18,350
+soit une horloge externe,
+soit l'horloge système.
+
+40
+00:03:18,350 --> 00:03:26,260
+Le compteur, modulo 8, permet d'avoir, sur
+la sortie, des fréquences sous multiples.
+
+41
+00:03:26,260 --> 00:03:31,010
+Le deuxième multiplexeur
+nous permet d'avoir,
+
+42
+00:03:31,010 --> 00:03:36,500
+sur cette sortie, une fréquence adaptée
+au problème que nous voulons résoudre.
+
+43
+00:03:36,500 --> 00:03:41,870
+Le Bit du registre d'état permet de
+commander les deux multiplexeurs.
+
+44
+00:03:43,140 --> 00:03:50,460
+Ce schéma montre que le passage du timer,
+de la valeur maximale à la valeur zéro,
+
+45
+00:03:50,460 --> 00:03:56,600
+provoque sur cette ligne un front montant,
+qui met à, 1, la bascule du, Overflow.
+
+46
+00:03:56,600 --> 00:04:01,850
+L'état de la bascule du, Overflow,
+constitue le fanion de débordement.
+
+47
+00:04:01,850 --> 00:04:07,940
+Ce fanion est consigné dans l'un
+des bits du registre d'état.
+
+48
+00:04:07,940 --> 00:04:12,310
+La mise à, 1, de ce fanion peut
+provoquer une interruption,
+
+49
+00:04:12,310 --> 00:04:17,010
+si cette interruption
+a les deux autorisations,
+
+50
+00:04:17,010 --> 00:04:21,900
+l'autorisation locale, IE,
+et l'autorisation générale, GIE.
+
+51
+00:04:21,900 --> 00:04:24,630
+La valeur du registre de comparaison,
+
+52
+00:04:24,630 --> 00:04:28,850
+est en permanence comparée
+au contenu du timer.
+
+53
+00:04:29,990 --> 00:04:36,750
+En cas d'égalité, le fanion d'égalité,
+CCIFG, est mis à, 1.
+
+54
+00:04:36,750 --> 00:04:41,230
+Cet événement peut, éventuellement,
+générer une interruption,
+
+55
+00:04:41,230 --> 00:04:45,786
+si elle est localement autorisée,
+
+56
+00:04:45,786 --> 00:04:50,410
+et globalement autorisée, par le Bit, GIE.
+
+57
+00:04:50,410 --> 00:04:55,420
+Les timers ont très vite
+complété les micro processeurs.
+
+58
+00:04:55,420 --> 00:05:00,870
+En effet, dès 1981,
+Intel a mis sur le marché le célèbre 8253.
+
+59
+00:05:00,870 --> 00:05:08,350
+Nous avons également observé des
+timers très simples sur les premiers
+
+60
+00:05:09,840 --> 00:05:14,810
+micro contrôleurs PIC, mais ces
+timers très simples étaient utiles.
+
+61
+00:05:16,090 --> 00:05:21,150
+Les micro contrôleurs, AVR, nous
+proposent des timers 16 bits et 8 bits.
+
+62
+00:05:21,150 --> 00:05:26,200
+Nous retrouvons des timers 32 bits, très
+complexes, sur les micro contrôleurs, ARM.
+
+63
+00:05:27,530 --> 00:05:32,350
+Nous allons nous intéressés au timer,
+à 16 bits, du MSP430.
+
+64
+00:05:33,970 --> 00:05:37,180
+Sa structure interne dévoile quatre blocs.
+
+65
+00:05:37,180 --> 00:05:42,138
+Nous avons un bloc timer,
+et trois blocs de, capture comparaison.
+
+66
+00:05:42,138 --> 00:05:47,910
+Le bloc timer, que voici, nous présente
+
+67
+00:05:47,910 --> 00:05:53,470
+le compteur binaire, 16 bits, qui
+possède quatre modes de fonctionnement.
+
+68
+00:05:53,470 --> 00:05:57,230
+Nous pouvons choisir le mode qui nous
+sied, à l'aide de ces deux bits,
+
+69
+00:05:58,485 --> 00:06:02,915
+puis, également, choisir,
+grâce à ce multiplexeur,
+
+70
+00:06:04,085 --> 00:06:07,855
+l'une des quatre sources horloge.
+
+71
+00:06:09,535 --> 00:06:12,975
+Nous avons le choix entre
+quatre facteurs de prédivision,
+
+72
+00:06:14,175 --> 00:06:16,605
+que nous pouvons choisir grâce au Bit,
+IDx.
+
+73
+00:06:17,620 --> 00:06:23,260
+Cette ligne permet de mettre à, 1,
+le fanion de débordement de capacité.
+
+74
+00:06:24,870 --> 00:06:29,850
+Le registre de contrôle du bloc
+timer est un registre de 16 bits.
+
+75
+00:06:29,850 --> 00:06:33,510
+Nous voyons, ici,
+les deux bits qui nous permettent de
+
+76
+00:06:33,510 --> 00:06:36,817
+choisir les sources horloge, les deux bits
+qui nous permettent, également, de choisir
+
+77
+00:06:36,817 --> 00:06:38,500
+les facteurs de prédivision, nous avons
+les deux bits qui nous permettent
+
+78
+00:06:46,230 --> 00:06:51,210
+de choisir l'un des quatre
+modes de fonctionnement, et,
+
+79
+00:06:51,210 --> 00:06:54,980
+le fanion de débordement
+est sur le Bit zéro.
+
+80
+00:06:56,000 --> 00:07:01,534
+Remarquons, sur le Bit 1,
+l'autorisation d'interruption.
+
+81
+00:07:01,534 --> 00:07:04,620
+Nous proposons, dans ce programme,
+
+82
+00:07:04,620 --> 00:07:09,660
+d'utiliser les ressources que nous
+avons vues, du Bit de débordement,
+
+83
+00:07:10,670 --> 00:07:16,670
+pour allumer et éteindre une LED,
+branchée sur la ligne, P1 zéro.
+
+84
+00:07:16,670 --> 00:07:21,320
+La première instruction permet
+de désactiver le chien de garde,
+
+85
+00:07:22,620 --> 00:07:28,270
+les deux suivantes permettent
+d'utiliser une horloge de un mégahertz,
+
+86
+00:07:28,270 --> 00:07:32,450
+en orientant P1 point zéro, en sortie,
+
+87
+00:07:32,450 --> 00:07:38,270
+du moins cette instruction permet de
+fixer le mode de fonctionnement du timer,
+
+88
+00:07:38,270 --> 00:07:42,870
+par cette expression,
+nous sélectionnons les,
+
+89
+00:07:42,870 --> 00:07:47,350
+MS Clock, ici, nous choisissons
+le facteur de prédivision 8,
+
+90
+00:07:47,350 --> 00:07:52,550
+et là nous fixons le mode
+de fonctionnement continu.
+
+91
+00:07:52,550 --> 00:07:58,150
+La boucle, while, teste en
+permanence le fanion de débordement.
+
+92
+00:07:58,150 --> 00:08:03,810
+Lorsque celui-ci est à, 1, nous le
+remettons à zéro, par cette instruction,
+
+93
+00:08:03,810 --> 00:08:08,540
+et inversons l'état de la ligne,
+P1 point zéro.
+
+94
+00:08:08,540 --> 00:08:10,710
+Le bloc, capture et comparaison,
+
+95
+00:08:12,230 --> 00:08:15,630
+montre que le registre de comparaison,
+ici présenté,
+
+96
+00:08:16,830 --> 00:08:23,470
+est en permanence comparé avec le
+contenu du compteur binaire 16 bits.
+
+97
+00:08:23,470 --> 00:08:29,380
+En cas d'égalité, le fanion,
+CCIFG, est mis à, 1.
+
+98
+00:08:29,380 --> 00:08:33,030
+Il peut, éventuellement,
+générer une interruption,
+
+99
+00:08:34,380 --> 00:08:37,410
+s'il est, localement et globalement,
+autorisé.
+
+100
+00:08:39,070 --> 00:08:45,850
+Cette figure nous présente le registre de
+contrôle du bloc, capture et comparaison.
+
+101
+00:08:47,440 --> 00:08:50,780
+Nous avons, sur le Bit zéro,
+le fanion d'égalité.
+
+102
+00:08:50,780 --> 00:08:57,640
+Et sur le Bit 4,
+l'autorisation locale d'interruption.
+
+103
+00:08:57,640 --> 00:09:01,980
+À partir de ces ressources
+du registre de comparaison,
+
+104
+00:09:03,780 --> 00:09:09,010
+nous nous proposons de faire
+clignoter la LED sur P1 zéro,
+
+105
+00:09:09,010 --> 00:09:12,430
+à une fréquence précise de un mégahertz.
+
+106
+00:09:13,550 --> 00:09:18,030
+Cette instruction permet de
+charger le nombre, 62 500,
+
+107
+00:09:18,030 --> 00:09:22,500
+dans le registre de
+comparaison du canal zéro.
+
+108
+00:09:22,500 --> 00:09:28,330
+Ce nombre, 62 500,
+a été trouvé après des calculs,
+
+109
+00:09:28,330 --> 00:09:32,660
+car nous utilisons une fréquence
+système de un mégahertz,
+
+110
+00:09:32,660 --> 00:09:35,650
+et un facteur de prédivision de 8.
+
+111
+00:09:35,650 --> 00:09:42,470
+Dans la boucle, while, nous testons,
+en permanence, le fanion d'égalité.
+
+112
+00:09:44,230 --> 00:09:48,750
+Lorsque celui-ci est à, 1, nous le
+remettons à zéro, par cette instruction.
+
+113
+00:09:50,240 --> 00:09:55,170
+Ajoutons la valeur, 62 500,
+au contenu du registre de comparaison.
+
+114
+00:09:55,170 --> 00:09:59,420
+Et inversons l'état de la LED.
+
+115
+00:10:00,530 --> 00:10:04,080
+Les timers deviennent très intéressants
+lorsqu'ils sont associés aux mécanismes
+
+116
+00:10:04,080 --> 00:10:05,300
+d'interruption.
+
+117
+00:10:05,300 --> 00:10:09,910
+Plusieurs événements peuvent provoquer
+des interruptions dans les timers.
+
+118
+00:10:10,940 --> 00:10:15,610
+Nous nous intéressons à deux,
+le dépassement de capacité,
+
+119
+00:10:15,610 --> 00:10:20,626
+et l'égalité du registre de
+comparaison avec la valeur du timer.
+
+120
+00:10:20,626 --> 00:10:26,993
+Ce programme se propose de
+faire clignoter la LED,
+
+121
+00:10:26,993 --> 00:10:35,050
+branchée sur P1 zéro, cette fois-ci en
+utilisant la routine d'interruption.
+
+122
+00:10:35,050 --> 00:10:38,940
+La première ligne autorise
+localement l'interruption.
+
+123
+00:10:38,940 --> 00:10:44,090
+La deuxième ligne l'autorise également,
+mais de façon générale.
+
+124
+00:10:44,090 --> 00:10:48,750
+La routine d'interruption utilise
+le vecteur d'interruption,
+
+125
+00:10:48,750 --> 00:10:51,850
+TAIV, qui possède trois cas.
+
+126
+00:10:51,850 --> 00:10:57,480
+Le cas qui nous intéresse est le cas 10,
+qui est celui de l'Overflow.
+
+127
+00:10:57,480 --> 00:11:03,100
+Lorsque ce cas se présente, nous inversons
+par cette instruction l'état de la LED.
+
+128
+00:11:04,160 --> 00:11:08,990
+Ce programme permet de générer une
+interruption, lorsqu'il y a égalité
+
+129
+00:11:10,230 --> 00:11:14,105
+du registre de comparaison
+et du compteur 16 bits.
+
+130
+00:11:14,105 --> 00:11:17,845
+Nous autorisons localement
+l'interruption de la comparaison.
+
+131
+00:11:19,185 --> 00:11:23,415
+Autorisons de façon
+générale les interruptions.
+
+132
+00:11:23,415 --> 00:11:27,476
+La routine d'interruption, que voici,
+
+133
+00:11:27,476 --> 00:11:34,540
+ajoute ce nombre au contenu
+du registre de comparaison.
+
+134
+00:11:34,540 --> 00:11:38,820
+Notons que la boucle, while,
+ne contient aucune instruction.
+
+135
+00:11:39,950 --> 00:11:43,790
+Elle est vide, donc nous ne faisons
+rien dans le programme principal.
+
+136
+00:11:45,160 --> 00:11:50,690
+Ce dernier programme génère un signal,
+PWM, par interruption,
+
+137
+00:11:50,690 --> 00:11:54,920
+sur n'importe quelle broche
+du micro contrôleur.
+
+138
+00:11:54,920 --> 00:11:59,180
+Ce programme est constitué de
+deux routines d'interruption.
+
+139
+00:12:00,560 --> 00:12:04,100
+La première routine d'interruption,
+que nous reconnaissons ici,
+
+140
+00:12:04,100 --> 00:12:08,690
+permet de mettre à, 1,
+la sortie du signal,
+
+141
+00:12:10,150 --> 00:12:13,690
+M, lorsque le compteur passe à zéro.
+
+142
+00:12:13,690 --> 00:12:18,930
+La deuxième routine d'interruption
+remet la sortie PWM à zéro.
+
+143
+00:12:18,930 --> 00:12:24,570
+Dans cette leçon, nous avons vu
+comment est géré le temps dans
+
+144
+00:12:24,570 --> 00:12:28,710
+les applications des micro contrôleurs,
+à l'aide des timers.
+
+145
+00:12:30,160 --> 00:12:34,750
+L'étude du timer a permis de comprendre
+le rôle et le fonctionnement des
+
+146
+00:12:34,750 --> 00:12:39,900
+blocs les plus importants,
+tel que le bloc prédivision.
+
+147
+00:12:39,900 --> 00:12:44,790
+Nous avons fait une mise en
+œuvre des timers sur les MSP430,
+
+148
+00:12:44,790 --> 00:12:47,420
+et les interruptions liées aux timers.

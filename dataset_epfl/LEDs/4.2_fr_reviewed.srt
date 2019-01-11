@@ -1,0 +1,558 @@
+1
+00:00:00,012 --> 00:00:06,566
+[AUDIO_VIDE]
+
+2
+00:00:06,566 --> 00:00:13,360
+[AUDIO_VIDE] Bonjour.
+
+3
+00:00:13,360 --> 00:00:16,490
+Piloter l'intensité d'une LED,
+c'est facile avec du P W M.
+
+4
+00:00:16,490 --> 00:00:19,950
+Mais qu'en est-il dans une matrice de LED?
+
+5
+00:00:19,950 --> 00:00:21,950
+Eh bien c'est ce que nous allons voir.
+
+6
+00:00:23,120 --> 00:00:28,920
+Nous allons rappeler le principe du P W M,
+mais voir aussi comment nous pouvons
+
+7
+00:00:28,920 --> 00:00:34,620
+avoir une tolérance sur la forme des
+signaux, et c'est ce qui va nous donner le
+
+8
+00:00:34,620 --> 00:00:40,520
+système B C M, Binary Coded Modulation.
+
+9
+00:00:40,520 --> 00:00:42,650
+Nous allons voir ses avantages,
+
+10
+00:00:42,650 --> 00:00:46,560
+ses limites, et nous allons voir
+comment programmer de tels signaux.
+
+11
+00:00:47,680 --> 00:00:50,670
+On se souvient de la manière
+de faire varier l'intensité
+
+12
+00:00:50,670 --> 00:00:53,460
+d'une LED avec du P W M.
+
+13
+00:00:53,460 --> 00:00:58,700
+On a donc des impulsions qui
+reviennent périodiquement mais dont la
+
+14
+00:00:58,700 --> 00:01:04,220
+longueur varie selon l'intensité
+qu'on veut donner à la LED.
+
+15
+00:01:05,330 --> 00:01:06,850
+Mais sur un afficheur matriciel,
+
+16
+00:01:06,850 --> 00:01:09,690
+l'intensité de chaque LED
+doit être indépendante.
+
+17
+00:01:09,690 --> 00:01:13,420
+Et souvent pour changer
+l'état d'une seule LED,
+
+18
+00:01:13,420 --> 00:01:16,090
+il faut renvoyer l'état de toutes les LED.
+
+19
+00:01:16,090 --> 00:01:19,950
+C'est par exemple le cas en utilisant
+des registres série parallèle.
+
+20
+00:01:20,995 --> 00:01:26,065
+Si on souhaite une certaine fréquence
+du P W M, par exemple 100 hertz,
+
+21
+00:01:26,065 --> 00:01:31,015
+et qu'on veut un certain nombre
+d'intensités pour chacune des LED,
+
+22
+00:01:32,165 --> 00:01:36,805
+il va falloir une fréquence de
+rafraîchissement de l'ensemble des LED
+
+23
+00:01:36,805 --> 00:01:42,000
+qui est la multiplication de ces
+deux nombres, par exemple 100 hertz
+
+24
+00:01:42,000 --> 00:01:47,010
+multipliés par 256 si on veut
+des intensités sur huit minutes.
+
+25
+00:01:48,040 --> 00:01:52,800
+Ça nous donne extrêmement peu de
+temps pour renvoyer l'ensemble
+
+26
+00:01:52,800 --> 00:01:55,000
+des valeurs de chaque LED.
+
+27
+00:01:56,010 --> 00:01:58,470
+On peut toutefois remarquer
+que l'intensité perçue
+
+28
+00:01:58,470 --> 00:02:02,400
+par l'oeil ne dépend pas
+de la forme du signal.
+
+29
+00:02:02,400 --> 00:02:08,970
+Ici, on a un P W M qui produit
+trois unités de temps à un,
+
+30
+00:02:08,970 --> 00:02:13,359
+sept unités de temps à zéro,
+donc on a un P W M de 30 %.
+
+31
+00:02:13,359 --> 00:02:18,810
+Eh bien ce signal-là va
+produire sur une LED
+
+32
+00:02:18,810 --> 00:02:24,670
+exactement le même effet puisqu'on
+a aussi deux plus une périodes à un,
+
+33
+00:02:25,830 --> 00:02:30,630
+cinq plus deux périodes,
+c'est-à-dire sept à zéro.
+
+34
+00:02:30,630 --> 00:02:36,650
+Et effectivement, ces deux signaux
+donnent la même impression visuelle.
+
+35
+00:02:36,650 --> 00:02:40,700
+C'est cette idée qui va
+nous conduire au B C M.
+
+36
+00:02:40,700 --> 00:02:44,415
+On va découper la période
+du signal en tranches
+
+37
+00:02:44,415 --> 00:02:49,115
+dont les durées sont les poids
+binaires de la valeur de l'intensité.
+
+38
+00:02:50,195 --> 00:02:53,105
+Prenons des intensités sur quatre bits,
+
+39
+00:02:53,105 --> 00:02:55,725
+l'intensité doit pouvoir
+varier de zéro à 15.
+
+40
+00:02:55,725 --> 00:02:59,815
+Pour l'intensité un,
+
+41
+00:02:59,815 --> 00:03:04,830
+on va activer une fois le temps.
+
+42
+00:03:04,830 --> 00:03:09,350
+Pour l'intensité deux, deux fois le temps,
+
+43
+00:03:10,450 --> 00:03:16,055
+mais décalé par rapport à
+l'apparition de ce poids.
+
+44
+00:03:16,055 --> 00:03:21,890
+Ici, quatre fois le temps.
+
+45
+00:03:21,890 --> 00:03:23,800
+Ici, huit fois le temps.
+
+46
+00:03:23,800 --> 00:03:28,910
+On a donc bien un plus deux, plus quatre,
+plus huit égal 15 unités de temps.
+
+47
+00:03:28,910 --> 00:03:35,130
+Si maintenant on prend des valeurs
+qui ont un nombre variable de bits,
+
+48
+00:03:35,130 --> 00:03:39,020
+pour zéro bit,
+la valeur est toujours à zéro,
+
+49
+00:03:39,020 --> 00:03:43,560
+pour tous les bits à un,
+le signal est en permanence à un,
+
+50
+00:03:45,390 --> 00:03:50,260
+et par exemple pour la valeur six,
+le un est à zéro, le deux est à un,
+
+51
+00:03:50,260 --> 00:03:55,740
+le quatre est à un, le huit est à zéro.
+
+52
+00:03:55,740 --> 00:04:01,020
+Pour la valeur 13, le un est à un,
+le deux est à zéro,
+
+53
+00:04:01,020 --> 00:04:03,560
+le quatre et le huit sont à un.
+
+54
+00:04:05,000 --> 00:04:12,120
+On peut donc générer l'ensemble des
+intensités à partir de ce canevas binaire,
+
+55
+00:04:13,580 --> 00:04:17,530
+d'où l'expression
+modulation codée binaire,
+
+56
+00:04:17,530 --> 00:04:22,550
+en anglais Binary Coded Modulation, B C M.
+
+57
+00:04:24,300 --> 00:04:26,770
+Prenons d'autres exemples.
+
+58
+00:04:26,770 --> 00:04:30,340
+J'ai dessiné ici trois périodes,
+chaque fois une période,
+
+59
+00:04:30,340 --> 00:04:32,690
+une deuxième, une troisième.
+
+60
+00:04:32,690 --> 00:04:37,110
+Pour la valeur cinq, on a le bit
+deux puissance zéro qui est à un,
+
+61
+00:04:37,110 --> 00:04:40,220
+le bit deux puissance un qui est à zéro,
+
+62
+00:04:40,220 --> 00:04:45,460
+le bit deux puissance deux qui est à un,
+le bit deux puissance trois qui est zéro.
+
+63
+00:04:45,460 --> 00:04:49,310
+On a donc pour chaque
+période ces deux impulsions.
+
+64
+00:04:49,310 --> 00:04:52,580
+Pour le neuf,
+
+65
+00:04:52,580 --> 00:04:56,770
+on a deux puissance zéro qui est à un,
+deux puissance trois qui est à un.
+
+66
+00:04:56,770 --> 00:05:04,600
+Il se termine ici,
+et ça c'est déjà la période suivante.
+
+67
+00:05:04,600 --> 00:05:11,190
+On a un signal rectangulaire quand bien
+même on a deux poids qui sont activés.
+
+68
+00:05:12,690 --> 00:05:15,390
+Ici pour la valeur 12,
+on a également deux poids,
+
+69
+00:05:15,390 --> 00:05:18,395
+le poids quatre et le poids
+huit qui sont activés.
+
+70
+00:05:18,395 --> 00:05:24,870
+Qu'est-ce qu'on a gagné avec
+le B C M par rapport au P W M?
+
+71
+00:05:24,870 --> 00:05:31,070
+Dans un P W M, si les LED doivent être
+rafraîchies de manière indépendante,
+
+72
+00:05:31,070 --> 00:05:37,590
+à chaque unité de temps,
+on doit rafraîchir toutes les LED.
+
+73
+00:05:37,590 --> 00:05:44,310
+Donc pour nos 16 niveaux, on devra
+envoyer 16 fois la nouvelle valeur.
+
+74
+00:05:44,310 --> 00:05:49,350
+Vous voyez qu'on prépare la valeur
+pour qu'elle soit prête au moment
+
+75
+00:05:49,350 --> 00:05:52,020
+du début de la période.
+
+76
+00:05:52,020 --> 00:05:55,200
+Dans le cas du B C M,
+au lieu de l'exécuter 16 fois,
+
+77
+00:05:55,200 --> 00:05:58,180
+on ne l'exécutera plus que quatre fois.
+
+78
+00:05:59,840 --> 00:06:03,250
+On avait deux à la puissance quatre,
+c'est-à-dire 16,
+
+79
+00:06:03,250 --> 00:06:08,400
+on n'a plus que quatre
+rafraîchissements pour le B C M.
+
+80
+00:06:08,400 --> 00:06:14,270
+A noter tout de même que le temps minimum
+entre deux rafraîchissements est le même.
+
+81
+00:06:14,270 --> 00:06:19,450
+Pour passer de cette
+valeur à cette valeur,
+
+82
+00:06:19,450 --> 00:06:22,192
+on n'a que le temps élémentaire,
+
+83
+00:06:22,192 --> 00:06:26,440
+c'est-à-dire on a la même
+contrainte que sur le P W M.
+
+84
+00:06:27,500 --> 00:06:32,620
+Mais par contre, il y a d'autres moments,
+par exemple ici, où on a du temps,
+
+85
+00:06:32,620 --> 00:06:36,450
+et ce temps libre pourra être utilisé,
+par exemple,
+
+86
+00:06:36,450 --> 00:06:40,970
+pour calculer l'état suivant des LED,
+c'est-à-dire préparer une nouvelle image.
+
+87
+00:06:42,250 --> 00:06:46,290
+Voilà un exemple de
+programmation de signaux P C M.
+
+88
+00:06:46,290 --> 00:06:51,610
+Dans le programme principal, on va mettre
+en sortie les huit broches de P 1.
+
+89
+00:06:51,610 --> 00:06:55,630
+On cherche à leur donner
+à chacune une intensité
+
+90
+00:06:55,630 --> 00:07:00,400
+donc on a huit intensités différentes,
+des intensités sur huit bits.
+
+91
+00:07:02,090 --> 00:07:06,640
+Ici j'ai mis quelques valeurs pour
+qu'on puisse voir un effet sur les LED.
+
+92
+00:07:06,640 --> 00:07:13,480
+Dans la boucle infinie du programme,
+on va avoir pour chaque période du B C M
+
+93
+00:07:15,080 --> 00:07:20,240
+les bits zéro jusqu'au bit sept.
+
+94
+00:07:20,240 --> 00:07:26,390
+Donc ici, bits souligné B C M est défini
+à huit, et pour chacun de ces bits,
+
+95
+00:07:26,390 --> 00:07:29,890
+on aura l'action sur les huit sorties,
+
+96
+00:07:32,050 --> 00:07:37,380
+si le bit correspondant est à
+un on allume, sinon on éteint,
+
+97
+00:07:37,380 --> 00:07:45,350
+et une attente produite par cette
+procédure qui se trouve ici, qui va être
+
+98
+00:07:45,350 --> 00:07:50,460
+d'une valeur une, puis deux, puis quatre,
+puis huit, puis 16, et cetera.
+
+99
+00:07:50,460 --> 00:07:57,810
+On voit qu'ici cette procédure est une
+attente active avec une variable volatile.
+
+100
+00:07:57,810 --> 00:08:02,020
+Ici, j'ai multiplié la durée par 64
+
+101
+00:08:02,020 --> 00:08:06,390
+pour avoir un temps tel que la fréquence
+globale du B C M soit acceptable.
+
+102
+00:08:09,100 --> 00:08:13,400
+Lorsqu'on a terminé un cycle,
+on va calculer les prochaines valeurs
+
+103
+00:08:13,400 --> 00:08:17,520
+d'intensités, calculer la prochaine image
+en quelque sorte, puis on peut commencer.
+
+104
+00:08:19,750 --> 00:08:21,750
+Bien évidemment ce
+programme a une faiblesse.
+
+105
+00:08:23,050 --> 00:08:26,670
+Il ne tient pas compte de la
+durée de ces instructions,
+
+106
+00:08:26,670 --> 00:08:29,990
+mais seulement de la
+durée de cette attente.
+
+107
+00:08:29,990 --> 00:08:34,620
+Et on pourra remarquer des
+imprécisions au niveau
+
+108
+00:08:34,620 --> 00:08:39,700
+visuel si on passe par
+exemple de 127 à 128.
+
+109
+00:08:39,700 --> 00:08:43,130
+On n'aura pas tout à fait quelque chose de
+
+110
+00:08:43,130 --> 00:08:46,410
+parfaitement linéaire au
+niveau de l'intensité.
+
+111
+00:08:46,410 --> 00:08:51,670
+C'est la raison pour laquelle on utilisera
+plutôt des programmes construits
+
+112
+00:08:51,670 --> 00:08:56,050
+sur les timers et les interruptions, et
+c'est un sujet que nous verrons plus tard.
+
+113
+00:08:57,090 --> 00:09:04,120
+Nous sommes donc partis du P W M et de
+la tolérance à la forme des signaux
+
+114
+00:09:04,120 --> 00:09:08,810
+pour imaginer ce système de
+modulation codée linéaire B C M.
+
+115
+00:09:08,810 --> 00:09:12,340
+Nous avons vu ses
+avantages et ses limites.
+
+116
+00:09:12,340 --> 00:09:14,150
+Nous avons vu comment la programmer.
+
+117
+00:09:14,150 --> 00:09:19,480
+Eh bien ces types de signaux sont très
+souvent utilisés pour piloter les matrices
+
+118
+00:09:19,480 --> 00:09:24,370
+de LED, en particulier des grands écrans,
+des murs de LED, des écrans géants.

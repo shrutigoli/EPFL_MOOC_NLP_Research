@@ -1,0 +1,1170 @@
+﻿1
+00:00:05,137 --> 00:00:05,962
+Hi!
+
+2
+00:00:06,161 --> 00:00:09,161
+Today I will present two tools
+we developed at the Blue Brain
+
+3
+00:00:09,356 --> 00:00:11,581
+to constrain biophysically
+detailed neuron models
+
+4
+00:00:11,766 --> 00:00:13,778
+to experimental data.
+
+5
+00:00:13,964 --> 00:00:17,214
+Namely the "E feature extraction
+library", in short eFEL
+
+6
+00:00:17,447 --> 00:00:19,434
+and BluePyOpt, which stands for
+
+7
+00:00:19,632 --> 00:00:22,632
+the "Blue Brain Python
+Optimization Library".
+
+8
+00:00:22,880 --> 00:00:25,155
+This lecture will give
+a broad overview
+
+9
+00:00:25,353 --> 00:00:27,365
+of the functionalities
+of these tools.
+
+10
+00:00:27,560 --> 00:00:30,535
+In the tutorial, later on,
+you will learn in more detail
+
+11
+00:00:30,736 --> 00:00:32,398
+how to use them.
+
+12
+00:00:32,600 --> 00:00:34,913
+The structure of this lecture
+is as follows.
+
+13
+00:00:35,111 --> 00:00:36,686
+For the eFEL I will describe
+
+14
+00:00:36,874 --> 00:00:39,874
+the goal of the software
+and show an example.
+
+15
+00:00:40,153 --> 00:00:42,315
+Regarding BluePyOpt
+I have some slides
+
+16
+00:00:42,500 --> 00:00:44,563
+explaining
+the optimization algorithm
+
+17
+00:00:44,748 --> 00:00:47,311
+some examples of how
+BluePyOpt is used
+
+18
+00:00:47,517 --> 00:00:48,917
+and how it can benefit from
+
+19
+00:00:49,122 --> 00:00:51,647
+parallelization
+on cluster computers.
+
+20
+00:00:51,853 --> 00:00:54,465
+This is a slide you have already
+seen in a previous lecture.
+
+21
+00:00:54,652 --> 00:00:57,240
+It summarizes the different
+components we use to model
+
+22
+00:00:57,432 --> 00:00:59,882
+electrical behavior of neurons.
+
+23
+00:01:00,090 --> 00:01:04,552
+In this lecture we will focus on how
+to extract features from voltage traces
+
+24
+00:01:04,754 --> 00:01:07,754
+using eFEL to constrain our models.
+
+25
+00:01:08,031 --> 00:01:12,181
+Once we have these constrains we can
+fit the densities of ion channels
+
+26
+00:01:12,380 --> 00:01:15,668
+or morphologies of the cells,
+so that the models could use
+
+27
+00:01:15,890 --> 00:01:19,190
+voltage traces that match
+the experimental data.
+
+28
+00:01:19,689 --> 00:01:21,839
+So let's start with the eFEL.
+
+29
+00:01:22,019 --> 00:01:24,982
+Here on the right,
+you see an example
+
+30
+00:01:25,174 --> 00:01:28,174
+of an experimentally recorded
+membrane voltage trace.
+
+31
+00:01:28,398 --> 00:01:32,223
+As you can see, the trace has
+five action potentials in it.
+
+32
+00:01:34,708 --> 00:01:38,008
+The "E Feature Extraction Library"
+consists of C++ code
+
+33
+00:01:38,222 --> 00:01:40,109
+with a Python wrapper
+that allows you to extract
+
+34
+00:01:40,287 --> 00:01:42,762
+important features
+from such traces.
+
+35
+00:01:43,024 --> 00:01:46,137
+These could've been recorded
+from real neurons
+
+36
+00:01:46,353 --> 00:01:49,553
+but can as well be the output
+of the electrical neuron model.
+
+37
+00:01:49,847 --> 00:01:55,022
+Examples of such features are
+the width of the action potentials
+
+38
+00:01:55,277 --> 00:01:57,077
+the amplitude of
+the action potentials
+
+39
+00:01:57,272 --> 00:02:00,472
+or, for example, the firing rate
+of the neuron.
+
+40
+00:02:00,866 --> 00:02:04,853
+The eFEL library is Open Source,
+and it's available on GitHub.
+
+41
+00:02:05,897 --> 00:02:10,097
+Here you see a practical example
+of values determined by the eFEL.
+
+42
+00:02:10,389 --> 00:02:12,339
+When asked for the mean frequency
+
+43
+00:02:12,545 --> 00:02:15,745
+which is just a number of spikes
+per second in a trace
+
+44
+00:02:15,971 --> 00:02:20,996
+the eFEL response with a value
+of around 2.5Hz.
+
+45
+00:02:21,254 --> 00:02:24,829
+I also requested the amplitude
+and the width of the spikes
+
+46
+00:02:26,055 --> 00:02:30,518
+and you see that we get
+five different values
+
+47
+00:02:31,007 --> 00:02:36,057
+for these specific amplitudes
+and for the widths of the spikes.
+
+48
+00:02:37,699 --> 00:02:40,399
+Typically the experimental data
+will consist of many neurons
+
+49
+00:02:40,606 --> 00:02:42,456
+of the similar type.
+
+50
+00:02:42,664 --> 00:02:45,664
+Many traces have been
+recorded from these neurons
+
+51
+00:02:46,053 --> 00:02:48,328
+from different protocols,
+but also repetition
+
+52
+00:02:48,524 --> 00:02:50,349
+of the same protocol.
+
+53
+00:02:50,551 --> 00:02:54,126
+The eFEL enables us to automatically
+analyze all these traces,
+
+54
+00:02:54,330 --> 00:02:58,080
+group the relevant features together,
+and calculate an experimental mean
+
+55
+00:02:58,278 --> 00:03:01,278
+and standard deviation
+for each feature.
+
+56
+00:03:02,276 --> 00:03:06,089
+We will require that the electrical
+model for a certain type of neuron
+
+57
+00:03:06,300 --> 00:03:09,950
+stays within a certain range
+of the experimental mean.
+
+58
+00:03:10,579 --> 00:03:13,254
+This is where BluePyOpt
+comes into play.
+
+59
+00:03:13,442 --> 00:03:15,254
+We have the morphology of our neuron
+
+60
+00:03:15,451 --> 00:03:17,376
+and we have the description
+of the ion channels
+
+61
+00:03:17,583 --> 00:03:20,133
+the only values that
+are very difficult to measure
+
+62
+00:03:20,315 --> 00:03:22,677
+are the densities of
+the different ion channels
+
+63
+00:03:22,886 --> 00:03:24,736
+along the dendrites.
+
+64
+00:03:25,039 --> 00:03:26,814
+BluePyOpt allows us to run
+
+65
+00:03:26,990 --> 00:03:29,140
+an evolutionary
+optimization algorithm
+
+66
+00:03:29,342 --> 00:03:32,930
+to find parameter values for our
+model so that the voltage traces
+
+67
+00:03:33,112 --> 00:03:35,662
+it generates following
+the experimental constraints
+
+68
+00:03:35,868 --> 00:03:37,481
+set by the eFEL.
+
+69
+00:03:37,694 --> 00:03:39,431
+BluePyOpt is a Python library.
+
+70
+00:03:39,622 --> 00:03:42,622
+It tires to hide the complexity
+of optimization algorithms
+
+71
+00:03:42,846 --> 00:03:46,296
+and tries to be extensible,
+so that it can be applicable
+
+72
+00:03:46,541 --> 00:03:49,541
+to a wide variety of
+neuro scientific problems.
+
+73
+00:03:49,749 --> 00:03:52,924
+In this lecture I will focus on
+how to use BluePyOpt
+
+74
+00:03:53,117 --> 00:03:56,017
+to fit electrical models
+of single cells.
+
+75
+00:03:56,206 --> 00:03:58,544
+Running such optimization
+algorithms can be
+
+76
+00:03:58,730 --> 00:04:01,030
+very computationally expensive.
+
+77
+00:04:01,220 --> 00:04:04,095
+So we also provide instructions
+together with BluePyOpt
+
+78
+00:04:04,329 --> 00:04:07,854
+on how to run this software
+on large computing resources
+
+79
+00:04:08,050 --> 00:04:09,762
+like cluster computers.
+
+80
+00:04:09,965 --> 00:04:13,015
+So we basically have two inputs
+to the evolutionary optimization
+
+81
+00:04:13,222 --> 00:04:15,460
+algorithm in BluePyOpt.
+
+82
+00:04:15,675 --> 00:04:20,450
+We have an electrical model,
+which has some three parameters.p
+
+83
+00:04:20,667 --> 00:04:23,942
+Namely the densities of ion
+channels along the morphology.
+
+84
+00:04:24,523 --> 00:04:27,985
+And we also have some
+experimental constraints
+
+85
+00:04:28,232 --> 00:04:32,332
+that were extracted from
+the experimental data using eFEL.
+
+86
+00:04:32,945 --> 00:04:36,032
+Then we run an evolutionary
+algorithm applying these
+
+87
+00:04:36,250 --> 00:04:39,250
+constraints to the model
+and we get some model parameters
+
+88
+00:04:39,513 --> 00:04:42,826
+that satisfy the constraints,
+which is on the output
+
+89
+00:04:43,019 --> 00:04:46,019
+of our BluePyOpt software.
+
+90
+00:04:46,725 --> 00:04:49,725
+The evolutionary
+algorithm works as follows.
+
+91
+00:04:49,953 --> 00:04:53,453
+We have a set of individuals
+in a population.
+
+92
+00:04:53,664 --> 00:04:56,664
+Every individual represents
+one set of parameter values
+
+93
+00:04:56,893 --> 00:04:58,168
+of the model.
+
+94
+00:04:58,357 --> 00:05:03,544
+We have an evaluation function
+that maps the parameters to
+
+95
+00:05:03,742 --> 00:05:06,255
+objective scores
+of the individual.
+
+96
+00:05:06,395 --> 00:05:08,470
+This is the part where
+the experimental constraints
+
+97
+00:05:08,575 --> 00:05:09,400
+are used.
+
+98
+00:05:09,597 --> 00:05:12,747
+The closer the model output
+matches the experimental data
+
+99
+00:05:12,959 --> 00:05:15,284
+the better the objective score.
+
+100
+00:05:15,887 --> 00:05:19,112
+We start the algorithm by
+creating an initial population
+
+101
+00:05:19,333 --> 00:05:21,496
+of random individuals.
+
+102
+00:05:21,745 --> 00:05:24,220
+The parameters of these
+individuals are randomly selected
+
+103
+00:05:24,423 --> 00:05:27,423
+with bounds specified
+for every parameter.
+
+104
+00:05:27,925 --> 00:05:32,075
+Now the algorithm evaluates
+every individual in the population
+
+105
+00:05:33,455 --> 00:05:36,655
+so that all the individuals
+get objective scores.
+
+106
+00:05:36,851 --> 00:05:40,888
+Based on these scores, a ranking
+is created in the population
+
+107
+00:05:41,110 --> 00:05:44,847
+and the best individuals
+are selected as parents.
+
+108
+00:05:45,100 --> 00:05:49,500
+The Crosser operator then
+is used to create children
+
+109
+00:05:49,745 --> 00:05:51,257
+from these parents.
+
+110
+00:05:51,443 --> 00:05:53,881
+This is done in a way so that
+the parameters of the children
+
+111
+00:05:54,086 --> 00:05:56,223
+are the combination of the parents.
+
+112
+00:05:56,408 --> 00:05:59,408
+And the mutation operator
+is applied to the children
+
+113
+00:05:59,633 --> 00:06:03,470
+to create some extra jitter,
+and this new offspring
+
+114
+00:06:03,664 --> 00:06:06,376
+it forms is put together
+with the parents
+
+115
+00:06:06,586 --> 00:06:09,036
+and it creates
+a new population.
+
+116
+00:06:09,219 --> 00:06:12,144
+The individuals in the population
+are evaluated again
+
+117
+00:06:12,345 --> 00:06:14,883
+and a new iteration starts.
+
+118
+00:06:15,951 --> 00:06:18,726
+So basically, we have a model
+that creates better and better
+
+119
+00:06:18,910 --> 00:06:21,022
+parameter sets over time.
+
+120
+00:06:21,221 --> 00:06:24,121
+The algorithm keeps on
+repeating and repeating itself
+
+121
+00:06:24,332 --> 00:06:27,882
+in cycles until
+a certain stop criteria is met.
+
+122
+00:06:28,243 --> 00:06:32,330
+We can then use the best individuals
+as parameters for our model.
+
+123
+00:06:32,664 --> 00:06:35,664
+To implement the evolutionary
+algorithm BluePyOpt uses
+
+124
+00:06:35,840 --> 00:06:38,190
+under the hood DEAP library.
+
+125
+00:06:38,387 --> 00:06:42,949
+DEAP stands for the Distributed
+Evolutionary Algorithms in Python.
+
+126
+00:06:43,197 --> 00:06:45,672
+More specifically,
+we use an algorithm called
+
+127
+00:06:45,859 --> 00:06:50,147
+Indicator Based Evolutionary
+Algorithm, or IBEA
+
+128
+00:06:50,352 --> 00:06:53,052
+which we implemented
+in the DEAP framework.
+
+129
+00:06:53,246 --> 00:06:55,496
+An advantage of
+this specific algorithm
+
+130
+00:06:55,676 --> 00:06:58,238
+is that it is multi objective,
+which means that
+
+131
+00:06:58,440 --> 00:07:02,453
+it sees different objective scores
+as different orthogonal dimensions.
+
+132
+00:07:03,016 --> 00:07:06,429
+It tires to spread the solutions
+it finds as much as possible
+
+133
+00:07:06,617 --> 00:07:09,617
+on fronts of this multi
+dimensional space
+
+134
+00:07:09,881 --> 00:07:13,556
+so that we get a high
+diversity of solutions.
+
+135
+00:07:14,582 --> 00:07:17,095
+Like the eFEL,
+BluePyOpt is available
+
+136
+00:07:17,285 --> 00:07:20,110
+as an Open Source
+library on GitHub.
+
+137
+00:07:20,324 --> 00:07:21,999
+Now, let me give you two examples
+
+138
+00:07:22,184 --> 00:07:24,509
+to illustrate the workings
+of BluePyOpt.
+
+139
+00:07:24,719 --> 00:07:27,119
+The first example is something
+that will probably not be used
+
+140
+00:07:27,312 --> 00:07:30,750
+in the real world, but it helps
+to explain the different concepts
+
+141
+00:07:30,981 --> 00:07:33,044
+used in BluePyOpt.
+
+142
+00:07:33,233 --> 00:07:36,058
+So we have a single
+compartmental model
+
+143
+00:07:36,258 --> 00:07:37,721
+which has two parameters.
+
+144
+00:07:37,946 --> 00:07:40,996
+One for the maximum
+conductance of the Sodium
+
+145
+00:07:41,178 --> 00:07:44,178
+and one for the maximum
+conductance of the Potassium.
+
+146
+00:07:44,475 --> 00:07:46,925
+What we want to achieve is
+to find parameter values
+
+147
+00:07:47,147 --> 00:07:50,847
+for this model, so that they are
+constrained by two objectives.
+
+148
+00:07:51,045 --> 00:07:54,732
+We inject two different
+current injections
+
+149
+00:07:54,995 --> 00:08:02,095
+in our cell and we check for every
+step how many spikes are generated.
+
+150
+00:08:02,322 --> 00:08:03,272
+For the lower step
+
+151
+00:08:03,465 --> 00:08:06,440
+we want the model to
+fire one action potential
+
+152
+00:08:06,726 --> 00:08:10,539
+and for the higher step, we want
+to have five action potentials.
+
+153
+00:08:10,989 --> 00:08:13,189
+When feeding this problem
+into BluePyOpt
+
+154
+00:08:13,375 --> 00:08:19,475
+it finds good solutions very quickly
+within a couple of generations.
+
+155
+00:08:20,174 --> 00:08:23,174
+On this slide you see a plot
+of the solutions base generated
+
+156
+00:08:23,407 --> 00:08:25,007
+by this example.
+
+157
+00:08:25,217 --> 00:08:29,292
+on the X and Y axis are the values
+of the two parameters.
+
+158
+00:08:29,541 --> 00:08:33,779
+The maximum conductances
+of sodium and potassium.
+
+159
+00:08:34,446 --> 00:08:39,533
+The core map shows how will
+each pair of parameter values
+
+160
+00:08:39,739 --> 00:08:41,777
+match with our objectives.
+
+161
+00:08:42,001 --> 00:08:44,426
+The lower the value,
+the better.
+
+162
+00:08:44,645 --> 00:08:48,007
+So blue colors represent
+very good solutions.
+
+163
+00:08:48,223 --> 00:08:51,411
+For convenience,
+I've plotted a blue circle
+
+164
+00:08:51,636 --> 00:08:54,273
+for all the solutions
+that have a perfect score
+
+165
+00:08:54,461 --> 00:08:57,148
+which means that they have
+one spike in the first current step
+
+166
+00:08:57,330 --> 00:09:00,330
+and five spikes in the other.
+
+167
+00:09:00,524 --> 00:09:04,874
+So basically, all the solutions
+here are very good
+
+168
+00:09:05,106 --> 00:09:10,644
+and the rest of the solutions base
+is visualized by all the scores.
+
+169
+00:09:11,965 --> 00:09:14,715
+In the second example,
+I'll show an optimization
+
+170
+00:09:14,912 --> 00:09:17,100
+of a much more detailed model.
+
+171
+00:09:17,319 --> 00:09:19,131
+This is the kind of
+optimization that was used
+
+172
+00:09:19,306 --> 00:09:21,481
+to fit the Layer 5
+pyramidal cell model
+
+173
+00:09:21,658 --> 00:09:25,020
+for the Markram Et. Al. 2015
+publication that contains
+
+174
+00:09:25,207 --> 00:09:29,595
+the description of a reconstruction
+of a neo-cortical microcircuit.
+
+175
+00:09:29,805 --> 00:09:33,143
+What you see here is a detailed
+morphological reconstruction
+
+176
+00:09:33,338 --> 00:09:35,575
+of a pyramidal cell.
+
+177
+00:09:35,961 --> 00:09:39,949
+BluePyOpt will need to search
+for densities of ion channels
+
+178
+00:09:40,132 --> 00:09:43,132
+along the morphology in
+four different zones.
+
+179
+00:09:43,319 --> 00:09:47,719
+We have the Apical and Basal
+dendrites, and we also have
+
+180
+00:09:47,929 --> 00:09:50,929
+the Soma and the Axon.
+
+181
+00:09:51,261 --> 00:09:54,074
+Only the first initial
+segment of the axon is used.
+
+182
+00:09:54,246 --> 00:09:57,246
+This is where the spike
+initiation takes place.
+
+183
+00:09:57,732 --> 00:10:00,144
+Now we have twenty
+parameters to optimize.
+
+184
+00:10:00,337 --> 00:10:02,525
+Sixteen of these are
+maximum conductances
+
+185
+00:10:02,712 --> 00:10:04,450
+of different ion channels.
+
+186
+00:10:04,637 --> 00:10:08,199
+Every zone in the morphology
+has a different mix of ion channels.
+
+187
+00:10:10,488 --> 00:10:14,238
+Channels can also be non uniformly
+distributed within one zone.
+
+188
+00:10:14,449 --> 00:10:18,249
+There are another four parameters
+controlling the dynamics of
+
+189
+00:10:18,444 --> 00:10:22,094
+the internal calcium of the neuron.
+
+190
+00:10:22,545 --> 00:10:25,682
+The constraints are taken
+from three somatic recordings
+
+191
+00:10:25,911 --> 00:10:28,911
+each with a different
+current amplitude.
+
+192
+00:10:29,429 --> 00:10:32,292
+We have recorded these
+experimental traces from
+
+193
+00:10:32,477 --> 00:10:36,927
+five different individual
+pyramidal cells.
+
+194
+00:10:37,163 --> 00:10:40,225
+The constraints we use are
+an average of some features
+
+195
+00:10:40,459 --> 00:10:42,484
+over these traces.
+
+196
+00:10:42,743 --> 00:10:46,031
+We also have dendritic constraints
+in a form of back-propagating
+
+197
+00:10:46,260 --> 00:10:47,735
+action potential.
+
+198
+00:10:47,908 --> 00:10:52,308
+We stimulate the soma
+and we record at two different
+
+199
+00:10:52,504 --> 00:10:55,679
+locations this back-propagating
+action potential.
+
+200
+00:10:56,681 --> 00:11:01,368
+The values we took from literature
+constrain this shape of
+
+201
+00:11:01,559 --> 00:11:05,146
+the back-propagating action
+potential in width and in height.
+
+202
+00:11:06,589 --> 00:11:09,739
+Both for our model and experiment
+we extract from these somatic
+
+203
+00:11:09,913 --> 00:11:15,776
+and dendritic recordings using
+the eFEL, a total of 35 e-features.
+
+204
+00:11:16,279 --> 00:11:19,142
+By comparing these to
+the experimental mean
+
+205
+00:11:19,359 --> 00:11:22,384
+and standard deviation,
+we can calculate the score
+
+206
+00:11:22,596 --> 00:11:24,746
+for every objective.
+
+207
+00:11:25,337 --> 00:11:29,750
+By dividing the value by
+the experimental standard deviation
+
+208
+00:11:29,933 --> 00:11:33,920
+we make sure that all the objectives
+have the same scale.
+
+209
+00:11:34,133 --> 00:11:40,170
+In this plot, the 35 objectives
+are shown along the Y axis.
+
+210
+00:11:40,367 --> 00:11:45,929
+The X axis shows
+the score of each objective.
+
+211
+00:11:46,189 --> 00:11:49,901
+The goal of the optimization
+algorithm is to find a parameter set
+
+212
+00:11:50,103 --> 00:11:53,453
+which minimizes
+all these objectives.
+
+213
+00:11:54,869 --> 00:11:59,357
+The X axis basically translates to,
+when I record an e-feature
+
+214
+00:11:59,563 --> 00:12:02,800
+from the model output,
+how many experimental
+
+215
+00:12:03,011 --> 00:12:06,536
+standard deviations is my model
+away from the experimental mean
+
+216
+00:12:06,729 --> 00:12:10,804
+which is basically shown
+here by this equation.
+
+217
+00:12:11,737 --> 00:12:14,425
+Here you see the results
+of the optimization.
+
+218
+00:12:14,613 --> 00:12:18,563
+On the left we have the evolution
+of the total objective value
+
+219
+00:12:18,769 --> 00:12:21,607
+so that's the sum of all
+the objective scores
+
+220
+00:12:21,800 --> 00:12:24,125
+over the consecutive generations:
+
+221
+00:12:24,328 --> 00:12:27,578
+both of the best
+individual of the population
+
+222
+00:12:27,769 --> 00:12:31,494
+and of the average
+in the populations.
+
+223
+00:12:31,715 --> 00:12:35,240
+On the right, you see the traces
+generated by the solution with
+
+224
+00:12:35,427 --> 00:12:38,364
+the lower score in dark blue.
+
+225
+00:12:38,587 --> 00:12:42,475
+The light blue traces
+that are shown behind the dark blue
+
+226
+00:12:42,753 --> 00:12:44,853
+are the best ten individuals
+
+227
+00:12:45,018 --> 00:12:50,180
+or, this is what we call in
+our software, the hall of fame.
+
+228
+00:12:50,403 --> 00:12:53,765
+Evaluation a detailed biophysical
+neuron model can be
+
+229
+00:12:53,953 --> 00:12:56,315
+computationally very expensive.
+
+230
+00:12:56,504 --> 00:13:01,066
+You really have to do it many times,
+during your evolutionary algorithm.
+
+231
+00:13:01,372 --> 00:13:05,072
+Luckily all these evaluations
+are computationally independent
+
+232
+00:13:05,297 --> 00:13:08,071
+So we can easily panelize them.
+
+233
+00:13:08,261 --> 00:13:10,723
+BluePyOpt has a built-in
+functionality to allow
+
+234
+00:13:10,933 --> 00:13:13,108
+the users to use,
+for an example
+
+235
+00:13:13,298 --> 00:13:17,673
+the Python library (INAUDIBLE)
+to run the algorithm on cluster
+
+236
+00:13:17,880 --> 00:13:20,167
+or cloud computers.
+
+237
+00:13:20,408 --> 00:13:23,358
+So in summary, I've shown
+you the eFEL library
+
+238
+00:13:23,551 --> 00:13:26,326
+which provides functionality
+to extract e-features from
+
+239
+00:13:26,511 --> 00:13:27,936
+experimental data
+
+240
+00:13:28,116 --> 00:13:29,504
+and model output;
+
+241
+00:13:29,679 --> 00:13:32,829
+and these e-features are used
+as constraints for bio-physically
+
+242
+00:13:33,029 --> 00:13:34,842
+detailed neuron models.
+
+243
+00:13:35,041 --> 00:13:37,478
+BluePyOpt uses there constraints
+
+244
+00:13:37,673 --> 00:13:40,073
+in an evolutionary
+optimization algorithm
+
+245
+00:13:40,240 --> 00:13:44,365
+to find suitable parameter sets
+for such models.
+

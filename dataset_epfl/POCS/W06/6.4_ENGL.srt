@@ -1,0 +1,1148 @@
+1
+00:00:04,468 --> 00:00:05,667
+Welcome back!
+
+2
+00:00:05,667 --> 00:00:08,282
+In this module, we'll talk
+about a class of systems
+
+3
+00:00:08,282 --> 00:00:13,401
+that apply redundancy in order to achieve
+"good enough" levels of availability,
+
+4
+00:00:13,510 --> 00:00:16,568
+without necessarily being viewed
+as fault tolerant.
+
+5
+00:00:16,930 --> 00:00:21,664
+So, if you remember our discussion
+of tandem in the nonstop operating system
+
+6
+00:00:21,664 --> 00:00:24,766
+and the use of process pairs,
+we saw a systematic discipline,
+
+7
+00:00:24,766 --> 00:00:27,168
+in which we applied redundancy
+both in hardware
+
+8
+00:00:27,168 --> 00:00:31,166
+and between applications
+in order to create a fault tolerant system
+
+9
+00:00:31,585 --> 00:00:35,997
+Now that level of availability is required
+for a certain class of application,
+
+10
+00:00:35,997 --> 00:00:39,800
+but it's not necessarily necessary
+for all possible class of applications.
+
+11
+00:00:40,331 --> 00:00:42,547
+As a matter of fact, you can actually 
+create a spectrum
+
+12
+00:00:42,547 --> 00:00:46,764
+and define the operating point 
+of various systems based on their use.
+
+13
+00:00:47,361 --> 00:00:50,169
+And this is sort of an illustrated view
+of that spectrum
+
+14
+00:00:50,169 --> 00:00:53,295
+from the lowest levels
+of required availability
+
+15
+00:00:53,295 --> 00:00:56,134
+to the highest possible levels
+of fault tolerance.
+
+16
+00:00:56,830 --> 00:00:59,997
+And the tandem example
+actually falls most closely
+
+17
+00:00:59,997 --> 00:01:03,109
+into the category that today
+we would call carrier-grade,
+
+18
+00:01:03,109 --> 00:01:06,831
+or at least that the networking industry
+would call carrier-grade today.
+
+19
+00:01:07,231 --> 00:01:11,301
+And that is a term that describes systems
+that have no single point of failure
+
+20
+00:01:11,301 --> 00:01:13,898
+and upgrade themselves
+without service interruption
+
+21
+00:01:13,898 --> 00:01:17,320
+and can recover from failures quickly,
+including software failures.
+
+22
+00:01:18,640 --> 00:01:20,330
+Now the tandem servers
+were often used
+
+23
+00:01:21,060 --> 00:01:23,695
+to create fault tolerant transaction
+processing systems
+
+24
+00:01:24,195 --> 00:01:26,043
+and used process pairs.
+
+25
+00:01:26,075 --> 00:01:29,229
+And today's carrier-grade routers
+have very similar design patterns
+
+26
+00:01:29,229 --> 00:01:33,148
+to ensure that they never fail
+and they never lose a networking state
+
+27
+00:01:33,148 --> 00:01:35,264
+in the case of component failures.
+
+28
+00:01:37,301 --> 00:01:39,966
+But there are actually
+very different design points.
+
+29
+00:01:39,966 --> 00:01:43,134
+Now, first there are systems
+that are not just fault tolerant,
+
+30
+00:01:43,134 --> 00:01:45,739
+but additionally what we call
+dependable.
+
+31
+00:01:46,230 --> 00:01:48,767
+And these are the systems
+that our lives depend on.
+
+32
+00:01:48,767 --> 00:01:51,200
+Not our digital lives,
+but our actual lives.
+
+33
+00:01:51,601 --> 00:01:54,261
+And that actually suit
+different sets of assumptions,
+
+34
+00:01:54,261 --> 00:01:57,133
+unlike the Telecon model,
+which must live on forever,
+
+35
+00:01:57,256 --> 00:02:01,565
+dependable systems often have a built-in
+concept of a maintenance window,
+
+36
+00:02:01,565 --> 00:02:04,360
+rather than the concept
+of in-server serviceability.
+
+37
+00:02:05,410 --> 00:02:08,976
+So, for example, after the airplane lands,
+you have a convenient time
+
+38
+00:02:08,976 --> 00:02:10,645
+in which you can upgrade systems.
+
+39
+00:02:10,855 --> 00:02:13,206
+You don't have to worry about doing
+a software upgrade
+
+40
+00:02:13,206 --> 00:02:15,233
+while the airplane is actually flying.
+
+41
+00:02:15,651 --> 00:02:18,616
+However, obviously none
+of the control systems on the airplane
+
+42
+00:02:18,616 --> 00:02:21,650
+should ever fail, under normal
+circumstance during the flight,
+
+43
+00:02:21,650 --> 00:02:23,592
+and the process pair methodology
+
+44
+00:02:23,592 --> 00:02:25,547
+or the end way
+modular programming
+
+45
+00:02:25,729 --> 00:02:29,949
+is often necessary in order to capture
+all the possible failure models
+
+46
+00:02:29,949 --> 00:02:31,734
+of that particular system.
+
+47
+00:02:32,712 --> 00:02:35,227
+Now at the other extreme
+of the spectrum
+
+48
+00:02:35,227 --> 00:02:37,828
+is what we would call
+a customer-grade design.
+
+49
+00:02:38,068 --> 00:02:42,073
+There the availability is often determined
+and dominated by external factors.
+
+50
+00:02:42,140 --> 00:02:44,512
+Take a cellphone, for example,
+I used before.
+
+51
+00:02:44,512 --> 00:02:48,400
+The operational assumption is that it
+will be subject to temperature variations,
+
+52
+00:02:48,400 --> 00:02:49,894
+humidity, bacteria,
+
+53
+00:02:49,894 --> 00:02:53,832
+downloads of dubious applications,
+frequent synchronization over USB ports,
+
+54
+00:02:54,372 --> 00:02:56,598
+a high probability of theft or loss,
+
+55
+00:02:56,978 --> 00:02:59,374
+and the possibility that it gets run over
+by a truck.
+
+56
+00:02:59,914 --> 00:03:01,166
+And you think about it,
+
+57
+00:03:01,166 --> 00:03:03,593
+cellphone designs have worked out
+many of these assumptions
+
+58
+00:03:03,593 --> 00:03:04,998
+into their model,
+
+59
+00:03:05,508 --> 00:03:07,605
+but when it comes to faults and repair,
+
+60
+00:03:07,605 --> 00:03:11,195
+the customer-grade design point
+makes absolutely no amends.
+
+61
+00:03:11,351 --> 00:03:14,100
+It should work, and if it does not,
+just get another one.
+
+62
+00:03:14,694 --> 00:03:18,300
+Now, of course this is not acceptable
+for enterprise-grade designs,
+
+63
+00:03:18,300 --> 00:03:20,540
+products that are sold to companies.
+
+64
+00:03:20,540 --> 00:03:23,370
+And here, the computer hardware
+is designed around the notion
+
+65
+00:03:23,370 --> 00:03:27,700
+of components that are, whenever possible,
+field replaceable units.
+
+66
+00:03:27,700 --> 00:03:29,301
+Now this means that the customer
+
+67
+00:03:29,301 --> 00:03:32,268
+can directly exchange
+a faulty hardware component
+
+68
+00:03:32,268 --> 00:03:35,600
+such as a disc drive, a fan,
+or a power supply.
+
+69
+00:03:35,600 --> 00:03:38,231
+And this approach dramatically reduces
+the mean time
+
+70
+00:03:38,231 --> 00:03:42,866
+to repair of the computer system,
+and therefore improves the availability.
+
+71
+00:03:43,638 --> 00:03:47,047
+Now, generally these field-replaceable
+units are deployed themselves
+
+72
+00:03:47,047 --> 00:03:48,298
+in a redundant fashion.
+
+73
+00:03:48,298 --> 00:03:50,578
+Disc drives already together,
+fans and power supplies
+
+74
+00:03:50,578 --> 00:03:53,490
+have enough spare capacity to deal
+with the failure
+
+75
+00:03:53,490 --> 00:03:55,241
+of at least one of their components.
+
+76
+00:03:55,241 --> 00:03:58,794
+And again, this improves 
+the MTTF of the system.
+
+77
+00:03:59,661 --> 00:04:03,003
+Now this module focuses
+on the main design principles
+
+78
+00:04:03,003 --> 00:04:05,929
+to ensure enterprise-grade availability.
+
+79
+00:04:05,929 --> 00:04:08,669
+And particularly with a focus
+on the software layer
+
+80
+00:04:08,669 --> 00:04:13,436
+that can be deployed on the hardware
+of enterprise-grade servers.
+
+81
+00:04:15,794 --> 00:04:17,807
+Now, to put this further into perspective,
+
+82
+00:04:17,807 --> 00:04:20,733
+let's compare the MTTR
+of different design points.
+
+83
+00:04:21,574 --> 00:04:24,999
+In previous modules, we actually looked
+at two extremes of the spectrum
+
+84
+00:04:24,999 --> 00:04:28,701
+end way module redundancy,
+as used in digital design
+
+85
+00:04:28,701 --> 00:04:30,907
+can repair itself extremely fast.
+
+86
+00:04:30,907 --> 00:04:33,124
+Sometimes nanosecond fast.
+
+87
+00:04:33,362 --> 00:04:37,163
+At the other extreme of the spectrum,
+we saw that RAID 6 can take multiple days
+
+88
+00:04:37,163 --> 00:04:38,772
+when using SATA drives.
+
+89
+00:04:39,732 --> 00:04:42,696
+And then in discussing tandem,
+we saw that process pairs
+
+90
+00:04:42,696 --> 00:04:46,965
+can recover from software failures
+and hardware failures in milliseconds.
+
+91
+00:04:47,666 --> 00:04:51,735
+Now, the high availability design point,
+which is the focus of this module
+
+92
+00:04:52,335 --> 00:04:54,950
+is another systematic way
+to achieve fault tolerance.
+
+93
+00:04:55,870 --> 00:04:58,792
+It has a much higher MTTR
+than fault tolerance.
+
+94
+00:04:58,792 --> 00:05:01,867
+Often measured in minutes,
+sometimes hours,
+
+95
+00:05:02,277 --> 00:05:05,040
+but it can actually be deployed
+in a very simple,
+
+96
+00:05:05,040 --> 00:05:08,930
+and much simpler matter,
+than the full fault-tolerance discipline,
+
+97
+00:05:08,930 --> 00:05:10,635
+which makes it interesting.
+
+98
+00:05:12,000 --> 00:05:14,241
+Now, the basic idea is pretty simple.
+
+99
+00:05:14,241 --> 00:05:15,993
+To create a high-availability cluster,
+
+100
+00:05:15,993 --> 00:05:20,497
+you need two independent systems
+with a logically-shared storage subsystem.
+
+101
+00:05:21,270 --> 00:05:23,134
+Now, between the two servers,
+
+102
+00:05:23,134 --> 00:05:24,759
+you have a heartbeat mechanism,
+
+103
+00:05:25,411 --> 00:05:27,034
+and the heartbeat mechanism is used
+
+104
+00:05:27,034 --> 00:05:31,400
+to detect whether the other server
+is up or down and to communicate.
+
+105
+00:05:31,825 --> 00:05:33,254
+And the logically-shared disc
+
+106
+00:05:33,254 --> 00:05:37,208
+is where the shared state that is used
+by the application is actually stored.
+
+107
+00:05:37,565 --> 00:05:39,929
+So, so far this is actually
+nearly identical
+
+108
+00:05:39,929 --> 00:05:42,609
+from the fault tolerance
+transaction processing system,
+
+109
+00:05:42,609 --> 00:05:44,644
+the way the tandem engineers
+designed it.
+
+110
+00:05:45,234 --> 00:05:48,443
+The difference is in a sweeping
+simplification of the design,
+
+111
+00:05:49,193 --> 00:05:52,723
+which is to separate all durable state,
+
+112
+00:05:53,403 --> 00:05:56,603
+which is presumed to be consistently
+written on disc,
+
+113
+00:05:56,603 --> 00:05:58,863
+from the transient state
+of the application.
+
+114
+00:05:58,887 --> 00:06:01,035
+So, the durable state is on disc,
+
+115
+00:06:01,035 --> 00:06:04,397
+and the transient state is only
+within the application
+
+116
+00:06:04,397 --> 00:06:10,364
+very specifically only within
+the active application of the pair.
+
+117
+00:06:11,034 --> 00:06:14,724
+So, whereas the fault tolerant design
+aims to keep a transient state
+
+118
+00:06:14,724 --> 00:06:17,665
+of the two processes 
+in correspondence at all time,
+
+119
+00:06:17,665 --> 00:06:21,533
+the high-availability design only monitors
+the pair for help.
+
+120
+00:06:22,269 --> 00:06:23,604
+And when a fault is detected,
+
+121
+00:06:23,604 --> 00:06:25,858
+whether hardware fault
+or software fault,
+
+122
+00:06:26,058 --> 00:06:30,538
+the hot spare takes over and reinitializes
+the transaction system,
+
+123
+00:06:30,538 --> 00:06:33,319
+or the application,
+from the durable state,
+
+124
+00:06:33,319 --> 00:06:34,874
+that is, from disc.
+
+125
+00:06:34,941 --> 00:06:36,095
+So, in practice that means
+
+126
+00:06:36,095 --> 00:06:38,871
+that the hot spare must recover
+the state stored on disc
+
+127
+00:06:38,871 --> 00:06:43,094
+as if the system simply had crashed
+and was rebooting on the same machine.
+
+128
+00:06:43,970 --> 00:06:47,420
+In this case, the MTTR is dominated
+by the application recovery time.
+
+129
+00:06:48,040 --> 00:06:50,067
+For example, in the case
+of a database management system,
+
+130
+00:06:50,067 --> 00:06:52,966
+this is the time to apply 
+the redo log and the undo log
+
+131
+00:06:52,966 --> 00:06:54,500
+onto the database file.
+
+132
+00:06:56,101 --> 00:06:59,898
+Now, in the previous example, we used
+two servers and two software stocks
+
+133
+00:07:00,388 --> 00:07:02,332
+to create a high-availability cluster.
+
+134
+00:07:02,590 --> 00:07:06,962
+Now it turns out that the same methodology
+can also be applied to a single stack
+
+135
+00:07:06,962 --> 00:07:10,634
+without having to configure
+a separate operating system image,
+
+136
+00:07:10,634 --> 00:07:13,103
+an application image,
+as the backup.
+
+137
+00:07:13,576 --> 00:07:15,929
+And this is possible
+when you use virtual machines
+
+138
+00:07:15,929 --> 00:07:17,393
+to create the cluster.
+
+139
+00:07:17,629 --> 00:07:21,564
+Now, in this model, a pool of servers
+are running virtual machines.
+
+140
+00:07:21,564 --> 00:07:23,464
+And when one server fails,
+
+141
+00:07:23,464 --> 00:07:25,034
+all of its virtual machines
+
+142
+00:07:25,034 --> 00:07:27,900
+automatically restart elsewhere
+on the cluster.
+
+143
+00:07:28,629 --> 00:07:32,333
+This clustering algorithm involves
+the various hypervisor instances,
+
+144
+00:07:32,333 --> 00:07:35,598
+but each of the virtual machines
+simply restarts on a different node
+
+145
+00:07:35,598 --> 00:07:37,968
+without knowing that anything changed.
+
+146
+00:07:37,968 --> 00:07:40,437
+Now, of course, this works 
+because the virtual machines
+
+147
+00:07:40,437 --> 00:07:42,416
+are stored on a shared storage device
+
+148
+00:07:42,416 --> 00:07:46,565
+and the state of the virtual machine
+is fully-encapsulated and portable.
+
+149
+00:07:46,986 --> 00:07:50,700
+And again, as in the previous example,
+we're making the simplifying assumption
+
+150
+00:07:51,180 --> 00:07:54,099
+that the disc subsystem itself
+is always up.
+
+151
+00:07:54,510 --> 00:07:57,840
+And that it is a logically-shared,
+accessible component.
+
+152
+00:07:58,491 --> 00:08:00,464
+In other words,
+so far we've been concentrating
+
+153
+00:08:00,464 --> 00:08:02,114
+on server failures.
+
+154
+00:08:02,114 --> 00:08:04,965
+Now, of course, we know
+that this can be a problem too.
+
+155
+00:08:05,985 --> 00:08:07,841
+That's actually not a limitation.
+
+156
+00:08:07,841 --> 00:08:10,330
+Simply because you can easily
+combine clustering,
+
+157
+00:08:11,270 --> 00:08:13,173
+which guarantees
+the availability of servers,
+
+158
+00:08:13,173 --> 00:08:16,000
+with replication of the storage
+subsystem itself.
+
+159
+00:08:16,870 --> 00:08:18,274
+And here's actually an example
+
+160
+00:08:18,274 --> 00:08:22,139
+of how you would deploy financial
+trading systems today in real life.
+
+161
+00:08:22,559 --> 00:08:24,633
+This is actually a very hard
+and constrained problem
+
+162
+00:08:24,633 --> 00:08:27,529
+since the system must ensure
+high availability,
+
+163
+00:08:27,529 --> 00:08:30,865
+must be resilient to any possible
+component failure, software failure,
+
+164
+00:08:31,645 --> 00:08:35,698
+and, in addition, must deal with the case
+where the entire system fails,
+
+165
+00:08:35,698 --> 00:08:38,483
+including the case
+where the entire building fails.
+
+166
+00:08:38,483 --> 00:08:41,535
+And, of course, this issue became a front
+and center problem
+
+167
+00:08:41,535 --> 00:08:43,962
+on September 11th in 2001.
+
+168
+00:08:44,023 --> 00:08:46,874
+And since then the financial industry
+has more or less figured out
+
+169
+00:08:46,874 --> 00:08:50,564
+a standard way to answer this problem,
+in part through regulation.
+
+170
+00:08:50,897 --> 00:08:54,463
+It's no longer sufficient to keep
+the database in one storage array,
+
+171
+00:08:54,463 --> 00:08:57,594
+but instead you need to have two
+identical copies
+
+172
+00:08:57,594 --> 00:09:01,958
+that must be, at all times, kept in sync
+on two different storage arrays.
+
+173
+00:09:02,396 --> 00:09:04,895
+And this is called the synchronous
+storage replication model
+
+174
+00:09:04,895 --> 00:09:06,402
+between two storage arrays.
+
+175
+00:09:06,752 --> 00:09:08,267
+It's actually a very stringent requirement
+
+176
+00:09:08,267 --> 00:09:10,634
+since it requires the copy
+of each disc write
+
+177
+00:09:10,924 --> 00:09:15,135
+must be written to both locations
+before the disc write is returned
+
+178
+00:09:15,135 --> 00:09:18,100
+to the server with a successful
+completion message.
+
+179
+00:09:18,633 --> 00:09:21,737
+In that model, by the way,
+the primary and the backup servers
+
+180
+00:09:21,737 --> 00:09:23,236
+are also in the two locations,
+
+181
+00:09:23,236 --> 00:09:26,596
+so the high-availability cluster
+actually stretches the two buildings
+
+182
+00:09:27,366 --> 00:09:30,668
+in the same way that the storage cluster
+stretches two buildings.
+
+183
+00:09:31,304 --> 00:09:34,305
+And while I go into details,
+distance matters a great deal here.
+
+184
+00:09:34,305 --> 00:09:35,332
+It's not--
+
+185
+00:09:35,532 --> 00:09:37,166
+It has to be sufficiently distant
+
+186
+00:09:37,746 --> 00:09:40,663
+that a major disaster will not affect
+both locations.
+
+187
+00:09:40,994 --> 00:09:43,682
+It has to also be sufficiently close
+to each other
+
+188
+00:09:43,682 --> 00:09:45,963
+not to impact the latency
+of disc transactions.
+
+189
+00:09:46,873 --> 00:09:49,201
+And then there's a bigger issue
+associated with partitioning,
+
+190
+00:09:49,201 --> 00:09:51,929
+which is why these deployments
+are usually done
+
+191
+00:09:51,929 --> 00:09:53,789
+on dedicated fiber-optic connections
+
+192
+00:09:53,789 --> 00:09:57,006
+that are redundantly deployed
+between the two data centers.
+
+193
+00:09:57,006 --> 00:09:58,406
+And in this picture, by the way,
+
+194
+00:09:58,406 --> 00:10:00,385
+which I found on some
+commercial presentation,
+
+195
+00:10:00,385 --> 00:10:02,299
+even shows a third copy of the data.
+
+196
+00:10:02,299 --> 00:10:05,169
+This time only with asynchronous
+replication requirement.
+
+197
+00:10:05,169 --> 00:10:08,764
+This is typically used for analytics
+as well as archiving purposes.
+
+198
+00:10:10,483 --> 00:10:13,061
+Let's actually go back
+to our MTTR spectrum.
+
+199
+00:10:13,527 --> 00:10:15,484
+We've just spent this module so far
+
+200
+00:10:15,484 --> 00:10:18,771
+covering the high-availability
+point of the spectrum.
+
+201
+00:10:18,771 --> 00:10:20,915
+And if you recall the sweeping
+simplification,
+
+202
+00:10:20,915 --> 00:10:24,061
+of the basis of high-availability
+clustering
+
+203
+00:10:24,061 --> 00:10:26,860
+is the separation between durable
+and transient state.
+
+204
+00:10:27,774 --> 00:10:31,383
+This principle is that the system
+can recover from durable state alone
+
+205
+00:10:32,203 --> 00:10:34,465
+and therefore, let's not keep
+any additional state
+
+206
+00:10:34,465 --> 00:10:36,467
+to make recovery faster.
+
+207
+00:10:36,954 --> 00:10:40,165
+Now, unfortunately this has
+a very significant implication
+
+208
+00:10:40,165 --> 00:10:41,669
+on the MTTR.
+
+209
+00:10:42,209 --> 00:10:45,197
+There's actually another point
+in the timeline spectrum,
+
+210
+00:10:45,677 --> 00:10:48,406
+which is called
+Recovery-Oriented Computing.
+
+211
+00:10:48,467 --> 00:10:52,631
+And the ground-breaking research
+result in Recovery-Oriented Computing
+
+212
+00:10:52,631 --> 00:10:54,351
+are due to our own George Candea,
+
+213
+00:10:54,351 --> 00:10:57,727
+and you'll actually read about this
+in the paper this week.
+
+214
+00:10:59,211 --> 00:11:01,443
+So, the key observation behind
+Recovery-Oriented Computing
+
+215
+00:11:01,443 --> 00:11:05,933
+is that MTTF is due to many things,
+hardware, software, environment,
+
+216
+00:11:05,933 --> 00:11:10,086
+of which we can actually address many
+by simply throwing money at the problem.
+
+217
+00:11:10,536 --> 00:11:15,928
+But software reliability remains a problem
+in particular it impacts the recovery time
+
+218
+00:11:16,518 --> 00:11:20,029
+especially if you use the classic
+high-availability cluster methodology
+
+219
+00:11:20,029 --> 00:11:22,367
+with its sweeping simplification.
+
+220
+00:11:22,956 --> 00:11:26,329
+So, Recovery-Oriented Computing
+and the use of micro-reboots
+
+221
+00:11:26,329 --> 00:11:28,298
+addresses this very specific topic
+
+222
+00:11:28,298 --> 00:11:30,393
+and I hope you enjoy
+the paper this week.
+
+223
+00:11:31,332 --> 00:11:32,934
+So, it's time to summarize.
+
+224
+00:11:33,142 --> 00:11:34,248
+In this short module,
+
+225
+00:11:34,248 --> 00:11:37,100
+we've covered the concept of building
+a high-availability cluster
+
+226
+00:11:37,100 --> 00:11:39,173
+for solutions that need
+to be "good enough"
+
+227
+00:11:39,173 --> 00:11:42,228
+for enterprise grade level availability.
+
+228
+00:11:42,319 --> 00:11:45,777
+And that can be done with the hot spare,
+and a sweeping simplification
+
+229
+00:11:45,777 --> 00:11:47,724
+to only focus on durable state.
+
+230
+00:11:47,999 --> 00:11:50,972
+There's another sweeping 
+simplification in this design,
+
+231
+00:11:50,972 --> 00:11:52,137
+which I hope you appreciate,
+
+232
+00:11:52,137 --> 00:11:56,284
+is that we have access to a shared
+logical disc between multiple points
+
+233
+00:11:56,284 --> 00:11:59,023
+and that disc actually serves
+as the arbiter
+
+234
+00:11:59,023 --> 00:12:01,603
+for the ownership of the disc,
+
+235
+00:12:01,603 --> 00:12:04,899
+and to determine which
+the primary application actually is.
+
+236
+00:12:05,187 --> 00:12:09,134
+We covered how different ways in which
+we can apply the cluster methodology,
+
+237
+00:12:09,134 --> 00:12:12,433
+either by having two software stacks
+on two physical servers,
+
+238
+00:12:12,433 --> 00:12:14,721
+or one software stack
+and a virtual machine
+
+239
+00:12:14,721 --> 00:12:17,162
+running on a cluster of hypervisors.
+
+240
+00:12:17,396 --> 00:12:19,504
+And then lastly, we've put this
+all in perspective
+
+241
+00:12:19,504 --> 00:12:21,800
+on the MTTR time spectrum,
+
+242
+00:12:21,800 --> 00:12:24,366
+introducing the concept
+of Recovery-Oriented Computing,
+
+243
+00:12:24,366 --> 00:12:28,603
+which lands between fault tolerance
+and high-availability clusters.

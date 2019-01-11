@@ -1,0 +1,92 @@
+In this video, we discuss multiversion concurrency control which is yet another concurrency control for achieving serializability.
+So the basic idea is that you can have multiple versions of objects that means we create copies when we need them to be able to make sure that there is an appropriate copy version for each relevant transaction still alive in the system, so that transactions can find the object it needs.
+So in this way, we can basically create something like efficient snapshots of the databases as itâ€™s also needed, necessary, inside the optimistic concurrency control.
+So we will have in channel a version pool and the versions are chained so that the new versions chain backwards to the older versions and we can find which older versions exist.
+And there is a main segment that tells me about what the current versions of DB objects is for new transactions.
+Each version of an object has again a timestamp, a write timestamp and a read timestamp just as in timestamp concurrency control.
+Transactions are classified either as readers or writers.
+The readers can only read.
+The writers can read and write.
+And the transaction has to be declaring its start time whether is a reader or a writer.
+The fact is just simply that if you know that a transaction will never write, we can deliver it more efficiently.
+And in particular, readers are always allowed to proceed, while in general, sometimes we might have to terminate and restart writers or block them.
+The protocol again is somewhat complicated and weâ€™re going to discuss the cases of readers and writers individually.
+A reader transaction works as follows.
+For each object to be read, it finds the newest version in the version pool with the write timestamp of that object being less than our timestamp.
+That means, assuming that we want to read this object, weâ€™re not going to update its write timestamp and weâ€™re going to find the newest write timestamp of any transaction that is older than my transaction.
+Again, as in timestamp concurrency of control protocols, weâ€™re going to try to serialize the transactions by transaction timestamp.
+That means we want to serialize them in such a way that an older transaction is serialized before a new transaction.
+And of course in a serial orders transaction, my transaction can only read older transactionâ€™s output.
+I will never have to read my own transactionâ€™s output because Iâ€™m not a writer.
+So Iâ€™m reading the most recent all the transactions write.
+And you have to have such an object in the database.
+For a writer transaction, reading works just as for reader transactions.
+And to write we find the newest version of the object such that its write timestamp is less than timestamp of the transaction.
+And if the read timestamp of the object is less than the timestampâ€™s transaction, we make a copy of that object with the write timestamp of this copy being the timestamps of the transaction.
+That means you create a new version especially for that transaction and potentially later transactions, newer transactions that might also want to read it.
+The read timestamp is also going to be the timestamp of the transaction.
+And otherwise, if the condition read timestamp of the object is not less than the timestamp of the transaction, we have to reject the write.
+Now letâ€™s go over an example.
+Weâ€™ve got two transactions here,
+T1 and T2.
+T1 starts by reading A.
+Then T2 reads B.
+Then T1 writes B.
+And finally T2 writes A.
+The two objects A and B have initial read and write timestamps zero.
+Thatâ€™s my initial version of the database.
+And the version zero of the database has two values for A and B,
+15 and six let's say.
+So we start by reading A.
+What does this involve?
+We are going to look up the newest value for A whoâ€™s timestamp is older than transaction T1.
+Thatâ€™s of course value 15 in V0.
+Weâ€™re going to update the read timestamp to one.
+Next weâ€™re going to try to read B.
+For that we look for the newest version of the database for this object that is older than the two which is also V0.
+So we get value six.
+And we have to update the read timestamp to two.
+Next weâ€™re trying to write B.
+So there we make a comparison between the transactionâ€™s timestamp one and the read timestamp of B which is two.
+According to the rules we had on the previous slide, weâ€™re not allowed to do this write because weâ€™re going to try backdate this write.
+We are trying to write to an object while we already have read from an object that should have been newer.
+And this object didnâ€™t exist.
+That means the read of B in the two should have read this value that weâ€™re now going to write.
+We didnâ€™t do this, so weâ€™re not allowed to do this.
+That means weâ€™re not allowed to perform this operation and we will exit this transaction.
+Now letâ€™s look at the second example.
+This is the same example again.
+Letâ€™s modify this by say, writing B here and reading B here instead.
+So weâ€™ve reordered the second and third operation giving them to the different transactions.
+Now letâ€™s start again.
+Weâ€™re going to first read A and weâ€™re allowed to do this.
+Weâ€™re reading the initial value, 15.
+And weâ€™re going to update the read timestamp of A to one.
+Next weâ€™re going to try to write B.
+So what this take?
+Weâ€™r going to check and realize that B is still virgin.
+There is nothing done to this yet.
+We are going to be allowed to write B.
+For that, we have to create a new version.
+An object V2.
+And this value will be for B, whatever we write here.
+Letâ€™s say we write seven.
+Now we also have to update the read timestamp and the write timestamp to two.
+Next weâ€™re going to try to read B.
+Well, to read B, we have to find the oldest version of B that is newer than transaction T1.
+And thatâ€™s actually fifteen again.
+That means we read 15 again despite the fact that B has been updated, however, in a new version.
+So thatâ€™s the true value of multiversion concurrency control.
+We can deal with different versions.
+We can serialize T1 before T2.
+That was a decision we made at transaction start time by giving timestamps to the transactions.
+We can do this using versions.
+And weâ€™re allowed to continue here.
+So finally, weâ€™re going to try to write A.
+And for this we have to compare the read timestamp of A which is one with the timestamp that was action two and since two is greater than one, weâ€™re allowed to write this value here.
+Weâ€™re going to write some value, letâ€™s say 16 in version two.
+And now we can actually commit T1 before T2.
+Multiversion concurrency control in summary, is a clever way of dealing with multiple versions.
+So we can for example deal with the snapshots if you like that we also used optimistic concurrency control.
+Itâ€™s efficient. We donâ€™t copy the emptied out database, we only copy stuff that we really need to copy.
+And we have a way of keeping track of all the different versions of the objects.

@@ -1,0 +1,137 @@
+Welcome back: Nature, In Code.
+We're in Chapter 3, Lecture 15.
+This is the last lecture of Chapter 3, and in this lecture, we are going to implement the bottlenecks, population bottlenecks, in JavaScript in our simulations, and then we'll see whether the informed, or the uninformed prediction was the correct one.
+I think I have an idea, but let's go and find out.
+So this is the code as we left it last time as we developed it.
+We have here--
+We're showing the effect of population size.
+We're calculating it here with this function.
+This is what we developed in the last lecture, and this seems to work just fine.
+What we don't do at the moment though is to actually implement real bottlenecks.
+Our population size is still <i>N</i> and we never change <i>N</i>.
+We simply set it here, but we never change it.
+We never change the population size.
+So how are we going do this?
+How are we going to change the population size, and who should do that?
+Who should take the responsibility?
+Who should take care of it?
+So at the moment, the one place where the population size really matters in terms of the simulations-- that's this line here, this first line here <i>next_generation</i>, where we say we're going to draw two <i>N</i> alleles for the next generation.
+So should we do this here?
+Should we check which generation we're in, and so on?
+No, we shouldn't, I don't think so.
+<i>next_generation</i> should not care about the current time in the simulation.
+It's simply one generation.
+It should not have to care about the population size.
+So what we'll do is we'll simply now pass the population size as a parameter, so I'm going to here set up a second parameter, and I'm going to call this <i>current_N</i>, and then here, I'm simply going to say the number of draws is 2 times <i>current_N</i>.
+And so with this simple modification,
+I'm basically delegating the responsibility of this to whoever calls that function, and I'm basically saying:
+Look, you just have to pass me the population size.
+Whatever it is,
+I'm going to work with it.
+So I think that's the correct approach.
+Okay, but so now we just passed on the problem, so who should take care of setting the correct population size?
+Well, I think it should happen down here in simulation, because that's where we have our iterator, that runs for a certain number of generations, that pushes the population size into the <i>population_size</i> array, so we can later correctly calculate the effective population size, and that importantly calls the 
+<i>next_generation</i> function.
+So I think it should happen here.
+This is the right place to do it.
+So what I'm going to do is I'm going to set up here a local variable.
+I'm not going to use this anywhere outside of this function, so this can be a local variable, and I'm going to call it <i>population_size</i>.
+And I'm not going to set it to any particular value,
+I'm just going to define it for the time being.
+And now, down here in the loop where we run the generations, here I could now assign a value to this population size.
+So what I'm gonna do here is
+I'm gonna say <i>population_size</i> equals, for example, <i>N</i> .
+Now this will be true most of the time, but other times we want to set it to 10.
+So, before I do this, what we now have to do is we have to push this <i>population_size</i> variable into the <i>population_sizes</i> array, and when we call <i>next-generation</i> we have to pass this variable as an argument, because that's--
+We just recalled, we just modified this function here.
+It's expecting now the current population size that is stored in <i>population_size</i>.
+So this variable <i>population_size</i> contains the current population size.
+Now if we would just leave it at that, this would still work, but we wouldn't have bottlenecks and also it would be kind of silly to have this additional variable when we already have <i>N</i>.
+But of course what we want to do is we want to implement a bottleneck, and so I'm going to do this here, and I'm now going to replace this line with the following, and you should just follow me and type with me, and I'm going to explain in a minute how this works.
+So what I'm going to say is that
+<i>if (i%10 ==</i> and you should use the double equal, because this is an equality condition here, if this equals 9, then we're going to set the <i>population_size</i> to 10.
+So this is the bottleneck.
+And if that's not the case, so <i>else</i>, then we're going to set it to <i>N</i>.
+So this <i>population_size</i>, that is the normal <i>population_size</i> that we defined up there in the variables.
+And so most of the time, this will be true, but every tenth generation, this will be true.
+And so now we're really working with a real bottleneck, because we're setting this <i>population_size</i> occasionally to 10. and then we're pushing this into the <i>population_sizes</i> array, and we're passing it to the <i>next_generation</i> function.
+Now this, of course, here is the money line, this is where we check whether it's the tenth generation, and I'll talk in a bit about how this works.
+Let's just go and see what the dynamics now are.
+So we're going to save this, and we're going to go over to the browser, and we're going to reload, and now we have a drum roll, and <i>boom!</i> - 92 is indeed the effective population size.
+So this is calculated now on the fly with our effective
+<i>population_size</i> function, and as you can also see when you reload this, the dynamics here now really look like a constant population of 92.
+It doesn't all look like a constant population size of 901, so the informed prediction was, not surprisingly, the correct one.
+It is really the harmonic mean that matters, and this indeed much more looks like a constant population size of 92.
+So this population, even though it has an average population size of 901, from a genetic perspective it behaves like a population of 92 individuals.
+And if you now take a look at what's happening here, you can gain a lot of insights.
+The first thing that you immediately recognize is that you have these jumps, jumps or quick falls, but these happen now every tenth generation, and this is of course exactly when the population bottlenecks occur.
+This is when the population size gets reduced to 10 individuals; when you have only 10 individuals genetic drift will be very strong.
+And so this is reflected here in these huge jumps, and then in between those bottlenecks, you see of course a bit of variation.
+The population size is not huge.
+It's a thousand in these times, but you don't have these kinds of jumps.
+But it's the jumps now that are completely determining the dynamics of these simulations.
+So, to bring this home even more strongly, let's go back to the code, and let's set <i>N</i>, so the population size normally, outside of the bottlenecks, to 100,000.
+So we're going to increase this now by a factor 100.
+Correspondingly, the average population size would increase by something a little less than 100.
+But we now have an average population size of roughly 90,000 individuals over an entire simulation.
+But if we reload this, and this is going to take a few seconds, it looks like this.
+I think this is quite beautiful, because here, first of all, you see the effective population size is only 100.
+Why is that?
+Well again because what really matters--
+I mean it barely moved, right?, from 92 up to 100-- because what really matters are these bottlenecks.
+In the harmonic mean, the small numbers matter much more than the large numbers, and so this is exactly what's happening here.
+This population, even though on average you have something like
+90,000 individuals, it behaves like a population of 100.
+So you would severely overestimate the population size, and therefore underestimate the effects of genetic drift, if you didn't know that.
+And you can see here quite nicely, also, how this works.
+Again, you get these huge jumps, and the dynamics now are completely driven by these jumps, because here in between you barely have any movement up or down.
+Certainly you cannot see this here.
+Something happens, but it's barely visible, because the effects are so small, because the population is quite large here, it's 100,000 individuals, but here in between these bottlenecks, it's only 10 individuals.
+That's why you get these jumps, and these jumps are completely determining the outcome of the simulation.
+So congratulations, if you managed to get this far!
+It's quite amazing what you're doing here: you're implementing genetic drift simulation, a stochastic simulation in JavaScript, and you've now just implemented bottlenecks showing that the effective population size is indeed given by the harmonic mean of the population sizes over time.
+That's quite an achievement.
+So congratulations, if you managed to go this far!
+Now one thing I still want to do is take a look at how this works, with this line of code that we can look at here, where we are actually determining whether it's now time for a population bottleneck.
+So how do we do this?
+Well, here we say, <i>if(i%10 == 9)</i>
+So what is this?
+Well this is the modulo operator, and the modulo operator gives you the remainder of a division, taking the integer division into account.
+So let's go to the console and take a look at how this works.
+So here in the browser,
+I'm still in Chrome, so I'm going to say
+<i>View &gt; Developer &gt; JavaScript Console</i>, to get the console.
+And so now we can work here.
+And again, the modulo operator gives you the remainder of the integer division, so <i>0%10</i>, the way to think about this is
+0 divided by 10, well that gives exactly zero, no remainder, so remainder is zero here.
+<i>1%10</i> - as an integer division, this gives you 0, with a remainder of 1.
+<i>2%10</i> - as an integer division gives you again 0 with a remainder of 2, and so on, and you can continue this up to <i>9%10</i>, this gives you 0 with a remainder of 9.
+And then finally, when you do <i>10%10</i>, this is like 10 divided by 10 is obviously 1, so no remainder here, and then <i>11%10</i> gives you 1.
+11 divided by 10 integer division gives you 1 remainder 1.
+So this now starts again, counting up from zero all the way up to 9.
+And here when you at <i>19%10</i>, then the remainder is again 9, because the result of the integer division is 1, and the remainder is 9 and so on.
+So <i>29%10</i> is also remainder 9.
+And this goes on and on and on, and that's now every 10th generation, because we start at zero, and then the 10th generation is when this remainder is 9.
+And so whenever the remainder is 9 then we're at the 10th generation.
+We could also have tested for whether this is actually 5, because if--
+Let me reload this here.
+If I put <i>5%</i>... sorry, <i>i</i>, so <i>i</i> being, for example, 5, then <i>%10</i>, that is remainder 5.
+And then again in 10 generations, so <i>15%10</i>, this is also 5 and so on.
+<i>25%10</i>... 5.
+So this is also always giving the same number every 10th generation, and you can do this with any single-digit number.
+You can check for equality with 3 or 8 or 7, it doesn't matter, it would still be correct.
+But what's crucial is that you do the modulo division with 10.
+I chose 9 because that's the very exact way to do this, because then you indeed have 9 generations, and then at the 10th generation, this bottleneck happens. if you had said <i>if (i%10 == 5)</i>, in the long run, you would also have been correct, that it happens every 10th generation, but the first time it would have happened would have been at the 6th-generation when <i>i == 5</i>.
+And so the first time it would not have been precisely correct, but that would have been a detail.
+It's important just that you understand how this modulo operator works.
+So this concludes this lecture, but it also concludes this chapter.
+So if you made it this far, congratulations, very well done!
+We've learned a lot in this chapter.
+It was quite rich in terms of content.
+You learned a lot about JavaScript programming, new ideas, new concepts, but you also learned about genetic drift, which really is a key idea in genetics, and evolutionary biology, more broadly.
+So in the next chapter, we're going to now move on to another of the four major forces of evolution.
+We had genetic drift so far, which is the effect of randomness due to finite population sizes, and we saw that one of the consequences would be a pretty sad one, namely that all genetic diversity would eventually get lost.
+Clearly that's not the case in the real world.
+So clearly there must be some other process that counters that.
+That process is mutation, and that's a process we'll look at in the next chapter.
+So, I'll see you in Chapter 4.

@@ -1,0 +1,2438 @@
+﻿1
+00:00:05,100 --> 00:00:07,000
+Hello. In this part of the MOOC
+
+2
+00:00:07,300 --> 00:00:08,800
+we'll talk about the case
+
+3
+00:00:09,000 --> 00:00:11,382
+when it's difficult to find
+experimental values
+
+4
+00:00:11,582 --> 00:00:12,897
+for your model parameters,
+
+5
+00:00:13,097 --> 00:00:15,922
+so, you have the problem of
+under constrained parameters
+
+6
+00:00:16,122 --> 00:00:18,522
+and we would like to
+use parameter optimization
+
+7
+00:00:18,722 --> 00:00:21,722
+in particular, meta heuristics
+such as evolutionary algorithms
+
+8
+00:00:21,922 --> 00:00:24,222
+to help us in building
+the good neuron models.
+
+9
+00:00:24,522 --> 00:00:26,822
+When you want the computer
+to help you with it
+
+10
+00:00:27,022 --> 00:00:29,116
+you have to be able
+to guide the computer
+
+11
+00:00:29,316 --> 00:00:31,513
+what is a good model
+and what is a bad model
+
+12
+00:00:31,713 --> 00:00:34,774
+and for that, you'll need some way
+of assessing the goodness
+
+13
+00:00:34,974 --> 00:00:36,074
+of fit of your model.
+
+14
+00:00:36,274 --> 00:00:38,274
+Furthermore
+We will try to make a case
+
+15
+00:00:38,474 --> 00:00:41,549
+that using multi-objective
+optimization is a good ingredient
+
+16
+00:00:41,749 --> 00:00:44,990
+to sort of expose certain trade offs
+in the parameter space
+
+17
+00:00:45,190 --> 00:00:48,818
+and we'll give you an example
+that hopefully convinces you
+
+18
+00:00:49,018 --> 00:00:51,866
+that these are useful techniques
+to help us build
+
+19
+00:00:52,066 --> 00:00:54,429
+detailed neuron models
+and of course, as always
+
+20
+00:00:54,629 --> 00:00:56,903
+there's some caveats
+you'll have to consider.
+
+21
+00:00:57,103 --> 00:00:58,103
+Let's get started.
+
+22
+00:00:58,303 --> 00:01:00,303
+In previous parts of the MOOC
+
+23
+00:01:00,503 --> 00:01:03,231
+we were talking about in-framing
+the problem by saying
+
+24
+00:01:03,431 --> 00:01:05,231
+you have a detailed
+neuron morphology
+
+25
+00:01:05,431 --> 00:01:08,131
+and you have certain
+electro physiological recordings
+
+26
+00:01:08,331 --> 00:01:10,631
+that you want to express in
+mathematical terms
+
+27
+00:01:10,831 --> 00:01:13,331
+so that you have a computational
+model of a neuron
+
+28
+00:01:13,531 --> 00:01:15,331
+that then can recreate this behavior.
+
+29
+00:01:15,531 --> 00:01:17,731
+We showed you
+there are different data sets
+
+30
+00:01:17,931 --> 00:01:20,653
+that you should consider
+when building up these models,
+
+31
+00:01:20,853 --> 00:01:23,253
+you start with morphology,
+ideally you have a list
+
+32
+00:01:23,453 --> 00:01:25,453
+and identification of ion channels
+
+33
+00:01:25,653 --> 00:01:27,853
+that are creating
+the electrical behavior,
+
+34
+00:01:28,053 --> 00:01:32,735
+possibly you have kinetic information
+about how these channels behave,
+
+35
+00:01:32,935 --> 00:01:36,060
+and ideally you have also information
+where these channels are
+
+36
+00:01:36,260 --> 00:01:39,770
+and how much of a certain channel
+is in a certain part of the dendrite.
+
+37
+00:01:39,970 --> 00:01:41,970
+As we were saying earlier
+
+38
+00:01:42,170 --> 00:01:44,907
+sort of some of these data sets
+might be easier to get
+
+39
+00:01:45,107 --> 00:01:47,957
+for the neuron of interest
+and particular other data sets
+
+40
+00:01:48,157 --> 00:01:49,857
+like for example the localization
+
+41
+00:01:50,057 --> 00:01:52,763
+and the maximum conductance
+might be less available.
+
+42
+00:01:52,963 --> 00:01:54,963
+So, when we're talking about using
+
+43
+00:01:55,163 --> 00:01:58,297
+resorting to computer based
+search techniques
+
+44
+00:01:58,497 --> 00:02:00,206
+of course in principle you could
+
+45
+00:02:00,406 --> 00:02:03,006
+you could apply them to any
+parameter in this space
+
+46
+00:02:03,206 --> 00:02:04,906
+but in particular we'll talk about
+
+47
+00:02:05,106 --> 00:02:08,006
+applying them to finding
+the right location of a channel
+
+48
+00:02:08,206 --> 00:02:10,206
+and the maximum conductance.
+
+49
+00:02:10,450 --> 00:02:12,950
+So, what to do with under
+constrained parameters?
+
+50
+00:02:13,150 --> 00:02:15,150
+Of course, the natural
+course of science
+
+51
+00:02:15,350 --> 00:02:18,250
+is that you would hope that there
+will be more experiments,
+
+52
+00:02:18,450 --> 00:02:21,500
+maybe even novel types of experiments
+that can measure aspects
+
+53
+00:02:21,700 --> 00:02:24,310
+that were previously unmeasurable
+and then, of course
+
+54
+00:02:24,510 --> 00:02:26,810
+you simply wait until this data
+becomes available
+
+55
+00:02:26,910 --> 00:02:28,110
+and then you use that data.
+
+56
+00:02:28,310 --> 00:02:31,460
+Now, if you can't wait that long,
+or essentially it is unlikely
+
+57
+00:02:31,660 --> 00:02:34,660
+that this will be done, you can
+of course resort to guessing
+
+58
+00:02:34,860 --> 00:02:36,860
+these parameters and hand tune them.
+
+59
+00:02:37,060 --> 00:02:39,460
+You can be systematic about it
+and simply sample
+
+60
+00:02:39,660 --> 00:02:43,360
+the different parameters in
+a regular fashion
+
+61
+00:02:43,489 --> 00:02:45,889
+but that might become very easily
+a large problem,
+
+62
+00:02:46,089 --> 00:02:49,389
+especially if you have many
+parameters to search for.
+
+63
+00:02:49,589 --> 00:02:52,289
+Another strategy altogether
+could be to say
+
+64
+00:02:52,489 --> 00:02:55,389
+"Well, maybe these are not all
+independent parameters
+
+65
+00:02:55,589 --> 00:02:58,889
+but maybe you can express some
+relation between two parameters"
+
+66
+00:02:59,089 --> 00:03:00,489
+For example the conductance
+
+67
+00:03:00,689 --> 00:03:02,689
+at 2 different locations
+of the dendrite
+
+68
+00:03:02,889 --> 00:03:05,789
+and instead of searching for them
+as individual parameters
+
+69
+00:03:05,989 --> 00:03:08,689
+maybe you can, again, express
+this relation in a function
+
+70
+00:03:08,889 --> 00:03:11,689
+and sort of that has less parameters
+in the first place.
+
+71
+00:03:11,889 --> 00:03:14,889
+A yet other way of thinking
+about it is that maybe
+
+72
+00:03:15,089 --> 00:03:20,389
+you can infer parameters from other
+and more easily measurable properties.
+
+73
+00:03:20,589 --> 00:03:23,189
+So, take the example
+of the ion channel conductance:
+
+74
+00:03:23,389 --> 00:03:26,289
+ultimately what it means is sort
+of how many channels are
+
+75
+00:03:26,489 --> 00:03:29,758
+in a certain unit area
+of the dendrite.
+
+76
+00:03:29,958 --> 00:03:32,472
+Now, typically you could sort of say
+
+77
+00:03:32,672 --> 00:03:35,772
+"I could count them under a microscope"
+but if you can't do that
+
+78
+00:03:35,972 --> 00:03:39,526
+why not infer at least
+the maximum bound of that value
+
+79
+00:03:39,726 --> 00:03:44,837
+by saying looking at the size
+of the ion channel complex
+
+80
+00:03:45,037 --> 00:03:48,837
+that it occupies in the surface
+and then calculate how much
+
+81
+00:03:49,037 --> 00:03:52,571
+surface you have in this part
+of the dendrite altogether
+
+82
+00:03:52,771 --> 00:03:55,562
+so at least you could infer
+how many channels maximally
+
+83
+00:03:55,762 --> 00:03:57,662
+could fit into a certain
+patch of dendrite.
+
+84
+00:03:57,762 --> 00:04:01,112
+So, while this is not giving you
+the answer of the direct parameter
+
+85
+00:04:01,312 --> 00:04:04,312
+it at least gives you an upper value
+which can be very useful.
+
+86
+00:04:04,512 --> 00:04:07,612
+So, in this spirit, of course
+you could imagine other ways
+
+87
+00:04:07,812 --> 00:04:10,612
+of inferring properties.
+But if all that doesn't help you,
+
+88
+00:04:10,812 --> 00:04:14,724
+then one possibility is to resort
+to parameter optimization.
+
+89
+00:04:15,224 --> 00:04:18,397
+Parameter optimization
+is a mathematical field
+
+90
+00:04:18,597 --> 00:04:20,897
+which you can express
+in mathematical terms
+
+91
+00:04:21,097 --> 00:04:24,876
+for example for function F of X
+which this might be the function
+
+92
+00:04:25,076 --> 00:04:29,586
+you're looking for certain X zero
+that fulfills a certain criteria
+
+93
+00:04:29,786 --> 00:04:32,586
+for example that the evaluation
+of a function at X zero
+
+94
+00:04:32,786 --> 00:04:35,286
+is the minimum for all of X,
+so, you're looking for,
+
+95
+00:04:35,486 --> 00:04:37,686
+for example,
+a global minimum of a function.
+
+96
+00:04:38,537 --> 00:04:40,837
+This is a longstanding problem
+in mathematics
+
+97
+00:04:41,037 --> 00:04:45,321
+and different large variety
+of methods have been developed
+
+98
+00:04:45,521 --> 00:04:46,821
+for solving these problems,
+
+99
+00:04:47,021 --> 00:04:50,221
+and first and foremost of course
+you have calculus based methods
+
+100
+00:04:50,421 --> 00:04:51,921
+where you can simply say
+"Ok"
+
+101
+00:04:52,121 --> 00:04:55,021
+"If I'm somewhere in this function
+I possibly can calculate"
+
+102
+00:04:55,221 --> 00:04:57,421
+"the derivative and then
+sort of, for example,"
+
+103
+00:04:57,621 --> 00:05:02,482
+"descend to local minimum, or I can
+find maybe do the second derivative"
+
+104
+00:05:02,682 --> 00:05:05,623
+"and find all my extreme
+oppositions" and so on.
+
+105
+00:05:05,823 --> 00:05:10,808
+So, if your function continues
+and has certain properties
+
+106
+00:05:11,008 --> 00:05:13,777
+you can use these
+calculus based methods.
+
+107
+00:05:13,977 --> 00:05:17,482
+Another group of methods
+
+108
+00:05:17,682 --> 00:05:20,382
+is when you can express your problem
+in different terms.
+
+109
+00:05:20,582 --> 00:05:25,485
+For example, if you can express your
+problem as a set of linear equations,
+
+110
+00:05:25,685 --> 00:05:28,485
+and then sort of express
+the constraints in the same way,
+
+111
+00:05:28,685 --> 00:05:31,585
+and then you can use a technique
+called linear programming
+
+112
+00:05:31,785 --> 00:05:34,934
+to address the optimization
+in those cases.
+
+113
+00:05:35,134 --> 00:05:38,150
+And then, more generally
+there's another class of methods
+
+114
+00:05:38,350 --> 00:05:41,126
+which fall under
+the term of "iterative methods"
+
+115
+00:05:41,326 --> 00:05:45,739
+that do less assumptions about
+the properties of the function;
+
+116
+00:05:45,939 --> 00:05:49,779
+and this is useful because in our
+case, as a matter of fact,
+
+117
+00:05:49,979 --> 00:05:53,245
+we don't want to make particular
+assumptions about our function.
+
+118
+00:05:53,445 --> 00:05:55,445
+What is our function?
+We'll come to that,
+
+119
+00:05:55,645 --> 00:05:58,645
+but ultimately this is the neuron
+model you want to evaluate
+
+120
+00:05:58,845 --> 00:06:01,888
+and it might be not fulfilling
+properties that are required
+
+121
+00:06:02,088 --> 00:06:04,488
+for calculus based methods
+or linear programming.
+
+122
+00:06:04,688 --> 00:06:07,568
+And, of course, in all of that
+is you want to do this
+
+123
+00:06:07,768 --> 00:06:10,452
+with the minimum number
+of function evaluations
+
+124
+00:06:10,652 --> 00:06:13,036
+because ultimately this
+will cost you the time
+
+125
+00:06:13,236 --> 00:06:17,101
+if you have to sort of calculate
+the function at every X
+
+126
+00:06:17,301 --> 00:06:19,301
+this might take a long time
+
+127
+00:06:19,801 --> 00:06:24,208
+A variant of parameter
+optimization is instead of
+
+128
+00:06:24,408 --> 00:06:28,853
+trying to set out to find
+the global minimum, global maximum
+
+129
+00:06:29,253 --> 00:06:32,930
+you might be able to get
+away with finding a sufficiently
+
+130
+00:06:33,130 --> 00:06:35,130
+good solution
+to an optimization problem
+
+131
+00:06:35,330 --> 00:06:38,366
+and that maybe because you have
+incomplete information about
+
+132
+00:06:38,566 --> 00:06:41,617
+the problem in the first place
+and limited computer capacity,
+
+133
+00:06:41,817 --> 00:06:43,317
+limited time, at your disposal
+
+134
+00:06:43,517 --> 00:06:46,117
+So, a metaheuristic says
+"Instead of looking for this
+
+135
+00:06:46,317 --> 00:06:49,728
+global optimum, maybe you can
+sort of have an approximation
+
+136
+00:06:49,928 --> 00:06:52,733
+or a set of reasonably
+good solutions",
+
+137
+00:06:52,933 --> 00:06:57,221
+and in that sense, the metaheuristics
+is not the categorization
+
+138
+00:06:57,821 --> 00:07:01,444
+of calculus based method
+or an intuitive method,
+
+139
+00:07:01,644 --> 00:07:04,010
+but in fact it can be
+a combination of the two,
+
+140
+00:07:04,210 --> 00:07:05,910
+and people have done and combined
+
+141
+00:07:06,110 --> 00:07:09,462
+for example, local gradient descent
+methods with global heuristics
+
+142
+00:07:09,662 --> 00:07:11,062
+such as simulated annealing.
+
+143
+00:07:11,262 --> 00:07:13,672
+And another variant
+of these metaheuristics
+
+144
+00:07:13,872 --> 00:07:18,503
+are population-based metaheuristics
+like for example swarm optimization
+
+145
+00:07:18,703 --> 00:07:22,222
+or evolutionary algorithms, where
+instead of having one search point
+
+146
+00:07:22,422 --> 00:07:26,958
+you have a multitude of search points
+and treating them at the same time.
+
+147
+00:07:28,405 --> 00:07:31,505
+The good thing about metaheuristics
+is that they make very few
+
+148
+00:07:31,705 --> 00:07:33,705
+assumptions on the
+optimization problem,
+
+149
+00:07:33,905 --> 00:07:37,540
+and essentially therefore
+can also give you approximate
+
+150
+00:07:37,740 --> 00:07:41,833
+solutions to otherwise possibly
+intractable problems.
+
+151
+00:07:42,465 --> 00:07:45,360
+But that comes with the
+down side of it, that essentially
+
+152
+00:07:45,560 --> 00:07:49,517
+they don't give you a guarantee on
+whether is a globally optimal solution
+
+153
+00:07:49,717 --> 00:07:53,832
+and they tightly and closely
+depend on the random number quality
+
+154
+00:07:54,032 --> 00:07:57,096
+you use for your
+sampling of the space.
+
+155
+00:07:57,296 --> 00:08:02,051
+So, here you just need to be wary
+that running your search algorithm
+
+156
+00:08:02,251 --> 00:08:05,030
+with different random seeds
+and good random numbers
+
+157
+00:08:05,230 --> 00:08:08,396
+is a good quality and might
+essentially be the make or break
+
+158
+00:08:08,596 --> 00:08:10,596
+when sampling a certain search space.
+
+159
+00:08:12,132 --> 00:08:15,865
+So, how would it look to use
+a metaheuristic in neuronal modeling?
+
+160
+00:08:16,065 --> 00:08:19,506
+The schema is in a way that
+you start with the model skeleton,
+
+161
+00:08:19,906 --> 00:08:22,672
+so in our case you choose
+
+162
+00:08:22,872 --> 00:08:26,279
+the formalism, like
+multi-compartment Hodgkin-Huxley,
+
+163
+00:08:26,479 --> 00:08:28,649
+and then you have for example
+the dendrite
+
+164
+00:08:28,849 --> 00:08:31,249
+you have the diameters
+you have the bifurcations...
+
+165
+00:08:31,449 --> 00:08:36,244
+So let M be the equations
+that describe the cable,
+
+166
+00:08:36,644 --> 00:08:40,425
+as well as the ion channel
+of Hodgkin and Huxley,
+
+167
+00:08:40,625 --> 00:08:43,247
+and sort of ideally when you come
+to this point
+
+168
+00:08:43,647 --> 00:08:48,698
+ywere able to fix certain
+parameters with experimental data,
+
+169
+00:08:48,798 --> 00:08:52,623
+while another set of parameters
+like this factor Pvar are now
+
+170
+00:08:52,823 --> 00:08:56,955
+the parameters you didn't constrain
+with experimental data for which
+
+171
+00:08:57,155 --> 00:08:58,622
+you would find like to find
+
+172
+00:08:58,822 --> 00:09:02,899
+a good set by using
+a parameter optimization.
+
+173
+00:09:03,099 --> 00:09:05,728
+So, then the search space
+is essentially
+
+174
+00:09:06,128 --> 00:09:09,228
+the space that's spanned by all
+these variables, and of course
+
+175
+00:09:09,428 --> 00:09:11,828
+they might not be the full
+range of real numbers,
+
+176
+00:09:12,028 --> 00:09:14,681
+but it could be for example
+in a certain interval.
+
+177
+00:09:15,603 --> 00:09:19,136
+What you then have to do
+is you create essentially
+
+178
+00:09:19,636 --> 00:09:22,413
+an initial set of samples of this
+
+179
+00:09:22,613 --> 00:09:25,863
+search space, and then
+you will evaluate
+
+180
+00:09:26,063 --> 00:09:29,350
+your model on these parameters,
+
+181
+00:09:29,550 --> 00:09:32,411
+so that for each of these
+parameter sets X I
+
+182
+00:09:32,611 --> 00:09:35,442
+you're going to evaluate
+the model equation
+
+183
+00:09:35,642 --> 00:09:37,743
+between a certain
+start time and end time.
+
+184
+00:09:38,043 --> 00:09:42,289
+You're essentially calculating,
+solving, the differential equation
+
+185
+00:09:42,489 --> 00:09:45,090
+in time for the cable equation
+and the ion channels.
+
+186
+00:09:45,290 --> 00:09:48,390
+Once you've done that, you ideally
+have some way of expressing
+
+187
+00:09:48,590 --> 00:09:51,634
+whether you like the solution or not.
+
+188
+00:09:51,834 --> 00:09:56,351
+So, you calculate a function
+of the response of the neuron,
+
+189
+00:09:56,551 --> 00:10:00,161
+and that should then allow
+you to sort that one
+
+190
+00:10:00,861 --> 00:10:04,905
+parameter point is better
+than another one.
+
+191
+00:10:05,205 --> 00:10:07,605
+So you can create a ranking
+between the different
+
+192
+00:10:07,805 --> 00:10:10,519
+points you originally started
+out with sampling.
+
+193
+00:10:11,680 --> 00:10:15,683
+And then, in order to continue
+you will retain the better ones
+
+194
+00:10:15,883 --> 00:10:19,095
+and from there generate,
+decide, where your search continues
+
+195
+00:10:19,295 --> 00:10:21,195
+with a new evaluation,
+
+196
+00:10:21,395 --> 00:10:24,762
+and you keep going until
+you hit a certain stop criteria
+
+197
+00:10:24,962 --> 00:10:27,833
+and the stop criterion
+can simply be you ran out of time,
+
+198
+00:10:28,033 --> 00:10:33,049
+or your absolute value of a metric
+reached something that is good enough,
+
+199
+00:10:33,249 --> 00:10:38,278
+or you have some other constraints
+that make you stop the search.
+
+200
+00:10:40,426 --> 00:10:44,021
+So a particular variant
+of metaheuristics are so called
+
+201
+00:10:44,221 --> 00:10:47,479
+"evolutionary algorithms", which
+are population-based metaheuristics
+
+202
+00:10:47,679 --> 00:10:49,879
+and they are called
+evolutionary algorithms
+
+203
+00:10:50,079 --> 00:10:52,579
+because they are inspired
+by biological evolution:
+
+204
+00:10:52,779 --> 00:10:56,288
+so they use terms like reproduction,
+mutation, recombination, selection,
+
+205
+00:10:56,488 --> 00:11:00,463
+and they call these points
+in the search space
+
+206
+00:11:00,663 --> 00:11:02,663
+"individuals in a population".
+
+207
+00:11:02,899 --> 00:11:05,499
+So, if you look to the right,
+this is an illustration
+
+208
+00:11:05,699 --> 00:11:09,566
+of how you can think of it
+so you have the first generation N
+
+209
+00:11:09,766 --> 00:11:12,546
+which is a pool of individuals:
+A, B, C, and D
+
+210
+00:11:12,746 --> 00:11:14,746
+and each individual has a genum
+
+211
+00:11:14,946 --> 00:11:18,676
+which encodes in genes
+different search parameters.
+
+212
+00:11:18,876 --> 00:11:21,468
+For example, these could
+be the conductances
+
+213
+00:11:21,668 --> 00:11:24,711
+of a certain type of channel
+in a certain part of the neuron.
+
+214
+00:11:25,411 --> 00:11:28,211
+With this population
+
+215
+00:11:28,411 --> 00:11:31,038
+you then generate
+and evaluate the phenotypes
+
+216
+00:11:31,238 --> 00:11:36,672
+so these channel conductances
+translate into neuron model
+
+217
+00:11:36,872 --> 00:11:38,472
+which you can evaluate over time,
+
+218
+00:11:38,672 --> 00:11:41,572
+and then, you can create
+the responses to certain stimuli
+
+219
+00:11:41,772 --> 00:11:45,090
+and with a mentioned fitness
+function, distance function
+
+220
+00:11:45,290 --> 00:11:48,690
+you might be able to rank and select
+that sort of you like solution B
+
+221
+00:11:48,890 --> 00:11:51,190
+better than A, better than C
+and better than D.
+
+222
+00:11:51,390 --> 00:11:54,472
+And with that information
+evolutionary algorithm can then say
+
+223
+00:11:54,672 --> 00:11:58,388
+"Ok, survival of the fittest:
+solutions B and A were good",
+
+224
+00:11:58,588 --> 00:12:02,085
+so you allow them to, for example,
+survive into the next generation
+
+225
+00:12:02,285 --> 00:12:04,385
+and also say "they are so good that"
+
+226
+00:12:04,585 --> 00:12:07,510
+"we allow them to mate
+and create offsprings".
+
+227
+00:12:07,710 --> 00:12:12,960
+So you essentially take
+the 2 genomes of two solutions
+
+228
+00:12:13,160 --> 00:12:15,607
+and then combine off-springs,
+
+229
+00:12:15,807 --> 00:12:19,908
+combining parts of one channel
+conductances and other
+
+230
+00:12:20,108 --> 00:12:22,526
+channel conductance from
+the other neuron model.
+
+231
+00:12:22,726 --> 00:12:26,209
+And another element could be for
+example to introduce some randomness
+
+232
+00:12:26,409 --> 00:12:28,776
+by mutating individual
+channel conductances
+
+233
+00:12:28,976 --> 00:12:30,976
+with a certain probability.
+
+234
+00:12:31,176 --> 00:12:33,689
+The whole idea of this is that
+this new generation
+
+235
+00:12:33,889 --> 00:12:37,937
+has some knowledge from
+the previous generation, in a sense
+
+236
+00:12:38,137 --> 00:12:40,662
+that sort of solutions
+that you ranked
+
+237
+00:12:40,862 --> 00:12:44,580
+good sort of are those that
+you explore further.
+
+238
+00:12:44,780 --> 00:12:48,334
+So, the idea is that you run this
+mini evolution and hope that this
+
+239
+00:12:48,534 --> 00:12:52,137
+the information about
+the individuals is guiding you
+
+240
+00:12:52,337 --> 00:12:54,337
+smartly through your search space.
+
+241
+00:12:55,819 --> 00:12:59,239
+By doing all that, of course,
+the key element is
+
+242
+00:12:59,439 --> 00:13:02,486
+"When is a model a good model?".
+So, here you have two traces,
+
+243
+00:13:02,686 --> 00:13:04,237
+a red trace and a black trace,
+
+244
+00:13:04,437 --> 00:13:08,548
+and how can you express the
+difference between these two traces?
+
+245
+00:13:09,325 --> 00:13:15,191
+So, one way is simply calculating
+a simple least square distance norm
+
+246
+00:13:15,391 --> 00:13:17,491
+where you sort of point
+by point calculate
+
+247
+00:13:17,691 --> 00:13:19,468
+the difference between the two traces
+
+248
+00:13:19,668 --> 00:13:23,099
+and that will give you an arbitrary
+unit distance of 0.3, for example.
+
+249
+00:13:23,699 --> 00:13:25,699
+When you do that, you
+have to be aware
+
+250
+00:13:25,899 --> 00:13:28,603
+that sort of that
+is possibly misleading
+
+251
+00:13:28,803 --> 00:13:31,704
+because you can find other solutions
+like the green trace
+
+252
+00:13:31,904 --> 00:13:35,029
+which has very little to do in terms
+of having spiking behavior,
+
+253
+00:13:35,229 --> 00:13:37,229
+but in terms of the metric
+
+254
+00:13:37,429 --> 00:13:41,981
+it will end up having
+the same arbitrary unit's
+
+255
+00:13:42,181 --> 00:13:46,972
+unit's distance between the red
+trace and the black from the red.
+
+256
+00:13:47,172 --> 00:13:49,172
+And this is something which
+
+257
+00:13:49,372 --> 00:13:53,985
+for the problem of using parameter
+optimization for neuronal modeling,
+
+258
+00:13:54,185 --> 00:13:56,320
+has been sort of a key challenge
+
+259
+00:13:56,520 --> 00:13:59,582
+and I think there were several
+innovations in the last years
+
+260
+00:13:59,782 --> 00:14:01,209
+that sort of addressed that.
+
+261
+00:14:01,409 --> 00:14:04,674
+But before we get there, you
+need to keep another thing in mind.
+
+262
+00:14:04,874 --> 00:14:07,024
+Sort of these two traces
+we showed you here
+
+263
+00:14:07,224 --> 00:14:11,015
+in fact are the repetitions
+of the same biological cell.
+
+264
+00:14:11,215 --> 00:14:16,077
+So, by applying the same
+stimulus to the same cell twice
+
+265
+00:14:16,277 --> 00:14:19,069
+the cell might not react
+the exact same way.
+
+266
+00:14:19,469 --> 00:14:22,469
+The reason why that is important
+when you are sort of wanting
+
+267
+00:14:22,669 --> 00:14:25,242
+to guide a computer by helping
+you find good models
+
+268
+00:14:25,442 --> 00:14:28,642
+is you need to sort of be careful
+what it is you're asking for :
+
+269
+00:14:28,842 --> 00:14:30,342
+are you really asking for that
+
+270
+00:14:30,542 --> 00:14:32,842
+you want to have an
+exact match of the red trace
+
+271
+00:14:32,942 --> 00:14:35,842
+if the cell is behaving differently
+the second time you ask it?
+
+272
+00:14:36,042 --> 00:14:38,493
+And therefore, sort of
+it might be a useful thing
+
+273
+00:14:38,693 --> 00:14:42,303
+to account for this variability
+in your search as well
+
+274
+00:14:43,617 --> 00:14:49,241
+So, a method that proved useful
+and which was described by
+
+275
+00:14:49,441 --> 00:14:51,035
+Druckmann in 2007
+
+276
+00:14:51,235 --> 00:14:55,690
+is that instead of treating
+every point of the trace equally
+
+277
+00:14:55,890 --> 00:14:58,056
+you essentially say that
+
+278
+00:14:58,256 --> 00:15:02,190
+"Maybe what is important
+for me is that a cell spikes"
+
+279
+00:15:02,390 --> 00:15:04,390
+that these spikes have
+a certain height
+
+280
+00:15:04,590 --> 00:15:08,117
+if the action potential that there
+is a certain time delay
+
+281
+00:15:08,317 --> 00:15:12,616
+to the first spike and that there
+are certain intervals between spikes.
+
+282
+00:15:12,816 --> 00:15:13,894
+So, instead of saying
+
+283
+00:15:14,094 --> 00:15:16,444
+"I need to insist on that
+this point is correct"
+
+284
+00:15:16,644 --> 00:15:20,174
+you insist that you want these
+basic features of a neuronal trace,
+
+285
+00:15:20,374 --> 00:15:22,574
+and of course, you can
+choose which features
+
+286
+00:15:22,774 --> 00:15:24,774
+you want and think are important.
+
+287
+00:15:25,061 --> 00:15:28,928
+What these features allow you
+to do is you can measure them
+
+288
+00:15:29,128 --> 00:15:31,991
+of course, not only in the model
+but you can measure them
+
+289
+00:15:32,191 --> 00:15:34,417
+in the experimental traces
+and not only once
+
+290
+00:15:34,617 --> 00:15:37,017
+but on iterations of
+the same stimulus protocol
+
+291
+00:15:37,217 --> 00:15:39,868
+so you can calculate a mean
+and a variance.
+
+292
+00:15:40,068 --> 00:15:42,168
+So, what is the mean
+action potential high
+
+293
+00:15:42,468 --> 00:15:45,010
+and what's the variance
+in the experimental trace?
+
+294
+00:15:45,210 --> 00:15:47,510
+And by then subtracting
+the experimental mean
+
+295
+00:15:47,710 --> 00:15:49,133
+from the model feature
+
+296
+00:15:49,333 --> 00:15:53,403
+and dividing it by the standard
+deviation allows you to do two things.
+
+297
+00:15:53,603 --> 00:15:56,198
+On the one hand,
+you penalize the model
+
+298
+00:15:56,398 --> 00:15:58,368
+according to experimental
+variabilities.
+
+299
+00:15:58,568 --> 00:16:01,101
+If the experimental traces
+are very well
+
+300
+00:16:01,301 --> 00:16:03,425
+constrained within
+a certain distance
+
+301
+00:16:03,825 --> 00:16:06,283
+you want the model
+to have the same property.
+
+302
+00:16:06,483 --> 00:16:09,483
+If the experimental traces is
+variable in a certain feature
+
+303
+00:16:09,683 --> 00:16:14,564
+you may not sort of care so much
+whether you hit it exactly or not.
+
+304
+00:16:15,264 --> 00:16:17,564
+And the second aspect
+of it that comes with it
+
+305
+00:16:17,764 --> 00:16:21,560
+is that suddenly the distance
+function is longer in arbitrary units,
+
+306
+00:16:21,760 --> 00:16:24,360
+but it's in the multiples
+of the standard deviation.
+
+307
+00:16:24,560 --> 00:16:28,487
+So, you can say that my model
+for this feature
+
+308
+00:16:28,687 --> 00:16:32,072
+is within one standard deviation
+of the experimental variability.
+
+309
+00:16:32,272 --> 00:16:34,832
+So, suddenly the distance
+between your model
+
+310
+00:16:35,032 --> 00:16:37,978
+and the experimental trace
+is something you can interpret.
+
+311
+00:16:39,828 --> 00:16:44,695
+Another concept that proved to be
+very useful while trying to advance
+
+312
+00:16:44,895 --> 00:16:48,178
+parameter optimization
+with neuron modeling
+
+313
+00:16:48,378 --> 00:16:50,097
+is multi-objective optimization.
+
+314
+00:16:50,297 --> 00:16:54,042
+So, we just previously described that
+sort of these different features:
+
+315
+00:16:54,242 --> 00:16:56,836
+action potential height
+and time to for spike
+
+316
+00:16:57,036 --> 00:17:00,057
+sort of are different features
+but you could now sort of say
+
+317
+00:17:00,257 --> 00:17:03,230
+"I sum it all up in one scalar
+to sort of guide my search".
+
+318
+00:17:03,530 --> 00:17:05,830
+But instead, multi-objective
+optimization says
+
+319
+00:17:06,130 --> 00:17:09,164
+"you will treat these different
+features separately
+
+320
+00:17:09,364 --> 00:17:12,550
+"you do not try to sort of trade
+them in for the other".
+
+321
+00:17:12,750 --> 00:17:17,554
+So, obviously you might have
+many features in your problem,
+
+322
+00:17:17,754 --> 00:17:20,392
+here we simply depic
+two, for simplicity,
+
+323
+00:17:20,592 --> 00:17:23,350
+and what a multi-objective
+optimization algorithm does
+
+324
+00:17:23,550 --> 00:17:25,650
+you're trying to seek for
+better solutions
+
+325
+00:17:25,850 --> 00:17:28,046
+that might exhibit trade offs.
+
+326
+00:17:28,246 --> 00:17:31,677
+So if you have different solutions
+in your search space
+
+327
+00:17:31,877 --> 00:17:34,918
+you could imagine again put here
+the action potential height
+
+328
+00:17:35,118 --> 00:17:37,118
+and here the time to first spike.
+
+329
+00:17:37,318 --> 00:17:39,118
+So, some solutions are very good:
+
+330
+00:17:39,518 --> 00:17:43,204
+they have a low distance value
+for the model to experiment
+
+331
+00:17:43,404 --> 00:17:45,304
+comparison in time to first spike,
+
+332
+00:17:45,504 --> 00:17:47,932
+but they are not very good
+in action potential height;
+
+333
+00:17:48,032 --> 00:17:50,732
+while other solutions have
+a good action potential height
+
+334
+00:17:50,932 --> 00:17:54,127
+But sort of don't fulfill your
+criterion in time to first spike.
+
+335
+00:17:54,227 --> 00:17:56,327
+and so, if you'll have
+different solutions
+
+336
+00:17:56,527 --> 00:17:59,427
+that sort of are landing
+in different parts of this space
+
+337
+00:17:59,627 --> 00:18:01,727
+and some of them you
+can clearly sort out
+
+338
+00:18:01,927 --> 00:18:03,527
+because essentially there simply
+
+339
+00:18:03,727 --> 00:18:06,227
+you have solutions that
+are better in all metrics
+
+340
+00:18:06,427 --> 00:18:09,027
+and therefore you will
+be able to remove those
+
+341
+00:18:09,227 --> 00:18:13,614
+those that are dominated by these solutions
+that are better in all features.
+
+342
+00:18:14,014 --> 00:18:16,914
+And you keep going until you end up
+
+343
+00:18:17,314 --> 00:18:22,918
+with a set of solutions that are all
+not dominating each other.
+
+344
+00:18:23,118 --> 00:18:28,522
+So what that means is that these
+solutions are... 
+
+345
+00:18:28,722 --> 00:18:33,802
+Dominance means that a solution is equal
+or better in all of its features
+
+346
+00:18:34,002 --> 00:18:36,002
+than the other solution.
+In this case
+
+347
+00:18:36,202 --> 00:18:39,225
+the solutions are actually
+better in some feature,
+
+348
+00:18:39,625 --> 00:18:41,625
+but worse in another feature
+so, in that sense
+
+349
+00:18:41,725 --> 00:18:44,387
+there is no clear decision
+that one is better than the other
+
+350
+00:18:44,887 --> 00:18:47,487
+it simply means they're
+showing different trade offs
+
+351
+00:18:47,687 --> 00:18:50,387
+and in the terminology of multi
+objective optimization
+
+352
+00:18:50,587 --> 00:18:51,887
+this is called the Pareto front.
+
+353
+00:18:52,087 --> 00:18:54,087
+This is very
+interesting scientifically
+
+354
+00:18:54,287 --> 00:18:57,187
+because what it means is that
+while you would like to be here
+
+355
+00:18:57,387 --> 00:18:59,687
+where you have a perfect
+match of your model
+
+356
+00:18:59,887 --> 00:19:01,887
+to the experimental expectations,
+
+357
+00:19:02,087 --> 00:19:04,487
+this one shows you that you
+can have one or the other
+
+358
+00:19:04,687 --> 00:19:06,887
+and it might prompt you
+to ask the question
+
+359
+00:19:07,087 --> 00:19:09,287
+whether the search space
+you've been sampling
+
+360
+00:19:09,487 --> 00:19:11,787
+is the good search space
+or maybe you should add
+
+361
+00:19:11,787 --> 00:19:13,987
+another ion channel conductance
+or maybe you need of another
+
+362
+00:19:13,987 --> 00:19:16,387
+or maybe you need another type
+of time constant in your model.
+
+363
+00:19:16,587 --> 00:19:19,869
+So, in this one, this type of using
+multi objective optimization
+
+364
+00:19:20,069 --> 00:19:23,238
+for parameter optimization
+helps you to expose that
+
+365
+00:19:23,438 --> 00:19:26,958
+the search space might not be the
+right search space in the first place
+
+366
+00:19:27,158 --> 00:19:29,058
+which you have to always keep in mind:
+
+367
+00:19:29,258 --> 00:19:33,339
+then if you model something
+it is not a given that
+
+368
+00:19:33,539 --> 00:19:37,752
+the components you put
+in your model are sufficient
+
+369
+00:19:37,952 --> 00:19:40,446
+to create the behavior
+you're actually looking for.
+
+370
+00:19:42,346 --> 00:19:45,346
+So, putting it all together using
+an evolutionary algorithm
+
+371
+00:19:45,546 --> 00:19:47,346
+with feature based metrics
+
+372
+00:19:47,546 --> 00:19:51,111
+and multi-objective optimization
+proved to be a useful
+
+373
+00:19:51,311 --> 00:19:55,668
+set of mechanisms to advance
+
+374
+00:19:56,238 --> 00:19:58,438
+the automated modeling of neurons.
+
+375
+00:19:59,084 --> 00:20:01,681
+We showed that by reverting
+back to the paper of
+
+376
+00:20:01,881 --> 00:20:03,381
+Matthew Larkum and colleagues
+
+377
+00:20:03,581 --> 00:20:05,681
+where sort of there
+is a parametal cell
+
+378
+00:20:05,881 --> 00:20:08,781
+which was recorded at different
+locations with simultaneous patchclamps
+
+379
+00:20:08,981 --> 00:20:14,183
+and sort of to the right you see
+different simulation scenarios.
+
+380
+00:20:14,383 --> 00:20:16,483
+The upper one is where
+you only stimulate
+
+381
+00:20:16,683 --> 00:20:22,320
+the distal dendritic electrode and you
+see some membrane voltage deflection
+
+382
+00:20:22,520 --> 00:20:24,720
+which is high at the location
+of the stimulus
+
+383
+00:20:24,920 --> 00:20:28,149
+lower at the blue and almost
+impossible to see in the black one.
+
+384
+00:20:28,349 --> 00:20:31,275
+If, on the other hand
+you stimulate the somatic firing
+
+385
+00:20:31,475 --> 00:20:35,347
+with a step current you will see
+the spike generation in the soma
+
+386
+00:20:35,547 --> 00:20:37,720
+and then the back
+propagation of the spike
+
+387
+00:20:37,920 --> 00:20:39,320
+to the other electrodes.
+
+388
+00:20:39,520 --> 00:20:42,562
+But then, the interesting thing
+is when you combine the two,
+
+389
+00:20:42,762 --> 00:20:45,046
+so you have the somatic firing
+
+390
+00:20:45,246 --> 00:20:47,746
+in step current injection, and
+a little bit later,
+
+391
+00:20:47,946 --> 00:20:51,242
+within a certain time window,
+you do the dendritic stimulation
+
+392
+00:20:51,442 --> 00:20:52,842
+which mimics dendritic input,
+
+393
+00:20:53,042 --> 00:20:55,461
+you actually see a non-linear
+
+394
+00:20:55,661 --> 00:20:57,661
+somation effect that sort of the soma
+
+395
+00:20:58,461 --> 00:21:02,465
+suddenly sends a little burst
+of spiking activity
+
+396
+00:21:02,665 --> 00:21:05,999
+and you see calcium spike
+in the dendrite.
+
+397
+00:21:06,199 --> 00:21:08,199
+So, this has been experimentally
+observed
+
+398
+00:21:08,399 --> 00:21:12,236
+and we set out to
+sort of model this
+
+399
+00:21:12,236 --> 00:21:18,789
+in a model using automated
+parameter optimization.
+
+400
+00:21:18,989 --> 00:21:21,538
+So, this was published by
+Itad Hay and colleagues
+
+401
+00:21:21,738 --> 00:21:24,694
+and here you now have
+a reconstructed morphology,
+
+402
+00:21:24,894 --> 00:21:27,676
+you sort of have
+the different electrode set up
+
+403
+00:21:27,876 --> 00:21:30,535
+in an insilical experiment,
+and you can do replay
+
+404
+00:21:30,735 --> 00:21:37,437
+the kind of same stimulus protocols and you see
+that the model is capable of recreating
+
+405
+00:21:37,637 --> 00:21:41,044
+this non-trivial interaction between
+two spikings of a neuron.
+
+406
+00:21:42,675 --> 00:21:45,082
+So, this is a nice demonstration
+
+407
+00:21:45,282 --> 00:21:51,860
+That these parameter search methods
+and the combination of techniques
+
+408
+00:21:52,060 --> 00:21:55,541
+we showed are useful 
+and create real neuron models.
+
+409
+00:21:55,741 --> 00:21:59,950
+When you do that, you have
+to consider important pieces:
+
+410
+00:22:00,150 --> 00:22:04,138
+so, recreating your experimental
+expectation, of course is the first
+
+411
+00:22:04,338 --> 00:22:06,338
+goal of all of that,
+but at the same time
+
+412
+00:22:06,538 --> 00:22:10,208
+you have to think further:
+I mean, it is very easy to get into
+
+413
+00:22:10,608 --> 00:22:14,405
+a scenario where you have over-fitting,
+where essentially your model exactly
+
+414
+00:22:14,705 --> 00:22:20,285
+reproduces the behavior you asked it
+for, and then fails when you go from
+
+415
+00:22:20,485 --> 00:22:24,960
+a step current to a REM current.
+And we looked into that and found
+
+416
+00:22:25,160 --> 00:22:32,060
+that actually step currents are quite
+a good training-set which then have
+
+417
+00:22:32,260 --> 00:22:37,179
+a reasonable generalization of when
+you then, in a second step, test your
+
+418
+00:22:37,379 --> 00:22:40,495
+model on a different stimulus.
+It's not the same if you trained
+
+419
+00:22:40,695 --> 00:22:44,822
+your model on the REM current and
+then went back, so the time constant
+
+420
+00:22:45,022 --> 00:22:48,575
+or very fast time constant and slow
+and relaxation in the step current
+
+421
+00:22:48,775 --> 00:22:54,420
+seems to be useful information for
+the algorithm to find parameter
+
+422
+00:22:54,620 --> 00:22:56,386
+locations in the search space
+
+423
+00:22:56,586 --> 00:22:58,789
+that then have 
+a more general applicability.
+
+424
+00:22:58,989 --> 00:23:02,458
+So, this is an important aspect you
+always need to consider when doing
+
+425
+00:23:02,658 --> 00:23:05,968
+parameter optimization that you
+don't want to over-fit
+
+426
+00:23:06,168 --> 00:23:08,168
+and you have to test 
+for generalization.
+
+427
+00:23:09,968 --> 00:23:14,168
+Another aspect is that by design,
+a metaheuristic doesn't guarantee
+
+428
+00:23:14,368 --> 00:23:17,383
+that it finds the globally
+best solution.
+
+429
+00:23:17,583 --> 00:23:22,016
+So, it might be finding 
+similar solutions
+
+430
+00:23:22,216 --> 00:23:27,460
+that are in your feature space,
+look similar, but sort of the way
+
+431
+00:23:27,660 --> 00:23:32,243
+the value comes about is by very
+different mechanisms.
+
+432
+00:23:32,443 --> 00:23:35,016
+So, especially in these population
+based algorithms
+
+433
+00:23:35,216 --> 00:23:36,804
+you have some solutions
+
+434
+00:23:37,004 --> 00:23:40,793
+which always seem to be very
+constrained in one parameter
+
+435
+00:23:41,193 --> 00:23:44,838
+but they show quite
+a range of expression
+
+436
+00:23:45,038 --> 00:23:47,765
+in other channel conductances
+for example.
+
+437
+00:23:47,965 --> 00:23:51,814
+So, on the one hand this could
+be a problem of the search method
+
+438
+00:23:52,014 --> 00:23:56,311
+that you're looking in a big
+search space and essentially you're
+
+439
+00:23:56,511 --> 00:24:00,222
+finding parameters that lead to
+the same phenotype,
+
+440
+00:24:00,422 --> 00:24:03,830
+but what is interesting about it
+is that this also should prompt you
+
+441
+00:24:04,030 --> 00:24:07,730
+about thinking whether maybe this
+non-uniqueness is the property of
+
+442
+00:24:07,930 --> 00:24:10,061
+the biological system 
+in the first place;
+
+443
+00:24:10,261 --> 00:24:14,261
+because it seems there are some
+indication that at least certain
+
+444
+00:24:14,661 --> 00:24:17,495
+types of firing can 
+be, are recreated in real
+
+445
+00:24:17,695 --> 00:24:20,701
+cells by different 
+channel conductances.
+
+446
+00:24:20,901 --> 00:24:26,094
+So, what is therefore interesting
+when you look at your solutions
+
+447
+00:24:26,294 --> 00:24:28,794
+you might not only want 
+to pick the best solution
+
+448
+00:24:28,994 --> 00:24:31,927
+but you want to understand what
+is the range of solutions
+
+449
+00:24:32,127 --> 00:24:35,539
+and actually ask yourself whether
+what you're seeing might be even
+
+450
+00:24:36,139 --> 00:24:40,175
+a representation of the biological
+diversity, but it also
+
+451
+00:24:40,375 --> 00:24:44,281
+could be an artifac
+of the algorithm.
+
+452
+00:24:44,481 --> 00:24:46,841
+In any case 
+this values your attention
+
+453
+00:24:47,041 --> 00:24:49,489
+and for example, Eve Mart
+and her colleagues,
+
+454
+00:24:49,689 --> 00:24:52,603
+they've been studying this
+for a long time and it's useful,
+
+455
+00:24:52,803 --> 00:24:53,954
+further reading.
+
+456
+00:24:54,732 --> 00:24:59,010
+Lastly, as with every model it is
+important that you understand what
+
+457
+00:24:59,210 --> 00:25:01,110
+the model was built for and what's
+
+458
+00:25:01,310 --> 00:25:04,887
+the range of applicability
+of your model.
+
+459
+00:25:05,087 --> 00:25:08,222
+So, there's an interesting recent
+review of Almak and Corngreen
+
+460
+00:25:08,422 --> 00:25:11,531
+that took different models
+in particular, also the model which
+
+461
+00:25:11,731 --> 00:25:15,216
+we showed before and sort of tested
+them in foreign questions
+
+462
+00:25:15,416 --> 00:25:18,640
+for which the neuron models 
+weren't explicitly built for.
+
+463
+00:25:18,840 --> 00:25:23,816
+So, if you do that, of course
+you may have good surprises
+
+464
+00:25:24,016 --> 00:25:26,042
+that the model actually
+is generalizing
+
+465
+00:25:26,242 --> 00:25:29,339
+even into these new contexts;
+or, you have bad surprises that
+
+466
+00:25:29,539 --> 00:25:33,067
+your model actually cannot react
+and predict properly
+
+467
+00:25:33,267 --> 00:25:36,079
+simply, because the information
+you've been giving it
+
+468
+00:25:36,279 --> 00:25:38,707
+when you built the model
+might not be sufficient.
+
+469
+00:25:38,907 --> 00:25:42,335
+So, this you always have to keep
+in mind, that models have a certain
+
+470
+00:25:42,535 --> 00:25:45,639
+realm of applicability.
+And that you constantly need to ask
+
+471
+00:25:45,839 --> 00:25:48,868
+yourself the question whether you're
+still within that realm.
+
+472
+00:25:49,268 --> 00:25:51,268
+Let me summarize today's MOOC.
+
+473
+00:25:51,468 --> 00:25:54,553
+So, we're in the context
+of constraining
+
+474
+00:25:54,753 --> 00:25:56,695
+neuronal models with
+experimental data.
+
+475
+00:25:56,895 --> 00:26:01,118
+Sometimes, it's easier than other
+times to find these experimental data
+
+476
+00:26:01,318 --> 00:26:03,739
+and for those cases where it's 
+difficult to find
+
+477
+00:26:03,939 --> 00:26:06,900
+the experimental data, what other
+alternatives do you have?
+
+478
+00:26:07,100 --> 00:26:10,374
+Here, we've presented how parameter
+optimization in particular
+
+479
+00:26:10,574 --> 00:26:13,840
+metaheuristic, such as evolutionary
+algorithms can be used to help
+
+480
+00:26:14,040 --> 00:26:17,926
+you find some of these parameters
+with the help of a computer.
+
+481
+00:26:18,126 --> 00:26:22,289
+When you do that you have
+to help the computer to determine
+
+482
+00:26:22,489 --> 00:26:25,502
+what is a good solution
+so you'll have to find smart metrics
+
+483
+00:26:25,702 --> 00:26:27,802
+such as the presented
+feature based metrics
+
+484
+00:26:28,002 --> 00:26:31,533
+and it is useful to use
+multi-objective optimization to help
+
+485
+00:26:31,733 --> 00:26:35,091
+you expose certain trade-offs
+in your parameter space
+
+486
+00:26:35,291 --> 00:26:38,238
+because it's not a given that 
+the model parameters,
+
+487
+00:26:38,438 --> 00:26:42,075
+you're actually starting
+out with are guaranteed to have
+
+488
+00:26:42,275 --> 00:26:45,988
+a valid solution for the parameter
+for the behavior you're looking for
+
+489
+00:26:46,188 --> 00:26:49,008
+we presented that 
+the different techniques
+
+490
+00:26:49,208 --> 00:26:54,020
+we've shown here can be used 
+to create valid realistic models.
+
+491
+00:26:54,220 --> 00:26:57,360
+But at the same time you have to
+always be aware of the caveats
+
+492
+00:26:57,560 --> 00:27:00,469
+you have to make sure to test that
+your model generalizes.
+
+493
+00:27:00,669 --> 00:27:02,627
+You have to think about
+the uniqueness
+
+494
+00:27:02,827 --> 00:27:06,361
+or non-uniqueness of solutions
+but overall, and after all
+
+495
+00:27:06,561 --> 00:27:09,823
+one important thing is parameter
+optimization doesn't do magic:
+
+496
+00:27:10,023 --> 00:27:14,370
+you have a sample space and you have
+a certain amount of samples
+
+497
+00:27:14,670 --> 00:27:18,109
+you're doing, so the more
+free parameters you have
+
+498
+00:27:18,309 --> 00:27:19,917
+the more difficult
+it will be for
+
+499
+00:27:20,117 --> 00:27:22,396
+a parameter optimization
+technique to help you.
+
+500
+00:27:22,596 --> 00:27:25,774
+So, it's always good to look out
+for more parameters constrained
+
+501
+00:27:25,974 --> 00:27:28,943
+from experimental data and resort
+to the optimization part
+
+502
+00:27:29,143 --> 00:27:30,298
+as a last resort.
+
+503
+00:27:30,498 --> 00:27:32,498
+Thank you very much 
+for your attention.
+

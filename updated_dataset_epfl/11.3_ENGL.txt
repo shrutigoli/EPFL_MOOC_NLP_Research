@@ -1,0 +1,48 @@
+You can't have a week on data centers without a dedicated module on the CAP theorem.
+But because you'll be reading about the CAP theorem this week
+I'm going to focus on the history of the CAP theorem, which is actually quite interesting.
+It's interesting because it was not introduced in the paper, it was actually not introduced as a theorem, it was rather postulated by Eric Brewer in his keynote at PODC in the year 2000.
+And Eric first made the comparison between ACID and BASE.
+ACID are the traditional properties associated with database transactions.
+And BASE is the alternative set of properties that we associate with Internet scale services.
+And BASE stands for basically available, soft state, eventually consistent systems.
+Basic availability means that the state, the site should always be up so the yield should be greater than zero at all times.
+Soft state means that the website operates on some soft state that can be reconstructed by some hard state that may be stored elsewhere, maybe using the transactional system.
+A shopping cart is a great example of soft state at any commerce website.
+And eventual consistency means that different clients may see slightly different versions of the data at any point in time.
+For example, you may have a slightly different view of the number of seats that may be available for a concert as you are shopping through it on an Internet website.
+And the difference between an ACID and BASE is helpful to understand the context of the CAP theorem.
+Now as I mentioned, Brewer did not prove the CAP theorem he simply postulated, he had an intuition that this was true.
+This was actually later formally proved by two computer scientists
+Gilbert and Lynch a few years later.
+(Edouard) So what do we mean by the CAP theorem?
+Well it looks like the relationship between three properties of a shared data system.
+"C" stands for consistency, the properties equivalent to having a single up to date copy of the data.
+"A" stands for availability and specifically the ability for updates to complete.
+"P" stands for partition tolerance.
+The ability to operate in the presence of network partitions.
+And so the CAP theorem is that you have to chose.
+You get two out of three, but not all three.
+And let's see what that means.
+So maybe you don't care about partition tolerance or otherwise assume that you can engineer your solution to avoid them in practice.
+Now if that's the case, you can ensure both consistency and availability of a shared data system.
+As a matter of fact, classic databases use this as a design pattern.
+For example, two phase commit allows two distribute databases to show a consistent view of data.
+Unfortunately, two phase commit cannot successfully commit a transaction that involves multiple sites in the presence of a network partition.
+It would just hang.
+Now if you assume that network partitions can occur one design consequence would be to give up on availability.
+Majority protocols, for example, are designed to operate as long as a majority or quorum can achieve consensus.
+Of course in that case the minority partition can no longer make updates.
+But if you think about it this design point makes a lot of sense in particular if the partitioning is due to the lack of availability of the entire minority site.
+In that case the network partition is actually a symptom and the issue of the availability of data in the minority site is actually a non-issue because the site itself is not present.
+Now the problem with that design pattern is actually its implementation cost.
+Consistency is expensive.
+Consistency across site is particularly expensive because of the latency that is involved in the protocols.
+Now when consistency is expensive and network partitions can occur, the alternative design point is to actually give up on consistency altogether and design a system that actually is always available.
+And there are many examples of systems that show those traits.
+DNS systems, Web caching are still relevant today.
+In his talk, Brewer used Coda as an example.
+Coda was a distributed file system that supported offline operations and reconciliation.
+If Eric were to give the same talk today he would probably list Dropbox rather than Coda as an example of a system that gives up consistency for availability.
+So this was the history and the textbook level explanation of the CAP theorem.
+There are actually lots of nuances in this topic and I encourage you to read Eric's paper on his retrospective on the CAP theorem.

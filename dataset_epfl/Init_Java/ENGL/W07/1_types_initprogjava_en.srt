@@ -1,0 +1,382 @@
+1
+00:00:05,814 --> 00:00:06,983
+In this last lesson,
+
+2
+00:00:06,983 --> 00:00:09,706
+we will learn how to attack
+a project more ambitious
+
+3
+00:00:09,706 --> 00:00:12,139
+than those we considered
+up until now.
+
+4
+00:00:12,139 --> 00:00:17,962
+That is, how to decompose this project
+into easily-solved sub-problems
+
+5
+00:00:17,962 --> 00:00:21,012
+until we know how to write
+the final program.
+
+6
+00:00:21,122 --> 00:00:25,400
+To illustrate this, we have chosen
+a game of connect 4.
+
+7
+00:00:25,400 --> 00:00:28,831
+You no doubt know the rules
+of connect 4.
+
+8
+00:00:28,831 --> 00:00:32,800
+It is a two-player game with
+a grid of seven columns
+
+9
+00:00:32,800 --> 00:00:34,395
+and 6 rows.
+
+10
+00:00:34,395 --> 00:00:39,681
+The players drop a chip of their
+own color one after another
+
+11
+00:00:39,681 --> 00:00:45,204
+in the column they choose, until
+one player manages to line up
+
+12
+00:00:45,204 --> 00:00:49,144
+four chips of his color or until the
+grid is completely filled.
+
+13
+00:00:49,477 --> 00:00:52,338
+First, please note that we are not
+going to develop
+
+14
+00:00:52,338 --> 00:00:55,741
+a pretty graphical interface. What
+we are interested in here
+
+15
+00:00:55,741 --> 00:00:59,141
+is having a program which can
+follow the mechanics of the game,
+
+16
+00:00:59,142 --> 00:01:02,918
+and we will make do with a
+text-based display of the grid
+
+17
+00:01:02,918 --> 00:01:10,198
+and chips, that is, something that
+would look like this.
+
+18
+00:01:11,246 --> 00:01:13,774
+Generally, how should
+you approach such
+
+19
+00:01:13,774 --> 00:01:17,564
+large problem as this one?
+
+20
+00:01:17,564 --> 00:01:21,318
+You should definitely not try to
+write the program all at once,
+
+21
+00:01:21,318 --> 00:01:23,080
+you won't manage that.
+
+22
+00:01:23,080 --> 00:01:26,740
+You should know how to break down the
+problem into sub-problems
+
+23
+00:01:26,740 --> 00:01:30,242
+to write the program step-by-step.
+And at each step,
+
+24
+00:01:30,242 --> 00:01:33,759
+you must test the code that you
+have written in order
+
+25
+00:01:33,759 --> 00:01:35,837
+to continue on solid bases.
+
+26
+00:01:36,747 --> 00:01:40,581
+First of all, we must identify
+what types 
+
+27
+00:01:40,581 --> 00:01:45,221
+our program needs to work,
+
+28
+00:01:45,221 --> 00:01:48,030
+what data our program needs.
+
+29
+00:01:48,960 --> 00:01:52,112
+In our example, it essentially
+needs to
+
+30
+00:01:52,112 --> 00:01:59,400
+be able to represent the grid.
+Then, we will have to identify the methods
+
+31
+00:01:59,400 --> 00:02:03,940
+that will work on these types and test
+them as we code them.
+
+32
+00:02:04,722 --> 00:02:08,572
+Then, when a method is hard
+to write,
+
+33
+00:02:08,572 --> 00:02:11,368
+we can introduce an extra
+method
+
+34
+00:02:11,368 --> 00:02:13,668
+for each of the difficult steps.
+
+35
+00:02:13,875 --> 00:02:16,792
+I said that we should start by
+identifying the types.
+
+36
+00:02:16,792 --> 00:02:18,821
+What does this mean?
+
+37
+00:02:18,821 --> 00:02:22,972
+We will start by identifying the data
+which our program needs
+
+38
+00:02:22,972 --> 00:02:25,852
+and finding how to represent these data.
+
+39
+00:02:25,852 --> 00:02:29,227
+In this case, for our game of connect 4,
+
+40
+00:02:29,227 --> 00:02:33,075
+the main data are the grid
+and the chips it contains
+
+41
+00:02:33,075 --> 00:02:36,386
+or more precisely, we
+want to know, for each cell,
+
+42
+00:02:36,386 --> 00:02:38,406
+what the cell contains.
+
+43
+00:02:38,406 --> 00:02:43,416
+Is it a red chip, a yellow chip, or
+nothing at all?
+
+44
+00:02:44,195 --> 00:02:48,005
+The simplest and surely
+the most practical way
+
+45
+00:02:48,005 --> 00:02:51,841
+of representing the grid in
+our Java program
+
+46
+00:02:51,841 --> 00:02:55,625
+is to use a two-dimensional
+array
+
+47
+00:02:55,625 --> 00:02:58,450
+where each element of the
+two-dimensional array
+
+48
+00:02:58,450 --> 00:03:00,873
+corresponds to a cell of the grid.
+
+49
+00:03:00,873 --> 00:03:04,751
+We shall decree that the
+first index of the array
+
+50
+00:03:04,751 --> 00:03:11,257
+corresponds to the line number,
+where line 0
+
+51
+00:03:11,257 --> 00:03:14,678
+corresponds to the line
+at the top of the grid
+
+52
+00:03:14,678 --> 00:03:19,331
+and that the second index
+corresponds to the column number.
+
+53
+00:03:19,331 --> 00:03:23,358
+And here again, we must decide
+on a convention
+
+54
+00:03:23,358 --> 00:03:29,508
+and we shall say that the left-most
+column will be column 0.
+
+55
+00:03:30,171 --> 00:03:34,119
+We still have to choose the
+type of the array's elements,
+
+56
+00:03:34,119 --> 00:03:39,994
+which corresponds to cells in the grid.
+We will choose an <i>int</i> type here,
+
+57
+00:03:39,994 --> 00:03:46,489
+and define constants of type <i>int</i>.
+The three constants will be named
+
+58
+00:03:46,489 --> 00:03:49,813
+<i>VIDE</i>, <i>JAUNE</i> and <i>ROUGE</i>
+(TN: <i>EMPTY</i>, <i>YELLOW</i> and <i>RED</i>).
+
+59
+00:03:49,813 --> 00:03:53,983
+All three will be initialized with
+different values
+
+60
+00:03:54,193 --> 00:03:58,223
+which will allow us to use these
+three constants
+
+61
+00:03:59,606 --> 00:04:05,316
+to gives values to the chips or
+cells of our grid.
+
+62
+00:04:05,860 --> 00:04:08,182
+There are other ways of doing this,
+
+63
+00:04:08,182 --> 00:04:11,248
+using for example enumerated
+types,
+
+64
+00:04:11,248 --> 00:04:13,808
+but we will not talk about these
+in this video.
+
+65
+00:04:14,503 --> 00:04:17,243
+Updating the grid will then be
+done in the following way:
+
+66
+00:04:17,909 --> 00:04:24,169
+for example, this instruction will
+give the value VIDE (TN: EMPTY), that is, 0,
+
+67
+00:04:24,334 --> 00:04:31,269
+in the element of the grid array which
+is on line 0 and column 0,
+
+68
+00:04:31,549 --> 00:04:35,748
+which corresponds, if we respect
+the conventions we described
+
+69
+00:04:35,748 --> 00:04:41,830
+a few slides earlier, to this
+cell right here,
+
+70
+00:04:41,830 --> 00:04:46,000
+in which we will put the value
+<i>VIDE</i> (= 0).
+
+71
+00:04:46,063 --> 00:04:52,453
+With this instruction, we will
+assign to cell 2,
+
+72
+00:04:52,491 --> 00:04:57,648
+since we start with the top-most
+cell which has the index 0.
+
+73
+00:04:57,928 --> 00:05:04,188
+We change the element of this line 2
+which has an index of 3.
+
+74
+00:05:04,188 --> 00:05:11,747
+So, 0, 1, 2, 3. This one.
+We assign the value JAUNE (TN: "YELLOW")
+
+75
+00:05:11,747 --> 00:05:16,440
+which equals 1.  But I could easily
+have represented this assignment
+
+76
+00:05:16,440 --> 00:05:19,181
+in this way to show that it corresponds
+
+77
+00:05:19,181 --> 00:05:24,991
+to a cell of my grid that should be
+marked as yellow.
+
+78
+00:05:25,838 --> 00:05:27,343
+In the next video,
+
+79
+00:05:27,343 --> 00:05:29,844
+we will learn how to write the
+functions which will allow us
+
+80
+00:05:29,844 --> 00:05:32,724
+to initialize and display the grid.

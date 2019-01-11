@@ -1,0 +1,73 @@
+In this episode, we continue our case study on watches -- Swiss made or not -- and we will attack the polymorphic output of the various products in our hierarchy.
+As a reminder, in the last step, we had drafted a product hierarchy and we will now focus on how to make sure that these different products can be displayed in a polymorphic way.
+Basically, a product like a watch, a mechanism or an accessory will have its own way of being displayed and we want this display to be polymorphic.
+Meaning that if we put an object of type Montre, for example, in a variable of type Produit and we call the output method on that variable, the the output should automatically adapt to the actual type of the instance stored in the variable.
+So each product will have its own way of being displayed, and we want to know how to procede to implement a polymorphic output
+We would like this output to be made using the output operator.
+So concretely here if we imagine, for example, that we declare a pointer <i>p</i> to a product
+[Silence] we would like this, "display the contents pointed to by <i>p</i>"... to display the information specific to the watch.
+So, is it possible to program this operator to have the desired polymorphic behavior?
+The answer is yes.
+Of course, it is not the operator itself which will be declared as a virtual method.
+It is not a method. It is a function that is external to all classes, so the operator itself cannot be virtual.
+However, nothing prevents us from invoking a virtual, polymorphic method on the operand it must display.
+So the idea here is to make our output operator call a polymorphic method which would be defined at the superclass level.
+In this case, in the <i>Produit</i> superclass.
+Our operator allowing the output of a product will thus call an <i>afficher</i> method defined in the <i>Produit</i> superclass; of course, this <i>afficher</i> method must be declared as virtual to allow polymorphic behavior
+Remember that here, it is the fact that this method is virtual and that it is called via a reference to a product that allows it to have a polymorphic behavior, as desired.
+You will notice that the <i>afficher</i> method is defined as public first, because it makes sense to offer this functionality to the outside world, but also because it will free us from some constraints related to programming the output operator.
+Typically here, since <i>afficher</i> is a public-accessible method, the operator can be programmed to use it directly and so, it isn't necessary to use
+<i>friend</i> to access this method of the
+<i>Produit</i> class.
+Once a method, in a class, is declared as virtual, it means that we can potentially use instances of this class in a polymorphic way.
+And so, we must think about destroying them appropriately by introducing a destructor, which will be virtual
+We want want the output method of a product to display its price by default.
+We could imagine writing the 
+<i>afficher</i> method in such a way that it displays the price of a product.
+This solution, however, is not good.
+Do you know why?
+Indeed, the price of a subclass of
+Produit could very well be different from the base value
+Using the base value to display the price will thus not be correct for all the possible instances of Produit including its subclasses.
+Indeed, for subclasses of Produit such as bracelets, for example, we could perfectly imagine that the price would correspond to the base value of the product; however, for watches, another type of product, we could imagine that the calculation of the price would be more complex and that it would be the sum of the prices of all its components.
+The correct way to proceed here is therefore to use, instead of values, the prix() (means "price()") method, which will itself of course be capable of having a polymorphic behavior and calculate the price of a watch if the displayed product is a watch, or the price of a bracelet if we are displaying a bracelet.
+If we go back to our initial example, the one where we declared a pointer on a product in which we stored the address of a watch, imagine now that we call the output operator on the object pointed to by <i>p</i>.
+What happens here?
+This will be translated by a call to the output operator, that we have overloaded for products.
+It will call the <i>afficher</i> method, knowing that now, this variable, this parameter, contains a reference to a watch.
+The <i>afficher</i> method, as it is defined in the Produit class, will be called, and it will itself call the price calculation method, <i>prix()</i>.
+This method is polymorphic, so it will automatically adapt to the real nature of the object on which it is called, which it so happens is a watch here.
+The <i>prix()</i> method is indeed virtual.
+As we allow it to access the real instance through a pointer, it can truly apply in a polymorphic way and we will have the desired result.
+That is, the price for a watch will be calculated as, for example, the sum of the prices of all its components.
+Now, let's finalize our Produit class.
+Suppose that we wish to impose the fact that the base value of a product should remain unchanged once we initialized it.
+That way, a product's base value would remain as it was initialized, and it would be impossible to change it during the lifetime of the product.
+This can be forced by labeling the variable as constant.
+We will be able to initialize the <i>valeur</i> member variable, but once this is done, we will no longer be able to change its value
+If we also wish to impose that by default, a product has a base value of zero, we can do this by using a default value for the constructor's parameter.
+So we would have a default constructor for the
+<i>Produit</i> class which, when called, would initialize the product's value with a value of <i>0</i>.
+Finally, let's imagine that we want to model the fact that a product does not exist as such, that it is an abstract entity in our design and that we cannot create any instance of Produit as such.
+How do we force this constraint in our design?
+In C++, for a class to be abstract, it must contain at least one pure virtual method, meaning that here, we would need to have a method defined as pure virtual.
+We don't really have any reason to create one here, and creating one artificially would not really make any sense.
+A good candidate for a pure virtual method in a class is actually the destructor.
+The destructor can be declared as pure virtual to ensure that the class becomes abstract.
+Since any class necessarily has a destructor, the fact of declaring it as pure virtual saves us from having to create an artificial method simply to make the class abstract
+Note that it is imperative to give a body to all destructors and note, at the same time, that nothing prevents a pure virtual method from having a body.
+This syntax, however, is not valid C++ so it is not possible to specify the body of a pure virtual destructor within the class, like so.
+We will have to define the destructor of the Produit class outside of the class, with this syntax.
+Meaning that within the <i>Produit</i> class, we declare the destructor as pure virtual, and we define its body outside.
+So this body must be specified, we must give a definition for the destructor even if it doesn't do anything.
+This is what we obtain, after this step, for the code of the Produit class.
+The constructor of the class allows initialization of its <i>valeur</i> attribute using a value passed as parameter.
+This constructor can be used as a default constructor since all of its parameters have a default value, a value of <i>0</i> here.
+The <i>Produit</i> class provides an output method that can be used in a polymorphic way.
+This method is declared as virtual, so if it is used via a pointer or a reference, then it will exhibit polymorphic behavior.
+It then calls another potentially polymorphic method, the <i>prix()</i> method, also declared as virtual
+The output operator can be overloaded to display instances of <i>Produit</i>.
+In order to have polymorphic behavior, it simply has to call a polymorphic output method in its body; a method defined as public in the
+<i>Produit</i> class.
+Finally, to model the fact that a product is an abstract entity in our design, we have declared the destructor as pure virtual and we did not forget to define it even if we have nothing specific to make it do, here.
+And this concludes our episode on the definition of products and their polymorphic output.

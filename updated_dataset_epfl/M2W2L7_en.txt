@@ -1,0 +1,1426 @@
+1
+00:00:22,260 --> 00:00:23,064
+In this lesson,
+
+2
+00:00:23,264 --> 00:00:24,555
+we will address the question
+
+3
+00:00:24,755 --> 00:00:26,904
+of topological spatial queries,
+
+4
+00:00:27,104 --> 00:00:30,681
+so something that completes
+the geometric spatial queries
+
+5
+00:00:30,881 --> 00:00:32,428
+that we saw in the previous lesson.
+
+6
+00:00:32,628 --> 00:00:36,098
+These topological spatial queries
+
+7
+00:00:36,298 --> 00:00:38,440
+are therefore interested in
+extracting information
+
+8
+00:00:38,640 --> 00:00:41,680
+which characterize not the spatial
+objects themselves
+
+9
+00:00:41,880 --> 00:00:43,897
+but rather the spatial relations
+
+10
+00:00:44,097 --> 00:00:45,859
+and the relations between spatial objects.
+
+11
+00:00:46,059 --> 00:00:47,865
+The objective of this lesson
+
+12
+00:00:48,065 --> 00:00:49,511
+is to explore
+
+13
+00:00:49,711 --> 00:00:52,423
+the syntax field of SQL queries
+
+14
+00:00:52,623 --> 00:00:55,053
+which allow to extract information
+
+15
+00:00:55,253 --> 00:00:57,363
+characterizing spatial relations
+
+16
+00:00:57,563 --> 00:01:00,121
+between objects hosted in a database.
+
+17
+00:01:00,321 --> 00:01:02,017
+At the end of this lesson
+
+18
+00:01:02,217 --> 00:01:03,461
+you should be able to
+
+19
+00:01:03,661 --> 00:01:04,921
+write queries
+
+20
+00:01:05,121 --> 00:01:07,626
+which will allow you to test
+spatial relations
+
+21
+00:01:07,839 --> 00:01:09,070
+between objects,
+
+22
+00:01:09,270 --> 00:01:12,090
+to calculate characteristics
+
+23
+00:01:12,290 --> 00:01:13,403
+such as the distance between objects
+
+24
+00:01:13,603 --> 00:01:15,360
+or to make new objects
+
+25
+00:01:15,560 --> 00:01:17,798
+by intersection or difference
+
+26
+00:01:17,998 --> 00:01:21,799
+or other operations involving
+existing spatial objects.
+
+27
+00:01:23,733 --> 00:01:26,569
+Just as in the case of geometric
+spatial queries,
+
+28
+00:01:26,769 --> 00:01:28,244
+topological spatial queries
+
+29
+00:01:28,444 --> 00:01:29,872
+are numerous.
+
+30
+00:01:30,072 --> 00:01:32,287
+There are many keywords that can be used.
+
+31
+00:01:32,487 --> 00:01:34,886
+We will present only a very small
+part of it
+
+32
+00:01:35,086 --> 00:01:37,999
+so this is the reason 
+why I encourage you
+
+33
+00:01:38,199 --> 00:01:39,720
+to take a look
+
+34
+00:01:39,920 --> 00:01:43,480
+on the sites that document the
+available functions
+
+35
+00:01:43,680 --> 00:01:44,763
+in SpatiaLite
+
+36
+00:01:44,963 --> 00:01:45,872
+and in Postgis.
+
+37
+00:01:46,072 --> 00:01:49,405
+Again, the syntax is pretty
+much the same in both cases
+
+38
+00:01:49,605 --> 00:01:51,932
+with, in the case of Postgis,
+
+39
+00:01:52,132 --> 00:01:54,108
+the addition of the letters S and T
+
+40
+00:01:54,308 --> 00:01:55,405
+underlined
+
+41
+00:01:55,605 --> 00:01:56,441
+before the function.
+
+42
+00:01:56,641 --> 00:01:58,375
+In this lesson,
+
+43
+00:01:58,575 --> 00:02:02,235
+we will first go back to the 
+notion of topology
+
+44
+00:02:02,435 --> 00:02:03,300
+and topological query,
+
+45
+00:02:03,500 --> 00:02:05,528
+notion which had been presented
+at the beginning of the course.
+
+46
+00:02:05,728 --> 00:02:09,235
+Then we will present the test functions
+
+47
+00:02:09,435 --> 00:02:12,722
+before addressing the distance function
+
+48
+00:02:12,922 --> 00:02:15,888
+and ending by spatial operators.
+
+49
+00:02:21,324 --> 00:02:22,548
+We had seen
+
+50
+00:02:22,748 --> 00:02:24,439
+by presenting the notions of topologies
+
+51
+00:02:24,639 --> 00:02:26,786
+that a relation, a spatial dependence
+
+52
+00:02:26,986 --> 00:02:29,634
+is defined by a property
+
+53
+00:02:29,834 --> 00:02:31,581
+shared by two spatial entities.
+
+54
+00:02:31,781 --> 00:02:34,058
+As for example the simplest one of them,
+
+55
+00:02:34,258 --> 00:02:36,137
+the distance that separates two points.
+
+56
+00:02:36,337 --> 00:02:37,913
+We also saw
+
+57
+00:02:38,113 --> 00:02:39,507
+that the topological relations
+
+58
+00:02:39,707 --> 00:02:41,329
+are a sub category
+
+59
+00:02:41,529 --> 00:02:42,582
+of spatial relation,
+
+60
+00:02:42,782 --> 00:02:44,872
+of a qualitative nature,
+
+61
+00:02:45,072 --> 00:02:46,530
+independent of the measure
+
+62
+00:02:46,730 --> 00:02:48,713
+and characterized by the fact
+
+63
+00:02:48,913 --> 00:02:50,895
+of being invariant under 
+continuous deformation.
+
+64
+00:02:51,095 --> 00:02:53,571
+The main forms of topological relations
+
+65
+00:02:53,771 --> 00:02:55,339
+are the adjacency, the connectivity,
+
+66
+00:02:55,539 --> 00:02:56,642
+the inclusion and the intersection.
+
+67
+00:02:58,268 --> 00:03:01,939
+The requests which are on the
+spatial relations between objects
+
+68
+00:03:02,139 --> 00:03:03,915
+and more particularly on 
+topological relations
+
+69
+00:03:04,115 --> 00:03:06,280
+can be subdivided
+
+70
+00:03:06,480 --> 00:03:07,833
+roughly into 3 categories.
+
+71
+00:03:08,033 --> 00:03:10,149
+First, the test requests
+
+72
+00:03:10,349 --> 00:03:12,916
+which return "true" or "false" values.
+
+73
+00:03:13,116 --> 00:03:15,493
+Distance queries
+
+74
+00:03:15,693 --> 00:03:17,341
+which return a numeric value
+
+75
+00:03:17,541 --> 00:03:19,416
+and action requests
+
+76
+00:03:19,616 --> 00:03:22,024
+which return spatial objects.
+
+77
+00:03:31,746 --> 00:03:32,834
+Test requests
+
+78
+00:03:33,034 --> 00:03:33,738
+or test function
+
+79
+00:03:33,938 --> 00:03:36,506
+allow to test spatial relations
+
+80
+00:03:36,706 --> 00:03:38,832
+or more precisely the topological
+relations
+
+81
+00:03:39,032 --> 00:03:40,838
+between two spatial entities
+
+82
+00:03:41,038 --> 00:03:42,018
+on the basis of their geometry.
+
+83
+00:03:42,218 --> 00:03:44,534
+The syntax is always
+
+84
+00:03:44,734 --> 00:03:45,857
+the SELECT keyword,
+
+85
+00:03:46,057 --> 00:03:48,587
+the test function
+
+86
+00:03:48,787 --> 00:03:50,743
+with the two geometries concerned
+
+87
+00:03:50,943 --> 00:03:51,907
+in brackets,
+
+88
+00:03:52,107 --> 00:03:53,251
+separated by a comma,
+
+89
+00:03:53,451 --> 00:03:54,965
+the FROM clause
+
+90
+00:03:55,165 --> 00:03:56,322
+and the table.
+
+91
+00:03:56,522 --> 00:03:58,972
+The main functions that can be used
+
+92
+00:03:59,172 --> 00:03:59,877
+are listed here
+
+93
+00:04:00,077 --> 00:04:03,680
+in particular, we can test
+the equality between two geometries,
+
+94
+00:04:03,880 --> 00:04:05,956
+the fact that they are distant 
+from one another,
+
+95
+00:04:06,156 --> 00:04:06,838
+that they touch each other,
+
+96
+00:04:07,038 --> 00:04:08,257
+that one is contained into the other
+
+97
+00:04:08,457 --> 00:04:09,179
+or that it contains the other,
+
+98
+00:04:09,379 --> 00:04:11,202
+that they overlap,
+
+99
+00:04:11,402 --> 00:04:13,745
+that they cross each other, etc.
+
+100
+00:04:15,973 --> 00:04:17,049
+In this example
+
+101
+00:04:17,249 --> 00:04:20,047
+we will select the hotels
+
+102
+00:04:20,247 --> 00:04:21,301
+the name of the hotels
+
+103
+00:04:21,501 --> 00:04:23,649
+which are located
+
+104
+00:04:23,849 --> 00:04:25,367
+within the Takamaka districts.
+
+105
+00:04:25,567 --> 00:04:27,149
+To do this,
+
+106
+00:04:27,349 --> 00:04:31,793
+the syntax is SELECT,
+the name of the hotel,
+
+107
+00:04:31,993 --> 00:04:33,442
+the FROM clause with the two
+
+108
+00:04:33,642 --> 00:04:34,540
+hotels and districts tables
+
+109
+00:04:34,740 --> 00:04:36,735
+and a conditional clause
+
+110
+00:04:36,935 --> 00:04:38,016
+in which we specify
+
+111
+00:04:38,216 --> 00:04:39,620
+the fact that the geometry of the hotels
+
+112
+00:04:39,820 --> 00:04:41,221
+must be inside
+
+113
+00:04:41,421 --> 00:04:42,216
+the geometry of the districts
+
+114
+00:04:42,416 --> 00:04:43,695
+and that the district name
+
+115
+00:04:43,895 --> 00:04:45,621
+should resemble Takamaka.
+
+116
+00:04:51,127 --> 00:04:52,255
+By executing this query
+
+117
+00:04:52,455 --> 00:04:54,492
+we get the 6 hotels
+
+118
+00:04:54,692 --> 00:04:56,515
+which are in this district.
+
+119
+00:04:58,749 --> 00:05:00,365
+We can now, in a second example,
+
+120
+00:05:00,565 --> 00:05:01,980
+replace the hotels
+
+121
+00:05:02,180 --> 00:05:02,950
+by the roads
+
+122
+00:05:03,150 --> 00:05:05,669
+and search for the roads
+
+123
+00:05:05,869 --> 00:05:10,154
+which intersect the district of Takamaka.
+
+124
+00:05:10,354 --> 00:05:13,017
+So we see that we have 
+a series of 21 roads
+
+125
+00:05:13,217 --> 00:05:15,232
+which form an intersection
+
+126
+00:05:15,432 --> 00:05:17,365
+with that district.
+
+127
+00:05:17,565 --> 00:05:21,491
+To store the result of this query
+
+128
+00:05:21,691 --> 00:05:23,069
+as a new layer
+
+129
+00:05:23,269 --> 00:05:25,393
+we have to add in the request
+
+130
+00:05:25,593 --> 00:05:28,212
+a "select the geometry 
+attribute" column
+
+131
+00:05:28,412 --> 00:05:30,957
+and define with the geometry name,
+
+132
+00:05:31,157 --> 00:05:32,426
+which is the field that we will use
+
+133
+00:05:32,626 --> 00:05:35,336
+to make the layer in QGIS,
+
+134
+00:05:35,536 --> 00:05:37,238
+give a name to this layer,
+
+135
+00:05:37,438 --> 00:05:38,796
+in this case INTERSECT,
+
+136
+00:05:38,996 --> 00:05:41,099
+and execute this request.
+
+137
+00:05:43,620 --> 00:05:44,986
+We make a second request
+
+138
+00:05:45,186 --> 00:05:46,304
+to select this time
+
+139
+00:05:46,504 --> 00:05:51,469
+the roads that touch the district
+of Takamaka.
+
+140
+00:05:51,669 --> 00:05:53,712
+We can see that this request
+
+141
+00:05:53,912 --> 00:05:54,891
+does not give any result,
+
+142
+00:05:55,091 --> 00:05:57,573
+so there is no object
+
+143
+00:05:57,773 --> 00:06:01,340
+which properly touches the district
+
+144
+00:06:01,540 --> 00:06:03,223
+and a third request
+
+145
+00:06:03,423 --> 00:06:05,913
+to identify the roads
+
+146
+00:06:06,113 --> 00:06:09,312
+which are contained in the district.
+
+147
+00:06:12,637 --> 00:06:14,697
+We also export the result of that query
+
+148
+00:06:14,897 --> 00:06:16,273
+as a layer in QGIS
+
+149
+00:06:20,027 --> 00:06:22,024
+and if we now look at these two layers,
+
+150
+00:06:22,224 --> 00:06:23,969
+the "intersection" layer in red
+
+151
+00:06:24,169 --> 00:06:26,475
+and the "content" layer in yellow,
+
+152
+00:06:26,675 --> 00:06:29,324
+it is clear that the intersection layer
+
+153
+00:06:29,524 --> 00:06:30,823
+includes more objects
+
+154
+00:06:31,023 --> 00:06:33,626
+than the layer of what is strictly
+contained in the district.
+
+155
+00:06:44,183 --> 00:06:45,796
+The distance function
+
+156
+00:06:45,996 --> 00:06:49,218
+simply allows to calculate the
+
+157
+00:06:49,418 --> 00:06:51,657
+minimum distance separating 
+two geometries,
+
+158
+00:06:51,857 --> 00:06:53,418
+generally expressed in meters,
+
+159
+00:06:53,618 --> 00:06:56,033
+well it depends on the projection
+system used.
+
+160
+00:06:57,517 --> 00:06:59,560
+The syntax is of the same nature 
+as in the previous cases,
+
+161
+00:06:59,760 --> 00:07:02,027
+the SELECT keyword, the distance function,
+
+162
+00:07:02,227 --> 00:07:03,785
+the two geometries concerned
+
+163
+00:07:03,985 --> 00:07:06,210
+in brackets, separated by a comma,
+
+164
+00:07:06,410 --> 00:07:08,508
+the FROM clause, and the name
+of the table.
+
+165
+00:07:10,817 --> 00:07:11,721
+In this example,
+
+166
+00:07:11,921 --> 00:07:13,071
+we will build a query
+
+167
+00:07:13,271 --> 00:07:14,941
+to classify the hotels
+
+168
+00:07:15,141 --> 00:07:18,019
+according to their distance from
+the road network.
+
+169
+00:07:18,219 --> 00:07:22,824
+In the syntax, we will start
+with the SELECT keyword,
+
+170
+00:07:23,024 --> 00:07:24,495
+the name of the hotels
+
+171
+00:07:24,695 --> 00:07:26,359
+and a second factor
+
+172
+00:07:26,559 --> 00:07:28,577
+which will be the distance
+
+173
+00:07:28,777 --> 00:07:30,292
+between the hotel geometries
+
+174
+00:07:30,492 --> 00:07:32,717
+and the geometry of the roads
+
+175
+00:07:32,917 --> 00:07:35,512
+and we will take the minimum value
+
+176
+00:07:35,712 --> 00:07:38,544
+of all the distances separating
+a hotel from all the roads.
+
+177
+00:07:40,027 --> 00:07:42,072
+The field "calculate the minimum distance"
+
+178
+00:07:42,272 --> 00:07:43,358
+is given an alias,
+
+179
+00:07:43,558 --> 00:07:44,472
+DIST,
+
+180
+00:07:44,672 --> 00:07:46,794
+in the FROM clause
+
+181
+00:07:46,994 --> 00:07:48,179
+the two tables concerned,
+
+182
+00:07:48,379 --> 00:07:49,607
+so hotels and roads
+,
+183
+00:07:49,807 --> 00:07:52,526
+a grouping clause,
+
+184
+00:07:52,726 --> 00:07:53,608
+the name of the hotels
+
+185
+00:07:53,808 --> 00:07:55,930
+and then a ranking
+
+186
+00:07:56,130 --> 00:07:59,224
+in increasing order of distances.
+
+187
+00:08:00,945 --> 00:08:02,000
+By executing this query
+
+188
+00:08:02,200 --> 00:08:04,985
+we find the series of 124 hotels
+
+189
+00:08:05,185 --> 00:08:06,904
+with the distance which separates them
+
+190
+00:08:07,104 --> 00:08:09,927
+from the road network, 
+between 10 and 600m.
+
+191
+00:08:20,996 --> 00:08:23,468
+A series of spatial operators
+
+192
+00:08:23,668 --> 00:08:24,365
+to finish,
+
+193
+00:08:24,565 --> 00:08:29,194
+so operators that return new
+geometric objects
+
+194
+00:08:29,394 --> 00:08:32,212
+created from existing geometric objects.
+
+195
+00:08:32,412 --> 00:08:34,559
+The first of these operators
+
+196
+00:08:34,759 --> 00:08:35,654
+is the union query
+
+197
+00:08:35,854 --> 00:08:38,598
+which allows to merge two geometries
+
+198
+00:08:38,798 --> 00:08:39,850
+into a single object.
+
+199
+00:08:40,050 --> 00:08:41,765
+The intersection request
+
+200
+00:08:41,965 --> 00:08:43,790
+which returns the common part
+
+201
+00:08:43,990 --> 00:08:44,850
+of two geometries.
+
+202
+00:08:45,050 --> 00:08:46,869
+The difference request
+
+203
+00:08:47,069 --> 00:08:48,524
+which subtracts a geometry
+
+204
+00:08:48,724 --> 00:08:49,686
+of another.
+
+205
+00:08:49,886 --> 00:08:52,079
+The syntax, as usual
+
+206
+00:08:52,279 --> 00:08:54,090
+is composed by the SELECT keyword 
+
+207
+00:08:54,290 --> 00:08:55,486
+Followed by the function,
+
+208
+00:08:55,686 --> 00:08:57,083
+the two geometries concerned
+
+209
+00:08:57,283 --> 00:08:59,333
+in brackets, separated by a comma,
+
+210
+00:08:59,533 --> 00:09:02,192
+the ​​AS GEOMETRY alias
+
+211
+00:09:02,392 --> 00:09:04,677
+to be able to reuse this result,
+
+212
+00:09:04,877 --> 00:09:06,713
+say that it is a geometry
+
+213
+00:09:06,913 --> 00:09:10,550
+and the table from where the data come.
+
+214
+00:09:10,750 --> 00:09:15,499
+As in the case of the length of
+the polylines,
+
+215
+00:09:15,699 --> 00:09:17,361
+the union request,
+
+216
+00:09:17,561 --> 00:09:19,423
+the UNION keyword,
+
+217
+00:09:19,623 --> 00:09:22,383
+is part of a series of keywords
+
+218
+00:09:22,583 --> 00:09:23,855
+reserved in SpatiaLite,
+
+219
+00:09:24,055 --> 00:09:25,782
+that is why we use
+
+220
+00:09:25,982 --> 00:09:27,206
+GUnion instead
+
+221
+00:09:27,406 --> 00:09:30,523
+and as always in Postgis
+
+222
+00:09:30,723 --> 00:09:34,209
+the equivalent will be  ST
+underlined UNION.
+
+223
+00:09:34,409 --> 00:09:37,623
+Two other important space operators,
+
+224
+00:09:37,823 --> 00:09:39,337
+SIMPLIFY and BUFFER.
+
+225
+00:09:39,537 --> 00:09:41,139
+The first, SIMPLIFY,
+
+226
+00:09:41,339 --> 00:09:42,876
+refers to a simplified geometry,
+
+227
+00:09:43,076 --> 00:09:44,823
+taking into account a tolerance
+
+228
+00:09:45,023 --> 00:09:46,764
+which is defined by the numerical argument
+
+229
+00:09:46,964 --> 00:09:48,829
+given in the function,
+
+230
+00:09:49,029 --> 00:09:51,359
+so it is a simplification
+
+231
+00:09:51,559 --> 00:09:55,074
+which is based on a 
+Douglas-Peucker algorithm,
+
+232
+00:09:55,274 --> 00:09:58,274
+which allows to reduce
+
+233
+00:09:58,474 --> 00:10:00,696
+the number of points of which a
+geometry is composed,
+
+234
+00:10:00,896 --> 00:10:03,013
+which can be important
+
+235
+00:10:03,213 --> 00:10:04,585
+in the display performances
+
+236
+00:10:04,785 --> 00:10:06,679
+of the geometry on the screen.
+
+237
+00:10:06,879 --> 00:10:08,954
+The BUFFER function
+
+238
+00:10:09,154 --> 00:10:10,223
+returns a geometry
+
+239
+00:10:10,423 --> 00:10:12,043
+which covers an entire area
+
+240
+00:10:12,243 --> 00:10:14,987
+located at a distance inferior
+or equal to
+
+241
+00:10:15,187 --> 00:10:17,949
+the number given as an attribute
+
+242
+00:10:18,149 --> 00:10:20,381
+of an original geometry.
+
+243
+00:10:20,581 --> 00:10:22,510
+It is the concept of buffer zone.
+
+244
+00:10:22,710 --> 00:10:24,577
+At the syntax level
+
+245
+00:10:24,777 --> 00:10:26,573
+still the SELECT keyword,
+
+246
+00:10:26,773 --> 00:10:27,431
+the function,
+
+247
+00:10:27,631 --> 00:10:31,667
+the geometry, comma, the numeric variable,
+
+248
+00:10:31,867 --> 00:10:34,417
+a tolerance in the case of SIMPLIFY,
+
+249
+00:10:34,617 --> 00:10:36,607
+a distance in the case of BUFFER,
+
+250
+00:10:36,807 --> 00:10:40,345
+AS GEOMETRY because we create
+geometries
+
+251
+00:10:40,545 --> 00:10:42,294
+and the original table.
+
+252
+00:10:44,212 --> 00:10:45,081
+In this first example
+
+253
+00:10:45,281 --> 00:10:47,023
+we will illustrate the use
+
+254
+00:10:47,223 --> 00:10:48,231
+of the SIMPLIFY function
+
+255
+00:10:48,431 --> 00:10:51,681
+by simplifying the road network of
+the Seychelles
+
+256
+00:10:51,881 --> 00:10:55,241
+with a tolerance of 50.
+
+257
+00:10:55,441 --> 00:10:58,113
+We see that the request produces
+
+258
+00:10:58,313 --> 00:11:00,457
+geometric objects indeed.
+
+259
+00:11:00,657 --> 00:11:03,924
+They have to be defined as geometries
+
+260
+00:11:04,124 --> 00:11:05,438
+to be able to recover them
+
+261
+00:11:05,638 --> 00:11:07,792
+in QGIS as usual.
+
+262
+00:11:09,481 --> 00:11:11,037
+A name is given to the table,
+
+263
+00:11:11,237 --> 00:11:12,997
+SIMPLIFY, the geometry
+
+264
+00:11:13,197 --> 00:11:15,376
+being of course the GEOMETRY field.
+
+265
+00:11:15,576 --> 00:11:18,090
+This simplified layer
+
+266
+00:11:18,290 --> 00:11:19,690
+appears here in white
+
+267
+00:11:19,890 --> 00:11:21,381
+and if we go a little bit closer
+
+268
+00:11:21,581 --> 00:11:23,228
+we see that the detail
+
+269
+00:11:23,428 --> 00:11:25,617
+of the road network has been erased
+
+270
+00:11:25,817 --> 00:11:27,228
+in favor of a simpler structure.
+
+271
+00:11:30,094 --> 00:11:30,988
+Second example
+
+272
+00:11:31,188 --> 00:11:33,411
+with the union.
+
+273
+00:11:33,611 --> 00:11:35,954
+We will establish a union request
+
+274
+00:11:36,154 --> 00:11:37,923
+between two districts,
+
+275
+00:11:38,123 --> 00:11:39,076
+the district of Port Glaud
+
+276
+00:11:39,276 --> 00:11:41,189
+and the district of Grand'Anse Mahé.
+
+277
+00:11:43,466 --> 00:11:46,631
+We transfer the union request
+
+278
+00:11:46,831 --> 00:11:49,114
+on the geometry field of
+the district table
+
+279
+00:11:49,314 --> 00:11:52,333
+and in the conditional clause
+
+280
+00:11:52,533 --> 00:11:54,447
+which clarifies things
+
+281
+00:11:54,647 --> 00:11:56,411
+we say that we want the name
+
+282
+00:11:56,611 --> 00:11:59,401
+of districts chosen for the union
+
+283
+00:11:59,601 --> 00:12:02,386
+to be either Port Glaud 
+or Grand'Anse Mahé.
+
+284
+00:12:10,659 --> 00:12:11,872
+The execution of this request
+
+285
+00:12:12,072 --> 00:12:13,914
+causes the merging
+
+286
+00:12:14,114 --> 00:12:16,129
+of the two entities.
+
+287
+00:12:18,761 --> 00:12:19,625
+Third case,
+
+288
+00:12:19,825 --> 00:12:23,383
+we will build a buffer zone,
+
+289
+00:12:23,583 --> 00:12:24,355
+a buffer,
+
+290
+00:12:24,555 --> 00:12:27,742
+around the Sans Soucis road
+
+291
+00:12:27,942 --> 00:12:32,148
+which is located in the 
+center-western part
+
+292
+00:12:32,348 --> 00:12:33,064
+of the Seychelles.
+
+293
+00:12:33,264 --> 00:12:36,784
+So we define a buffer with 
+a width of 100m
+
+294
+00:12:36,984 --> 00:12:37,818
+around that road
+
+295
+00:12:38,018 --> 00:12:40,676
+and in the conditional clause
+
+296
+00:12:40,876 --> 00:12:42,624
+we will simply say that we want
+
+297
+00:12:42,824 --> 00:12:44,211
+all the segments of the road
+
+298
+00:12:44,411 --> 00:12:47,430
+which look like Sans Soucis road.
+
+299
+00:12:50,312 --> 00:12:51,710
+The execution of this request
+
+300
+00:12:51,910 --> 00:12:53,321
+provides geometric objects.
+
+301
+00:12:53,521 --> 00:12:56,484
+With the AS GEOMETRY
+
+302
+00:12:56,684 --> 00:12:58,235
+and by defining a table name,
+
+303
+00:12:58,435 --> 00:13:01,863
+we add this request
+
+304
+00:13:02,063 --> 00:13:03,958
+as a layer
+
+305
+00:13:04,158 --> 00:13:06,481
+in the QGIS interface
+
+306
+00:13:06,681 --> 00:13:09,182
+and we see that at the
+time I execute the request
+
+307
+00:13:09,382 --> 00:13:12,729
+the buffer zone is displayed on the map,
+
+308
+00:13:12,929 --> 00:13:13,624
+here in pink,
+
+309
+00:13:13,824 --> 00:13:16,332
+and if we look a
+little closer
+
+310
+00:13:16,532 --> 00:13:18,272
+we see that the different sections
+of the road
+
+311
+00:13:18,472 --> 00:13:21,097
+will give rise to a succession
+
+312
+00:13:21,297 --> 00:13:22,740
+of buffer zone pieces
+
+313
+00:13:22,940 --> 00:13:25,107
+which fit with each other.
+
+314
+00:13:26,838 --> 00:13:27,822
+As a final example,
+
+315
+00:13:28,022 --> 00:13:30,991
+we will create a buffer zone
+
+316
+00:13:31,191 --> 00:13:34,838
+around the two districts
+
+317
+00:13:35,038 --> 00:13:36,425
+of Port Glaud and Grand'Anse Mahé
+
+318
+00:13:36,625 --> 00:13:38,931
+by taking up the merging request 
+
+319
+00:13:39,131 --> 00:13:42,033
+of these elements from before
+
+320
+00:13:42,233 --> 00:13:44,307
+and this time we will add
+
+321
+00:13:44,507 --> 00:13:47,600
+the creation of a buffer 
+to this merging.
+
+322
+00:13:49,897 --> 00:13:51,761
+If we move the district layer
+
+323
+00:13:51,961 --> 00:13:53,030
+above this buffer
+
+324
+00:13:53,230 --> 00:13:54,526
+and that we look little closer
+
+325
+00:13:54,726 --> 00:13:55,942
+we see that
+
+326
+00:13:56,142 --> 00:13:57,148
+we have created a 100m block
+
+327
+00:13:57,348 --> 00:13:59,583
+around these two merged districts.
+
+328
+00:14:08,832 --> 00:14:10,102
+In this lesson,
+
+329
+00:14:10,302 --> 00:14:11,564
+after talking a little bit about
+
+330
+00:14:11,764 --> 00:14:12,741
+the notions of topology
+
+331
+00:14:12,941 --> 00:14:14,539
+we have seen a few examples
+
+332
+00:14:14,739 --> 00:14:15,822
+of test functions
+
+333
+00:14:16,022 --> 00:14:17,748
+which allow to evaluate
+
+334
+00:14:17,948 --> 00:14:21,434
+the existence of topological
+spatial relations
+
+335
+00:14:21,634 --> 00:14:22,875
+between spatial entities.
+
+336
+00:14:23,075 --> 00:14:25,295
+We have seen an example of using
+
+337
+00:14:25,495 --> 00:14:26,940
+the distance function
+
+338
+00:14:27,140 --> 00:14:31,280
+To sort hotels according to their
+distance to the road network
+
+339
+00:14:31,480 --> 00:14:33,547
+and we have seen some examples
+
+340
+00:14:33,747 --> 00:14:35,666
+of application of spatial operators
+
+341
+00:14:35,866 --> 00:14:38,064
+which allow to create new objects
+
+342
+00:14:38,264 --> 00:14:39,556
+by intersection
+
+343
+00:14:39,756 --> 00:14:43,010
+by difference, by creation 
+of buffer zones
+
+344
+00:14:43,210 --> 00:14:44,333
+and other.
+

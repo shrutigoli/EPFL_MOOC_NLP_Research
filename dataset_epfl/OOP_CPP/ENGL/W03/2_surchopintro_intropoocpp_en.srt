@@ -1,0 +1,854 @@
+1
+00:00:04,522 --> 00:00:06,201
+In this episode, as well as
+the upcoming ones,
+
+2
+00:00:06,201 --> 00:00:09,240
+we will focus on operator
+overloading.
+
+3
+00:00:09,659 --> 00:00:11,044
+This is a rather technical subject
+
+4
+00:00:11,044 --> 00:00:13,870
+which will make us able to define
+our very own operators.
+
+5
+00:00:14,885 --> 00:00:17,858
+Let us begin with an example so that
+we may see what purpose it serves.
+
+6
+00:00:18,433 --> 00:00:22,193
+For example, let us say we have
+defined a "Complexe" (= "Complex")  class
+
+7
+00:00:22,193 --> 00:00:24,164
+in order to add complex numbers.
+
+8
+00:00:24,164 --> 00:00:26,222
+It does not matter what it is
+exactly.
+
+9
+00:00:26,535 --> 00:00:28,955
+What matters, is that we wish
+to add
+
+10
+00:00:28,957 --> 00:00:30,537
+complex numbers.
+
+11
+00:00:30,537 --> 00:00:33,457
+Let us suppose we have already defined
+a few complex numbers :
+
+12
+00:00:33,457 --> 00:00:34,896
+z1, z2 and so on.
+
+13
+00:00:34,988 --> 00:00:38,280
+How should we proceed in order
+to add these complex numbers?
+
+14
+00:00:39,138 --> 00:00:43,119
+For example, we may wish to store inside
+z3, the result of " z1 + z2 ".
+
+15
+00:00:43,744 --> 00:00:45,959
+Of course, we would very much like
+to write something like :
+
+16
+00:00:46,217 --> 00:00:49,261
+" z3 = z1 + z2 "
+
+17
+00:00:50,785 --> 00:00:52,474
+If we write this in our
+usual classes
+
+18
+00:00:52,474 --> 00:00:54,484
+we will get a compiling error
+
+19
+00:00:54,484 --> 00:00:57,611
+since the " + " is indeed not
+defined for z1, z2,
+
+20
+00:00:57,611 --> 00:00:59,657
+it is not defined for
+complex numbers.
+
+21
+00:01:00,197 --> 00:01:02,452
+Until now, we would rather
+
+22
+00:01:02,504 --> 00:01:04,910
+have defined a function in charge
+of the addition.
+
+23
+00:01:05,009 --> 00:01:07,398
+For example, we could define
+a function called "add"
+
+24
+00:01:07,468 --> 00:01:08,873
+which would work like this :
+
+25
+00:01:08,953 --> 00:01:13,511
+add(z1, z2) and
+" z3 = add(z1, z2) "
+
+26
+00:01:14,193 --> 00:01:17,780
+in order to store the result of the addition
+of z1 and z2 into z3.
+
+27
+00:01:19,107 --> 00:01:23,550
+And if we wanted to store, into z4,
+the result of the addition of
+
+28
+00:01:23,550 --> 00:01:27,532
+z1, z2 and z3,
+we would have to write it like this.
+
+29
+00:01:27,532 --> 00:01:32,660
+As the first argument, here,
+we add up z1 and z2
+
+30
+00:01:34,637 --> 00:01:40,642
+and then, as the second argument,
+we will call the function "add" again
+
+31
+00:01:41,199 --> 00:01:44,454
+and add z3 here.
+
+32
+00:01:45,842 --> 00:01:48,309
+Unfortunatley, this way to write it
+is rather unnatural.
+
+33
+00:01:48,309 --> 00:01:54,342
+It would be much more pleasant
+to write " z4 = z1 + z2 + z3 ";
+
+34
+00:01:54,342 --> 00:01:58,522
+it is much clearer than something like
+this with an "add" function.
+
+35
+00:01:59,050 --> 00:02:02,089
+Indeed, the goal of operator
+overloading
+
+36
+00:02:02,089 --> 00:02:05,858
+is to let us write something like this,
+using the " + " operator
+
+37
+00:02:05,858 --> 00:02:10,151
+with a class belonging to us,
+that we have defined,
+
+38
+00:02:10,151 --> 00:02:12,200
+called the "Complexe" class.
+
+39
+00:02:12,968 --> 00:02:15,502
+Similarly, we could wish to print
+
+40
+00:02:15,502 --> 00:02:18,631
+complex numbers in an homogenous
+way like this.
+
+41
+00:02:18,631 --> 00:02:22,478
+For example, printing the
+message " z3 = "
+
+42
+00:02:22,478 --> 00:02:25,808
+followed by the value of the complex number z3
+so that we may print z3.
+
+43
+00:02:25,913 --> 00:02:28,515
+Why, writing this is only
+possible
+
+44
+00:02:28,515 --> 00:02:31,991
+if we do not overload the
+printing operator.
+
+45
+00:02:32,479 --> 00:02:37,638
+We daresay it is better to write this
+rather than having to cut out here
+
+46
+00:02:37,638 --> 00:02:42,579
+a printing of the message "z3 = "
+and then calling a printing function
+
+47
+00:02:42,579 --> 00:02:45,858
+which we have defined for the
+complex class.
+
+48
+00:02:45,858 --> 00:02:48,104
+Finally printing the line
+break like this.
+
+49
+00:02:48,384 --> 00:02:50,401
+This here is the purpose
+of operator overloading.
+
+50
+00:02:50,578 --> 00:02:53,339
+This will let us expand the
+use of the usual operators
+
+51
+00:02:53,339 --> 00:02:54,883
+(the ones we deem most useful)
+
+52
+00:02:54,883 --> 00:02:57,886
+to the classes where we wish
+
+53
+00:02:57,886 --> 00:03:01,029
+to add these different operators
+(addition, printing, multiplication)
+
+54
+00:03:01,029 --> 00:03:03,029
+according to our needs.
+
+55
+00:03:03,783 --> 00:03:07,510
+That said, operator overloading is
+still quite a technical subject;
+
+56
+00:03:07,510 --> 00:03:09,893
+it can be rather complicated since we
+are in the core of the language.
+
+57
+00:03:09,893 --> 00:03:12,358
+We will redefine elementary
+operations :
+
+58
+00:03:12,358 --> 00:03:13,494
+the operators.
+
+59
+00:03:13,494 --> 00:03:15,596
+Therefore, according to your level
+
+60
+00:03:15,596 --> 00:03:18,635
+or to the restrains you find
+yourselves in,
+
+61
+00:03:18,640 --> 00:03:22,661
+you have several ways to tackle
+the operator overloading.
+
+62
+00:03:22,720 --> 00:03:25,777
+You can decide not to use them at
+all and continue
+
+63
+00:03:25,777 --> 00:03:28,640
+using functions as you were
+doing up until now.
+
+64
+00:03:29,506 --> 00:03:32,190
+Also, you may decide to introduce
+only the operators
+
+65
+00:03:32,190 --> 00:03:35,682
+relatively simple :
+additions, multiplications
+
+66
+00:03:36,186 --> 00:03:39,026
+without worrying about the so-called
+auto-assignment
+
+67
+00:03:39,026 --> 00:03:41,987
+(that is, += , -=, x= ).
+
+68
+00:03:42,045 --> 00:03:46,893
+At this level, you may also decide to
+overload the printing operator
+
+69
+00:03:46,893 --> 00:03:48,876
+if you find it useful.
+
+70
+00:03:49,638 --> 00:03:51,694
+At a higher level, you may start
+to tackle
+
+71
+00:03:51,745 --> 00:03:56,102
+the overloading of auto-assignment
+operators : += , -= and so on
+
+72
+00:03:56,102 --> 00:03:58,805
+but in a slightly simplified
+version
+
+73
+00:03:58,805 --> 00:04:00,365
+with the return type "void".
+
+74
+00:04:00,424 --> 00:04:03,710
+We will go back to this in detail
+in the different following episodes.
+
+75
+00:04:04,205 --> 00:04:07,380
+Here, we are giving the plan of the videos
+we will be proposing.
+
+76
+00:04:08,144 --> 00:04:11,502
+Finally, at the highest level,
+you may also redefine
+
+77
+00:04:11,502 --> 00:04:15,694
+these operators according to the
+standard, at a much higher level.
+
+78
+00:04:16,484 --> 00:04:18,792
+The level targeted by this course
+is the level 2.
+
+79
+00:04:18,792 --> 00:04:22,069
+We will thus do a relatively simple
+operator overloading.
+
+80
+00:04:22,069 --> 00:04:25,499
+However, in the upcoming videos,
+we will still present
+
+81
+00:04:25,499 --> 00:04:30,570
+the level 3 and the level 4 so that
+you know they exist.
+
+82
+00:04:31,238 --> 00:04:34,674
+If you interested, you may freely
+expand on the subject.
+
+83
+00:04:36,278 --> 00:04:38,445
+Now, let us dive into the heart
+of the matter :
+
+84
+00:04:38,445 --> 00:04:40,150
+this famous operator overloading.
+
+85
+00:04:40,150 --> 00:04:43,147
+First of all, what is an operator?
+Operators are signs used
+
+86
+00:04:43,147 --> 00:04:47,219
+to represent the operations
+
+87
+00:04:47,219 --> 00:04:49,790
+such as arithmetic operators.
+
+88
+00:04:49,790 --> 00:04:53,453
+For example, when you write 
+" z = a + b ",
+
+89
+00:04:56,629 --> 00:04:58,215
+you are using the addition
+operator.
+
+90
+00:04:58,278 --> 00:05:02,120
+You have logical operators.
+For example, if we write
+
+91
+00:05:09,976 --> 00:05:12,317
+" (a == b) and (x == y) "
+here, "and" is an operator.
+
+92
+00:05:13,211 --> 00:05:19,085
+You also have comparison operators.
+For example, if you write : " x <= y "
+
+93
+00:05:22,024 --> 00:05:24,331
+you are still using an operator.
+
+94
+00:05:25,386 --> 00:05:28,997
+You also have the auto-increment operators.
+For example, when we write " ++i "
+
+95
+00:05:30,001 --> 00:05:31,346
+in "for loops".
+
+96
+00:05:32,206 --> 00:05:34,999
+You also have the assignment operator
+of which we have not yet spoken,
+
+97
+00:05:34,999 --> 00:05:37,771
+but which is written here.
+If you have : " z = something ",
+
+98
+00:05:37,771 --> 00:05:41,142
+it is indeed an operator.
+This operator is overloadable aswell.
+
+99
+00:05:41,142 --> 00:05:43,813
+We will talk about it in
+the very last video.
+
+100
+00:05:44,544 --> 00:05:48,531
+What you need to know is that when you write
+an expression containing an operator
+
+101
+00:05:48,531 --> 00:05:51,549
+(the operator "==" here, the operator "and"...)
+
+102
+00:05:52,053 --> 00:05:55,129
+it corresponds to the call
+to a function
+
+103
+00:05:55,129 --> 00:05:56,794
+or to a call to a method (class member function).
+
+104
+00:05:57,596 --> 00:05:59,407
+Every time you write  "a Op b ",
+
+105
+00:06:00,090 --> 00:06:03,700
+either you have the function
+"operatorOp (a, b) ".
+
+106
+00:06:03,700 --> 00:06:06,065
+For example, when we write
+" a + b ",
+
+107
+00:06:07,769 --> 00:06:13,000
+it means we have either a call
+to the function " Operator+ (a, b)
+
+108
+00:06:15,509 --> 00:06:18,786
+or (we will see the distrinctions
+later) the class method
+
+109
+00:06:18,786 --> 00:06:22,515
+of which a is an instance :
+a.operator+
+
+110
+00:06:24,583 --> 00:06:29,656
+This means the method "operator+ "
+where b is the argument.
+
+111
+00:06:30,987 --> 00:06:33,903
+Similarly, if we have
+unary operators
+
+112
+00:06:33,903 --> 00:06:36,461
+(operators with only one operand),
+
+113
+00:06:36,897 --> 00:06:41,311
+for example, when we write " -a "
+to take the opposite of a,
+
+114
+00:06:41,633 --> 00:06:44,700
+or when we write " ++a " to
+increment a,
+
+115
+00:06:45,538 --> 00:06:49,080
+it is either a call to a function or a  call to a method.
+In the case of "-a",
+
+116
+00:06:49,969 --> 00:06:53,413
+it is either the function "operator-"
+with a as argument,
+
+117
+00:06:54,658 --> 00:07:01,657
+or the method of a class instance
+written " a.operator- "
+
+118
+00:07:03,316 --> 00:07:04,992
+here without argument.
+
+119
+00:07:05,957 --> 00:07:10,101
+Similarly, " ++a" will either
+call a function
+
+120
+00:07:10,101 --> 00:07:16,234
+according to what has been defined
+( "operator++ (a))
+
+121
+00:07:17,891 --> 00:07:21,309
+or the method "operator++ " of the
+class where a is an instance (a.operator++()).
+
+122
+00:07:24,695 --> 00:07:29,148
+To give more examples, when you
+write "cout << a ",
+
+123
+00:07:30,837 --> 00:07:34,821
+you are either using the function
+"operator<< " taking cout and a as argument
+
+124
+00:07:37,689 --> 00:07:42,228
+or (since cout is an instance
+of class
+
+125
+00:07:42,228 --> 00:07:48,347
+called "iostream") the method
+"operator<< "
+
+126
+00:07:50,467 --> 00:07:53,094
+of the class where "cout" is an instance,
+that is, the "ostream" class
+
+127
+00:07:54,514 --> 00:07:56,143
+with a as parameter.
+
+128
+00:07:57,067 --> 00:07:59,254
+Finally, you need to know
+that when you call " a = b ",
+
+129
+00:07:59,414 --> 00:08:01,615
+you indeed in this case here.
+
+130
+00:08:03,251 --> 00:08:08,026
+However, there is no function " = "
+with two arguments.
+
+131
+00:08:08,083 --> 00:08:13,353
+Therefore, we are perforce
+using the method " operator= "
+
+132
+00:08:14,659 --> 00:08:17,086
+of the class where a is an instance
+called
+
+133
+00:08:17,086 --> 00:08:18,758
+with b as parameter.
+
+134
+00:08:20,671 --> 00:08:22,575
+Those were a handful of examples.
+
+135
+00:08:22,575 --> 00:08:24,798
+The set of the operators
+you can overload
+
+136
+00:08:24,798 --> 00:08:28,041
+is given as a pdf complement
+
+137
+00:08:28,041 --> 00:08:30,081
+on the course website.
+
+138
+00:08:30,644 --> 00:08:32,911
+This is it for the operators.
+Now what about the overloading?
+
+139
+00:08:33,680 --> 00:08:36,208
+The overloading is when a function
+or a method
+
+140
+00:08:36,208 --> 00:08:40,616
+has the same name as another function/method,
+both being distinguished by their arguments
+
+141
+00:08:41,321 --> 00:08:46,326
+For example, we can imagine a function
+"max" taking two integers as parameters
+
+142
+00:08:46,881 --> 00:08:51,664
+and another function "max" taking
+two doubles as parameters.
+
+143
+00:08:52,280 --> 00:08:54,634
+At this point, we say that the two
+"max" functions are overloaded.
+
+144
+00:08:55,203 --> 00:08:59,034
+There are several functions
+with the same name "max"
+
+145
+00:08:59,034 --> 00:09:01,820
+but distinguished by the types
+of their parameters.
+
+146
+00:09:02,709 --> 00:09:05,111
+Regarding operators,
+we will do the same thing :
+
+147
+00:09:05,111 --> 00:09:06,758
+we will overload operators.
+
+148
+00:09:07,321 --> 00:09:11,159
+For example, we will overload the operator
+" + " for the "Complexe" class.
+
+149
+00:09:11,159 --> 00:09:14,351
+Here, it takes two complex numbers
+and the addition of two complex numbers
+
+150
+00:09:14,351 --> 00:09:18,090
+returns here a complex number.
+For example, if we are working
+
+151
+00:09:18,090 --> 00:09:20,858
+with matrices we wish to add,
+
+152
+00:09:20,858 --> 00:09:25,300
+we may overload the operator " + "
+and take two matrices here.
+
+153
+00:09:26,332 --> 00:09:27,947
+This is the operator overloading.
+
+154
+00:09:27,947 --> 00:09:31,665
+It is the possibility to
+redefine operators having the same name :
+
+155
+00:09:31,665 --> 00:09:34,798
+"operator something" for
+different classes.
+
+156
+00:09:36,375 --> 00:09:39,207
+In C++, pretty much all operators
+are overloadable.
+
+157
+00:09:39,207 --> 00:09:42,482
+Once again, the complete list
+is given on the course website.
+
+158
+00:09:43,155 --> 00:09:45,854
+Therefore, you can freely overload
+the usual operators
+
+159
+00:09:45,854 --> 00:09:49,401
+for your classes.
+As we said, there are two ways
+
+160
+00:09:49,401 --> 00:09:51,882
+to interpret an operator :
+either as a function
+
+161
+00:09:51,882 --> 00:09:53,293
+or as a method.
+
+162
+00:09:53,892 --> 00:09:56,380
+Indeed, there are two types
+of overloading.
+
+163
+00:09:56,380 --> 00:09:59,960
+The so-called external overloading
+or internal overloading.
+
+164
+00:10:00,934 --> 00:10:03,782
+The external overloading is the one
+using usual non-member functions;
+
+165
+00:10:03,782 --> 00:10:07,804
+for example, "operator+ " taking
+two complex numbers
+
+166
+00:10:07,804 --> 00:10:17,442
+in order to do, for example "z3 = z1 + z2"
+which will be called "operator+ " :
+
+167
+00:10:18,352 --> 00:10:22,485
+" z3 = operator+(z1, z2) ".
+
+168
+00:10:23,752 --> 00:10:27,160
+This overloading is external to
+the class; we call it
+
+169
+00:10:27,160 --> 00:10:30,591
+an external overloading by
+opposition to the internal overloading
+
+170
+00:10:30,667 --> 00:10:35,669
+which is done inside the class
+and is the alternative.
+
+171
+00:10:36,336 --> 00:10:40,843
+This time, we would have
+" z3 = z1.operator+ (z2) "
+
+172
+00:10:41,741 --> 00:10:44,011
+where "operator+ " is a method of
+the class of z1.
+
+173
+00:10:44,878 --> 00:10:48,584
+Therefore, in an internal overloading,
+the operator corresponds
+
+174
+00:10:48,584 --> 00:10:52,784
+to a method (a class member function). On the other hand,
+in the external overloading,
+
+175
+00:10:52,784 --> 00:10:56,286
+the operator corresponds to
+a usual non-member function.
+
+176
+00:10:57,268 --> 00:10:59,590
+We will begin by presenting the external
+overloading.
+
+177
+00:10:59,590 --> 00:11:03,327
+Then, in the next episode, we will
+present the internal overloading
+
+178
+00:11:03,327 --> 00:11:05,739
+and decide which one is
+more appropriate
+
+179
+00:11:05,739 --> 00:11:07,765
+and choose one of these
+overloading options.

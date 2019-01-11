@@ -1,0 +1,105 @@
+In this episode, we will keep discussing operator overloading.
+This time, we will focus on the inner overloading.
+In the previous episodes, we have indeed learnt that an operator could be overloaded either outside a class or inside a class
+(in this case, it is a member function belonging to a class).
+For example, let us say we have defined the operator "+" for complex numbers through a function.
+Then, when we write something like "z1 + z2" where z1 an z2 are "Complex", this corresponds to a call to the function "operator+ " taking z1 and z2 as arguments.
+The first operand corresponds to the first argument of the function, and the second to the second argument of the function.
+A possible alternative would be to defne the operator "+" through an inner overloading.
+This means we will place this operator's definition inside the "Complexe" class.
+Since it is a member function, we will need to call it through an object.
+Therefore, when we write this, it does not correspond to the same thing as in the case of outer overloading.
+This will be translated to a call to a member function which looks like this.
+The first operand is the current object on which the "operator +" is applied.
+The second operand will correspond to the argument of the member function.
+As we can see, in the case of inner overloading, we only need one single argument which corresponds to the second operand.
+Let us sum up. If we wish to realize the inner overloading of a given operator, we will place the member function "OperatorOP" inside a class.
+Just as we did for other member functions, we will simply place, inside the class, the prototype of the operator.
+Then, we will give the operator's definition outiside the class.
+In this external definition, the operator will have to be bound to the class it belongs to through to scope resolution operator; this is essentially the same as the other member functions we have seen.
+A keypoint you have to remember is that the first operant of such an operator is the current instance.
+Therefore, this instance will not be passed as parameter.
+Member functions will only receive as parameter a possible second operand.
+Let us now see a concrete example : the operator " += ".
+We will proceed to its inner overloading in the "Complexe" class.
+Usually, the " += " operator has the following semantics :
+" add to z1 the value of z2 ".
+Unlike the operator " + " which we have discussed previously and was tasked to create a new
+"Complexe" from these two existing complex numbers
+(by summing them), the operator " += " will modify its first operand.
+As we can see, the " += " operator we have chosen as example is an operator very close to the objects of the "Complexe" class; indeed it has to modify their content.
+In such a case, we usually resort to an inner overloading.
+This is translated into the following code.
+The operator " += " is thus defined as a member function of the "Complexe" class.
+Its only argument is the second operand.
+For the purpose of readability, we will place the definition outside the class.
+However, this is not mandatory.
+The definition can be written like this :
+To the attribute "x" of the current object (that is, the first operand), we will add the value of the attribute "x" of the second operand.
+We will do the same for the second attribute.
+Now, we know how to define the operator " += " by using the inner overloading.
+Now, we are wondering :
+How can we define the operators " += " and
+" + " one with the other.
+The fundamental idea is to establish a semantic link between the two.
+This link exists anyway, and we would like to set it up so that our way to add complex numbers remains coherent from one operator to the other.
+By nature, the operator " += " requires les processing that its " + " counterpart; indeed it does not create any new complex number.
+It is rather natural to define the more demanding according to the less demanding rather than the opposite. This is what we will do now.
+In order to understand the body of the
+"operator+" member function redefined through " += " in the way we have proposed here, we will use a simple example.
+Let us suppose we have two complex numbers c1 and c2 initialized in a certain way.
+Now, we are trying to write the algorithm to compute the sum of c1 and c2 using the operator " += " for complex numbers.
+We thus wish to compute a new "Complexe", let us call it "tmp"; it will be the sum of c1 and c2.
+Let us ponder on how to compute the value of "tmp" through the " += " operator.
+We realize we simply have to copy the value of c1 into "tmp" and apply the operator " += " to "tmp" in order to add the value of c2.
+Ultimately, we obtain, inside "tmp" the sum of "c1" and "c2" by proceeding this way.
+In order to make sure of this, let's make a little drawing.
+The declaration of this "Complexe" will correspond to this situation in the memory.
+We have a Complex-type object c1.
+Its members " x " and " y " will be initialized like this.
+Similarly, the object c2 will look like this.
+The "tmp" object first build on this line by copying from c1,
+Its members x and y will initially be the values copied from c1.
+Then, we will apply the operator " += " to "tmp".
+Thus, executing this line, we will apply the operator "+= ".
+Thus, we will add to the " x " of "tmp" the value of the " x " of c2.
+We thus get the value 8.0 here.
+Also, we will add to the " y " of "tmp" the value of the " y " of c2.
+Thus the value 5 here.
+We can clearly see that the "Complexe" computed through the operator " += " corresponds indeed to the sum of c1 and c2.
+This is exactly this algorithm applied in the version you can see here.
+There is one subtlety, related to this passage by value here.
+Indeed, we are using this header for "operator+", which is the recommended header since C++ 2011.
+Thus, when we write something like "c1 + c2" what will happen is that the value of the "Complexe" c1 will be copied into z1. z1 is an area local to the function
+"operator+" on which we can work and which will be finally returned.
+We thus realize that z1 plays exactly the role of "tmp".
+Therefore, it is pointless to redefine, in the body of "operator+", another intermediate variable in which we could copy the first operand here.
+This role is already fulfilled by the parameter passed by value here.
+In other words, the copy of the first operand c1, done in an intermediate variable "tmp" is realized de facto upon this  by-value call here.
+Naturally, the algorithm described here is placed inside a function.
+Once the computation is complete, the value will be returned; this is precisely done here.
+We thus get a definition of the operator " + " done through  " += ". This definition is very concise, elegant and mostly establishes a semantic link between the operator " += " and the operator " + ".
+These two operators should not be defined separately.
+Please note that this way to define the header using a passage by value lets the modern compiler C++ 2011 to process many an optimization.
+By the way, this new version of the operator " + ", defined through " += ", has the edge of sparing us the trouble of using getters which were necessary for the external function to access the private attributes of "Complexe".
+These getters are not necessary anymore which is good for the encapsulation.
+We know that getters running rampant can nefarious to the encapsulation.
+Thus, we can use outer overloading or inner overloading for operators.
+In certain cases though, we do not have a choice as to how to proceed.
+For example, for the printing operator we have seen in the previous episode, we can only overload it with a (non-member) function.
+In some other cases, we may choose between the two.
+For example, regarding the operator " + ", which we have encountered already, it is perfectly possible to define it through an inner overloading, like this.
+It is also possible to define it through an outer overloading; we have done just that in the previous examples.
+Be careful though, we have seen that, during the external definition of an operator, we could be tempted to use the "friend".
+In the previous examples, we have always avoided to do so.
+Some people could be tempted to do it nonetheless; it is a very poor idea, breaking the encapsulation and not a good way to proceed.
+This leads us to a few recommendations regarding methodology.
+This concerns the choice between inner overloading and outer overloading for a given operator.
+First recommendation : it is usually recommended to prefer the outer overloading every time we can do so without having to resort to the "friend" keyword in the body of the function.
+This means, every time we can write the operator through the member functions of the classe's interface without useless copies.
+This was the case with the operator " + " which we could define without resorting to the "friend" keyword.
+In this case, it is thus recommended to define this operator through an outer overloading, with a function.
+On the other hand, if the operator is close to the class, as was the case before with the operator " += ", which required the instance to be modified and thus internal access, and possibly supplementary useless copies.
+Then, in this case, it is much better to use inner overloading.
+You now know all the basics on operator overloading.
+In the last episode, we will discuss the sharper aspects and will bring the light on a few points, left in the dark until now.

@@ -1,0 +1,1530 @@
+1
+00:00:00,740 --> 00:00:02,530
+In the final unit of this week, we'll
+
+2
+00:00:02,530 --> 00:00:05,575
+cover some of the general theory that
+underlies
+
+3
+00:00:05,575 --> 00:00:05,750
+[INAUDIBLE]
+
+4
+00:00:05,750 --> 00:00:07,610
+what we have seen before.
+
+5
+00:00:07,610 --> 00:00:09,910
+We're going to study a very general class
+of
+
+6
+00:00:09,910 --> 00:00:14,600
+design patterns that come up almost
+everywhere in functional programming.
+
+7
+00:00:14,600 --> 00:00:16,800
+And also in reactive programming.
+
+8
+00:00:16,800 --> 00:00:19,780
+The theoretical foundation of this class
+of design
+
+9
+00:00:19,780 --> 00:00:22,800
+patterns is important in the concept of a
+Monad.
+
+10
+00:00:24,880 --> 00:00:29,590
+As we've seen data structures with map and
+flatMap are quite common.
+
+11
+00:00:29,590 --> 00:00:32,500
+And in fact there's a name that describes
+this class of
+
+12
+00:00:32,500 --> 00:00:37,260
+data structure together with some
+algebraic laws that they should have.
+
+13
+00:00:37,260 --> 00:00:40,460
+These data structures are called monads.
+
+14
+00:00:40,460 --> 00:00:43,630
+A monad is a parametric type M with a
+
+15
+00:00:43,630 --> 00:00:49,220
+tight parameter T that has two operations,
+flatMap and Unit.
+
+16
+00:00:49,220 --> 00:00:50,200
+And these operations
+
+17
+00:00:50,200 --> 00:00:52,910
+also need to satisfy some laws.
+
+18
+00:00:52,910 --> 00:00:57,030
+So you could, can see it in Scholar as a
+trait, M.
+
+19
+00:00:57,030 --> 00:01:00,060
+Where M is the monad, T is the type
+parameter.
+
+20
+00:01:00,060 --> 00:01:04,092
+It would have a flatMap method of the type
+that you see here.
+
+21
+00:01:04,092 --> 00:01:09,300
+So, it takes an arbitrary type U as a
+parameter, and a function that.
+
+22
+00:01:09,300 --> 00:01:15,480
+Maps at T to a monad of U and it gives it
+back the same monad applied
+
+23
+00:01:15,480 --> 00:01:15,808
+to U.
+
+24
+00:01:15,808 --> 00:01:20,760
+And besides flatMap that would also be the
+unit method.
+
+25
+00:01:20,760 --> 00:01:24,260
+That unit method takes an element of type
+T
+
+26
+00:01:24,260 --> 00:01:27,440
+and gives you an instance of the monad of
+T.
+
+27
+00:01:28,520 --> 00:01:32,110
+In the literature, flatMap is more
+commonly called bind.
+
+28
+00:01:32,110 --> 00:01:35,640
+But in scholar, we have flatMap already as
+the established name.
+
+29
+00:01:35,640 --> 00:01:37,380
+So I will continue to use that.
+
+30
+00:01:39,070 --> 00:01:41,300
+Here are some examples of monad.
+
+31
+00:01:41,300 --> 00:01:45,990
+List is a monad where unit is just the
+single element constructor.
+
+32
+00:01:45,990 --> 00:01:50,319
+So, given an x, I return the list that
+consists of just x.
+
+33
+00:01:51,460 --> 00:01:56,520
+Similarly, set is a monad where unit of x
+is set of x.
+
+34
+00:01:56,520 --> 00:02:01,560
+Option is a monad where unit is some, so
+unit of x would
+
+35
+00:02:01,560 --> 00:02:06,730
+be I have an element, and here it is.
+And the random
+
+36
+00:02:06,730 --> 00:02:10,130
+value generators that we've seen in the
+last unit, they're also a
+
+37
+00:02:10,130 --> 00:02:14,649
+monad where unit of x is the single
+generator single of x.
+
+38
+00:02:15,850 --> 00:02:20,020
+As you've seen, flatMap was available as
+an operation on each of
+
+39
+00:02:20,020 --> 00:02:24,300
+these types, where as the unit in scala is
+different for each monad.
+
+40
+00:02:24,300 --> 00:02:26,700
+Quite often, it's just a name of the monad
+
+41
+00:02:26,700 --> 00:02:30,010
+type applied to an argument, but sometimes
+it's different.
+
+42
+00:02:30,010 --> 00:02:31,780
+For instance, for generator,
+
+43
+00:02:31,780 --> 00:02:34,720
+we use single, for option, we use some.
+
+44
+00:02:36,120 --> 00:02:39,370
+So we've seen monads have the flatMap
+operation.
+
+45
+00:02:39,370 --> 00:02:40,880
+What about map?
+
+46
+00:02:40,880 --> 00:02:45,030
+Well, in fact map can be defined for every
+monad as a combination of
+
+47
+00:02:45,030 --> 00:02:49,800
+flatMap and unit.
+So, the map applied to a monad with a
+
+48
+00:02:49,800 --> 00:02:57,230
+function f would be flatMap of.
+First apply f to the argument x and then
+
+49
+00:02:57,230 --> 00:03:02,960
+reinject into the monad using unit.
+Another way to write this expression would
+
+50
+00:03:02,960 --> 00:03:08,720
+be to use the m then combinator in scala
+that you have for function composition.
+
+51
+00:03:08,720 --> 00:03:15,110
+So you could write m, m map f is m flatMap
+of f andThen unit.
+
+52
+00:03:15,110 --> 00:03:19,810
+So you first apply the f function and then
+you apply the unit function.
+
+53
+00:03:19,810 --> 00:03:20,830
+To the result of that.
+
+54
+00:03:22,380 --> 00:03:25,550
+Now in scalar we do not have a unit that
+we can call
+
+55
+00:03:25,550 --> 00:03:30,740
+here because every monad has a different
+expression that gives the unit value.
+
+56
+00:03:30,740 --> 00:03:33,170
+Therefore map is in scalar a primitive
+
+57
+00:03:33,170 --> 00:03:36,870
+function that is also defined on every
+monad.
+
+58
+00:03:36,870 --> 00:03:42,320
+To qualify as a monad, a type has to
+satisfy three laws that connect
+
+59
+00:03:42,320 --> 00:03:47,580
+flatMap and unit.
+Associativity is, as usual, a law about
+
+60
+00:03:47,580 --> 00:03:49,290
+placing parentheses.
+
+61
+00:03:49,290 --> 00:03:52,750
+Here, the parentheses would be placed on
+the left hand side.
+
+62
+00:03:52,750 --> 00:03:55,550
+And here, you see them placed on the right
+hand side here.
+
+63
+00:03:55,550 --> 00:03:57,990
+So we can alternatively.
+
+64
+00:03:57,990 --> 00:04:00,737
+Either do the flatMap here first, or
+combine the
+
+65
+00:04:00,737 --> 00:04:04,850
+two functions in the flatMap, and apply to
+the monad.
+
+66
+00:04:04,850 --> 00:04:08,232
+Domain where associativity is a bit easier
+to
+
+67
+00:04:08,232 --> 00:04:11,620
+express as if we go from monads to
+monoides.
+
+68
+00:04:11,620 --> 00:04:12,840
+Monoids is a simpler
+
+69
+00:04:12,840 --> 00:04:18,684
+form of monads, it doesn't bind anything.
+So for instance, integers
+
+70
+00:04:18,684 --> 00:04:24,550
+are a monoide, and they are associative
+because x plus y plus z.
+
+71
+00:04:24,550 --> 00:04:29,890
+It's the same thing as x plus y plus z in
+parenthesis.
+
+72
+00:04:29,890 --> 00:04:33,750
+So I can, I can put the parenthesis either
+to the left or to the right.
+
+73
+00:04:35,370 --> 00:04:38,160
+The second law that needs to hold for
+monad
+
+74
+00:04:38,160 --> 00:04:39,970
+is called left unit.
+
+75
+00:04:39,970 --> 00:04:46,530
+It says that if I inject into the monad
+using unit, and then flatMap with f.
+
+76
+00:04:46,530 --> 00:04:50,180
+Then the result is the same as simply
+applying f to the value x.
+
+77
+00:04:51,370 --> 00:04:52,840
+The last law is right unit.
+
+78
+00:04:52,840 --> 00:04:56,540
+It says that if I flatMap with the unit
+constructor,
+
+79
+00:04:56,540 --> 00:04:59,340
+I end up with the same monad value as
+before.
+
+80
+00:05:00,390 --> 00:05:03,230
+Let's check the monad laws for an example
+type,
+
+81
+00:05:03,230 --> 00:05:05,110
+I pick Option for that.
+
+82
+00:05:05,110 --> 00:05:08,910
+First thing we have to do is look at
+flatMap for Option.
+
+83
+00:05:08,910 --> 00:05:13,830
+So what flatMap should do is, it should
+take an optional value.
+
+84
+00:05:13,830 --> 00:05:18,450
+If that optional value is None, so, we
+have nothing, then we keep None.
+
+85
+00:05:18,450 --> 00:05:22,450
+If the optional value is something with a
+value x, we apply a
+
+86
+00:05:22,450 --> 00:05:26,660
+given function to that value and that will
+give us another optional value.
+
+87
+00:05:27,990 --> 00:05:28,470
+Let's start
+
+88
+00:05:28,470 --> 00:05:30,870
+to prove the Left Unit Law.
+
+89
+00:05:30,870 --> 00:05:33,940
+What we need to show here is that, unit of
+
+90
+00:05:33,940 --> 00:05:37,040
+x for option that was some of x as you
+know.
+
+91
+00:05:38,210 --> 00:05:41,520
+flatMap f is the same thing as f of x.
+
+92
+00:05:42,620 --> 00:05:44,610
+So let's start with that expression, some
+of
+
+93
+00:05:44,610 --> 00:05:48,900
+x flatMap f, and expand what flatMap
+means.
+
+94
+00:05:48,900 --> 00:05:53,540
+So flatMap is this pattern match which
+says, well, if it's some of x,
+
+95
+00:05:53,540 --> 00:05:57,080
+then apply f to it.
+If it's none, keep on having none.
+
+96
+00:05:58,310 --> 00:06:00,815
+Now that we can simplify obviously,
+because we have a
+
+97
+00:06:00,815 --> 00:06:04,510
+some of x here, so it clearly matches the
+first pattern.
+
+98
+00:06:04,510 --> 00:06:07,060
+And that would give us f(x) as the result.
+
+99
+00:06:07,060 --> 00:06:12,820
+So the first monad law holds.
+Let's look at the right unit law now.
+
+100
+00:06:12,820 --> 00:06:18,590
+So the right unit law says that some
+optional value flatMap, with some which
+
+101
+00:06:18,590 --> 00:06:23,580
+is the unit constructor.
+Is the same thing as that optional value.
+
+102
+00:06:23,580 --> 00:06:25,750
+So we start with the left hand side.
+
+103
+00:06:25,750 --> 00:06:27,560
+Optional value, flatMap some.
+
+104
+00:06:28,960 --> 00:06:34,360
+We expand what flatMap means, so we again
+have this pattern match which says well,
+
+105
+00:06:34,360 --> 00:06:39,670
+match if it's some of x then return now
+function f is some.
+
+106
+00:06:39,670 --> 00:06:43,470
+So the function f here gets inserted here.
+
+107
+00:06:43,470 --> 00:06:47,610
+So we return some of x, and if it's none,
+then we return none.
+
+108
+00:06:49,200 --> 00:06:54,110
+And that again simplifies to just opt,
+because we see that in each of the
+
+109
+00:06:54,110 --> 00:06:56,290
+two branches of the pattern match, we
+
+110
+00:06:56,290 --> 00:06:58,800
+return exactly this thing that we started
+with.
+
+111
+00:06:59,830 --> 00:07:02,290
+So the right unit law holds also.
+
+112
+00:07:02,290 --> 00:07:04,660
+Finally we have to check the Associative
+Law.
+
+113
+00:07:04,660 --> 00:07:05,566
+So here it is.
+
+114
+00:07:05,566 --> 00:07:09,092
+We need to show that the sequence of the
+two flatMaps
+
+115
+00:07:09,092 --> 00:07:12,782
+with the parenthesis to the left, is the
+same thing as
+
+116
+00:07:12,782 --> 00:07:17,110
+a flatMap of a flatMap with the
+parenthesis to the right.
+
+117
+00:07:17,110 --> 00:07:19,000
+So let's start with the left again.
+
+118
+00:07:19,000 --> 00:07:21,030
+Here we have the sequence of the two
+flatMaps.
+
+119
+00:07:22,090 --> 00:07:26,526
+Here's what it expands to.
+So that line is the first flatMap with the
+
+120
+00:07:26,526 --> 00:07:32,930
+two pattern matches now on one line.
+And the parenthesis will go to this.
+
+121
+00:07:34,280 --> 00:07:36,330
+That's its expansion.
+
+122
+00:07:36,330 --> 00:07:39,970
+So that result has to be subjected to the
+second flatMap.
+
+123
+00:07:39,970 --> 00:07:44,290
+So here we immediately follow the first
+pattern match with the second one, which
+
+124
+00:07:44,290 --> 00:07:50,090
+now implements the flatMap called, it's g
+instead of f before.
+
+125
+00:07:51,470 --> 00:07:53,360
+So that's the expansion of this
+expression.
+
+126
+00:07:54,760 --> 00:07:59,810
+Now what I do is, I take the second
+
+127
+00:07:59,810 --> 00:08:01,400
+pattern match, this one here.
+
+128
+00:08:04,030 --> 00:08:09,650
+And I move it inside.
+The two branches of the first one.
+
+129
+00:08:12,810 --> 00:08:14,810
+So I know that the result of the first
+
+130
+00:08:14,810 --> 00:08:18,470
+pattern match will be the selector of the
+second one.
+
+131
+00:08:18,470 --> 00:08:23,370
+All I did here was to say, well let's take
+each branch of the first pattern match.
+
+132
+00:08:23,370 --> 00:08:25,610
+And make it the selector of the second
+one.
+
+133
+00:08:25,610 --> 00:08:30,540
+So I pulled the second selector in here.
+And in here.
+
+134
+00:08:32,640 --> 00:08:34,670
+That gives me this expression here, and
+
+135
+00:08:34,670 --> 00:08:37,950
+that expression now in turn, we can
+simplify.
+
+136
+00:08:37,950 --> 00:08:41,540
+So let's look at the case, none here
+first.
+
+137
+00:08:41,540 --> 00:08:45,900
+So in, if the optional value is none, then
+we have the
+
+138
+00:08:45,900 --> 00:08:49,930
+match none match case some y g of y case
+none none.
+
+139
+00:08:49,930 --> 00:08:53,710
+So obviously it would be the second
+pattern match that applies.
+
+140
+00:08:53,710 --> 00:08:57,380
+And the whole expression simplifies to
+this one that you see here.
+
+141
+00:08:57,380 --> 00:08:57,745
+So the
+
+142
+00:08:57,745 --> 00:09:02,125
+second case is just, if you get a none, we
+keep a none.
+
+143
+00:09:02,125 --> 00:09:03,960
+Let's turn to the first case.
+
+144
+00:09:03,960 --> 00:09:06,010
+So in the first case we say well, if we
+got
+
+145
+00:09:06,010 --> 00:09:10,000
+a some of x then we match f of x in turn.
+
+146
+00:09:10,000 --> 00:09:14,720
+If we, again, get a some of y we give you
+g of y and we keep a none.
+
+147
+00:09:16,240 --> 00:09:21,470
+So what that is, if we look at things in
+reverse, it's just f of x flatMap g.
+
+148
+00:09:22,480 --> 00:09:27,310
+Because if we expand flatMap g, then that
+expansion
+
+149
+00:09:27,310 --> 00:09:31,630
+in turn gives us exactly that pattern
+match here.
+
+150
+00:09:33,780 --> 00:09:37,820
+And if we look at that expression in turn,
+then we see that it's
+
+151
+00:09:37,820 --> 00:09:40,420
+just another instance of a flatMap, this
+
+152
+00:09:40,420 --> 00:09:43,070
+time the flatMap is with this function
+here.
+
+153
+00:09:44,070 --> 00:09:47,270
+So we say well it's the function that
+says,
+
+154
+00:09:47,270 --> 00:09:51,200
+given an x, it will return this expression
+here.
+
+155
+00:09:51,200 --> 00:09:54,870
+So we get opt flatMap x arrow f of x
+flatMap
+
+156
+00:09:54,870 --> 00:09:59,750
+g and that's exactly the right hand side
+of our original equation
+
+157
+00:09:59,750 --> 00:10:00,650
+that we wanted to prove.
+
+158
+00:10:02,410 --> 00:10:06,990
+So option is a monad because those three
+laws hold as we have just shown.
+
+159
+00:10:08,710 --> 00:10:11,710
+You might ask well why should I care about
+the Monads Laws?
+
+160
+00:10:11,710 --> 00:10:15,625
+What significance do they have for
+programming practice.
+
+161
+00:10:15,625 --> 00:10:18,730
+Well, one answer to that is that they give
+a
+
+162
+00:10:18,730 --> 00:10:23,479
+justification for certain refactorings of,
+for expressions that are quite intuitive.
+
+163
+00:10:24,530 --> 00:10:25,710
+The Associative Law
+
+164
+00:10:25,710 --> 00:10:29,500
+says essentially that one can inline
+nested for expressions.
+
+165
+00:10:29,500 --> 00:10:31,740
+So if I have a for expression like that,
+
+166
+00:10:31,740 --> 00:10:35,860
+where the first generator is in turn a for
+expression.
+
+167
+00:10:35,860 --> 00:10:40,690
+What I can do is I can essentially inline
+the two generators here.
+
+168
+00:10:40,690 --> 00:10:44,650
+In one large for expression, and the
+result would always be the
+
+169
+00:10:44,650 --> 00:10:49,340
+same, provided that the type in question
+satisfies the Monad Associativity Law.
+
+170
+00:10:50,860 --> 00:10:54,350
+The right unit law also has a significance
+for, for expressions.
+
+171
+00:10:54,350 --> 00:10:58,950
+It essentially says that the trivial for
+expression here where I generate x and
+
+172
+00:10:58,950 --> 00:11:04,594
+immediately return it, is the same as the
+original value that you see here.
+
+173
+00:11:05,640 --> 00:11:07,404
+For the left unit law, though, I haven't
+
+174
+00:11:07,404 --> 00:11:09,620
+found an analogue like that for, for
+expressions.
+
+175
+00:11:09,620 --> 00:11:12,632
+So it seems that as what concerns behavior
+for,
+
+176
+00:11:12,632 --> 00:11:16,420
+for expressions, only associativity and
+right unit is important.
+
+177
+00:11:18,580 --> 00:11:21,850
+So here's another type that might or might
+not be a monad.
+
+178
+00:11:21,850 --> 00:11:23,230
+We'll find out.
+
+179
+00:11:23,230 --> 00:11:26,800
+And that type will be important in the
+later parts of this course.
+
+180
+00:11:26,800 --> 00:11:30,590
+The type is named Try, and it resembles
+option.
+
+181
+00:11:30,590 --> 00:11:33,460
+Except that instead of some and none,
+there
+
+182
+00:11:33,460 --> 00:11:36,840
+are two cases which are named success and
+failure.
+
+183
+00:11:36,840 --> 00:11:39,740
+The success case returns a value, just
+like some
+
+184
+00:11:39,740 --> 00:11:44,570
+does, but the failure case returns
+something, namely an exception.
+
+185
+00:11:44,570 --> 00:11:49,170
+So the idea is that try will be used in
+cases where we want to.
+
+186
+00:11:49,170 --> 00:11:53,650
+Propagate exceptions not at the call
+stack, but say between
+
+187
+00:11:53,650 --> 00:11:58,020
+different threads of different processes,
+or even between different computers.
+
+188
+00:11:58,020 --> 00:12:00,410
+So in, in a sense we want to bottle up an
+
+189
+00:12:00,410 --> 00:12:04,980
+exception in a value that we can then
+freely pass around.
+
+190
+00:12:04,980 --> 00:12:09,790
+Here's a definition of the Try class.
+It's an abstract class Try with a T
+
+191
+00:12:09,790 --> 00:12:11,880
+parameter, just like Option.
+
+192
+00:12:11,880 --> 00:12:17,250
+The Success case extends Try and gives you
+simply a value of type T.
+
+193
+00:12:17,250 --> 00:12:23,780
+The second case, failure, contains an
+exception and extends Try of Nothing.
+
+194
+00:12:23,780 --> 00:12:25,420
+As you've seen in the functional
+programming
+
+195
+00:12:25,420 --> 00:12:28,880
+course, nothing is the Bottom type in
+scala.
+
+196
+00:12:28,880 --> 00:12:32,120
+Know where nothing doesn't have any value,
+and it
+
+197
+00:12:32,120 --> 00:12:35,120
+typically refers to something that is
+either a missing
+
+198
+00:12:35,120 --> 00:12:40,260
+value in the exception or a computation
+that does not return normally.
+
+199
+00:12:40,260 --> 00:12:44,580
+Because maybe the computation throws an
+exception or it loops infinitely.
+
+200
+00:12:46,450 --> 00:12:50,470
+So a typical way to create try values is
+using.
+
+201
+00:12:50,470 --> 00:12:55,210
+Try of expressions, so you can wrap an
+arbitrary expression in a try.
+
+202
+00:12:55,210 --> 00:13:00,310
+And that is achieved by making try an
+object in the standard library that has
+
+203
+00:13:00,310 --> 00:13:01,500
+an apply method.
+
+204
+00:13:01,500 --> 00:13:03,980
+So, you've seen that anything that has an
+
+205
+00:13:03,980 --> 00:13:07,520
+apply method can be applied just like a
+function.
+
+206
+00:13:07,520 --> 00:13:10,510
+The same holds for objects such as try.
+
+207
+00:13:10,510 --> 00:13:13,820
+So what is the definition of the supply
+method?
+
+208
+00:13:13,820 --> 00:13:19,480
+Well, it would take an expression, a
+computation, and return a try of the
+
+209
+00:13:19,480 --> 00:13:24,600
+type of that computation, and what it
+would do is it would use a Java try.
+
+210
+00:13:24,600 --> 00:13:25,390
+So a try that
+
+211
+00:13:25,390 --> 00:13:30,040
+you know from the jvn that's written, in
+lowercase try.
+
+212
+00:13:30,040 --> 00:13:35,430
+So we try to compute the value of
+expression and rapid inner success.
+
+213
+00:13:35,430 --> 00:13:38,880
+If the computation here throws an
+exception
+
+214
+00:13:38,880 --> 00:13:40,750
+that will be caught here in the block
+
+215
+00:13:40,750 --> 00:13:47,130
+and the exception will then be wrapped in
+a failure value and returned as a result.
+
+216
+00:13:47,130 --> 00:13:50,200
+That happens for any exception that is non
+fatal.
+
+217
+00:13:50,200 --> 00:13:50,750
+Non fatal
+
+218
+00:13:50,750 --> 00:13:54,490
+is a fairly technical thing essentially
+and exception is fatal if
+
+219
+00:13:54,490 --> 00:13:58,240
+it doesn't make sense to export this
+beyond a single thread there.
+
+220
+00:13:58,240 --> 00:14:00,040
+Couple of exceptions that are.
+
+221
+00:14:00,040 --> 00:14:02,890
+But the vast majority of all exceptions,
+both
+
+222
+00:14:02,890 --> 00:14:06,220
+run time exceptions, and normal
+exceptions, are non fatal.
+
+223
+00:14:07,540 --> 00:14:10,880
+What's important here is that the
+expression is passed as a by
+
+224
+00:14:10,880 --> 00:14:14,310
+name parameter because otherwise, of
+course,
+
+225
+00:14:14,310 --> 00:14:16,180
+we would already have our value here.
+
+226
+00:14:16,180 --> 00:14:19,680
+So there wouldn't be a computation that
+could throw an exception.
+
+227
+00:14:19,680 --> 00:14:24,140
+So that's why you have the type arrow t
+indicating call by name parameters here.
+
+228
+00:14:25,980 --> 00:14:28,170
+Just like with option, try value
+
+229
+00:14:28,170 --> 00:14:30,850
+computation can be composed in for
+expressions.
+
+230
+00:14:30,850 --> 00:14:35,830
+So, for instance, you could write for x
+taken from some computation compute
+
+231
+00:14:35,830 --> 00:14:41,370
+x, y taken from some computation compute
+y, yield the result
+
+232
+00:14:41,370 --> 00:14:46,980
+f applied to x and y wherever f is some
+function that takes an x and a y value.
+
+233
+00:14:46,980 --> 00:14:51,320
+So, what that means is that, if compute x
+and compute y both succeed.
+
+234
+00:14:51,320 --> 00:14:56,070
+So, they give you result, success x and
+success y, respectively.
+
+235
+00:14:56,070 --> 00:15:01,170
+That would return a success value with the
+value f of xy.
+
+236
+00:15:01,170 --> 00:15:03,270
+But if either computation fails with an
+
+237
+00:15:03,270 --> 00:15:06,650
+exception, this will return failure with
+the first
+
+238
+00:15:06,650 --> 00:15:11,930
+exception that got drawn.
+So to support this kind of notation
+
+239
+00:15:11,930 --> 00:15:16,940
+all we need to do is define map and
+flatMap the right way on the Try type.
+
+240
+00:15:18,040 --> 00:15:22,730
+Here the definitions of flatMap and map on
+the Try type.
+
+241
+00:15:22,730 --> 00:15:24,150
+Let's look at flatMap first.
+
+242
+00:15:24,150 --> 00:15:30,060
+So flatMap takes a function from the
+domain T, gives us a try of U.
+
+243
+00:15:30,060 --> 00:15:32,160
+And what it would do is, it would say if
+
+244
+00:15:32,160 --> 00:15:38,370
+we start out with a success, so we have a
+value x, then let's apply f to x.
+
+245
+00:15:38,370 --> 00:15:40,600
+That would give us the result value.
+
+246
+00:15:40,600 --> 00:15:45,150
+But on the other hand if the function f
+itself throws an exception
+
+247
+00:15:45,150 --> 00:15:49,540
+which is not fatal, then let's package
+this up in a failure value.
+
+248
+00:15:49,540 --> 00:15:51,190
+Because there is a principle that we will
+
+249
+00:15:51,190 --> 00:15:57,010
+never leak non-fatal exception from a
+trial computation.
+
+250
+00:15:57,010 --> 00:15:57,180
+On the
+
+251
+00:15:57,180 --> 00:15:59,850
+other hand, if we started out with already
+a failure, and
+
+252
+00:15:59,850 --> 00:16:04,040
+an exception, then that gets propagated
+into the result and returned here.
+
+253
+00:16:05,550 --> 00:16:06,440
+What about map?
+
+254
+00:16:06,440 --> 00:16:11,980
+So map just takes a simple function from T
+to U and we have to wrap it up in a try.
+
+255
+00:16:11,980 --> 00:16:15,750
+The way this is done is again, pattern
+match on success and failure.
+
+256
+00:16:15,750 --> 00:16:23,460
+If we have a success x, then let's apply f
+to x and submit it to the try constructor
+
+257
+00:16:23,460 --> 00:16:27,440
+so that again, would if f throws an
+exception, give us a failure,
+
+258
+00:16:27,440 --> 00:16:32,580
+if f returns a value, then we will drop
+that in a success.
+
+259
+00:16:32,580 --> 00:16:36,500
+And, as before, failures get propagated in
+the result.
+
+260
+00:16:37,820 --> 00:16:39,725
+So if we look at the relationship between
+
+261
+00:16:39,725 --> 00:16:43,410
+flatMap and map, then that's what we have
+here.
+
+262
+00:16:43,410 --> 00:16:49,630
+A try value of mapped with a function f.
+It's the same thing as a flatMap
+
+263
+00:16:49,630 --> 00:16:52,730
+where the function f gets applied to x,
+and then the
+
+264
+00:16:52,730 --> 00:16:56,839
+result gets trapped in a try because
+that's how map was defined.
+
+265
+00:16:57,860 --> 00:17:03,940
+And if I rewrite that expression here, I
+get t flatMap f and then try.
+
+266
+00:17:03,940 --> 00:17:08,340
+So t map f is the same thing as flatMap f
+and then try.
+
+267
+00:17:10,050 --> 00:17:14,840
+So having map and flatMap defined like
+this, some try values suggest that try
+
+268
+00:17:14,840 --> 00:17:20,050
+might be a monad where the unit is the try
+constructor itself.
+
+269
+00:17:20,050 --> 00:17:21,400
+Is it?
+
+270
+00:17:21,400 --> 00:17:25,330
+Possible answers would be yes, it is, or
+it isn't.
+
+271
+00:17:25,330 --> 00:17:28,260
+And in that case I would also like to know
+why
+
+272
+00:17:28,260 --> 00:17:30,920
+it isn't, so it couldn't, it might not be
+a monad
+
+273
+00:17:30,920 --> 00:17:34,760
+because the Associative Law fails, or the
+left unit or the
+
+274
+00:17:34,760 --> 00:17:38,840
+right unit law fail, or maybe two or more
+Monad Laws fail.
+
+275
+00:17:38,840 --> 00:17:39,480
+What do you think?
+
+276
+00:17:41,390 --> 00:17:43,370
+Well, if you check the laws, then you find
+
+277
+00:17:43,370 --> 00:17:47,240
+out that, in fact, the left unit law
+fails.
+
+278
+00:17:47,240 --> 00:17:47,910
+Let's see why.
+
+279
+00:17:49,680 --> 00:17:52,800
+So, what's the left unit law for Tries?
+
+280
+00:17:52,800 --> 00:17:54,950
+It says that the unit, so that would
+
+281
+00:17:54,950 --> 00:17:58,660
+be Try, applied to an expression, flatMap,
+a function
+
+282
+00:17:58,660 --> 00:18:04,850
+f, would have to be the same as f apply
+directly to the expression on the left.
+
+283
+00:18:04,850 --> 00:18:05,630
+But it isn't.
+
+284
+00:18:05,630 --> 00:18:07,100
+We have a non equality here.
+
+285
+00:18:08,270 --> 00:18:09,172
+And why is that?
+
+286
+00:18:09,172 --> 00:18:11,890
+Well, the left hand side, here as we've
+
+287
+00:18:11,890 --> 00:18:15,150
+seen, will never raise a non fatal
+exception.
+
+288
+00:18:15,150 --> 00:18:17,550
+Neither try nor flatMap would.
+
+289
+00:18:17,550 --> 00:18:19,790
+Where as, of course the right hand side
+will raise
+
+290
+00:18:19,790 --> 00:18:24,280
+any exception that's thrown by the either
+f or expression.
+
+291
+00:18:24,280 --> 00:18:27,320
+So that means that the left unit law
+cannot possibly hold
+
+292
+00:18:27,320 --> 00:18:33,280
+for a good implementation of Try and,
+otherwise put the Try,
+
+293
+00:18:33,280 --> 00:18:36,400
+in a sense, trades one monad law for
+another law.
+
+294
+00:18:36,400 --> 00:18:38,650
+Which in this context is more useful.
+
+295
+00:18:38,650 --> 00:18:44,030
+That other law, I call it the bullet-proof
+principle, would be that an expression
+
+296
+00:18:44,030 --> 00:18:49,220
+composed from Try, map, and flatMap will
+never throw a non-fatal exception.
+
+297
+00:18:51,320 --> 00:18:53,410
+So to conclude, we've seen that for
+
+298
+00:18:53,410 --> 00:18:57,020
+expressions are useful not only for
+collections.
+
+299
+00:18:57,020 --> 00:19:00,040
+Many other types also define map, flatMap,
+and
+
+300
+00:19:00,040 --> 00:19:04,160
+withFilter, and that enables with them
+for, for expressions.
+
+301
+00:19:04,160 --> 00:19:07,420
+For expressions can be written over these
+types then.
+
+302
+00:19:07,420 --> 00:19:10,410
+The examples we've seen are where
+generator.
+
+303
+00:19:10,410 --> 00:19:11,680
+Option and try.
+
+304
+00:19:12,920 --> 00:19:16,690
+We've seen that many of the types that
+have a flatMap and map functions
+
+305
+00:19:16,690 --> 00:19:17,760
+are in fact monads.
+
+306
+00:19:17,760 --> 00:19:20,040
+That means that we can also give a unit a
+
+307
+00:19:20,040 --> 00:19:25,550
+constructor, and we can verify that they
+satisfy the monad laws.
+
+308
+00:19:25,550 --> 00:19:27,110
+You might ask what about filter?
+
+309
+00:19:27,110 --> 00:19:29,050
+We haven't seen filter so far.
+
+310
+00:19:29,050 --> 00:19:31,180
+Well, it turns out that if these
+
+311
+00:19:31,180 --> 00:19:34,460
+monad's define also with filter and
+satisfy certain
+
+312
+00:19:34,460 --> 00:19:37,740
+additional laws, they are called monads
+with
+
+313
+00:19:37,740 --> 00:19:41,180
+zero which is somewhat richer category
+than monads.
+
+314
+00:19:42,230 --> 00:19:46,780
+The three monad laws that we have seen
+give useful guidance in the design of
+
+315
+00:19:46,780 --> 00:19:52,790
+library APIs, but as always of every law,
+you also have to know when to break it.
+
+316
+00:19:52,790 --> 00:19:55,465
+We've seen that the laws do apply to
+option and
+
+317
+00:19:55,465 --> 00:19:59,640
+are very useful there, but they don't all
+apply to try.
+
+318
+00:19:59,640 --> 00:20:01,960
+the left unit law fails.
+
+319
+00:20:01,960 --> 00:20:03,480
+on the other hand, we've also seen that
+the
+
+320
+00:20:03,480 --> 00:20:08,150
+left unit law itself doesn't really have a
+good explanation
+
+321
+00:20:08,150 --> 00:20:09,680
+in terms of for-expressions.
+
+322
+00:20:09,680 --> 00:20:13,210
+So that would mean that while try is not a
+monad, it is
+
+323
+00:20:13,210 --> 00:20:17,570
+still a type that can be used in a
+perfectly safe and reasonable way.
+
+324
+00:20:17,570 --> 00:20:22,125
+As they carry a type of a for-expression.
+

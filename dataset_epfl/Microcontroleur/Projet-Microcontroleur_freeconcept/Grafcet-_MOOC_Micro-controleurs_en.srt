@@ -1,0 +1,1162 @@
+1
+00:00:04,287 --> 00:00:05,502
+Hello!
+
+2
+00:00:06,277 --> 00:00:09,277
+It is clear that microcontrollers are ideal
+
+3
+00:00:09,411 --> 00:00:11,743
+for carrying out automation tasks.
+
+4
+00:00:12,175 --> 00:00:13,689
+In the French-speaking world,
+
+5
+00:00:13,814 --> 00:00:17,063
+when we talk about automatism,
+we always talk about Grafcet.
+
+6
+00:00:17,735 --> 00:00:19,800
+And then, often my students tell me,
+
+7
+00:00:19,925 --> 00:00:22,800
+"Oh, if I want to do a Grafcet,
+then I have to buy
+
+8
+00:00:22,975 --> 00:00:24,710
+a programmable controller."
+
+9
+00:00:24,908 --> 00:00:25,983
+Et bien pas du tout !
+
+10
+00:00:26,133 --> 00:00:29,358
+The Grafcet, it is quite as
+possible to program them,
+
+11
+00:00:29,695 --> 00:00:31,824
+and that is what we are going to do today.
+
+12
+00:00:32,223 --> 00:00:35,261
+So, I will not repeat the Grafcet theory,
+
+13
+00:00:35,337 --> 00:00:37,062
+it would be too long.
+
+14
+00:00:37,137 --> 00:00:39,025
+I will just give a few reminders
+
+15
+00:00:39,114 --> 00:00:41,651
+that will help us for what we have to do.
+
+16
+00:00:42,129 --> 00:00:44,654
+Then we will see how to program
+
+17
+00:00:44,754 --> 00:00:46,894
+in C a Grafcet?
+
+18
+00:00:47,298 --> 00:00:48,879
+And of course we will apply
+
+19
+00:00:48,979 --> 00:00:52,531
+it to the example we
+see for the fourth time,
+
+20
+00:00:52,841 --> 00:00:55,035
+the famous example of the drill
+
+21
+00:00:55,219 --> 00:00:57,243
+that goes down and goes up.
+
+22
+00:00:58,833 --> 00:01:00,401
+Then you recognize here
+
+23
+00:01:00,813 --> 00:01:02,965
+an example of Grafcet.
+
+24
+00:01:03,501 --> 00:01:06,320
+Compared to the state graph we used,
+
+25
+00:01:06,420 --> 00:01:08,275
+there are a number of differences
+
+26
+00:01:09,114 --> 00:01:10,761
+that are details:
+
+27
+00:01:11,143 --> 00:01:13,616
+The stages of the Grafcet
+
+28
+00:01:13,879 --> 00:01:15,553
+are what were called stages:
+
+29
+00:01:16,300 --> 00:01:17,540
+The initial step,
+
+30
+00:01:18,002 --> 00:01:20,242
+the initial steps, we will see why.
+
+31
+00:01:20,703 --> 00:01:23,703
+Transitions are the same
+as in state graphs.
+
+32
+00:01:24,166 --> 00:01:26,771
+We speak of receptivity,
+
+33
+00:01:27,179 --> 00:01:29,054
+it corresponds to the condition
+
+34
+00:01:29,552 --> 00:01:31,138
+linked to a transition.
+
+35
+00:01:32,746 --> 00:01:35,921
+We may have divergences in OR,
+
+36
+00:01:36,182 --> 00:01:37,616
+this is the case here.
+
+37
+00:01:38,267 --> 00:01:40,441
+This is the same as in state graphs.
+
+38
+00:01:40,575 --> 00:01:42,369
+From this stage, we can
+
+39
+00:01:42,894 --> 00:01:44,478
+arrive at that one
+
+40
+00:01:44,804 --> 00:01:46,851
+or arrive at that one
+
+41
+00:01:47,139 --> 00:01:49,509
+according to whether this transition
+
+42
+00:01:49,647 --> 00:01:52,584
+or this transition will be crossed.
+
+43
+00:01:53,305 --> 00:01:54,439
+However,
+
+44
+00:01:54,781 --> 00:01:56,801
+the divergences in AND
+
+45
+00:01:57,336 --> 00:02:00,236
+are some things that do not exist
+not in the state graphs.
+
+46
+00:02:00,499 --> 00:02:03,337
+Here, if this condition
+
+47
+00:02:03,422 --> 00:02:06,047
+if this transition is crossed,
+
+48
+00:02:06,122 --> 00:02:08,397
+we will activate both
+
+49
+00:02:08,852 --> 00:02:10,116
+this step
+
+50
+00:02:10,696 --> 00:02:12,193
+and this step.
+
+51
+00:02:12,770 --> 00:02:14,299
+This means that you can have
+
+52
+00:02:14,547 --> 00:02:16,476
+two or more active steps
+
+53
+00:02:16,818 --> 00:02:19,073
+at the same time.
+
+54
+00:02:19,286 --> 00:02:21,125
+While in a state graph,
+
+55
+00:02:21,245 --> 00:02:22,583
+one and only one state
+
+56
+00:02:22,695 --> 00:02:24,683
+was always active at a given time.
+
+57
+00:02:25,167 --> 00:02:27,867
+This generalization is
+extremely interesting,
+
+58
+00:02:28,020 --> 00:02:29,532
+extremely powerful,
+
+59
+00:02:29,737 --> 00:02:31,686
+it is in a way the multitasking
+
+60
+00:02:32,200 --> 00:02:33,675
+of automatism.
+
+61
+00:02:34,995 --> 00:02:38,170
+So let's start writing our program in C:
+
+62
+00:02:38,986 --> 00:02:39,938
+We will define
+
+63
+00:02:40,216 --> 00:02:41,814
+the number of steps
+
+64
+00:02:42,108 --> 00:02:45,608
+we will have in our Grafcet or the maximum
+
+65
+00:02:46,123 --> 00:02:49,186
+number, the number of
+transitions that will appear
+
+66
+00:02:49,380 --> 00:02:53,105
+in such a way that we can create
+a table that s 'Calls Steps
+
+67
+00:02:53,438 --> 00:02:56,051
+and a second table called Transitions.
+
+68
+00:02:56,489 --> 00:02:59,327
+In fact, these 2 arrays will contain
+
+69
+00:02:59,792 --> 00:03:01,392
+Boolean values
+
+70
+00:03:01,561 --> 00:03:04,186
+thus considered as True or False.
+
+71
+00:03:04,449 --> 00:03:06,811
+If a step is active,
+
+72
+00:03:07,288 --> 00:03:09,750
+the corresponding value will be true.
+
+73
+00:03:10,575 --> 00:03:11,820
+If it is inactive,
+
+74
+00:03:11,920 --> 00:03:13,882
+it will be false therefore equal to 0.
+
+75
+00:03:14,516 --> 00:03:16,000
+The same for transitions
+
+76
+00:03:16,280 --> 00:03:19,205
+If a transition can be crossed
+
+77
+00:03:19,579 --> 00:03:22,579
+then the value that is in this table
+
+78
+00:03:23,012 --> 00:03:25,462
+will be true.
+
+79
+00:03:26,984 --> 00:03:28,346
+As in all programs,
+
+80
+00:03:28,491 --> 00:03:32,141
+there will be a procedure of initialization
+of the inputs and outputs.
+
+81
+00:03:32,515 --> 00:03:33,795
+I will not go into details,
+
+82
+00:03:33,889 --> 00:03:37,039
+it will obviously depend on
+the processor used.
+
+83
+00:03:38,073 --> 00:03:40,723
+We have a procedure here
+that allows to read
+
+84
+00:03:40,994 --> 00:03:43,994
+The inputs, the set of inputs.
+
+85
+00:03:44,565 --> 00:03:47,565
+The idea is at one point,
+
+86
+00:03:48,070 --> 00:03:49,270
+to read
+
+87
+00:03:50,073 --> 00:03:53,423
+all entries, one and only once.
+
+88
+00:03:53,987 --> 00:03:54,865
+Then,
+
+89
+00:03:55,070 --> 00:03:58,233
+We will be able to look
+at the logical conditions
+
+90
+00:03:58,449 --> 00:03:59,949
+on these inputs
+
+91
+00:04:00,246 --> 00:04:03,796
+on which the transitions depend.
+
+92
+00:04:04,269 --> 00:04:06,130
+But if we did several readings,
+
+93
+00:04:06,255 --> 00:04:07,655
+we could have inconsistencies
+
+94
+00:04:07,746 --> 00:04:10,846
+so it is extremely important
+to have a variable
+
+95
+00:04:10,996 --> 00:04:12,484
+that will contain
+
+96
+00:04:13,333 --> 00:04:15,070
+the value of the input
+
+97
+00:04:15,428 --> 00:04:18,428
+read at the beginning of the procedure.
+
+98
+00:04:18,840 --> 00:04:21,665
+I look at the main program:
+
+99
+00:04:22,602 --> 00:04:24,786
+Initialization of inputs and outputs.
+
+100
+00:04:26,162 --> 00:04:27,900
+Initialization of the steps:
+
+101
+00:04:28,199 --> 00:04:31,312
+they will all be inactive
+
+102
+00:04:31,943 --> 00:04:35,355
+except the step (s),
+
+103
+00:04:35,524 --> 00:04:37,149
+here perhaps the first,
+
+104
+00:04:37,597 --> 00:04:39,522
+which will be activated.
+
+105
+00:04:40,192 --> 00:04:41,593
+But I remind you, there could
+
+106
+00:04:41,693 --> 00:04:43,880
+be several initial steps.
+
+107
+00:04:44,344 --> 00:04:46,515
+The principle of the Grafcet
+allows to have several
+
+108
+00:04:46,628 --> 00:04:48,978
+active steps at the same time.
+
+109
+00:04:49,899 --> 00:04:52,611
+Then we have an infinite loop
+
+110
+00:04:52,819 --> 00:04:55,332
+that will repeat these procedures.
+
+111
+00:04:56,364 --> 00:04:59,114
+First thing: I affect the outputs.
+
+112
+00:04:59,475 --> 00:05:01,225
+Like the first time, I already
+
+113
+00:05:01,445 --> 00:05:02,870
+have at least one active step.
+
+114
+00:05:03,425 --> 00:05:05,850
+I can, according to
+
+115
+00:05:06,137 --> 00:05:09,137
+the active steps from where active steps,
+
+116
+00:05:09,360 --> 00:05:11,410
+affect the outputs correctly.
+
+117
+00:05:11,509 --> 00:05:12,721
+I remind you that
+
+118
+00:05:12,841 --> 00:05:15,041
+the output values depend only
+
+119
+00:05:15,452 --> 00:05:18,114
+on the step or the active steps.
+
+120
+00:05:18,853 --> 00:05:19,965
+then,
+
+121
+00:05:20,056 --> 00:05:24,019
+We will perform this procedure
+which binds the inputs
+
+122
+00:05:24,252 --> 00:05:27,440
+and which stores in these variables
+the values of the inputs.
+
+123
+00:05:27,858 --> 00:05:29,771
+And then, we go successively,
+
+124
+00:05:30,218 --> 00:05:32,005
+calculate the transitions:
+
+125
+00:05:32,395 --> 00:05:34,678
+are they crossable?
+
+126
+00:05:34,842 --> 00:05:37,942
+Next,we will deactivate the steps
+
+127
+00:05:38,974 --> 00:05:40,562
+for which a transition
+
+128
+00:05:41,032 --> 00:05:42,345
+passable
+
+129
+00:05:42,994 --> 00:05:44,962
+justify deactivating it
+
+130
+00:05:45,490 --> 00:05:47,877
+and activate the steps
+
+131
+00:05:48,509 --> 00:05:51,321
+that are the result of the
+transition transition.
+
+132
+00:05:52,086 --> 00:05:55,086
+This is the very principle
+of the Grafcet,
+
+133
+00:05:55,300 --> 00:05:57,651
+it is the rules of evolution
+of the Grafcet.
+
+134
+00:05:57,764 --> 00:06:00,789
+You find this principle in all...
+
+135
+00:06:00,948 --> 00:06:03,886
+the documents that describe
+what a Grafcet is.
+
+136
+00:06:05,525 --> 00:06:08,525
+So I go back to the details
+on these few procedures.
+
+137
+00:06:09,266 --> 00:06:11,670
+The one that calculates the transitions,
+
+138
+00:06:11,903 --> 00:06:15,392
+it will be necessary to look
+for a given transition,
+
+139
+00:06:16,456 --> 00:06:19,188
+of which stage it depends?
+
+140
+00:06:19,338 --> 00:06:20,889
+At what stage is it connected
+
+141
+00:06:21,543 --> 00:06:23,793
+up, up, upstream?
+
+142
+00:06:24,222 --> 00:06:27,010
+It is necessary apply the receptivity,
+
+143
+00:06:27,316 --> 00:06:30,591
+we must make the logical AND
+of these 2 conditions
+
+144
+00:06:31,201 --> 00:06:35,764
+And it is memorized whether this
+transition can be crossed.
+
+145
+00:06:37,307 --> 00:06:39,002
+Then for the deactivation,
+
+146
+00:06:39,267 --> 00:06:41,467
+again, it will be necessary to look at
+
+147
+00:06:41,746 --> 00:06:42,826
+the Grafcet
+
+148
+00:06:43,135 --> 00:06:46,844
+and to look that if this transition
+
+149
+00:06:47,169 --> 00:06:49,082
+can be crossed
+
+150
+00:06:49,482 --> 00:06:52,925
+then this stage must be deactivated.
+
+151
+00:06:53,309 --> 00:06:54,741
+And in the same way,
+
+152
+00:06:55,216 --> 00:06:58,603
+if this transition can be crossed,
+
+153
+00:06:58,981 --> 00:07:02,614
+at what stage, what next step
+must be activated?
+
+154
+00:07:04,323 --> 00:07:07,353
+And finally, assign the outputs
+
+155
+00:07:07,578 --> 00:07:10,053
+according to the step that is active.
+
+156
+00:07:10,267 --> 00:07:11,325
+If this step,
+
+157
+00:07:11,500 --> 00:07:13,062
+and it will be done for the following ones
+
+158
+00:07:13,152 --> 00:07:14,189
+is also active,
+
+159
+00:07:14,412 --> 00:07:15,546
+then  we write
+
+160
+00:07:15,746 --> 00:07:17,254
+the output values
+
+161
+00:07:17,529 --> 00:07:19,468
+according to the definition of the step.
+
+162
+00:07:21,933 --> 00:07:25,288
+Perhaps an example, where we
+will facilitate understanding.
+
+163
+00:07:27,074 --> 00:07:28,715
+Our drill,
+
+164
+00:07:29,128 --> 00:07:30,725
+I hope you remember,
+
+165
+00:07:31,298 --> 00:07:34,298
+we had described it by a graph of states:
+
+166
+00:07:34,612 --> 00:07:37,787
+Stop, descent, climb,
+
+167
+00:07:38,343 --> 00:07:40,068
+three transitions.
+
+168
+00:07:41,025 --> 00:07:44,200
+Let us design a perfectly
+equivalent Grafcet:
+
+169
+00:07:46,884 --> 00:07:50,428
+Stop, descent, climb.
+
+170
+00:07:51,538 --> 00:07:55,056
+Transitions with Start receptivities,
+
+171
+00:07:55,731 --> 00:07:57,765
+bottom and top
+
+172
+00:07:58,119 --> 00:08:00,682
+And for each of the steps,
+the output values:
+
+173
+00:08:01,149 --> 00:08:03,744
+And for each of the steps,
+the output values:
+
+174
+00:08:04,160 --> 00:08:06,689
+Advance is activated,
+that's what we have there.
+
+175
+00:08:06,852 --> 00:08:09,689
+Backspace is activated, that's
+what we have there.
+
+176
+00:08:11,244 --> 00:08:14,931
+So let's look at how we can write
+this program for the drill.
+
+177
+00:08:16,576 --> 00:08:19,726
+Our variables: steps and transitions,
+
+178
+00:08:21,378 --> 00:08:24,378
+the names of the steps
+
+179
+00:08:24,729 --> 00:08:28,045
+that will also be the
+indices with the enum,
+
+180
+00:08:29,198 --> 00:08:30,945
+the variables in which
+
+181
+00:08:31,570 --> 00:08:34,270
+the entries will be stored,
+
+182
+00:08:34,457 --> 00:08:36,224
+it is precisely in this procedure
+
+183
+00:08:36,412 --> 00:08:38,396
+that these variables are read.
+
+184
+00:08:38,914 --> 00:08:40,600
+For the calculation of the transitions:
+
+185
+00:08:41,075 --> 00:08:43,938
+for each of the transitions,
+we will look at
+
+186
+00:08:44,673 --> 00:08:47,160
+what is the previous step?
+
+187
+00:08:47,627 --> 00:08:50,120
+What is receptivity?
+
+188
+00:08:50,620 --> 00:08:52,463
+Logical AND
+
+189
+00:08:52,646 --> 00:08:54,260
+is set and the value is stored.
+
+190
+00:08:55,357 --> 00:08:57,655
+Here, the stop
+
+191
+00:08:58,813 --> 00:09:00,474
+corresponds to Start.
+
+192
+00:09:00,637 --> 00:09:02,293
+When we're going downhill,
+
+193
+00:09:02,670 --> 00:09:04,290
+it's low we'll wait.
+
+194
+00:09:04,427 --> 00:09:05,675
+When we are climbing,
+
+195
+00:09:06,025 --> 00:09:07,702
+it is Haut that we will wait.
+
+196
+00:09:08,947 --> 00:09:11,672
+We will then be able to deactivate the steps
+
+197
+00:09:11,995 --> 00:09:13,736
+which can be crossed.
+
+198
+00:09:13,858 --> 00:09:16,908
+If this transition can be crossed,
+
+199
+00:09:17,586 --> 00:09:18,620
+So
+
+200
+00:09:19,309 --> 00:09:22,925
+then the previous step is deactivated,
+
+201
+00:09:23,915 --> 00:09:26,427
+in the same way for the other transitions.
+
+202
+00:09:27,322 --> 00:09:29,172
+Similarly, we will activate
+
+203
+00:09:29,560 --> 00:09:31,393
+the steps that must
+
+204
+00:09:31,580 --> 00:09:34,207
+always be in function of the transition.
+
+205
+00:09:34,792 --> 00:09:37,792
+And here, we go downhill,
+
+206
+00:09:38,131 --> 00:09:39,698
+uphill and off.
+
+207
+00:09:39,894 --> 00:09:42,338
+And finally the procedure Affects Outputs
+
+208
+00:09:42,594 --> 00:09:44,358
+will simply take into account
+
+209
+00:09:44,483 --> 00:09:46,155
+the different values.
+
+210
+00:09:46,511 --> 00:09:50,686
+I have to write the Advance
+
+211
+00:09:51,688 --> 00:09:53,056
+downhill
+
+212
+00:09:53,309 --> 00:09:55,797
+value and the Retreat uphill value.
+
+213
+00:09:57,244 --> 00:09:58,859
+We finally have the main program
+
+214
+00:09:58,972 --> 00:10:01,167
+that looks the same as
+what we had earlier.
+
+215
+00:10:01,890 --> 00:10:03,458
+Initialization,
+
+216
+00:10:03,954 --> 00:10:07,538
+resetting, inactivating all the steps,
+
+217
+00:10:07,779 --> 00:10:10,220
+activating the first step
+
+218
+00:10:10,345 --> 00:10:12,797
+and this loop which continuously
+
+219
+00:10:13,197 --> 00:10:15,224
+performs these procedures:
+
+220
+00:10:15,976 --> 00:10:19,101
+Assign outputs, read inputs,
+
+221
+00:10:19,522 --> 00:10:21,382
+calculate transitions,
+
+222
+00:10:21,638 --> 00:10:24,231
+disable steps that have been crossed,
+
+223
+00:10:24,511 --> 00:10:26,692
+activate the following steps.
+
+224
+00:10:27,696 --> 00:10:30,264
+So, you might tell me it's
+very complicated
+
+225
+00:10:30,352 --> 00:10:31,802
+for this program
+
+226
+00:10:31,943 --> 00:10:34,943
+of the drill that we managed
+to write infinitely simpler.
+
+227
+00:10:35,583 --> 00:10:37,892
+True, for a simple Grafcet,
+
+228
+00:10:38,185 --> 00:10:39,355
+it's too complicated
+
+229
+00:10:39,693 --> 00:10:41,671
+And for a complicated Grafcet,
+
+230
+00:10:41,837 --> 00:10:43,718
+it's going to be much simpler,
+
+231
+00:10:44,158 --> 00:10:47,158
+because the method,it is systematic.
+
+232
+00:10:48,029 --> 00:10:49,602
+We take care of the stages,
+
+233
+00:10:49,727 --> 00:10:51,439
+we take care of the transitions,
+
+234
+00:10:51,638 --> 00:10:53,186
+we take care of the entrances,
+
+235
+00:10:53,298 --> 00:10:54,420
+we take care of the outings.
+
+236
+00:10:54,612 --> 00:10:55,934
+Once we've done everything,
+
+237
+00:10:56,268 --> 00:10:58,234
+it works the first time
+
+238
+00:10:58,484 --> 00:10:59,752
+if we do not make mistakes.
+
+239
+00:11:00,990 --> 00:11:02,356
+It is often necessary to
+
+240
+00:11:02,444 --> 00:11:05,115
+add timers
+
+241
+00:11:05,228 --> 00:11:06,586
+in the Grafcet.
+
+242
+00:11:07,504 --> 00:11:10,248
+And our system lends
+itself perfectly to it.
+
+243
+00:11:10,688 --> 00:11:12,940
+It will suffice to add a delay
+
+244
+00:11:13,406 --> 00:11:14,706
+in the main loop.
+
+245
+00:11:14,856 --> 00:11:16,285
+You remember, we have done that
+
+246
+00:11:16,392 --> 00:11:17,992
+on several occasions.
+
+247
+00:11:18,466 --> 00:11:21,466
+For example, 1/100th of seconds.
+
+248
+00:11:22,016 --> 00:11:23,028
+and then
+
+249
+00:11:23,236 --> 00:11:25,656
+In the main loop for each Timer
+
+250
+00:11:26,037 --> 00:11:28,573
+that has been initialized
+at the beginning of 0,
+
+251
+00:11:28,771 --> 00:11:29,754
+we will write
+
+252
+00:11:29,991 --> 00:11:32,754
+if the Timer is greater than 0
+
+253
+00:11:33,150 --> 00:11:35,143
+then it is decremented.
+
+254
+00:11:35,488 --> 00:11:38,488
+So it is necessary to understand that at
+the moment when one enters for example
+
+255
+00:11:38,911 --> 00:11:40,690
+in a step
+
+256
+00:11:41,127 --> 00:11:42,512
+which requires a Timer,
+
+257
+00:11:42,637 --> 00:11:45,512
+the timer is initialized
+with the right value
+
+258
+00:11:45,803 --> 00:11:47,072
+and then it will suffice
+
+259
+00:11:47,359 --> 00:11:49,654
+to test if it is equal to 0
+
+260
+00:11:49,841 --> 00:11:53,171
+to know if the time in question
+has been expired.
+
+261
+00:11:54,443 --> 00:11:56,201
+When we have several Timers,
+
+262
+00:11:56,288 --> 00:11:57,800
+we will proceed in the same way
+
+263
+00:11:57,968 --> 00:12:00,093
+with a Timers array
+
+264
+00:12:00,197 --> 00:12:02,484
+that is initialized to 0
+
+265
+00:12:02,730 --> 00:12:05,061
+for the number of Timers we have planned
+
+266
+00:12:05,770 --> 00:12:07,185
+And in the main loop,
+
+267
+00:12:07,373 --> 00:12:09,356
+again for each Timers,
+
+268
+00:12:09,481 --> 00:12:12,193
+we will test s 'they are greater than 0
+
+269
+00:12:12,365 --> 00:12:15,143
+and decrement if this is the case..
+
+270
+00:12:15,422 --> 00:12:17,820
+Here is the Delay, waiting
+
+271
+00:12:18,158 --> 00:12:20,420
+for 1 / 100th of seconds
+from the main loop.
+
+272
+00:12:20,780 --> 00:12:23,434
+And for example, for the
+calculation of a transition,
+
+273
+00:12:23,608 --> 00:12:28,444
+we can add if Timer number 3 is equal to 0
+
+274
+00:12:28,861 --> 00:12:31,399
+then we will do this or that.
+
+275
+00:12:32,278 --> 00:12:34,554
+So I wanted to show
+you that it is possible
+
+276
+00:12:34,666 --> 00:12:37,285
+to program Grafcet with a microcontroller.
+
+277
+00:12:37,547 --> 00:12:39,922
+With the habit, it is not complicated
+
+278
+00:12:40,112 --> 00:12:42,069
+and sometimes it is much cheaper
+
+279
+00:12:42,263 --> 00:12:44,724
+than buying a PLC.
+

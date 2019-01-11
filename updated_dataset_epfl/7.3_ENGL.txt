@@ -1,0 +1,136 @@
+Welcome again.
+Another module on virtualization.
+This time, very specifically, we'll talk about VMM construction, how to create the piece of software, the virtual machine monitor or VMM that runs virtual machines, and more importantly, how to create that piece of software so that the virtual machines run efficiently.
+Now the high level answer is pretty simple.
+In an earlier module, we saw that there were three techniques to virtualize resources.
+You can multiplex, you can aggregate, you can emulate.
+Well, a VMM uses two of those three techniques, specifically it multiplexes some resources and it emulates other resources.
+Now there are two resources that are critical to the multiplex, and those are both the 
+CPU and the memory and that's critical from a performance perspective.
+The last thing you want is for the 
+VMM to be in the way on the path between the virtual machine and the physical CPU, or similarly you don't want the 
+VMM to be on the path between the virtual machine and its ability to access DRAM.
+So both CPU and memory are multiplex resources, and in both cases, we export the identical abstraction that we have from the hardware to the virtual machine.
+So our virtual machine has multiple virtual cores and a virtual machine has some amount of virtualized, physical memory, which is different from virtual memory.
+Now multiplexing unfortunately is not sufficient.
+Sometimes you actually need to emulate.
+You need to be on the path, at runtime, between the virtual machine and the hardware.
+And this is where emulation comes in play.
+And there actually are two forms of emulation that are important.
+One, is there is a class of instructions that actually need to be emulated, even in systems that have architectural support for that, and we'll define that in a few minutes, and you'll also need to emulate resources and devices above and beyond CPU and memory so that the virtual machine has the illusion that it has a complete hardware base.
+So for example, a virtual machine has a reasonable expectation that it will have its own network device, its own disk drive, its own keyboard's on screen if it's desktop and all these devices are typically emulated in software, rather than multiplexed in hard.
+Now to understand how a virtual machine monitor can multiplex the CPU resource, we actually need to forget about virtual machines for a second and just go back to our understanding of how an operating system performs layering, and refresh our understanding of that.
+Now this picture actually comes from the textbook from discussion, from the chapter on layering.
+And what this picture shows is that there are two distinct APIs, the hardware/software interface exports the instructions and architecture of the CPU, and then there's the whole set of instructions privileged or unprivileged, that can be issued by software.
+And now the operating system multiplexes the CPU and augments the abstraction of a virtual CPU with the ability to perform system calls, and that is what we commonly understand as a thread, so if you would be running on a Linux system on x86, your API as an application is the combination of the ISA x86 as well as the ability to issue 
+POSIX system calls.
+So if you actually think about it from that perspective, there is a layer in between the application and operating system and there is obviously a layer in between software and hardware.
+What's equally important to understand and appreciate, however, is that applications can actually directly issue instructions to the CPU, and that unprivileged instructions, very specifically, all are executed directly about the CPU without the intervention of the operating system.
+If you had to go through the operating system for every instruction, things would go incredibly slow.
+So let's keep that in mind, we have a layering system that provides protection, and yet we also have to ability, selectively, for the application to bypass the operating system layer and directly access the hardware, and that is critical for performance, in the classic operating system and obviously as we will see, this is equally important and equally critical for a virtualized environment.
+So with that background in place, let's go back to VMMs and try to picture how a VMM might look like from a layering perspective.
+Now as you would expect is that some things would change, and some things would not change.
+The first thing that would not change is the relationship between the application and the operating system because by definition, a virtual machine is identical to the piece of hardware that runs without a virtual machine monitor, but also there's now change is the hardware/software API that is basically the instructions that architecture export by the hardware because we're assuming that the hardware is now different.
+What is obviously new here is that we have a virtual machine monitor that, from a layering perspective, it sits between the hardware and the virtual machine.
+And that layering, that layer, exports the same, identical virtualized abstraction of the underlying resource that it multiplexes in specifically in the case of the CPU, it would export a virtual version of a core running the same instructions that architecture as, the underlying hardware.
+And if you could do that, then at least in [inaudible] everything would still work.
+Obviously we would have an issue with respect to performance because this diagram does not show any ability to bypass a virtual machine either by the operating system or by the application in order to issue instructions on the CPU, and therefore the situation would be relatively slow, but we can hold that thought for a second.
+Let's first think about how this relates in the context of multiplexing and then we'll think about it from the context of performance and efficiency.
+So what do we mean by multiplexing?
+Well first, the virtual machine monitor multiplexes the cores both in space and in time.
+Now what that means specifically, is if you have a system with multiple physical cores that are shown here, the virtual machine monitor can multiplex these cores into the virtual-- the different virtual machines.
+Now we can multiplex them in space, in the sense that you can have a virtual machine with a smaller set of cores that are available physically, and it could run next to, and in parallel with another virtual machine that has another set of cores, and that's actually the picture that we're showing here.
+But we're also-- can multiplex the cores in time, by scheduling the same physical core among multiple virtual machines, so it is absolutely possible for this particular core to be assigned to one particular virtual CPU for a while, and then be assigned to another particular CPU, for, at a later point in time.
+And that is very similar to the problem of scheduling in an operating system.
+And yet, in all cases, a virtual machine remains isolated.
+So this is multiplexing of the CPU.
+Let's now shift into the discussion of efficiency of the virtualization of the CPU.
+And the key point here, when in comes to efficiency, is that we achieve efficiency through direct execution, and specifically, through the ability in a controlled, and secured, and layered manner that bypass the layers selectively.
+What we're basically, specifically doing is augmenting the picture that we saw that talked about layer bypass in the context of an operating system by adding a new construct, which is the virtual machine.
+So what we had in the earlier diagram, is the ability for the operating system to issue instructions directly and for the applications to issue instructions directly.
+We insert a new piece of software, the virtual machine monitor, which is in full control of the system.
+It obviously can issue instructions directly, but what's important here is that it's the operating system and the applications that can actually still issue instructions directly on the CPU.
+Now this is easier said than done, and the reason the why this is complex is that the virtual machine monitor must, at all times, remain in control of the system.
+So that's one important relationship, which is that the virtual machine monitor needs to guarantee the integrity of this interface that it exports to the virtual machine and guarantee the isolation of the virtual machine.
+And what's equally important is that the operating system needs to remain protected from the application because if you lose any of the isolation, guarantees that the operating system might expect, with respect, to it's relationship to applications, where you run into and you would open a whole set of security issues.
+So this is easier said than done, but this is what we mean by direct execution, the ability for virtual machine software, whether in kernel space or in user space, to directly issue instructions on the CPU.
+And this brings up to probably the most significant contribution to the theory of virtualization and virtual machines, and this is the Popek and Goldberg Theorem.
+This is the paper that you're reading in this module.
+This was published in 1974 and this formalizes the characteristics of an architecture that can be virtualized.
+And how specifically this theorem defines a property of instruction set architecture and what it does for that instruction set architecture is classify instructions into at least two important categories: the set of "privileged" instructions, that's obviously a subset of all instructions, and the privileged instructions, which are instructions, can only be issued in kernel mode and can only be executed by an operating system, and then there's another category of instructions, which are called "sensitive" instructions, and these are instructions whose semantics vary without causing a trap based on the privileged level that they're executing at.
+So you basically have-- if you think about the universe of instructions, you have all instructions, among them you have a subset which are privileged and a subset that is sensitive.
+And what the theorem states is that you can create a virtual machine monitor that uses direct execution, so the ability to bypass a layer when executing both the application and the operating system, and you can only do that if all sensitive instructions are also privileged.
+So if instruction semantic varies based on the privileged level, and that instruction is not privileged, that means it could be executed by an application, then it is not possible to build a VMM that relies exclusively on direct execution and layer bypass.
+So this is a fundamental theorem.
+Obviously there's an intuition behind it, there's a proof behind it, the paper focuses on the proof.
+I'm going to limit myself here to it.
+Some form of an intuition, and the intuition is the following: you can construct a virtual machine monitor that runs the guest kernel in user mode.
+So if you assume an architecture, a very simple architecture, with only two layers, kernel mode and user mode, the operating system is designed to run in kernel mode, but if you somehow run the operating system in user mode, and emulate all privileged instructions so that they fold the semantics that would be expected of them if these instructions had been executed in kernel mode.
+Then, you can actually convince the operating system that it's actually running in kernel mode.
+And therefore everything would work.
+And that is the intuition, and obviously this is only possible if the semantics of instruction is not a function of the privileged level, or more specifically, if all sensitive instructions are also privileged, because that means that all sensitive instructions would create a trap and the virtual machine monitor in software has the ability to emulate those sensitive instructions, in order to represent the full semantic of these instructions, assuming that they executed in kernel mode.
+So this is where we go back to the fact that in order to build a VMM, you need to both multiplex and emulate.
+You want to multiplex as much as possible, and yet a minimal VMM that is running on an architecture that is strictly virtualizable, according to this theorem, has some form of emulation for all privileged instructions of the virtual machine.
+So this is the intuition, obviously there are details, there are details on the paper, and that is one of the key tasks for this week, is for you to get a deep understanding of how this theorem is constructed and the implication that this theorem has on architectural design.
+We'll talk about it in our discussion section, in particular around the historical importance of this theorem as time went on.
+Now the paper actually doesn't talk about memory that much, and once you read the paper, you'll get a sense of what I'm saying here.
+So let me give you a little bit of perspective on how a virtual machine monitor virtualized the second critical resource that must be multiplexed, and that is memory itself.
+And the challenge is to efficiently multiplex physical memory of the real machine into the physical memory of the virtual machines.
+Now this is a challenge because obviously, from a performance perspective, because nearly every instruction accesses memory and on top of that every instruction is stored in memory and so it must actually be done without any runtime overheads.
+So if you actually think about what happens in this situation, we're adding a level of indirection between-- within the memory hierarchy.
+So an application in orange uses virtual addresses.
+The operating system manages the relationship between virtual addresses and physical addresses.
+Now a virtual machine monitor, which multiplexes memory across multiple virtual machines, adds another level of indirection between the operating system's view of memory-- of physical memory, and the virtual machine monitor's view of physical memory.
+So there are two distinct views of physical memory.
+And as a matter of fact, these two distinct views of physical memory are generally called "guest" physical memory and "host" physical memory, corresponding to the two different levels of indirection.
+What's important in this diagram is actually not the relationship, the layered relationship on the left, but the relationship that you see on the right that shows the TLB mapping virtual addressees directly onto host physical address.
+Now by insuring that the TLB, which runs as part of the processor pipeline, has mappings between virtual addressees and host physical addressees, we can insure that instructions can execute at the normal rate without any particular overhead.
+Now this is easier said than done, and it's very specifically a challenge is how to insert into the TLB mappings between virtual and host physical addressees when there actually are two levels of indirections that need to be looked at.
+And in the industry and in computer systems today, there are actually two generally possible answers to this challenge.
+The first one is to use shadow page tables, and the second one is to use nested page tables and I'm just going to very quickly illustrate what we mean by both of them.
+So let's first talk about shadow page tables, and that is the technique that is used by the virtual machine monitor when there is no architectural support for virtual machines in the processor, and very specifically when there's no architectural support in the memory management of the processor.
+So effectively, the virtual machine monitor is left having to solve the problem entirely in software.
+And the way the virtual machine monitor solves this problem, is by keeping pages that define address spaces in correspondence.
+So the operating system, on top, manages it's own address space.
+The address space is typically routed by a register which defines the base of the address space.
+Now that register is actually not used by the hardware.
+The register that the hardware uses is under the control of the virtual machine monitor, but the mappings that are managed by the operating systems, are obviously stored here and those mappings relate to, or define the mappings, between virtual addressees and guest physical addressees.
+What the VMM does is it composes this first mapping with the mapping between guest physical and host physical addresses, and stores the resulting mapping in a corresponding page that shadows the original page.
+So the term shadowing defines the relationship, between the guest page table pages and the VM page table pages.
+And as long as the VMM can effectively, efficiently shadow these pages, ensure that the correspondence is met, then the entries inserted into the TLB correspond to the ones that are under the control of the VMM and the virtual machine is executing at full speed using-- because the mappings between virtual addressees and host physical addressees are directly stored into the hardware.
+And for completeness, this picture also describes, or illustrates, the fact that the VMM itself needs to be somewhere in memory, and there's typically a portion of the address space that is reserved for the VMM, for this particular purpose.
+So this is shadow page tables, and again shadow page tables is a technique that is required when the hardware does not provide architectural support to virtualize physical memory.
+Now as you can imagine, maintaining shadow page tables in consistence can be quite expensive and quite complicated.
+As a matter of fact, there were years of research associated with how to make that as efficiently as possible.
+And fortunately also, that research is no longer required because now most systems have hardware support and architectural support for virtualized physical memory.
+And that is what the industry calls nested page tables, or extended page tables.
+And so this is a hardware implementation that actually walks through two different sets of page table structures simultaneously, in order to reload a TLB entry.
+So, you actually have two hardware registers, rather than one.
+One in privileged mode, one in de-privileged mode, that determine the roots of these address spaces.
+The first one is the mapping between virtual addressees and guest physical, and the second one is the mapping between guest physical and host physical addressees.
+And then as you walk through the page table structures on a TLB reload, the hardware automatically looks at the coarse-- the combination of those two mappings in order to find the right answer.
+Now if you actually -- there's an interesting [inaudible] paper on this.
+The number of page table walks, that is required in order to provide and implement nested page tables, is quadratic with the depth of the page table and today most page tables have a depth of four.
+So this is actually a very large number of memory references that are potentially required in order to do a nested walk, and there are many alogorithms that have been implemented also in hardware in order to optimize the walking of these nested page tables.
+Now, I want to conclude this module on VMM construction with an orthogonal point that is important because it's a recurring point in the industry and often an area of confusion.
+And that is the classification between type l and type ll virtual machine monitors.
+Now, this was actually also defined by 
+Goldberg in his thesis in a separate document also in the 1970s, and what very specifically the document states is that the type l virtual machine monitors allocate and schedule the physical resources among the virtual machines.
+So they not only perform the multiplexing function, but also perform the resource management function.
+And in contrast, the type ll VMMs rely on a separate host operating system for resource scheduling, so in this case, the VMM performs the multiplexing function and the emulation function, but the VMM does not perform the resource management and resource allocation functions.
+And as we will see in the next module, efficient resource scheduling is actually fundamental to any particular layered design, and specifically fundamental to any virtualized design.
+And so the choice of the VMM architecture type l versus type ll is extremely important.
+If you actually look at what is currently out and available today, we actually see a combination of type l and type ll systems.
+Most of you are probably familiar, or heard of Xen, which is an open-source type l hypervisor.
+So it manages the resources itself, it does the scheduling of the CPU, and of the physical memory of the system.
+There are other type l architectures 
+VMware or vSphere, and Microsoft Hyper-V are two examples of those architectures.
+But equally importantly, there are extremely important and significant systems that are type ll designs.
+KVM is an open-source Linux based type ll design, it's main advantage over Xen is that it is part of Linux, and so it does not require a separate hypervisor running on the bare metal, but rather it can run a virtual machine, any number of virtual machines, as an extension of an existing canonical, normal Linux based operating system.
+And on your desktop or your laptops, you're maybe familiar with 
+VMware workstation, and if you have a Mac, you may be using a product called Fusion, which basically allows you run any virtual machine running any operating system on top of the Mac OS operating system.
+Parallels is another commercial company that has products in a similar plane.
+So there are two types of virtual machine monitor architectures, type l and type ll, both of them are actually still used today, with a little bit of a bias towards type l in data centers and in the cloud, and type ll designs in the enterprise and on the desktop, where convenience and ease of installation is actually the most important.
+And with that, I want to thank you.
+This is the end of the module on VMM construction.
+Goodbye.

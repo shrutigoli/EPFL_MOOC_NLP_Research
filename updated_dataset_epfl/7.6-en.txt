@@ -1,0 +1,57 @@
+Welcome back! Nature, In code.
+Chapter 7, lecture 6.
+In this lecture, we are gonna slightly modify our contact network structure. At the moment, it only allows for disease transmissions between very local neighbors.
+We are now gonna relax this assumption, just a little bit to allow for occasional long distance transmission of disease. and even though, this is just a minor change we will see that the effects are quite large.
+Ok, so here we are in our expose_neighbors function where we try to infect our neighbors except of course ourselves.
+Now, what we are going to say here is in one percent of the cases, we wanna do something special.
+So, the way we are gonna do this is, we are gonna write if math_random is smaller than 0.01
+So, in one percent of the cases, we will do something and this we have to implement else, so in ninety-nine percent of the cases we are just gonna go here with the old version of try_infection to get bounded indices of the neighbors.
+Alright, so what do we want to do in one percent of the cases?
+Well, in one percent of the cases, we simply want to pick a random individual that can be anywhere on the grid, independent of where we currently are. and so, we can do this by basically picking two random numbers.
+So, I am gonna say here var random_i and, I already thankfully have a method a function that allows me to do this and this is of course, the get_random_int which has a min and a max.
+So, zero is the min and the max is grid_length - 1. and I am gonna do the same, for second random variable.
+So, random ii in this case but it calls the same function with the same min, max range.
+Tthen, I can basically say alright, now try to infect this individual instead of my neighbour.
+So, try_infection and now, the indices here are random_i and random_ii.
+We don't have to worry about bounded indices because, these two random variables, are already chosen in such a way that they are in the correct range.
+And there is one tiny detail, that I want to mention we do not currently check for random_i and random_ii being identical to i and ii. that could mean, that we could pick a random individual that is actually ourselves. and so, this code now does in fact
+Well, this code to be more precise does, in fact allow for self-infection, but it is a very rare, event, and so, I don't want to lose focus here on the issue of long term transmissions you should have the knowledge now, to basically check for the case where random_i will be equal to i and random_ii be equal to  ii. and then, we could basically do this until this is not the case.
+But I am gonna, essentially leave this up to you now.
+It won't change much here but I just wanted to mention it, that it is now theoretically possible to do self infection.
+But it is so rare, I'm gonna ignore it for the time being and this is the entire change now.
+Ok, so we are just gonna save this file we're gonna go over to the browser and we're gonna reload here the document. And here what happens is, we have an outbreak of one.
+Basically, patient zero recovered, before it had the chance to infect others. So, obviously we won't see much here let's reload this again. So now, here it's happening we have a cluster, and look, here was another cluster and another
+So suddenly these small clusters pop up seemingly out of nowhere.
+These are now seeded, by these long-term transmission events and now, you know at this stage, you can already see this is gonna be a fairly large outbreak. and indeed it is.
+I don't know, how many individuals are infected here? and ultimately recovered, but I would say somewhere around sixty percent. Let's reload this, again here is the first cluster and now the second appeared here and now here, here, here.
+At this point, the epidemic can essentially not be stopped.
+This is now very easy for the simulation here, to start new clusters and once that happens, it is very hard to control.
+So again, here we can just let this run, until it finishes.
+Let's see, yup now it's finished
+Ok, let's reload this once more here, and now the first two clusters, but they died out.
+Will this die out? Will it?
+No, it started a new cluster here, and now here, and now here and now, we have multiple clusters and I think now it is over.
+The thing will just go all the way to the finish and infect almost everyone here.
+So, you can see these are now changed dynamics.
+Before, with the values we currently have for beta and gamma it was very hard to get a large outbreak.
+Basically, the clusters will just grow, grow , grow locally but it would eventually die out especially, as we increase the recovery range.
+But in this new world, with these occasional long distant jumps it's very easy to seed many, many new spots new clusters, and once that happens the infection basically cannot be stopped.
+So, my hunch here is that, this new network structure has a major effect that's something we can observe here, in the sense that outbreaks occur much faster now, and crucially they are also much larger.
+Now, this is the contention that we can put to the test. We can calculate the average outbreak size here quite easily, and compare the two different scenarios with and without long distance transmission.
+But before we do that,
+I want to just show you in another type of a network structure, how this works and why this is the case?
+So, here I am plotting a similar network structure that we originally had in the completely local neighborhood.
+The only change here is that it's not two dimensional it is simply a circle, and I am connecting each node to two neighbors, two immediate neighbors on both sides.
+Each node here has four neighbors, and this node has four neighbors to the left, to the right. This node has four neighbors to the left to the right, and so on. This is a very local network structure. and if we now pick two random individuals for example, this individual and this individual here then we can see, well, to go from this individual to this individual we actually need to go through a lot of nodes.
+Concretely this here is the shortest path between these two nodes and you can see that here we have one, two, three, four five, six, seven, eight, nine, ten, eleven, twelve, thirteen, fourteen fifteen, sixteen, seventeen, eighteen, nineteen, twenty twenty one, twenty two intermediary nodes. So, what do you think of right now? Information transmission or disease transmission and you can see, you need to go through a lot of hops. and so, in each of these hops has a probability of passing on an infection, since, it is very to see that this could very easily
+ fade out stochastically.
+Now, if we can take this network go back to these two nodes. and we now pick a few of these connections and we just randomly rewire them, but really, only few a like this.
+Now here is a new network structure.
+From a macro perspective this is practically the same network structure we, only changed one, two three, four, five edges here. of all these many, many edges.
+But I think it is now very easy to see that the shortest path between any two nodes is much shorter, so, here now, we only need to go through five intermediary nodes, and that makes any transmission stochastic transmission events between these two nodes, much, much more likely. and this is a very well known, and well understood phenomenon by now.
+It's called the small world effect, and it's also why we think in social networks, each node actually, has a relatively short distance to every other node in the network and if you do this in a global scale, there is this old saying that everyone knows everyone else, in the planet through six degrees of separation. Now, there is still a little bit of fear a scientific dispute to whether that's true or not.
+But, we now know that indeed, most social networks are structured like this and so, it is clear that the average path between any two nodes is much, much, much shorter, than it would be if it wouldn't have these long distance somewhat random connections in here.
+So, this the small world phenomenon, and this explains why
+I think at least from looking at the simulation results that the outbreaks are much more likely and when they do occur, they are indeed much bigger.
+But, no need to believe in it, we can test this because we have the code in place, and this is what we're gonna do in the next lecture.
+So, I will see you there.

@@ -1,0 +1,137 @@
+Let's now look at the case of distributed transactions.
+Our model is as follows:
+We assume there is multiple database servers that can talk to each other.
+In a network.
+There is no replication.
+That means each database object is on one server only.
+And transactions access objects on multiple servers, in general.
+That means a transaction will probably originate from one client, that communicates via some middleware, with, by default, maybe one machine, but potentially several of these database servers.
+A transaction can involve several objects that are read or written, and the database servers have to figure out among themselves how to properly execute these transactions.
+There is a number of issues that we have to look at.
+The first one is, how to achieve, so to say, serializability.
+One way to do this is by locking.
+That's probably the simplest form.
+And what one could do is to use a global version of two-phase locking.
+What would that mean?
+That would mean that there is maybe a single dedicated server that globally maintains locks for all the objects of all the machines, and executes a classical two-phase locking protocol.
+Alternatively, one could have some clever scheme of not leaving this to a single node, but achieving the same performance behavior.
+Alternatively, we could simply use local, strict two-phase locking on each side.
+That means strict, rather than classical two-phase locking, where all the locks have to be released together at commit time, and not before.
+If you do that, actually it's sufficient to do locking on each node, on each so, individually, and overall, serializability will be maintained.
+Let's first see why, if you would locally use two-phase locking, rather than strict two-phase locking, that would not be enough.
+So here's an example.
+I have shown you two transactions.
+T1, and T2.
+And there is two database objects that you care about.
+Well actually database object A is stored at the first machine, which is machine number 1, and object B is stored and maintained by machine 2.
+So, transaction T1 first greets object A, then transaction T2 writes object A, then transaction T2 reads object B, and finally, transaction T2, writes object B.
+If you now ignore this allocation, that A is at node 1, and B is at node 2, we can really see that classical example of a non-serializable transaction.
+We've got a read-write conflict from T1 to T2, and a read-write conflict from T2 to T1.
+So there's a cycle, this transaction schedule is not conflict serializable, and it's actually also not serializable.
+However, if we look at individual nodes, maintaining ANP respectively, we could do an extreme thing and could locally, at each node, think of each of these individual operations as the transaction.
+That means, from the viewpoint of node 1, it sees an operation that T1 executes, that asks for a reading of A.
+And later it sees transaction T2 writing A.
+But then there's nothing else left, there's no more work to be done for either transaction.
+So we could actually think of, locally, if locking and unlocking are completely maintained by the database system, that since there is no more work to be done, this transaction, T1 for example, is finished after the first operation, and we can start unlocking this object A.
+Which would then immediately allow us to get a write-lock on object A for transaction T2.
+And the same thing on the second node.
+And of course, overall, this leads to something that looks like four different transactions,
+T1 on the first node,
+T1 on the second node,
+T2 on the first node, and T2 on the second node.
+Of course, the semantic is not the same, and this is not correct.
+So this is a consequence of basically, unlocking as soon as, from the viewpoint of a node, nothing more needs to be done in this transaction.
+This is allowed, so to say, under two-phase locking.
+However, if you use strict two-phase locking in each case, on both local nodes, then this scenario would be avoided because the locks would be maintained until globally, on all the nodes, we do a commit.
+And this would, in the case of this example, lock transaction T2 as soon as it tries to write to A.
+So clearly, using classical two-phase locking, non-strict two-phase locking, is not sufficient if you do it locally in each machine.
+But we have said that strict two-phase locking, doing it locally, <i>is</i> sufficient.
+So why is this?
+Well if you think about it, it's not that surprising because all we need to do when locking is avoid conflicts between accesses, by two different transactions, on the same resource.
+And right now, each resource is one node only.
+That means we can locally deal with every conflict that arises, some node maintains the object on which the conflict arises, and then we realize that one transaction has to be ordered before the other, by blocking one transaction, because another transaction has to lock.
+Now, if we then not unlock until a commit happens, then things will be maintained properly, and serializability will be assured.
+So now we have a way of maintaining serializability using locking.
+One thing that can arise in lock-based concurrency control is deadlocks.
+And we have dealt with this by either avoiding deadlocks, or by detecting them.
+How do we detect deadlocks at this particular scenario?
+So what we can do is have each side, each different individual database server, maintain a local waits-for graph that basically has a node switch transaction, and and edge.
+When one transaction is blocked, it waits for a lock held by another transaction.
+Now it can absolutely arise, and we've got an example here, that there is, let's say, two database servers,
+Site A, and and Site B, and they individually have an acyclic waits-for graph, but if you combine those by combining the edges, adding them up, we get a cyclic waits-for graph, which means there is a deadlock.
+That means, maintaining waits-for graphs locally is not enough.
+What we can do, of course, is have a single centralized database server responsible for maintaining the edges of waits-for graphs of all the nodes.
+That means, a machine that collects all these edges, and then maintains, globally, the waits-for graph for all the machines, and does detect cycles and deadlocks.
+And then can let machines know that they have to deal with deadlocks by killing transactions.
+Alternatively, you can optimize this a bit by having some hierarchical scheme of propagating edges towards something like a central node, and there are certain optimizations that can be done using this idea.
+The alternative would be, of course, having a time-out to detect deadlocks.
+If nothing progresses in the system anymore, we can start killing transactions.
+In that case, we don't need such a waits-for graph.
+One thing that we have not discussed yet, is performing commits.
+So far we didn't have much to say about this.
+In a single-node scenario, once we decide, in a single-fronted scenario, once we decided that we want to commit, it was relatively clear what has to be done.
+In certain schemes, locking-based schemes, data was already in place, and all we had to do is not roll back.
+Not undo changes.
+In other scenarios, lets say, the scenarios that use multiple versions, or snapshots, these snapshots would be just deleted, and not propagated back to the database.
+Now in this one scenario, the committing problem is harder, because we really have make sure that whenever we decide to commit, we commit on all nodes.
+And not just on some.
+If we did the latter, if we commit only on some, we could get into serious consistency issues.
+A very famous technique here, a very famous algorithm, is so-called, "two-phase commit".
+Which is a committing algorithm in this particular scenario.
+And it shouldn't be confused, of course, with two-phase locking, which is something completely different.
+Although, there is again, two phases.
+Now, in the two-phase commit scenario, there is one coordinator among all these database servers, which initiates the commit, and then is responsible for collecting certain votes and answers to make sure that everything works properly.
+Well, if for example, our client has been most recently in contact with a single machine to say,
+"Now I want to commit my transaction," then, this could be, for example, the coordinator.
+Or we could have some lead election scheme to decide which machine to coordinate this.
+This is not a very heavy-load job, so we don't have to worry very much about paralyzing this.
+Now, when the message from the client lets say, arrives, that we want to commit, we do the following: the coordinator receives this message, and decides to send a prepare signal to all the machines involved in the transaction.
+If the coordinator itself is one of those machines, it also has to act as a subordinate.
+Now, the subordinates receive this prepare signal, and have to force-write a prepare record to the log.
+Then they decide, based on their own constraints, whether their part in satisfying the integrated constraints that have to be maintained, can be satisfied.
+That means they will check locally at the objects whether all the potential integrated constraints can be maintained.
+And if there is any reason to believe that this is not going to be possible, then that subordinate has to say "no" as an answer to the coordinator.
+If however, the subordinate can say,
+"Locally aside, my part in the committing can be satisfied," then it will send a "yes".
+The coordinator has to wait for all the responses from all the subordinates.
+And then decides, based on these votes, whether every of the subordinates -- each of the subordinates can commit.
+Only then, it decides to commit.
+Otherwise, if there's at least one machine that says,
+"I cannot commit," then all of them have to abort.
+So, it collects the votes.
+When it has received only yes's, and everybody has answered, then it will send a commit signal to all the subordinates again.
+That's the second phase.
+Otherwise, it tells all the subordinates that they have to abort.
+The subordinates, again, have to force-write this decision to abort a commit to the log, and then they send an acknowledgement.
+And of course they do the action.
+That means they either abort, locally, or they commit their part locally.
+Finally, the coordinator waits for all these acknowledgments to arrive, and then writes an end record to its log.
+We haven't talked about logs before, in the previous lectures, but the log is actually important to be able to deal with failures during to the commit.
+So, assume a protocol where data is, change data of a transactions in a local copy, lets say, multi-versional concurrency control, or optimistic concurrency control, then dealing with aborts is very easy.
+Just, we want to make sure, when they commit, that they write everything correctly.
+And of course, the two-phase commit protocol is not bound in any way to lock-based concurrency controls, it can be used with any distributed concurrency control protocol, be it multi-version based, snapshot isolation based, or whatever.
+So the challenge is, what happens if at least one machine breaks while the commit is executed?
+In that case, we must be sure that we proceed as planned, and don't forget what we've decided.
+So for that reason, when the core data makes a decision, and it communicates to the other machines, it has to make sure that this decision is logged and written, so it will save to the log, so that when it crashes, it can recover and is still in the same state, and similarly, the subordinates will have to make the same decision.
+Now there are many details about this protocol.
+There is many corner cases that have to be dealt with, and they're really beyond the scope of this lecture.
+For that one, we'll have to read the specific literature to implement two-phase commit correctly.
+There's many potential pitfalls, including all these fine-grain details about how to deal with failures during commit.
+In general, there may be many database machines involved, and the more machines that are involved, the more likely that at least one of them fails.
+So this has to be handled properly.
+But, again, just to say the high-level things, two-phase commit is called two-phase commit, because there is these two phases.
+The first, the voting phase, where together, the distributed fashion will decide whether we can actually commit.
+There's the coordinator which collects these votes, and then, based on the votes, counts them, so to say, and makes a decision.
+And then all of these guys who have to commit themselves, have to follow this decision.
+So it's not possible that a machine says "commit", and later, after it has been confirmed that it should commit, by the coordinator, it decides,
+"Actually, I cannot commit."
+I have to abort."
+This is not possible.
+And in this first phase, the subordinates make sure that if it says,
+"Yes, I can commit," it can really commit.
+So, in summary, distributed transaction management, at least on this high-level that we have now discussed, is not that hard.
+We have talked about two-phase commit, which is an important protocol, not to be confused with two-phase locking.
+We've talked about lock-based concurrency control, and why local, strict two-phase locking does the job.
+We've talked about deadlock protection avoidance, and that said, of course, we have only scratched the surface.
+There is much more to be said about this topic.
+And there could be special-purpose lectures on this, and courses for this.

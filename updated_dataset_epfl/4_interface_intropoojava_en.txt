@@ -1,0 +1,126 @@
+Let's continue our case study on watches.
+The idea is to refine the model of the different types of mechanisms used in particular by including the concept of interfaces.
+As a reminder, in the previous episodes, the heart of a watch was modeled as being a mechanism, a mechanism that could take on different forms; we could have either an analog mechanism, a digital mechanism, or a double mechanism
+These three types of mechanism all inherited from Mecanisme.
+This first hierarchy, however, does not quite correspond to our wishes concerning modeling of double mechanisms.
+Indeed, we would like a double mechanism to be able to have characteristics from both analog mechanisms and digital mechanisms.
+Ideally, a double mechanism should be able to inherit from the MecanismeDigital class as well as from the
+MecanismeAnalogique class.
+Unfortunately, multiple inheritance does not exist in Java.
+Suppose for example that in the analog class we have a attribute that is specific to analog mechanisms which would be the date displayed by the mechanism and that in the case of the digital mechanism, we have another attribute which would be an alarm linked to the digital mechanism.
+Then, maintaining this inheritance link would result in a duplication of both attributes into the double mechanism class since we would effectively want a double mechanism to have the characteristics of both of these classes that is, having both an alarm and a date.
+We would end up in this situation as would be the case for all the methods specific to analog mechanisms and to digital mechanisms which we would have to review entirely in double mechanisms.
+Thus, we could decide that, for example, a double mechanism is an analog mechanism to which some characteristics of digital mechanisms would be added.
+If we take this point of view, we can prevent duplication incurred by the original conception of inheritance.
+In this case, we would end up with a hierarchy that would look like this: double mechanisms inherit from analog mechanisms, and for now there is no direct link between double mechanisms and digital mechanisms.
+We will correct this a little later on.
+All the attributes specific to analog mechanisms and all the methods are thus inherited by the MecanismeDouble class which doesn't need to duplicate them.
+However, since we cannot inherit fro the MecanismeDigital class, the characteristics of digital mechanisms that we would like to see in double mechanisms must be duplicated.
+The Java code that corresponds to this first revision of the hierarchy is as follows.
+We have a Mecanisme superclass which is derived from Produit and which has two direct subclasses: the MecanismeAnalogique class and the MecanismeDigital class; so we suppose, here, that our classes for analog mechanisms and digital mechanisms have specific attributes: a date, for analog mechanisms and an alarm for digital mechanisms.
+And we choose to consider that a double mechanism is first and foremost an analog mechanism to which we add some characteristics of digital mechanisms.
+So here, the inheritance link between double mechanisms and analog mechanisms is established, and we graft onto the MecanismeDouble class some elements that are characteristic of digital mechanisms.
+So here we are forced to duplicate the reveil attribute (TN: "reveil" means "alarm").
+Now, let's focus on construction of the mechanisms: programming constructors in a class hierarchy follows certain rules that we will review now.
+Let's start by defining how we will construct mechanisms
+-- up until now we only had a default constructor -- and let's refine the description of this constructor.
+Given that a mechanism is a product, meaning it inherits from the Produit class, it must initialize the base value of the product inherited from Produit and it must initialize its own attribute, that is, heure (TN: means "time").
+So naturally, we could think of a constructor for the Mecanisme class that would look like this.
+It would take as parameter a value allowing to initialize the attribute inherited from Produit and as second parameter, a value allowing to initialize its own attribute.
+The constructor of the Mecanisme class must absolutely invoke the constructor of the Produit superclass via this syntax.
+If, during construction, we want to assign a default value to the heure attribute, then we will do this in the same way as we did for the Produit class by overloading the constructor.
+That is, we define a second constructor that would take no parameter for the mechanism's time, but that would initialize this attribute with a specific value.
+Now, let's work on the constructors of the subclasses.
+First, the constructor of the
+MecanismeAnalogique subclass for example, which inherits directly from the Mecanisme class.
+This constructor will take, as parameters, values allowing it to initialize all of its attributes; those inherited from higher up and its own ones.
+The constructor of the
+MecanismeAnalogique subclass must therefore also invoke the constructor of the
+Mecanisme superclass always in the same way.
+And the constructor of the
+MecanismeDigital class will be written in a very analogous way.
+One possible constructor for the MecanismeDouble class is a constructor allowing the initialization of all of its attributes, those that are specific to it such as the alarm here, and those that are inherited from above.
+We will inherit several attributes from higher up: the date, from MecanismeAnalogique, the time from Mecanisme and the base value from Produit.
+This constructor for MecanismeDouble will thus call the superclass's constructor to initialize the inherited attributes and it will initialize its own attribute.
+Now, let's focus on how the constructors will handle default values.
+Remember that when we defined the constructors of the 
+Mecanisme class, we had provided the possibility of constructing a mechanism without supplying a time, in which case the time would have a certain default value.
+And now, we want to know how the constructors of the subclasses can preserve this default value.
+For example, we would like to be able to define a double mechanism without giving it a time and in that case, we would like its heure attribute to have the same default value as the one that is intended for simple mechanisms and of course, we still want to have the ability to initialize its own value
+The solution, once again, relies on overloading.
+The overload would define the constructor of the MecanismeDouble class in a way that would allow it to work without a value for its heure attribute
+It would then call the constructor of the superclass that is based on the same principle, that is, a constructor that would not require the time as a parameter.
+This means that in the
+MecanismeAnalogique superclass, there is a constructor that does not require a parameter for the time. and do you know what the first instruction of this constructor will be?
+The constructor of MecanismeAnalogique will indeed invoke this constructor of the Mecanisme superclass which will initialize the default time correctly 
+To conclude our discussion on construction at this step, remember that the Montre class has a core attribute of type Mecanisme.
+The constructor that we used up til now was a default constructor which simply initialized the set of accessories as an empty array
+Now, we can provide a somewhat more complete constructor which would take as parameter a Mecanisme that would be used to initialize the core attribute
+This way of initializing the core using a reference to an object passed as parameter to the constructor is not very satisfactory.
+We will come back to this in the next episode when we will cover deep copy.
+Now we have finished with the constructors for mechanism, let's focus on displaying them.
+Suppose that to do these displays, we wish for all mechanisms to be displayed following the same model: a model that is imposed and cannot be modified.
+This model would for example be to systematically display the mechanism's type followed by displaying the dial which would contain the time and, when applicable, the date, the time of the alarm, all of this followed by the price, for example
+But we would also like each of these parts, each of the parts of this model to be adaptable.
+What we mean by <i>part</i> would be for example the part that displays the mechanism's type the part that displays the dial.
+This conception implies that there is a general display method for all mechanisms that follows a precise model but that this method calls other methods which could have a dynamic behavior, in a polymorphic way.
+Therefore, the idea is to allow these methods to have a specific behavior depending on the subclass, meaning that, for example, we would have a display method for mechanisms that would be specific to each subclass.
+Similarly, we would have a method for displaying the dial that would be specific to each subclass and, thanks to polymorphism, it would be able to adapt automatically to the real nature of the objects for which it is called.
+The fact that the same basic schema is imposed for all mechanisms implies that once these methods are made to follow this fixed outline, they must not be modified anymore.
+This should make us think of final methods.
+We also want to make sure that there exists a usable version of the dial display in the subclasses.
+So this method should have a default definition, typically right at the top of the hierarchy, in the Mecanisme class.
+This default version could for example simply display the time and be used in the subclasses to display the time but also possibly more information
+So here, we are going towards a method that would be polymorphic for the display of the dial but that would have a default definition in the superclass.
+However, to display the type of mechanism, we absolutely want to force an override in subclasses, which should make us think of abstract methods here.
+Here is how we can translate these constraints into Java code
+Our Mecanisme superclass provides a polymorphic display method which overrides the one inherited from Product that displayed the price our Mecanisme superclass therefore provides a display method that follows a precise schema including displaying the type, the dial and the price via the method inherited from Produit
+To make sure that this schema is fixed once and for all and cannot be overridden in a subclass of the hierarchy, we mark this method as "final".
+Subclasses of Mecanisme will no longer be able to redefine the toString method. It is declared as final.
+However, they will be able to redefine parts of this schema, such as the display of the dial for example, or the display of the type, which are polymorphic methods which will be able to adapt to the type of mechanism on which they are called.
+The method that displays the dial according to what we specified earlier has a default definition in the Mecanisme class.
+There, it simply allows one to display the time
+We have decided to declare it as protected to allow subclasses to use this method of their superclass.
+There is no risk concerning encapsulation here since the toStringCadran method, which allows us to generate a representation of the dial, does not modify internal details of the mechanism.
+However, we can consider that the method that displays the type of the mechanism cannot really be defined at this stage of the hierarchy.
+This method will therefore be defined as abstract.
+The fact that we declare this method as abstract forces its redefinition in all of the subclasses of Mecanisme that we want to instantiate later on.
+Any subclass of the Mecanisme class that we want to be able to instantiate, such as the MecanismeDigital class for example, will absolutely have to provide an actual definition for the method that displays the type, as is the case here.
+The MecanismeDigital sublcass can of course also override the method that handles the dial's display.
+And it can override this method by using the method inherited from above, that is, the one that allows us to display the time.
+So here, displaying the dial of a digital mechanism will display the time as well as the alarm.
+Displaying the alarm is also handled through a method but in this case, the method is specific to the MecanismeDigital class.
+It simply displays "rÃ©veil" followed by the time of the alarm.
+The MecanismeDouble class, if it is do be instantiated, which is the case, must also imperatively override the method handling multiple display.
+Since it has an alarm, whose value we probably also want to be able to display, we must also define the method that will allow us to display the time of the alarm in the same way as we did for digital mechanisms.
+And we can consider redefining the method that handles the display of the dial, that is, the one that can display information on the dial inherited from MecanismeAnalogique, specifically the time and the date here.
+And we would then display the information pertaining to the alarm through this specific method.
+So as you can see, both the 
+MecanismeDouble class and the MecanismeDigital class contain methods that are used to display information about the alarm and do so in a completely analogous way.
+However, there is no link between the two.
+It would be nice to clarify the link between mechanisms that have a digital behavior, that is, MecanismeDouble and
+MecanismeDigital in our case, and to force mechanisms that have this digital behavior to implement these common methods such as the toStringReveil method that handles the display of information relating to the alarm.
+And this leads us to a new revision of our class hierarchy.
+We can establish the link between digital mechanisms and double mechanisms via an interface, which would force subclasses that implement it to implement the method that handles the display of information about the alarm.
+So we can introduce the ReveilDigital
+(TN: means "digital alarm") interface and force all classes that would implement digital characteristics to provide a method allowing the display of information concerning the alarm.
+Our MecanismeDigital class would implement this interface.
+The same would go for the MecanismeDouble class. And if we want to be able to instantiate these two classes, they must imperatively provide an implementation of the same method, the method allowing the display of information about the alarm.
+In this model, the MecanismeDouble class is mostly an analog mechanism that would contain a certain number of aspects of digital mechanisms, that we can also find in the
+MecanismeDigital class.
+But it is forced to implement these elements that are characteristic of digital mechanisms due to the fact that it implements the ReveilDigital interface.
+Note that thanks to the introduction of the interface, the model is now clearer, more understandable, but we have not avoided code duplication that results from the lack of real multiple inheritance in Java.
+If these code duplications become too common, then this model that we based on inheritance would have to be reviewed, and probably changed to have a model using encapsulation.
+For example, we could imagine introducing a "DigitalFunctions" class grouping all the common elements from digital mechanisms, and so each of the MecanismeDigital and MecanismeDouble classes would have an instance of this as an attribute, for example.
+If you paid attention to the evolution of the code in the previous slides, you may have noticed that we modified the access rights of the toStringReveil method.
+Do you know why?
+There, this concludes the modelling of our class hierarchy.
+As usual now, here is a small main program allowing us to test the latest additions.
+These lines of code will allow us to test the different constructors of our subclasses, including those that manage unprovided, default values.
+This constructor builds an analog mechanism that has a base value of 312, a time that will take on the default value, that is, 12.0, and with this date.
+And this call builds a double mechanism with a base value of 543, with an explicit initialization time of a date -- since it is a MecanismeDouble, it inherits from MecanismeAnalogique and thus has a date -- and an alarm time.
+The following lines will test that the toString methods coded in the different levels were coded correctly.
+We can now declare a watch with a core that corresponds to a specific mechanism and we can, as we could earlier, add accessories to this watch.
+We can finalize the display method by having it display its core too, since we now have display methods for our mechanisms and this will allow us to display an entire watch.
+The code for this part can be downloaded on the course website.
+And this concludes this episode on the modeling of mechanisms.

@@ -1,0 +1,972 @@
+1
+00:00:03,863 --> 00:00:07,825
+Welcome back. Nature, In Code. We're
+in chapter five, lecture seven.
+
+2
+00:00:09,613 --> 00:00:08,003
+So we just finished the
+ implementation of the
+
+3
+00:00:09,801 --> 00:00:13,288
+spatial model. It works nicely. 
+It looks beautiful but 
+
+4
+00:00:13,471 --> 00:00:15,996
+I'm going to delve a little 
+deeper into one of the
+
+5
+00:00:16,156 --> 00:00:19,769
+observations that we made, 
+which is that we seem to be
+
+6
+00:00:19,970 --> 00:00:23,907
+losing heterozygotes. We get these 
+clusters of homozygotes,
+
+7
+00:00:24,088 --> 00:00:27,525
+but the heterozygote counts 
+seem to be going down.
+
+8
+00:00:27,711 --> 00:00:30,586
+What is this? Where does this 
+come from and how can
+
+9
+00:00:30,759 --> 00:00:32,571
+we quantify this, a little better?
+
+10
+00:00:32,727 --> 00:00:35,627
+So if we look at the 
+simulation here, what we can see
+
+11
+00:00:35,803 --> 00:00:38,741
+very quickly when we reload 
+this is that we very quickly seem
+
+12
+00:00:39,704 --> 00:00:42,641
+ to be getting these white 
+and black clusters here,
+
+13
+00:00:42,817 --> 00:00:48,554
+and those are clusters of A1A1 
+and A2A2 homozygotes. 
+
+14
+00:00:48,743 --> 00:00:52,456
+And in particular when we look 
+here in the console are these
+
+15
+00:00:52,640 --> 00:00:56,128
+absolute numbers of the
+heterozygotes,
+
+16
+00:00:56,303 --> 00:01:00,916
+you can see that those go down 
+relatively quickly for example
+
+17
+00:01:01,093 --> 00:01:02,831
+here around 3,000.
+
+18
+00:01:03,007 --> 00:01:06,244
+Now, recall that we started them
+at Hardy Weinberg frequencies
+
+19
+00:01:06,409 --> 00:01:11,059
+with a one milli frequency 
+of .5, 10,000 individuals,
+
+20
+00:01:11,244 --> 00:01:15,769
+so are 5,000 heterozygotes 
+in the very beginning.
+
+21
+00:01:15,942 --> 00:01:20,430
+But very quickly, this number drops
+down to about 3,000 individuals.
+
+22
+00:01:20,607 --> 00:01:24,532
+And it would keep going down until
+eventually all heterozygotes
+
+23
+00:01:24,712 --> 00:01:25,887
+will be gone.
+
+24
+00:01:26,048 --> 00:01:28,835
+So what is driving this?
+Well, we will make the observation
+
+25
+00:01:28,994 --> 00:01:32,445
+here that we get these clusters
+in white and these are A1A1
+
+26
+00:01:32,633 --> 00:01:38,108
+homozygotes and here,
+the A2A2 homozygotes.
+
+27
+00:01:38,293 --> 00:01:42,930
+And we basically observed that
+because we have a limited mating
+
+28
+00:01:43,113 --> 00:01:49,076
+distance here, individuals are 
+much more likely to mate with the
+
+29
+00:01:49,261 --> 00:01:52,223
+same genotype that's in the vicinity
+
+30
+00:01:52,396 --> 00:01:57,083
+And so, of course, it's not easy
+to see if A1A1 mates with A1A1,
+
+31
+00:01:57,273 --> 00:02:02,435
+it can only ever produce A1A1.
+Same with A2A2, if A2A2 mates
+
+32
+00:02:02,610 --> 00:02:06,348
+with A2A2, it can only ever 
+produce A2A2. However if 
+
+33
+00:02:06,522 --> 00:02:11,122
+heterozygotes mate with each other,
+A1A2 with A1A2, you get all
+
+34
+00:02:11,291 --> 00:02:14,728
+three possible outcomes, 
+all three possible genotypes.
+
+35
+00:02:14,914 --> 00:02:19,964
+And so that is driving the
+heterozygotes down and we can
+
+36
+00:02:20,145 --> 00:02:24,058
+ask ourselves, "Okay, but we still
+at Hardy Weinberg Frequencies
+
+37
+00:02:24,237 --> 00:02:28,899
+and what is exactly a good 
+quantitative measure of this
+
+38
+00:02:29,077 --> 00:02:31,252
+observation?" So let's find out.
+
+39
+00:02:31,437 --> 00:02:35,212
+So we seem to be losing
+heterozygosity and we can measure
+
+40
+00:02:35,386 --> 00:02:37,786
+this with the so called F 
+statistics.
+
+41
+00:02:37,961 --> 00:02:41,011
+Now, what is the F statistic? 
+Very generally,
+
+42
+00:02:41,180 --> 00:02:44,017
+ this is about expected 
+and observed value. 
+
+43
+00:02:44,184 --> 00:02:47,459
+You have some expected value.
+You have some served value
+
+44
+00:02:47,648 --> 00:02:51,910
+and so now you divide this
+difference by the expected value.
+
+45
+00:02:52,076 --> 00:02:55,226
+So concretely when we care 
+about heterozygosity here,
+
+46
+00:02:55,401 --> 00:03:00,864
+this is the expected heterozygosity
+minus the observed heterozygosity
+
+47
+00:03:01,042 --> 00:03:04,879
+and then divided by the 
+expected heterozygosity. 
+
+48
+00:03:05,072 --> 00:03:07,722
+So why this formula?
+What does it stand for?
+
+49
+00:03:07,899 --> 00:03:12,324
+Well, it's actually a very generic
+formula if you think about it,
+
+50
+00:03:12,498 --> 00:03:16,748
+and you use this type of formula
+all the time unknowingly
+
+51
+00:03:16,916 --> 00:03:20,291
+in your head, because essentially
+what this formula says right,
+
+52
+00:03:20,469 --> 00:03:24,044
+is that you have some expected
+value, so E here,
+
+53
+00:03:24,231 --> 00:03:29,781
+and then you have some observed 
+value, let's say this is less. 
+
+54
+00:03:30,831 --> 00:03:33,718
+So this is the observed value
+and as a consequence
+
+55
+00:03:33,904 --> 00:03:37,517
+I'm going to draw this here in red.
+You have something that is
+
+56
+00:03:37,690 --> 00:03:43,927
+ missing, E-O, so the expected minus
+what you're actually observing.
+
+57
+00:03:44,175 --> 00:03:49,475
+So this is the missing value,
+but now it's relatively difficult
+
+58
+00:03:49,648 --> 00:03:53,498
+ to make much sense of this missing
+value in absolute terms.
+
+59
+00:03:53,677 --> 00:03:57,239
+It only makes sense if you put
+it in the perspective of what
+
+60
+00:03:57,418 --> 00:03:59,218
+you expected in the first place.
+
+61
+00:03:59,420 --> 00:04:02,170
+ And this is what this formula 
+captures, so let me give you 
+
+62
+00:04:02,348 --> 00:04:05,360
+an example that's completely 
+outside of biology
+
+63
+00:04:05,552 --> 00:04:10,165
+that's related to everyday usage,
+for example money.
+
+64
+00:04:10,422 --> 00:04:14,647
+Let's say you expect a payment
+of $100,
+
+65
+00:04:15,064 --> 00:04:18,852
+and now-- say this is the expected
+and now you're getting your
+
+66
+00:04:19,027 --> 00:04:22,864
+ payment back but it's only $80.
+
+67
+00:04:23,180 --> 00:04:28,605
+In other words, the expected minus
+observed value here is $20, right. 
+
+68
+00:04:28,793 --> 00:04:30,555
+That's what's missing. 
+
+69
+00:04:31,148 --> 00:04:34,348
+So $20 is that a lot or not a lot?
+
+70
+00:04:34,594 --> 00:04:39,657
+Well, on the face of it, it is a lot
+but we have to put it in a context,
+
+71
+00:04:39,838 --> 00:04:44,175
+right. I mean here, you're basically
+missing 20% of your payment.
+
+72
+00:04:44,371 --> 00:04:46,921
+That's quite large. 
+So you know, something to be
+
+73
+00:04:47,094 --> 00:04:48,006
+worried about.
+
+74
+00:04:48,240 --> 00:04:52,878
+On the other hand let's say you
+would be expecting a payment
+
+75
+00:04:53,073 --> 00:04:59,160
+ for some reason, don't ask me why,
+of $100 million, okay,
+
+76
+00:04:59,332 --> 00:05:11,669
+$100 million and now you're getting
+only "$99,999,980."
+
+77
+00:05:11,885 --> 00:05:16,447
+So you get the idea.
+The quantity E minus O here
+
+78
+00:05:16,619 --> 00:05:20,419
+is the same. The difference is
+you're missing $20,
+
+79
+00:05:20,598 --> 00:05:25,536
+but now in the context of the
+expectation of the $100 million,
+
+80
+00:05:25,709 --> 00:05:28,847
+that's probably not going to
+keep you awake at night.
+
+81
+00:05:29,031 --> 00:05:33,356
+So it is simply a way to quantify
+what is missing,
+
+82
+00:05:33,543 --> 00:05:36,680
+what is the difference between 
+the expected and the observed
+
+83
+00:05:37,160 --> 00:05:41,335
+in the context of the
+overall expected value.
+
+84
+00:05:42,042 --> 00:05:44,729
+All right, so with this knowledge
+in hand, we can easily
+
+85
+00:05:44,911 --> 00:05:50,011
+now calculate the F statistics
+and print it into the console.
+
+86
+00:05:50,193 --> 00:05:52,768
+ So currently, we're calling
+this print data function
+
+87
+00:05:52,961 --> 00:05:55,949
+ in run generation and if we look
+at the print data function,
+
+88
+00:05:56,137 --> 00:06:01,787
+it's here. What it does is it simply
+counts all the three genotypes,
+
+89
+00:06:01,966 --> 00:06:04,716
+basically the absolute number
+of the three genotypes.
+
+90
+00:06:04,893 --> 00:06:08,143
+And then it output those here
+and also outputs the
+
+91
+00:06:08,326 --> 00:06:09,463
+generation counter.
+
+92
+00:06:09,646 --> 00:06:13,183
+So here we can add some code
+to calculate the F statistics
+
+93
+00:06:13,352 --> 00:06:15,739
+because here we have all
+the information we need.
+
+94
+00:06:15,895 --> 00:06:19,171
+We know exactly how
+many genotypes there are.
+
+95
+00:06:19,970 --> 00:06:22,457
+All right, so first of all,
+we need to figure out 
+
+96
+00:06:22,650 --> 00:06:25,087
+what is the actual population
+size at the moment?
+
+97
+00:06:25,269 --> 00:06:29,282
+ So we are going to say here 
+var N equals A1A1
+
+98
+00:06:29,466 --> 00:06:32,466
+ plus A1A2 plus A2A2, and of course,
+there would be another to
+
+99
+00:06:34,789 --> 00:06:38,802
+do this namely, simply multiply
+grid lengths times grid length
+
+100
+00:06:38,986 --> 00:06:41,811
+and this if of course also the
+population size but
+
+101
+00:06:41,997 --> 00:06:45,209
+we can do it like this here. This 
+should be exactly the same number.
+
+102
+00:06:45,385 --> 00:06:49,560
+And now we can calculate
+the observed heterozygosity,
+
+103
+00:06:49,732 --> 00:06:52,969
+right, because we know the number,
+the absolute number
+
+104
+00:06:53,146 --> 00:06:57,034
+of A1A2 genotypes. We know the 
+population size,
+
+105
+00:06:57,328 --> 00:07:02,965
+ so we can simply say,
+Ho, so the observed heterozygosity,
+
+106
+00:07:03,164 --> 00:07:09,526
+simply the A1A2 genotypes divide
+by the total number of genotypes.
+
+107
+00:07:10,185 --> 00:07:13,423
+And that is now our observed
+heterozygosity.
+
+108
+00:07:13,691 --> 00:07:16,079
+Okay, so that's the 
+first bit that we need.
+
+109
+00:07:16,246 --> 00:07:18,508
+Now, what's the second
+information that we need?
+
+110
+00:07:18,690 --> 00:07:21,278
+Well, we need the
+expected heterozygosity.
+
+111
+00:07:21,580 --> 00:07:24,243
+So the expected heterozygosity
+as you know,
+
+112
+00:07:24,421 --> 00:07:27,121
+that's the one that we would
+expect on the Hardy Weinberg
+
+113
+00:07:27,293 --> 00:07:32,568
+Frequencies, and that is going to be
+2PQ has we've learned much earlier.
+
+114
+00:07:33,573 --> 00:07:37,110
+And we know P, we know Q.
+
+115
+00:07:37,640 --> 00:07:42,727
+Q is simply 1 minus P,
+but how do we know P?
+
+116
+00:07:42,920 --> 00:07:45,820
+Well, we know the number of
+A1A1 genotypes
+
+117
+00:07:46,000 --> 00:07:48,975
+and we know the number
+of A1A2 genotypes.
+
+118
+00:07:49,409 --> 00:07:53,384
+And so we can now simply
+calculate P by saying,
+
+119
+00:07:53,571 --> 00:07:55,659
+and I'm going to use
+here a local variable.
+
+120
+00:07:56,017 --> 00:08:01,492
+Okay, it's twice the number 
+of A1A1 genotypes,
+
+121
+00:08:01,672 --> 00:08:05,609
+because each A1A1 genotypes 
+has two A1 alleles,
+
+122
+00:08:05,957 --> 00:08:08,432
+okay, plus
+
+123
+00:08:09,517 --> 00:08:13,342
+the A1A2 genotypes.
+
+124
+00:08:13,713 --> 00:08:19,276
+Here, each A1A2 genotype 
+provides one--
+
+125
+00:08:21,292 --> 00:08:25,830
+I'm going to put this in 
+parentheses, provides one A1 allele.
+
+126
+00:08:27,008 --> 00:08:29,933
+So I'm just going to put all of
+these in parentheses just to be
+
+127
+00:08:30,119 --> 00:08:33,332
+clear about the order even
+though this wouldn't be necessary.
+
+128
+00:08:33,516 --> 00:08:36,079
+The inner one wouldn't be necessary.
+
+129
+00:08:36,438 --> 00:08:41,176
+So these are now the absolute
+numbers of A1 alleles that
+
+130
+00:08:41,358 --> 00:08:45,083
+we have in this population,
+right, two per A1A1 genotype
+
+131
+00:08:45,271 --> 00:08:47,783
+and one per A1A2 genotype.
+
+132
+00:08:48,031 --> 00:08:51,206
+How many alleles do we have
+in this population?
+
+133
+00:08:51,379 --> 00:08:56,404
+Well, simply we have 2N,
+so 2 times N alleles.
+
+134
+00:08:57,177 --> 00:09:03,290
+So this is our P and therefore our
+expected heterozygosity,
+
+135
+00:09:04,370 --> 00:09:04,957
+HE
+
+136
+00:09:05,946 --> 00:09:08,721
+ with these numbers is 2PQ.
+
+137
+00:09:09,338 --> 00:09:14,113
+So 2 times P times Q, 
+which is 1 minus P.
+
+138
+00:09:15,997 --> 00:09:17,935
+All right, now, we have 
+everything we need.
+
+139
+00:09:18,114 --> 00:09:21,289
+We simply need to define here
+a variable that I'm going to
+
+140
+00:09:21,464 --> 00:09:24,801
+call F or the F statistics
+and that is simply
+
+141
+00:09:24,979 --> 00:09:30,629
+as we just learned the
+expected minus the observed
+
+142
+00:09:31,610 --> 00:09:35,597
+divided by the expected value,
+
+143
+00:09:35,846 --> 00:09:38,021
+HE.
+
+144
+00:09:39,609 --> 00:09:48,896
+So now we can simply log
+this console, "F = " + F,
+
+145
+00:09:49,336 --> 00:09:52,323
+then you strain the 
+incantation here.
+
+146
+00:09:53,361 --> 00:09:58,423
+All right, so let's save this,
+and first, what we're actually 
+
+147
+00:09:58,608 --> 00:10:02,233
+going to do, I want to make sure
+you know what to expect
+
+148
+00:10:02,417 --> 00:10:06,379
+under completely random
+circumstances with global mating. 
+
+149
+00:10:06,580 --> 00:10:10,930
+So let's put the max mating distance
+value here back to 50
+
+150
+00:10:11,114 --> 00:10:13,639
+so that we get global mating.
+
+151
+00:10:13,841 --> 00:10:17,591
+All right, save and then let's go
+back to the browser
+
+152
+00:10:18,232 --> 00:10:20,057
+and reload this here.
+
+153
+00:10:21,339 --> 00:10:25,139
+And so here we can now see
+that F hovers zero.
+
+154
+00:10:25,314 --> 00:10:28,639
+Sometimes it's slightly negative,
+sometimes it's slightly positive,
+
+155
+00:10:28,828 --> 00:10:31,828
+but it hovers around zero 
+and what that means is that
+
+156
+00:10:32,024 --> 00:10:36,774
+the expected and the observed
+are essentially identical.
+
+157
+00:10:37,044 --> 00:10:41,207
+Small of course differences due
+to stsarcastic effect, but the 
+
+158
+00:10:41,388 --> 00:10:44,525
+F statistics is essentially zero.
+
+159
+00:10:44,779 --> 00:10:47,516
+And so that's exactly
+what we would expect.
+
+160
+00:10:47,703 --> 00:10:54,116
+ The genotype frequencies are always
+at Hardy Weinberg Frequencies here.
+
+161
+00:10:54,293 --> 00:10:56,730
+The P values may have of course 
+changed over time
+
+162
+00:10:56,908 --> 00:10:59,270
+ and they eventually will, 
+because this is still a
+
+163
+00:10:59,445 --> 00:11:02,845
+finite population size,
+and so we're going to lose one
+
+164
+00:11:03,013 --> 00:11:06,262
+of the two alleles.
+But as we do this
+
+165
+00:11:06,446 --> 00:11:09,533
+the genotypes remain in
+Hardy Weinberg Frequencies.
+
+166
+00:11:10,533 --> 00:11:14,746
+Now, let's go back to the code 
+and set max mating distance back
+
+167
+00:11:14,916 --> 00:11:18,966
+to one so that we get this really
+one severe limitation
+
+168
+00:11:19,154 --> 00:11:22,267
+in the mating distance
+and therefore a lot of inbreeding.
+
+169
+00:11:22,437 --> 00:11:25,550
+I'm going to save this and 
+now we're going to reload this.
+
+170
+00:11:25,735 --> 00:11:29,397
+So now, we get these islands here 
+of homozygotes, and as we can see 
+
+171
+00:11:29,571 --> 00:11:36,971
+here very quickly this F statistics
+goes up about .3 or even
+
+172
+00:11:37,141 --> 00:11:38,653
+higher eventually.
+
+173
+00:11:38,841 --> 00:11:44,478
+So that means there's roughly 30%
+difference in the expected
+
+174
+00:11:44,658 --> 00:11:46,583
+and in the observed value.
+
+175
+00:11:47,165 --> 00:11:51,415
+And so this is now a good
+quantitative measure for the extent
+
+176
+00:11:51,606 --> 00:11:55,343
+ to which heterozygosity is reduced.
+
+177
+00:11:56,387 --> 00:12:01,549
+Here we can now see this goes very
+quickly to relatively high values
+
+178
+00:12:01,824 --> 00:12:06,874
+and here we can see this visually,
+but we didn't quite have,
+
+179
+00:12:07,345 --> 00:12:11,208
+you know, the quantitative
+means to capture this. 
+
+180
+00:12:11,388 --> 00:12:16,101
+This F statistics now says here 
+over a third of the heterozygosity
+
+181
+00:12:16,287 --> 00:12:19,637
+is essentially missing due 
+to inbreeding.
+
+182
+00:12:20,067 --> 00:12:22,979
+All right, so this concludes 
+this lecture and this chapter, 
+
+183
+00:12:23,153 --> 00:12:27,540
+so you implemented a spatial
+explicit individual based sarcastic
+
+184
+00:12:27,735 --> 00:12:31,635
+simulation for population genetic
+process in java script.
+
+185
+00:12:31,837 --> 00:12:32,862
+So, well done.
+
+186
+00:12:33,065 --> 00:12:35,753
+One of the effects as we saw 
+of space considerations
+
+187
+00:12:35,934 --> 00:12:38,384
+in particular limited
+mating distances,
+
+188
+00:12:38,600 --> 00:12:42,762
+which is what happens in the real
+world is the effect of inbreeding
+
+189
+00:12:42,955 --> 00:12:46,767
+and its consequence, 
+the reduction in heterozygosity.
+
+190
+00:12:46,953 --> 00:12:51,216
+And heterozygosity is an important
+measure in an evolutionary sense,
+
+191
+00:12:51,398 --> 00:12:53,811
+because it is a measure
+of genetic variation.
+
+192
+00:12:54,008 --> 00:12:57,958
+So the bigger picture here is now
+we've learned about the three forces
+
+193
+00:12:58,118 --> 00:13:01,955
+that can affect evolution,
+genetic drift, mutation
+
+194
+00:13:02,135 --> 00:13:03,998
+and now spatial considerations. 
+
+195
+00:13:04,181 --> 00:13:07,343
+I also want to mention that 
+inbreeding is by no means
+
+196
+00:13:07,526 --> 00:13:10,589
+the only effect of spatial
+considerations, but I wanted to 
+
+197
+00:13:10,776 --> 00:13:13,913
+focus here on this one
+because it is an important one.
+
+198
+00:13:14,367 --> 00:13:19,317
+So, we have so far not spoken 
+about the queen of the four forces,
+
+199
+00:13:19,480 --> 00:13:22,930
+of evolution and that is
+natural selection, but we'll get
+
+200
+00:13:23,111 --> 00:13:26,773
+to it right away in the
+next chapter. So I'll see you there.
+

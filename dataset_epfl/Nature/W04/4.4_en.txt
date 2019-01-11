@@ -1,0 +1,117 @@
+Welcome back, Nature, In Code, 
+Chapter 4, Lecture 4.
+We said in the last lecture, we'd like to clean up some of the code here and also fix a tiny mistake that we made.
+So, what's this?
+What do we need to clean up?
+Well, it actually has a bit to do with the way we present the results in the browser.
+You can see here, right, that I'm outputting all the DNA sequences first before mutation and then after mutation.
+But it's not actually clear that this happens, at a certain timepoint and that, this is the outcome at another timepoint.
+We just happen to know it, but we would need to look at this source code to understand this, and that's obviously not good.
+So let's fix that very quickly.
+So basically we go back into our code.
+So what I'd like to do is, down here, when I print the sequences, here--
+I'd like this function to basically also tell us, to give us a title, like tell us which generation we are or something like that.
+So I'm going to pass here a string to output and then I'm going to modify these <i>print_sequences</i> functions that outputs the string.
+So here I would like to say, this is <i>Generation 0</i>, 
+<i>Generation 0</i>, and then down here,
+I would like to say something like,
+<i>After 100 generations</i>, and now of course, you know, you could modify this new string concatenation and actually use the variable here instead of hard coding <i>100</i>.
+But I just want to fix it very briefly, and you can do this yourself, if you'd like to.
+Okay, so <i>print_sequences</i> that will be up here--
+<i>print_sequences</i>, at the moment, doesn't have any parameters, so I'm going to change this, so I'm gonna just add a title here as a parameter and then I'm going to say,
+"look, you first have to print this title into the console".
+Okay, so <i>console. log (title)</i>.
+And also to make this a little nicer
+I'm actually going to add and an empty line here so it is simple going to say,
+"print the empty string into the console", that gives us an empty line and that gives us a nice visual distinction.
+So if we save this and go back to the browser and reload this, then we should see something like that.
+Now, here is nicely saying <i>Generation 0</i>, here is the population at generation 0 and then after 100 generations, here's what we get.
+This is our diverse population.
+So that is-- a bit of a cleanup here.
+So now what I'd like to do is
+I'd like to fix this mistake that we made unwittingly, last time, when we developed this mutation code.
+So if you look here at the <i>run_generations</i>, right at this nested loop, so a loop within a loop, within the loop and down here we basically go through each base, in each of the sequences for many, many generations and we say, if this condition is true, change the base.
+And so this is simply the <i>mutation_rate</i> here change that base.
+But if you think about this a little more deeply, it's not the way we implement this here at the moment, right?
+A <i>random_base</i> just gives us, a truly <i>random_base</i>--
+Here are the four bases stored as elements in an array, we then pick a random index, a rounded number between zero and three, including those too-- and then we simply return the corresponding element.
+So it gives us a truly <i>random_base</i>, but it doesn't actually check whether that base is already here, so it could be there, for example, we have an A here and we call this function, this function returns an A, and now we're overwriting this base which is an A, with an A.
+And so we actually haven't had a manifested mutation.
+So we need to take that into account.
+We're actually not generating quite as much genetic variation as we should.
+So how can we do this?
+Well, I think what we'll do here is, first of all, we have to let the <i>random_base</i> function know what we have at the current position, so that they can avoid returning this.
+So why don't we do this-- why don't we essentially pass this information here, from this base, as an argument to the <i>random_base</i> function?
+So we're passing a base pair here.
+Okay, so in <i>random_base</i> we need to receive that, so here in <i>random_base</i> we currently don't have a parameter, alright?
+So let's let's change that.
+I mean I'm going to call this <i>current_base</i> because that's what we're receiving here we're receiving the current_base.
+And now we need to modify this function a little bit, that it returns a <i>random_base</i> from the set of basis that do not include this <i>current_base</i>, because otherwise there will be the possibility that we return the exact same base.
+So how are we going to do this?
+So first what I'm going to do is,
+I'm going to define here a new variable, a local variable that I'm going to call <i>new_base</i>.
+Okay--
+Not going to initialize this with any value, just going to define it here, <i>new_base</i>.
+And now I'm going to do something using a new chart script construct that we haven't encountered before and this is the so-called <i>do-while loop</i>.
+So basically <i>do-while</i> works like this, you say <i>do</i> and then curly brackets, and something here in these brackets, and then <i>while</i>, parentheses, and semicolon.
+So what is this?
+Well <i>do-while</i> is basically just another type of iteration.
+So far, we've encountered only one type of iteration, and that's the <i>for</i> loop here, but this is not the only way how we can do an iteration, 
+<i>do-while</i> is another way that we can do this.
+And how this works is you basically say <i>do</i> and then here you're and then here your iteration code that you'd like to be iterated and then <i>while</i> and here a certain condition, and as long as this condition is true, this code here is being iterated.
+And so that can be quite handy, it's a little shorter and it has another side effect, there is another subtle difference here, namely that, this <i>do-while</i> iteration guarantees that the code that will be in here, will be executed at least once, because it is going to be executed <i>do</i>, and only then will that condition be checked.
+So this guarantees that it's executed at least once and sometimes that's exactly what you want.
+This is not true necessarily for a <i>for</i> loop, you can hear in this <i>for</i> construct, you can create a condition that is not true, that is false, right from the get-go.
+And so the code in here will never be executed.
+That is not possible with the <i>do-while</i>.
+This code in here that output in here , will be executed at least once in the beginning and then, the condition will be checked.
+So for us, what we would like to do, we would basically like to have this here.
+So we'd like to draw this these random numbers,
+I'm going to cut this line here and I'm going to past it here, okay, and then, so I've now drawn this <i>random index</i>,
+And then I would like to say-- okay, so <i>new_base</i>, my *new_base, right, that I am initialing here, but doesn't have any value-- equals
+<i>bases</i>
+<i>index</i>.
+Okay.
+And now, of course,
+I have to make sure that I'll find the bases variable up here, otherwise this is going to throw an error because here it wouldn't know what bases this is.
+And then at the end 
+I would return this <i>new_base</i> okay, so, <i>new_base</i>.
+Alright, and now 
+I can get rid of this here.
+Okay, so now what is the condition here?
+How is this now any better than it was before?
+Well, so what we can do is, we can say, " look, you're going to choose an index up here, and then you're going to pick a <i>base</i> corresponding to this <i>index</i>, but now, after you've done this once we're going to check whether this is actually the same <i>base</i>, so the condition here is going to be <i>while (new_base)</i>-- equals, so don't forget the double equal, <i>current_base</i>.
+So what this means is that we are going to pick a <i>random_base</i> and then we're gonna check if these 2 now, the new one and the current one are the same.
+And if they are, so then that condition is true.
+So we're going to do it again and if it's still the same, we're gonna do it again.
+And so this will be executed until this condition is not true anymore.
+So until we have the guarantee that the <i>new_base</i> is not the same as the <i>current_base</i> and this is, of course, exactly what we want.
+So this guarantees that we will get a <i>new_base</i> here that will return, that is different, that is not equal to the <i>current_base</i>.
+And so, this is a great usage here of the <i>do-while loop</i> and we just have to make sure now that <i>random_base</i>, right, expects here a <i>current_base</i>.
+We use <i>random_base</i> up here as well where we initialized the first original sequence.
+So we have to pass something here as well.
+Now here it doesn't matter, we can just pass it any string that's not <i>A, G, C or T</i>, so we're going to pass the empty string, this will guarantee that this condition is always true, and we'll just get a <i>random_base</i> out of this <i>for</i>, which is what we want, when we built the original string.
+Good, so there is one thing 
+I would like to do, and that is I'd like to take this variable here, <i>bases</i>, and move it out of the function, so, I'm going to cut it here and I'm going just to add it here at the top, where we have defined the other variables and I'm going to say 
+<i>var bases</i> equals this array, and I'm going to define it as a variable that's in all capital letters.
+And then I have to make sure that I reference correctly, down here, where I choose the <i>new_base.</i>
+So why am I doing this?
+Well, other functions may want to access this variable out of the four that contains the four bases of the DNA as well in the future.
+So, it's a good thing to have this just defined in one place.
+And the other thing is:
+Why am I using all capital letters?
+That's basically just as a signal to tell other programmers who were to reuse this code, this is meant to be essentially constant.
+It's a variable, of course, and you can always overwrite variables in Java script, but this gives a clear signal,
+"this is meant to be a constant, please do not change this."
+So we can now save this and we can go over to our browser and basically see what have changed.
+So here's our console,
+I'm going to reload this--
+So what you can see is not much changes, but if you could actually measure it, you would see that we now get more mutation, and why is that?
+Well, for a simple reason, we used to, in one out of four cases, we used to get a base, as a replacement, as a mutation that was actually already there.
+So we would take an A and replace it with any an A, in one out of four cases, and the same for T, G or C.
+So we actually got less mutation than we wanted.
+Now we fix this problem.
+So we should get a bit more-- mutation that manifests itself in the population.
+You can't see this here in the console but you could measure it.
+The other thing of course is that we now are aware of this, the new type of implementing a loop, which is the <i>do-while</i> which is really quite handy.
+And will use this type of loop and other loops that we'll get to encounter in the future as well.

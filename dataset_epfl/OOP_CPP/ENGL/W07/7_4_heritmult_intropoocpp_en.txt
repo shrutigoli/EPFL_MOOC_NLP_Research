@@ -1,0 +1,133 @@
+Let's continue our case study on watches and cover this time, multiple inheritance through the modeling of the various mechanisms considered.
+As a reminder, in the previous episodes, the design on which we had settled was to model the watch by giving it a core, which is a pointer to a "Mecanisme".
+An inheritance hierarchy had been drafted for the different mechanisms considered.
+So we had the "Mecanisme" superclass from which three types of mechanisms inherit: analog mechanisms ("MecanismeAnalogique"), digital mechansims ("MecanismeDigital"), and "double mechanisms"
+("MecanismeDouble").
+This first hierarchy, however, does not quite reflect our wishes concerning "double mechanisms".
+Indeed, in the constraints we had set ourselves, we wanted "double mechanisms" to be both analog mechanisms and digital mechanisms, while having, while showing, only one time.
+Making "MecanismeDouble" inherit from "Mecanisme" rather than making it inherit from
+"MecanismeDigital" and "MecanismeAnalogique" does not allow us to model what we want properly.
+So we will now update our hierarchy in order to make apparent the link between
+"double mechanisms", and analog, as well as digital mechanisms.
+In C++, since multiple inheritance is possible, the path is quite clear, we must make "MecanismeDouble" inherit both from "MecanismeAnalogique" and from "MecanismeDigital".
+If we set up multiple inheritance like this, we must be watch out for one thing.
+We want a "double mechanism" to display only one single time, inherited from above.
+The time is modeled at the level of the "Mecanisme" class.
+If we simply set up this multiple inheritance:
+"MecanismeDouble" inheriting from "MecanismeAnalogique" and "MecanismeDigital", any instance of "MecanismeDouble" will inherit the "heure" variable twice
+(TN: "heure" means "time"): once, as an analog mechanism and once as a digital mechanism
+However, this is not what we want
+We want a "double mechanism" to keep only one time.
+So we must make sure that this superclass is virtual in order for the "MecanismeDouble" subclass to inherit from the "heure" variable only once.
+And for that, all the inheritance links linking "Mecanisme" to its direct subclasses must be declared as "virtual".
+The new hierarchy we obtain corresponds to the code that you see here.
+So we have a "Mecanisme" superclass, which will provide the member variable indicating the time.
+From this "Mecanisme" superclass, two direct subclasses will inherit:
+"MecanismeAnalogique" and "MecanismeDigital".
+So we make sure to declare the inheritance links as "virtual" in order to allow the "MecanismeDouble" subclass to inherit only once the attribute coming from "Mecanisme".
+"MecanismeDouble" inherits both from "MecanismeAnalogique" and from "MecanismeDigital".
+To make our example a little more interesting, we will give our "MecanismeAnalogique"
+"MecanismeDigital" subclasses specific members such as a date, for example, for the analog mechanism and an alarm clock for the digital one.
+Note that in C++, a superclass of which subclasses inherit virtually is called a "virtual class".
+This should not be confused with an abstract class.
+The fact that "Mecanisme" is a virtual class has an effect on the construction of a "double mechanism".
+Do you know what effects?
+In a class hierarchy with no virtual classes, a subclass's constructor simply has to invoke the constructors of its direct superclasses.
+However, in a hierarchy containing a virtual class, all the subclasses must call the constructor of this virtual class.
+So, let's start by defining how mechanisms are built.
+Up until now, we only had a default constructor.
+Let's refine the definition of this constructor.
+Given that a mechanism is a product, and thus inherits from the "Produit" class, it must initialize the base value of the product, inherited from Produit, and must initialize its own member variable, the time.
+Therefore, for the "Mecanisme" class, we could naturally think of making a constructor that looks like this.
+So, it would take as parameters a value allowing it to initialize the variable inherited from "Produit" and a second value to initialize its own variable
+We could also imagine giving a default value for this second parameter.
+The constructor for the "Mecanisme" class must of course invoke the constructor of the superclass
+"Produit" and initialize its member variable.
+Now, let's discuss the subclasses' constructors.
+First, the constructor for 
+"MecanismeAnalogique" for example, which inherits directly from the
+"Mecanisme" class.
+This constructor will take as parameters values allowing it to initialize all of its member variables: those inherited from above and those that are specific to it.
+And it will, in any case, invoke the constructor of its direct superclass, which happens to be the virtual
+"Mecanisme" class.
+The constructor for the 
+"MecanismeDigital" class will be written quite similarly.
+The constructor for the
+"MecanismeDouble" subclass must invoke the constructors for its direct superclasses but it must first invoke the constructor of the virtual superclass.
+Do you remember what happens with the call to the virtual superclass's constructor in the direct superclasses?
+Now, let's have a look at how default values are handled.
+Remember that in the constructor for "Mecanisme", the parameter allowing us to initialize the mechanism's time was a default value.
+If we want this default time to be preserved by the constructors of
+"Mecanisme"'s subclasses, we will need to take some steps.
+Then we must make sure that it is possible to create an analog mechanism without providing a time and in that case, it would have the default time, the same as for mechanisms.
+It should still have the option, of course, of initializing its own member variable.
+To do so, we should provide a second constructor that would take no parameter linked to the time and that would call the constructor of the superclass, initializing the default time
+-- that is, without providing any value for this time.
+But wouldn't it have been easier to give a default value for this second parameter?
+The answer is no, because the last parameter, intended for the date, doesn't have a default value and all default values in the parameters must be at the end of the list.
+Note that it would also be very bad to duplicate one default value in two different places for example here, in the analog mechanism and higher up, in the mechanism.
+This would open the door to problems of bad maintenance nd incoherence.
+To correctly manage the default value of the superclass, the same reasoning we used for "MecanismeAnalogique" should of course also be used in "MecanismeDigital" and in
+"MecanismeDouble".
+In the "MecanismeDouble" class, where the constructors should be overloaded.
+So here, one takes a time as parameter, and the other takes no parameter for the time and will call the constructor of the superclass which gives a default value for this time attribute, "heure".
+We have now finished with the construction of mechanisms, let's move on to displaying them.
+Suppose that for these outputs, we want all mechanisms to be displayed following the same model a model that is imposed and cannot be modified.
+This model would, for example, display systematically the type of the mechanism, followed by a display of the watch face containing the time and when applicable, the date or the time of the alarm, followed by the price for example.
+But we also want each of these parts, each of the parts of this model, to be adaptable.
+What we mean by "part" would typically be the part that displays the type of the mechanism, or the part that displays the watch face.
+This description assumes that there exists a general display method for all mechanisms following a precise model but that this method calls other methods itself and these could have an adaptable behavior, that is, a polymorphic aspect.
+The idea is thus to allow these methods to have a specific behavior depending on subclasses meaning that we could have, for example, a method for displaying the mechanism type that would be specific to each subclass.
+Similarly, we could have a method to display the watch face that would be specific to each subclass and, thanks to polymorphism, they would be able to adapt automatically to the real type of the objects on which they are called.
+The fact that the same basic model is imposed to all mechanisms implies that once a method follows this fixed model, it must no longer be modified.
+This should make us think of final methods.
+We also want to provide a default version of the watch face display for all the subclasses.
+So this method should have a default definition, typically right at the top of the hierarchy, in the "Mecanisme" class.
+This default version could, for example, simply display the time and be used in the subclasses to display the time of course, and possibly other information.
+So here, we are moving towards a method for displaying the watch face that would be polymorphic but that would have a default definition in the superclass.
+However, to display the mechanism type, we want to force subclasses to redefine it.
+This, of course, should make us think of pure virtual qualifiers
+This is how we could translate these different constraints into C++ code.
+Our "Mecanisme" superclass provides a polymorphic display method which overrides the one inherited from
+"Produit" displaying the price. 
+Our "Mecanisme" superclass thus provides a display method that adheres to a precise model.
+It will display the type, the face and the price via the method inherited from "Produit".
+To make sure that this model is fixed once and for all and cannot be overridden in a subclass of the hierarchy, we mark this method as "final".
+"Mecanisme"'s subclasses will thus no longer be able to override the "afficher" method, so all the mechanisms will be displayed following this precise model.
+However, via new methods:
+"afficher_type", "afficher_cadran" which will be of course defined as "virtual", we guarantee that the different parts involved in this model can be adapted and modified in the subclasses.
+You may have noticed, by the way, that since the "afficher" method from the "Mecanisme" class overrides the "afficher" method from the "Produit" class, we have used the "override" qualifier.
+The "afficher_cadran" method, as specified in the constraints that we mentioned earlier, provides a default version that will display the time.
+However, concerning the 
+"afficher_type" method: we want to force its definition in the subclasses, but it is still an abstract concept at the level of the mechanisms and so it is declared as a pure virtual method.
+If we want the subclasses of
+"Mecanisme" that have overridden
+"afficher_cadran" to still be able to invoke the "afficher_cadran" method inherited from the superclass, then the access to "afficher_cadran" must be possible in these subclasses and this is the reason why we labeled this method as protected.
+Conversely, the "afficher_type" method will not be invoked in the subclasses of "Mecanisme"; it is pure virtual and has no body.
+Therefore, it makes sense to declare it as "private".
+All the mechanisms with which we want to be able to work
+-- we want to be able to give an analog mechanism as core for a watch -- must inevitably override the "afficher_type" method to be instantiable.
+We can imagine that for the
+"MecanismeAnalogique" class,
+"afficher_type" simply displays
+"analog".
+The "afficher_cadran" method does indeed have a definition in the superclass, but it can still be overridden in the subclasses.
+For example here, we can imagine overriding it in the "MecanismeAnalogique" subclass in order to make it display the time by calling the method inherited from the superclass.
+As a reminder, here is the syntax using the scope resolution operator allowing us to call the "afficher_cadran" method from the "Mecanisme" class.
+But we will also display the date.
+Analogously, the "MecanismeDouble" class will also provide a concrete definition for "afficher_type".
+It can also override the "afficher_cadran" method and it can benefit from the "afficher_cadran" methods inherited from both "MecanismeAnalogique" and "MecanismeDigital".
+This way, we would display the information specific to the analog mechanism, that is, the time and date, and using this, display the information specific to the digital mechanism, i.e the time followed by the time of the alarm.
+And now, as we are now used to doing, we can test the new features using a small main program.
+We can create an analog mechanism using the default value for the time, meaning that we provide no time.
+We can create a digital mechanism that would have a non-default value for the time and specific value for its parameters.
+And in a similar way, a "double mechanism" by providing all the information necessary to initialize it like a time here, a date and the time of the alarm.
+The "afficher" method of the mechanisms that we have just developed will be invoked by the overloaded output operator that we specified earlier for the products.
+This method is polymorphic and so it will adapt to all types of products, including to mechanisms.
+These lines will allow us to test our latest developments on the constructors in "Mecanisme"'s hierarchy.
+And this line will allow us to test our display method.
+We can now give our watch an actual core we can for example imagine defining, in the "Montre" class, a constructor that would take as argument the value of a pointer to a mechanism.
+So we can create this mechanism using the constructors that we have discussed in this episode.
+The display of the watch would also be completed in such a way to invoke the display of its core.
+The complete code for this part can be downloaded on the course website.
+And this concludes this episode on modeling mechanisms.

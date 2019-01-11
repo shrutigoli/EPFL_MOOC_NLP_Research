@@ -1,0 +1,725 @@
+1
+00:00:00,855 --> 00:00:04,266
+We'll now study the Gaussian 
+elimination algorithm on an example.
+
+2
+00:00:04,685 --> 00:00:08,986
+I want to solve the linear system Ax=b,
+
+3
+00:00:10,000 --> 00:00:13,266
+x is the vector of the unkowns, 
+x1, x2 until xN
+
+4
+00:00:15,271 --> 00:00:19,584
+b is the right side of the equation 
+with entries b1, ..., bN.
+
+5
+00:00:21,102 --> 00:00:25,076
+and the matrix A
+has a particular structure,
+
+6
+00:00:25,119 --> 00:00:26,716
+it is a tridiagonal matrix.
+
+7
+00:00:26,850 --> 00:00:30,747
+There are 3's on the diagonal,
+
+8
+00:00:31,965 --> 00:00:35,302
+-1 just below the diagonal ,
+
+9
+00:00:35,483 --> 00:00:36,956
+(the subdiagonal)
+
+10
+00:00:38,592 --> 00:00:40,936
+-2 just above,
+
+11
+00:00:41,019 --> 00:00:42,612
+ (the superdiagonal)
+
+12
+00:00:45,069 --> 00:00:48,811
+and all the other entries are 0.
+
+13
+00:00:49,270 --> 00:00:53,576
+Here is the matrix A for the linear
+ system I must solve, Ax=b.
+
+14
+00:00:53,903 --> 00:00:56,139
+We'll see in chapters 10 to 14
+
+15
+00:00:56,159 --> 00:00:58,956
+that the discretization 
+of partial differential equations
+
+16
+00:00:58,976 --> 00:01:00,750
+in one space dimension
+
+17
+00:01:00,784 --> 00:01:03,569
+leads to such
+tridiagonal matrices.
+
+18
+00:01:04,001 --> 00:01:07,301
+The goal is to transform
+this linear system Ax=b
+
+19
+00:01:07,401 --> 00:01:10,292
+in an equivalent system
+Ux=d
+
+20
+00:01:11,717 --> 00:01:14,813
+where U is an upper triangular matrix,
+
+21
+00:01:16,633 --> 00:01:21,767
+so I have 1's on its diagonal,
+
+22
+00:01:22,574 --> 00:01:26,541
+and 0 in the lower triangular part.
+
+23
+00:01:26,606 --> 00:01:29,913
+Since I chose U as an
+upper triangular matrix,
+
+24
+00:01:30,007 --> 00:01:34,121
+and because the matrix on 
+the left handside is tridiagonal
+
+25
+00:01:35,555 --> 00:01:38,557
+the upper triangular 
+part will be
+
+26
+00:01:38,993 --> 00:01:46,417
+reduced to only a line above
+the diagonal with entries u1,u2, ... uN-1.
+
+27
+00:01:51,139 --> 00:01:54,783
+Here is the same vector x
+ of unknowns,
+
+28
+00:01:55,053 --> 00:01:58,321
+and the right side will be changed,
+
+29
+00:01:58,756 --> 00:02:06,069
+it's now the vector d, 
+with entries d1, d2, ..., dN.
+
+30
+00:02:08,939 --> 00:02:12,194
+What are the steps of this 
+algorithm ?
+
+31
+00:02:12,534 --> 00:02:16,412
+Step 1 : We want a 1 
+at the top here
+
+32
+00:02:17,134 --> 00:02:18,328
+and 0 below.
+
+33
+00:02:18,639 --> 00:02:20,323
+There are already 0 below here,
+
+34
+00:02:20,510 --> 00:02:23,157
+so I only need to transform
+this 3 in 1 and this -1 in 0.
+
+35
+00:02:23,423 --> 00:02:25,013
+So in order to transform
+this 3 into a 1
+
+36
+00:02:25,183 --> 00:02:31,076
+I take the first line which is
+3*x1-2*x2=b1,
+
+37
+00:02:31,419 --> 00:02:34,120
+I divide it by 3
+
+38
+00:02:34,180 --> 00:02:36,511
+which is the diagonal entry.
+
+39
+00:02:37,041 --> 00:02:39,119
+We get
+
+40
+00:02:40,099 --> 00:02:44,057
+x1-(2/3)x2 = b1/3.
+
+41
+00:02:45,107 --> 00:02:48,805
+égal <i>b1</i> que je dois diviser par 3,
+
+42
+00:02:48,904 --> 00:02:52,440
+In the algorithm I will 
+call this entry u1
+
+43
+00:02:54,723 --> 00:02:57,170
+so we found the u1 we needed,
+
+44
+00:02:57,230 --> 00:02:59,086
+ce coefficient,
+
+45
+00:02:59,246 --> 00:03:01,682
+and then I must divide
+b1 by 3.
+
+46
+00:03:01,842 --> 00:03:05,390
+I will only write down 
+the first 2 lines
+
+47
+00:03:05,424 --> 00:03:07,820
+of the linear system I get.
+
+48
+00:03:08,092 --> 00:03:11,539
+Here on the second line 
+I still have -1, 3, 2,
+
+49
+00:03:13,302 --> 00:03:16,707
+Here are the first lines of the 
+linear system.
+
+50
+00:03:17,281 --> 00:03:20,867
+There is have b2 and we
+ can continue all the way down.
+
+51
+00:03:21,508 --> 00:03:25,310
+Then I will transform this
+-1 in a 0,
+
+52
+00:03:25,728 --> 00:03:29,603
+so I add the 2 first lines.
+
+53
+00:03:29,966 --> 00:03:33,599
+When computing this sum,
+
+54
+00:03:33,793 --> 00:03:35,995
+I will get a 0 here,
+
+55
+00:03:36,256 --> 00:03:39,497
+so I will have 1, u1, and still x1 and x2,
+
+56
+00:03:41,097 --> 00:03:45,348
+then here I will get 
+0, 3+u1, -2+0
+
+57
+00:03:45,594 --> 00:03:48,410
+because we summed the first 
+and second lines.
+
+58
+00:03:49,010 --> 00:03:52,720
+et -2 + 0 au-dessus.
+
+59
+00:03:52,937 --> 00:03:57,008
+On the right handside, 
+I'll call this quantity b1,
+
+60
+00:03:58,333 --> 00:04:04,231
+so I get b1 on the first line
+and b1+b2 on the second.
+
+61
+00:04:04,769 --> 00:04:07,718
+So that is my linear system
+
+62
+00:04:07,815 --> 00:04:10,217
+when I sum the first 2 lines.
+
+63
+00:04:10,287 --> 00:04:11,748
+<i>(écrit)</i>
+
+64
+00:04:11,788 --> 00:04:12,819
+Now, 
+
+65
+00:04:12,949 --> 00:04:15,312
+what we need to succeed is, 
+
+66
+00:04:15,365 --> 00:04:17,238
+we want a 1 here,
+
+67
+00:04:17,238 --> 00:04:19,361
+so I must transform 3+u1 into 1,
+
+68
+00:04:19,701 --> 00:04:22,586
+so I must divide
+this second line by (3+u1).
+
+69
+00:04:23,457 --> 00:04:27,329
+I have 1, u1 on the first line, 
+
+70
+00:04:28,189 --> 00:04:30,051
+here x1, x2.
+
+71
+00:04:31,021 --> 00:04:32,930
+and here b1,
+
+72
+00:04:34,670 --> 00:04:38,319
+when dividing this line by (3+u1),
+
+73
+00:04:38,319 --> 00:04:41,468
+I get a 1 wher the 3+u1 was,
+
+74
+00:04:41,509 --> 00:04:44,555
+here I have -2/ (3+u1).
+
+75
+00:04:45,987 --> 00:04:51,035
+I'll call this u2, which 
+is the u2 I was looking for.
+
+76
+00:04:55,229 --> 00:04:59,231
+I must take the right side
+b1+b2,
+
+77
+00:04:59,314 --> 00:05:01,895
+and divide it by 3+u1.
+
+78
+00:05:04,345 --> 00:05:06,681
+So in this 
+
+79
+00:05:07,171 --> 00:05:09,715
+linear system, I already 
+
+80
+00:05:10,415 --> 00:05:13,778
+have u1, u2, 
+
+81
+00:05:15,208 --> 00:05:17,571
+and also d1 and d2.
+
+82
+00:05:18,181 --> 00:05:22,534
+Now I can write the 
+Gaussian elimination algorithm.
+
+83
+00:05:26,563 --> 00:05:29,012
+We started from b, 
+
+84
+00:05:32,573 --> 00:05:38,724
+the N-vector with entries bj, 
+j = 1,...,N,
+
+85
+00:05:38,995 --> 00:05:44,447
+and we need the vector u that
+ is over the diagonal of the matrix u,
+
+86
+00:05:46,164 --> 00:05:51,603
+which is a (N-1)vector 
+with entries uj.
+
+87
+00:05:53,120 --> 00:05:55,252
+What did we do ?
+
+88
+00:05:55,302 --> 00:05:58,590
+The first step was to take u1= -2/3,
+
+89
+00:05:59,624 --> 00:06:03,391
+and also b1 = b1/3, 
+we divided the first line by 3.
+
+90
+00:06:04,454 --> 00:06:06,579
+It is the initialization step.
+
+91
+00:06:06,767 --> 00:06:11,737
+u1 = -2/3 and b1 = b1/3.
+
+92
+00:06:12,590 --> 00:06:14,555
+Then I do a loop, 
+
+93
+00:06:14,675 --> 00:06:18,397
+Here after the first step, 
+I only drew the second line, 
+
+94
+00:06:19,137 --> 00:06:21,103
+but imagine we go to
+
+95
+00:06:21,123 --> 00:06:23,761
+the last line, 
+or last but one.
+
+96
+00:06:24,061 --> 00:06:28,497
+I do a loop for i going 
+from 2 to N-1,
+
+97
+00:06:28,766 --> 00:06:30,912
+the last but one line.
+
+98
+00:06:34,800 --> 00:06:42,206
+I take here u2=-2/(3+u1),
+
+99
+00:06:43,536 --> 00:06:52,282
+so ui = -2/(3+u(i-1)),
+
+100
+00:06:52,901 --> 00:06:55,397
+so for i=2
+
+101
+00:06:57,007 --> 00:07:00,413
+I already have u1  which 
+appears in the formula for u2.
+
+102
+00:07:00,653 --> 00:07:04,231
+Then I must do the same
+thing on the right side, 
+
+103
+00:07:04,441 --> 00:07:09,381
+bi = (bi+b(i-1))/(3+u(i-1)),
+
+104
+00:07:11,291 --> 00:07:14,081
+divisé par (3 + (<i>ui-1</i>)).
+
+105
+00:07:15,951 --> 00:07:21,731
+So here 
+b2 =  (b1 + b2) / (3 + u1).
+
+106
+00:07:22,663 --> 00:07:26,495
+When this loop from 
+2 to N-1 is over,
+
+107
+00:07:26,549 --> 00:07:31,606
+I computed u(N-1) here, 
+and b(N-1).
+
+108
+00:07:32,167 --> 00:07:36,303
+I still need to compute is 
+the last entry of the vector d.
+
+109
+00:07:36,860 --> 00:07:42,369
+I didn't mention it, but
+the vectors b and d will be stored
+
+110
+00:07:42,409 --> 00:07:44,420
+here in the same vector b.
+
+111
+00:07:45,553 --> 00:07:48,766
+So I only have to do the last operation
+
+112
+00:07:48,933 --> 00:07:52,620
+on the coefficient bN.
+
+113
+00:07:53,960 --> 00:08:01,687
+bN= (bN+b(N-1))/(3+u(N-1)).
+
+114
+00:08:02,497 --> 00:08:08,868
+I got the coefficients 
+u1, u2, ..., uN-1
+
+115
+00:08:08,919 --> 00:08:12,232
+of the upper triangular matrix U,
+
+116
+00:08:12,696 --> 00:08:15,355
+and the coefficients d1, d2, ..., dN-1
+
+117
+00:08:15,520 --> 00:08:18,092
+of the right handside that I put
+in the vector b.
+
+118
+00:08:19,665 --> 00:08:22,810
+Now I only have to solve
+the linear system
+
+119
+00:08:25,506 --> 00:08:28,900
+Ux=d, starting from the bottom:
+
+120
+00:08:29,266 --> 00:08:35,978
+xN = dN, x(N-1) = d(N-1) - u(N-1)*xN
+that we already computed,
+
+121
+00:08:36,017 --> 00:08:39,081
+and so on until we get x1.
+
+122
+00:08:39,884 --> 00:08:43,539
+Now I ask two questions,
+
+123
+00:08:44,277 --> 00:08:46,273
+the first one is : 
+
+124
+00:08:46,336 --> 00:08:51,323
+how many operations are needed
+to perform this algorithm?
+
+125
+00:08:51,383 --> 00:08:53,680
+The answer is simple, 
+
+126
+00:08:53,750 --> 00:08:57,635
+here we have a loop from 2 to N-1,
+
+127
+00:08:57,765 --> 00:09:00,880
+so the number of operations
+of this algorithm is
+
+128
+00:09:01,450 --> 00:09:03,317
+...
+
+129
+00:09:03,447 --> 00:09:05,004
+...
+
+130
+00:09:07,064 --> 00:09:09,981
+we are talking about complexity
+of the algorithm, so it's O(N),
+
+131
+00:09:10,224 --> 00:09:16,030
+which means that if we double N, 
+
+132
+00:09:16,080 --> 00:09:19,046
+we double the number of 
+operations.
+
+133
+00:09:21,646 --> 00:09:24,144
+The second question is:
+
+134
+00:09:24,934 --> 00:09:26,866
+in the algorithm, 
+
+135
+00:09:26,983 --> 00:09:33,778
+there are divisions by 3+u(i-1), 3+u(N-1), ...
+
+136
+00:09:33,863 --> 00:09:36,299
+can there be a division by 0?
+
+137
+00:09:36,431 --> 00:09:41,545
+So, do we have a division by 0? 
+
+138
+00:09:41,595 --> 00:09:43,309
+...
+
+139
+00:09:43,519 --> 00:09:47,064
+We claim the following result,
+without proof: 
+
+140
+00:09:47,309 --> 00:09:50,842
+if all the principal submatrices
+of A are regular, 
+
+141
+00:09:51,292 --> 00:09:53,591
+<i>(écrit)</i>
+
+142
+00:10:03,809 --> 00:10:06,066
+that is to say invertible,
+
+143
+00:10:07,136 --> 00:10:09,563
+then we do not have a division 
+by 0.
+
+144
+00:10:10,023 --> 00:10:11,500
+<i>(écrit)</i>
+
+145
+00:10:15,201 --> 00:10:20,694
+Thus I can execute the algorithm 
+without any problem.
+
+146
+00:10:21,256 --> 00:10:25,234
+So now, what are the principal 
+submatrices of A? 
+
+147
+00:10:25,668 --> 00:10:29,334
+The first principal submatrix of A 
+is the entry 1,1.
+
+148
+00:10:30,206 --> 00:10:33,120
+The second principal submatrix of A, 
+
+149
+00:10:33,230 --> 00:10:34,934
+is the restriction
+
+150
+00:10:34,934 --> 00:10:38,686
+to the first 2 lines 
+and 2 columns.
+
+151
+00:10:38,998 --> 00:10:41,787
+The third principal submatrix of A,
+
+152
+00:10:41,787 --> 00:10:45,206
+is the 3x3 matrix here of entries
+
+153
+00:10:45,726 --> 00:10:49,157
+Aij, with i,j between 1 and 3, 
+and so on.
+
+154
+00:10:49,467 --> 00:10:53,939
+One can check that the first matrix, 
+which is just 3, is regular,
+
+155
+00:10:54,009 --> 00:10:56,228
+for the second one, 
+compute the determinant, 
+
+156
+00:10:56,258 --> 00:10:59,583
+and we find something 
+different from 0 and so on,
+
+157
+00:10:59,593 --> 00:11:00,867
+we have to show that
+
+158
+00:11:00,885 --> 00:11:03,317
+all the submatrices of A are regular
+
+159
+00:11:03,317 --> 00:11:06,052
+then we'll have no problem.
+
+160
+00:11:06,053 --> 00:11:08,525
+In fact,
+
+161
+00:11:08,545 --> 00:11:10,417
+it can be proved that the matrix A
+
+162
+00:11:10,469 --> 00:11:12,671
+is regular, invertible,
+
+163
+00:11:12,711 --> 00:11:16,475
+and all the principal submatrices 
+are also regular.
+
+164
+00:11:16,665 --> 00:11:19,509
+au sens inversibles, 
+vous verrez ça par vous-mêmes.

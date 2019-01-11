@@ -1,0 +1,1735 @@
+1
+00:00:00,850 --> 00:00:04,320
+In the previous lectures, we talked about
+how futures help us
+
+2
+00:00:04,320 --> 00:00:09,190
+to write code that is asynchronous, and
+that deals with latency.
+
+3
+00:00:09,190 --> 00:00:12,610
+Futures however, return only a single
+result.
+
+4
+00:00:12,610 --> 00:00:16,980
+What we're going to do now, is we're going
+to turn futures into observables.
+
+5
+00:00:16,980 --> 00:00:19,920
+Which are asynchronous streams of data,
+
+6
+00:00:19,920 --> 00:00:25,090
+so collections that asynchronously produce
+their values.
+
+7
+00:00:27,580 --> 00:00:33,330
+Do you remember our little diagram of the
+four essential effects in programming?
+
+8
+00:00:33,330 --> 00:00:38,800
+What we've done in the previous lectures
+is focus on this side.
+
+9
+00:00:39,920 --> 00:00:44,310
+We looked at computations that returned
+one value.
+
+10
+00:00:44,310 --> 00:00:47,130
+Both synchronously and asynchronously.
+
+11
+00:00:48,550 --> 00:00:50,760
+What we're going to do in these lectures,
+in
+
+12
+00:00:50,760 --> 00:00:52,870
+the coming lectures, is we're going to
+look at
+
+13
+00:00:52,870 --> 00:00:58,650
+computations that return multiple values.
+Either synchronously or asynchronously.
+
+14
+00:00:58,650 --> 00:01:01,560
+And if it's synchronously, it's iterable.
+
+15
+00:01:01,560 --> 00:01:05,310
+And our new type that we'll introduce is
+observable.
+
+16
+00:01:06,450 --> 00:01:09,560
+But before we go there, let's first look a
+
+17
+00:01:09,560 --> 00:01:13,750
+little bit more in depth at futures and
+tries.
+
+18
+00:01:13,750 --> 00:01:17,170
+Because there's some interesting things
+that we have to discover there still.
+
+19
+00:01:18,730 --> 00:01:24,815
+In particular what we're going to show is
+that future of t and try of t are dual.
+
+20
+00:01:24,815 --> 00:01:28,140
+Oh, that sounds really, really difficult
+and complicated.
+
+21
+00:01:28,140 --> 00:01:29,920
+But actually it's a lot of fun.
+
+22
+00:01:30,980 --> 00:01:36,330
+But first, let's look again at the
+definition of our future of t trait.
+
+23
+00:01:36,330 --> 00:01:43,986
+Future of t had one method, onComplete,
+which takes a function from try of t to u.
+
+24
+00:01:43,986 --> 00:01:50,950
+And implicit execution context, on which
+the work is run, and it returns unit.
+
+25
+00:01:50,950 --> 00:01:53,340
+And this function here, this callback
+function,
+
+26
+00:01:53,340 --> 00:01:56,859
+receives this single value when the future
+completes.
+
+27
+00:01:58,450 --> 00:02:02,470
+Now this is all in your traits, and
+definitions, and whatever.
+
+28
+00:02:02,470 --> 00:02:09,120
+So if you really simplify this type, what
+we get is a function that takes a function
+
+29
+00:02:09,120 --> 00:02:13,740
+from try of t for u, and returns unit.
+And for simplicity, we will substitute
+
+30
+00:02:13,740 --> 00:02:19,780
+unit for u there.
+So, a future is really nothing more
+
+31
+00:02:19,780 --> 00:02:26,080
+than a function, that takes a callback
+from try of t to unit, and returns unit.
+
+32
+00:02:26,080 --> 00:02:30,890
+So that's really the essence of a future,
+is this simple type.
+
+33
+00:02:30,890 --> 00:02:33,810
+Now, let's do some massaging on this type.
+
+34
+00:02:33,810 --> 00:02:34,210
+We're going
+
+35
+00:02:34,210 --> 00:02:37,469
+to kind of, you know, squeeze it and turn
+it into something different.
+
+36
+00:02:39,710 --> 00:02:43,820
+The first thing we're going to do is we're
+going to flip the arrows.
+
+37
+00:02:43,820 --> 00:02:47,980
+So here's the function that we created,
+
+38
+00:02:47,980 --> 00:02:51,680
+that captured the essence of all the
+futures.
+
+39
+00:02:51,680 --> 00:02:56,390
+What we're going to do now is we're going
+to turn the arrows around.
+
+40
+00:02:56,390 --> 00:02:59,310
+What will happen now, is that this unit
+here that's
+
+41
+00:02:59,310 --> 00:03:03,300
+the result, becomes the argument, and that
+try becomes the result.
+
+42
+00:03:03,300 --> 00:03:04,710
+And the same here, we take this
+
+43
+00:03:04,710 --> 00:03:06,950
+unit and instead of being the result of
+
+44
+00:03:06,950 --> 00:03:09,800
+this function, it becomes the argument of
+the function.
+
+45
+00:03:09,800 --> 00:03:12,760
+So, you see this here?
+
+46
+00:03:12,760 --> 00:03:15,140
+This goes there, and that goes there.
+
+47
+00:03:16,190 --> 00:03:18,730
+Good, so we have just dropped the arrows,
+
+48
+00:03:18,730 --> 00:03:21,500
+and now this signature looks a little bit
+unusual.
+
+49
+00:03:21,500 --> 00:03:25,650
+Because typically instead of taking unit,
+which is a type that
+
+50
+00:03:25,650 --> 00:03:29,880
+has a single value, as a parameter, we do
+use a function
+
+51
+00:03:29,880 --> 00:03:33,230
+that takes no parameters.
+And that's how we write that.
+
+52
+00:03:33,230 --> 00:03:35,300
+Okay, so we just rewrite this a little
+
+53
+00:03:35,300 --> 00:03:37,820
+bit, and now we get the fault line
+function.
+
+54
+00:03:39,230 --> 00:03:43,340
+We can even simplify this further, by
+noticing
+
+55
+00:03:43,340 --> 00:03:47,360
+that the future only returned a single
+value.
+
+56
+00:03:47,360 --> 00:03:51,770
+Remember, when we call onComplete multiple
+times on the future,
+
+57
+00:03:51,770 --> 00:03:55,530
+we know that the future always returns the
+same value.
+
+58
+00:03:55,530 --> 00:03:58,350
+Saying that, future is item potent.
+
+59
+00:03:58,350 --> 00:04:03,300
+And the, in this case we can use that to
+simplify this expression even further.
+
+60
+00:04:03,300 --> 00:04:11,060
+Because the arrow here, is only there to
+allow side effects and the same for here.
+
+61
+00:04:11,060 --> 00:04:15,900
+But if the try here is always the same
+value, then we don't
+
+62
+00:04:15,900 --> 00:04:20,890
+need these extra tongues here in front, so
+we can represent it immediately
+
+63
+00:04:20,890 --> 00:04:25,080
+by this try.
+What did we arrive at?
+
+64
+00:04:25,080 --> 00:04:30,340
+Well, here we have our asynchronous
+function, that returns a future.
+
+65
+00:04:30,340 --> 00:04:32,190
+And how do we communicate by that?
+
+66
+00:04:32,190 --> 00:04:37,860
+By passing a callback, from try to t to
+unit, to this future.
+
+67
+00:04:37,860 --> 00:04:40,080
+Or we can do a synchronous method.
+
+68
+00:04:40,080 --> 00:04:46,690
+Which returns a try of t, and blocks until
+the result has been returned.
+
+69
+00:04:46,690 --> 00:04:51,670
+So we see here the difference between an
+asynchronous call that returns a future.
+
+70
+00:04:51,670 --> 00:04:54,590
+Where we get the result by passing a
+callback.
+
+71
+00:04:54,590 --> 00:04:59,110
+Or we do a synchronous goal where we have
+to block until we get the value.
+
+72
+00:04:59,110 --> 00:05:01,450
+But they are very, very closely related.
+
+73
+00:05:01,450 --> 00:05:03,340
+Because what we did is we reversed the
+
+74
+00:05:03,340 --> 00:05:06,020
+arrows, and then we simplified a little
+bit.
+
+75
+00:05:06,020 --> 00:05:11,920
+And what that means is that future of t
+and try of t are dual.
+
+76
+00:05:13,900 --> 00:05:17,300
+Now, if you want to know more about
+duality and so
+
+77
+00:05:17,300 --> 00:05:20,570
+on, you have to learn a little bit of
+category theory.
+
+78
+00:05:20,570 --> 00:05:23,090
+If you go to Wikipedia, for example, and
+you look
+
+79
+00:05:23,090 --> 00:05:27,360
+up duality, you can find a lot of
+information there.
+
+80
+00:05:27,360 --> 00:05:31,550
+but this course is about programming, not
+about category theory.
+
+81
+00:05:31,550 --> 00:05:34,070
+So, we'll leave it by this statement.
+
+82
+00:05:36,660 --> 00:05:42,360
+What we have seen, is that try of t, and
+future of t, are each other duals.
+
+83
+00:05:42,360 --> 00:05:45,040
+And that one is used for an asynchronous
+computation,
+
+84
+00:05:45,040 --> 00:05:48,120
+and the other one is used for a
+synchronous computation.
+
+85
+00:05:48,120 --> 00:05:50,290
+What we're going to try now is to see
+whether we
+
+86
+00:05:50,290 --> 00:05:55,990
+can play the same trick, for computations
+that return multiple results.
+
+87
+00:05:55,990 --> 00:06:00,490
+But before we do that, let's revisit our
+old friend iterable again.
+
+88
+00:06:02,120 --> 00:06:08,038
+Here is the trait definition for iterable.
+Iterable consists of two types.
+
+89
+00:06:08,038 --> 00:06:13,250
+There's iterable, that has the single
+method iterator.
+
+90
+00:06:13,250 --> 00:06:16,480
+And the Iterator is the one that has the
+
+91
+00:06:16,480 --> 00:06:20,180
+next method that gives the next value in
+the stream.
+
+92
+00:06:20,180 --> 00:06:23,480
+And the Boolean has next, that tells you
+
+93
+00:06:23,480 --> 00:06:26,250
+when the stream still has more elements or
+not.
+
+94
+00:06:29,660 --> 00:06:34,980
+Here's our little action hero again.
+The action hero wants to get coins.
+
+95
+00:06:34,980 --> 00:06:38,900
+And in this case the coins are in an
+Iterable collection.
+
+96
+00:06:38,900 --> 00:06:43,100
+So, how does our little friend here get
+the coins out of the collection?
+
+97
+00:06:43,100 --> 00:06:46,530
+Well, the first thing he does, is he calls
+iterator.
+
+98
+00:06:47,780 --> 00:06:53,520
+If you call iterator on an Iterable of
+coins, you get an Iterator of coins.
+
+99
+00:06:53,520 --> 00:06:54,880
+And then he does
+
+100
+00:06:54,880 --> 00:06:58,690
+while has next, he calls the next coins.
+
+101
+00:06:58,690 --> 00:07:02,900
+Notice he's pulling the values out of this
+iterator.
+
+102
+00:07:02,900 --> 00:07:08,180
+Every time you call next, you have your
+block in, until the next coin comes out.
+
+103
+00:07:10,960 --> 00:07:15,160
+If we look further in the search codes of
+iterable, we
+
+104
+00:07:15,160 --> 00:07:19,320
+see that it has a lot of interesting
+methods defined on it.
+
+105
+00:07:19,320 --> 00:07:24,820
+Our good friend filter, map, take, et
+cetera.
+
+106
+00:07:24,820 --> 00:07:31,580
+But the most important one is flat map.
+Flat map takes an Iterable,
+
+107
+00:07:31,580 --> 00:07:36,530
+and a function that, for each element in
+the Iterable, returns another iterable.
+
+108
+00:07:36,530 --> 00:07:42,250
+And then flattens all these streams into a
+result stream of type iterable of b.
+
+109
+00:07:42,250 --> 00:07:48,080
+Another way of saying this is that
+iterable is a monad.
+
+110
+00:07:48,080 --> 00:07:52,620
+But we all know that that was true
+already, so that's nothing new.
+
+111
+00:07:53,970 --> 00:07:54,570
+Nothing new.
+
+112
+00:07:57,250 --> 00:07:59,766
+In order to talk nicely about collections,
+
+113
+00:07:59,766 --> 00:08:02,550
+we're going to use so called marble
+diagrams.
+
+114
+00:08:02,550 --> 00:08:07,780
+Marble diagrams show the values of a
+collection like this on an arrow.
+
+115
+00:08:07,780 --> 00:08:11,130
+So in this case, we have a collection of
+coins.
+
+116
+00:08:11,130 --> 00:08:14,750
+And we have a function that turns coins
+into diamonds.
+
+117
+00:08:14,750 --> 00:08:17,040
+And when we map that function over the
+input
+
+118
+00:08:17,040 --> 00:08:21,200
+collection of coins, we get an output
+collection of diamonds.
+
+119
+00:08:21,200 --> 00:08:22,540
+And in the rest
+
+120
+00:08:22,540 --> 00:08:25,606
+of the lectures, we will dr, keep drawing
+these kind of marble
+
+121
+00:08:25,606 --> 00:08:30,510
+diagrams, because they give a very concise
+way of how these operators work.
+
+122
+00:08:30,510 --> 00:08:32,440
+You can see, you know, this is like a
+
+123
+00:08:32,440 --> 00:08:35,260
+sample input, and you can see the sample
+output.
+
+124
+00:08:35,260 --> 00:08:37,580
+So they are very, very beautiful to look
+at.
+
+125
+00:08:40,420 --> 00:08:44,090
+Since we were interested in asynchronous
+computations,
+
+126
+00:08:44,090 --> 00:08:47,530
+it's good to remind us of the times,
+
+127
+00:08:47,530 --> 00:08:52,140
+you know, things take on a typical PC,
+that we converted on a human scale.
+
+128
+00:08:52,140 --> 00:08:55,030
+These were the times that Peter Norvig
+collected.
+
+129
+00:08:56,580 --> 00:08:58,620
+And what we're gong to do is, we're going
+to
+
+130
+00:08:58,620 --> 00:09:05,110
+write some code using Iterables to read
+values from a disk.
+
+131
+00:09:06,160 --> 00:09:10,700
+And what we will see then, is that it's
+really not such a good
+
+132
+00:09:10,700 --> 00:09:15,980
+idea to use iterables to do, kind of a,
+computations that take a long time.
+
+133
+00:09:18,350 --> 00:09:20,270
+Here's the sample code.
+
+134
+00:09:20,270 --> 00:09:24,250
+If we look in the standard library, the
+standard scala library.
+
+135
+00:09:24,250 --> 00:09:29,370
+There's a trait source that has a method
+from file, that takes a path.
+
+136
+00:09:29,370 --> 00:09:35,460
+And on that you can call get lines, and
+which returns an iterator of strengths.
+
+137
+00:09:35,460 --> 00:09:40,850
+Say that we read all the lines from our
+attempt directory, attempt file.
+
+138
+00:09:40,850 --> 00:09:44,710
+And now we for looping over this
+
+139
+00:09:44,710 --> 00:09:46,090
+number of lines.
+
+140
+00:09:46,090 --> 00:09:50,090
+But notice that we're reading the lines
+from disk.
+
+141
+00:09:50,090 --> 00:09:54,350
+And, you know, say that each line is, you
+know, a few hundred k.
+
+142
+00:09:54,350 --> 00:09:58,610
+Which typically means you know, in with
+these numbers, that it would
+
+143
+00:09:58,610 --> 00:10:03,160
+take two weeks in human time to get a line
+from disk.
+
+144
+00:10:03,160 --> 00:10:07,150
+So this is really not a very smart way to
+read stuff from disk.
+
+145
+00:10:07,150 --> 00:10:09,030
+Instead what we need to do.
+
+146
+00:10:09,030 --> 00:10:09,800
+Just like we did
+
+147
+00:10:09,800 --> 00:10:13,665
+with futures, we have to start doing
+asynchronous io.
+
+148
+00:10:16,520 --> 00:10:18,750
+In order to get to this, we will do
+
+149
+00:10:18,750 --> 00:10:22,980
+the same dualization trick that we used
+for futures.
+
+150
+00:10:22,980 --> 00:10:26,380
+Now let's look at our iterable and
+iterator traits.
+
+151
+00:10:26,380 --> 00:10:30,130
+And let's convert them into their duals.
+
+152
+00:10:30,130 --> 00:10:34,110
+And we are going to take exactly the same
+steps as we did with futures.
+
+153
+00:10:34,110 --> 00:10:36,810
+So the first thing we're going to do to
+turn this
+
+154
+00:10:36,810 --> 00:10:42,140
+pull model into a push model, is to boil
+Iterable and Iterator
+
+155
+00:10:42,140 --> 00:10:43,400
+down to their essence.
+
+156
+00:10:43,400 --> 00:10:48,710
+So, instead of having threads, we will
+just describe them using functions.
+
+157
+00:10:51,450 --> 00:10:54,470
+In order to boil down iterable and
+iterator
+
+158
+00:10:54,470 --> 00:10:56,956
+to their essence we look at the signature.
+
+159
+00:10:56,956 --> 00:11:03,320
+So the iterator method takes no arguments,
+and returns an iterator.
+
+160
+00:11:03,320 --> 00:11:06,110
+So what we do is we write here a function
+that
+
+161
+00:11:06,110 --> 00:11:11,980
+takes no arguments, and returns the boiled
+down version of iterator.
+
+162
+00:11:11,980 --> 00:11:16,450
+So what is an iterator?
+Well, it something that either has a
+
+163
+00:11:16,450 --> 00:11:18,710
+Boolean or a t.
+
+164
+00:11:18,710 --> 00:11:22,180
+Which we really can model with an option
+of t.
+
+165
+00:11:22,180 --> 00:11:27,460
+Okay, so if you, you know, instead of
+having these two functions, what you
+
+166
+00:11:27,460 --> 00:11:31,510
+can do is you can just have a function
+that returns an option of t.
+
+167
+00:11:32,840 --> 00:11:36,180
+And now, we have to even be a little bit
+more careful.
+
+168
+00:11:36,180 --> 00:11:43,080
+Because next can also throw an exception,
+if has next returns false.
+
+169
+00:11:43,080 --> 00:11:48,480
+So, really what we should do is that an
+iterator corresponds to a function
+
+170
+00:11:48,480 --> 00:11:54,040
+and has no arguments.
+And returns a try of an option of t.
+
+171
+00:11:54,040 --> 00:11:59,400
+Okay, and that corresponds to the fact
+that these methods can
+
+172
+00:11:59,400 --> 00:12:04,660
+either throw, or return a t, or return
+nothing.
+
+173
+00:12:04,660 --> 00:12:08,510
+So, you see that the three choices here
+are exactly corresponding
+
+174
+00:12:08,510 --> 00:12:12,059
+with the values that these two functions
+here can produce.
+
+175
+00:12:14,530 --> 00:12:17,640
+This type here is quite complicated,
+right?
+
+176
+00:12:17,640 --> 00:12:23,510
+This is like a composition of two types
+that already are some types of two things.
+
+177
+00:12:23,510 --> 00:12:26,640
+So this is not as simple as I want it to
+be.
+
+178
+00:12:26,640 --> 00:12:29,550
+So let's make this even simpler.
+
+179
+00:12:29,550 --> 00:12:31,640
+And the way we're going to do that, is
+instead
+
+180
+00:12:31,640 --> 00:12:35,640
+of having a value of try of option of t.
+
+181
+00:12:35,640 --> 00:12:40,530
+We're going to represent this value, by
+the callback functions that you would give
+
+182
+00:12:40,530 --> 00:12:43,170
+when you better match on a value of this
+type.
+
+183
+00:12:44,370 --> 00:12:49,300
+Before however we're going to simplify the
+type, we still have to flip the arrows.
+
+184
+00:12:49,300 --> 00:12:50,020
+Remember that?
+
+185
+00:12:50,020 --> 00:12:53,280
+We were going to play the magic
+dualization trick.
+
+186
+00:12:53,280 --> 00:12:59,490
+So here's our type that we boil down for
+iterable iterator.
+
+187
+00:12:59,490 --> 00:13:02,960
+The first thing we're going to do is we're
+going to flip the arrows.
+
+188
+00:13:02,960 --> 00:13:05,580
+And as we flip the arrows, a function that
+
+189
+00:13:05,580 --> 00:13:10,190
+takes no argument becomes a function that
+returns unit.
+
+190
+00:13:10,190 --> 00:13:13,040
+But you see here, we just reversed the
+arrows,
+
+191
+00:13:13,040 --> 00:13:16,270
+just like we did when we were massaging
+future.
+
+192
+00:13:17,680 --> 00:13:23,100
+Now if we look at this type here, that
+doesn't really look simple enough to me.
+
+193
+00:13:23,100 --> 00:13:25,810
+Because this try of option of t, it's a
+
+194
+00:13:25,810 --> 00:13:30,450
+composition of two types that are already
+pretty complicated themselves.
+
+195
+00:13:30,450 --> 00:13:35,990
+So what I'm going to do, is I'm going to
+replace this type by the
+
+196
+00:13:35,990 --> 00:13:40,420
+set of functions that I need to pass, when
+I'm pattern matching on that type.
+
+197
+00:13:40,420 --> 00:13:43,510
+And what do I need to do, when I pattern
+matching on that type?
+
+198
+00:13:43,510 --> 00:13:45,590
+Well, there's three possibilities.
+
+199
+00:13:45,590 --> 00:13:49,270
+The first thing is that the inner value is
+an exception.
+
+200
+00:13:49,270 --> 00:13:53,650
+So I have to pass in a function from
+throwable to unit.
+
+201
+00:13:53,650 --> 00:13:55,400
+If it was not an exception,
+
+202
+00:13:55,400 --> 00:13:59,720
+then the result I get, is the success of
+an option of t.
+
+203
+00:13:59,720 --> 00:14:02,800
+Which means that I have to pass two
+functions.
+
+204
+00:14:02,800 --> 00:14:08,480
+One in case there is a value, and one in
+case there was not a value.
+
+205
+00:14:08,480 --> 00:14:14,350
+So what we ended up with after simplifying
+iterable and iterator,
+
+206
+00:14:15,350 --> 00:14:21,120
+reversing the arrows, and then simplifying
+this, is the following type.
+
+207
+00:14:21,120 --> 00:14:24,160
+It's a type that takes three callbacks and
+returns unit.
+
+208
+00:14:25,740 --> 00:14:30,090
+Now the next step that we're going to do,
+is we're going to unsimplify this.
+
+209
+00:14:30,090 --> 00:14:32,060
+We're going to complexify this.
+
+210
+00:14:32,060 --> 00:14:34,730
+And instead of you know, all these
+functions, we're going
+
+211
+00:14:34,730 --> 00:14:38,180
+to define a few traits that capture the
+essence of this.
+
+212
+00:14:38,180 --> 00:14:40,870
+So we're going to unboil these functions.
+
+213
+00:14:42,480 --> 00:14:45,570
+And here on the right, you see the result
+of you know,
+
+214
+00:14:45,570 --> 00:14:48,290
+complexifying these types.
+
+215
+00:14:48,290 --> 00:14:51,500
+The first thing that we have is we have a
+new trait observable.
+
+216
+00:14:52,860 --> 00:14:59,090
+The observable is the thing that
+corresponds to a trait
+
+217
+00:14:59,090 --> 00:15:04,940
+that takes these three as an argument, and
+these guys here become the observer.
+
+218
+00:15:04,940 --> 00:15:09,950
+And you see that subscribe takes an
+observer and returns unit.
+
+219
+00:15:09,950 --> 00:15:14,560
+Well, instead of unit, we are making it
+slightly more complicated, and
+
+220
+00:15:14,560 --> 00:15:19,740
+we return a subscription.
+What is the subscription?
+
+221
+00:15:19,740 --> 00:15:25,680
+Well, unlike futures where we didn't have
+a notion of cancellation.
+
+222
+00:15:25,680 --> 00:15:27,780
+What we want to do when we have a stream,
+
+223
+00:15:27,780 --> 00:15:31,520
+the stream can be infinite, it can return
+many, many results.
+
+224
+00:15:31,520 --> 00:15:35,300
+And what we want to do is if we pass a
+call, a set of callbacks
+
+225
+00:15:35,300 --> 00:15:38,010
+to the stream to receive the values.
+
+226
+00:15:38,010 --> 00:15:40,330
+At some point we may want to signal to the
+
+227
+00:15:40,330 --> 00:15:44,600
+producer, that we're not interested in
+receiving any more values.
+
+228
+00:15:44,600 --> 00:15:50,150
+And so, when you pass your observer to an
+observable, you get back a subscription.
+
+229
+00:15:50,150 --> 00:15:53,590
+And when you go unsubscribe on the
+subscription, you tell
+
+230
+00:15:53,590 --> 00:15:57,840
+the producer that you're not interested in
+receiving any more values.
+
+231
+00:15:57,840 --> 00:15:58,920
+But don't worry.
+
+232
+00:15:58,920 --> 00:16:00,470
+We will have a whole lesson
+
+233
+00:16:00,470 --> 00:16:05,509
+to talk about subscriptions.
+Let's put iterable, iterator,
+
+234
+00:16:05,509 --> 00:16:10,760
+and observable, observer, next to each
+other.
+
+235
+00:16:11,840 --> 00:16:15,180
+And you see that they really look very,
+
+236
+00:16:15,180 --> 00:16:18,050
+very similar, except that things are
+swapped around.
+
+237
+00:16:20,330 --> 00:16:23,610
+Alright.
+I think this is quite remarkable.
+
+238
+00:16:23,610 --> 00:16:27,518
+What we did is we showed that try and
+future, are duals.
+
+239
+00:16:27,518 --> 00:16:30,560
+And the one is synchronous, and the one is
+asynchronous.
+
+240
+00:16:30,560 --> 00:16:32,400
+And then what we did is we did
+
+241
+00:16:32,400 --> 00:16:37,640
+exactly the same exercise, this
+dualization scheme, on iterables.
+
+242
+00:16:37,640 --> 00:16:41,060
+And then we came up with this notion of
+observables.
+
+243
+00:16:41,060 --> 00:16:42,330
+That's quite nice.
+
+244
+00:16:42,330 --> 00:16:46,470
+Now, what we want to do is let's put
+futures and
+
+245
+00:16:46,470 --> 00:16:49,870
+observables side by side, and see how they
+are related.
+
+246
+00:16:49,870 --> 00:16:51,880
+Because here it says that this one
+
+247
+00:16:51,880 --> 00:16:55,700
+is a asynchronous computation that returns
+one result.
+
+248
+00:16:55,700 --> 00:17:01,230
+And observables are asynchronous
+computations that return multiple results.
+
+249
+00:17:01,230 --> 00:17:03,930
+But that must mean that, in the types,
+when
+
+250
+00:17:03,930 --> 00:17:07,080
+we boil the, the types back down to their
+essence.
+
+251
+00:17:07,080 --> 00:17:11,510
+We must be able to see where the
+difference between and, one
+
+252
+00:17:11,510 --> 00:17:14,770
+and many lies.
+Okay.
+
+253
+00:17:14,770 --> 00:17:20,920
+Here are our two types, observable.
+We have, you know,
+
+254
+00:17:20,920 --> 00:17:26,450
+moved back to the try of option of t, and
+returns unit.
+
+255
+00:17:26,450 --> 00:17:32,390
+And let's ignore for now the subscription.
+And if we look at future,
+
+256
+00:17:32,390 --> 00:17:37,330
+future was a try of t to unit to unit.
+And the reason
+
+257
+00:17:37,330 --> 00:17:39,720
+I don't want to kind of, you know, look at
+the
+
+258
+00:17:39,720 --> 00:17:44,810
+subscription here, is because I'm not
+interested in the cancellation part.
+
+259
+00:17:44,810 --> 00:17:48,570
+I'm really interested in the one and many
+part.
+
+260
+00:17:48,570 --> 00:17:52,930
+And that's exactly what you see in the
+difference of the type.
+
+261
+00:17:52,930 --> 00:17:57,180
+When you have a future, it returns only a
+single value and that
+
+262
+00:17:57,180 --> 00:18:02,290
+single value, well it's either a value or
+ec, there can an exception.
+
+263
+00:18:02,290 --> 00:18:05,940
+But in an observable you can have multiple
+values.
+
+264
+00:18:05,940 --> 00:18:07,100
+Or you can have an exception.
+
+265
+00:18:07,100 --> 00:18:13,310
+So the exception part is still the same,
+but to be able to receive multiple values,
+
+266
+00:18:13,310 --> 00:18:17,750
+you have to have a way to also indicate
+that there will be no more values.
+
+267
+00:18:17,750 --> 00:18:20,150
+And that's where the option of t comes in.
+
+268
+00:18:20,150 --> 00:18:23,760
+So here you see that, because there's no
+option, the only
+
+269
+00:18:23,760 --> 00:18:27,840
+thing really that you can do, is to
+produce a single value.
+
+270
+00:18:27,840 --> 00:18:30,900
+But, once you have a try of an option of
+
+271
+00:18:30,900 --> 00:18:35,630
+t, then you have the ability to have
+multiple values.
+
+272
+00:18:35,630 --> 00:18:39,610
+Because I can signal whether there's an
+error, or whether this stream
+
+273
+00:18:39,610 --> 00:18:45,240
+has terminated, or whether there's a
+regular value that is produced next.
+
+274
+00:18:47,140 --> 00:18:49,660
+Now, there was one thing that we also
+
+275
+00:18:49,660 --> 00:18:52,990
+haven't talked about yet, is that in
+futures,
+
+276
+00:18:52,990 --> 00:18:55,290
+we had this notion of execution context.
+
+277
+00:18:55,290 --> 00:19:01,280
+So, whenever we had a body of a future, it
+would run in a certain execution context.
+
+278
+00:19:02,300 --> 00:19:06,130
+How does this, you know, work with
+observables?
+
+279
+00:19:06,130 --> 00:19:08,760
+Because observables are asynchronous, so
+there must be
+
+280
+00:19:08,760 --> 00:19:12,040
+some way of doing things concurrently
+there as well.
+
+281
+00:19:12,040 --> 00:19:14,030
+And that's exactly true.
+
+282
+00:19:14,030 --> 00:19:18,930
+Except that in observables, just because
+there's also many results,
+
+283
+00:19:18,930 --> 00:19:22,160
+we cannot have simple execution context.
+
+284
+00:19:22,160 --> 00:19:26,940
+But we need something slightly more
+complicated, and that's a scheduler.
+
+285
+00:19:26,940 --> 00:19:32,020
+And we will have a whole lesson, or two
+lessons actually, devoted to schedulers.
+
+286
+00:19:33,840 --> 00:19:36,200
+but for now, in the next few lessons,
+
+287
+00:19:36,200 --> 00:19:39,980
+we will really not talk much about
+schedulers.
+
+288
+00:19:39,980 --> 00:19:40,620
+We don't need to.
+
+289
+00:19:43,080 --> 00:19:48,170
+Well, that was more than enough theory and
+category theory and so on.
+
+290
+00:19:48,170 --> 00:19:50,230
+Let's look at some real code here.
+
+291
+00:19:50,230 --> 00:19:53,139
+Let's look at some simple examples of
+observables.
+
+292
+00:19:54,550 --> 00:19:59,920
+The easiest way to think about an
+asynchronous stream, is a clock or time.
+
+293
+00:19:59,920 --> 00:20:02,245
+Or, you know, it's a timer.
+
+294
+00:20:02,245 --> 00:20:07,665
+In, in this case, we have the interval
+function,
+
+295
+00:20:07,665 --> 00:20:10,740
+onobservable, that takes a duration.
+
+296
+00:20:12,260 --> 00:20:15,830
+Look how beautiful this is in Scala with
+postfix notation.
+
+297
+00:20:15,830 --> 00:20:21,710
+So this guy says, create an observable
+stream, that
+
+298
+00:20:21,710 --> 00:20:27,980
+turns a long every single second.
+And since observables
+
+299
+00:20:27,980 --> 00:20:32,700
+have the same operators as any other
+collection, we can then take that
+
+300
+00:20:32,700 --> 00:20:34,520
+stream of ticks.
+
+301
+00:20:34,520 --> 00:20:38,200
+And we can filter it and only keep the
+even ones.
+
+302
+00:20:38,200 --> 00:20:42,340
+And then we can do even fancy things, like
+buffering the things by
+
+303
+00:20:42,340 --> 00:20:46,600
+chopping up that stream in slices of two,
+where we shift by one.
+
+304
+00:20:46,600 --> 00:20:50,550
+So this is like slices of two, shifted by
+one.
+
+305
+00:20:50,550 --> 00:20:56,350
+And then, in the end, we subscribe to this
+stream and we print them out.
+
+306
+00:20:56,350 --> 00:20:58,320
+Let's see how this works.
+
+307
+00:21:00,520 --> 00:21:04,240
+And here you see I can, you should never
+believe me when I
+
+308
+00:21:04,240 --> 00:21:07,860
+say that this is runnable code because
+there's a kind of a typo here.
+
+309
+00:21:07,860 --> 00:21:10,570
+But believe me, this is actually runnable
+code.
+
+310
+00:21:10,570 --> 00:21:11,990
+Let's see what it does.
+
+311
+00:21:14,010 --> 00:21:19,250
+And as I promised, we're going to use
+marble diagrams to visualize how
+
+312
+00:21:19,250 --> 00:21:24,850
+our streams look like.
+Our tick stream is type observable of long
+
+313
+00:21:24,850 --> 00:21:29,890
+will tick, it will tick one second before
+It produces the first tick.
+
+314
+00:21:29,890 --> 00:21:34,380
+And then another second to produce the
+second tick, and another second.
+
+315
+00:21:34,380 --> 00:21:38,530
+So this is every time there's one second
+in between.
+
+316
+00:21:38,530 --> 00:21:39,600
+When we filter
+
+317
+00:21:39,600 --> 00:21:45,690
+all the ones that are even, well, all the
+ticks that are even will fall through.
+
+318
+00:21:45,690 --> 00:21:48,230
+But, all the ones that are alt will be
+filtered out.
+
+319
+00:21:48,230 --> 00:21:54,220
+So what we end up with, is a stream of
+numbers that are two seconds apart.
+
+320
+00:21:54,220 --> 00:21:54,480
+Right?
+
+321
+00:21:54,480 --> 00:21:57,580
+There's two seconds now between every
+tick.
+
+322
+00:21:57,580 --> 00:22:00,310
+And then the last one here, this buffer.
+
+323
+00:22:00,310 --> 00:22:05,220
+What buffer does, it takes segments of
+length two,
+
+324
+00:22:05,220 --> 00:22:07,860
+shifted by one.
+What does that mean?
+
+325
+00:22:07,860 --> 00:22:14,670
+Well, it takes segments of two shifted
+one, so there's the first segment of two.
+
+326
+00:22:14,670 --> 00:22:18,160
+Now it shifts one, and then it creates
+this second segment of two.
+
+327
+00:22:18,160 --> 00:22:22,040
+And then it will shift one, and create
+this second, the,
+
+328
+00:22:22,040 --> 00:22:25,260
+the third segment of two there, so there
+will be six there.
+
+329
+00:22:25,260 --> 00:22:26,550
+Et cetera, et cetera.
+
+330
+00:22:26,550 --> 00:22:30,520
+So what you will see is that you now get
+the two values here,
+
+331
+00:22:31,820 --> 00:22:37,570
+with two seconds in between.
+When are these values actually produced?
+
+332
+00:22:37,570 --> 00:22:40,560
+That's an interesting question, because
+what buffer does, is
+
+333
+00:22:40,560 --> 00:22:44,710
+it only produces the, the pair, at this
+point.
+
+334
+00:22:44,710 --> 00:22:47,710
+Because it doesn't know yet, here, that
+there's a value here.
+
+335
+00:22:47,710 --> 00:22:52,240
+So, it needs to kind of, get two values
+before it can send them out too.
+
+336
+00:22:52,240 --> 00:22:55,600
+This pair, actually, is produced, at this
+point.
+
+337
+00:22:55,600 --> 00:22:56,942
+But, you know, the pic,
+
+338
+00:22:56,942 --> 00:22:59,470
+for the picture sake, we left it like this
+here.
+
+339
+00:23:01,540 --> 00:23:05,680
+Let's do a little quiz.
+Here's a function, observable.range.
+
+340
+00:23:05,680 --> 00:23:10,530
+This is a function that we will develop
+later in this course.
+
+341
+00:23:11,800 --> 00:23:16,010
+but what observable.range does, it just
+returns the numbers,
+
+342
+00:23:16,010 --> 00:23:18,520
+starting at one, and then the next ten
+numbers.
+
+343
+00:23:18,520 --> 00:23:22,030
+So if I do observable.range, one through
+ten, it
+
+344
+00:23:22,030 --> 00:23:26,980
+produces an asynchronous stream of the
+values one through ten.
+
+345
+00:23:26,980 --> 00:23:32,790
+Now let's map x plus one over this stream.
+What is the answer?
+
+346
+00:23:35,700 --> 00:23:40,990
+Well, let's look at all the possibilities.
+Let's look at number a.
+
+347
+00:23:40,990 --> 00:23:47,150
+Well, if you map over sequence the number
+of elements never changes.
+
+348
+00:23:47,150 --> 00:23:49,410
+So here if this stream stops at ten.
+
+349
+00:23:49,410 --> 00:23:52,350
+And you know, here there's suddenly,
+there's, you
+
+350
+00:23:52,350 --> 00:23:55,090
+know, like 42, there's many more values
+here.
+
+351
+00:23:55,090 --> 00:23:57,280
+This cannot be the right answer.
+
+352
+00:23:57,280 --> 00:23:57,860
+Because
+
+353
+00:23:59,960 --> 00:24:03,310
+this cannot be the right answer, because
+there's too many values.
+
+354
+00:24:03,310 --> 00:24:09,180
+Moreover, the values here are flipped, so
+this is completely wrong.
+
+355
+00:24:09,180 --> 00:24:11,170
+Now let's look at the second one.
+
+356
+00:24:11,170 --> 00:24:13,800
+This one here is the correct answer.
+
+357
+00:24:13,800 --> 00:24:18,530
+It, exactly the same values as the input
+stream, except that this
+
+358
+00:24:18,530 --> 00:24:23,400
+function here that you're passing to map,
+is applied to each element.
+
+359
+00:24:23,400 --> 00:24:25,240
+And for the same reason that the first
+
+360
+00:24:25,240 --> 00:24:29,120
+one was wrong, these other two are wrong
+as well.
+
+361
+00:24:29,120 --> 00:24:32,460
+But what this shows you, is that even
+though this is
+
+362
+00:24:32,460 --> 00:24:37,560
+an asynchronous string; where the values
+are pushed at the consumer.
+
+363
+00:24:37,560 --> 00:24:40,010
+You can still do map filter, and all
+
+364
+00:24:40,010 --> 00:24:44,230
+the collection operations on these
+asynchronous data streams.
+

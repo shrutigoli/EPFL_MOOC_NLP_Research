@@ -1,0 +1,1195 @@
+1
+00:00:04,695 --> 00:00:06,809
+Dans cette séquence vidéo,
+nous allons voir comment
+
+2
+00:00:06,809 --> 00:00:10,026
+le polymorphisme est un très bon 
+complément de l'abstraction,
+
+3
+00:00:10,026 --> 00:00:12,698
+et nous permet donc
+de mieux spécifier les classes
+
+4
+00:00:12,698 --> 00:00:14,808
+au niveau le plus abstrait.
+
+5
+00:00:14,808 --> 00:00:18,303
+Nous allons justement introduire 
+la notion de classe abstraite
+
+6
+00:00:18,303 --> 00:00:20,962
+et de méthode virtuelle pure.
+
+7
+00:00:20,962 --> 00:00:22,994
+Mais commençons 
+par présenter le problème
+
+8
+00:00:22,994 --> 00:00:25,507
+auquel répondent ces
+méthodes virtuelles pures.
+
+9
+00:00:25,867 --> 00:00:28,384
+Au niveau le plus élevé d'une hiérarchie,
+
+10
+00:00:28,384 --> 00:00:31,258
+on ne sais pas forcément 
+définir une méthode,
+
+11
+00:00:31,258 --> 00:00:35,614
+que l'on sait pourtant qui va exister 
+pour toutes les sous-classes.
+
+12
+00:00:35,614 --> 00:00:39,078
+Par exemple, si l'on imagine avoir 
+une classe très générale
+
+13
+00:00:39,078 --> 00:00:43,493
+qui représente des figures géométriques 
+fermées, quelconques,
+
+14
+00:00:43,493 --> 00:00:45,691
+à ce moment là, au niveau de cette classe,
+
+15
+00:00:45,691 --> 00:00:49,944
+il va être assez difficile de définir
+comment calculer la surface
+
+16
+00:00:49,944 --> 00:00:52,737
+d'une figure géométrique quelconque,
+
+17
+00:00:52,737 --> 00:00:55,549
+c'est certainement quelque chose 
+de difficile à définir,
+
+18
+00:00:55,549 --> 00:00:57,167
+on ne saurait pas bien le faire.
+
+19
+00:00:57,167 --> 00:00:59,428
+Pourtant on sait que toute figure fermée,
+
+20
+00:00:59,428 --> 00:01:02,879
+-- par exemple un cercle
+est une figure fermée --
+
+21
+00:01:04,896 --> 00:01:07,828
+donc on sait qu'au niveau de toutes 
+les figures fermées spécifiques,
+
+22
+00:01:07,828 --> 00:01:11,352
+on devrait quand même pouvoir
+définir la méthode surface.
+
+23
+00:01:11,352 --> 00:01:14,086
+Donc, on imagine que
+toutes les figures fermées
+
+24
+00:01:14,086 --> 00:01:15,938
+vont avoir une méthode surface,
+
+25
+00:01:15,938 --> 00:01:19,223
+même si l'on ne sait pas bien la définir
+au niveau le plus abstrait.
+
+26
+00:01:19,223 --> 00:01:22,255
+Pourtant, pour pousser le problème 
+un petit peu plus loin,
+
+27
+00:01:22,255 --> 00:01:24,976
+on peut même imaginer
+que cette méthode surface
+
+28
+00:01:24,976 --> 00:01:27,683
+soit utilisée au niveau le plus élevé,
+
+29
+00:01:27,683 --> 00:01:33,117
+par exemple pour calculer un volume 
+engendré sur une certaine hauteur,
+
+30
+00:01:34,193 --> 00:01:36,021
+par cette surface.
+
+31
+00:01:36,021 --> 00:01:40,336
+A ce moment là, ce volume 
+engendré suivant cette hauteur
+
+32
+00:01:40,336 --> 00:01:42,045
+par cette figure géométrique,
+
+33
+00:01:42,045 --> 00:01:46,437
+serait défini par le produit 
+de la hauteur multiplié
+
+34
+00:01:46,437 --> 00:01:49,630
+la surface de la figure fermée.
+
+35
+00:01:49,630 --> 00:01:52,002
+Donc on pourrait même 
+faire appel à cette méthode,
+
+36
+00:01:52,002 --> 00:01:54,960
+même si on ne sait pas très bien
+comment la définir.
+
+37
+00:01:54,960 --> 00:01:57,122
+Au plus haut niveau, elle serait définie
+
+38
+00:01:57,122 --> 00:02:00,369
+pour tous les exemples concrets
+de figures fermées.
+
+39
+00:02:00,369 --> 00:02:02,438
+La bonne façon de faire ceci,
+
+40
+00:02:02,438 --> 00:02:05,045
+une méthode que l'on sait
+qui doit exister,
+
+41
+00:02:05,045 --> 00:02:08,065
+mais que l'on ne sait pas 
+forcément bien définir
+
+42
+00:02:08,065 --> 00:02:09,904
+au niveau d'une super classe,
+
+43
+00:02:09,904 --> 00:02:12,588
+cette façon de faire est 
+d'introduire la méthode
+
+44
+00:02:12,588 --> 00:02:15,472
+comme une méthode virtuelle pure.
+
+45
+00:02:16,571 --> 00:02:19,278
+Illustrons encore ce concept 
+de méthode virtuelle pure
+
+46
+00:02:19,278 --> 00:02:22,735
+sur un autre exemple et revenons 
+donc à nos fameux jeux
+
+47
+00:02:22,735 --> 00:02:24,779
+avec des personnages,
+
+48
+00:02:24,779 --> 00:02:27,950
+où nous avons donc des guerriers 
+qui sont des personnages,
+
+49
+00:02:27,950 --> 00:02:31,573
+des magiciens qui sont 
+des personnages, des voleurs..
+
+50
+00:02:33,198 --> 00:02:37,281
+La classe « Jeu » contiendrait bien sûr
+plusieurs personnages,
+
+51
+00:02:37,281 --> 00:02:39,186
+on a décidé de les mettre ici
+
+52
+00:02:39,186 --> 00:02:41,229
+dans un tableau dynamique
+de personnages.
+
+53
+00:02:41,229 --> 00:02:42,814
+Et pour avoir du polymorphisme,
+
+54
+00:02:42,814 --> 00:02:45,391
+nous avons donc un tableau
+de pointeurs sur des personnages,
+
+55
+00:02:45,391 --> 00:02:48,688
+cet aspect précis, 
+tableau de pointeurs sur une classe,
+
+56
+00:02:48,688 --> 00:02:52,046
+sera repris très en détails 
+dans une future vidéo
+
+57
+00:02:52,046 --> 00:02:54,564
+qui s'appelle collections hétérogènes.
+
+58
+00:02:54,564 --> 00:02:57,004
+Ici, on a simplement notre 
+tableau de personnages,
+
+59
+00:02:57,004 --> 00:02:59,935
+et imaginons que dans le jeu, 
+on souhaite afficher
+
+60
+00:02:59,935 --> 00:03:02,150
+l'ensemble des personnages.
+
+61
+00:03:02,150 --> 00:03:06,733
+Donc on ferait une boucle qui parcoure
+l'ensemble des personnages,
+
+62
+00:03:06,733 --> 00:03:09,435
+qui parcoure ce tableau « persos »,
+
+63
+00:03:09,435 --> 00:03:14,903
+et pour chacun des personnages,
+on afficherait ce personnage.
+
+64
+00:03:14,903 --> 00:03:17,138
+Cette syntaxe ici, « un_perso »,
+
+65
+00:03:17,138 --> 00:03:20,662
+c'est la variable qui parcourt
+le tableau de personnages,
+
+66
+00:03:20,662 --> 00:03:22,698
+c'est donc un pointeur sur un personnage.
+
+67
+00:03:22,698 --> 00:03:26,213
+Et donc, comme on a un pointeur,
+on utilise cette syntaxe ici,
+
+68
+00:03:26,213 --> 00:03:31,265
+pour dire la méthode « afficher »
+de l'objet pointée par « un_perso ».
+
+69
+00:03:31,265 --> 00:03:34,221
+Donc ici, on afficherait bien 
+chacun des personnages
+
+70
+00:03:34,221 --> 00:03:38,073
+« un_perso » dans l'ensemble 
+des personnages stockés,
+
+71
+00:03:38,073 --> 00:03:41,646
+ici dans l'attribut « persos »
+avec un 's', du jeu.
+
+72
+00:03:42,298 --> 00:03:47,163
+Le problème, c'est comment
+afficher un personnage générique.
+
+73
+00:03:47,163 --> 00:03:49,696
+On ne sait pas afficher
+un personnage générique,
+
+74
+00:03:49,696 --> 00:03:55,800
+on sait certainement afficher un guerrier,
+un magicien, un voleur,
+
+75
+00:03:55,800 --> 00:04:00,066
+donc chacune des sous-classes spécifiques
+sait comment s'afficher,
+
+76
+00:04:00,066 --> 00:04:02,388
+mais par contre, 
+au niveau général d'un personnage,
+
+77
+00:04:02,388 --> 00:04:04,342
+on ne sait pas forcément l'afficher,
+
+78
+00:04:04,342 --> 00:04:08,032
+mais on sait qu'on en a besoin
+ici au niveau très général du jeu,
+
+79
+00:04:08,032 --> 00:04:11,088
+de pouvoir afficher les personnages.
+
+80
+00:04:11,088 --> 00:04:12,334
+Donc comment faire ?
+
+81
+00:04:12,334 --> 00:04:15,206
+Bien sûr, si on ne fait rien 
+au niveau de la classe « Personnage »,
+
+82
+00:04:15,206 --> 00:04:17,598
+si on ne définit pas de méthode 
+« afficher » dans « Personnage »,
+
+83
+00:04:17,598 --> 00:04:21,172
+alors le code « afficher » de jeu
+ne compilerait pas
+
+84
+00:04:21,172 --> 00:04:24,360
+puisque ici on appelle bien la méthode 
+« afficher » d'un personnage,
+
+85
+00:04:24,360 --> 00:04:26,462
+et le compilateur 
+ne saurait pas quoi faire,
+
+86
+00:04:26,462 --> 00:04:28,357
+il nous donnerait donc une erreur.
+
+87
+00:04:28,357 --> 00:04:31,810
+On doit donc pour pouvoir écrire ceci
+au niveau global du jeu,
+
+88
+00:04:31,810 --> 00:04:35,781
+on doit mettre une méthode « afficher »
+dans la classe « Personnage ».
+
+89
+00:04:35,781 --> 00:04:38,498
+De plus, on aimerait imposer 
+à chacune des sous-classes,
+
+90
+00:04:38,498 --> 00:04:42,343
+les « Guerriers », « Magiciens », de s'afficher 
+avec leur propre méthode « afficher »,
+
+91
+00:04:42,343 --> 00:04:45,690
+d'avoir une méthode spécifique,
+et que ce soit cette méthode spécifique
+
+92
+00:04:45,690 --> 00:04:50,237
+qui soit appelée dans l'appel général,
+ici au niveau du jeu.
+
+93
+00:04:50,237 --> 00:04:54,035
+On veut effectivement forcer
+d'avoir une méthode spécifique
+
+94
+00:04:54,035 --> 00:04:56,663
+au niveau des classes,
+et que cette méthode soit polymorphique.
+
+95
+00:04:56,663 --> 00:04:59,581
+Il faut donc que
+cette méthode soit virtuelle
+
+96
+00:04:59,581 --> 00:05:02,142
+et existe au niveau des personnages.
+
+97
+00:05:02,142 --> 00:05:03,842
+Mais comment faire si on ne sait pas,
+
+98
+00:05:03,842 --> 00:05:07,874
+supposons qu'on ne sache pas
+afficher un personnage générique.
+
+99
+00:05:08,174 --> 00:05:11,345
+De plus, comment imposer 
+que cette méthode « afficher »
+
+100
+00:05:11,345 --> 00:05:16,651
+soit redéfinie, forcer la redéfinition
+dans les sous-classes ?
+
+101
+00:05:16,651 --> 00:05:19,475
+Une première solution
+pour le premier problème,
+
+102
+00:05:19,475 --> 00:05:22,844
+comment définir l'affichage 
+pour un personnage générique,
+
+103
+00:05:22,844 --> 00:05:26,662
+serait d'avoir une méthode quelconque,
+définie arbitrairement,
+
+104
+00:05:26,662 --> 00:05:28,801
+par exemple, supposons qu'ici, 
+arbitrairement,
+
+105
+00:05:28,801 --> 00:05:31,758
+on définisse que l'affichage
+générique d'un personnage,
+
+106
+00:05:31,758 --> 00:05:34,463
+c'est de ne rien afficher.
+
+107
+00:05:34,463 --> 00:05:37,562
+Cette solution est une très mauvaise idée,
+
+108
+00:05:37,562 --> 00:05:40,387
+parce que d'abord c'est
+un mauvais modèle de la réalité,
+
+109
+00:05:40,387 --> 00:05:43,611
+les personnages ne s'affichent pas 
+comme du vide,
+
+110
+00:05:43,611 --> 00:05:47,908
+donc ça ne correspond à rien,
+l'affichage est incorrect,
+
+111
+00:05:47,908 --> 00:05:49,933
+et en plus l'affichage serait incorrect
+
+112
+00:05:49,933 --> 00:05:54,150
+si une sous-classe oubliait 
+de redéfinir la méthode,
+
+113
+00:05:54,150 --> 00:05:55,829
+on aurait des personnages 
+qui ne s'affichent pas,
+
+114
+00:05:55,829 --> 00:05:59,049
+des personnages fantôme,
+ce qui est peut-être embêtant pour le jeu.
+
+115
+00:05:59,049 --> 00:06:02,365
+De plus, cette solution ne répond pas 
+au deuxième problème,
+
+116
+00:06:02,365 --> 00:06:08,437
+elle n'oblige pas les sous-classes à
+redéfinir leur propre méthode « afficher ».
+
+117
+00:06:08,437 --> 00:06:12,957
+La seule bonne solution est de signaler 
+que la méthode « afficher »
+
+118
+00:06:12,957 --> 00:06:16,663
+doit exister et doit être définie
+dans chacune des sous-classes,
+
+119
+00:06:16,663 --> 00:06:20,400
+c'est ce qu'on appelle 
+une méthode virtuelle pure.
+
+120
+00:06:20,400 --> 00:06:23,987
+Voilà donc un deuxième exemple, 
+qui j'espère, vous a fait comprendre
+
+121
+00:06:23,987 --> 00:06:26,301
+le besoin d'avoir ces
+méthodes virtuelles pures
+
+122
+00:06:26,301 --> 00:06:30,837
+dans la définition générale abstraite
+de super classes.
+
+123
+00:06:31,157 --> 00:06:35,154
+Voyons maintenant comment tout ceci
+s'écrit concrètement en C++.
+
+124
+00:06:35,154 --> 00:06:39,068
+Une méthode virtuelle pure, on appelle 
+aussi cela une méthode abstraite,
+
+125
+00:06:39,068 --> 00:06:41,833
+sert donc à imposer 
+aux autres sous-classes
+
+126
+00:06:41,833 --> 00:06:46,134
+qu'elles doivent redéfinir 
+la méthode virtuelle héritée.
+
+127
+00:06:46,134 --> 00:06:49,600
+Pour définir une méthode virtuelle pure,
+une méthode abstraite,
+
+128
+00:06:49,600 --> 00:06:54,090
+on rajoute simplement « = 0 »
+à la fin de son prototype.
+
+129
+00:06:54,090 --> 00:06:57,142
+Par exemple, si dans la classe « Personnage »,
+
+130
+00:06:57,142 --> 00:07:00,101
+on aurait écrit que c'est
+une méthode virtuelle « afficher »,
+
+131
+00:07:00,101 --> 00:07:02,832
+la méthode « afficher » ne 
+modifie pas un personnage,
+
+132
+00:07:02,832 --> 00:07:04,196
+et à la fin de son prototype,
+
+133
+00:07:04,196 --> 00:07:07,612
+au lieu d'avoir un point virgule,
+on rajoute « = 0 »
+
+134
+00:07:07,612 --> 00:07:12,806
+Ceci définit donc une méthode 
+virtuelle pure, une méthode abstraite.
+
+135
+00:07:12,806 --> 00:07:16,590
+En général, une méthode virtuelle pure
+est incomplètement spécifiée,
+
+136
+00:07:16,590 --> 00:07:19,111
+c'est-à-dire qu'il n'y a
+souvent pas de définition,
+
+137
+00:07:19,111 --> 00:07:22,327
+mais juste un prototype dans la classe
+où elle est introduite.
+
+138
+00:07:22,327 --> 00:07:25,393
+Ceci n'est pas une stricte nécessité 
+mais c'est souvent le cas,
+
+139
+00:07:25,393 --> 00:07:28,429
+on ne définirait pas par exemple 
+ici la méthode « afficher »
+
+140
+00:07:28,429 --> 00:07:30,008
+pour un personnage générique,
+
+141
+00:07:30,008 --> 00:07:34,355
+on attend que les sous-classes 
+définissent leur propre méthode « afficher »
+
+142
+00:07:34,355 --> 00:07:38,087
+spécifique aux guerriers,
+magiciens, aux voleurs...
+
+143
+00:07:38,387 --> 00:07:42,227
+Si je reprends l'autre exemple,
+celui des figures fermées,
+
+144
+00:07:42,227 --> 00:07:47,435
+on aurait donc une méthode « surface »,
+qui serait une méthode virtuelle pure,
+
+145
+00:07:47,435 --> 00:07:51,282
+donc ici on rajoute « = 0 »
+derrière son prototype,
+
+146
+00:07:51,282 --> 00:07:53,186
+que l'on pourrait quand même utiliser,
+
+147
+00:07:53,186 --> 00:07:55,524
+on a le droit d'utiliser 
+une méthode virtuelle pure,
+
+148
+00:07:55,524 --> 00:07:59,333
+on peut tout à fait définir 
+une méthode volume,
+
+149
+00:07:59,333 --> 00:08:01,120
+qu'on n'a pas définie comme virtuelle,
+
+150
+00:08:01,120 --> 00:08:05,490
+il n'y a aucune raison qu'une sous-classe
+redéfinisse cette méthode volume,
+
+151
+00:08:05,490 --> 00:08:08,966
+qui prend donc une hauteur, 
+et qui calcule le volume engendré,
+
+152
+00:08:08,966 --> 00:08:12,476
+comme le produit de la hauteur,
+par l'appel de la méthode surface,
+
+153
+00:08:12,476 --> 00:08:17,693
+laquelle méthode surface sera la 
+méthode de l'instance qui sera appelée.
+
+154
+00:08:17,693 --> 00:08:19,579
+Car en effet, comme nous allons le voir,
+
+155
+00:08:19,579 --> 00:08:21,506
+une classe qui contient 
+une méthode virtuelle pure,
+
+156
+00:08:21,506 --> 00:08:23,711
+comme « FigureFermee », 
+ne peut pas être instanciée,
+
+157
+00:08:23,711 --> 00:08:26,663
+et donc de ce fait, on n'appellera
+jamais la méthode surface
+
+158
+00:08:26,663 --> 00:08:28,734
+directement sur une figure fermée.
+
+159
+00:08:28,734 --> 00:08:31,508
+Par contre on peut imaginer
+des sous-classes, comme Rectangle, Cercle, ...
+
+160
+00:08:31,508 --> 00:08:33,742
+qui savent calculer leur surface.
+
+161
+00:08:33,742 --> 00:08:36,370
+Donc on appellera la méthode de « Cercle »
+s'il s'agit d'un cercle,
+
+162
+00:08:36,370 --> 00:08:39,628
+on appellera la méthode de « Rectangle »
+s'il s'agit d'un rectangle,
+
+163
+00:08:39,628 --> 00:08:41,591
+ça c'est l'aspect polymorphique,
+
+164
+00:08:41,591 --> 00:08:44,080
+par ce mot clé « virtual »
+qui pourra prendre place.
+
+165
+00:08:44,080 --> 00:08:47,500
+On a bien ici appel de la méthode surface
+au travers d'un pointeur,
+
+166
+00:08:47,500 --> 00:08:51,035
+car je vous rappelle que ceci est
+exactement la même chose
+
+167
+00:08:51,035 --> 00:08:56,774
+que « this --> surface », 
+on a parfois tendance à l'oublier,
+
+168
+00:08:56,774 --> 00:09:01,302
+et donc on a bien ici le polymorphisme
+qui peut prendre place
+
+169
+00:09:01,302 --> 00:09:04,586
+puisque on a bien appel 
+au travers d'un pointeur,
+
+170
+00:09:04,586 --> 00:09:08,146
+même s'il n'est pas explicitement écrit,
+et un aspect virtuel.
+
+171
+00:09:08,566 --> 00:09:11,220
+Une autre méthode virtuelle pure
+que l'on pourrait définir
+
+172
+00:09:11,220 --> 00:09:14,914
+au niveau de la classe « FigureFermee »,
+c'est la notion de périmètre
+
+173
+00:09:14,914 --> 00:09:20,340
+qui calculerait la longueur 
+d'une figure fermée, le périmètre,
+
+174
+00:09:20,340 --> 00:09:24,478
+et on ne saurait pas non plus a priori
+le définir de façon générale
+
+175
+00:09:24,478 --> 00:09:28,261
+au niveau de la classe très générique,
+abstraite, « FigureFermee »,
+
+176
+00:09:28,261 --> 00:09:32,329
+mais on pourrait imaginer pouvoir le 
+définir proprement dans des sous-classes.
+
+177
+00:09:32,329 --> 00:09:35,222
+Nous allons reprendre 
+cet exemple dans un instant.
+
+178
+00:09:35,711 --> 00:09:39,660
+Une classe, qui comme ceci, contient 
+au moins une méthode virtuelle pure,
+
+179
+00:09:39,660 --> 00:09:42,590
+c'est ce qu'on appelle 
+une « classe abstraite ».
+
+180
+00:09:42,590 --> 00:09:44,615
+C'est en effet une classe abstraite,
+
+181
+00:09:44,615 --> 00:09:48,667
+car si une classe contient 
+une méthode virtuelle pure,
+
+182
+00:09:48,667 --> 00:09:51,601
+alors elle ne peut pas être instanciée,
+
+183
+00:09:51,601 --> 00:09:54,026
+on ne peut pas créer 
+d'instances de cette classe.
+
+184
+00:09:54,026 --> 00:09:59,422
+Par exemple, on ne peut pas déclarer 
+de variable de type « personne »,
+
+185
+00:09:59,422 --> 00:10:03,632
+et évidemment toute sous-classe qui hérite
+d'une super classe abstraite
+
+186
+00:10:03,632 --> 00:10:08,224
+reste abstraite tant qu'elles 
+ne fournissent pas de définition
+
+187
+00:10:08,224 --> 00:10:11,897
+à la méthode virtuelle pure 
+qu'elles ont hérité.
+
+188
+00:10:11,897 --> 00:10:15,348
+En toute rigueur, c'est tant 
+qu'elles ne suppriment pas « = 0 »
+
+189
+00:10:15,348 --> 00:10:20,820
+dans les prototypes de leur redéfinition 
+de la méthode virtuelle pure
+
+190
+00:10:20,820 --> 00:10:22,822
+héritée de la super classe.
+
+191
+00:10:22,822 --> 00:10:25,170
+Regardons tout ceci concrètement 
+sur un exemple,
+
+192
+00:10:25,170 --> 00:10:28,003
+revenons à notre exemple de jeu
+avec des personnages,
+
+193
+00:10:28,003 --> 00:10:30,439
+et où un « Guerrier » est un « Personnage »,
+
+194
+00:10:30,439 --> 00:10:34,333
+et a hérité une méthode virtuelle pure,
+
+195
+00:10:37,033 --> 00:10:41,726
+une méthode virtuelle pure « afficher »
+de la classe « Personnage ».
+
+196
+00:10:41,726 --> 00:10:47,037
+Si au niveau de la classe « Guerrier »,
+on ne redéfinit pas la méthode « afficher »,
+
+197
+00:10:47,037 --> 00:10:49,258
+alors à ce moment là, 
+la sous-classe « Guerrier »
+
+198
+00:10:49,258 --> 00:10:51,545
+est aussi une classe abstraite,
+
+199
+00:10:51,545 --> 00:10:53,972
+puisqu'elle a hérité une méthode
+virtuelle pure,
+
+200
+00:10:53,972 --> 00:10:56,865
+qu'elle n'a pas redéfinie, 
+donc qui reste virtuelle pure,
+
+201
+00:10:56,865 --> 00:11:00,627
+et donc si l'on essaie 
+d'ajouter comme ça un « Guerrier »,
+
+202
+00:11:00,627 --> 00:11:03,750
+-- une instance de la classe « Guerrier » --
+au jeu,
+
+203
+00:11:03,750 --> 00:11:06,026
+on va avoir une erreur du compilateur,
+
+204
+00:11:06,026 --> 00:11:08,585
+qui dit que je ne peux pas créer d'objets,
+
+205
+00:11:08,585 --> 00:11:12,631
+d'instances de la classe 
+abstraite « Guerrier », « abstract type »,
+
+206
+00:11:12,631 --> 00:11:16,609
+la classe abstraite « Guerrier », 
+car la méthode virtuelle
+
+207
+00:11:16,609 --> 00:11:22,442
+« afficher » dans « Guerrier »
+est une méthode virtuelle pure.
+
+208
+00:11:23,757 --> 00:11:27,601
+Complétons par notre second exemple
+sur les figures fermées,
+
+209
+00:11:27,601 --> 00:11:30,016
+nous avons donc toujours 
+les figures fermées
+
+210
+00:11:30,016 --> 00:11:32,627
+qui ont deux méthode virtuelles pures,
+
+211
+00:11:32,627 --> 00:11:36,806
+une méthode périmètre 
+et une méthode surface,
+
+212
+00:11:36,806 --> 00:11:39,257
+et imaginons donc 
+qu'on ait une classe « Cercle »
+
+213
+00:11:39,257 --> 00:11:43,725
+qui hérite de figures fermées
+ainsi qu'une sous-classe « Polygone »
+
+214
+00:11:43,725 --> 00:11:46,420
+qui hérite aussi de figures fermées.
+
+215
+00:11:46,420 --> 00:11:50,562
+Dans la sous-classe « Cercle », 
+nous redéfinissons la méthode surface,
+
+216
+00:11:50,562 --> 00:11:53,969
+la surface d'un cercle
+c'est PI fois le rayon au carré,
+
+217
+00:11:53,969 --> 00:11:56,728
+la classe « Cercle » aurait 
+un attribut spécifique rayon,
+
+218
+00:11:56,728 --> 00:12:03,664
+et on redéfinit aussi le périmètre,
+comme étant « 2 fois PI fois le rayon ».
+
+219
+00:12:03,664 --> 00:12:07,532
+La classe « Cercle » définit donc proprement
+surface et périmètre.
+
+220
+00:12:07,532 --> 00:12:11,718
+La classe « Cercle » a donc redéfini 
+les deux méthodes virtuelles pures
+
+221
+00:12:11,718 --> 00:12:16,542
+sans qu'elles ne restent virtuelles pures,
+sans rajouter le « = 0 » ici,
+
+222
+00:12:16,542 --> 00:12:19,584
+donc la classe « Cercle » 
+n'a plus de méthode abstraite,
+
+223
+00:12:19,584 --> 00:12:22,738
+c'est donc une classe 
+dont on peut créer des instances,
+
+224
+00:12:22,738 --> 00:12:27,723
+il n'y a aucun souci à déclarer 
+une instance d'un « Cercle ».
+
+225
+00:12:28,300 --> 00:12:31,399
+De l'autre côté, la classe « Polygone »,.
+Admettons qu'un polygone
+
+226
+00:12:31,399 --> 00:12:34,431
+soit défini par un tableau 
+dynamique de côtés.
+
+227
+00:12:34,861 --> 00:12:40,135
+Cette classe « Polygone » aurait 
+une redéfinition de la méthode périmètre,
+
+228
+00:12:40,135 --> 00:12:41,754
+sans qu'elle soit abstraite,
+
+229
+00:12:41,754 --> 00:12:45,150
+donc enlève l'aspect abstrait à périmètre,
+
+230
+00:12:45,150 --> 00:12:47,503
+et redéfinit bien effectivement 
+cette méthode périmètre,
+
+231
+00:12:47,503 --> 00:12:52,151
+mais par contre la classe « Polygone » 
+ne redéfinit pas la surface,
+
+232
+00:12:52,151 --> 00:12:55,107
+on trouve trop compliqué 
+d'avoir une formule ici,
+
+233
+00:12:55,107 --> 00:12:58,039
+pour redéfinir de façon générale
+la surface d'un polygone,
+
+234
+00:12:58,039 --> 00:13:01,008
+et donc on ne redéfinit pas la 
+méthode surface dans la classe « Polygone ».
+
+235
+00:13:01,008 --> 00:13:05,204
+Donc « Polygone » reste donc
+de ce fait une classe abstraite,
+
+236
+00:13:05,204 --> 00:13:08,609
+on ne peut pas déclarer 
+d'instances de « Polygone »,
+
+237
+00:13:09,269 --> 00:13:12,502
+ce n'est pas possible parce que 
+dans la classe « Polygone »,
+
+238
+00:13:12,502 --> 00:13:15,299
+il reste une méthode virtuelle pure
+
+239
+00:13:15,299 --> 00:13:18,512
+qui est la méthode surface
+héritée de figures fermées,
+
+240
+00:13:18,512 --> 00:13:22,925
+et comme la classe « Polygone » a encore
+une méthode virtuelle pure,
+
+241
+00:13:22,925 --> 00:13:26,844
+c'est une classe abstraite, 
+on ne peut donc pas en créer d'instances.
+
+242
+00:13:27,284 --> 00:13:29,803
+Voilà, cet exemple conclut cette séquence
+
+243
+00:13:29,803 --> 00:13:33,215
+sur les méthodes virtuelles pures
+et les classes abstraites.
+
+244
+00:13:33,215 --> 00:13:36,468
+La prochaine séquence va s'intéresser
+plus en détails
+
+245
+00:13:36,468 --> 00:13:39,037
+à ces fameuses collections hétérogènes,
+
+246
+00:13:39,037 --> 00:13:41,377
+les tableaux dynamiques 
+dans lesquels on mettait
+
+247
+00:13:41,377 --> 00:13:44,153
+des pointeurs de personnages
+par exemple dans le jeu,
+
+248
+00:13:44,153 --> 00:13:46,244
+nous allons reprendre tout ceci en détails
+
+249
+00:13:46,244 --> 00:13:48,204
+dans la prochaine séquence vidéo.
+
+250
+00:13:48,204 --> 00:13:50,652
+Et puis nous apporterons 
+des compléments sur le sujet
+
+251
+00:13:50,652 --> 00:13:53,924
+dans une dernière 
+séquence vidéo optionnelle.

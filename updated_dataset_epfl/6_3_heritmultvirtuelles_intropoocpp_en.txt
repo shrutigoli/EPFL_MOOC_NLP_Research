@@ -1,0 +1,173 @@
+In this episode, we will discuss the most subtle point of multiple inheritance. This is the reason why some languages refuse to include multiple inheritance.
+This is what we call virtual classes.
+Let us begin by illustrating the problem, to which this new concept pertains.
+Let us go back to our infamous example regarding ovoviviparous - they are oviparous and viviparous. This is a case of multiple inheritance since the class
+"Ovovivipare" inherits from the classes
+"Vivipare" and "Ovipare".
+Now, let us imagine that Ovipare inherit from the class "Animal"
+(indeed, an oviparous is an animal),
+Similarly, a viviparous is also an animal.
+Therefore, in a certain way, an ovoviviparous is two times an animal.
+Here is a more technical example from the system library of C++.
+Of couse, you do not have to comprehend every single detail; we merely wish to make it obvious that the problems we are talking about occur in daily life.
+So, regarding the "iostream" class
+(we have talked about it along with "cout"), it so happens that this "iostream" class is both an "ostream" and an "istream".
+Then, the conceptors of these classes have decided that both "istream" and "ostream" were also "ios" (no matter what it actually is).
+Consequently, "iostream" is apparently two times an "ios".
+By the way, this how, in reality, we represent multiple inheritance diagrams. We never draw the same class multiple times on an inheritance diagram.
+However, we draw it once only with both inheritances going back to the same class.
+The reason why we have drawn our diagram this way is so that you understand what the problem is.
+What does it mean that an ovoviviparous is an oviparous (which is an animal) and also a viviparous
+(which is an animal too) ?
+Does it mean that an ovoviviparous is two times an animal?
+For example, if an animal has a head, does an ovoviviparous have two?
+Does it have an oviparous head and a viviparous head?
+Or does it only have one head?
+Is it the very same animal?
+This here is the core problem.
+Due to this conundrum, certain languages refuse to provide multiple inheritance.
+In C++, if we do not take precautions
+(this is why we drew our diagram in such an unusual way), our ovoviviparous will indeed inherit twice from the class "Animal".
+Each instance of Ovovivipare will have two times the attributes from the class "Animal".
+Let us see this in an concrete example.
+Let us imagine the following example.
+Here, we have written it in a condensed way so that it can fit in a single slide.
+We thus have the class "Animal".
+It has a constructor which initializes its attribute.
+This attribute is a character string indicating what kind of head the animal has.
+We receive a character string and we initialize the head attribute with the received paramater.
+Then, we have an "Ovipare" class, which inherits from the class "Animal".
+This "Ovipare" class redefines a default constructor here - we kept things really simple here.
+This default constructor calls the constructor of "Animal" passing a character string : "Ã  cornes"
+(TN: means "horny").
+This means that an instance of  Ovipare have a horny head.
+Then, we have the class "Vivipare" which also inherits from "Animal".
+It also has a default constructor which says that the animal has, for example, a fish head.
+Finally, the class "Ovovivipare" inherits from "Ovipare" and from "Vivipare".
+We thus get the very diagram that we have presented previously.
+Then, we have a public method called "affiche" (TN : means "print") which prints the head inherited from "Animal" through
+"Ovipare". Here, we can see the scope resolution operator.
+We do have an ambiguity since
+Ovovivipare inherits two heads; one from "Ovipare", the other from "Vivipare".
+In order to solve the ambiguity, we use, as always, the scope resolution operator.
+Thus we say "j'ai une tÃªte" (TN: means "I have a head"), print the head of Ovipare,
+"et une tÃªte" (TN: means "and a head"), and print the head of Vivipare.
+Now if, for example, in the main function or elsewhere, we declare an Ovovivipare "x"
+- it is absolutely possible since "Ovovivipare" has a default constructor.
+Now, " x " will be constructed through the default constructor.
+It will call the two default constructors of the super-classes in the inheritance declaration oder, here at the class level.
+Here, we will thus call the constructors of "Ovipare" and of "Vivipare".
+We can very well do this default construction here.
+Then, if we print " x ", we will have the following printing for this ovoviviparous :
+"j'ai une tÃªte Ã  corne"
+(TN: means "I have a horny head"), which is the result of the initialization through the default constructor of "Ovipare", and
+"et une tÃªte de poisson"
+(TN: means "and a fish head"), which is the result of the printing of "Vivipare::tete" initialized through the default constructor of the class "Vivipare".
+Thus, the class "Ovovivipare" has indeed inherited two heads.
+There are two animals in the class
+"Ovoviviparous".
+Here, of course, it is rather unwanted for an ovoviviparous to retrieve two heads through this multiple inheritance.
+Same for the fact that there are two copies of "Animal".
+Please note that, in certain cases, we may to effectively inherit the attributes twice.
+For example, let us imagine that we have a hierarchy of vehicles.
+We have petrol engine vehicles, and electric vehicles.
+Now, we imagine that we have hybrid vehicles: they are petrol engine vehicles and electric vehicles.
+The question is :
+Is a hybrid vehicle a single vehicle, just as was the case for ovoviviparous?
+Or are they indeed two vehicles?
+This depends on what we mean by "vehicle"?
+If, by vehicle, we mean four tires, a steering wheel... then, naturally, a hybrid vehicle has only one time four tires and a steering wheel and surely not eight tires and two steering wheels.
+If, on the other hand, we mean that a vehicle has an engine, it is different.
+Indeed, we have an electric engine and a petrol engine.
+In this case, we will wish to have two engines in "hybride".
+Now, you can see that this is a subtle problem which is very conception-dependant.
+We need to understand what the inheritance relationship truly means in the case at hand.
+If we do not wish to receive several times the attributes of the super-super-class, we will need to do something particular in order to prevent it : we will declare the inheritance link as a virtual link.
+We are once again using the keyword
+"virtual" here, but for another reason.
+Here, the inheritance link is virtual.
+Thus, if a super-class has its inheritance links towards its sub-classes declared as virtual, the super-class will be called a virtual super-class.
+Be careful, this has nothing to do with an abstract class!
+In an abstract class, we have virtual methods, and, in a virtual class, we can whatever method we desire.
+It is the sub-classes' inheritance link that is special, that is virtual.
+Do not confuse one concept with the other.
+The general syntax is as follows : for the sub-classes we will say that we inherit virtually.
+Personally, we say that it is a virtual inheritance rather than a virtual class.
+Thus, we say that inherit virtually from the super-class.
+Concretely, in our ovoviviparous example, we will change things at the level of Ovipare and Vivipare.
+This way, Ovipare inherits virtually from the class "Animal" : consequently, "Animal" is a virtual class.
+Similarly, we will write that
+"Vivipare" inherits virtually from the class "Animal".
+Please note that it is the class we inherit from several times that is called virtual.
+Here, this means that it is the class "Animal" that will be a virtual class.
+We have to modify the inheritance links from Ovipare towards "Animal" and from "Vivipare" towards "Animal" even though it is the class "Ovovivipare" that introduces the problem.
+You can see that there is a problem with the general conception.
+The designers of the classes
+"Ovipare" and "Vivipare" must declare a virtual inheritance towards the class "Animal" because, possibly, someone, someday, will imagine a sub-class "Ovovivipare", which inherits from "Ovipare", and from "Vivipare".
+This is a severe flaw of virtial inheritance and virtual classes.
+It creates a dependency of higher-level inheritances towards possible lower-level inheritances.
+This is another reason why certain programming languages want nothing to do with virtual inheritance.
+However, since the possibility exists in C++, we should use it carefully, and parcimoniously.
+Now let us go back to our multiple inheritance diagrams.
+In order to signify that the inhertiance links are virtual, we will use dash lines instead of the full ones.
+Now, let us see concretely what happens with virtual inheritances.
+What happens in our example if we render these two inheritances virtual?
+The "Ovovivipare" class will only have one single head.
+What will happen is that we will only create one "Animal" in "Ovovivipare".
+We will no longer create two animals inside "Ovovivipare".
+This solves the aforementioned problem.
+Now let us see how virtual classes, virtual inheritances, impact the constructors.
+It generates a strong restraint for the programmer.
+But first, a remainder.
+Remember that, in a usual inheritance, the constructor of the sub-class calls the constructor
+(or the constructors in the case of multiple inheritance) of the direct super-classes.
+Direct meaning that they inherit directly from these super-classes.
+So, in the case of multiple inheritance with a virtual super-super-super class, the responsability to initialize, to call the constructors of this virtual super-super-class belongs to all the sub-classes we want to create an instance of.
+Thus, all these sub-classes, sub-sub-classes... which inherit indirectly from a virtual super-super-super-class, and are not abstract
+(which means we can create instances of them), will have to explicitly call the constructor of the virtual super-super-super-class.
+As you can plainly see, this is a strong constraint in the declaration of the constructor of the sub-classes.
+Let us see this concretely on the Ovovivipare example.
+In this case, we have the sub-sub-class "Ovovivipare", which inherits from the sub-classes
+"Ovipare" and "Vivipare".
+These two classes inherit virtually from the class "Animal".
+We thus have a virtual class "Animal".
+Consequently, the sub-class
+"Ovovipare" must, in its constructors, directly call the constructor of "Animal".
+We will thus have to write the following instruction in the constructor of Ovovivipare : an explicit call to the constructor of "Animal" is mandatory here.
+Let us suppose this constructor takes three parameters before we write the call to the usual constructor of Ovovivipare's direct super-classes.
+As we have said, this is a strong constraint regarding virtual classes.
+Now, let us see what concretely happens when we declare an instance.
+Let us declare an instance " o " of Ovovivipare.
+Thus we are calling Ovovivipare's constructor.
+First of all, we will trigger the constructor of an "Animal".
+Thus, when we are building a sub-sub-class, which inherits from a virtual class, the first thing we do is to create the virtual class.
+There is only one virtual class.
+Indeed, the goal of multiple inheritance and of virtual classes is to have only one virtual classes and not several along with all the inheritance paths.
+Since we have only one virtual class, we must build it first and foremost.
+Consequently, we will build this "Animal" first.
+The first constructor to be called is the constructor of "Animal".
+Then, we will go back to the normal calls of the constructors.
+Thus, the constructor of
+Ovovivipare will then call the constructor of Ovipare.
+This constructor of "Ovipare" should normally call the constructor of the super-class.
+But here, since we have already initialized the super-class, this call to the constructor of "Animal" found in the constructor of "Ovipare", will be ignored.
+Similarly, we will then call the constructor of "Vivipare", which will ignore the call to the constructor of "Animal" since it has already been done.
+Let us now sum up the construction of an Ovovivipare.
+First of all, we call the constructor of "Animal".
+Secondly, we call the constructor of "Ovipare", in which we ignore the supplementary call to the constructor of "Animal".
+Thirdly, we call the constructor of "Vivipare", in which we ignore the supplementary call to the constructor of "Animal".
+Finally, we conclude by the usual initialization of its own attributes.
+Let us sum one final time.
+During the creation of an object of the most derived class, the sub-sub-sub-class of a virtual class, it is the constructor of this sub-sub-sub-class that is tasked with the direct call to the constructor of the virtual super-class.
+Also, the calls to the constructor of the virtual super-class in the intermediate classes are simply ignored.
+Naturally, if the virtual super-class has a default constructor, it is not mandatory to explicitly call its constructor.
+But, one way or the other, there will be a call to this default constructor : it will be called during the creation of the most derived instance.
+As usual, if we omit the call to the constructor of the virtual super-super-class in the sub-sub-classes and that this virtual super-super-class has not default constructor, the compiler will naturally report an error.
+Indeed, it will try to call a non-existing constructor.
+So, in a class hieararchy, where there are virtual super-classes, the initialization of the virtual super-classes must be done by all the sub-classes we wish to create.
+The constructor of the virtual super-classes will be called first and foremost.
+Then, the calls to the virtual super-classes in the intermediate classes will be ignored.
+Regarding non-virtual super-classes, they are then initialized in the order of the inheritance declaration, as usual.
+The call order of the copy constructors follows this rule aswell.
+As always, the call order of the destructors is the reverse order to the constructors'.
+Thus concludes this sequences on this slightly delicate subject of virtual classes, and virtual inheritance.

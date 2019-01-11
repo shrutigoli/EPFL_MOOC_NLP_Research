@@ -1,0 +1,152 @@
+Welcome back!
+Nature, In Code, we are in Chapter 6, Lecture 5.
+In this lecture we will take a look at Balancing Selection.
+Alright, just as a reminder,
+Balancing selection means that the hetero zygote effect is negative.
+In other words, the fitness of the
+ genotype is actually larger than 1.
+It is indeed the hereto zygote has the highest fitness of the three genotypes and that's why we get this kind of fitness peak.
+So what does that mean in terms of Delta P and in terms of the dynamic of p over time?
+Well we have the Java script code in place so let's go ahead and find out. Alright so I have both files open here, Delta p versus p and p versus time.
+So the first that I want to modify quickly is the one Delta p versus p.
+In here we don't need to change anything other than actually changing the value of h.
+So now we would like to set this to minus, for example, 0.5 and now we can simply save this and that's all we need to change here.
+We simply change the value of h.
+Then we go to the browser and here is our Delta p versus p and we are going to reload this and this is now what it looks like. 
+So you can see a fundamental change here.
+That is, we still see Delta p being positive for a large fraction here
+of this space, but there is one point here where it's actually zero in the middle.
+So not only at 1, p1 and p0, but also at something like p0.75.
+And in this region here it's in fact a negative. 
+So what does that mean?
+Well it means the following.
+Imagine you are somewhere here now
+in the simulation you have a p of I don't know 0.1 or you know
+ slightly above 0.
+Your Delta p is positive so the next  generation your p is larger so you are essentially moving towards the right here, in this space.
+And because Delta p in this space keeps being positive you keep moving to the right here, you keep increasing p.
+And so this happens all the time, then it will slow down, until you reach p roughly 0.75 here, from this graph, and then it stops.
+Then Delta p is 0, so p is not going to change.
+On the other hand if you would start here from a condition were p was very large and close to one but not quite one, well Delta p would be negative. In other words, in the next generation your p is going to be a little bit reduced so you are actually moving to the left here on this axis and because
+Delta p keeps being negative, you keep moving to the left, keep moving to the left, to the left. and same thing here, eventually, you will reach this point of 0.75 and then Delta p is 0.
+So same thing you will also converge to this equilibrium value of 0.75.
+So let's use now our other code the one we developed in p versus time to see if this is really true.
+So p versus time is this one here right before in the directional selection we saw it go straight to one. 
+So we can very quickly test this by simply going back to our code.
+Now we are going to open the file p versus time, so that's the one here and, I am going to change this value here to -0.5 so that we have balancing selection.
+I'm gonna save this and I'm gonna go back to the browser and
+I'm gonna reload this and indeed as you can see this goes up as expected relatively
+quickly but then it flattens out and it  is here flatten out at this
+ value, somewhere here between 7 and
+ 8 so roughly 0.75 probably.
+But what we seen is that this seems to be happening independent of where we are with p.
+What I would like to do is I'd like to extend the code that generates this figure a little bit by having many simulations at the same time that start at different values of p and we want to see what happens
+to those. So let's go back to the code of p versus time and change the code correspondingly.
+Alright so I'm here back in p versus time,  so I would like to modify this code here a little bit to have multiple simulations.
+So we are obviously going to keep here h-0 but we don't need this p anymore because we are going to have many many different types of ps' at which we start the simulation.
+So I'm simply going to rename this to initial p.
+This is the one, this is sort of the minimum p that I would like to have here.
+And then I want to have many other initial ps increasing going to you know close to 1 but not quite for the initial p value of the particular simulation.
+All these initial p values 
+I'm ultimately going to store in some array so I'm going to call this p values and I'm going to initialize this as an empty array.
+So this is where I'm going to store the initial p values for many different simulations.
+Good!
+So data we can keep, we still need the data array.
+In this case it's going to be two dimensional as we had it back in
+Chapter 3, and 400 generations is still fine so all good here.
+So the first thing I'd like to do is
+I'd like  to fill up this p values array with values.
+And I am going to do this by introducing a new type of a loop and this is simply called the while loop.
+You have encountered before the do while loop.
+The do while loop does something at least once and then it checks if the condition is true in the while clause and it will just continue to reiterate while the condition is true.
+Here in the while loop we only have the while clause and so basically we simply going to test is this true in here and then we are going to reiterate. So it's kinda simplified version of do while loop.
+The condition I want to have here is that the initial p initial p value is smaller than 1.
+Okay, I don't want to go up to 1 because this will be a trivial simulation, because p will just remain at 1.
+Okay so while, why it is smaller, basically push the corresponding value into this p value's array.
+So p values push, oops!
+Okay put this initial p value, in the first time is 0.01 as we defined it up in the global variables and then we are essentially going to
+increment it by, let's say, initial p =initial p + 0.01.
+So we get lots of simulations that are only different in one aspect which is that the initial p value is 0.01 larger than the previous simulation.
+Okay so this will now fill up this p values array with different types of initial ps'.
+Good!
+So now I need to run
+multiple simulations here we only ran one simulation.
+So what I'm actually going to do is
+I'm going to wrap this into a function and I'm going to call this function, run simulation, okay run simulation and then I'm going to wrap this whole thing here.
+So this whole thing here, 
+I'm going to move these over
+I'm going to indent it correctly.
+All of this is now wrapped into this function.
+But I'm calling it run simulation and I'm gonna pass it one value which is this p value, that it should start with so I'm simply going to call this parameter p.
+So now here I'm pushing p values into the data array but because this is going to be a two dimensional array actually don't want to do this.
+What I want to do is, I want to have some temporary array where I am gonna push the p values of a simulation and then at the end
+I'm going to put this entire array of p values of a single simulation into the data array. This is exactly identical to what we did before in the drift simulations.
+So I'm gonna call this temporary array that contains all the p values of one simulation, results.
+I'm gonna initialize this as an empty array.
+And so now basically, here what we doing is exactly the same we are gonna run
+this a couple of generations. q is of course 1-p, then we are calculating Delta p correctly we are updating p correctly but now we are pushing p not into data but into this temporary array, results.
+So this now over one simulation fills up this results array with the values of p for each generation.
+And then at the end we cannow push this results array into the data array. So here
+I'm gonna say, data push, results.
+Okay, so this is how we create this two dimensional array.
+Alright, so almost there so now I have this run simulation function
+I simply need to call this now, you know, how many ever times
+I want to, depending on how many initial p values I have.
+How many do I have?
+Well, how ever many I put here in this p values array.
+We just need to look at the length properties of this p values array and then we will know how often we need to do this.
+So I'm gonna set up a for loop here for var i =0, so I here simply needs to be smaller than p values dot length and of course we are going increment here i by 1.
+And so now what we are doing is we are calling this function
+run simulation okay and we need to pass one p value.
+Which p value?
+Well the one that we are now currently at in this p values array.
+So the i-th element of p values.
+And that's pretty much it.
+So data is now a two dimensional array but this draw line chart
+function was created to be able to deal with this.
+Here we are still going to plot generation p and we still don't want a legend so all this is fine.
+So we can save this code and now go to the browser and reload this p versus time.
+So here is p versus time let's reload this.
+Error!
+Okay, something is not working.
+So I'm actually glad that his is finally happening, so because now we can do something that's called debugging.
+Okay, so we are going to take a look here at the Java script console somewhere here I made a mistake.
+On caught reference, initial p is not defined.
+Alright so let's go ahead and see what's going on here.
+So this is initial p, this is initial p as well.
+So why would it say it's not defined?
+Because I defined it, oh no I didn't define it here because he is a typo so I need to fix this typo alright save, go back to the browser, reload
+Here we are.
+No more mistakes here, so I'm going to close the Java script console.
+And this now is
+Balancing selection and I find it quite beautiful
+ if you plot it like this.
+So you can see here, independent of where you start with p you are actually going to converge to this equilibrium value here of, it seems to be exactly between 0.7 and 0.8.
+Why is that?
+Well remember we have balancing selection, so we have this peak where the hetero zygote actually has the highest fitness.
+So when we start with very low levels of A2 then whenever we create the hetero zygote this has the highest fitness.
+So ideally you would like to have all hetero zygotes but as we know this is not possible because when hetero zygotes mate under Mendelian inheritance you get half hetero zygotes but you also always get the homo zygotes, and so as a consequence this will not go up to 1 because the hetero zygote which is always both alleles is the fittest and that's why you have this equilibrium, but in some sense this is actually quite a nice situation that simply means that you actually maintain genetic diversity, and that's something that you wouldn't in the case of directional selection because one of the alleles is going to be out competed.
+So this value looks interesting, can this somehow be calculated?
+Yes it can, you can actually calculated this value mathematically.
+This equilibrium value can be calculated relatively easily.
+I'm going to call it p* and it has a very simple formula and that is h-1/2h-1
+So,for example, if we would put it in the h value that we have in our codec sample minus 0.05 then we would here get 
+Okay, so we calculated this value now as 0.75 and that's exactly what we saw here.
+We thought it was somewhere between 0.7 and 0.8.
+It turns out its actually exactly at 0.75.
+You also might have noticed that what was not in this equation h-1/2h-1, was s.
+So if we go back to the code this s here, the selection coefficient it does not affect where this equilibrium is going to be.
+So what does it affect then?
+Well, let's go ahead and find out.
+Let's change this value here to
+0.2 okay, so we double this value.
+So the selection coefficient is now double and if we save this and go back to the browser and reload.
+We will find that the same thing happens but now it just happens faster because selection is stronger, right because the selection coefficient is larger.
+Let's go back to the code and now reduce this value so not to 0.1 to 0.05.
+Okay so now if we go back to the browser we can still see the exact same thing thing so again it goes to the same exact value as it should because it only depends on h but we didn't change h but now this process is just simply slower.
+So s will effect the speed at which this process here happens but not where it's gonna go to, that is given by h.
+So this h value is really important not only does it tell us here where this equilibrium is going to be, but it also tells us the type of selection and so really really important value.
+So this is now balancing selection the one type of selection that is now still missing is that of disruptive selection.
+So now there is one type of selection we need to look at and that's that of disruptive selection and
+ we will do this in the next lecture.
+I'll see you there.

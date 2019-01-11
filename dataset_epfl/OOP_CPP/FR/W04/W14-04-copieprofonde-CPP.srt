@@ -1,0 +1,1312 @@
+1
+00:00:04,209 --> 00:00:06,679
+Lorsque nous avons abordé 
+le thème des constructeurs,
+
+2
+00:00:06,679 --> 00:00:08,970
+nous avons vu que ces méthodes 
+étaient tellement importantes
+
+3
+00:00:08,970 --> 00:00:12,098
+que C++ en fournissait 
+une version par défaut.
+
+4
+00:00:12,098 --> 00:00:14,388
+C'est le cas notamment 
+du constructeur de copie.
+
+5
+00:00:14,388 --> 00:00:18,050
+Nous avons vu également que la version
+par défaut du constructeur de copie
+
+6
+00:00:18,050 --> 00:00:20,719
+faisait ce que l'on appelle
+une copie de surface,
+
+7
+00:00:20,719 --> 00:00:24,160
+que cette façon de copier les objets est
+satisfaisante dans la plupart des cas
+
+8
+00:00:24,160 --> 00:00:26,160
+mais pas tous,
+dans d'autres cas
+
+9
+00:00:26,160 --> 00:00:29,289
+il faut avoir recours à ce que l'on
+appelle la copie profonde
+
+10
+00:00:29,289 --> 00:00:31,560
+et c'est le thème de cette séquence.
+
+11
+00:00:31,559 --> 00:00:35,009
+Pour rappel, nous savons donc qu'il existe
+en C++ des méthodes particulières
+
+12
+00:00:35,009 --> 00:00:38,890
+permettant d'initialiser un objet en début
+de vie, « les constructeurs »,
+
+13
+00:00:38,890 --> 00:00:42,300
+de copier un objet dans un autre,
+« les constructeurs de copie »,
+
+14
+00:00:42,300 --> 00:00:46,000
+et de libérer les ressources associées 
+à un objet, « les destructeurs ».
+
+15
+00:00:46,000 --> 00:00:48,890
+C'est à une version minimale 
+par défaut de ces méthodes
+
+16
+00:00:48,890 --> 00:00:53,478
+que nous allons nous intéresser 
+et en particulier dans le cadre de la copie.
+
+17
+00:00:53,478 --> 00:00:57,579
+Nous avons vu dans une séquence précédente 
+sur l'exemple du « comptage des instances »
+
+18
+00:00:57,579 --> 00:01:01,070
+que les versions minimales par défaut 
+des méthodes constructeur destructeur
+
+19
+00:01:01,070 --> 00:01:02,789
+n'étaient pas toujours adaptées.
+
+20
+00:01:02,789 --> 00:01:04,190
+Nous avons également vu que
+
+21
+00:01:04,190 --> 00:01:07,310
+lorsqu'il était nécessaire 
+d'en définir un de façon explicite,
+
+22
+00:01:07,310 --> 00:01:10,506
+et bien, il fallait considérer 
+la définition de tous les autres,
+
+23
+00:01:10,506 --> 00:01:12,302
+également de façon explicite.
+
+24
+00:01:12,302 --> 00:01:14,210
+Nous allons maintenant étudier un autre
+exemple
+
+25
+00:01:14,210 --> 00:01:18,510
+lié au constructeur de copie par défaut
+qui réalise une copie de surface
+
+26
+00:01:18,510 --> 00:01:20,666
+et nous allons voir que 
+cette copie de surface
+
+27
+00:01:20,666 --> 00:01:22,992
+peut poser un certain nombre de problèmes
+
+28
+00:01:22,992 --> 00:01:26,569
+typiquement lorsque certains attributs
+sont des « pointeurs ».
+
+29
+00:01:26,569 --> 00:01:29,758
+Commençons par préciser un peu 
+ce qu'est la copie de surface :
+
+30
+00:01:29,759 --> 00:01:33,280
+il s'agit en fait d'une copie membre 
+à membre des attributs.
+
+31
+00:01:33,280 --> 00:01:36,890
+Supposons que l'on dispose de notre
+fameuse classe « Rectangle »
+
+32
+00:01:36,890 --> 00:01:40,649
+et que dans un programme on déclare 
+deux objets de type « Rectangle »
+
+33
+00:01:40,649 --> 00:01:45,579
+un « Rectangle r1 » dont la largeur et la 
+hauteur seraient initialisées
+
+34
+00:01:45,579 --> 00:01:48,609
+au moyen d'un des constructeurs
+de la classe « Rectangle »,
+
+35
+00:01:48,609 --> 00:01:53,760
+et un second objet toujours
+de type « Rectangle », « r2» ,
+
+36
+00:01:53,760 --> 00:01:59,620
+obtenu par copie, initialisé par copie,
+à partir du rectangle « r1 ».
+
+37
+00:01:59,620 --> 00:02:02,840
+Supposons que dans le constructeur utilisé
+
+38
+00:02:02,840 --> 00:02:08,559
+le premier argument correspond 
+à la hauteur et le second à la largeur ;
+
+39
+00:02:10,579 --> 00:02:15,689
+le rectangle « r1 » serait donc 
+un objet en mémoire
+
+40
+00:02:15,689 --> 00:02:21,198
+qui aurait deux attributs, « largeur »
+et « hauteur », initialisés comme suit.
+
+41
+00:02:21,199 --> 00:02:23,229
+Supposons que dans cette classe « Rectangle »
+
+42
+00:02:23,229 --> 00:02:26,899
+il n'existe aucune définition
+explicite du constructeur de copie,
+
+43
+00:02:26,899 --> 00:02:30,348
+ceci signifie que au moment où 
+l'on exécute cette ligne
+
+44
+00:02:30,348 --> 00:02:33,968
+c'est le constructeur de copie par défaut 
+qui est exécuté.
+
+45
+00:02:33,968 --> 00:02:38,529
+Si l'on suppose donc que ceci correspond
+à l'attribut hauteur du rectangle « r1 »
+
+46
+00:02:38,529 --> 00:02:41,169
+et ceci à son attribut « largeur »,
+
+47
+00:02:41,169 --> 00:02:44,119
+l'exécution du constructeur 
+de copie par défaut
+
+48
+00:02:44,119 --> 00:02:47,549
+va résulter dans la création
+d'un rectangle « r2 »
+
+49
+00:02:47,549 --> 00:02:52,660
+dont les valeurs des attributs auraient été
+copiées membre à membre depuis ceux de « r1 »
+
+50
+00:02:52,660 --> 00:02:54,578
+c'est-à-dire concrètement
+
+51
+00:02:54,579 --> 00:02:57,718
+la valeur de l'attribut hauteur de « r2 »
+va être copiée
+
+52
+00:02:57,718 --> 00:03:04,378
+depuis la valeur de l'attribut 
+du même nom de « r1 »
+
+53
+00:03:04,378 --> 00:03:07,558
+et pareil pour l'attribut « largeur ».
+
+54
+00:03:07,558 --> 00:03:11,968
+Le constructeur du copie par défaut
+réalise donc une copie de surface,
+
+55
+00:03:11,968 --> 00:03:18,809
+c'est-à-dire une copie 
+membre à membre des attributs.
+
+56
+00:03:18,809 --> 00:03:21,478
+Lorsque les attributs 
+sont de type « pointeur »,
+
+57
+00:03:21,479 --> 00:03:24,330
+contrairement au cas 
+que nous avons ici sous les yeux,
+
+58
+00:03:24,330 --> 00:03:28,558
+et bien cette copie membre à membre,
+cette copie de surface,
+
+59
+00:03:28,558 --> 00:03:30,288
+peut poser un certain nombre de problèmes,
+
+60
+00:03:30,288 --> 00:03:32,989
+c'est ce que nous allons étudier 
+dans ce qui suit.
+
+61
+00:03:32,989 --> 00:03:34,372
+Prenons un exemple concret,
+
+62
+00:03:34,372 --> 00:03:37,345
+celui d'une classe « Rectangle »
+où l'on aurait choisi d'implémenter
+
+63
+00:03:37,345 --> 00:03:40,049
+les attributs « largeur » et « hauteur »
+au moyen de pointeurs sur des « double »
+
+64
+00:03:40,049 --> 00:03:42,239
+au lieu de « double » tout simplement ;
+
+65
+00:03:42,239 --> 00:03:45,869
+il s'agit bien sûr d'une implémentation qui
+n'est pas très naturelle ni très justifiée
+
+66
+00:03:45,870 --> 00:03:48,829
+mais nous la prenons ici uniquement 
+pour illustrer notre propos
+
+67
+00:03:48,829 --> 00:03:50,648
+sur un exemple simple.
+
+68
+00:03:50,648 --> 00:03:54,748
+Le constructeur de la classe « Rectangle »
+est en charge d'allouer dynamiquement
+
+69
+00:03:54,748 --> 00:03:57,549
+les emplacements mémoire 
+nécessaires à stocker
+
+70
+00:03:57,549 --> 00:04:00,799
+la largeur et la hauteur 
+d'une instance de « Rectangle ».
+
+71
+00:04:00,799 --> 00:04:04,260
+Pour rappel, cette tournure permet 
+d'allouer dynamiquement,
+
+72
+00:04:04,259 --> 00:04:07,309
+pendant que le programme s'exécute, 
+un emplacement mémoire pour un « double »,
+
+73
+00:04:07,309 --> 00:04:09,809
+d'y stocker la valeur « l »,
+
+74
+00:04:09,809 --> 00:04:14,089
+ce qui est retourné par cette instruction
+et l'adresse du « double » en question,
+
+75
+00:04:14,089 --> 00:04:16,529
+laquelle est ici stockée 
+dans l'attribut « largeur »
+
+76
+00:04:16,529 --> 00:04:19,738
+qui est effectivement de type pointeur 
+donc une adresse.
+
+77
+00:04:19,738 --> 00:04:24,060
+En utilisant cette définition de la classe
+« Rectangle », il est donc possible,
+
+78
+00:04:24,060 --> 00:04:29,360
+dans une autre portion de programme,
+de déclarer « initialiser un rectangle »,
+
+79
+00:04:29,360 --> 00:04:35,269
+en utilisant le constructeur fourni,
+comme ceci,
+
+80
+00:04:35,269 --> 00:04:40,580
+le résultat d'une telle déclaration
+« initialisation »
+
+81
+00:04:40,580 --> 00:04:44,378
+correspondra à la construction 
+d'un objet en mémoire
+
+82
+00:04:44,378 --> 00:04:49,680
+dont les deux champs « largeur » et « hauteur »
+sont des adresses vers des « double »
+
+83
+00:04:49,680 --> 00:04:53,150
+représentant la largeur et 
+la hauteur du rectangle.
+
+84
+00:04:53,149 --> 00:04:57,929
+En C++, celui qui alloue a 
+la responsabilité de désallouer,
+
+85
+00:04:57,930 --> 00:04:59,698
+ici la classe « Rectangle »
+
+86
+00:04:59,698 --> 00:05:03,808
+prend la responsabilité d'allouer 
+des emplacements mémoire
+
+87
+00:05:03,809 --> 00:05:05,580
+au moment où l'on crée un « Rectangle »
+
+88
+00:05:05,580 --> 00:05:08,449
+elle doit donc,
+lorsque cet objet cesse d'exister,
+
+89
+00:05:08,449 --> 00:05:11,989
+désallouer les emplacements nécessaires
+et ceci se fait bien évidemment
+
+90
+00:05:11,989 --> 00:05:15,409
+au niveau du destructeur 
+de la classe « Rectangle ».
+
+91
+00:05:15,408 --> 00:05:19,649
+Vous noterez enfin que dans cette
+définition de la classe « Rectangle »
+
+92
+00:05:19,649 --> 00:05:22,728
+il y a une définition explicite 
+du constructeur,
+
+93
+00:05:22,728 --> 00:05:25,838
+également une définition explicite
+du destructeur
+
+94
+00:05:25,838 --> 00:05:29,119
+mais aucune définition explicite 
+du constructeur de copie
+
+95
+00:05:29,119 --> 00:05:33,838
+ce qui signifie que c'est la version 
+par défaut qui sera employée le cas échéant.
+
+96
+00:05:33,838 --> 00:05:37,709
+Supposons maintenant qu'un programmeur
+souhaite utiliser la classe « Rectangle »
+
+97
+00:05:37,709 --> 00:05:41,719
+et donc il définit une fonction
+« afficher_largeur »
+
+98
+00:05:41,719 --> 00:05:46,049
+qui prend en paramètre un « Rectangle » et
+qui a pour but d'en afficher la largeur ;
+
+99
+00:05:46,050 --> 00:05:50,480
+donc typiquement il pourrait décider,
+dans une portion de son programme,
+
+100
+00:05:50,480 --> 00:05:56,119
+de déclarer un objet de type « Rectangle »
+
+101
+00:05:56,119 --> 00:05:59,930
+qui serait construit au moyen 
+du constructeur
+
+102
+00:05:59,930 --> 00:06:02,209
+que l'on a présenté 
+dans le transparent précédent
+
+103
+00:06:02,209 --> 00:06:09,239
+et puis d'invoquer la fonction
+« afficher_largeur », sur ce « Rectangle »,
+
+104
+00:06:09,239 --> 00:06:10,748
+pour en afficher la largeur.
+
+105
+00:06:10,749 --> 00:06:14,740
+En mémoire, nous venons de le voir, 
+l'objet « r » a l'allure suivante
+
+106
+00:06:14,740 --> 00:06:19,889
+donc ses champs « largeur » et « hauteur »
+pointent vers,
+
+107
+00:06:19,889 --> 00:06:22,258
+ce sont des adresses qui pointent 
+vers deux emplacements mémoire,
+
+108
+00:06:22,258 --> 00:06:26,988
+contenant les valeurs
+de la largeur et de la hauteur.
+
+109
+00:06:26,990 --> 00:06:29,699
+C'est ce qui est construit
+au terme de l'exécution de cette ligne,
+
+110
+00:06:29,699 --> 00:06:34,098
+on souhaite ensuite faire afficher la
+largeur du rectangle ainsi construit
+
+111
+00:06:34,098 --> 00:06:37,399
+et en fait ici on risque d'avoir de
+mauvaises surprises,
+
+112
+00:06:37,399 --> 00:06:41,208
+on risque de se rendre compte que l'objet
+« r » n'est pas sorti indemne
+
+113
+00:06:42,278 --> 00:06:43,777
+de cet affichage
+
+114
+00:06:44,327 --> 00:06:45,974
+mais que s'est-il donc passé ici
+
+115
+00:06:45,974 --> 00:06:48,671
+lors de l'exécution 
+de la fonction « afficher_largeur »
+
+116
+00:06:48,671 --> 00:06:52,688
+qui se borne pourtant à afficher
+la largeur de notre « Rectangle ».
+
+117
+00:06:52,689 --> 00:06:56,050
+Si l'on examine l'entête de la
+fonction « afficher_largeur »,
+
+118
+00:06:56,050 --> 00:06:59,550
+on voit que le paramètre, le « Rectangle »
+dont on veut faire afficher la valeur
+
+119
+00:06:59,550 --> 00:07:02,629
+est en fait passé « par valeur ».
+
+120
+00:07:02,629 --> 00:07:07,089
+Ceci signifie concrètement que 
+lorsque l'on exécute cette ligne de code
+
+121
+00:07:07,089 --> 00:07:14,449
+la valeur de « r » va être copiée dans « tmp »
+puisqu'on a à faire à un passage par valeur
+
+122
+00:07:14,449 --> 00:07:19,199
+et le code de la fonction « affiche » 
+s'exécute sur la copie « tmp ».
+
+123
+00:07:19,199 --> 00:07:26,868
+Qui est en charge de réaliser cette copie
+du « Rectangle r » dans le « Rectangle tmp » ?
+
+124
+00:07:27,418 --> 00:07:30,969
+Et bien, oui c'est bien le constructeur
+de copie de la classe « Rectangle »
+
+125
+00:07:30,969 --> 00:07:33,529
+qui est en charge de réaliser cette copie.
+
+126
+00:07:33,528 --> 00:07:35,569
+Celui-ci n'est pas défini explicitement,
+
+127
+00:07:35,569 --> 00:07:37,249
+on vous le rappelle, ce qui veut dire que
+
+128
+00:07:37,249 --> 00:07:39,649
+c'est le constructeur de copie 
+par défaut, qui est invoqué
+
+129
+00:07:39,649 --> 00:07:42,269
+lequel fait une copie de la surface,
+
+130
+00:07:42,269 --> 00:07:44,919
+donc au moment de l'exécution de
+cette ligne de code
+
+131
+00:07:44,919 --> 00:07:49,839
+il va y avoir création d'un objet « tmp »
+créé par copie à partir de l'objet « r »
+
+132
+00:07:49,839 --> 00:07:52,368
+au moyen du 
+constructeur de copie par défaut.
+
+133
+00:07:52,369 --> 00:07:58,180
+Ceci signifie que l'objet « tmp » 
+aura cette allure
+
+134
+00:07:58,180 --> 00:08:01,528
+le constructeur par défaut fait 
+une copie membre à membre
+
+135
+00:08:03,559 --> 00:08:04,939
+des valeurs des attributs
+
+136
+00:08:04,939 --> 00:08:09,159
+donc supposons que le premier attribut
+contienne la valeur « adresse 1 »
+
+137
+00:08:09,158 --> 00:08:13,018
+et le second « adresse 2 »,
+il y aura une copie membre à membre
+
+138
+00:08:15,088 --> 00:08:17,968
+ce qui signifie concrètement
+
+139
+00:08:17,968 --> 00:08:23,258
+que les deux champs de l'objet « tmp »
+pointent vers les mêmes zones mémoire
+
+140
+00:08:23,258 --> 00:08:25,158
+que ceux de l'objet « r ».
+
+141
+00:08:25,158 --> 00:08:28,819
+Le corps de la fonction « afficher_largeur »
+peut s'exécuter sans problème.
+
+142
+00:08:28,819 --> 00:08:32,759
+A partir de l'objet « tmp »,
+on peut accéder via le pointeur
+
+143
+00:08:32,759 --> 00:08:35,639
+à la valeur du champ « largeur » 
+qui est la même que celui du rectangle
+
+144
+00:08:35,639 --> 00:08:38,479
+et dans ce cas-là l'affichage 
+va correspondre à ce que l'on souhaite.
+
+145
+00:08:38,480 --> 00:08:41,789
+C'est un petit peu plus loin que les
+choses vont commencer à se gâter.
+
+146
+00:08:41,789 --> 00:08:42,660
+En effet,
+
+147
+00:08:43,360 --> 00:08:47,539
+le paramètre « tmp »de la fonction 
+« afficher_largeur »
+
+148
+00:08:47,539 --> 00:08:50,099
+est un objet qui est local à la fonction
+
+149
+00:08:50,100 --> 00:08:52,640
+et qui ne peut pas être utilisé à
+l'extérieur de la fonction,
+
+150
+00:08:52,640 --> 00:08:57,800
+ceci signifie qu'au moment où l'on termine
+l'exécution de la fonction « afficher_largeur »
+
+151
+00:08:57,800 --> 00:09:00,629
+cet objet « tmp » 
+n'a plus de raison d'exister
+
+152
+00:09:00,629 --> 00:09:07,019
+et donc le destructeur va être invoqué
+automatiquement sur cet objet « tmp ».
+
+153
+00:09:07,019 --> 00:09:10,790
+Pour rappel, le destructeur 
+de la classe « Rectangle » a pour vocation
+
+154
+00:09:10,790 --> 00:09:15,969
+de désallouer les zones mémoire
+associées aux attributs de l'objet.
+
+155
+00:09:15,969 --> 00:09:18,469
+Dans le cadre de notre exemple 
+ceci signifie
+
+156
+00:09:18,469 --> 00:09:22,599
+qu'au moment où la fonction 
+« afficher_largeur » a terminé son exécution,
+
+157
+00:09:22,600 --> 00:09:25,470
+le destructeur est invoqué 
+sur l'objet « tmp »,
+
+158
+00:09:25,470 --> 00:09:31,619
+lequel va désallouer les emplacements
+mémoire associés à ses attributs.
+
+159
+00:09:32,329 --> 00:09:36,339
+Or, ici, il se trouve que malheureusement
+les zones mémoire désallouées
+
+160
+00:09:36,339 --> 00:09:38,959
+lors de la destruction de « tmp » 
+sont les mêmes que
+
+161
+00:09:38,959 --> 00:09:42,429
+celles qui sont pointées 
+par notre objet « Rectangle r »
+
+162
+00:09:42,429 --> 00:09:44,920
+qui, lui, continue bel et bien 
+son existence
+
+163
+00:09:44,920 --> 00:09:48,750
+une fois que la fonction 
+« afficher_largeur » a terminé son exécution.
+
+164
+00:09:48,750 --> 00:09:49,769
+En réalité,
+
+165
+00:09:49,769 --> 00:09:53,159
+il n'y a pas de raison que 
+« afficher la largeur » d'un « Rectangle »
+
+166
+00:09:53,159 --> 00:09:57,179
+cause la destruction des zones mémoire 
+associées à ce « Rectangle »
+
+167
+00:09:57,179 --> 00:10:00,488
+c'est pourtant bel et bien 
+ce qui s'est passé ici
+
+168
+00:10:00,488 --> 00:10:04,240
+et ceci veut dire très concrètement que
+si l'on essaie d'utiliser le « Rectangle » ici
+
+169
+00:10:04,240 --> 00:10:07,519
+pour faire une autre manipulation dessus,
+ce qui normalement en principe
+
+170
+00:10:07,519 --> 00:10:11,159
+ne devrait pas être empêché par
+l'affichage de sa largeur précédemment
+
+171
+00:10:11,159 --> 00:10:15,580
+et bien on est en train ici de travailler 
+avec un objet « Rectangle r » qui est corrompu
+
+172
+00:10:15,580 --> 00:10:19,380
+puisque les zones mémoire associées
+ont été désallouées.
+
+173
+00:10:19,380 --> 00:10:20,779
+Pour résumer notre exemple,
+
+174
+00:10:20,779 --> 00:10:25,318
+appeler la fonction « afficher_largeur » 
+en lui passant en argument un « Rectangle r »
+
+175
+00:10:25,318 --> 00:10:31,149
+fait que « r » est copié dans « tmp » en raison
+du passage par valeur,
+
+176
+00:10:31,149 --> 00:10:34,678
+lorsque la fonction « afficher_largeur »
+a terminé son exécution,
+
+177
+00:10:34,678 --> 00:10:38,209
+« tmp » qui est local à la fonction, 
+doit être détruit,
+
+178
+00:10:38,210 --> 00:10:42,130
+il l'est automatiquement par le
+destructeur de la classe « Rectangle »
+
+179
+00:10:42,130 --> 00:10:44,666
+ce destructeur va libérer 
+la mémoire pointée
+
+180
+00:10:44,666 --> 00:10:47,202
+par les champs « largeur » et « hauteur »
+de « tmp »
+
+181
+00:10:47,202 --> 00:10:49,740
+qui se trouvent être 
+les mêmes zones mémoire
+
+182
+00:10:49,740 --> 00:10:52,619
+pointées par les champs 
+« largeur » et « hauteur » de « r ».
+
+183
+00:10:52,619 --> 00:10:57,379
+Du coup, toute utilisation de « r » après que
+la fonction « afficher_largeur » ait terminé
+
+184
+00:10:57,379 --> 00:11:00,460
+son exécution nous expose 
+à un certain nombre de dangers,
+
+185
+00:11:00,460 --> 00:11:03,679
+on peut voir le contenu de « r » changer
+de façon intempestive,
+
+186
+00:11:03,678 --> 00:11:06,909
+on s'expose également à un risque
+de « Segmentation Fault »
+
+187
+00:11:06,909 --> 00:11:09,969
+s'il y a des opérations de destruction 
+sur cet objet « r »
+
+188
+00:11:09,969 --> 00:11:14,479
+qui interviennent par la suite.
+La corruption de l'objet « r »,
+
+189
+00:11:14,479 --> 00:11:19,119
+suite à la destruction de l'objet « tmp »,
+est en fait liée simplement au fait que
+
+190
+00:11:19,119 --> 00:11:22,136
+ces deux objets pointent 
+sur les mêmes zones mémoire
+
+191
+00:11:22,136 --> 00:11:24,293
+alors qu'ils ne le devraient pas ;
+
+192
+00:11:25,153 --> 00:11:28,170
+« r » et « tmp » pointent vers les 
+mêmes zones mémoire car
+
+193
+00:11:28,170 --> 00:11:30,226
+comme nous l'avons vu précédemment
+
+194
+00:11:30,226 --> 00:11:33,412
+la copie qui est réalisée 
+est une copie de surface.
+
+195
+00:11:34,422 --> 00:11:37,550
+Pour éviter le problème il faudrait
+que la copie fasse ce que l'on appelle
+
+196
+00:11:37,550 --> 00:11:41,860
+une copie profonde c'est-à-dire qu'elle ne
+se contente pas de copier les adresses
+
+197
+00:11:41,860 --> 00:11:44,620
+mais qu'elle copie plutôt
+les contenus pointés ;
+
+198
+00:11:44,620 --> 00:11:49,169
+donc concrètement ceci voudrait dire
+que l'on ne veut pas avoir de lien
+
+199
+00:11:50,659 --> 00:11:53,909
+entre « tmp » et les zones mémoire
+pointées par « r »
+
+200
+00:11:53,909 --> 00:11:58,750
+mais l'on veut créer à partir de « r » 
+un objet « tmp » qui pointerait
+
+201
+00:11:58,750 --> 00:12:01,899
+sur deux zones mémoire indépendantes
+
+202
+00:12:01,899 --> 00:12:07,009
+qui aurait simplement les mêmes valeurs
+que celles de l'objet d'origine,
+
+203
+00:12:07,740 --> 00:12:09,459
+à savoir « r ».
+
+204
+00:12:10,639 --> 00:12:12,919
+Du coup, la destruction du « tmp » ,
+
+205
+00:12:12,919 --> 00:12:16,309
+après la fin de l'exécution 
+de la fonction « afficher_largeur »,
+
+206
+00:12:16,309 --> 00:12:20,220
+n'aurait d'incidence que sur
+les champs pointés par « tmp »
+
+207
+00:12:20,740 --> 00:12:24,890
+et n'aurait aucune incidence sur
+ceux pointés par l'objet « r »
+
+208
+00:12:24,890 --> 00:12:29,020
+lequel pourrait continuer à être
+utilisé sans problème par la suite.
+
+209
+00:12:29,019 --> 00:12:30,949
+Le constructeur de copie par défaut
+
+210
+00:12:30,949 --> 00:12:33,702
+qui fait une copie de surface
+n'est donc pas adapté ;
+
+211
+00:12:33,702 --> 00:12:37,155
+il s'agit donc ici de redéfinir 
+le constructeur de copie
+
+212
+00:12:37,155 --> 00:12:42,199
+de sorte à ce qu'il fasse une copie
+profonde qui duplique des zones pointées.
+
+213
+00:12:42,200 --> 00:12:46,240
+En souhaitant que le constructeur de
+copie duplique les zones pointées,
+
+214
+00:12:46,240 --> 00:12:53,029
+donc à partir d'un « Rectangle r » dont
+les attributs seraient des pointeurs vers
+
+215
+00:12:54,620 --> 00:12:57,446
+des « double » particuliers.
+
+216
+00:13:00,272 --> 00:13:03,100
+On souhaite que l'objet « tmp » obtenu 
+par copie depuis « r » soit un objet
+
+217
+00:13:03,100 --> 00:13:06,310
+complètement indépendant
+
+218
+00:13:06,309 --> 00:13:11,519
+dont la valeur des attributs serait de
+nouvelles adresses pointant vers des « double »
+
+219
+00:13:11,519 --> 00:13:17,009
+dont la seule particularité serait 
+d'avoir des valeurs identiques
+
+220
+00:13:17,009 --> 00:13:19,559
+à celles de l'objet d'origine.
+
+221
+00:13:19,559 --> 00:13:23,029
+L'objet copié étant ainsi complètement
+indépendant de l'objet d'origine,
+
+222
+00:13:23,029 --> 00:13:27,599
+sa destruction n'a plus aucune incidence
+sur l'objet d'origine.
+
+223
+00:13:28,440 --> 00:13:30,879
+Le constructeur de copie 
+doit donc être réécrit
+
+224
+00:13:30,879 --> 00:13:33,318
+de sorte à dupliquer les zones pointées.
+
+225
+00:13:34,658 --> 00:13:39,419
+Créer une copie « tmp » de l'objet « r » 
+en utilisant ce constructeur de copie
+
+226
+00:13:39,419 --> 00:13:43,119
+se traduirait donc 
+par la situation suivante en mémoire
+
+227
+00:13:43,120 --> 00:13:48,730
+l'objet « tmp » aurait un champ « largeur »
+
+228
+00:13:48,730 --> 00:13:54,196
+dont la valeur serait l'adresse 
+d'un objet nouvellement alloué
+
+229
+00:13:54,196 --> 00:13:56,742
+donc une nouvelle adresse
+
+230
+00:13:58,122 --> 00:13:59,840
+et dont le contenu pointé
+
+231
+00:14:00,929 --> 00:14:05,869
+serait obtenu par copie du contenu
+pointé par l'objet d'origine
+
+232
+00:14:07,889 --> 00:14:12,880
+et pareil pour la triple hauteur.
+
+233
+00:14:13,340 --> 00:14:15,539
+Donc ici si l'on veut décortiquer 
+un peu les choses
+
+234
+00:14:15,539 --> 00:14:19,950
+« obj » est l'objet copié, l'objet à partir 
+duquel on veut faire la copie,
+
+235
+00:14:19,950 --> 00:14:25,370
+cette notation « obj.largeur » va nous donner
+la valeur de cette adresse,
+
+236
+00:14:25,370 --> 00:14:29,859
+« *obj.largeur » va nous donner le contenu 
+pointé par cette adresse ;
+
+237
+00:14:29,859 --> 00:14:35,300
+cette valeur correspond donc au contenu
+pointé par l'objet d'origine,
+
+238
+00:14:35,300 --> 00:14:39,379
+l'instruction « new double » ici
+
+239
+00:14:39,379 --> 00:14:45,959
+va donc allouer un emplacement mémoire
+pour le champ « largeur »
+
+240
+00:14:47,879 --> 00:14:51,789
+avec pour contenu le contenu 
+de l'objet d'origine.
+
+241
+00:14:51,789 --> 00:14:54,960
+Donc voici comment il faudrait 
+réécrire la classe « Rectangle »
+
+242
+00:14:54,960 --> 00:14:57,870
+de sorte à s'éviter les problèmes 
+de copie de surface
+
+243
+00:14:57,870 --> 00:15:00,210
+lorsque les attributs sont des pointeurs
+
+244
+00:15:00,210 --> 00:15:01,193
+nous avons vu que
+
+245
+00:15:01,193 --> 00:15:04,076
+le fait d'avoir un constructeur 
+qui s'occupe d'allouer la mémoire
+
+246
+00:15:04,076 --> 00:15:07,429
+et un destructeur qui s'occupe 
+de la restituer n'a pas suffi,
+
+247
+00:15:07,429 --> 00:15:11,659
+il faut en plus définir un constructeur 
+de copie qui fait de la copie profonde
+
+248
+00:15:11,659 --> 00:15:16,990
+c'est-à-dire qui ne copie pas les adresses
+mais qui duplique les zones pointées.
+
+249
+00:15:17,000 --> 00:15:20,570
+En toute rigueur il faudrait aussi
+redéfinir « opérateur = »
+
+250
+00:15:20,570 --> 00:15:22,789
+qui comme nous l'avons vu 
+dans les séquences précédentes
+
+251
+00:15:22,789 --> 00:15:24,828
+est très proche du constructeur de copie.
+
+252
+00:15:24,828 --> 00:15:28,908
+La version par défaut de l'opérateur « = »
+fait elle aussi en effet,
+
+253
+00:15:28,908 --> 00:15:32,078
+une copie de surface 
+et si on ne la définit pas proprement
+
+254
+00:15:32,078 --> 00:15:35,800
+aux endroits voulus et bien on s'expose
+aux mêmes problèmes qu'en s'abstenant
+
+255
+00:15:35,799 --> 00:15:39,079
+de redéfinir correctement le
+constructeur de copie.
+
+256
+00:15:39,080 --> 00:15:40,909
+Voilà, du point de vue de la méthodologie
+
+257
+00:15:40,909 --> 00:15:43,970
+lorsque une classe contient des attributs
+qui sont des pointeurs
+
+258
+00:15:43,970 --> 00:15:47,120
+il faut penser à la copie profonde,
+au moins se poser la question :
+
+259
+00:15:47,120 --> 00:15:49,569
+est-ce qu'on doit redéfinir 
+le constructeur de copie
+
+260
+00:15:49,569 --> 00:15:53,679
+de sorte à ce qu'il fasse de la duplication 
+des zones mémoire pointées, ou non ;
+
+261
+00:15:53,679 --> 00:15:56,032
+si l'on redéfinit le constructeur de copie
+
+262
+00:15:56,032 --> 00:15:59,365
+il faut penser également 
+à la surcharge de l'opérateur « = »
+
+263
+00:15:59,365 --> 00:16:01,900
+qui doit être défini de façon appropriée
+
+264
+00:16:01,900 --> 00:16:03,736
+et lorsque l'on fait de la copie profonde
+
+265
+00:16:03,736 --> 00:16:07,032
+on est souvent amené à utiliser
+de nouvelles ressources en mémoire
+
+266
+00:16:07,032 --> 00:16:10,950
+et dans ce cas il faut penser également 
+à adapter le destructeur.
+
+267
+00:16:10,950 --> 00:16:14,660
+Enfin petit rappel lorsque l'on redéfinit
+le constructeur de copie
+
+268
+00:16:14,660 --> 00:16:17,819
+dans le cadre d'une relation d'héritage
+donc dans une sous-classe
+
+269
+00:16:17,818 --> 00:16:19,839
+il ne faut pas oublier de faire en sorte
+
+270
+00:16:19,839 --> 00:16:22,475
+que le constructeur de copie 
+de la sous-classe invoque
+
+271
+00:16:22,475 --> 00:16:24,911
+le constructeur de copie 
+de la super-classe
+
+272
+00:16:24,911 --> 00:16:27,590
+autrement c'est le constructeur par défaut
+tout court de la super-classe
+
+273
+00:16:27,590 --> 00:16:31,269
+qui est appelé et ceci peut en effet 
+poser un certain nombre
+
+274
+00:16:31,269 --> 00:16:32,949
+de comportements aberrants du programme.

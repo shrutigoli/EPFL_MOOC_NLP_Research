@@ -1,0 +1,797 @@
+1
+00:00:00,610 --> 00:00:02,620
+Concerning actors, we have talked
+
+2
+00:00:02,620 --> 00:00:05,880
+about their message-driven or event-driven
+nature.
+
+3
+00:00:06,956 --> 00:00:11,610
+We have talked about that supervision
+makes them resilient against failure.
+
+4
+00:00:11,610 --> 00:00:16,550
+And we've seen how routing of messages can
+achieve scalability.
+
+5
+00:00:17,560 --> 00:00:20,370
+As a conclusion to this part we need to
+talk
+
+6
+00:00:20,370 --> 00:00:26,050
+about the fourth tenet of reactive
+programming, which is responsiveness.
+
+7
+00:00:26,050 --> 00:00:31,100
+And we will see that this trait ties all
+of the four of them together into a
+
+8
+00:00:31,100 --> 00:00:36,290
+cohesive whole.
+The first we note is that responsiveness
+
+9
+00:00:36,290 --> 00:00:41,940
+means that a system can respond to input
+within a given time limit.
+
+10
+00:00:41,940 --> 00:00:46,370
+If it is unable to respond and there is
+just a certain waiting
+
+11
+00:00:46,370 --> 00:00:51,159
+time which you give it that is equivalent
+to the system not being available.
+
+12
+00:00:52,380 --> 00:00:57,730
+This means that resilience is not achieved
+if the system cannot respond.
+
+13
+00:00:57,730 --> 00:01:02,150
+No matter how you restart your parts of
+your actor hierarchy, for example, if that
+
+14
+00:01:02,150 --> 00:01:04,730
+does not lead to the system generating
+responses
+
+15
+00:01:04,730 --> 00:01:07,540
+in time, then it is all for nothing.
+
+16
+00:01:08,590 --> 00:01:11,100
+One regime in which this is particularly
+hard
+
+17
+00:01:11,100 --> 00:01:13,950
+to achieve is when the system is
+overloaded.
+
+18
+00:01:15,190 --> 00:01:17,520
+But even there it holds that
+
+19
+00:01:17,520 --> 00:01:19,876
+if the system does not respond in
+
+20
+00:01:19,876 --> 00:01:22,550
+an overload scenario, then it is not
+resilient.
+
+21
+00:01:24,550 --> 00:01:28,670
+In the following, we will talk about
+patterns, how to achieve
+
+22
+00:01:28,670 --> 00:01:33,170
+responsiveness in both the normal and the
+failure cases and underload.
+
+23
+00:01:34,740 --> 00:01:39,930
+Let us first look at the nominal case and
+see what we, what we can do there.
+
+24
+00:01:39,930 --> 00:01:42,760
+We had this example in the aggregation
+
+25
+00:01:42,760 --> 00:01:46,650
+patterns where this PostSummary actor
+fires
+
+26
+00:01:46,650 --> 00:01:50,060
+off requests to different backend
+services, and
+
+27
+00:01:50,060 --> 00:01:55,610
+aggregates them and then responds to the
+sender when everything has been received.
+
+28
+00:01:55,610 --> 00:01:58,450
+But what we do here is, we ask one actor
+
+29
+00:01:58,450 --> 00:02:01,760
+and when we get the reply, we ask another
+one.
+
+30
+00:02:01,760 --> 00:02:04,190
+When we get the reply, we ask the third
+one.
+
+31
+00:02:04,190 --> 00:02:07,960
+And once we have all three of them, we
+construct the response
+
+32
+00:02:07,960 --> 00:02:12,400
+which can be result of failure.
+And then pipe it back to the sender.
+
+33
+00:02:12,400 --> 00:02:16,270
+This adds the call latencies to all these
+three
+
+34
+00:02:16,270 --> 00:02:21,002
+actors together before the final result
+can be dispatched.
+
+35
+00:02:21,002 --> 00:02:24,794
+This PostSummary actor will respond quite
+a lot sooner if
+
+36
+00:02:24,794 --> 00:02:28,335
+we were intead to fire off the requests in
+parallel.
+
+37
+00:02:28,335 --> 00:02:33,639
+So, we ask in parallel, and then we tie
+the resulting futures
+
+38
+00:02:33,639 --> 00:02:37,821
+together in one full comprehension, to
+compute
+
+39
+00:02:37,821 --> 00:02:41,987
+the result, and this will reduce the
+latency.
+
+40
+00:02:41,987 --> 00:02:47,643
+Obviously, the slowest of these three
+actors to respond will
+
+41
+00:02:47,643 --> 00:02:53,344
+define how long it takes the PostSummary
+actor to respond in turn.
+
+42
+00:02:53,344 --> 00:02:56,944
+Once all opportunity for parallelism has
+been exploited,
+
+43
+00:02:56,944 --> 00:02:58,672
+the next step is to look at the
+
+44
+00:02:58,672 --> 00:03:04,630
+responsiveness of each single component,
+and try to reduce the latency time there.
+
+45
+00:03:04,630 --> 00:03:09,150
+One thing which should be avoided is that
+the processing cost
+
+46
+00:03:09,150 --> 00:03:13,310
+depends on how loaded your system is,
+because that will amplify
+
+47
+00:03:13,310 --> 00:03:17,800
+problems when users start to hit your
+business for example, and
+
+48
+00:03:17,800 --> 00:03:21,560
+you become successful, and then suddenly
+the site doesn't work anymore.
+
+49
+00:03:21,560 --> 00:03:24,880
+Because you built in something which is
+for example
+
+50
+00:03:24,880 --> 00:03:28,350
+order of n squared in the number of
+current users in your system.
+
+51
+00:03:29,830 --> 00:03:33,040
+This mean choosing data structures and
+algorithms
+
+52
+00:03:33,040 --> 00:03:37,240
+which preferably exhibit linear or
+algorithmic complexity.
+
+53
+00:03:38,780 --> 00:03:43,830
+Once you have reduced the time it takes to
+process a single request as far as is
+
+54
+00:03:43,830 --> 00:03:49,550
+practical or desirable, then you need to
+add parallelism when needed.
+
+55
+00:03:49,550 --> 00:03:50,290
+For example
+
+56
+00:03:50,290 --> 00:03:54,150
+using the scalability patterns where we
+talked about
+
+57
+00:03:54,150 --> 00:03:57,190
+different routing strategies and pools
+which you can use.
+
+58
+00:03:59,070 --> 00:04:03,150
+But inevitably, every system has a certain
+limit, and once
+
+59
+00:04:03,150 --> 00:04:07,850
+the system's capacity is reached, requests
+will start piling up.
+
+60
+00:04:07,850 --> 00:04:12,110
+This means that the processing get
+backlogged, queues fill,
+
+61
+00:04:12,110 --> 00:04:15,310
+and the latency rises for everyone using
+the system.
+
+62
+00:04:16,660 --> 00:04:19,265
+Eventually the clients themselves will
+time out.
+
+63
+00:04:19,265 --> 00:04:21,800
+You have seen that on web pages for
+example, where
+
+64
+00:04:21,800 --> 00:04:25,500
+the browser tells you that the site did
+not respond.
+
+65
+00:04:25,500 --> 00:04:26,930
+What do you do in that case?
+
+66
+00:04:26,930 --> 00:04:31,380
+Well you go to different site if you have
+a choice, so this needs to be avoided.
+
+67
+00:04:33,500 --> 00:04:35,520
+In order to achieve this, you can use the
+
+68
+00:04:35,520 --> 00:04:40,026
+circuit breaker pattern and implementation
+of which comes with Akka.
+
+69
+00:04:40,026 --> 00:04:43,900
+Let's use an example here, where we want
+to contact
+
+70
+00:04:43,900 --> 00:04:46,680
+the user service and ask it about a
+certain user.
+
+71
+00:04:48,150 --> 00:04:53,330
+We want to make this resilient against the
+user service being overloaded or just
+
+72
+00:04:53,330 --> 00:04:58,780
+constantly failing.
+So this ask returns a future and
+
+73
+00:04:58,780 --> 00:05:02,170
+the circuit breaker wraps this future and
+looks
+
+74
+00:05:02,170 --> 00:05:05,350
+at whether it succeeds and when it
+succeeds.
+
+75
+00:05:05,350 --> 00:05:07,780
+The configuration of it is given here.
+
+76
+00:05:07,780 --> 00:05:10,520
+The call timeout is one second.
+
+77
+00:05:10,520 --> 00:05:12,980
+So it checks for every future put in
+
+78
+00:05:12,980 --> 00:05:15,920
+here, whether it was completed within one
+second.
+
+79
+00:05:15,920 --> 00:05:18,850
+And if it was not, it increases a failure
+counter.
+
+80
+00:05:18,850 --> 00:05:24,070
+And when that reaches three, then the
+circuit breaker will open.
+
+81
+00:05:24,070 --> 00:05:26,260
+And all subsequent requests will fail
+
+82
+00:05:26,260 --> 00:05:29,620
+immediately wthout contacting the user
+service.
+
+83
+00:05:29,620 --> 00:05:31,920
+This takes the pressure off the user
+service
+
+84
+00:05:31,920 --> 00:05:34,390
+and makes the system respond a lot faster.
+
+85
+00:05:36,180 --> 00:05:41,100
+Then, as requests keep coming in, every 30
+seconds the circuit
+
+86
+00:05:41,100 --> 00:05:45,100
+breaker will allow one request through, to
+see if it succeeds.
+
+87
+00:05:45,100 --> 00:05:49,140
+And if that is the case, then the circuit
+breaker closes again, and things
+
+88
+00:05:49,140 --> 00:05:50,500
+will proceed normally.
+
+89
+00:05:50,500 --> 00:05:54,569
+But if that also fails, then it will open
+again for another 30 seconds.
+
+90
+00:05:55,830 --> 00:06:00,310
+You'll notice here that the timeout for
+the ask operation is two
+
+91
+00:06:00,310 --> 00:06:05,030
+seconds, while the call timeout for the
+circuit breaker was one second.
+
+92
+00:06:05,030 --> 00:06:09,337
+And that can come in handy, that you say a
+single request may take two or
+
+93
+00:06:09,337 --> 00:06:14,228
+even 5five seconds, but if three in a row
+are slower than one second, I want the
+
+94
+00:06:14,228 --> 00:06:15,900
+circuit breaker to trip.
+
+95
+00:06:17,310 --> 00:06:20,430
+This pattern is a good way to separate two
+components
+
+96
+00:06:20,430 --> 00:06:24,660
+such that failures in one do not influence
+the other.
+
+97
+00:06:24,660 --> 00:06:28,290
+But it does not completely isolate actors
+if
+
+98
+00:06:28,290 --> 00:06:30,540
+they happen to run on the same dispatcher.
+
+99
+00:06:32,860 --> 00:06:37,400
+Therefore, the last thing we need to
+consider is to segregate the resources
+
+100
+00:06:37,400 --> 00:06:39,870
+available to different parts of your
+system
+
+101
+00:06:39,870 --> 00:06:42,220
+to make them independent from each other.
+
+102
+00:06:42,220 --> 00:06:44,580
+For example, you have that part of the
+system
+
+103
+00:06:44,580 --> 00:06:48,620
+which is responsible for sending a
+response to the client.
+
+104
+00:06:48,620 --> 00:06:51,060
+And that part needs to function as long as
+
+105
+00:06:51,060 --> 00:06:53,650
+possible, even if all the back ends
+services are down.
+
+106
+00:06:54,820 --> 00:06:58,200
+This can be achieved by configuring these
+actors
+
+107
+00:06:58,200 --> 00:07:00,440
+to run on different nodes for example, or
+
+108
+00:07:00,440 --> 00:07:03,820
+on the same host to run on different
+dispatchers.
+
+109
+00:07:03,820 --> 00:07:08,280
+You can configure this if you create the
+props of your actors
+
+110
+00:07:08,280 --> 00:07:14,250
+and say, with dispatcher, saying for
+example compute jobs in this case.
+
+111
+00:07:14,250 --> 00:07:16,510
+And that will make this actor run on
+
+112
+00:07:16,510 --> 00:07:19,600
+a different thread pool than its parent
+for example.
+
+113
+00:07:21,140 --> 00:07:23,110
+If you do not specify this,
+
+114
+00:07:23,110 --> 00:07:26,700
+actors run on the so-called default
+dispatcher.
+
+115
+00:07:26,700 --> 00:07:31,125
+This is the configuration section which is
+the current default in
+
+116
+00:07:31,125 --> 00:07:36,730
+Akka, and it says that the executors is a
+so-called fork-join-executor.
+
+117
+00:07:36,730 --> 00:07:41,110
+And it uses minimum eight threads, maximum
+64 threads.
+
+118
+00:07:41,110 --> 00:07:43,850
+And in that it defaults to three times the
+
+119
+00:07:43,850 --> 00:07:47,550
+number of your CPU cores that you have
+available.
+
+120
+00:07:47,550 --> 00:07:48,340
+You configure
+
+121
+00:07:48,340 --> 00:07:51,790
+another dispatcher just by putting another
+config section in your
+
+122
+00:07:51,790 --> 00:07:55,730
+file with the name you gave in the with
+dispatcher method.
+
+123
+00:07:56,800 --> 00:07:59,330
+And then you can just say, compute jobs
+and configure it.
+
+124
+00:07:59,330 --> 00:08:03,490
+For example, fork-join-executor and this
+locks it down to exactly
+
+125
+00:08:03,490 --> 00:08:07,450
+four threads, which you reserve for this
+kind of compute job.
+
+126
+00:08:08,930 --> 00:08:13,420
+While doing this, you should keep in mind
+that configuring many more threads
+
+127
+00:08:13,420 --> 00:08:18,350
+than you have CPUs in your system can
+defeat the purpose of this bulk heading.
+
+128
+00:08:18,350 --> 00:08:22,180
+Because then these threads will compete
+for the available CPU cores.
+
+129
+00:08:23,580 --> 00:08:27,680
+Detecting failure in distributed systems
+takes time because the only
+
+130
+00:08:27,680 --> 00:08:30,910
+thing you can observe is that you do not
+observe anything.
+
+131
+00:08:30,910 --> 00:08:34,230
+And, you need to give yourself a timeout
+for that.
+
+132
+00:08:34,230 --> 00:08:38,450
+There are systems where you can afford to
+wait and you have for
+
+133
+00:08:38,450 --> 00:08:43,130
+example a back up system which you need to
+switch to immediately.
+
+134
+00:08:43,130 --> 00:08:48,230
+But obviously, this is limited in latency
+to how
+
+135
+00:08:48,230 --> 00:08:51,440
+frequently you check that the prime system
+is up.
+
+136
+00:08:52,440 --> 00:08:56,800
+Where there is not enough you can do
+nothing but immediately
+
+137
+00:08:56,800 --> 00:09:01,370
+always send to all, so you have for
+example three systems.
+
+138
+00:09:03,370 --> 00:09:06,265
+And you have the requests coming in.
+
+139
+00:09:06,265 --> 00:09:12,210
+Nominally you would use A and then you
+would want to switch to B or C as needed.
+
+140
+00:09:12,210 --> 00:09:16,100
+But if that needs to happen within a
+millisecond for example, there is no
+
+141
+00:09:16,100 --> 00:09:21,890
+choice, you always need to send to all of
+them to keep them in sync.
+
+142
+00:09:21,890 --> 00:09:26,840
+Because within a millisecond, you cannot
+transfer all state between A and B.
+
+143
+00:09:26,840 --> 00:09:28,060
+And then what you can do is,
+
+144
+00:09:29,620 --> 00:09:34,770
+like for example, in highly redundant
+satellite systems,
+
+145
+00:09:37,500 --> 00:09:39,990
+get the responses from all three, and as
+soon as you
+
+146
+00:09:39,990 --> 00:09:43,930
+have two responses and they match you can,
+send the reply.
+
+147
+00:09:43,930 --> 00:09:48,430
+And if you notice that one of the nodes
+does not send within the time
+
+148
+00:09:48,430 --> 00:09:53,080
+allotted, then you can shut it down and
+request a new one to be added.
+
+149
+00:09:53,080 --> 00:09:58,680
+Such a scheme would allow you to be always
+responsive, even if one node fails.
+
+150
+00:10:00,380 --> 00:10:02,790
+We have seen how event-driven
+
+151
+00:10:02,790 --> 00:10:07,640
+systems can scale vertically, because you
+can dispatch the processing
+
+152
+00:10:07,640 --> 00:10:12,100
+of events to any number of CPU cores in
+your system.
+
+153
+00:10:12,100 --> 00:10:17,770
+And if you add the ability to send events
+over the network, so you make your system
+
+154
+00:10:17,770 --> 00:10:22,430
+location transparent, that adds horizontal
+scalability, because you
+
+155
+00:10:22,430 --> 00:10:25,030
+can run your computation on whole cluster
+of nodes.
+
+156
+00:10:26,260 --> 00:10:28,100
+But the quality which we want
+
+157
+00:10:28,100 --> 00:10:30,770
+to achieve in the end is that the system
+
+158
+00:10:30,770 --> 00:10:36,040
+which we construct responds to inputs,
+giving the correct outputs.
+
+159
+00:10:36,040 --> 00:10:39,280
+And this demands not only scalability,
+which
+
+160
+00:10:39,280 --> 00:10:41,530
+we get by being event-driven and location
+
+161
+00:10:41,530 --> 00:10:45,360
+transparent, but also resilient, which
+means that
+
+162
+00:10:45,360 --> 00:10:49,270
+failure is contained and fixed by
+delegation.
+
+163
+00:10:50,490 --> 00:10:53,416
+Therefore, we can see
+
+164
+00:10:53,416 --> 00:11:00,346
+how responsiveness ties together all the
+principles
+
+165
+00:11:00,346 --> 00:11:07,122
+of reactive programming including,
+resilience,
+
+166
+00:11:07,122 --> 00:11:13,395
+scalability, and its event-driven nature.
+

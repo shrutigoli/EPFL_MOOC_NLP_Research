@@ -1,0 +1,1184 @@
+1
+00:00:03,400 --> 00:00:07,399
+Welcome back: Nature, In Code.
+We're in Chapter 3, Lecture 15.
+
+2
+00:00:07,399 --> 00:00:11,140
+This is the last lecture of Chapter 3,
+and in this lecture,
+
+3
+00:00:11,140 --> 00:00:14,950
+we are going to implement
+the bottlenecks, population bottlenecks,
+
+4
+00:00:15,380 --> 00:00:20,420
+in JavaScript in our simulations,
+and then we'll see whether the informed,
+
+5
+00:00:20,420 --> 00:00:23,700
+or the uninformed prediction 
+was the correct one.
+
+6
+00:00:23,700 --> 00:00:26,755
+I think I have an idea,
+but let's go and find out.
+
+7
+00:00:27,020 --> 00:00:31,197
+So this is the code as we left it 
+last time as we developed it.
+
+8
+00:00:31,197 --> 00:00:32,530
+We have here--
+
+9
+00:00:32,530 --> 00:00:34,510
+We're showing the effect 
+of population size.
+
+10
+00:00:34,510 --> 00:00:36,900
+We're calculating it here 
+with this function.
+
+11
+00:00:36,900 --> 00:00:39,902
+This is what we developed
+in the last lecture,
+
+12
+00:00:39,902 --> 00:00:42,816
+and this seems to work just fine.
+
+13
+00:00:43,510 --> 00:00:49,187
+What we don't do at the moment though 
+is to actually implement real bottlenecks.
+
+14
+00:00:50,110 --> 00:00:53,590
+Our population size is still <i>N</i>
+and we never change <i>N</i>.
+
+15
+00:00:54,040 --> 00:00:56,050
+We simply set it here,
+
+16
+00:00:56,050 --> 00:00:57,320
+but we never change it.
+
+17
+00:00:57,320 --> 00:01:00,100
+We never change the population size.
+
+18
+00:01:00,100 --> 00:01:02,708
+So how are we going do this?
+How are we going to change
+
+19
+00:01:02,708 --> 00:01:06,110
+the population size,
+and who should do that?
+
+20
+00:01:06,110 --> 00:01:07,520
+Who should take the responsibility?
+
+21
+00:01:07,520 --> 00:01:09,300
+Who should take care of it?
+
+22
+00:01:09,300 --> 00:01:10,670
+So at the moment,
+
+23
+00:01:10,670 --> 00:01:13,766
+the one place where
+the population size really matters
+
+24
+00:01:13,766 --> 00:01:16,080
+in terms of the simulations--
+that's this line here,
+
+25
+00:01:16,080 --> 00:01:18,520
+this first line here <i>next_generation</i>,
+
+26
+00:01:18,520 --> 00:01:23,749
+where we say we're going to draw 
+two <i>N</i> alleles for the next generation.
+
+27
+00:01:24,520 --> 00:01:26,450
+So should we do this here?
+
+28
+00:01:26,450 --> 00:01:28,900
+Should we check which generation
+we're in, and so on?
+
+29
+00:01:28,900 --> 00:01:31,119
+No, we shouldn't, I don't think so.
+
+30
+00:01:31,119 --> 00:01:34,143
+<i>next_generation</i> should not care
+
+31
+00:01:34,143 --> 00:01:36,860
+about the current time in the simulation.
+
+32
+00:01:36,860 --> 00:01:38,410
+It's simply one generation.
+
+33
+00:01:38,410 --> 00:01:41,140
+It should not have to care 
+about the population size.
+
+34
+00:01:41,140 --> 00:01:46,033
+So what we'll do is we'll simply now 
+pass the population size
+
+35
+00:01:46,033 --> 00:01:50,280
+as a parameter, so I'm going to here
+set up a second parameter,
+
+36
+00:01:50,280 --> 00:01:55,539
+and I'm going to call this <i>current_N</i>,
+and then here, I'm simply going to say
+
+37
+00:01:55,539 --> 00:01:59,120
+the number of draws is 2 times <i>current_N</i>.
+
+38
+00:01:59,120 --> 00:02:00,900
+And so with this simple modification,
+
+39
+00:02:00,900 --> 00:02:04,437
+I'm basically delegating
+the responsibility of this
+
+40
+00:02:04,437 --> 00:02:08,050
+to whoever calls that function,
+and I'm basically saying:
+
+41
+00:02:08,050 --> 00:02:11,773
+Look, you just have to pass me 
+the population size.
+
+42
+00:02:11,773 --> 00:02:12,890
+Whatever it is,
+
+43
+00:02:12,890 --> 00:02:14,322
+I'm going to work with it.
+
+44
+00:02:14,790 --> 00:02:17,425
+So I think that's the correct approach.
+
+45
+00:02:18,130 --> 00:02:20,423
+Okay, but so now we just
+passed on the problem,
+
+46
+00:02:20,423 --> 00:02:24,840
+so who should take care
+of setting the correct population size?
+
+47
+00:02:24,840 --> 00:02:28,272
+Well, I think it should happen
+down here in simulation,
+
+48
+00:02:28,272 --> 00:02:32,700
+because that's where
+we have our iterator,
+
+49
+00:02:32,700 --> 00:02:35,880
+that runs for a certain 
+number of generations,
+
+50
+00:02:35,880 --> 00:02:39,890
+that pushes the population size
+into the <i>population_size</i> array,
+
+51
+00:02:39,890 --> 00:02:44,161
+so we can later correctly calculate 
+the effective population size,
+
+52
+00:02:44,161 --> 00:02:48,130
+and that importantly calls the 
+<i>next_generation</i> function.
+
+53
+00:02:48,130 --> 00:02:49,970
+So I think it should happen here.
+
+54
+00:02:49,970 --> 00:02:51,800
+This is the right place to do it.
+
+55
+00:02:51,800 --> 00:02:55,130
+So what I'm going to do is I'm going
+to set up here a local variable.
+
+56
+00:02:55,130 --> 00:02:57,882
+I'm not going to use this anywhere
+outside of this function,
+
+57
+00:02:57,882 --> 00:02:59,903
+so this can be a local variable,
+
+58
+00:02:59,903 --> 00:03:03,110
+and I'm going to call it <i>population_size</i>.
+
+59
+00:03:08,420 --> 00:03:10,864
+And I'm not going to set it
+to any particular value,
+
+60
+00:03:10,864 --> 00:03:13,565
+I'm just going to define it
+for the time being.
+
+61
+00:03:14,323 --> 00:03:20,008
+And now, down here in the loop
+where we run the generations,
+
+62
+00:03:20,008 --> 00:03:24,600
+here I could now assign a value
+to this population size.
+
+63
+00:03:24,600 --> 00:03:26,497
+So what I'm gonna do here is
+
+64
+00:03:26,497 --> 00:03:32,308
+I'm gonna say <i>population_size</i>
+equals, for example, <i>N</i> .
+
+65
+00:03:33,670 --> 00:03:36,096
+Now this will be true most of the time,
+
+66
+00:03:36,096 --> 00:03:39,320
+but other times we want to set it to 10.
+
+67
+00:03:39,320 --> 00:03:42,420
+So, before I do this,
+what we now have to do
+
+68
+00:03:42,420 --> 00:03:46,223
+is we have to push
+this <i>population_size</i> variable
+
+69
+00:03:46,223 --> 00:03:51,320
+into the <i>population_sizes</i> array,
+and when we call <i>next-generation</i>
+
+70
+00:03:51,320 --> 00:03:56,193
+we have to pass this variable 
+as an argument, because that's--
+
+71
+00:03:56,193 --> 00:03:59,418
+We just recalled, we just modified
+this function here.
+
+72
+00:03:59,418 --> 00:04:02,070
+It's expecting now
+the current population size
+
+73
+00:04:02,070 --> 00:04:04,358
+that is stored in <i>population_size</i>.
+
+74
+00:04:04,982 --> 00:04:09,370
+So this variable <i>population_size</i>
+contains the current population size.
+
+75
+00:04:09,370 --> 00:04:11,960
+Now if we would just leave it at that,
+this would still work,
+
+76
+00:04:11,960 --> 00:04:14,750
+but we wouldn't have bottlenecks
+and also it would be kind of silly
+
+77
+00:04:14,750 --> 00:04:18,570
+to have this additional variable 
+when we already have <i>N</i>.
+
+78
+00:04:18,570 --> 00:04:22,133
+But of course what we want to do 
+is we want to implement a bottleneck,
+
+79
+00:04:22,133 --> 00:04:23,850
+and so I'm going to do this here,
+
+80
+00:04:23,850 --> 00:04:27,533
+and I'm now going to replace this line 
+with the following,
+
+81
+00:04:28,396 --> 00:04:30,477
+and you should just follow me
+and type with me,
+
+82
+00:04:30,477 --> 00:04:33,490
+and I'm going to explain
+in a minute how this works.
+
+83
+00:04:33,490 --> 00:04:39,370
+So what I'm going to say is that
+<i>if (i%10 ==</i>
+
+84
+00:04:39,370 --> 00:04:40,957
+and you should use the double equal,
+
+85
+00:04:40,957 --> 00:04:46,548
+because this is
+an equality condition here,
+
+86
+00:04:46,548 --> 00:04:48,586
+if this equals 9,
+
+87
+00:04:48,586 --> 00:04:57,914
+then we're going to set
+the <i>population_size</i> to 10.
+
+88
+00:04:58,180 --> 00:04:59,640
+So this is the bottleneck.
+
+89
+00:05:00,772 --> 00:05:03,218
+And if that's not the case, so <i>else</i>,
+
+90
+00:05:03,854 --> 00:05:07,720
+then we're going to set it to <i>N</i>.
+
+91
+00:05:08,592 --> 00:05:13,140
+So this <i>population_size</i>,
+that is the normal <i>population_size</i>
+
+92
+00:05:13,140 --> 00:05:16,076
+that we defined up there 
+in the variables.
+
+93
+00:05:17,150 --> 00:05:19,561
+And so most of the time,
+this will be true,
+
+94
+00:05:19,561 --> 00:05:22,957
+but every tenth generation,
+this will be true.
+
+95
+00:05:22,957 --> 00:05:26,453
+And so now we're really working 
+with a real bottleneck,
+
+96
+00:05:26,453 --> 00:05:31,249
+because we're setting
+this <i>population_size</i> occasionally to 10.
+
+97
+00:05:31,249 --> 00:05:34,700
+and then we're pushing this into 
+the <i>population_sizes</i> array,
+
+98
+00:05:34,700 --> 00:05:39,800
+and we're passing it
+to the <i>next_generation</i> function.
+
+99
+00:05:40,450 --> 00:05:43,870
+Now this, of course, here
+is the money line,
+
+100
+00:05:43,870 --> 00:05:46,638
+this is where we check whether
+it's the tenth generation,
+
+101
+00:05:46,638 --> 00:05:48,920
+and I'll talk in a bit
+about how this works.
+
+102
+00:05:48,920 --> 00:05:52,896
+Let's just go and see
+what the dynamics now are.
+
+103
+00:05:52,896 --> 00:05:57,601
+So we're going to save this,
+and we're going to go over to the browser,
+
+104
+00:05:57,601 --> 00:06:00,600
+and we're going to reload,
+and now we have a drum roll,
+
+105
+00:06:00,600 --> 00:06:05,620
+and <i>boom!</i> - 92 is indeed
+the effective population size.
+
+106
+00:06:05,620 --> 00:06:07,510
+So this is calculated now on the fly
+
+107
+00:06:07,510 --> 00:06:10,310
+with our effective
+<i>population_size</i> function,
+
+108
+00:06:10,310 --> 00:06:12,930
+and as you can also see
+when you reload this,
+
+109
+00:06:12,930 --> 00:06:19,000
+the dynamics here now really look
+like a constant population of 92.
+
+110
+00:06:19,010 --> 00:06:24,016
+It doesn't all look like a constant 
+population size of 901,
+
+111
+00:06:24,016 --> 00:06:29,270
+so the informed prediction was,
+not surprisingly, the correct one.
+
+112
+00:06:29,610 --> 00:06:34,210
+It is really the harmonic mean
+that matters, and this indeed
+
+113
+00:06:34,210 --> 00:06:38,111
+much more looks like
+a constant population size of 92.
+
+114
+00:06:38,111 --> 00:06:44,015
+So this population, even though it has
+an average population size of 901,
+
+115
+00:06:44,015 --> 00:06:50,280
+from a genetic perspective it behaves
+like a population of 92 individuals.
+
+116
+00:06:51,230 --> 00:06:54,210
+And if you now take a look
+at what's happening here,
+
+117
+00:06:54,210 --> 00:06:56,520
+you can gain a lot of insights.
+
+118
+00:06:56,520 --> 00:07:01,820
+The first thing that you immediately 
+recognize is that you have these jumps,
+
+119
+00:07:01,820 --> 00:07:04,969
+jumps or quick falls,
+
+120
+00:07:04,969 --> 00:07:08,160
+but these happen now
+every tenth generation,
+
+121
+00:07:08,160 --> 00:07:12,297
+and this is of course exactly
+when the population bottlenecks occur.
+
+122
+00:07:12,297 --> 00:07:16,790
+This is when the population size 
+gets reduced to 10 individuals;
+
+123
+00:07:16,790 --> 00:07:20,950
+when you have only 10 individuals
+genetic drift will be very strong.
+
+124
+00:07:20,950 --> 00:07:25,087
+And so this is reflected here in 
+these huge jumps,
+
+125
+00:07:25,087 --> 00:07:27,080
+and then in between those bottlenecks,
+
+126
+00:07:27,080 --> 00:07:29,060
+you see of course a bit of variation.
+
+127
+00:07:29,060 --> 00:07:31,410
+The population size is not huge.
+
+128
+00:07:31,410 --> 00:07:33,910
+It's a thousand in these times,
+
+129
+00:07:33,910 --> 00:07:37,250
+but you don't have these kinds of jumps.
+
+130
+00:07:37,250 --> 00:07:41,291
+But it's the jumps now
+that are completely determining
+
+131
+00:07:41,291 --> 00:07:44,580
+the dynamics of these simulations.
+
+132
+00:07:45,090 --> 00:07:47,590
+So, to bring this home even more strongly,
+
+133
+00:07:47,590 --> 00:07:51,663
+let's go back to the code,
+and let's set <i>N</i>,
+
+134
+00:07:51,663 --> 00:07:57,970
+so the population size normally,
+outside of the bottlenecks, to 100,000.
+
+135
+00:07:57,970 --> 00:08:02,850
+So we're going to increase this now
+by a factor 100.
+
+136
+00:08:02,850 --> 00:08:06,190
+Correspondingly,
+the average population size
+
+137
+00:08:06,190 --> 00:08:10,050
+would increase by something
+a little less than 100.
+
+138
+00:08:10,050 --> 00:08:12,610
+But we now have an average population size
+
+139
+00:08:12,610 --> 00:08:16,580
+of roughly 90,000 individuals
+
+140
+00:08:16,580 --> 00:08:20,460
+over an entire simulation.
+
+141
+00:08:20,460 --> 00:08:24,842
+But if we reload this,
+and this is going to take a few seconds,
+
+142
+00:08:24,842 --> 00:08:26,450
+it looks like this.
+
+143
+00:08:26,450 --> 00:08:29,001
+I think this is quite beautiful,
+because here, first of all,
+
+144
+00:08:29,001 --> 00:08:33,289
+you see the effective
+population size is only 100.
+
+145
+00:08:34,300 --> 00:08:37,140
+Why is that?
+Well again because what really matters--
+
+146
+00:08:37,140 --> 00:08:40,690
+I mean it barely moved, right?,
+from 92 up to 100--
+
+147
+00:08:40,690 --> 00:08:44,660
+because what really matters
+are these bottlenecks.
+
+148
+00:08:44,660 --> 00:08:48,690
+In the harmonic mean,
+the small numbers matter much more
+
+149
+00:08:48,690 --> 00:08:51,120
+than the large numbers,
+
+150
+00:08:51,120 --> 00:08:53,790
+and so this is exactly
+what's happening here.
+
+151
+00:08:53,790 --> 00:08:56,590
+This population, even though on average
+
+152
+00:08:56,590 --> 00:08:59,590
+you have something like
+90,000 individuals,
+
+153
+00:08:59,590 --> 00:09:03,970
+it behaves like a population of 100.
+
+154
+00:09:03,970 --> 00:09:07,770
+So you would severely overestimate 
+the population size,
+
+155
+00:09:07,770 --> 00:09:11,110
+and therefore underestimate
+the effects of genetic drift,
+
+156
+00:09:11,110 --> 00:09:12,510
+if you didn't know that.
+
+157
+00:09:12,510 --> 00:09:15,630
+And you can see here quite nicely,
+also, how this works.
+
+158
+00:09:15,630 --> 00:09:18,100
+Again, you get these huge jumps,
+
+159
+00:09:18,100 --> 00:09:22,010
+and the dynamics now are completely
+driven by these jumps,
+
+160
+00:09:22,010 --> 00:09:25,960
+because here in between you barely have
+any movement up or down.
+
+161
+00:09:25,960 --> 00:09:28,600
+Certainly you cannot see this here.
+Something happens,
+
+162
+00:09:28,600 --> 00:09:32,051
+but it's barely visible,
+because the effects are so small,
+
+163
+00:09:32,051 --> 00:09:36,150
+because the population is quite large
+here, it's 100,000 individuals,
+
+164
+00:09:36,150 --> 00:09:39,728
+but here in between these bottlenecks,
+it's only 10 individuals.
+
+165
+00:09:39,728 --> 00:09:41,194
+That's why you get these jumps,
+
+166
+00:09:41,194 --> 00:09:45,982
+and these jumps are completely
+determining the outcome of the simulation.
+
+167
+00:09:46,370 --> 00:09:49,600
+So congratulations,
+if you managed to get this far!
+
+168
+00:09:49,610 --> 00:09:51,922
+It's quite amazing what you're doing here:
+
+169
+00:09:51,922 --> 00:09:55,160
+you're implementing
+genetic drift simulation,
+
+170
+00:09:55,160 --> 00:09:58,160
+a stochastic simulation in JavaScript,
+
+171
+00:09:58,160 --> 00:10:00,700
+and you've now
+just implemented bottlenecks
+
+172
+00:10:00,700 --> 00:10:03,666
+showing that the effective population size
+
+173
+00:10:03,666 --> 00:10:08,114
+is indeed given by the harmonic mean
+
+174
+00:10:08,114 --> 00:10:12,310
+of the population sizes over time.
+That's quite an achievement.
+
+175
+00:10:12,310 --> 00:10:15,794
+So congratulations,
+if you managed to go this far!
+
+176
+00:10:16,170 --> 00:10:20,100
+Now one thing I still want to do
+is take a look at how this works,
+
+177
+00:10:20,100 --> 00:10:23,213
+with this line of code
+that we can look at here,
+
+178
+00:10:23,213 --> 00:10:25,993
+where we are actually determining
+
+179
+00:10:25,993 --> 00:10:29,560
+whether it's now time
+for a population bottleneck.
+
+180
+00:10:29,560 --> 00:10:36,240
+So how do we do this?
+Well, here we say, <i>if(i%10 == 9)</i>
+
+181
+00:10:36,240 --> 00:10:40,140
+So what is this?
+Well this is the modulo operator,
+
+182
+00:10:40,140 --> 00:10:46,020
+and the modulo operator
+gives you the remainder of a division,
+
+183
+00:10:46,020 --> 00:10:48,594
+taking the integer division into account.
+
+184
+00:10:48,594 --> 00:10:52,420
+So let's go to the console
+and take a look at how this works.
+
+185
+00:10:52,621 --> 00:10:54,773
+So here in the browser,
+I'm still in Chrome,
+
+186
+00:10:54,773 --> 00:10:58,260
+so I'm going to say
+<i>View &gt; Developer &gt; JavaScript Console</i>,
+
+187
+00:10:58,260 --> 00:10:59,750
+to get the console.
+
+188
+00:10:59,750 --> 00:11:04,002
+And so now we can work here.
+And again, the modulo operator
+
+189
+00:11:04,002 --> 00:11:07,936
+gives you the remainder
+of the integer division,
+
+190
+00:11:07,936 --> 00:11:11,590
+so <i>0%10</i>,
+
+191
+00:11:11,590 --> 00:11:15,319
+the way to think about this is
+0 divided by 10,
+
+192
+00:11:15,319 --> 00:11:18,777
+well that gives exactly zero,
+no remainder,
+
+193
+00:11:18,777 --> 00:11:20,822
+so remainder is zero here.
+
+194
+00:11:20,822 --> 00:11:26,936
+<i>1%10</i> - as an integer division,
+this gives you 0, with a remainder of 1.
+
+195
+00:11:27,966 --> 00:11:34,450
+<i>2%10</i> - as an integer division
+gives you again 0 with a remainder of 2,
+
+196
+00:11:34,450 --> 00:11:39,140
+and so on, and you can
+continue this up to <i>9%10</i>,
+
+197
+00:11:39,140 --> 00:11:42,020
+this gives you 0 with a remainder of 9.
+
+198
+00:11:42,020 --> 00:11:44,830
+And then finally, when you do <i>10%10</i>,
+
+199
+00:11:44,830 --> 00:11:50,080
+this is like 10 divided by 10 is 
+obviously 1, so no remainder here,
+
+200
+00:11:50,080 --> 00:11:55,092
+and then <i>11%10</i> gives you 1.
+
+201
+00:11:55,813 --> 00:11:59,660
+11 divided by 10 integer division
+gives you 1 remainder 1.
+
+202
+00:11:59,660 --> 00:12:01,550
+So this now starts again,
+
+203
+00:12:01,550 --> 00:12:05,476
+counting up from zero
+all the way up to 9.
+
+204
+00:12:05,476 --> 00:12:09,720
+And here when you at <i>19%10</i>,
+
+205
+00:12:09,720 --> 00:12:13,164
+then the remainder is again 9,
+because the result
+
+206
+00:12:13,164 --> 00:12:17,060
+of the integer division is 1,
+and the remainder is 9 and so on.
+
+207
+00:12:17,060 --> 00:12:23,400
+So <i>29%10</i> is also remainder 9.
+
+208
+00:12:23,400 --> 00:12:27,690
+And this goes on and on and on,
+and that's now every 10th generation,
+
+209
+00:12:27,690 --> 00:12:30,111
+because we start at zero,
+
+210
+00:12:30,111 --> 00:12:34,119
+and then the 10th generation is
+when this remainder is 9.
+
+211
+00:12:34,650 --> 00:12:39,069
+And so whenever the remainder is 9
+then we're at the 10th generation.
+
+212
+00:12:39,470 --> 00:12:44,953
+We could also have tested
+for whether this is actually 5,
+
+213
+00:12:46,010 --> 00:12:49,674
+because if--
+Let me reload this here.
+
+214
+00:12:50,431 --> 00:12:53,478
+If I put <i>5%</i>...
+
+215
+00:12:54,930 --> 00:12:59,740
+sorry, <i>i</i>,
+so <i>i</i> being, for example, 5,
+
+216
+00:13:00,220 --> 00:13:04,000
+then <i>%10</i>, that is remainder 5.
+
+217
+00:13:04,000 --> 00:13:09,225
+And then again
+in 10 generations, so <i>15%10</i>,
+
+218
+00:13:10,120 --> 00:13:11,990
+this is also 5 and so on.
+
+219
+00:13:12,190 --> 00:13:15,228
+<i>25%10</i>... 5.
+
+220
+00:13:15,228 --> 00:13:20,794
+So this is also always giving
+the same number every 10th generation,
+
+221
+00:13:20,794 --> 00:13:23,303
+and you can do this
+with any single-digit number.
+
+222
+00:13:23,303 --> 00:13:28,259
+You can check for equality
+with 3 or 8 or 7, it doesn't matter,
+
+223
+00:13:28,259 --> 00:13:32,969
+it would still be correct.
+But what's crucial is that
+
+224
+00:13:32,969 --> 00:13:37,429
+you do the modulo division with 10.
+
+225
+00:13:38,363 --> 00:13:43,580
+I chose 9 because that's
+the very exact way to do this,
+
+226
+00:13:43,580 --> 00:13:47,410
+because then you indeed
+have 9 generations,
+
+227
+00:13:47,410 --> 00:13:51,117
+and then at the 10th generation,
+this bottleneck happens.
+
+228
+00:13:51,117 --> 00:13:56,980
+if you had said <i>if (i%10 == 5)</i>,
+in the long run,
+
+229
+00:13:56,980 --> 00:14:00,355
+you would also have been correct, 
+that it happens every 10th generation,
+
+230
+00:14:00,355 --> 00:14:02,923
+but the first time it would have 
+happened would have been
+
+231
+00:14:02,923 --> 00:14:06,310
+at the 6th-generation when <i>i == 5</i>.
+
+232
+00:14:06,310 --> 00:14:09,927
+And so the first time it would not
+have been precisely correct,
+
+233
+00:14:09,927 --> 00:14:13,011
+but that would have been a detail.
+It's important just that you understand
+
+234
+00:14:13,011 --> 00:14:15,411
+how this modulo operator works.
+
+235
+00:14:15,660 --> 00:14:19,517
+So this concludes this lecture,
+but it also concludes this chapter.
+
+236
+00:14:19,517 --> 00:14:23,197
+So if you made it this far,
+congratulations, very well done!
+
+237
+00:14:23,197 --> 00:14:25,380
+We've learned a lot in this chapter.
+
+238
+00:14:25,380 --> 00:14:27,423
+It was quite rich in terms of content.
+
+239
+00:14:27,423 --> 00:14:29,728
+You learned a lot
+about JavaScript programming,
+
+240
+00:14:29,728 --> 00:14:31,570
+new ideas, new concepts,
+
+241
+00:14:31,570 --> 00:14:33,550
+but you also learned about genetic drift,
+
+242
+00:14:33,550 --> 00:14:36,364
+which really is a key idea in genetics,
+
+243
+00:14:36,364 --> 00:14:39,400
+and evolutionary biology, more broadly.
+
+244
+00:14:39,400 --> 00:14:43,077
+So in the next chapter,
+we're going to now move on
+
+245
+00:14:43,077 --> 00:14:47,630
+to another of the four
+major forces of evolution.
+
+246
+00:14:47,630 --> 00:14:50,160
+We had genetic drift so far,
+
+247
+00:14:50,160 --> 00:14:55,362
+which is the effect of randomness 
+due to finite population sizes,
+
+248
+00:14:55,362 --> 00:14:59,672
+and we saw that one of the consequences 
+would be a pretty sad one,
+
+249
+00:14:59,672 --> 00:15:03,870
+namely that all genetic diversity 
+would eventually get lost.
+
+250
+00:15:03,870 --> 00:15:06,290
+Clearly that's not the case 
+in the real world.
+
+251
+00:15:06,290 --> 00:15:10,086
+So clearly there must be some other 
+process that counters that.
+
+252
+00:15:10,086 --> 00:15:11,900
+That process is mutation,
+
+253
+00:15:11,900 --> 00:15:15,470
+and that's a process
+we'll look at in the next chapter.
+
+254
+00:15:15,470 --> 00:15:17,767
+So, I'll see you in Chapter 4.

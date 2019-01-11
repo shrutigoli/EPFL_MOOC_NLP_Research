@@ -1,0 +1,84 @@
+In this video, we discuss timestamp concurrency control, which is yet another technique for achieving serializability in transactions.
+The basic idea is that we assign each object in the database, conceptually, a read timestamp which indicates when it was last read, and a write timestamp which indicates when it was last written.
+Furthermore, each transaction has a timestamp which indicates when it was started.
+We can then use these transaction and object timestamps, compare those, to detect any problem that has been arising.
+So in particular, if two actions of two transactions are conflicts, and one transaction-- the first transaction has a smaller timestamp the second, then we could say that we restart the second transaction to avoid the conflict.
+And we can use the read and write timestamps to detect these conflicts sufficiently.
+That means, for the purpose of detecting conflicts, we can do this in constant time by just comparing read and write timestamps, and we don't have to look at the history of the transactions so far, to detect that a conflict arose.
+The protocol, or the algorithm, is actually somewhat complicated.
+So we will go with this first, basically just saying what happens, and later we will execute an example, seeing and understanding better why everything is the way it is.
+So let's first look at the case that a transaction wants to read an object O.
+The case is as follows.
+If timestamp of the transaction is less than the write timestamp of that object, that means conceptually, the object has been written by a transaction that is coming later-- is to be serialized later than our transaction T, then we cannot read the appropriate value.
+We can only read a new value that is too new, so to say.
+So this violates the timestamp order of T, and we have to basically restart this transaction anew.
+That means we are always going to try to basically, serialize the transactions in the order of the timestamp order-- in the order in which they began.
+And when we have only an object at our disposal that has been written by a new transaction, and want to read it, we can't.
+However, if the timestamp of our transaction is greater or equal to the write timestamp of that object, we can read it.
+In that case, we update the read timestamp of that object to the maximum, so to say, of the timestamp of this transaction, and the old read timestamp.
+These timestamps have to also be recorded on disks appropriately, to deal with crashes and be able to recover.
+Of course this, and the fact that we have to restart transactions from time to time, kind of puts the cost of transaction management in this protocol.
+Now when transaction T wants to write an object O, then we do the following comparison.
+If the timestamp of that transaction is less than the read timestamp of the object, that means that the transaction is older than the transaction that has read this object already.
+Then this violates timestamp order.
+So to say, we cannot write this object in this older transaction, because a newer transaction has already read that value.
+So if you changed it, this new transaction should have read another value, and it didn't.
+So we are not allowed to do this.
+So in this case, we have to abort T.
+Otherwise, if the transaction timestamp is less than the write timestamp of O, that means we have-- we are trying to write now, before another transaction-- a later transaction overwrites it.
+But we have already decided what to do in this later transaction.
+We have already written this new value.
+Then this conceptually, violates the timestamp order, but it doesn't matter, because the value of T1 to insert now, is going to be overwritten later anyway.
+It has been overwritten already, so what we can just do is, ignore this write.
+We just drop the write, and everything is going to be correct, because that later transaction has written a value that would overwrite our value if we have done it in proper order.
+So if you don't write it now, we are doing the right thing.
+That's actually called a Thomas Write Rule.
+When otherwise, we are allowed to write this object and of course, have to update the write timestamp properly, to this new transaction.
+Now let's look at an example.
+In this example, we've got two transactions,
+T1 and T2.
+And T1 consists of the operations: read A, write A.
+Read A in transaction T2, writes A after the first operation of T1.
+We think of the database to be in intial state, timestamp zero, and the read and write timestamps of object A have been set up accordingly.
+They have initially, state zero.
+Now let's execute this protocol.
+The first operation is R(A) in transaction T1.
+The read timestamp of A is zero.
+Since one is greater than zero, we are in the second case of read.
+The read protocol is here.
+And that means we are allowed to read O, and we have to set the read timestamp to one.
+Now we get to the second operation.
+The write of A in transaction T2.
+So TS(T) is 2.
+The read timestamp is one.
+We are not having to abort.
+And the write timestamp is still zero, so with this case, we also go over.
+So we're allowed to write O in transaction T, and we also have to write the write timestamp so it becomes two.
+That means the read timestamp is still one.
+Next, we are going to try to write A in transaction T1.
+In this case, the read timestamp will still be one, so we are not going to the first case.
+However, we have to go into the second case.
+The transaction's timestamp is one, and the write timestamp is two.
+So this violates the timestamp order, but we can apply the Thomas Write Rule and just basically drop this operation.
+We don't execute it, because there is a newer transaction T2, that written the value that conceptually, will be written later.
+It would overwrite this value.
+So we don't write this value in T1 in the first case.
+So in this case we don't do anything, we also don't update the timestamps.
+Finally, we read A in transaction T1-- or try to do this.
+So the timestamp of this transaction is one, and the write timestamp of the object is two.
+So we are in the first case, and this violates the timestamp order of T.
+So we have to abort the transaction and restart it anew, with a larger timestamp.
+That means we abort transaction T1, and we restart is as transaction T3.
+That means we are going to basically start T3 as
+R(A), W(A), and R(B).
+Let's assume that the transaction variable of T2 was really just his write.
+So we could for example, now commit.
+And conceptually, everything that happens in transaction T3, is serially after everything that happened before, and ultimately T3 will also succeed, unless something happened with later coming transactions that for example, transaction T4.
+So that's the basic idea of this protocol.
+So that's it for timestamp concurrency control.
+It's a clever protocol.
+It uses various kinds of timestamps to do its job, compared to lock-based concurrency control.
+We have no deadlocks.
+On the other hand, there's a drawback.
+We might sometimes abort transactions, which doesn't happen in lock-based protocols, unless there is deadlocks.
+Compared to optimistic concurrency control, we have a clever way of making, so to say, dealing with versions more cheaply, rather than having to deal with copies of the data, that we try our protocol optimistically on, we can work with a single version of that data, and just mantain consistency, so to say, via these timestamps.

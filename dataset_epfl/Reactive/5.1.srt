@@ -1,0 +1,1020 @@
+1
+00:00:00,570 --> 00:00:04,430
+Welcome to the Actor part of the Reactive
+Programming course.
+
+2
+00:00:04,430 --> 00:00:06,940
+This week we will learn about the Actor
+model.
+
+3
+00:00:06,940 --> 00:00:10,090
+That means what Actors are, how they
+interact, what they can
+
+4
+00:00:10,090 --> 00:00:14,500
+do, and in general, how you can structure
+your computations using Actors.
+
+5
+00:00:15,860 --> 00:00:19,520
+Last week, we saw what reactive streams
+can do for us.
+
+6
+00:00:19,520 --> 00:00:22,910
+How data flow in them from producers to
+consumers.
+
+7
+00:00:22,910 --> 00:00:25,720
+How they are transformed, filtered, how
+streams
+
+8
+00:00:25,720 --> 00:00:26,460
+can be merged.
+
+9
+00:00:27,830 --> 00:00:30,150
+But it all goes more or less in one
+direction.
+
+10
+00:00:30,150 --> 00:00:32,310
+Actors give you more freedom than that.
+
+11
+00:00:32,310 --> 00:00:37,290
+Because they can collaborate and
+communicate just like we humans do.
+
+12
+00:00:38,400 --> 00:00:43,010
+In particular we will talk about how
+actors can create other actors.
+
+13
+00:00:43,010 --> 00:00:47,570
+How they change their behavior over on
+time, how they exchange messages.
+
+14
+00:00:47,570 --> 00:00:50,920
+And in the end, we will conclude with a
+lesson about how to test
+
+15
+00:00:50,920 --> 00:00:51,840
+Actor systems.
+
+16
+00:00:51,840 --> 00:00:55,270
+So that you are well equipped to solve the
+exercises.
+
+17
+00:00:57,440 --> 00:01:00,780
+Before we dive into what Actors are, let
+us first take a
+
+18
+00:01:00,780 --> 00:01:03,770
+look at why we want to investigate them,
+and where they came from.
+
+19
+00:01:06,830 --> 00:01:12,350
+The Actor formalism was first published by
+Hewitt, Bishop, and Steiger in 1973.
+
+20
+00:01:12,350 --> 00:01:15,970
+And what they wanted to achieve is to
+create a model
+
+21
+00:01:15,970 --> 00:01:17,800
+in which they can formulate the
+
+22
+00:01:17,800 --> 00:01:20,650
+programs for their artificial intelligence
+research.
+
+23
+00:01:22,350 --> 00:01:27,530
+One of Hewitt's students published his
+Ph.D thesis in 1986.
+
+24
+00:01:27,530 --> 00:01:31,950
+Gul Agha formulated Actor languages, so
+how to write down Actor
+
+25
+00:01:31,950 --> 00:01:34,300
+programs, how to reason about them.
+
+26
+00:01:34,300 --> 00:01:37,790
+He described communication patterns
+between Actors, and
+
+27
+00:01:37,790 --> 00:01:39,870
+how to use them to solve real problems.
+
+28
+00:01:41,440 --> 00:01:43,360
+In the same year, Ericsson started
+
+29
+00:01:43,360 --> 00:01:47,190
+developing a programming language named
+Erlang.
+
+30
+00:01:47,190 --> 00:01:50,285
+This is a purely functional programming
+language,
+
+31
+00:01:50,285 --> 00:01:53,810
+whose concurrency model is based on
+Actors.
+
+32
+00:01:53,810 --> 00:01:57,070
+And which was then subsequently used in
+commercial products.
+
+33
+00:01:58,810 --> 00:02:03,410
+In 1995, Ericsson presented their new
+telecommunications platform.
+
+34
+00:02:03,410 --> 00:02:05,780
+Which was highly successful.
+
+35
+00:02:05,780 --> 00:02:09,780
+It quoted a reliability of 9 9ths, which
+means that
+
+36
+00:02:09,780 --> 00:02:12,910
+there was only about 30 miliseconds of
+downtime per year.
+
+37
+00:02:14,200 --> 00:02:18,440
+This robustness and resilience was made
+possible by the Actor model.
+
+38
+00:02:20,720 --> 00:02:24,530
+Inspired by the success of Ericsson's
+Erlang, Philipp Haller
+
+39
+00:02:24,530 --> 00:02:28,321
+added Actors to the Scala standard library
+in 2006.
+
+40
+00:02:30,000 --> 00:02:32,770
+Jonas Bonér was then influenced by Erlang,
+as well
+
+41
+00:02:32,770 --> 00:02:37,590
+as the Scala Actors to create Akka in
+2009.
+
+42
+00:02:37,590 --> 00:02:41,840
+Akka is a active framework on the JVM with
+Java and Scala
+
+43
+00:02:41,840 --> 00:02:46,400
+APIs making the Actor model available to a
+wide range of developers.
+
+44
+00:02:48,000 --> 00:02:51,560
+Actors are applicable in a wide range of
+problems.
+
+45
+00:02:51,560 --> 00:02:54,530
+And we will see that in the following
+sessions.
+
+46
+00:02:54,530 --> 00:02:56,920
+But we, before we go there, let me first
+show
+
+47
+00:02:56,920 --> 00:03:00,360
+you a few problems which motivate our use
+of Actors.
+
+48
+00:03:03,320 --> 00:03:09,430
+In the past, programs just got faster by
+using the next generation of CPUs.
+
+49
+00:03:09,430 --> 00:03:13,900
+This was due to an ever increasing core
+frequency.
+
+50
+00:03:13,900 --> 00:03:18,010
+But this came to a halt around the year
+2005.
+
+51
+00:03:18,010 --> 00:03:23,500
+Since then, CPUs are not getting faster,
+they're getting wider.
+
+52
+00:03:23,500 --> 00:03:28,350
+This means that instead of making one
+execution core more
+
+53
+00:03:28,350 --> 00:03:31,280
+powerful, multiple such cores are
+incorporated
+
+54
+00:03:31,280 --> 00:03:33,810
+within one chip, accessing shared memory.
+
+55
+00:03:34,820 --> 00:03:38,320
+And in some of these, the cores are even
+virtualized such
+
+56
+00:03:38,320 --> 00:03:44,280
+that one physical execution core can host
+multiple logical execution threads.
+
+57
+00:03:45,790 --> 00:03:49,070
+There are different ways to benefit from
+these wider CPUs.
+
+58
+00:03:50,110 --> 00:03:53,730
+The first one is that you can run multiple
+programs
+
+59
+00:03:53,730 --> 00:03:56,050
+in parallel on the same computer.
+
+60
+00:03:56,050 --> 00:04:00,540
+This is called multi-tasking, and has been
+done since the first versions of Unix.
+
+61
+00:04:00,540 --> 00:04:01,040
+But
+
+62
+00:04:02,720 --> 00:04:06,850
+if you have a single program which you
+need to execute faster, and
+
+63
+00:04:06,850 --> 00:04:11,270
+you have no choice but to run parts of the
+same program in parallel.
+
+64
+00:04:11,270 --> 00:04:12,679
+And this is called multi-threading.
+
+65
+00:04:14,150 --> 00:04:17,237
+In order to achieve multithreading, your
+program must be
+
+66
+00:04:17,237 --> 00:04:20,820
+written in a different way than the
+traditional sequential form.
+
+67
+00:04:22,400 --> 00:04:27,730
+The difference between running separate
+programs in parallel, and using threads
+
+68
+00:04:27,730 --> 00:04:30,040
+of the same program in parallel, is
+
+69
+00:04:30,040 --> 00:04:33,340
+that these threads collaborate on a common
+task.
+
+70
+00:04:34,350 --> 00:04:36,510
+And if you think about a group of people
+
+71
+00:04:36,510 --> 00:04:40,570
+doing something together, they will need
+to synchronize their actions.
+
+72
+00:04:40,570 --> 00:04:43,160
+Otherwise they step on each others toes.
+
+73
+00:04:43,160 --> 00:04:46,440
+The same can happen in a multi-threaded
+program.
+
+74
+00:04:46,440 --> 00:04:51,830
+There are a new class of bugs and problems
+which await you there.
+
+75
+00:04:51,830 --> 00:04:53,310
+And this
+
+76
+00:04:53,310 --> 00:04:55,240
+is the reason why programs need to be
+
+77
+00:04:55,240 --> 00:05:00,446
+formulated differently in order to be
+ready for multi-threading.
+
+78
+00:05:00,446 --> 00:05:05,040
+In order to understand what that means,
+let us take a look at
+
+79
+00:05:05,040 --> 00:05:08,724
+the good old bank account which was
+introduced by Martin a few weeks back.
+
+80
+00:05:10,260 --> 00:05:11,050
+This is the class.
+
+81
+00:05:11,050 --> 00:05:11,929
+I just copied it.
+
+82
+00:05:13,260 --> 00:05:18,120
+It contains a field for the balance, and
+it has two methods to deposit some amount,
+
+83
+00:05:18,120 --> 00:05:20,010
+and to withdraw some amount.
+
+84
+00:05:23,330 --> 00:05:28,130
+Now let us look at the withdraw method in
+detail.
+
+85
+00:05:28,130 --> 00:05:31,860
+I have marked out here, specifically the
+places where
+
+86
+00:05:31,860 --> 00:05:35,740
+the balance is read, and where it is
+written to.
+
+87
+00:05:39,880 --> 00:05:41,300
+So let us take a look at what happens,
+
+88
+00:05:41,300 --> 00:05:43,710
+if two threads run this code at the same
+time.
+
+89
+00:05:49,460 --> 00:05:51,020
+I am making little table here.
+
+90
+00:05:52,610 --> 00:05:56,700
+Let's say this is thread 1, and this is
+thread 2.
+
+91
+00:05:56,700 --> 00:06:00,340
+They are executed by different CPUs, so
+can run really and parallel.
+
+92
+00:06:05,360 --> 00:06:07,740
+They enter the method with an amount.
+
+93
+00:06:07,740 --> 00:06:14,110
+Let us say that thread 1 wants to withdraw
+50 Swiss francs for example.
+
+94
+00:06:14,110 --> 00:06:17,720
+And thread 2 wants to withdraw 40.
+
+95
+00:06:17,720 --> 00:06:21,990
+The first thing they will both do is read
+the current balance.
+
+96
+00:06:25,750 --> 00:06:32,970
+In both cases, let us say the balance is
+right now 80, so they will both see 80.
+
+97
+00:06:32,970 --> 00:06:37,570
+Then both will enter the if statement, the
+check.
+
+98
+00:06:37,570 --> 00:06:40,540
+Is the amount positive?
+Yes it is.
+
+99
+00:06:40,540 --> 00:06:43,360
+And are there actually sufficient funds in
+the account?
+
+100
+00:06:43,360 --> 00:06:44,360
+Yes there are.
+
+101
+00:06:44,360 --> 00:06:49,149
+So both will continue.
+They will calculate the new balance.
+
+102
+00:06:56,950 --> 00:07:02,465
+The new balance in the first thread will
+be 30, and in the second will be
+
+103
+00:07:02,465 --> 00:07:09,350
+40.
+The next thing the threads will do is they
+
+104
+00:07:09,350 --> 00:07:13,600
+will write back the new balance, into the
+balance field of the bank account, object.
+
+105
+00:07:18,500 --> 00:07:24,593
+The first thread will write 30, and the
+second will write 40.
+
+106
+00:07:26,940 --> 00:07:33,930
+This is clearly in conflict, because only
+one of the writes can win in the end.
+
+107
+00:07:33,930 --> 00:07:37,900
+The one which comes last, will overwrite
+the one which came earlier.
+
+108
+00:07:39,710 --> 00:07:42,020
+This is the first problem which we see
+here.
+
+109
+00:07:42,020 --> 00:07:45,579
+It is that one of the updates to the
+balance is actually lost.
+
+110
+00:07:47,200 --> 00:07:52,145
+The other problem is that the invariant of
+the bank account is violated.
+
+111
+00:07:52,145 --> 00:07:56,411
+In that we have withdrawn 50 and 40 Swiss
+francs which is 90
+
+112
+00:07:56,411 --> 00:08:01,960
+in sum, and the balance was only 80, which
+should not have been possible.
+
+113
+00:08:01,960 --> 00:08:04,460
+One of the threads should have failed.
+
+114
+00:08:04,460 --> 00:08:07,963
+And that, that did not happen is the other
+problem with this code.
+
+115
+00:08:09,840 --> 00:08:16,450
+Now what can we do to fix this problem?
+We need to add synchronization.
+
+116
+00:08:16,450 --> 00:08:17,350
+When multiple threads
+
+117
+00:08:17,350 --> 00:08:20,980
+are working with the same data, they need
+to synchronize their actions.
+
+118
+00:08:22,210 --> 00:08:26,480
+Because otherwise they would be prone to
+step on each other's toes.
+
+119
+00:08:26,480 --> 00:08:29,550
+What we need to do is to make sure that
+when
+
+120
+00:08:29,550 --> 00:08:32,940
+one thread is working with the data, the
+others keep out.
+
+121
+00:08:32,940 --> 00:08:36,420
+Like you put a don't disturb sign on your
+hotel door.
+
+122
+00:08:38,340 --> 00:08:43,640
+So let's say in this example we're looking
+at the balance,
+
+123
+00:08:43,640 --> 00:08:46,802
+as the data to be protected.
+And what we need to do
+
+124
+00:08:46,802 --> 00:08:48,416
+[SOUND]
+
+125
+00:08:48,416 --> 00:08:55,121
+is to put a fence around it, so that when
+one thread is working with the data, say
+
+126
+00:08:55,121 --> 00:09:03,115
+thread 1.
+That this one has exclusive access to it.
+
+127
+00:09:03,115 --> 00:09:09,950
+Which means threat 2 here, if it tries to
+access the data, it will
+
+128
+00:09:09,950 --> 00:09:13,690
+actually be denied access at this time.
+And it has to wait
+
+129
+00:09:13,690 --> 00:09:19,210
+until threat 1 is finished with it.
+This way, the balance will be protected.
+
+130
+00:09:19,210 --> 00:09:21,770
+And all modifications done on it are done
+
+131
+00:09:21,770 --> 00:09:25,220
+in a consistent fashion, one after the
+other.
+
+132
+00:09:25,220 --> 00:09:26,330
+We also say serialized.
+
+133
+00:09:29,100 --> 00:09:33,390
+The primary tools for achieving this kind
+of synchronization are lock or mutex.
+
+134
+00:09:33,390 --> 00:09:37,850
+Which is basically the same concept as
+shown just previously.
+
+135
+00:09:37,850 --> 00:09:42,270
+Or a semaphore where the difference is
+that multiple but
+
+136
+00:09:42,270 --> 00:09:45,660
+only a defined number of threads can enter
+this region.
+
+137
+00:09:46,810 --> 00:09:49,760
+In Scala, every object has an associated
+lock.
+
+138
+00:09:49,760 --> 00:09:54,130
+Which you can access by calling the
+synchronized method on it.
+
+139
+00:09:54,130 --> 00:10:00,160
+And it accepts a code lock which will be
+executed in this protected region.
+
+140
+00:10:02,850 --> 00:10:06,110
+How do we apply this to the bank account
+to make it synchronized?
+
+141
+00:10:07,280 --> 00:10:11,130
+Well, we have the withdraw method here.
+
+142
+00:10:11,130 --> 00:10:13,840
+And if we put all of it inside
+
+143
+00:10:13,840 --> 00:10:18,520
+of a synchronized block, then reading the
+balance here.
+
+144
+00:10:18,520 --> 00:10:25,110
+Performing the check and writing it back,
+will all be done as one atomic action.
+
+145
+00:10:25,110 --> 00:10:28,410
+Which cannot be disturbed by another
+thread executing withdraw,
+
+146
+00:10:28,410 --> 00:10:31,020
+at the same time.
+That other thread will have to wait.
+
+147
+00:10:33,030 --> 00:10:37,760
+But why do we have synchronized also here
+on the deposit method?
+
+148
+00:10:37,760 --> 00:10:40,950
+The deposit method also modifies the
+balance.
+
+149
+00:10:40,950 --> 00:10:45,710
+And if it was not synchronized, then it
+could modify it without protection.
+
+150
+00:10:45,710 --> 00:10:50,580
+And once the withdrawal writes the balance
+back here, it would
+
+151
+00:10:50,580 --> 00:10:54,970
+override the override the update performed
+by deposit at the same time.
+
+152
+00:10:56,420 --> 00:10:58,250
+This is to illustrate that
+
+153
+00:10:58,250 --> 00:11:01,460
+all accesses to balance need to be
+synchronized, and not
+
+154
+00:11:01,460 --> 00:11:04,330
+just the one which we have proven to be
+problematic.
+
+155
+00:11:05,640 --> 00:11:09,600
+Now, let us try to transfer some money
+from one bank account to another.
+
+156
+00:11:10,670 --> 00:11:12,560
+What we need to do is to synchronize
+
+157
+00:11:12,560 --> 00:11:17,240
+both objects, such that they're in a
+consistent state.
+
+158
+00:11:17,240 --> 00:11:20,180
+Because otherwise, someone reading the
+balance of
+
+159
+00:11:20,180 --> 00:11:24,960
+the accounts could find the money in
+flight.
+
+160
+00:11:24,960 --> 00:11:28,870
+We withdraw from one account.
+We deposit later into another one.
+
+161
+00:11:30,030 --> 00:11:33,700
+During this time, the money is basically
+nowhere.
+
+162
+00:11:33,700 --> 00:11:37,670
+And if the invariant which needs to be
+enforced, is that the sum
+
+163
+00:11:37,670 --> 00:11:41,970
+of from and to needs to be the same, this
+will be violated.
+
+164
+00:11:41,970 --> 00:11:43,710
+Hence, we need to synchronize.
+
+165
+00:11:45,470 --> 00:11:48,890
+So first we take the lock on the from
+account.
+
+166
+00:11:48,890 --> 00:11:50,060
+Then we take the lock on
+
+167
+00:11:50,060 --> 00:11:51,920
+the to account.
+
+168
+00:11:51,920 --> 00:11:57,530
+Now we are safe that no other thread can
+modify these two accounts, but we can.
+
+169
+00:11:57,530 --> 00:12:03,040
+One property of locks in Scala is that
+they are reentrant, meaning
+
+170
+00:12:03,040 --> 00:12:06,250
+that the same thread can take it twice or
+any number of times.
+
+171
+00:12:08,030 --> 00:12:10,120
+it's just a protection against other
+threads.
+
+172
+00:12:13,360 --> 00:12:15,380
+There is a problem with this code, in
+
+173
+00:12:15,380 --> 00:12:17,720
+that it introduces the possibility of a
+deadlock.
+
+174
+00:12:18,900 --> 00:12:21,760
+Let us say that one thread wants to
+transfer
+
+175
+00:12:21,760 --> 00:12:25,130
+from account A to account B in one thread.
+
+176
+00:12:26,380 --> 00:12:29,800
+And another thread tries to transfer in
+the opposite direction.
+
+177
+00:12:29,800 --> 00:12:34,030
+If both start at the same time, they take
+the first
+
+178
+00:12:34,030 --> 00:12:37,430
+lock, this one on account A, this one on
+account B.
+
+179
+00:12:38,480 --> 00:12:40,790
+Then they go on to take the other lock.
+
+180
+00:12:40,790 --> 00:12:43,460
+This one will not succeed in taking the
+lock, because
+
+181
+00:12:43,460 --> 00:12:47,380
+it was already taken by the other thread
+for account B.
+
+182
+00:12:47,380 --> 00:12:49,820
+The same is true for account A in the
+other thread.
+
+183
+00:12:51,120 --> 00:12:53,060
+This means that none of the threads can
+
+184
+00:12:53,060 --> 00:12:56,120
+make progress, they will both be stuck
+forever.
+
+185
+00:12:56,120 --> 00:12:58,910
+Because there is no chance that either of
+
+186
+00:12:58,910 --> 00:13:01,270
+them will yield the lock they already
+have.
+
+187
+00:13:02,310 --> 00:13:03,950
+This is called a deadlock.
+
+188
+00:13:05,340 --> 00:13:07,130
+There are solutions for this deadlock.
+
+189
+00:13:07,130 --> 00:13:11,060
+For example, to always take the locks in
+the same order.
+
+190
+00:13:11,060 --> 00:13:13,850
+You need to define an ordering for
+accounts and so on.
+
+191
+00:13:14,910 --> 00:13:16,630
+and then you could potentially solve this.
+
+192
+00:13:17,660 --> 00:13:22,990
+You will find that there are most of the
+time solutions of that kind,
+
+193
+00:13:22,990 --> 00:13:28,122
+but they will aggregate and make your code
+much more complicated over time.
+
+194
+00:13:28,122 --> 00:13:30,410
+And in this
+
+195
+00:13:30,410 --> 00:13:32,520
+case, it is simple, because both are bank
+accounts.
+
+196
+00:13:32,520 --> 00:13:36,510
+But what if you want objects to
+collaborate which do not come
+
+197
+00:13:36,510 --> 00:13:39,800
+from the same code base, for example, in
+which you cannot modify?
+
+198
+00:13:41,970 --> 00:13:44,680
+In that sense, it would be much better
+
+199
+00:13:44,680 --> 00:13:48,980
+if our objects would not require blocking
+synchronization.
+
+200
+00:13:48,980 --> 00:13:52,990
+Because blocking is what really makes the
+deadlock happen.
+
+201
+00:13:52,990 --> 00:13:55,430
+Because one thread gets blocked on the
+lock.
+
+202
+00:13:57,640 --> 00:14:02,070
+The other problem with blocking, is that
+it is bad for CPU utilization.
+
+203
+00:14:02,070 --> 00:14:06,130
+If there are other threads to run, then
+the operating system will run them.
+
+204
+00:14:06,130 --> 00:14:08,335
+But otherwise, the CPU will be idle.
+
+205
+00:14:08,335 --> 00:14:11,900
+And, waking it up, or getting a thread
+back to run
+
+206
+00:14:11,900 --> 00:14:15,980
+when some other thread has interrupted it,
+takes a lot of time.
+
+207
+00:14:15,980 --> 00:14:18,920
+So your program will run slower if you use
+blocking.
+
+208
+00:14:20,690 --> 00:14:23,060
+Another problem with blocking objects
+
+209
+00:14:23,060 --> 00:14:28,410
+is that synchronous communication couples
+sender and receiver, quite strongly.
+
+210
+00:14:28,410 --> 00:14:32,270
+Because the sender needs to wait until the
+receiver is ready.
+
+211
+00:14:32,270 --> 00:14:35,550
+So if I call a bank account which is
+synchronized,
+
+212
+00:14:35,550 --> 00:14:38,415
+that bank account will block me until it
+is ready.
+
+213
+00:14:38,415 --> 00:14:43,030
+Non-blocking objects are exactly what
+Actors are.
+
+214
+00:14:43,030 --> 00:14:44,640
+And we will see that in the next lecture.
+

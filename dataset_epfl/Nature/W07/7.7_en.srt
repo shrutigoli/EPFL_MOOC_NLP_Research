@@ -1,0 +1,1979 @@
+1
+00:00:03,180 --> 00:00:06,840
+Welcome back, Nature in Code.
+We are in Chapter 7, lecture 7.
+
+2
+00:00:06,840 --> 00:00:09,470
+This is the final
+lecture of this chapter
+
+3
+00:00:09,470 --> 00:00:11,900
+and in it, we are going
+to reason quantitatively
+
+4
+00:00:11,900 --> 00:00:14,030
+about the outbreak size of epidemics.
+
+5
+00:00:14,030 --> 00:00:16,990
+my notion, observing our 
+simulations in the browser,
+
+6
+00:00:16,990 --> 00:00:22,300
+was that the outbreaks are in average 
+larger in the small world contact network
+
+7
+00:00:22,300 --> 00:00:25,370
+as opposed to the completely
+local contact network.
+
+8
+00:00:25,370 --> 00:00:26,770
+So let's find out.
+
+9
+00:00:26,770 --> 00:00:28,580
+All right. So here's our code.
+
+10
+00:00:29,800 --> 00:00:35,500
+We have down here this
+"set interval" method that we set up
+
+11
+00:00:35,540 --> 00:00:38,420
+so that we can actually
+visualize things in a meaningful way.
+
+12
+00:00:38,420 --> 00:00:42,790
+So we were basically artificially 
+slowing down the call of these
+
+13
+00:00:43,160 --> 00:00:44,870
+of this function here.
+
+14
+00:00:44,920 --> 00:00:48,470
+Now, we don't need this anymore,
+actually now on a bunch of simulations
+
+15
+00:00:48,470 --> 00:00:51,540
+and then calculate the outbreak size.
+
+16
+00:00:51,540 --> 00:00:54,000
+So how many people
+got infected in total
+
+17
+00:00:54,000 --> 00:00:56,270
+and then calculate the average.
+
+18
+00:00:56,280 --> 00:01:00,100
+So I'm going to get rid of 
+this "set interval" here.
+
+19
+00:01:00,100 --> 00:01:01,930
+We don't need that anymore.
+
+20
+00:01:01,930 --> 00:01:04,340
+We also don't need that anymore,
+as a consequence,
+
+21
+00:01:04,340 --> 00:01:05,830
+so we're gonna get rid of that,
+
+22
+00:01:07,210 --> 00:01:10,620
+and also in fact we don't need 
+to draw anything anymore,
+
+23
+00:01:10,620 --> 00:01:16,050
+so we can go to wherever we call 
+this <i>draw_grid</i> function here,
+
+24
+00:01:16,050 --> 00:01:17,790
+we don't need this anymore.
+
+25
+00:01:17,860 --> 00:01:20,450
+If you want to,
+you can get rid of all the--
+
+26
+00:01:20,450 --> 00:01:24,060
+of all the D3 code,
+because we're not visualizing,
+
+27
+00:01:24,060 --> 00:01:27,680
+but I'm just gonna
+leave it in here for now,
+
+28
+00:01:27,680 --> 00:01:28,870
+we don't need it,
+
+29
+00:01:28,870 --> 00:01:30,720
+but I'm gonna leave it in here.
+
+30
+00:01:30,760 --> 00:01:33,820
+Okay, but now I kind of lost
+the pacemaker here,
+
+31
+00:01:33,920 --> 00:01:37,320
+of this simulation.
+
+32
+00:01:37,470 --> 00:01:40,840
+So,I will now need
+to implement this again by hand.
+
+33
+00:01:40,840 --> 00:01:44,400
+And so I'm gonna go ahead and do this 
+and I am going to define a function
+
+34
+00:01:44,510 --> 00:01:47,280
+that I'm gonna call <i>run_simulation</i>.
+
+35
+00:01:49,470 --> 00:01:50,850
+"Run simulation".
+
+36
+00:01:50,850 --> 00:01:54,600
+So what it will do one simulation 
+run needs to first <i>init_grid</i>
+
+37
+00:01:54,600 --> 00:01:55,560
+and by the way,
+
+38
+00:01:55,560 --> 00:01:57,590
+since I'm doing this here
+
+39
+00:01:57,590 --> 00:02:00,840
+we can also get rid of the
+"init grid" up here.
+
+40
+00:02:00,840 --> 00:02:02,660
+We don't need this anymore.
+
+41
+00:02:02,660 --> 00:02:05,600
+So let's remove this as well.
+
+42
+00:02:05,600 --> 00:02:07,320
+You remove some of the lines here.
+
+43
+00:02:07,320 --> 00:02:08,470
+Okay.
+
+44
+00:02:08,530 --> 00:02:12,710
+All right, function <i>run_simulation</i>,
+it should certainly call <i>init_grid</i>,
+
+45
+00:02:12,710 --> 00:02:15,800
+and then I would like
+to run the simulation
+
+46
+00:02:15,800 --> 00:02:18,600
+for as long as there are
+infected individuals there.
+
+47
+00:02:18,840 --> 00:02:21,290
+Once we don't have any
+infected individuals anymore,
+
+48
+00:02:21,310 --> 00:02:23,840
+that means everyone,
+whoever was infected,
+
+49
+00:02:23,840 --> 00:02:27,190
+has recovered and nothing
+is going to happen anymore.
+
+50
+00:02:27,190 --> 00:02:29,820
+So this is the point where we can stop.
+
+51
+00:02:30,440 --> 00:02:31,720
+So basically,
+
+52
+00:02:31,720 --> 00:02:33,710
+I want to keep the simulation running
+
+53
+00:02:33,710 --> 00:02:38,420
+while I have infected individuals
+in the simulation.
+
+54
+00:02:38,420 --> 00:02:39,650
+So what I'm gonna do is,
+
+55
+00:02:39,650 --> 00:02:41,550
+I'm gonna set up <i>while</i> loop.
+
+56
+00:02:41,550 --> 00:02:42,440
+So "while",
+
+57
+00:02:44,050 --> 00:02:45,800
+and here I'm gonna call a function
+
+58
+00:02:45,800 --> 00:02:47,580
+that I will have to define.
+
+59
+00:02:47,580 --> 00:02:50,580
+<i>get_number_of_infected</i>.
+
+60
+00:02:50,580 --> 00:02:54,630
+So this is a function that will 
+get me the number of infected
+
+61
+00:02:54,630 --> 00:02:56,780
+individuals in the population.
+
+62
+00:02:56,780 --> 00:02:58,200
+I have to define this.
+
+63
+00:02:58,200 --> 00:03:00,600
+But while this is larger than zero,
+
+64
+00:03:00,600 --> 00:03:02,930
+I wanna keep the simulation running.
+
+65
+00:03:02,930 --> 00:03:03,730
+In other words,
+
+66
+00:03:03,730 --> 00:03:08,860
+I will call, I will keep on calling 
+this function <i>run_time_step</i>.
+
+67
+00:03:11,460 --> 00:03:14,680
+All right, so that will be
+a <i>run_simulation</i> function,
+
+68
+00:03:14,680 --> 00:03:16,390
+so now what I need to do is,
+
+69
+00:03:16,390 --> 00:03:20,940
+I need to now define this 
+<i>get_number_of_infected</i>.
+
+70
+00:03:20,940 --> 00:03:27,090
+So let me do this here
+I'm gonna define a function,
+
+71
+00:03:27,130 --> 00:03:32,360
+<i>get_number_of_infected</i>.
+
+72
+00:03:33,460 --> 00:03:35,420
+All right, so how can we do this?
+
+73
+00:03:35,420 --> 00:03:38,470
+Well, I'm going to implement
+kind of a brute force approach here.
+
+74
+00:03:38,470 --> 00:03:41,510
+I'm simply going to go through 
+all the cells in the grid and
+
+75
+00:03:41,540 --> 00:03:44,330
+whenever I encounter
+an infected individual,
+
+76
+00:03:44,530 --> 00:03:47,660
+I'm gonna keep track
+of the number of infected
+
+77
+00:03:48,220 --> 00:03:50,010
+so here I'm gonna do this,
+
+78
+00:03:50,010 --> 00:03:52,160
+and first of all,
+I am gonna set up a counter
+
+79
+00:03:52,160 --> 00:03:55,160
+and then I'm gonna go
+through the grid.
+
+80
+00:03:55,160 --> 00:04:01,460
+So using the 2 loops
+for "var i = 0",
+
+81
+00:04:01,590 --> 00:04:03,630
+"i &lt; grid_length".
+
+82
+00:04:04,090 --> 00:04:07,260
+And "i = i + 1",
+
+83
+00:04:08,420 --> 00:04:11,930
+and then the exact same thing,
+of course for an inner loop,
+
+84
+00:04:11,930 --> 00:04:15,740
+except, that we now need "iis".
+
+85
+00:04:17,310 --> 00:04:22,800
+"ii &lt; grid_length" and 
+finally "ii = ii + 1".
+
+86
+00:04:22,800 --> 00:04:26,260
+So now I can simply say,
+if the individual here,
+
+87
+00:04:26,260 --> 00:04:32,350
+on this particular cell grid [i] [ii],
+is actually an infected individual,
+
+88
+00:04:32,350 --> 00:04:34,880
+so, '== "I"', double equal, of course,
+
+89
+00:04:35,050 --> 00:04:38,670
+then I'm going to add 1 to the counter.
+
+90
+00:04:38,670 --> 00:04:42,240
+So, "counter = counter + 1",
+
+91
+00:04:42,240 --> 00:04:46,380
+and all I need to do at the end
+is to return the counter.
+
+92
+00:04:47,380 --> 00:04:49,610
+Now and just to be clear.
+
+93
+00:04:50,940 --> 00:04:53,850
+This is not the most
+performant way to do this.
+
+94
+00:04:53,850 --> 00:04:57,610
+I could, of course,
+keep track of the state, "i",
+
+95
+00:04:57,610 --> 00:05:02,250
+simply, whenever I call
+the <i>try_recovery</i> or to <i>try_infection</i>,
+
+96
+00:05:02,480 --> 00:05:06,460
+and an individual moves
+from the S-Class to the I-class,
+
+97
+00:05:06,540 --> 00:05:08,870
+I could simply increase
+the infected counters,
+
+98
+00:05:08,870 --> 00:05:13,790
+sort of a global infected counter
+and when an infected individual recovers
+
+99
+00:05:13,790 --> 00:05:15,040
+I could decrease it.
+
+100
+00:05:15,040 --> 00:05:20,460
+The point for me here is not to actually
+write the most performant JavaScript code.
+
+101
+00:05:20,670 --> 00:05:25,120
+It's simply to write these kinds 
+of expressions here, loops,
+
+102
+00:05:25,120 --> 00:05:28,720
+and "if statements" and so on,
+over and over again,
+
+103
+00:05:29,450 --> 00:05:32,000
+this is some of the concepts 
+of spaced repetition
+
+104
+00:05:32,010 --> 00:05:35,640
+where if you learn something and 
+you do something repeatedly
+
+105
+00:05:35,640 --> 00:05:37,090
+with some space in between,
+
+106
+00:05:37,090 --> 00:05:39,810
+you will have a much better
+long-term memory of this
+
+107
+00:05:39,810 --> 00:05:41,320
+and so, for me,
+the goal for you
+
+108
+00:05:41,320 --> 00:05:44,460
+is not to write the most
+performant JavaScript code,
+
+109
+00:05:44,460 --> 00:05:47,940
+but to really completely feel 
+at ease with this type of code,
+
+110
+00:05:48,380 --> 00:05:52,290
+being able to think in terms of a 
+raise in 2 dimensional raise and
+
+111
+00:05:52,290 --> 00:05:56,680
+how you loop iterate through these 
+arrays and do calculations
+
+112
+00:05:56,680 --> 00:05:58,910
+on the elements in this array.
+
+113
+00:05:58,910 --> 00:06:00,920
+So this is really the goal here,
+
+114
+00:06:00,920 --> 00:06:03,840
+this is why I do this brute 
+force approach here.
+
+115
+00:06:03,840 --> 00:06:05,220
+But of course in the works.
+
+116
+00:06:05,220 --> 00:06:07,070
+It's just not as fast as it could be,
+
+117
+00:06:07,070 --> 00:06:12,240
+but so far we haven't really encountered 
+any speed bottlenecks anyways.
+
+118
+00:06:12,270 --> 00:06:14,920
+So this is now a great function.
+
+119
+00:06:15,450 --> 00:06:17,730
+it gets the numbers
+of infected individuals
+
+120
+00:06:17,730 --> 00:06:20,380
+at each time that I want to,
+in the population.
+
+121
+00:06:21,020 --> 00:06:22,690
+however, is not very generic.
+
+122
+00:06:22,880 --> 00:06:26,830
+What if I want to get the number 
+of the susceptible individuals or
+
+123
+00:06:27,540 --> 00:06:30,350
+the number of the recovered individuals?
+
+124
+00:06:30,350 --> 00:06:32,910
+I could of course write three functions.
+
+125
+00:06:32,910 --> 00:06:35,310
+Two more functions like this
+and I could call them
+
+126
+00:06:35,310 --> 00:06:38,350
+<i>get_number_of_susceptibles</i> and 
+<i>get_number_of_recovered</i>,
+
+127
+00:06:38,350 --> 00:06:42,090
+but the only thing that will 
+change here is this state,
+
+128
+00:06:42,450 --> 00:06:45,360
+So it seems like
+I can make this more generic,
+
+129
+00:06:45,810 --> 00:06:48,880
+and I can do this by saying,
+by renaming this function
+
+130
+00:06:48,880 --> 00:06:51,520
+to <i>get_number_in_state</i>.
+
+131
+00:06:51,520 --> 00:06:55,360
+and then I would simply have to 
+pass the state here as an argument.
+
+132
+00:06:55,360 --> 00:06:58,600
+So I am defining the state
+as a parameter and a function.
+
+133
+00:06:58,600 --> 00:07:04,200
+Really now, this counter
+should be called <i>number_in_state</i>.
+
+134
+00:07:05,730 --> 00:07:08,590
+Because that is a effectively
+what it is capturing,
+
+135
+00:07:08,590 --> 00:07:13,170
+so I'm going to replace "counter"
+with <i>number_in_state</i> here and here,
+
+136
+00:07:13,170 --> 00:07:14,750
+and here of course.
+
+137
+00:07:14,750 --> 00:07:20,210
+And so now I'm testing for equality 
+the equality here not with an "I",
+
+138
+00:07:20,210 --> 00:07:24,480
+but with whatever was passed as state.
+
+139
+00:07:24,640 --> 00:07:27,790
+Now this is a much more generic function.
+
+140
+00:07:28,370 --> 00:07:30,960
+I still do like the fact
+that I can just call
+
+141
+00:07:30,960 --> 00:07:33,560
+a function called <i>get_number_of_infected</i>.
+
+142
+00:07:33,560 --> 00:07:39,050
+It's it feels very natural, more natural
+than saying <i>get_number_in_state I</i>.
+
+143
+00:07:39,050 --> 00:07:43,180
+So I'd like to kind o keep
+this function name,
+
+144
+00:07:43,180 --> 00:07:49,640
+but I also prefer this function 
+here to remain as generic as it is,
+
+145
+00:07:49,640 --> 00:07:52,210
+so, what's the solution to this problem?
+
+146
+00:07:52,210 --> 00:07:54,870
+Well, the solution is
+an intermediary function
+
+147
+00:07:54,870 --> 00:07:56,610
+or a helper function.
+
+148
+00:07:56,610 --> 00:07:59,690
+It's just a regular function,
+
+149
+00:07:59,690 --> 00:08:03,380
+but it doesn't do much other than 
+calling another function,
+
+150
+00:08:03,380 --> 00:08:08,020
+so I'm gonna define here,
+this function <i>get_number_of_infected</i>,
+
+151
+00:08:08,020 --> 00:08:11,810
+because I like the sound of it,
+it just feels very natural to use it,
+
+152
+00:08:13,480 --> 00:08:20,480
+And it simply calls
+<i>get_number_in_state("I")</i>.
+
+153
+00:08:21,500 --> 00:08:24,640
+And of course it does not 
+only call this function.
+
+154
+00:08:24,640 --> 00:08:30,830
+It also then returns the value that 
+<i>get_number_in_state</i> itself returns.
+
+155
+00:08:30,830 --> 00:08:31,980
+So this is how it works.
+
+156
+00:08:31,980 --> 00:08:35,410
+You call a <i>get_number_of_infected</i>
+well this gets called,
+
+157
+00:08:35,410 --> 00:08:39,020
+this gets executed,
+so we go here through all the cells,
+
+158
+00:08:39,020 --> 00:08:42,890
+check for state "I",
+then return a value
+
+159
+00:08:42,890 --> 00:08:45,890
+and then we returned this value to work
+
+160
+00:08:45,890 --> 00:08:47,660
+when <i>number_of_infected</i> was called.
+
+161
+00:08:47,660 --> 00:08:52,410
+and so I can now basically
+copy this function twice
+
+162
+00:08:52,410 --> 00:08:54,130
+and rename it here,
+
+163
+00:08:54,130 --> 00:08:59,190
+<i>Get_number_of_susceptibles</i>
+for example, "susceptibles".
+
+164
+00:09:00,350 --> 00:09:03,320
+So then I would simply return 
+<i>get_number_in_state("S")</i>.
+
+165
+00:09:04,020 --> 00:09:07,890
+And finally <i>get_number_of_recovered</i>.
+
+166
+00:09:09,670 --> 00:09:10,650
+"Recovered".
+
+167
+00:09:11,660 --> 00:09:14,130
+And this would simply return 
+<i>get_number_in_state</i>.
+
+168
+00:09:17,120 --> 00:09:19,050
+Okay, I am gonna save this,
+
+169
+00:09:19,050 --> 00:09:20,260
+all right, so what next?
+
+170
+00:09:20,260 --> 00:09:22,500
+Well, I do now have this <i>run simulation</i>,
+
+171
+00:09:22,500 --> 00:09:25,020
+but of course it doesn't
+just run on its own.
+
+172
+00:09:25,020 --> 00:09:26,720
+I need to call it and I, in fact,
+
+173
+00:09:26,720 --> 00:09:29,700
+I don't want to call this only once,
+
+174
+00:09:29,700 --> 00:09:33,020
+I want to call this many times,
+because I want to run many simulations
+
+175
+00:09:33,020 --> 00:09:38,620
+and then calculate the outbreak size
+and then get the average, ultimately.
+
+176
+00:09:38,630 --> 00:09:41,550
+So, I am going to do this down here,
+
+177
+00:09:41,550 --> 00:09:43,430
+I'm gonna set up a loop.
+
+178
+00:09:43,430 --> 00:09:46,880
+That loop will run, iterate 4.
+
+179
+00:09:46,880 --> 00:09:52,450
+Well, let's define a variable that
+I'm going to call <i>number_of_simulations</i>
+
+180
+00:09:52,480 --> 00:09:55,090
+I have not defined this yet,
+but I will in a second.
+
+181
+00:09:55,090 --> 00:09:57,720
+<i>number_of_simulations</i>.
+
+182
+00:09:59,300 --> 00:10:03,650
+And then of course '"I" = "I" + 1',
+
+183
+00:10:05,120 --> 00:10:09,200
+and this is how many times
+I'm going to call this function,
+
+184
+00:10:09,200 --> 00:10:11,310
+<i>run_simulation</i>.
+
+185
+00:10:11,990 --> 00:10:13,870
+Okay, so I'm going to set this up here,
+
+186
+00:10:13,870 --> 00:10:20,650
+"var number_of_simulations ="
+
+187
+00:10:20,650 --> 00:10:22,590
+let's say, "100".
+
+188
+00:10:24,070 --> 00:10:24,960
+All right,
+
+189
+00:10:24,960 --> 00:10:29,600
+so I'm going to run simulations here 
+a hundred times, but of course,
+
+190
+00:10:29,600 --> 00:10:32,640
+I want to keep track of
+the total outbreak size
+
+191
+00:10:32,640 --> 00:10:33,860
+in each simulation.
+
+192
+00:10:33,860 --> 00:10:35,110
+So how did I get this?
+
+193
+00:10:35,230 --> 00:10:39,990
+Well, it turns out that
+there's a handy method already
+
+194
+00:10:39,990 --> 00:10:42,410
+and it's called
+<i>Get_number_of_recovered</i>
+
+195
+00:10:42,410 --> 00:10:43,590
+so why is that?
+
+196
+00:10:43,670 --> 00:10:47,760
+Well, in order for any individual
+to be in the recovered state,
+
+197
+00:10:47,760 --> 00:10:50,820
+it had to be
+in the infected state before
+
+198
+00:10:50,820 --> 00:10:55,480
+and so at the end of the simulation
+when we are out of infected,
+
+199
+00:10:56,170 --> 00:11:00,240
+there are a number of recovered 
+individuals in the population,
+
+200
+00:11:00,240 --> 00:11:02,670
+and all of those have been infected.
+
+201
+00:11:02,670 --> 00:11:04,630
+So this is really my outbreak size.
+
+202
+00:11:06,000 --> 00:11:11,650
+So, I can easily calculate this 
+by simply calling this function.
+
+203
+00:11:11,690 --> 00:11:13,850
+But then what am I gonna 
+do with this number?
+
+204
+00:11:13,890 --> 00:11:16,710
+Well, I should probably
+stored it somewhere in an array
+
+205
+00:11:16,710 --> 00:11:20,070
+so I am going to set up here
+an array called <i>Data</i>.
+
+206
+00:11:20,810 --> 00:11:22,610
+Okay, just an empty array.
+
+207
+00:11:22,890 --> 00:11:26,900
+And so what I'm gonna do here right 
+after I call <i>run_simulation</i>,
+
+208
+00:11:27,020 --> 00:11:28,200
+I'm gonna say,
+
+209
+00:11:28,200 --> 00:11:31,310
+all right, I'm gonna push into this array
+
+210
+00:11:31,310 --> 00:11:34,460
+the number of recovered individuals.
+
+211
+00:11:34,460 --> 00:11:36,260
+Because that's the outbreak size,
+
+212
+00:11:36,260 --> 00:11:42,420
+So <i>get_number_of_recovered</i>.
+
+213
+00:11:44,140 --> 00:11:45,060
+All right.
+
+214
+00:11:45,060 --> 00:11:47,670
+And you know what,
+I want to be a good citizen here
+
+215
+00:11:47,670 --> 00:11:50,820
+and I don't want to have these
+global variables all over the place,
+
+216
+00:11:50,820 --> 00:11:52,300
+so I'm going to cut those and
+
+217
+00:11:52,300 --> 00:11:56,940
+I'm gonna move those up to where 
+have the other variables.
+
+218
+00:11:56,940 --> 00:11:59,220
+So, here. I am going to put them here.
+
+219
+00:12:00,990 --> 00:12:01,950
+All right.
+
+220
+00:12:03,210 --> 00:12:03,940
+Okay.
+
+221
+00:12:03,940 --> 00:12:05,860
+So we are going back down here.
+
+222
+00:12:05,860 --> 00:12:07,530
+I now have this loop.
+
+223
+00:12:07,530 --> 00:12:13,070
+It will run a hundred times
+and then it will push the outbreak size
+
+224
+00:12:13,120 --> 00:12:14,640
+into this data array.
+
+225
+00:12:14,640 --> 00:12:17,210
+So what it could do now as a first step is
+
+226
+00:12:17,210 --> 00:12:21,300
+I could simply log the 
+content of this data race
+
+227
+00:12:21,320 --> 00:12:25,260
+or <i>console.log (data)</i>.
+
+228
+00:12:25,260 --> 00:12:30,530
+and then I can save this
+and go to our browser.
+
+229
+00:12:31,900 --> 00:12:36,250
+Here still the the visual simulation.
+We won't need this anymore,
+
+230
+00:12:36,250 --> 00:12:40,230
+but we will need to take a look
+at the JavaScript console.
+
+231
+00:12:40,230 --> 00:12:41,610
+So I am going to reload this.
+
+232
+00:12:43,120 --> 00:12:45,800
+And so now, this may take a few seconds,
+
+233
+00:12:45,800 --> 00:12:49,850
+because it's running a hundred
+fairly complicated simulations
+
+234
+00:12:49,850 --> 00:12:52,020
+and so here is the result.
+
+235
+00:12:52,590 --> 00:12:56,270
+So you can see here
+that you have many simulations
+
+236
+00:12:56,270 --> 00:13:01,210
+that only have one or two
+infected individuals in total.
+
+237
+00:13:01,210 --> 00:13:03,410
+So at the end of course
+they are all recovered
+
+238
+00:13:03,410 --> 00:13:05,990
+so these we've seen in
+the visual simulations before.
+
+239
+00:13:05,990 --> 00:13:08,960
+These are the outbreaks that
+immediately fizzle out.
+
+240
+00:13:08,960 --> 00:13:12,500
+Then there are some that 
+are only 10 or 11 or so,
+
+241
+00:13:12,500 --> 00:13:13,430
+or just a handful,
+
+242
+00:13:13,430 --> 00:13:18,000
+but there are some here that in fact 
+many that are over 6,000 and
+
+243
+00:13:18,050 --> 00:13:20,040
+some even a little larger.
+
+244
+00:13:20,040 --> 00:13:23,440
+so let me just reload this again
+just to see if there was a fluke here.
+
+245
+00:13:23,440 --> 00:13:25,890
+Again, this will maybe
+take a few seconds,
+
+246
+00:13:25,890 --> 00:13:27,630
+and now we have the results here.
+
+247
+00:13:27,630 --> 00:13:28,870
+So, same thing,
+
+248
+00:13:28,870 --> 00:13:34,300
+a lot of one and two outbreak sizes,
+but many that are over 6,000.
+
+249
+00:13:34,700 --> 00:13:38,690
+So, recall that were still
+in the situation here of small world.
+
+250
+00:13:38,690 --> 00:13:42,430
+So now I'd like to compare itself 
+and not have in a small world.
+
+251
+00:13:42,430 --> 00:13:44,540
+So if we go back to our code,
+
+252
+00:13:44,540 --> 00:13:49,780
+the small world comes about up here,
+in the <i>expose_neighbors</i> function,
+
+253
+00:13:49,780 --> 00:13:53,560
+where we have this
+if <i>math random</i> is smaller than 0.01,
+
+254
+00:13:53,880 --> 00:14:02,140
+then we do this, we collect or rather we
+calculate these two random integer numbers
+
+255
+00:14:02,140 --> 00:14:05,380
+to point to a random individual
+and then we try to infect
+
+256
+00:14:05,380 --> 00:14:09,480
+this random individual 
+rather than the local neighbors.
+
+257
+00:14:09,550 --> 00:14:13,800
+So we could essentially set this 
+to zero here and then it would,
+
+258
+00:14:13,800 --> 00:14:18,430
+there would be no
+long distance transmission events
+
+259
+00:14:18,430 --> 00:14:20,350
+and so there would be no small world.
+
+260
+00:14:20,590 --> 00:14:25,410
+But rather then setting this here,
+we are going to replaced this here
+
+261
+00:14:25,630 --> 00:14:29,670
+with a variable that I will call
+<i>rewiring_probability</i>.
+
+262
+00:14:29,830 --> 00:14:31,540
+<i>rewiring</i>
+
+263
+00:14:31,680 --> 00:14:33,150
+<i>probability.</i>
+
+264
+00:14:37,920 --> 00:14:40,750
+And this is currently not defined,
+
+265
+00:14:40,750 --> 00:14:44,930
+so we should of course do this 
+and this is gonna be a global variable.
+
+266
+00:14:44,930 --> 00:14:48,300
+Then I am going to set up here
+with the parameters.
+
+267
+00:14:48,300 --> 00:14:52,530
+So, "var <i>rewiring_probability</i> = 0".
+
+268
+00:14:52,530 --> 00:14:56,790
+and so if I wanted this to be
+a small world contact network,
+
+269
+00:14:56,790 --> 00:14:59,840
+I could just set this to 0.01,
+for example,
+
+270
+00:14:59,840 --> 00:15:02,680
+but now I a simply
+want to set this to zero,
+
+271
+00:15:02,680 --> 00:15:08,820
+so that we can see what happens is
+the contact network is completely local.
+
+272
+00:15:08,820 --> 00:15:11,110
+So let me save this
+and go back to the browser
+
+273
+00:15:11,360 --> 00:15:12,790
+and then reload this
+
+274
+00:15:12,790 --> 00:15:15,850
+and take a look here
+at the JavaScript console.
+
+275
+00:15:17,670 --> 00:15:20,320
+And here I can see similar outcomes,
+
+276
+00:15:20,320 --> 00:15:25,020
+so lots of simulations with just one 
+patient zero that immediately recovers
+
+277
+00:15:25,020 --> 00:15:26,880
+before it can infect 
+other individuals
+
+278
+00:15:26,880 --> 00:15:28,590
+but there are also large outbreaks.
+
+279
+00:15:28,590 --> 00:15:34,020
+But it seems like the large outbreaks 
+here are more often sort of in the 1,000
+
+280
+00:15:34,020 --> 00:15:36,970
+perhaps occasionally 
+2,000 or 3,000,
+
+281
+00:15:36,970 --> 00:15:39,420
+but I don't see any 6,000
+
+282
+00:15:39,420 --> 00:15:40,420
+for example,
+
+283
+00:15:40,420 --> 00:15:44,500
+which is what we had before
+and I'm gonna reload this once again.
+
+284
+00:15:45,410 --> 00:15:46,820
+Wait a few seconds.
+
+285
+00:15:46,820 --> 00:15:48,410
+And here, same kind of result.
+
+286
+00:15:48,410 --> 00:15:54,350
+I do see a few fairly large outbreaks 
+but none in the 6,000 range.
+
+287
+00:15:54,470 --> 00:15:59,390
+so I think I've already confirmed 
+here my notion quantitatively
+
+288
+00:15:59,490 --> 00:16:03,450
+that indeed the outbreaks are 
+on average smaller
+
+289
+00:16:04,520 --> 00:16:10,660
+in this completely local network
+as opposed to the small world network.
+
+290
+00:16:10,760 --> 00:16:13,740
+But you know that would be nice 
+to quantify this and even more
+
+291
+00:16:13,740 --> 00:16:15,860
+and rather than looking
+at the numbers here,
+
+292
+00:16:15,860 --> 00:16:19,890
+why don't we just calculate 
+the average in our code?
+
+293
+00:16:19,890 --> 00:16:21,750
+So back in our code,
+
+294
+00:16:21,750 --> 00:16:24,590
+what we need to do is
+we need a function that calculates
+
+295
+00:16:24,590 --> 00:16:28,040
+the average of the elements that 
+we have here in this array.
+
+296
+00:16:28,160 --> 00:16:29,730
+So why don't we do that?
+
+297
+00:16:29,760 --> 00:16:31,850
+I am going to define a function here
+
+298
+00:16:31,850 --> 00:16:35,230
+that I am going to call
+<i>calculate_average_size</i>.
+
+299
+00:16:35,230 --> 00:16:42,120
+so function <i>calculate_average_size</i>.
+
+300
+00:16:43,090 --> 00:16:47,160
+And this will calculate
+the average size of the data array
+
+301
+00:16:47,340 --> 00:16:50,750
+so I'm going to defined this here
+as a parameter "data"
+
+302
+00:16:50,750 --> 00:16:53,620
+and of course I will have to pass
+this array as an argument,
+
+303
+00:16:53,620 --> 00:16:56,830
+and then and simply
+calculating the average,
+
+304
+00:16:56,830 --> 00:16:57,920
+so that's quite easy.
+
+305
+00:16:57,920 --> 00:17:00,450
+As you know, the average
+is simply at the means
+
+306
+00:17:00,450 --> 00:17:02,460
+so I have to sum up all the values
+
+307
+00:17:02,460 --> 00:17:08,400
+and then divide by the number of 
+values so <i>var sum equals zero</i>
+
+308
+00:17:08,400 --> 00:17:16,280
+and then I'm gonna iterate or disarray 
+so "for (var i equals 0";
+
+309
+00:17:16,280 --> 00:17:19,250
+"i &lt; data.length"
+
+310
+00:17:19,250 --> 00:17:21,880
+so however many elements
+we have in this array
+
+311
+00:17:21,880 --> 00:17:25,030
+and then "i ++".
+So "i++"? why?
+
+312
+00:17:25,030 --> 00:17:28,900
+This is a completely new notation
+I'll explain this in a second,
+
+313
+00:17:28,900 --> 00:17:32,220
+but this is identical to 
+"i=i+1".
+
+314
+00:17:33,690 --> 00:17:36,110
+0kay, curly brackets.
+
+315
+00:17:37,420 --> 00:17:40,980
+Well, you are learning new things,
+even in the last lecture of the course.
+
+316
+00:17:41,170 --> 00:17:47,160
+So here we can now simply say,
+I am going to add to some
+
+317
+00:17:47,290 --> 00:17:53,210
+the ith element of data,
+so "sum plus +=data [i]"
+
+318
+00:17:53,210 --> 00:17:55,370
+So once again you may be wondering,
+
+319
+00:17:55,460 --> 00:17:57,030
+"Wait,what is this +=?"
+
+320
+00:17:57,120 --> 00:17:58,450
+I've never seen this.
+
+321
+00:17:58,450 --> 00:18:02,740
+This corresponds to "sum = sum + data" .
+
+322
+00:18:02,740 --> 00:18:06,230
+And again, I am gonna
+also explain this in a second.
+
+323
+00:18:06,610 --> 00:18:08,220
+So at the end we have the sum,
+
+324
+00:18:08,220 --> 00:18:09,910
+so all we need to do is
+
+325
+00:18:09,910 --> 00:18:11,810
+you need to <i>return</i>
+
+326
+00:18:11,810 --> 00:18:16,310
+the division of sum divided by
+however many elements we have in data.
+
+327
+00:18:16,310 --> 00:18:19,200
+So <i>data.length</i> and that is
+
+328
+00:18:19,200 --> 00:18:23,670
+now calculate average
+size function that works.
+
+329
+00:18:23,670 --> 00:18:28,540
+And so here now in <i>console.log</i>,
+rather than logging the data
+
+330
+00:18:28,940 --> 00:18:33,630
+we are simply first passing the data 
+through <i>calculate_average_size</i>
+
+331
+00:18:33,630 --> 00:18:38,240
+which will then return
+the average size of the data rate.
+
+332
+00:18:38,240 --> 00:18:42,620
+So let's save this, go back into
+the browser and take a look.
+
+333
+00:18:44,130 --> 00:18:47,590
+So we're still in the completely 
+local world here,
+
+334
+00:18:47,590 --> 00:18:50,900
+so we're gonna reload this,
+this will take some time.
+
+335
+00:18:50,900 --> 00:18:54,540
+And here you can now see the average size,
+
+336
+00:18:54,540 --> 00:19:00,060
+so I'm gonna repeat this again and 
+so we'll see this over and over again.
+
+337
+00:19:00,060 --> 00:19:04,340
+So the average seems to be 
+somewhere around 300, 400
+
+338
+00:19:05,970 --> 00:19:08,130
+individuals infected
+
+339
+00:19:09,260 --> 00:19:12,790
+in the completely local contact network.
+
+340
+00:19:12,790 --> 00:19:15,670
+All right, there seems to be
+a relatively consistent range
+
+341
+00:19:15,670 --> 00:19:18,430
+somewhere between 300 and 400.
+
+342
+00:19:19,030 --> 00:19:23,220
+So now we're gonna go back to our
+code and we're gonna set this whole thing
+
+343
+00:19:23,220 --> 00:19:26,070
+to a small world network 
+by simply changing
+
+344
+00:19:26,480 --> 00:19:31,100
+this rewiring probability now to 0.01.
+
+345
+00:19:31,100 --> 00:19:34,600
+okay save and go back to the browser
+
+346
+00:19:34,600 --> 00:19:38,680
+and I will rerun this and take 
+a look at the average here.
+
+347
+00:19:39,490 --> 00:19:41,340
+So this will take a few seconds.
+
+348
+00:19:41,340 --> 00:19:46,040
+So over 2.5 thousand
+seems to be the range here
+
+349
+00:19:46,040 --> 00:19:49,460
+and that is, of course,
+quite a change.
+
+350
+00:19:49,460 --> 00:19:51,600
+So I'm going to reload this
+a couple of times
+
+351
+00:19:51,600 --> 00:19:53,440
+so that you see the values.
+
+352
+00:19:53,440 --> 00:19:58,390
+So we seem to be consistently
+over 2.5 thousand individuals,
+
+353
+00:19:58,390 --> 00:20:00,250
+even a bit more,
+
+354
+00:20:00,250 --> 00:20:04,750
+so very clearly,
+the average outbreak size
+
+355
+00:20:05,010 --> 00:20:10,060
+is about 6 to 7 times larger
+
+356
+00:20:10,060 --> 00:20:14,910
+than what we observe
+in the completely local network
+
+357
+00:20:14,910 --> 00:20:17,950
+and so now we 
+have proof, if you will,
+
+358
+00:20:17,950 --> 00:20:22,950
+that this is really the case if 
+our intuition was correct.
+
+359
+00:20:22,950 --> 00:20:25,830
+The average outbreak sizes
+in the small world network
+
+360
+00:20:25,830 --> 00:20:27,260
+is indeed much larger.
+
+361
+00:20:27,260 --> 00:20:28,680
+All else is equal,
+
+362
+00:20:28,680 --> 00:20:32,600
+we simply rewired
+a few edges here and there
+
+363
+00:20:32,600 --> 00:20:35,230
+and it has dramatic consequences.
+
+364
+00:20:35,230 --> 00:20:40,280
+and this is why the small world
+network idea is so important.
+
+365
+00:20:40,630 --> 00:20:43,150
+So I wanna go back
+to the code one last time
+
+366
+00:20:43,150 --> 00:20:46,870
+and simply take a look 
+at these new notations here
+
+367
+00:20:46,870 --> 00:20:50,660
+"i + +" and "+ =". what is this?
+
+368
+00:20:50,690 --> 00:20:52,200
+well, the idea is simple,
+
+369
+00:20:53,060 --> 00:20:58,290
+rather than having to write "i = i + x",
+
+370
+00:20:58,290 --> 00:21:00,810
+which is something
+that we do all the time. Right?
+
+371
+00:21:00,810 --> 00:21:05,520
+We simply want to add some value here.
+"x" to an existing value.
+
+372
+00:21:05,610 --> 00:21:10,050
+So this is how we do it and we've 
+done it all the time and this works,
+
+373
+00:21:10,050 --> 00:21:11,160
+of course, great.
+
+374
+00:21:11,370 --> 00:21:16,480
+But there is also a shortcut 
+and that shortcut is "+ =".
+
+375
+00:21:16,480 --> 00:21:22,440
+So that simply means
+"add 'x' to 'i'" and store this in <i>i</i>.
+
+376
+00:21:23,290 --> 00:21:27,990
+And this is not only true for "+", 
+you can also use the "- ="
+
+377
+00:21:27,990 --> 00:21:32,520
+and this simply means "subtract 
+"X" to "i" and store it in <i>i</i>".
+
+378
+00:21:32,520 --> 00:21:35,220
+You can do the "x =".
+
+379
+00:21:35,220 --> 00:21:39,410
+So this means "multiply "X" with "i"
+and store it in <i>i</i>.
+
+380
+00:21:39,410 --> 00:21:42,560
+and of course also the "/ =".
+
+381
+00:21:42,560 --> 00:21:47,770
+So this is a very handy shortcut 
+and this is what we are using here
+
+382
+00:21:47,770 --> 00:21:51,070
+instead of writing "sum + sum + data [i]"
+
+383
+00:21:52,100 --> 00:21:54,880
+if it is really the "+" case,
+
+384
+00:21:54,880 --> 00:21:59,310
+there is in fact an even
+shorter version of this
+
+385
+00:21:59,310 --> 00:22:02,900
+if it just so happens that "X=1".
+
+386
+00:22:02,900 --> 00:22:06,820
+So for simply adding 1 to a value,
+which we do all the time,
+
+387
+00:22:06,830 --> 00:22:09,120
+in the loops, for example,
+
+388
+00:22:09,120 --> 00:22:12,790
+then there's an even shorter
+version that is simple "i + +".
+
+389
+00:22:12,790 --> 00:22:19,640
+So "i + +" is the same
+as writing "i = i + 1",
+
+390
+00:22:19,640 --> 00:22:24,180
+which is the same 
+as writing "i + = 1".
+
+391
+00:22:24,260 --> 00:22:27,280
+So this is kind of a shortcut
+of the shortcut,
+
+392
+00:22:27,280 --> 00:22:33,660
+in the extreme case where
+you are simply adding 1 to a value
+
+393
+00:22:33,660 --> 00:22:37,180
+and this is something we do quite often
+as we iterate through an array.
+
+394
+00:22:37,180 --> 00:22:39,380
+And so you'll see this all the time,
+
+395
+00:22:39,380 --> 00:22:43,550
+for example, in four loops
+and I want to show you this.
+
+396
+00:22:43,550 --> 00:22:46,800
+Now, I don't necessarily think
+this is the best way to write it,
+
+397
+00:22:46,800 --> 00:22:48,860
+I actually think this is--
+
+398
+00:22:48,870 --> 00:22:52,360
+it doesn't really take much longer 
+and it's a very instructive way
+
+399
+00:22:52,360 --> 00:22:54,200
+of seeing what's going on.
+
+400
+00:22:54,200 --> 00:22:56,030
+You take this value, you add one
+
+401
+00:22:56,030 --> 00:23:00,360
+and then the result of this
+is going to be stored in "i".
+
+402
+00:23:00,360 --> 00:23:01,360
+Again, this is,
+
+403
+00:23:01,360 --> 00:23:03,490
+I think especially for a beginner
+
+404
+00:23:03,490 --> 00:23:07,370
+much easier to understand than, what 
+on earth is this "i + +"?
+
+405
+00:23:07,370 --> 00:23:10,490
+But, I wanted to let you know
+that these shortcuts exist,
+
+406
+00:23:10,490 --> 00:23:12,400
+because you see them 
+all over the place,
+
+407
+00:23:12,400 --> 00:23:15,210
+If you look at other
+people's JavaScript code
+
+408
+00:23:16,110 --> 00:23:20,260
+so gonna remove this
+because this is not part of the code.
+
+409
+00:23:20,440 --> 00:23:21,940
+I am going to save this code
+
+410
+00:23:21,940 --> 00:23:25,920
+and with that we've come
+to the end of this lecture
+
+411
+00:23:25,920 --> 00:23:28,040
+and to the end of this chapter.
+
+412
+00:23:28,520 --> 00:23:29,560
+All right, that's it.
+
+413
+00:23:29,580 --> 00:23:31,400
+We're at the end of this course.
+
+414
+00:23:31,400 --> 00:23:33,820
+Congratulations you made it
+all the way through
+
+415
+00:23:33,820 --> 00:23:36,650
+and you now have the basic
+programming skills
+
+416
+00:23:36,690 --> 00:23:40,540
+to reason about the world
+and in particular also to reason about
+
+417
+00:23:40,730 --> 00:23:44,990
+nature and evolutionary biology 
+and infectious diseases and so on.
+
+418
+00:23:44,990 --> 00:23:49,470
+This is an incredibly powerful skill 
+and I'm very glad you now have it.
+
+419
+00:23:49,870 --> 00:23:56,380
+Now, we should be clear,
+coding is a lifelong learning experience.
+
+420
+00:23:56,700 --> 00:23:57,770
+It doesn't stop here.
+
+421
+00:23:57,770 --> 00:23:59,300
+This is just a beginning.
+
+422
+00:23:59,300 --> 00:24:02,650
+Even if technological development 
+would stop tomorrow,
+
+423
+00:24:02,650 --> 00:24:05,190
+it would remain
+a lifelong learning experience,
+
+424
+00:24:05,190 --> 00:24:09,370
+but of course we all know it won't 
+stop and it will indeed accelerate,
+
+425
+00:24:09,370 --> 00:24:14,430
+but you now have the basic skills
+to keep on top of these developments.
+
+426
+00:24:14,430 --> 00:24:15,550
+Soo once again,
+
+427
+00:24:15,550 --> 00:24:16,740
+congratulations.
+
+428
+00:24:16,740 --> 00:24:20,810
+If you have the time, please
+occasionally visit <i>natureincode.com</i>
+
+429
+00:24:20,810 --> 00:24:25,270
+I keep updating the page, I keep adding 
+examples from various fields,
+
+430
+00:24:25,300 --> 00:24:28,560
+not just natural sciences 
+also the social sciences,
+
+431
+00:24:28,560 --> 00:24:31,090
+and I hope you will enjoy this as well.
+
+432
+00:24:31,090 --> 00:24:34,390
+So, good luck and perhaps see you around.

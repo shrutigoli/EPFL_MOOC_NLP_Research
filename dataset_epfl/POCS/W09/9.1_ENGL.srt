@@ -1,0 +1,1510 @@
+1
+00:00:03,899 --> 00:00:07,648
+So in this series of videos,
+we're going to talk about
+
+2
+00:00:07,648 --> 00:00:10,298
+languages, language design in particular.
+
+3
+00:00:10,298 --> 00:00:13,878
+Domain-specific languages,
+and engineered languages for one,
+
+4
+00:00:13,878 --> 00:00:16,208
+declarative languages,
+and we're also going to talk about
+
+5
+00:00:16,208 --> 00:00:20,838
+interpretation, and compiler, and
+interpreted side of programming languages,
+
+6
+00:00:20,838 --> 00:00:23,328
+and programming systems.
+
+7
+00:00:23,328 --> 00:00:25,487
+In this lecture, in this 
+video in particular,
+
+8
+00:00:25,487 --> 00:00:29,157
+we're going to start with
+talking about engineered languages.
+
+9
+00:00:29,157 --> 00:00:31,967
+And the first thing 
+I would like to observe is,
+
+10
+00:00:31,967 --> 00:00:36,165
+there's actually a connection between 
+how systems people view computation
+
+11
+00:00:36,165 --> 00:00:38,635
+as a resource, and how 
+complexity theorists look at this.
+
+12
+00:00:38,635 --> 00:00:40,755
+So if you look into
+the Saltzer Kaeshoek textbook,
+
+13
+00:00:40,755 --> 00:00:42,985
+you'll find among
+system resources mentioned,
+
+14
+00:00:42,985 --> 00:00:45,985
+computation, memory, and messaging.
+
+15
+00:00:45,985 --> 00:00:49,129
+And that's a smart observation
+because in a strong sense,
+
+16
+00:00:49,129 --> 00:00:52,049
+the analogous observation has been made
+in computation complexity theory,
+
+17
+00:00:52,049 --> 00:00:54,779
+that there is fundamental resources
+for computation
+
+18
+00:00:54,779 --> 00:00:56,899
+which are time,
+space against memory use,
+
+19
+00:00:56,899 --> 00:00:58,415
+and computation complexity.
+
+20
+00:00:58,415 --> 00:01:01,415
+How much messaging is necessary
+to actually get a job done
+
+21
+00:01:01,415 --> 00:01:03,325
+in this one scenario.
+
+22
+00:01:03,325 --> 00:01:07,645
+So these dimensions are not 
+completely orthogonal, not quite.
+
+23
+00:01:07,645 --> 00:01:11,152
+So for example, the time complexity
+can be at most exponentially high
+
+24
+00:01:11,152 --> 00:01:14,012
+to the space complexity
+of the computation.
+
+25
+00:01:14,012 --> 00:01:18,507
+Why? Well think of a big
+memory system even right?
+
+26
+00:01:18,507 --> 00:01:23,362
+As a huge finite state machine,
+which it is, as a localized system.
+
+27
+00:01:23,362 --> 00:01:25,782
+Unless you extend the hardware,
+you got only so many states.
+
+28
+00:01:26,532 --> 00:01:29,602
+Now, if you take so much memory,
+
+29
+00:01:29,602 --> 00:01:32,432
+let's say, megabytes
+or something like that,
+
+30
+00:01:32,432 --> 00:01:34,922
+there's only exponentially many states
+
+31
+00:01:34,922 --> 00:01:38,591
+in that size of the data
+
+32
+00:01:40,471 --> 00:01:42,501
+So if you've got <i>n</i> bits,
+
+33
+00:01:38,591 --> 00:01:40,471
+that are different.
+
+34
+00:01:42,501 --> 00:01:45,711
+there's 2 to the <i>n</i> different states
+that these <i>n</i> bits can be in.
+
+35
+00:01:45,711 --> 00:01:48,421
+If you're talking about
+the entire system's mutable state,
+
+36
+00:01:48,421 --> 00:01:51,181
+so that includes not just the RAM,
+but also all the caches,
+
+37
+00:01:51,181 --> 00:01:52,606
+the registers etc.
+
+38
+00:01:52,606 --> 00:01:56,226
+Everything that belongs to the state
+of such a computer.
+
+39
+00:01:56,226 --> 00:02:00,743
+So if you take this, this entire state,
+and you've got <i>n</i> bits now,
+
+40
+00:02:00,743 --> 00:02:02,393
+<i>n</i> could be a huge number.
+
+41
+00:02:02,393 --> 00:02:05,073
+Then there's only 2 to the <i>n</i>
+different things I can store.
+
+42
+00:02:05,073 --> 00:02:07,693
+So if you have a computation
+that changes the state, and iterates,
+
+43
+00:02:07,693 --> 00:02:10,643
+and it gets stuck in the same state
+and doesn't change anymore,
+
+44
+00:02:10,643 --> 00:02:11,793
+that's the final state.
+
+45
+00:02:11,793 --> 00:02:15,656
+We're talking about well-behaved programs
+that the program, let's say, terminates.
+
+46
+00:02:15,656 --> 00:02:20,754
+Then after, at most, 2 to the <i>n</i>
+computation steps,
+
+47
+00:02:20,754 --> 00:02:22,964
+you must get into a state
+that you've already been in.
+
+48
+00:02:22,964 --> 00:02:26,264
+So understand there was an accepting state
+you had stopped in before
+
+49
+00:02:26,264 --> 00:02:28,174
+you are in an infinite loop.
+
+50
+00:02:28,174 --> 00:02:34,061
+So that way, we see that time cost of any
+well-behaved computation that terminates,
+
+51
+00:02:34,061 --> 00:02:37,241
+can be at most exponentially larger
+than the space cost we have.
+
+52
+00:02:37,241 --> 00:02:40,621
+But leaving these aside,
+these are the fundamental resources.
+
+53
+00:02:40,621 --> 00:02:42,871
+And once we have thought of it that way,
+
+54
+00:02:42,871 --> 00:02:47,033
+we can start kind of engineering
+for a purpose. Because, remember,
+
+55
+00:02:47,037 --> 00:02:49,427
+there's this notion of
+Turing-complete languages.
+
+56
+00:02:49,427 --> 00:02:53,207
+And basically, there's this so-called
+Church-Turing thesis.
+
+57
+00:02:53,207 --> 00:02:56,047
+You have to decide something that
+you cannot really prove in that sense.
+
+58
+00:02:56,047 --> 00:02:58,327
+But you see, that there's really
+no computation possible
+
+59
+00:02:58,327 --> 00:03:00,466
+beyond what can be done 
+by a Turing machine.
+
+60
+00:03:00,466 --> 00:03:02,686
+And you have also seen
+that many different models
+
+61
+00:03:02,686 --> 00:03:05,680
+correspond to Turing machines,
+including, you know, our CPUs.
+
+62
+00:03:05,680 --> 00:03:09,050
+And it's very easy to write
+a programming language
+
+63
+00:03:09,050 --> 00:03:10,780
+that is Turing-complete.
+
+64
+00:03:10,780 --> 00:03:13,831
+So all you really need is something like
+unbounded looping,
+
+65
+00:03:13,831 --> 00:03:16,531
+<i>if-then-else</i> branching, and memory.
+
+66
+00:03:16,531 --> 00:03:21,231
+And you basically get a Turing machine.
+
+67
+00:03:21,231 --> 00:03:25,601
+Now you can actually argue 
+that in corner cases,
+
+68
+00:03:25,601 --> 00:03:27,987
+there's actually something
+beyond the Church-Turing thesis.
+
+69
+00:03:27,987 --> 00:03:32,162
+For example, if you have a way
+of generating true random numbers,
+
+70
+00:03:32,162 --> 00:03:35,022
+you actually add power.
+Or the so-called Interaction machine.
+
+71
+00:03:35,022 --> 00:03:37,748
+If you have, you can make a physical
+network of computers,
+
+72
+00:03:37,748 --> 00:03:40,105
+and this physical connection
+means quantum effects
+
+73
+00:03:40,105 --> 00:03:42,535
+physical effects that makes things
+unpredictable.
+
+74
+00:03:42,535 --> 00:03:45,245
+They get random delays, and so on, 
+that are truly random.
+
+75
+00:03:45,245 --> 00:03:46,845
+Out of the systems control.
+
+76
+00:03:46,845 --> 00:03:50,015
+And you add power. 
+Not really maybe useful power.
+
+77
+00:03:50,015 --> 00:03:54,015
+But probably you do, because you have
+a way of generating true random numbers,
+
+78
+00:03:54,015 --> 00:03:57,685
+which you cannot do in a completely
+deterministic system otherwise.
+
+79
+00:03:57,685 --> 00:04:01,115
+So this is this notion of Turing-complete,
+and it becomes very useful.
+
+80
+00:04:01,115 --> 00:04:03,835
+Things that you think of
+as classic programming language,
+
+81
+00:04:03,835 --> 00:04:07,515
+they are all Turing-complete languages.
+C, Java, Scala, etc.
+
+82
+00:04:07,515 --> 00:04:10,065
+Now, you could artificially restrict
+the languages.
+
+83
+00:04:10,065 --> 00:04:13,855
+For example, you could talk about saying
+computation can only take so much time.
+
+84
+00:04:13,855 --> 00:04:16,195
+Or so much space,
+as a function of the input size.
+
+85
+00:04:16,195 --> 00:04:18,545
+So you can talk about
+the complexity class, time,
+
+86
+00:04:18,545 --> 00:04:21,185
+<i>f</i> of <i>n</i> for <i>n</i> the input size,
+and <i>f</i> is some function.
+
+87
+00:04:21,185 --> 00:04:23,605
+For example,
+polynomial functions.
+
+88
+00:04:23,605 --> 00:04:27,275
+That would be big <i>o</i> of <i>n</i> to the <i>k</i>.
+The <i>k</i> is some constant.
+
+89
+00:04:27,275 --> 00:04:30,035
+That would be polynomials.
+Polynomial time.
+
+90
+00:04:30,035 --> 00:04:32,395
+So we have heard this
+in complexity theory lectures, right?
+
+91
+00:04:32,395 --> 00:04:34,825
+And you can think about
+engineering language
+
+92
+00:04:34,825 --> 00:04:38,255
+to capture such complexity class.
+You could also do this for space.
+
+93
+00:04:38,255 --> 00:04:41,945
+Or for messaging
+as communication complexity.
+
+94
+00:04:41,945 --> 00:04:45,945
+For example, you could take 
+Loop-and-recursion-free Java.
+
+95
+00:04:45,945 --> 00:04:47,905
+And that's going to have
+bounded running time.
+
+96
+00:04:47,905 --> 00:04:50,145
+Or you could have 
+Conditionals-free Java
+
+97
+00:04:50,145 --> 00:04:52,345
+that has no ability 
+to make true decisions.
+
+98
+00:04:52,345 --> 00:04:54,855
+So memory and time consumption
+may be unbounded,
+
+99
+00:04:54,855 --> 00:04:56,305
+but you cannot really compute much.
+
+100
+00:04:56,305 --> 00:05:00,055
+So this unbounded computation
+will not do anything of interest.
+
+101
+00:05:00,055 --> 00:05:03,053
+Or space-bounded Turing machines
+for example, Datalog.
+
+102
+00:05:03,053 --> 00:05:04,983
+It has actually 
+bounded memory consumption.
+
+103
+00:05:04,983 --> 00:05:07,973
+We're going to see more about this.
+
+104
+00:05:07,973 --> 00:05:13,448
+Now let's think about
+the domain-specific languages.
+
+105
+00:05:13,448 --> 00:05:16,758
+Now, what does that mean?
+Well we have talked about
+
+106
+00:05:16,758 --> 00:05:18,948
+engineering languages
+for a program while restricting it.
+
+107
+00:05:18,948 --> 00:05:22,488
+For example, if it doesn't consume
+more resources than a particular amount.
+
+108
+00:05:22,488 --> 00:05:24,238
+That's one way of thinking about it.
+
+109
+00:05:24,238 --> 00:05:26,767
+That way you've got, generally,
+less than Turing-completeness,
+
+110
+00:05:26,767 --> 00:05:29,031
+and it may still be acceptable.
+That way, for example,
+
+111
+00:05:29,031 --> 00:05:32,471
+you're guaranteed a polynomial time
+restricted class can only complete
+
+112
+00:05:32,471 --> 00:05:35,331
+a computation that runs with 
+polynomial time as it's terminating time.
+
+113
+00:05:35,331 --> 00:05:37,871
+That means, it cannot cost too much.
+That might be good, right?
+
+114
+00:05:37,871 --> 00:05:40,501
+But let's pull at this abstract argument
+about cost.
+
+115
+00:05:40,501 --> 00:05:43,051
+You might also do it 
+for a particular domain.
+
+116
+00:05:43,051 --> 00:05:45,358
+You've got a certain domain,
+let's say, biology,
+
+117
+00:05:45,358 --> 00:05:47,698
+and you want to do certain kind of
+biological computations,
+
+118
+00:05:47,698 --> 00:05:48,968
+or simulations, or so,
+
+119
+00:05:48,968 --> 00:05:52,158
+you might create 
+a domain-specific programming language
+
+120
+00:05:52,158 --> 00:05:55,158
+to make certain programming
+in certain domains particularly easy.
+
+121
+00:05:55,158 --> 00:05:58,348
+You could think of SQL
+as a domain-specific language
+
+122
+00:05:58,348 --> 00:06:00,648
+for the purpose of data-querying.
+
+123
+00:06:00,648 --> 00:06:02,898
+Out of the people who know databases,
+people usually
+
+124
+00:06:02,898 --> 00:06:05,428
+call a domain something else,
+like their business domain, or so.
+
+125
+00:06:05,428 --> 00:06:08,635
+Something like that.
+And then the schema would be specific.
+
+126
+00:06:08,635 --> 00:06:10,815
+But from a different view point,
+more high level,
+
+127
+00:06:10,815 --> 00:06:12,620
+you could say, well, 
+there's a domain of querying.
+
+128
+00:06:12,620 --> 00:06:15,420
+And for that, you got a domain-specific
+language engineered for a purpose.
+
+129
+00:06:15,420 --> 00:06:16,990
+SQL is not Turing-complete.
+
+130
+00:06:16,990 --> 00:06:19,320
+It's weaker, and you get
+something out of it.
+
+131
+00:06:19,320 --> 00:06:21,410
+The programming of those
+typical jobs gets easier
+
+132
+00:06:21,410 --> 00:06:24,490
+because the language's constraint
+doesn't allow it to do other things.
+
+133
+00:06:24,490 --> 00:06:27,770
+So you are guided along
+as helped by the language design
+
+134
+00:06:27,770 --> 00:06:30,880
+what you're going to do. Usually you
+are going to be more productive.
+
+135
+00:06:30,890 --> 00:06:33,270
+And certain things
+that the language is designed for
+
+136
+00:06:33,270 --> 00:06:36,110
+will be very easy to write,
+and short to write, so to say.
+
+137
+00:06:36,110 --> 00:06:38,800
+The goal of domain specific languages
+can be of so much help
+
+138
+00:06:38,800 --> 00:06:41,410
+that typical tasks, tasks that support
+the language,
+
+139
+00:06:41,410 --> 00:06:44,150
+are usually shorter than in
+the general purpose language.
+
+140
+00:06:44,150 --> 00:06:46,599
+So there is growth
+that you can achieve that way,
+
+141
+00:06:46,599 --> 00:06:49,160
+that are desirable.
+High levels of abstraction.
+
+142
+00:06:49,160 --> 00:06:51,160
+You don't have to, 
+in a specific language,
+
+143
+00:06:51,160 --> 00:06:53,390
+that is, for example,
+only about matrix computation,
+
+144
+00:06:53,390 --> 00:06:56,120
+there's no need to talk about, 
+maybe, some low-level
+
+145
+00:06:56,120 --> 00:06:57,760
+implementation details, and so on.
+
+146
+00:06:57,760 --> 00:06:59,280
+You may have matrix operations,
+
+147
+00:06:59,280 --> 00:07:02,980
+like multiplications and so on, 
+in that language.
+
+148
+00:07:02,980 --> 00:07:06,209
+And it's a seperation of concern
+from low level aspects.
+
+149
+00:07:06,209 --> 00:07:09,839
+In a database query,
+like SQL query language,
+
+150
+00:07:09,839 --> 00:07:12,249
+there's no need to have graphics,
+and there's no need
+
+151
+00:07:12,249 --> 00:07:14,709
+for sockets and things like that.
+
+152
+00:07:14,709 --> 00:07:17,659
+A query might be distributed
+but that happens below the hood.
+
+153
+00:07:17,659 --> 00:07:21,579
+So abstraction, seperation of concern,
+are a big critieria for design of DSLs.
+
+154
+00:07:21,579 --> 00:07:23,599
+Domain-specific languages.
+
+155
+00:07:23,599 --> 00:07:25,859
+Simplicity and programmer 
+productivity, as we said,
+
+156
+00:07:25,859 --> 00:07:28,829
+by making the language 
+designed for a purpose,
+
+157
+00:07:28,829 --> 00:07:30,999
+you can make typical computations
+shorter there.
+
+158
+00:07:30,999 --> 00:07:33,099
+And you can concisely capture
+the essence of the system.
+
+159
+00:07:33,099 --> 00:07:34,949
+You can make it impossible
+to program something
+
+160
+00:07:34,949 --> 00:07:36,859
+that is not intended to be programmed.
+
+161
+00:07:36,859 --> 00:07:42,179
+And that can allow you avoid bugs,
+or do malicious code of some kind,
+
+162
+00:07:42,179 --> 00:07:44,019
+and things like that.
+
+163
+00:07:44,019 --> 00:07:46,469
+And that's, of course, also desirable.
+
+164
+00:07:46,469 --> 00:07:49,059
+Now, how do you capture the essence?
+
+165
+00:07:49,059 --> 00:07:52,129
+So you have to ask, 
+for the kind of system
+
+166
+00:07:52,129 --> 00:07:55,339
+that you want to support, or build,
+or have a language for,
+
+167
+00:07:55,339 --> 00:07:56,709
+to kind of make it flexible,
+
+168
+00:07:56,709 --> 00:07:58,279
+what language would you need?
+
+169
+00:07:58,279 --> 00:08:00,589
+Remember that, 
+even graphical user inferfaces,
+
+170
+00:08:00,589 --> 00:08:02,919
+are actually languages,
+they're visual languages.
+
+171
+00:08:02,919 --> 00:08:06,579
+So <i>drag-and-drop</i>, or moving files
+on a device level,
+
+172
+00:08:06,579 --> 00:08:09,869
+they are basically 
+operations of a language.
+
+173
+00:08:09,869 --> 00:08:12,549
+And you can write programs that way.
+
+174
+00:08:12,549 --> 00:08:18,289
+And so are APIs, together with protocols.
+Constraints on using them.
+
+175
+00:08:18,289 --> 00:08:21,519
+So these are languages designed 
+and engineered for a purpose.
+
+176
+00:08:21,519 --> 00:08:25,748
+So let's think about, 
+what do DSLs usually look like?
+
+177
+00:08:25,748 --> 00:08:28,373
+Well, many DSLs are actually
+logic-based in nature.
+
+178
+00:08:28,373 --> 00:08:31,703
+SQL is one, we will have much more
+to say about this later.
+
+179
+00:08:31,703 --> 00:08:35,503
+And conversely, most logic-based
+languages are non Turing-complete.
+
+180
+00:08:35,503 --> 00:08:37,267
+Exception would be actually Prolog.
+
+181
+00:08:37,267 --> 00:08:41,987
+So you can create the DSL,
+restricting an existing general-purpose
+
+182
+00:08:41,987 --> 00:08:43,637
+Turing-complete language.
+
+183
+00:08:43,637 --> 00:08:46,087
+Or, and maybe add a library
+of domain-specific data structures
+
+184
+00:08:46,087 --> 00:08:48,737
+and methods to create the
+domain-specific vocabulary.
+
+185
+00:08:48,737 --> 00:08:52,907
+For example, I could take Scala,
+and say I would like to make it
+
+186
+00:08:52,907 --> 00:08:56,117
+the MATLAB style language
+for kind of matrix computations
+
+187
+00:08:56,117 --> 00:08:58,697
+by saying, add a library
+for matrix computations.
+
+188
+00:08:58,697 --> 00:09:02,357
+So there's a matrix datatype that is new,
+and there is matrix multiplications,
+
+189
+00:09:02,357 --> 00:09:04,907
+and inversions, and operations 
+like this. Add it new.
+
+190
+00:09:04,907 --> 00:09:09,157
+And then in turn I forbid certain things,
+like let's say, other certain datatypes,
+
+191
+00:09:09,157 --> 00:09:11,067
+they are forbidden to create lists, 
+for example.
+
+192
+00:09:11,067 --> 00:09:12,507
+We could do that, for example.
+
+193
+00:09:12,507 --> 00:09:14,907
+But if you have user-control
+structures, and so on,
+
+194
+00:09:14,907 --> 00:09:17,657
+we might have individual 
+floating point numbers,
+
+195
+00:09:17,657 --> 00:09:20,377
+to take them out of reals and so on,
+it can loop over things, etc.
+
+196
+00:09:20,377 --> 00:09:23,757
+And that would be a DSL.
+And how do we get this?
+
+197
+00:09:23,757 --> 00:09:26,657
+It's basically a subset
+of a general purpose language,
+
+198
+00:09:26,657 --> 00:09:29,267
+you take a language, you say, 
+maybe you forbid some feature,
+
+199
+00:09:29,267 --> 00:09:31,957
+you don't permit them,
+and you add a library.
+
+200
+00:09:31,957 --> 00:09:35,877
+So that's one way to do that.
+Why would you bother with this?
+
+201
+00:09:35,877 --> 00:09:38,097
+Well, obviously, such a language
+might be easier to use.
+
+202
+00:09:38,097 --> 00:09:40,027
+And these restrictions 
+limit the search space
+
+203
+00:09:40,027 --> 00:09:43,477
+that a human has to explore
+in their minds,
+
+204
+00:09:43,477 --> 00:09:46,097
+or in their brains, to find 
+the right program.
+
+205
+00:09:46,097 --> 00:09:48,557
+And it makes it easier 
+for unsophisticated users to program.
+
+206
+00:09:48,557 --> 00:09:53,067
+So for example, SQL is a language
+that business people can deal with
+
+207
+00:09:53,067 --> 00:09:56,087
+that have not really learned 
+programming properly.
+
+208
+00:09:56,087 --> 00:10:00,807
+Also, such restrictions may make
+certain optimization / analyses possible,
+
+209
+00:10:00,807 --> 00:10:03,497
+that are not possible, unfeasible
+for general-purpose languages.
+
+210
+00:10:03,497 --> 00:10:06,767
+For example, there are certain logics,
+
+211
+00:10:06,767 --> 00:10:10,097
+for which equivalence of two 
+logical formulas is desirable,
+
+212
+00:10:10,097 --> 00:10:13,097
+or whether a formula is satisfiable.
+
+213
+00:10:13,097 --> 00:10:16,627
+It is undesirable to tell any
+industrial property or general-purpose
+
+214
+00:10:16,627 --> 00:10:20,100
+programming language, like C,
+for example, where it halts.
+
+215
+00:10:20,100 --> 00:10:22,370
+Or some general-purpose
+correctness properties.
+
+216
+00:10:22,370 --> 00:10:24,610
+It is impossible to tell
+for this very powerful language.
+
+217
+00:10:24,610 --> 00:10:27,310
+But by making the language smaller,
+and restricting things,
+
+218
+00:10:27,310 --> 00:10:29,910
+you might be able to tell such things.
+
+219
+00:10:29,910 --> 00:10:32,276
+So you can, for example, 
+for a fragment of SQL,
+
+220
+00:10:32,276 --> 00:10:34,642
+not full SQL,
+it's desirable to find
+
+221
+00:10:34,642 --> 00:10:40,290
+the smallest possible equivalent 
+program query in that language.
+
+222
+00:10:40,290 --> 00:10:42,680
+So why is this non-trivial?
+
+223
+00:10:42,680 --> 00:10:47,870
+Well, given a query of a certain size,
+there's only finitely many
+
+224
+00:10:47,870 --> 00:10:49,580
+shorter queries.
+
+225
+00:10:49,580 --> 00:10:52,260
+But testing whether shorter queries
+are equivalent to my query,
+
+226
+00:10:52,260 --> 00:10:55,420
+in general, is undesirable, even for SQL,
+and certainly it's undesirable for C,
+
+227
+00:10:55,420 --> 00:10:57,940
+where two C programs 
+that were written independently
+
+228
+00:10:57,940 --> 00:11:01,990
+are equivalent for all possible 
+inputs. Undesirable.
+
+229
+00:11:01,990 --> 00:11:04,720
+But for restricted languages,
+maybe desirable.
+
+230
+00:11:04,720 --> 00:11:09,130
+For example, for SELECT FROM WHERE
+restricted fragment queries in SQL,
+
+231
+00:11:09,130 --> 00:11:10,510
+this is desirable.
+
+232
+00:11:10,510 --> 00:11:14,780
+So, again, a few more words about
+interface versus language design.
+
+233
+00:11:14,780 --> 00:11:18,310
+You can really think of interface
+and languages interchangeably.
+
+234
+00:11:18,310 --> 00:11:21,300
+In a sense, you can think of DSL
+update by the general-purpose language
+
+235
+00:11:21,300 --> 00:11:26,510
+adding a particular kind of API
+and library to it.
+
+236
+00:11:26,510 --> 00:11:29,920
+A bit like what you heard in visualization
+about taking, so to say,
+
+237
+00:11:29,920 --> 00:11:32,250
+above the operating systems,
+a Unix-like operating system.
+
+238
+00:11:32,250 --> 00:11:36,180
+you've got simpler machine language,
+plus you've got a POSIX system calls.
+
+239
+00:11:36,180 --> 00:11:40,570
+It's extended, it's a library of things,
+and this extends from the viewpoint
+
+240
+00:11:40,570 --> 00:11:43,470
+of an application program in a 
+Unix operating system,
+
+241
+00:11:43,470 --> 00:11:46,710
+that kind of, the language itself.
+
+242
+00:11:46,710 --> 00:11:50,260
+And you get a DSL 
+for Unix programming, so to say.
+
+243
+00:11:50,260 --> 00:11:54,780
+Now, so when you design 
+an interface, or a language,
+
+244
+00:11:54,780 --> 00:11:56,540
+you can switch backward 
+and forward between
+
+245
+00:11:56,540 --> 00:11:59,900
+this viewpoint of design language, 
+design the interface.
+
+246
+00:11:59,900 --> 00:12:03,110
+And it may help you to do a better job.
+
+247
+00:12:03,110 --> 00:12:05,960
+Of course, through layering,
+creates interpreter stacks.
+
+248
+00:12:05,960 --> 00:12:08,280
+If you layer these kind of languages
+on top of each other,
+
+249
+00:12:08,280 --> 00:12:09,890
+you get a stack of interpreters.
+
+250
+00:12:09,890 --> 00:12:13,590
+By the way, if you take a DSL
+defined as a general-purpose
+
+251
+00:12:13,590 --> 00:12:16,040
+programming language, 
+plus a library, and that's your DSL,
+
+252
+00:12:16,040 --> 00:12:21,040
+notion here, the term used is,
+that's called a "shallowly embedded" DSL.
+
+253
+00:12:21,040 --> 00:12:23,360
+So, I've mentioned SQL several times now.
+
+254
+00:12:23,360 --> 00:12:28,550
+It's probably the most successful 
+example of a DSL, so far.
+
+255
+00:12:28,550 --> 00:12:31,633
+So let me just say, we will talk 
+more about this concept of
+
+256
+00:12:31,633 --> 00:12:33,216
+declarative languages later,
+
+257
+00:12:33,216 --> 00:12:34,510
+But here's an example.
+
+258
+00:12:34,510 --> 00:12:38,530
+So we've got a language, 
+an example query in SQL that says,
+
+259
+00:12:38,530 --> 00:12:42,680
+SELECT student names, and course names, 
+and the grades of courses taken,
+
+260
+00:12:42,680 --> 00:12:46,480
+FROM triples of students tables, 
+courses tables, and taken tables.
+
+261
+00:12:46,480 --> 00:12:51,450
+Such that the student ID, the ID 
+of the student and the student relation
+
+262
+00:12:51,450 --> 00:12:53,870
+is the same as the student ID
+and the taken relation,
+
+263
+00:12:53,870 --> 00:12:58,880
+and the taken course ID is the same 
+as the course ID, in the course.
+
+264
+00:12:58,880 --> 00:13:02,570
+So we say these two 'join', so to say.
+
+265
+00:13:02,570 --> 00:13:04,550
+If you're a database expert, 
+that's very obvious,
+
+266
+00:13:04,550 --> 00:13:07,380
+otherwise you might not completely
+understand it from that description,
+
+267
+00:13:07,380 --> 00:13:10,510
+but the important thing is,
+it is a very declarative statement here.
+
+268
+00:13:10,510 --> 00:13:14,420
+I say, SELECT what I want, 
+which comes to end in a WHERE clause,
+
+269
+00:13:14,420 --> 00:13:17,640
+and so on, but I'm not saying
+how to compute it.
+
+270
+00:13:17,640 --> 00:13:20,790
+That's completely happening
+under the hood of the database system.
+
+271
+00:13:20,790 --> 00:13:23,210
+So this is a declarative language.
+
+272
+00:13:23,210 --> 00:13:26,840
+And it's super successful, there are
+huge, multi-billion dollar industry,
+
+273
+00:13:26,840 --> 00:13:30,150
+like the big part of the IT industry
+really, because, I mean,
+
+274
+00:13:30,150 --> 00:13:33,670
+databases play a role
+in all these applications, and SAP
+
+275
+00:13:33,670 --> 00:13:35,120
+and things like that.
+
+276
+00:13:35,120 --> 00:13:37,570
+There's a huge hardware and consulting
+market around
+
+277
+00:13:37,570 --> 00:13:39,900
+so this is a gigantic market
+for computer science.
+
+278
+00:13:39,900 --> 00:13:43,410
+And it really drives this nowadays.
+
+279
+00:13:43,410 --> 00:13:45,730
+And to some extent, it was an accident
+that this happened,
+
+280
+00:13:45,730 --> 00:13:48,760
+because there was this gentleman
+Ed Codd at IBM,
+
+281
+00:13:48,760 --> 00:13:51,120
+who advocated for 
+relational database systems.
+
+282
+00:13:51,120 --> 00:13:53,570
+Logic-based, with a clean
+theoretical foundation.
+
+283
+00:13:53,570 --> 00:13:55,500
+And nobody wanted to hear that, really.
+
+284
+00:13:55,500 --> 00:13:59,330
+At that time, IMS was the big thing,
+of the relational database systems,
+
+285
+00:13:59,330 --> 00:14:01,840
+something that has now almost died,
+except for legacy systems
+
+286
+00:14:01,840 --> 00:14:06,230
+that you as a student probably
+don't see very soon, but these,
+
+287
+00:14:09,290 --> 00:14:11,370
+so IBM, the management,
+the marketing people,
+
+288
+00:14:11,370 --> 00:14:12,898
+were not particularly interested.
+
+289
+00:14:12,898 --> 00:14:14,752
+They were not convinced 
+by the implementations
+
+290
+00:14:14,752 --> 00:14:16,752
+that this kind of relational
+database abstraction,
+
+291
+00:14:16,752 --> 00:14:20,452
+and declarative languages like this,
+and so on, were such a good idea.
+
+292
+00:14:20,452 --> 00:14:23,734
+And what happened is, at some point
+you want to deliver some product,
+
+293
+00:14:23,734 --> 00:14:25,324
+and IMS wasn't ready next version
+
+294
+00:14:25,324 --> 00:14:27,674
+and just a relational database 
+server was ready.
+
+295
+00:14:27,674 --> 00:14:31,344
+And that's how it got out, and then 
+it got lots of people started liking it.
+
+296
+00:14:31,344 --> 00:14:35,404
+So, and the nice thing is also that,
+it's not just a query language
+
+297
+00:14:35,404 --> 00:14:38,594
+and things are easy to understand,
+and you say "what", rather than "how",
+
+298
+00:14:38,594 --> 00:14:41,064
+and you don't have to have 
+technical skills.
+
+299
+00:14:41,064 --> 00:14:43,504
+Instead, the purpose of the
+computer optimizing the system
+
+300
+00:14:43,504 --> 00:14:46,064
+to turn this into good execution scheme.
+
+301
+00:14:46,064 --> 00:14:49,694
+It's very short, and very succinct.
+And it's only what queries.
+
+302
+00:14:49,694 --> 00:14:51,874
+You cannot write
+something else in the query
+
+303
+00:14:51,874 --> 00:14:53,744
+in this kind of select statement.
+
+304
+00:14:53,744 --> 00:14:58,554
+So you cannot write evilly-behaved things.
+You cannot really write a virus.
+
+305
+00:14:58,554 --> 00:15:01,044
+You might do something
+like denial of service attack
+
+306
+00:15:01,044 --> 00:15:03,994
+on the database system
+by just writing a very expensive query.
+
+307
+00:15:03,994 --> 00:15:04,974
+You could do that.
+
+308
+00:15:04,974 --> 00:15:08,694
+You cannot do graphs, you cannot really
+make a graphical computer game in SQL.
+
+309
+00:15:08,694 --> 00:15:12,694
+But the very restricted scheme
+and syntax of the language
+
+310
+00:15:12,694 --> 00:15:16,194
+makes it very easy to direct it
+towards correct programs.
+
+311
+00:15:16,194 --> 00:15:18,864
+And it takes little skill to use it.
+
+312
+00:15:19,254 --> 00:15:21,597
+So that's of course a big success.
+
+313
+00:15:21,597 --> 00:15:23,587
+So we're going to talk
+much more about this later.
+
+314
+00:15:23,587 --> 00:15:24,767
+But first, as a next step,
+
+315
+00:15:24,767 --> 00:15:27,227
+we're going to talk 
+a little more about interpretation.

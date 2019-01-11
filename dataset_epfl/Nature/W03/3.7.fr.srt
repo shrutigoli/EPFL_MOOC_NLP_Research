@@ -1,0 +1,1398 @@
+1
+00:00:03,101 --> 00:00:04,920
+Bienvenue dans
+Nature, In Code.
+
+2
+00:00:04,920 --> 00:00:07,098
+Nous sommes au chapitre 3, 
+cours 7.
+
+3
+00:00:07,160 --> 00:00:09,210
+Tout est maintenant prêt
+
+4
+00:00:09,210 --> 00:00:12,776
+pour l'implémentation de
+la dérive génétique en JavaScript.
+
+5
+00:00:12,776 --> 00:00:14,331
+Commençons sans plus tarder.
+
+6
+00:00:14,359 --> 00:00:18,020
+Je vais créer un nouveau fichier,
+un nouveau fichier html.
+
+7
+00:00:18,020 --> 00:00:19,941
+Je vais faire ça
+en partant de rien.
+
+8
+00:00:19,941 --> 00:00:23,450
+Je vais utiliser le <i>doctype</i> html
+tout en haut.
+
+9
+00:00:23,463 --> 00:00:25,793
+Oups ! h-t-m-l.
+
+10
+00:00:27,854 --> 00:00:31,249
+Je vais ensuite
+mettre un tag html,
+
+11
+00:00:32,240 --> 00:00:36,043
+et je vais,
+comme toujours, y insérer
+
+12
+00:00:36,068 --> 00:00:40,636
+un <i>head</i>
+et un <i>body</i>.
+
+13
+00:00:44,077 --> 00:00:47,875
+Je vais ensuite indenter ceci,
+comme toujours.
+
+14
+00:00:48,797 --> 00:00:53,807
+Et ici, dans le <i>head</i>,
+je vais définir mon script.
+
+15
+00:00:54,370 --> 00:00:56,788
+&lt;script&gt; et &lt;/script&gt;.
+
+16
+00:00:56,808 --> 00:00:59,907
+C'est là que je vais mettre
+mon code JavaScript.
+
+17
+00:01:01,647 --> 00:01:03,872
+Je vais tout de suite
+enregistrer ça.
+
+18
+00:01:03,975 --> 00:01:06,255
+Fichier,
+Enregistrer sous...
+
+19
+00:01:08,211 --> 00:01:10,252
+Ici, avec ces exemples de code,
+
+20
+00:01:10,884 --> 00:01:17,924
+et je vais enregistrer ça
+sous le nom "genetic_drift".
+
+21
+00:01:19,784 --> 00:01:21,595
+Voilà, c'est enregistré.
+
+22
+00:01:21,657 --> 00:01:22,624
+Bien.
+
+23
+00:01:23,415 --> 00:01:26,206
+La coloration syntaxique s'applique.
+Tout est prêt.
+
+24
+00:01:26,226 --> 00:01:30,107
+Donc, comment allons-nous
+implémenter la dérive génétique ?
+
+25
+00:01:30,687 --> 00:01:34,849
+Eh bien, réfléchissons tout d'abord
+aux variables que nous devons définir,
+
+26
+00:01:34,849 --> 00:01:36,557
+les valeurs que nous manipulerons.
+
+27
+00:01:36,557 --> 00:01:41,148
+Bien évidemment, il nous faut
+une trace des fréquences alléliques.
+
+28
+00:01:41,148 --> 00:01:42,909
+Pour cela,
+nous avons la variable <i>p</i>.
+
+29
+00:01:42,909 --> 00:01:45,976
+Je vais l'initialiser à 0,5.
+
+30
+00:01:45,996 --> 00:01:49,177
+Tout comme dans l'exemple
+du cours précédent.
+
+31
+00:01:49,997 --> 00:01:53,147
+Je ne vais pas
+tout de suite définir <i>q</i>
+
+32
+00:01:53,167 --> 00:01:58,749
+car q peut être trouvé
+en calculant 1 - <i>p</i>, donc <i>p</i> suffit.
+
+33
+00:01:59,110 --> 00:02:04,758
+L'autre variable dont j'ai besoin
+est évidemment la taille de la population.
+
+34
+00:02:04,806 --> 00:02:06,662
+Je vais utiliser <i>N</i>
+
+35
+00:02:06,672 --> 00:02:10,842
+parce que c'est comme ça
+qu'on le note en général.
+
+36
+00:02:10,842 --> 00:02:15,123
+Disons-que je vais l'initialiser
+à 1 000, par exemple.
+
+37
+00:02:15,133 --> 00:02:16,938
+Il s'agit donc
+d'une population finie,
+
+38
+00:02:16,958 --> 00:02:21,159
+pas aussi petite que celle que
+nous avions utilisée précédemment,
+
+39
+00:02:21,159 --> 00:02:25,158
+mais assez petite tout de même,
+un millier d'individus.
+
+40
+00:02:25,220 --> 00:02:28,890
+Ce que je voudrais maintenant faire
+à partir de cette population,
+
+41
+00:02:28,900 --> 00:02:31,650
+c'est comprendre
+
+42
+00:02:31,670 --> 00:02:37,112
+quelle sera la composition génétique
+de la génération suivante.
+
+43
+00:02:37,184 --> 00:02:43,014
+Notez que nous ne nous soucions plus
+de connaître le génotype
+
+44
+00:02:43,014 --> 00:02:45,254
+de ces allèles.
+
+45
+00:02:45,254 --> 00:02:48,765
+Nous ne sommes pas vraiment intéressés
+par l'évolution elle-même,
+
+46
+00:02:49,175 --> 00:02:50,175
+qui est,
+
+47
+00:02:50,175 --> 00:02:54,745
+selon notre définition, le changement
+de fréquences alléliques au fil du temps.
+
+48
+00:02:54,766 --> 00:02:58,476
+Nous allons donc juste suivre
+l'évolution des allèles,
+
+49
+00:02:58,496 --> 00:03:00,395
+et non plus des génotypes.
+
+50
+00:03:00,395 --> 00:03:05,376
+À présent, je dois calculer
+la nouvelle génération à partir de ça.
+
+51
+00:03:06,476 --> 00:03:09,847
+Comme pour l'exemple
+d'Hardy-Weinberg,
+
+52
+00:03:09,847 --> 00:03:13,415
+je vais définir une fonction,
+next_generation().
+
+53
+00:03:14,117 --> 00:03:16,375
+Si vous vous souvenez-bien,
+
+54
+00:03:16,375 --> 00:03:20,006
+la fonction next_generation()
+d'Hardy-Weinberg était assez simple.
+
+55
+00:03:20,026 --> 00:03:22,666
+Nous suivions l'évolution
+des fréquences génotypiques,
+
+56
+00:03:22,666 --> 00:03:27,416
+et nous pouvions les calculer
+en fonction des valeurs de <i>p</i> et <i>q</i>.
+
+57
+00:03:27,416 --> 00:03:30,282
+Ici, c'est un peu plus compliqué
+
+58
+00:03:30,682 --> 00:03:36,972
+puisque nous devons simuler
+l'échantillon aléatoire d'allèles
+
+59
+00:03:36,972 --> 00:03:38,746
+à partir d'une réserve
+de gamètes.
+
+60
+00:03:38,839 --> 00:03:43,099
+Nous ferons ça à la façon
+d'un pile ou face.
+
+61
+00:03:43,099 --> 00:03:46,869
+C'est pour cela que nous avons fait
+tous ces exercices de pile ou face.
+
+62
+00:03:46,869 --> 00:03:53,129
+Je vais donc tirer
+2<i>N</i> allèles à partir de
+
+63
+00:03:53,889 --> 00:03:57,119
+cette réserve de gamètes
+quasi infinie.
+
+64
+00:03:57,148 --> 00:04:01,149
+Je vais donc d'abord
+définir la variable <i>draws</i>,
+
+65
+00:04:01,149 --> 00:04:03,778
+le nombre de tirages
+que je vais faire,
+
+66
+00:04:03,788 --> 00:04:06,680
+qui est bien sûr 2 x <i>N</i>,
+
+67
+00:04:06,680 --> 00:04:09,598
+car c'est le nombre d'allèles
+dont nous avons besoin.
+
+68
+00:04:10,461 --> 00:04:13,121
+Je vais stocker
+les allèles ici,
+
+69
+00:04:13,151 --> 00:04:14,333
+ceux que je tire.
+
+70
+00:04:14,373 --> 00:04:16,585
+Je dois stocker
+le nombre d'allèles retirés.
+
+71
+00:04:16,585 --> 00:04:20,195
+Je vais nommer
+ces deux compteurs a1 et a2,
+
+72
+00:04:20,545 --> 00:04:25,574
+et je vais évidemment
+les initialiser à zéro
+
+73
+00:04:25,698 --> 00:04:28,300
+à chaque nouvelle génération.
+
+74
+00:04:29,160 --> 00:04:34,809
+Maintenant, je dois
+implémenter le pile ou face.
+
+75
+00:04:36,325 --> 00:04:37,869
+Allons-y.
+
+76
+00:04:37,965 --> 00:04:41,806
+Nous voulons faire ce tirage
+plusieurs fois.
+
+77
+00:04:41,806 --> 00:04:45,424
+Nous voulons faire un tirage,
+peu importe le nombre d'allèles tirés.
+
+78
+00:04:45,424 --> 00:04:49,135
+Bien évidemment, il faut pour cela
+implémenter une boucle.
+
+79
+00:04:50,576 --> 00:04:53,426
+Nous utilisons
+la structure habituelle,
+
+80
+00:04:53,434 --> 00:04:59,457
+donc je vais initialiser
+la variable ici.
+
+81
+00:04:59,457 --> 00:05:04,167
+Ensuite, je vais dire que
+tant que<i> i</i> est inférieur à <i>draws</i>,
+
+82
+00:05:04,770 --> 00:05:07,675
+et, évidemment,
+je dois m'assurer d'incrémenter <i>i</i>
+
+83
+00:05:07,720 --> 00:05:09,665
+pour éviter la boucle infinie.
+
+84
+00:05:11,155 --> 00:05:12,584
+Bien.
+
+85
+00:05:14,519 --> 00:05:17,454
+Nous allons faire appel
+à notre vieil ami, Math.random().
+
+86
+00:05:17,552 --> 00:05:23,455
+Nous allons tirer un nombre aléatoire.
+C'est notre pile ou face.
+
+87
+00:05:23,455 --> 00:05:27,015
+Comme vous vous en souvenez peut-être,
+l'exemple du pile ou face
+
+88
+00:05:27,035 --> 00:05:28,320
+était similaire à ceci.
+
+89
+00:05:28,350 --> 00:05:35,709
+Si Math.random()
+est inférieur ou égal à 0,5,
+
+90
+00:05:37,116 --> 00:05:39,482
+nous ferons alors quelque chose,
+
+91
+00:05:39,508 --> 00:05:42,514
+qui sera garder une trace
+du nombre de fois que cela se produit.
+
+92
+00:05:43,337 --> 00:05:45,466
+Nous pourrions,
+en principe, faire pareil ici
+
+93
+00:05:45,466 --> 00:05:48,341
+puisque nous savons,
+en fait,
+
+94
+00:05:49,524 --> 00:05:55,375
+que la probabilité de tirer un a1
+est exactement de 0,5.
+
+95
+00:05:55,725 --> 00:05:58,074
+Il s'agit donc
+d'un pile ou face équitable.
+
+96
+00:05:58,565 --> 00:06:01,065
+Je vais ensuite simplement dire
+
+97
+00:06:01,085 --> 00:06:03,853
+que si ça arrive,
+en moyenne une fois sur deux,
+
+98
+00:06:03,858 --> 00:06:07,686
+alors j'incrémente
+le compteur a1 de 1.
+
+99
+00:06:08,599 --> 00:06:10,579
+Si ça n'arrive pas,
+
+100
+00:06:10,579 --> 00:06:14,970
+si c'est l'autre côté qui est choisi,
+autrement dit, l'autre allèle,
+
+101
+00:06:14,970 --> 00:06:20,230
+c'est évidemment celui-ci
+que je vais incrémenter de 1, a2.
+
+102
+00:06:20,740 --> 00:06:22,966
+Je vais incrémenter a2 de 1.
+
+103
+00:06:23,291 --> 00:06:24,779
+Et c'est à peu près tout.
+
+104
+00:06:24,789 --> 00:06:29,771
+Vous pouvez voir que c'est presque
+identique à l'exemple du pile ou face.
+
+105
+00:06:29,940 --> 00:06:32,260
+Ensuite,
+une fois avoir fait tout ça,
+
+106
+00:06:32,260 --> 00:06:35,061
+donc ma boucle for
+se termine ici,
+
+107
+00:06:35,091 --> 00:06:39,010
+et c'est une autre raison pour laquelle
+il est utile d'indenter correctement,
+
+108
+00:06:39,010 --> 00:06:42,071
+pour que vous puissiez voir
+
+109
+00:06:42,071 --> 00:06:44,881
+quelle accolade ferme
+quelle autre accolade.
+
+110
+00:06:44,881 --> 00:06:46,491
+Car,
+comme vous avez pu le noter,
+
+111
+00:06:46,511 --> 00:06:48,701
+au fur et à mesure que
+le code se complexifie,
+
+112
+00:06:48,701 --> 00:06:50,451
+nous avons ces imbrications.
+
+113
+00:06:50,451 --> 00:06:55,061
+Nous avons une fonction ici
+qui a son corps de fonction.
+
+114
+00:06:55,061 --> 00:06:58,071
+Et dans ce corps de fonction,
+nous avons une boucle for.
+
+115
+00:06:58,071 --> 00:07:02,601
+Et dans cette boucle for,
+nous avons un <i>if</i> et un <i>else</i>,
+
+116
+00:07:02,601 --> 00:07:05,266
+et c'est pourquoi
+nous avons cette imbrication
+
+117
+00:07:05,266 --> 00:07:10,821
+où nous avons
+trois accolades fermantes ici.
+
+118
+00:07:10,821 --> 00:07:13,540
+Si vous n'indentez pas
+correctement,
+
+119
+00:07:13,540 --> 00:07:17,248
+il serait difficile de voir
+à quoi elles correspondent.
+
+120
+00:07:18,132 --> 00:07:21,374
+Ici, il est facile de voir
+que celle-ci va avec celle-là,
+
+121
+00:07:21,374 --> 00:07:24,244
+et que celle-ci doit être
+le niveau suivant, donc celle-là,
+
+122
+00:07:24,244 --> 00:07:28,544
+et celle-ci doit correspondre
+à la fermeture de la fonction.
+
+123
+00:07:29,014 --> 00:07:34,482
+Je vous recommande fortement
+d'indenter constamment.
+
+124
+00:07:34,815 --> 00:07:40,724
+Donc, à la fin de la boucle for,
+nous avons tiré nos allèles,
+
+125
+00:07:40,744 --> 00:07:43,994
+et nous pouvons maintenant
+calculer la nouvelle fréquence allélique.
+
+126
+00:07:44,024 --> 00:07:47,550
+Notre nouveau <i>p</i>
+a maintenant comme valeur
+
+127
+00:07:47,550 --> 00:07:52,910
+le nombre de a1 choisis
+divisé par le nombre d'allèles,
+
+128
+00:07:53,110 --> 00:07:56,707
+qui est stocké
+dans la variable <i>draws</i>. C'est 2<i>N</i>.
+
+129
+00:07:57,459 --> 00:07:59,829
+Et c'est à peu près tout.
+
+130
+00:08:00,219 --> 00:08:05,879
+Maintenant, le problème, c'est que
+quelque chose ne va pas dans le code
+
+131
+00:08:05,909 --> 00:08:08,060
+si nous voulons
+faire ça plusieurs fois.
+
+132
+00:08:08,090 --> 00:08:11,218
+Ce code ne marchera qu'une fois,
+
+133
+00:08:11,218 --> 00:08:15,720
+puisque nous avons implémenté
+un pile ou face
+
+134
+00:08:15,720 --> 00:08:17,650
+avec une probabilité de 50 %.
+
+135
+00:08:17,650 --> 00:08:21,581
+Cependant, comme nous l'avons vu
+dans le cours précédent,
+
+136
+00:08:21,581 --> 00:08:26,930
+nous nous attendons à ce que
+la valeur <i>p</i> change au fil du temps.
+
+137
+00:08:27,250 --> 00:08:30,521
+Donc la probabilité de tirer a1
+
+138
+00:08:30,521 --> 00:08:33,878
+ne sera pas
+tout le temps de 50 %.
+
+139
+00:08:34,228 --> 00:08:35,450
+Elle changera.
+
+140
+00:08:35,880 --> 00:08:40,383
+Ce que je dois faire, 
+c'est donc remplacer le 0,5
+
+141
+00:08:40,383 --> 00:08:43,991
+que j'ai codé en dur, ici,
+ce pile ou face équitable, par <i>p</i>.
+
+142
+00:08:44,591 --> 00:08:46,283
+C'est très important.
+
+143
+00:08:48,152 --> 00:08:52,643
+Parce que ça signifie, en gros,
+que je choisis un allèle a1
+
+144
+00:08:52,643 --> 00:08:57,384
+avec une probabilité égale
+à cette valeur de <i>p</i>,
+
+145
+00:08:57,384 --> 00:09:00,733
+la fréquence actuelle
+de l'allèle a1.
+
+146
+00:09:00,733 --> 00:09:02,162
+Et bien sûr, ceci est correct.
+
+147
+00:09:02,202 --> 00:09:04,998
+Si <i>p</i>, par exemple,
+avait la valeur 0,2,
+
+148
+00:09:04,998 --> 00:09:08,473
+alors 20 % des allèles
+étaient des a1,
+
+149
+00:09:08,744 --> 00:09:11,676
+et je tirerais un allèle a1
+de la réserve de gamètes
+
+150
+00:09:11,676 --> 00:09:13,926
+avec une probabilité de 20 %.
+
+151
+00:09:13,926 --> 00:09:18,348
+Cette condition est vraie
+exactement 20 % du temps,
+
+152
+00:09:18,348 --> 00:09:21,838
+si Math.random()
+est inférieur ou égal à 0,2.
+
+153
+00:09:21,838 --> 00:09:27,040
+Donc peu importe la valeur de <i>p</i>,
+cette instruction sera toujours correcte
+
+154
+00:09:27,132 --> 00:09:34,022
+car nous devons tirer l'allèle a1
+selon sa fréquence.
+
+155
+00:09:35,232 --> 00:09:38,832
+Bien. Il s'agit maintenant d'une fonction
+de génération suivante générique
+
+156
+00:09:38,854 --> 00:09:40,130
+pour la dérive génétique.
+
+157
+00:09:40,955 --> 00:09:42,299
+Pourquoi ne pas la tester ?
+
+158
+00:09:42,299 --> 00:09:46,969
+Pourquoi ne pas la tester
+tout de suite plusieurs fois ?
+
+159
+00:09:46,969 --> 00:09:50,429
+Disons que je veuille appeler
+cette fonction mille fois.
+
+160
+00:09:50,429 --> 00:09:55,470
+Nous allons construire un millier
+de générations, les unes après les autres.
+
+161
+00:09:55,470 --> 00:09:57,838
+Je vais le faire
+de très nombreuses fois,
+
+162
+00:09:57,838 --> 00:09:59,083
+donc avec des boucles for.
+
+163
+00:09:59,083 --> 00:10:01,272
+Je vais avoir
+une autre boucle ici.
+
+164
+00:10:01,652 --> 00:10:05,193
+Je créé de nouveau une variable
+pour cette boucle en particulier,
+
+165
+00:10:05,193 --> 00:10:09,624
+et je vais dire
+<i>i</i> inférieur à 1 000,
+
+166
+00:10:10,379 --> 00:10:13,609
+ensuite je devrai,
+évidemment, m'assurer que...
+
+167
+00:10:13,609 --> 00:10:16,051
+j'incrémente toujours
+ce compteur ici,
+
+168
+00:10:16,051 --> 00:10:18,273
+sinon je créé
+des boucles infinies.
+
+169
+00:10:18,593 --> 00:10:23,492
+Et ensuite, je vais simplement appeler
+la fonction next_generation.
+
+170
+00:10:23,492 --> 00:10:27,146
+Cette fonction
+est maintenant appelée mille fois.
+
+171
+00:10:29,187 --> 00:10:33,024
+Je suis vraiment curieux
+de voir comment va évoluer <i>p</i>.
+
+172
+00:10:33,214 --> 00:10:37,315
+Affichons maintenant ce qu'il se passe ici
+à chaque fois que c'est appelé,
+
+173
+00:10:37,315 --> 00:10:39,384
+après l'appel à
+la fonction next_generation.
+
+174
+00:10:39,764 --> 00:10:44,380
+Voyons voir la valeur de <i>p</i>
+maintenant.
+
+175
+00:10:45,338 --> 00:10:47,840
+console.log(p).
+
+176
+00:10:48,850 --> 00:10:51,440
+Et en principe, bien sûr,
+
+177
+00:10:51,440 --> 00:10:54,533
+je pourrais faire ça mieux
+en disant,
+
+178
+00:10:57,897 --> 00:11:00,725
+disons, « generation » ...
+
+179
+00:11:01,153 --> 00:11:04,573
+Nous n'allons pas seulement
+afficher <i>p</i>,
+
+180
+00:11:04,573 --> 00:11:10,309
+mais affichons d'abord
+la génération dans laquelle nous sommes,
+
+181
+00:11:10,309 --> 00:11:14,428
+qui est <i>i</i>,
+puis affichons ensuite <i>p</i>.
+
+182
+00:11:14,428 --> 00:11:19,121
+Et vous savez quoi, affichons aussi <i>q</i>,
+qui revient bien sûr à 1 - <i>p</i>.
+
+183
+00:11:19,190 --> 00:11:21,561
+Nous affichons donc
+les trois valeurs, à savoir,
+
+184
+00:11:21,677 --> 00:11:25,260
+la génération courante,
+la valeur de <i>p</i>,
+
+185
+00:11:25,660 --> 00:11:29,141
+et la valeur correspondant à <i>q</i>.
+
+186
+00:11:29,738 --> 00:11:32,022
+Une dernière chose que
+je voudrais faire,
+
+187
+00:11:32,022 --> 00:11:35,021
+juste pour pouvoir
+changer facilement à l'avenir.
+
+188
+00:11:35,021 --> 00:11:37,317
+Ici, nous avons codé en dur 1000.
+
+189
+00:11:37,317 --> 00:11:42,851
+Pourquoi ne pas stocker ça
+dans une variable
+
+190
+00:11:42,851 --> 00:11:45,500
+pour que nous puissions facilement
+changer ça plus tard.
+
+191
+00:11:45,500 --> 00:11:47,219
+J'y vais donc de ce pas.
+
+192
+00:11:47,219 --> 00:11:49,371
+Je vais définir
+une nouvelle variable ici,
+
+193
+00:11:49,371 --> 00:11:53,962
+var generations = 1000 ;
+
+194
+00:11:54,002 --> 00:11:57,252
+Puis ici, je vais remplacer
+ce 1000 codé en dur
+
+195
+00:11:57,252 --> 00:11:59,372
+tout simplement
+par la variable <i>generations</i>.
+
+196
+00:11:59,451 --> 00:12:03,650
+Je peux maintenant facilement
+changer cette valeur.
+
+197
+00:12:04,290 --> 00:12:09,862
+Bien. Enregistrons ça
+et passons sur le navigateur
+
+198
+00:12:09,862 --> 00:12:13,303
+pour voir
+comment se comporte le code.
+
+199
+00:12:14,272 --> 00:12:15,977
+Me voilà sur le navigateur.
+
+200
+00:12:15,977 --> 00:12:19,271
+Je vais ouvrir le fichier,
+<i>Ouvrir Fichier</i>,
+
+201
+00:12:19,994 --> 00:12:23,895
+voici ma dérive génétique,
+et je vais l'ouvrir.
+
+202
+00:12:24,390 --> 00:12:28,404
+Je dois bien sûr aussi ouvrir
+la console JavaScript.
+
+203
+00:12:28,404 --> 00:12:30,208
+Donc, sur Chrome,
+
+204
+00:12:30,228 --> 00:12:33,208
+c'est Présentation &gt;
+Développeur &gt; Console JavaScript.
+
+205
+00:12:33,978 --> 00:12:39,000
+Vous pouvez voir qu'en fait,
+il se passe beaucoup de choses.
+
+206
+00:12:39,000 --> 00:12:41,630
+Défilons jusqu'en haut.
+
+207
+00:12:42,210 --> 00:12:45,751
+Nous avons commencé
+à 0,5 et 0,5.
+
+208
+00:12:45,751 --> 00:12:49,880
+Et comme vous pouvez le voir,
+ça a rapidement changé,
+
+209
+00:12:49,880 --> 00:12:55,882
+et notre <i>p</i> semble avoir
+bien diminué au fil des générations.
+
+210
+00:12:55,882 --> 00:12:59,071
+Mais après un moment,
+il est en fait remonté.
+
+211
+00:12:59,071 --> 00:13:04,911
+Vous pouvez donc voir ici qu'il est
+au-dessus de 0,5, et ainsi de suite.
+
+212
+00:13:04,911 --> 00:13:06,932
+Vous pouvez défiler
+jusqu'en bas
+
+213
+00:13:06,932 --> 00:13:11,351
+et vous pouvez suivre
+l'évolution de <i>p</i> au cours du temps.
+
+214
+00:13:11,791 --> 00:13:15,282
+Puis, à la fin, vous pouvez voir,
+par exemple, qu'après 1 000 générations,
+
+215
+00:13:15,282 --> 00:13:19,112
+nous sommes
+à environ 65 % / 35 %.
+
+216
+00:13:19,532 --> 00:13:23,846
+Voici donc la dérive génétique
+implémentée en JavaScript.
+
+217
+00:13:23,846 --> 00:13:25,992
+Vous pouvez voir
+beaucoup d'évolution ici,
+
+218
+00:13:25,992 --> 00:13:30,912
+selon notre définition pratique
+du changement des fréquences alléliques
+
+219
+00:13:30,932 --> 00:13:32,742
+dans une population
+au cours du temps.
+
+220
+00:13:32,762 --> 00:13:38,278
+Comme c'était très amusant,
+relançons-le une nouvelle fois.
+
+221
+00:13:38,345 --> 00:13:41,683
+Intéressant.
+Qu'est-ce qu'on a ici ?
+
+222
+00:13:41,683 --> 00:13:44,233
+Nous avons un 1
+et nous avons un 0.
+
+223
+00:13:44,233 --> 00:13:46,274
+Défilons un peu en haut.
+
+224
+00:13:46,794 --> 00:13:48,609
+Ce n'était pas toujours
+le cas.
+
+225
+00:13:48,609 --> 00:13:51,790
+Nous avons commencé à 0,5,
+donc ça semble correct.
+
+226
+00:13:52,970 --> 00:13:54,967
+Puis nous défilons...
+
+227
+00:13:57,689 --> 00:13:58,906
+Intéressant...
+
+228
+00:13:59,038 --> 00:14:03,577
+Regardez. Il semble se passer
+quelque chose vers la génération 700.
+
+229
+00:14:03,937 --> 00:14:08,997
+D'une certaine manière, <i>p</i> atteint
+de grandes valeurs, puis passe à 1,
+
+230
+00:14:08,997 --> 00:14:13,422
+et <i>q</i> passe à 0.
+
+231
+00:14:13,682 --> 00:14:16,193
+C'est intéressant.
+
+232
+00:14:16,743 --> 00:14:20,733
+Bien, relançons-le de nouveau
+et voyons ce qu'il se passe.
+
+233
+00:14:21,773 --> 00:14:22,693
+Même chose.
+
+234
+00:14:22,723 --> 00:14:27,013
+Sauf que maintenant, on dirait que
+<i>p</i> est passé à 0, et <i>q</i> est passé à 1.
+
+235
+00:14:27,033 --> 00:14:28,432
+Relançons-le.
+
+236
+00:14:28,771 --> 00:14:32,551
+Nous n'avons pas
+ce problème ici. Relançons-le.
+
+237
+00:14:32,615 --> 00:14:34,114
+Ici non plus.
+
+238
+00:14:34,531 --> 00:14:36,040
+Ici non plus.
+
+239
+00:14:36,980 --> 00:14:42,560
+Ça se produit donc occasionnellement
+quand je lance mes simulations.
+
+240
+00:14:42,870 --> 00:14:47,149
+Pas très souvent,
+mais ça arrive occasionnellement.
+
+241
+00:14:47,349 --> 00:14:50,012
+Ici, de nouveau, 1 et 0.
+
+242
+00:14:50,392 --> 00:14:54,974
+Et il semble que ça se produit
+assez tôt ici.
+
+243
+00:14:54,974 --> 00:14:56,666
+Oh oui, très tôt en fait.
+
+244
+00:14:56,666 --> 00:15:00,527
+Regardez, ça se produit
+vers la génération 340.
+
+245
+00:15:00,560 --> 00:15:02,456
+De quoi s'agit-il donc ?
+
+246
+00:15:02,616 --> 00:15:06,946
+C'est là en fait un aspect clé
+de la dérive génétique,
+
+247
+00:15:06,946 --> 00:15:09,726
+peut-être même
+le plus important.
+
+248
+00:15:10,126 --> 00:15:15,496
+Ce qu'il se passe ici,
+c'est que l'allèle a1 se fixe.
+
+249
+00:15:15,706 --> 00:15:20,782
+Ou, autrement dit,
+l'allèle a2 disparaît.
+
+250
+00:15:21,252 --> 00:15:23,555
+Nous le perdons
+dans la population.
+
+251
+00:15:23,935 --> 00:15:26,746
+Cela peut se produire
+par dérive génétique.
+
+252
+00:15:26,796 --> 00:15:31,973
+Tout comme cela peut se produire
+quand vous faites un pile ou face 10 fois,
+
+253
+00:15:32,003 --> 00:15:36,411
+et toutes les pièces
+tombent sur pile ou sur face.
+
+254
+00:15:37,471 --> 00:15:41,408
+Et ici, bien sûr, à ce stade,
+cette génération,
+
+255
+00:15:41,408 --> 00:15:46,429
+avant qu'elle n'arrive,
+n'est plus un pile ou face équitable.
+
+256
+00:15:46,429 --> 00:15:48,860
+C'est maintenant
+une pièce truquée,
+
+257
+00:15:48,860 --> 00:15:51,830
+et il n'est donc pas surprenant
+que cela se produise.
+
+258
+00:15:52,893 --> 00:15:54,800
+Ceci est l'un
+des principaux résultats.
+
+259
+00:15:54,800 --> 00:16:01,675
+On peut en fait perdre des allèles
+à cause de la dérive génétique,
+
+260
+00:16:01,675 --> 00:16:06,983
+et nous avons vu cela se produire,
+pas toujours, mais quelques fois.
+
+261
+00:16:07,173 --> 00:16:10,400
+Et, alors que nous étudierons
+cela lors de cours à venir,
+
+262
+00:16:10,840 --> 00:16:16,767
+ce processus dépend beaucoup
+de la taille de la population elle-même.
+
+263
+00:16:17,277 --> 00:16:21,107
+Une dernière chose.
+J'ai cette erreur d'arrondi ici,
+
+264
+00:16:21,957 --> 00:16:23,236
+et je n'aime pas ça.
+
+265
+00:16:23,236 --> 00:16:28,850
+Pourquoi ne pas utiliser
+notre fonction round_number()
+
+266
+00:16:28,850 --> 00:16:30,907
+que nous avons développée
+précédemment,
+
+267
+00:16:30,937 --> 00:16:34,527
+pour nous débarrasser
+de ces erreurs d'arrondi.
+
+268
+00:16:34,537 --> 00:16:36,638
+Je vais donc revenir au code,
+
+269
+00:16:36,665 --> 00:16:43,010
+et je vais ouvrir le fichier
+où j'ai défini la fonction round_number().
+
+270
+00:16:43,033 --> 00:16:50,632
+Je vais donc ouvrir ce fichier qui
+a été utilisé dans mon premier exemple,
+
+271
+00:16:50,802 --> 00:16:52,650
+si je ne m'abuse.
+
+272
+00:16:52,679 --> 00:16:57,637
+Ouvrir...
+Le voilà, notre ami round_number().
+
+273
+00:16:57,853 --> 00:17:00,797
+Je vais donc copier ceci,
+
+274
+00:17:01,867 --> 00:17:08,453
+puis revenir à
+mon autre fichier, genetic_drift,
+
+275
+00:17:08,873 --> 00:17:17,102
+et je vais juste mettre ici,
+pour plus de clarté, mon round_number().
+
+276
+00:17:17,822 --> 00:17:21,251
+Puis ici,
+lorsque j'affiche <i>p</i> et 1 - <i>p</i>,
+
+277
+00:17:21,251 --> 00:17:23,380
+je ne dois pas
+afficher cela tel quel.
+
+278
+00:17:23,380 --> 00:17:28,397
+Je dois faire passer ça
+par round_number()...
+
+279
+00:17:28,705 --> 00:17:32,664
+round_number(p).
+
+280
+00:17:32,998 --> 00:17:37,064
+Puis je vais dire,
+quatre chiffres après la virgule.
+
+281
+00:17:38,061 --> 00:17:43,960
+Pareil ici. Je vais juste d'abord
+passer 1 - <i>p</i> à round_number().
+
+282
+00:17:44,550 --> 00:17:49,601
+Donc, 1 - <i>p</i>,
+quatre chiffres après la virgule.
+
+283
+00:17:49,668 --> 00:17:53,908
+J'enregistre ça.
+Je reviens sur Chrome.
+
+284
+00:17:54,228 --> 00:17:57,339
+Je rafraîchis...
+Et c'est déjà mieux.
+
+285
+00:17:57,729 --> 00:18:01,488
+Nous avons donc implémenté
+la dérive génétique en JavaScript,
+
+286
+00:18:01,508 --> 00:18:02,618
+ce qui est déjà bien.
+
+287
+00:18:02,618 --> 00:18:05,169
+Le prochain cours
+sera encore mieux,
+
+288
+00:18:05,169 --> 00:18:09,398
+car nous allons commencer
+à visualiser ces résultats.
+
+289
+00:18:09,398 --> 00:18:14,557
+C'est pratique de pouvoir parcourir
+les valeurs dans un navigateur,
+
+290
+00:18:14,557 --> 00:18:16,907
+dans la console JavaScript
+du navigateur.
+
+291
+00:18:16,907 --> 00:18:20,423
+Mais en réalité, nous voudrions
+maintenant visualiser ce qu'il se passe.
+
+292
+00:18:20,423 --> 00:18:22,306
+Et dans le prochain cours,
+
+293
+00:18:22,306 --> 00:18:26,307
+nous allons commencer à visualiser
+nos résultats à l'aide de JavaScript.
+
+294
+00:18:26,307 --> 00:18:27,726
+Alors, à la prochaine.

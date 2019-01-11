@@ -1,0 +1,83 @@
+We have seen that, in C++; a class can inherit from several super-classes.
+We call this multiple inheritance.
+What happens if several super-classes provide, to one of their sub-classes a member with the same name?
+This ambiguous situation will be the subject of today's video.
+The rules on multiple inheritance's access rights are the same as simple inheritance's.
+This means that a sub-class can directly access the members protected (or public, of course) from the super-classes.
+The new question, regarding multiple inheritance is:
+"What happens if several super-classes provide to a sub-class attributes and methods with the same name?"
+Let us use a concrete example.
+We will go back to our zoological hierarchy.
+Here, we had two super-classes "Ovipare" (Oviparous) and "Vivipare" (Viviparous).
+From those inherited the sub-class "Ovovivipare" (Ovoviviparous).
+Let us now suppose that each of the super-classes included a method "afficher".
+This method permits, for example, to print the instances' characterisitcs for each of these classes.
+The class Ovovivipare inherits from the classes Ovipare and
+Vivipare.
+Therefore, it will inherit two methods "afficher".
+The method "afficher" from the class Ovipare and the method "afficher" from the class Vivipare.
+These two methods' name is strictly identical.
+Let us now suppose that, elsewhere in the program
+(for example in a main program), we create an instance of Ovovivipare.
+On this instance, we call the method "afficher".
+Now, we are wondering which method will be called?
+The one inherited from Ovipare or the one inherited from Vivipare?
+The compiler would ask itself the very same question and thus refuse this instruction.
+For the compiler, there is an ambiguity,
+There is a problem of shadowing meaning that an identifier is shadowing another and the compiler knows not in which scope to solve this call.
+Be careful, in this case, we are indeed facing a shadowing problem: a scope resolution problem.
+Indeed, the call of the method
+"afficher" on an instance of Ovovivipare will trigger a compiling error.
+This will happen even if the method
+"afficher" does not have the same parameters in the classes "Ovipare" and "Vivipare".
+A priori, this can seem unexpected.
+Let us suppose, for example, that, in the class "Ovipare" the method
+"afficher" does not have parameters while, in the class "Vivipare", the method "afficher" has one string-type parameter.
+We could imagine that calling the method "afficher" by providing a string-type parameter should lift all ambiguity, for it appears obvious that this method should be called.
+Yet, the ambiguity could be lifted here only in situations where overloading plays a part.
+But, as you have already seen in the previous episodes, in C++, overloading can only occur within the same scope.
+This means that here, this has nothing to do with an overloading problem.
+Therefore, the compiler will still refuse this instruction.
+Indeed, the method "afficher" without parameters is in the scope of the class "Ovipare", while the method "afficher" with one string-type parameter is in the scope of the class "Vivipare".
+These two methods are not in the same scope.
+Consequently, we cannot consider that this method "afficher" here is an overloading of this other method "afficher" here.
+We cannot use an overloading-tied mechanism to lift the ambiguity.
+We shall thus resolve the scope appropriately.
+Now, how should we proceed in order to solve this scope resolution problem?
+First option :
+We could simply use the scope resolution operator.
+Here, for example in the main program creating the instance of Ovipare, upon calling the method "afficher", we could precise in which scope we are seeking this method "afficher".
+For example, we could say that, on the instance "o", we  call the method "afficher" of the class Vivipare.
+Thus, we are establishing the link between the method and the class through the scope resolution operator.
+However, this way to solve the problem, that is, through the external use of the scope resolution operator, is not the correct solution.
+Whyso?
+Because it delegates to the user of the class Ovovivipare the choice on how to print an ovoviviparous.
+This task clearly lies on the shoulders of the programmer of the class Ovovivipare.
+The idea would be, for a better solution, to have the sub-class
+(in our case, the sub-class
+Ovovivipare), indicating which method inherited from the sub-class it wishes to see called.
+To this end, in C++, we can add to the sub-class a special declaration indicating which ambiguous methods or attributed inherited from higher should be called through the instances of the sub-class.
+This declaration's syntax is the following : we use the reserved keyword "using", followed by the name of the ambiguous attribute or method.
+Then, we indicate through the scope resolution operator in which super-class we will seek this attribute or method.
+In the case of our example, we could, in the Ovovivipare class, indicate with such a declaration that the method from Vivipare will be chosen to print an Ovovivipare.
+In other words, when the method
+"afficher" will be applied on an instance of Ovovivipare, we will search for this method in the class "Vivipare".
+Pay close attention to the syntax : during the declaration, we will use neither parentheses nor return type for this method.
+We simply signify that we wish to use the method called "afficher" from the class Vivipare.
+This is solution is better than the former, for now the very class
+"Ovovivipare" decides how to print its own instances.
+This choice does not lie upon the class users anymore.
+To make things even clearer, it is possible to have the class "Ovovivipare" contain a method dedicated to indicate how its instances will be printed.
+This way, things are as explicit as humanly possible : it is not necessary to go through the class to make sure there is
+"using" declaration indicating how to print an Ovovivipare.
+This way, we know that an
+Ovovivipare has its own printing method.
+This method will decide how these printings will occur exactly.
+We could perfectly decide that, for example, to print an Ovovivipare, we print both the characteristics of Ovipare and of Vivipare.
+In this case, the method
+"afficher" of Ovovivipare will call the two methods, using the scope resolution operator to lift the amiguity.
+Here, the implementation choice designed for the method
+"afficher" of Ovovivipare is to call both methods "afficher"
+(the two inherited namesake methods) : first the method "afficher" inherited from the class "Ovipare", then the method "afficher" inhrited from the class "Vivipare".
+This here is a good solution where the sub-class provides an explicit method in order to clarifiy the ambiguous calls.
+This concludes the sequence on shadowing in the case of multiple inheritance.

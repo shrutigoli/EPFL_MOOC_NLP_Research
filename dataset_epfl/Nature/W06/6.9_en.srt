@@ -1,0 +1,1936 @@
+1
+00:00:03,340 --> 00:00:06,433
+Welcome back, Nature, In Code,
+we're in Chapter 6 lecture 9.
+
+2
+00:00:06,433 --> 00:00:09,293
+In this lecture we'll implement
+the whole selection
+
+3
+00:00:09,293 --> 00:00:12,938
+and the parasite selection functions
+and then we'll output the data
+
+4
+00:00:12,938 --> 00:00:16,886
+that we generated in the browser
+to see what kind of dynamics
+
+5
+00:00:16,886 --> 00:00:20,425
+we get in such a host-parasite
+core evolutionary simulation.
+
+6
+00:00:20,570 --> 00:00:24,265
+Before we do this, just a reminder,
+this is our fitness matrix.
+
+7
+00:00:24,265 --> 00:00:26,797
+We have these matching allele model,
+
+8
+00:00:26,797 --> 00:00:29,690
+where if the parasite matches 
+the allele of the host,
+
+9
+00:00:29,690 --> 00:00:32,332
+there will be an infection,
+otherwise, there won't be,
+
+10
+00:00:32,332 --> 00:00:34,830
+and these are the corresponding 
+fitness values.
+
+11
+00:00:34,830 --> 00:00:40,080
+So this is fitness matrix,
+and we'll refer to this a quite often.
+
+12
+00:00:40,080 --> 00:00:43,160
+Another thing I want
+to talk about briefly,
+
+13
+00:00:43,160 --> 00:00:46,125
+and this is just a reminder
+of something we already know.
+
+14
+00:00:46,125 --> 00:00:49,459
+How do we now implement
+this actually concretely?
+
+15
+00:00:49,459 --> 00:00:54,974
+Well, before, we said the frequency
+of a genotype is basically,
+
+16
+00:00:54,974 --> 00:00:57,900
+in the next generation,
+it's basically the frequency
+
+17
+00:00:57,900 --> 00:01:02,560
+that we have now times a fitness 
+and we call this w.
+
+18
+00:01:02,560 --> 00:01:05,130
+And then ultimately,
+given that there are many genotypes,
+
+19
+00:01:05,130 --> 00:01:06,800
+we need to normalize this,
+
+20
+00:01:08,310 --> 00:01:12,200
+and we used this factor here w bar,
+
+21
+00:01:12,200 --> 00:01:15,720
+which we called the average fitness.
+
+22
+00:01:15,720 --> 00:01:19,059
+But be aware that this
+is just a normalizing factor,
+
+23
+00:01:19,059 --> 00:01:22,439
+basically, the sum of these terms
+for each genotypes
+
+24
+00:01:23,554 --> 00:01:26,525
+Good, so concretely what does this mean
+in our model here?
+
+25
+00:01:26,525 --> 00:01:31,395
+Well, imagine you are a host
+of Type A1.
+
+26
+00:01:31,395 --> 00:01:33,344
+What is your fitness?
+
+27
+00:01:33,344 --> 00:01:38,239
+So fitness of the host, one,
+in the next generation is,
+
+28
+00:01:38,628 --> 00:01:41,280
+using this formula,
+the fitness of this host,
+
+29
+00:01:41,280 --> 00:01:46,044
+in the previous generation
+or current, and this is next generation,
+
+30
+00:01:46,044 --> 00:01:53,907
+times it's fitness, so this will be wH1
+and then normalized by some term here.
+
+31
+00:01:53,907 --> 00:01:58,679
+Now, the really important aspect
+about this entire concept of co-evolution,
+
+32
+00:01:58,679 --> 00:02:01,761
+or frequency dependent selection,
+is that this fitness value,
+
+33
+00:02:01,761 --> 00:02:03,586
+is now, not fixed.
+
+34
+00:02:03,586 --> 00:02:07,780
+Okay. This is what we assumed before,
+we gave this some value,
+
+35
+00:02:07,780 --> 00:02:10,873
+but now the key
+about frequency dependence,
+
+36
+00:02:10,873 --> 00:02:17,045
+is that, this is not a fixed value,
+this will depend on other frequencies.
+
+37
+00:02:17,045 --> 00:02:20,434
+In this particular case, it will depend,
+for example, on the frequencies
+
+38
+00:02:20,434 --> 00:02:22,984
+of the parasites that are around.
+
+39
+00:02:22,984 --> 00:02:26,226
+And so we need to calculate this,
+at each generation
+
+40
+00:02:26,226 --> 00:02:29,726
+because this will be different
+at each generation.
+
+41
+00:02:30,035 --> 00:02:33,054
+So how do we calculate this?
+Well, assuming the fact,
+
+42
+00:02:33,054 --> 00:02:39,070
+you are an A1 host, now you can run
+into two types of parasites.
+
+43
+00:02:39,070 --> 00:02:42,085
+You can run into parasite A1 here,
+in our model,
+
+44
+00:02:42,085 --> 00:02:46,090
+or you can run into parasite A2.
+
+45
+00:02:47,091 --> 00:02:56,211
+These occur, using this notion here,
+at frequency P1 and frequency P2.
+
+46
+00:02:56,829 --> 00:03:00,310
+So we don't have any spatial
+considerations anymore,
+
+47
+00:03:00,310 --> 00:03:04,560
+so the assumption is that you'd run 
+into these parasites randomly,
+
+48
+00:03:04,560 --> 00:03:07,701
+and so the probability to run
+into an A1 parasite,
+
+49
+00:03:07,701 --> 00:03:09,556
+is in fact, its frequency.
+
+50
+00:03:09,556 --> 00:03:13,066
+And in the same way, the probability
+to run into an A2 parasite,
+
+51
+00:03:13,066 --> 00:03:14,920
+is its frequency.
+
+52
+00:03:14,920 --> 00:03:19,780
+So we can calculate the H1 fitness.
+
+53
+00:03:19,780 --> 00:03:23,715
+At this particular moment,
+it simply the probability
+
+54
+00:03:23,715 --> 00:03:30,629
+that he run into an A1 parasite,
+times the fitness that you will experience
+
+55
+00:03:30,629 --> 00:03:34,790
+as this A1 host, when you run
+into an A1 parasite.
+
+56
+00:03:34,790 --> 00:03:38,851
+So this is the element of the fitness 
+matrix from the previous slide.
+
+57
+00:03:39,263 --> 00:03:44,060
+So, plus the probability that you run 
+into a P2 or an A2 rather,
+
+58
+00:03:44,060 --> 00:03:46,848
+sorry, parasites, so FP2.
+
+59
+00:03:46,848 --> 00:03:49,896
+And then, times the fitness
+that you experience,
+
+60
+00:03:49,896 --> 00:03:58,130
+when you as an H1-- so as an A1 host,
+experiences or interacts with a parasite
+
+61
+00:03:58,130 --> 00:04:01,440
+of genotype A2.
+
+62
+00:04:01,734 --> 00:04:06,283
+And again, this is also
+from the corresponding fitness matrix.
+
+63
+00:04:06,283 --> 00:04:13,040
+And let's assume, for example, let's make
+some concrete example of values.
+
+64
+00:04:13,040 --> 00:04:20,257
+Let's say the P1 frequency of A1 parasite,
+is now 20%, so this would be 20%.
+
+65
+00:04:20,257 --> 00:04:23,363
+Correspondingly, this would be 80%.
+
+66
+00:04:23,363 --> 00:04:31,915
+And here, this value, remember,
+you are a host; you will be infected,
+
+67
+00:04:31,915 --> 00:04:36,325
+because we have here, matching alleles,
+both have A1, so that means
+
+68
+00:04:36,325 --> 00:04:38,713
+if you look up the element
+in the fitness matrix,
+
+69
+00:04:39,706 --> 00:04:44,663
+the value here, is going to be
+one minus SH, whatever SH is.
+
+70
+00:04:45,465 --> 00:04:47,334
+Correspondingly the value here,
+if you look this up,
+
+71
+00:04:47,334 --> 00:04:52,042
+is one, because the A2 parasites
+will not be able to infect you,
+
+72
+00:04:52,042 --> 00:04:56,240
+with your A1 genotype as a host.
+So the value here, is one.
+
+73
+00:04:56,240 --> 00:04:59,820
+And so for particular moment in time,
+
+74
+00:04:59,820 --> 00:05:04,388
+this is the fitness of the H1 genotypes,
+host genotypes.
+
+75
+00:05:04,388 --> 00:05:07,844
+And you can easily see here,
+that this will probably be different
+
+76
+00:05:07,844 --> 00:05:12,490
+in each generation because these values 
+will change the frequencies
+
+77
+00:05:12,490 --> 00:05:15,172
+of the host-- of the parasites,
+will change.
+
+78
+00:05:15,743 --> 00:05:19,128
+The fitness is here.
+Those don't change.
+
+79
+00:05:19,128 --> 00:05:20,330
+These are fixed.
+
+80
+00:05:20,330 --> 00:05:24,994
+The assumption that you get infected
+when there's a matching allele.
+
+81
+00:05:24,994 --> 00:05:27,862
+You don't get infected
+when there's not a match.
+
+82
+00:05:27,862 --> 00:05:31,010
+But the frequencies change
+and that's why this needs
+
+83
+00:05:31,010 --> 00:05:34,049
+to be recalculated at each generation.
+
+84
+00:05:34,049 --> 00:05:38,820
+So what we're now doing in JavaScript,
+is we're going to do three steps.
+
+85
+00:05:38,820 --> 00:05:45,227
+The first is, we're going to calculate 
+this current fitness, if you will,
+
+86
+00:05:45,715 --> 00:05:48,816
+for both hosts obviously,
+then also for both parasites.
+
+87
+00:05:48,816 --> 00:05:53,591
+So this, we calculate first,
+then when we have calculated this,
+
+88
+00:05:53,591 --> 00:05:57,908
+after we've calculated it, we multiply it
+with the current frequencies,
+
+89
+00:05:57,908 --> 00:06:04,294
+and we then, normalize this,
+by taking the sum of these products
+
+90
+00:06:04,294 --> 00:06:08,970
+for both hosts, and then, normalizing it
+by the corresponding value.
+
+91
+00:06:08,970 --> 00:06:12,293
+So let's do this.
+Let's calculate these fitnesses,
+
+92
+00:06:12,293 --> 00:06:16,260
+these current fitness multiplied
+with the frequencies and normalize this,
+
+93
+00:06:16,260 --> 00:06:20,427
+so that we get the frequencies 
+in the next generation.
+
+94
+00:06:20,427 --> 00:06:22,134
+Alright, so here we're back in our code.
+
+95
+00:06:22,134 --> 00:06:24,370
+This is what we developed 
+in the last lecture.
+
+96
+00:06:24,370 --> 00:06:27,810
+We have these two functions called here,
+host selection and parasite selection,
+
+97
+00:06:27,810 --> 00:06:29,870
+but we haven't defined 
+these two functions.
+
+98
+00:06:29,870 --> 00:06:31,282
+We need to do that now.
+
+99
+00:06:31,282 --> 00:06:34,503
+And then, we also need to make sure,
+at the end, that we put all
+
+100
+00:06:34,503 --> 00:06:40,150
+the D3 elements into place
+because otherwise this draw_line_chart,
+
+101
+00:06:40,150 --> 00:06:42,144
+would now generate an error.
+
+102
+00:06:42,144 --> 00:06:44,608
+Good, but we'll get to this
+after we've implemented
+
+103
+00:06:44,608 --> 00:06:47,864
+whole selection-parasite selection.
+
+104
+00:06:47,864 --> 00:06:50,029
+So let's go ahead and and do this here.
+
+105
+00:06:50,029 --> 00:06:54,617
+So I'm going to have to find a function:
+host_selection.
+
+106
+00:06:54,617 --> 00:06:56,271
+And what this function should do,
+
+107
+00:06:56,271 --> 00:07:00,650
+is exactly, basically,
+what I just described on the slide.
+
+108
+00:07:00,650 --> 00:07:04,111
+So I need to go through each
+of the host genotypes.
+
+109
+00:07:04,111 --> 00:07:09,521
+And for each host genotype,
+I need to calculate the current fitness,
+
+110
+00:07:09,521 --> 00:07:13,330
+which will depend
+on the parasite frequencies.
+
+111
+00:07:13,330 --> 00:07:15,818
+So let me go ahead and do this. 
+I'm going to go here,
+
+112
+00:07:15,818 --> 00:07:17,673
+through all host genotypes.
+
+113
+00:07:17,673 --> 00:07:25,372
+So for (var i = 0)
+and then, i &lt; host_frequencies.
+
+114
+00:07:25,372 --> 00:07:29,804
+Actually let me copy this
+before I make any spelling mistakes.
+
+115
+00:07:29,804 --> 00:07:34,294
+Length. So the length of this array,
+which will simply give me
+
+116
+00:07:34,294 --> 00:07:36,575
+the number of genotypes
+that we have.
+
+117
+00:07:36,575 --> 00:07:38,820
+Which in our example here, will be too.
+
+118
+00:07:38,820 --> 00:07:41,070
+You have two host genotypes.
+
+119
+00:07:41,070 --> 00:07:44,078
+And then i = i + 1.
+
+120
+00:07:45,290 --> 00:07:46,740
+Alright.
+
+121
+00:07:46,740 --> 00:07:49,676
+So now, what do we need to do?
+Well, for each host genotype,
+
+122
+00:07:49,676 --> 00:07:52,058
+we need to calculate the current fitness.
+
+123
+00:07:52,058 --> 00:07:55,392
+And to do that, as we've just seen,
+we need to take a look
+
+124
+00:07:55,392 --> 00:07:58,304
+at each of the parasite frequencies.
+
+125
+00:07:58,304 --> 00:08:01,155
+So I'm going to put up here,
+an inner loop,
+
+126
+00:08:01,155 --> 00:08:05,579
+where I'm going
+to go through all the parasites.
+
+127
+00:08:05,579 --> 00:08:09,796
+Actually before I do that,
+let me set up of this local variable,
+
+128
+00:08:09,796 --> 00:08:12,362
+host fitness, that I actually want
+to calculate.
+
+129
+00:08:12,362 --> 00:08:14,805
+I'm going to initialize this at zero.
+
+130
+00:08:14,805 --> 00:08:19,574
+Okay. So now, I'm going to add
+this inner loop here.
+
+131
+00:08:19,574 --> 00:08:23,483
+So I'm going to use ii,
+here as my counter.
+
+132
+00:08:24,211 --> 00:08:25,490
+As I have before.
+
+133
+00:08:25,490 --> 00:08:29,966
+And here I'm going through 
+the parasite frequencies.
+
+134
+00:08:31,180 --> 00:08:33,603
+Okay. So now what do I need to do?
+
+135
+00:08:33,603 --> 00:08:35,990
+Well, as we've seen before in the slides,
+
+136
+00:08:35,990 --> 00:08:41,117
+it is simply the sum of the products 
+of the current parasite frequency
+
+137
+00:08:41,117 --> 00:08:44,332
+times the corresponding element
+in the fitness matrix.
+
+138
+00:08:44,332 --> 00:08:48,530
+So I'm simply going to say:
+host_fitness equals,
+
+139
+00:08:48,530 --> 00:08:53,224
+well what we have before,
+plus some value.
+
+140
+00:08:53,224 --> 00:08:57,394
+And this values is the product
+between the element of the fitness matrix,
+
+141
+00:08:57,394 --> 00:08:59,140
+and the parasite frequency.
+
+142
+00:08:59,140 --> 00:09:02,336
+But rather than spelling this out here
+I'm actually an outsourced this,
+
+143
+00:09:02,336 --> 00:09:03,314
+into a function.
+
+144
+00:09:03,314 --> 00:09:11,889
+And I'm going to call this function
+a get_w_f, because I simply want
+
+145
+00:09:11,889 --> 00:09:16,278
+the product of w and f, so the fitness
+and the frequency.
+
+146
+00:09:16,278 --> 00:09:22,914
+And I need to pass i and ii,
+so that the function will know
+
+147
+00:09:22,914 --> 00:09:24,930
+which genotypes I'm referring to.
+
+148
+00:09:24,930 --> 00:09:27,398
+So the i is the host.
+
+149
+00:09:27,398 --> 00:09:30,180
+The first element
+will be the host genotype.
+
+150
+00:09:30,180 --> 00:09:35,792
+So if it's zero, then we're referring 
+to the A1 host genotype.
+
+151
+00:09:35,792 --> 00:09:39,973
+If it's one, we're referring to the A2
+and the same for the ii,
+
+152
+00:09:39,973 --> 00:09:43,797
+which is simply the corresponding 
+parasite genotype.
+
+153
+00:09:43,797 --> 00:09:47,587
+Alright,so let's implement
+this helper function here.
+
+154
+00:09:47,587 --> 00:09:53,279
+So function get_w_f.
+
+155
+00:09:53,279 --> 00:09:59,460
+And I'm going to use the same names
+for the parameters i and ii.
+
+156
+00:10:01,590 --> 00:10:03,834
+So, how should this work?
+
+157
+00:10:03,834 --> 00:10:06,904
+Well, okay.
+These are the genotypes, right?
+
+158
+00:10:07,641 --> 00:10:12,700
+Or rather, they are actually the indices,
+in the corresponding array.
+
+159
+00:10:12,700 --> 00:10:15,786
+But we know that they correspond 
+to genotypes.
+
+160
+00:10:15,786 --> 00:10:19,001
+Zero being A1 and one being A2.
+
+161
+00:10:19,001 --> 00:10:23,108
+This is a matching alleles model,
+so we can say, if they are the same,
+
+162
+00:10:23,614 --> 00:10:28,709
+okay, if i equals ii,
+and this is of course using
+
+163
+00:10:28,709 --> 00:10:32,660
+the double equal for an equality test.
+
+164
+00:10:32,660 --> 00:10:35,651
+Well then, as we know,
+what we need to return,
+
+165
+00:10:35,651 --> 00:10:39,046
+is the fitness in the case of a match.
+
+166
+00:10:39,046 --> 00:10:44,307
+So for the host,
+this means the fitness is 1-sh.
+
+167
+00:10:44,307 --> 00:10:47,113
+And then times the corresponding
+parasite frequency.
+
+168
+00:10:47,113 --> 00:10:49,492
+So parasite frequencies.
+
+169
+00:10:50,114 --> 00:10:52,760
+And of course,
+tick the corresponding index here, as ii,
+
+170
+00:10:52,760 --> 00:10:57,348
+because the second index here,
+is the one for the parasite.
+
+171
+00:10:58,155 --> 00:11:04,799
+If there's no match, so else, then we know
+that we should return something else.
+
+172
+00:11:04,799 --> 00:11:07,454
+I'm just going to copy this
+and paste it here.
+
+173
+00:11:07,454 --> 00:11:09,670
+The fitness here, in this case,
+
+174
+00:11:09,670 --> 00:11:11,832
+there's no match; this is means
+there's no infection.
+
+175
+00:11:11,832 --> 00:11:17,565
+So the host has maximal fitness one,
+and again, times the parasite frequency
+
+176
+00:11:17,565 --> 00:11:20,567
+of that corresponding genotype.
+
+177
+00:11:21,963 --> 00:11:25,700
+So I'm going to do two things
+to simplify this a little further.
+
+178
+00:11:25,700 --> 00:11:29,968
+The first is, we'll need basically 
+the exact same function later on,
+
+179
+00:11:29,968 --> 00:11:34,270
+for the host frequencies
+and the parasite fitnesses.
+
+180
+00:11:34,270 --> 00:11:36,997
+And so, everything will be reversed here,
+
+181
+00:11:36,997 --> 00:11:39,140
+but I will probably need 
+two different functions,
+
+182
+00:11:39,140 --> 00:11:45,350
+so I'm going to just call this function:
+get_host_w_f.
+
+183
+00:11:45,770 --> 00:11:50,740
+So just that it's clear, which fitness it is,
+that I'm actually calculating here.
+
+184
+00:11:50,740 --> 00:11:57,618
+So get_host_w_f.
+
+185
+00:11:58,560 --> 00:12:00,063
+And the other thing that I want to do,
+
+186
+00:12:00,063 --> 00:12:02,350
+is I want to simplify this,
+quite a bit actually,
+
+187
+00:12:02,350 --> 00:12:05,158
+by using a new operator 
+that we haven't encountered before,
+
+188
+00:12:05,158 --> 00:12:07,909
+and this is called the ternary operator.
+
+189
+00:12:07,909 --> 00:12:10,690
+And it works as follows:
+
+190
+00:12:10,690 --> 00:12:13,640
+I can simplify this here,
+by simply saying, "return".
+
+191
+00:12:17,480 --> 00:12:22,895
+So what I'm going to do here is,
+I'm going to say, i = ii.
+
+192
+00:12:22,895 --> 00:12:25,420
+Mark and use proper spacing.
+
+193
+00:12:25,420 --> 00:12:26,847
+Question mark.
+
+194
+00:12:27,690 --> 00:12:30,048
+Okay now, we'll talk
+about this in a second.
+
+195
+00:12:30,048 --> 00:12:40,339
+1-sh, and sorry, 1-sh : 1.
+Okay.
+
+196
+00:12:40,339 --> 00:12:44,594
+And then, times the parasite frequencies.
+
+197
+00:12:44,594 --> 00:12:46,132
+Okay, so what does this mean?
+
+198
+00:12:46,132 --> 00:12:49,441
+So this here, this whole thing,
+this expression here,
+
+199
+00:12:49,441 --> 00:12:51,840
+is using the ternary operator,
+
+200
+00:12:51,840 --> 00:12:55,717
+which is a combination
+of a question mark and a colon.
+
+201
+00:12:55,717 --> 00:12:57,024
+So it has these three elements here.
+
+202
+00:12:57,024 --> 00:13:04,380
+The first element, then a question mark,
+the second, then a colon,
+
+203
+00:13:04,380 --> 00:13:05,723
+and then the third element.
+
+204
+00:13:05,723 --> 00:13:12,239
+And basically, this is the exact
+same thing as this.
+
+205
+00:13:13,180 --> 00:13:16,109
+So I'm going to delete
+all these lines here,
+
+206
+00:13:16,109 --> 00:13:17,580
+and look at this as much simpler.
+
+207
+00:13:17,580 --> 00:13:21,861
+So how do you read this ternary operator?
+Well it simply means,
+
+208
+00:13:23,180 --> 00:13:29,510
+if this expression here,
+concretely a condition, is true,
+
+209
+00:13:29,510 --> 00:13:35,880
+the one before the question mark,
+then use this expression here.
+
+210
+00:13:35,880 --> 00:13:39,617
+The one right after the question mark,
+or before the colon.
+
+211
+00:13:39,617 --> 00:13:42,760
+If it's false, and there's really
+only these 2 options:
+
+212
+00:13:42,760 --> 00:13:44,180
+it's either true or false.
+
+213
+00:13:44,180 --> 00:13:45,387
+Then use this value.
+
+214
+00:13:45,827 --> 00:13:47,652
+And this is exactly
+what we need to do here.
+
+215
+00:13:47,652 --> 00:13:51,020
+If it's really a match between 
+the genotypes,
+
+216
+00:13:51,020 --> 00:13:54,200
+then the fitness here, is 1-sh.
+
+217
+00:13:54,200 --> 00:13:56,787
+Otherwise the fitness is one.
+
+218
+00:13:56,787 --> 00:14:01,431
+So basically, this is a very
+shorthand notation
+
+219
+00:14:01,431 --> 00:14:06,195
+for picking the corresponding--
+the correct fitness value,
+
+220
+00:14:06,195 --> 00:14:07,380
+from the fitness matrix.
+
+221
+00:14:07,380 --> 00:14:09,877
+And then we know, we simply need
+to multiply this,
+
+222
+00:14:09,877 --> 00:14:14,666
+with the parasite frequencies
+and that's now much more compact.
+
+223
+00:14:15,650 --> 00:14:17,383
+Alright, so now that we implemented this,
+
+224
+00:14:17,383 --> 00:14:20,590
+we can go back here,
+to our host selection function.
+
+225
+00:14:20,590 --> 00:14:25,791
+So, we have now calculated the product 
+of the fitness and the frequency,
+
+226
+00:14:26,223 --> 00:14:29,863
+We've created the sum here,
+of this host fitness,
+
+227
+00:14:29,863 --> 00:14:34,719
+and we need to ensure that we're
+closing here, the brackets correctly,
+
+228
+00:14:34,719 --> 00:14:39,418
+and again, thanks to proper indentation,
+that's easy to see, if one is missing.
+
+229
+00:14:40,058 --> 00:14:42,744
+So now, I've calculated
+the host fitness here,
+
+230
+00:14:42,744 --> 00:14:45,039
+for the current host.
+
+231
+00:14:45,410 --> 00:14:48,094
+So now what we need to do, as we said,
+the second step is,
+
+232
+00:14:48,094 --> 00:14:55,864
+we need to multiply this,
+with the corresponding frequency
+
+233
+00:14:55,864 --> 00:14:57,550
+that we had before.
+
+234
+00:14:57,550 --> 00:15:02,970
+So here, after this loop here.
+Okay.
+
+235
+00:15:02,970 --> 00:15:11,382
+We can simply say, the host frequencies,
+okay, current host frequencies,
+
+236
+00:15:11,382 --> 00:15:14,889
+so host frequencies, in here,
+were in the outer loop, right?
+
+237
+00:15:14,889 --> 00:15:18,341
+i equals what we had before,
+
+238
+00:15:21,613 --> 00:15:25,080
+times this fitness value.
+
+239
+00:15:25,080 --> 00:15:29,597
+Okay. Here, this fitness value,
+that we just calculated.
+
+240
+00:15:30,266 --> 00:15:32,186
+So that's the second step.
+
+241
+00:15:33,307 --> 00:15:38,565
+Multiplying the frequency
+with this calculated fitness.
+
+242
+00:15:38,565 --> 00:15:40,520
+What's the third step
+that we need to do?
+
+243
+00:15:40,520 --> 00:15:42,172
+It's the normalization.
+
+244
+00:15:43,070 --> 00:15:47,810
+Now in order to normalize,
+we need to know the normalizing factor,
+
+245
+00:15:47,810 --> 00:15:53,173
+and that's just simply the sum
+of all these host frequencies
+
+246
+00:15:53,173 --> 00:15:54,885
+that we calculate.
+
+247
+00:15:54,885 --> 00:16:00,364
+So let's set up here, a sum variable
+that we can then use
+
+248
+00:16:00,364 --> 00:16:02,055
+as a normalizing factor.
+
+249
+00:16:02,055 --> 00:16:04,960
+So I'm simply going to define here,
+a local variable,
+
+250
+00:16:04,960 --> 00:16:09,450
+called sum_host_frequencies
+
+251
+00:16:09,450 --> 00:16:12,171
+Okay, sum_host_frequencies,
+because the host frequencies
+
+252
+00:16:12,171 --> 00:16:14,858
+wouldn't add up
+at the end to one necessarily.
+
+253
+00:16:14,858 --> 00:16:19,140
+Some host frequencies, okay,
+I'm going to initialize this at zero.
+
+254
+00:16:19,522 --> 00:16:21,110
+And then, whoops, sorry.
+
+255
+00:16:21,110 --> 00:16:25,329
+And then, I'm simply going to say,
+down here,
+
+256
+00:16:25,329 --> 00:16:28,786
+in each iteration of the host frequencies,
+I'm going to say okay,
+
+257
+00:16:28,786 --> 00:16:32,506
+some host frequencies
+need to be added.
+
+258
+00:16:33,669 --> 00:16:34,956
+What needs to be added?
+
+259
+00:16:34,956 --> 00:16:39,368
+Well, whatever we just calculated,
+has the host frequencies.
+
+260
+00:16:41,961 --> 00:16:43,600
+Alright, + host_frequencies (i).
+
+261
+00:16:45,391 --> 00:16:48,461
+So now, essentially what we're doing is,
+we're summing up all
+
+262
+00:16:48,461 --> 00:16:50,961
+these new host frequencies
+that we calculated.
+
+263
+00:16:50,961 --> 00:16:53,846
+And this is the third step
+because that allows us finally,
+
+264
+00:16:53,846 --> 00:16:59,330
+to normalize things here,
+after the loop is entirely finished.
+
+265
+00:16:59,330 --> 00:17:01,729
+So now, what we're going to do is,
+we're going to normalize
+
+266
+00:17:01,729 --> 00:17:05,040
+and I'm just going to make a comment here,
+that this is what we're doing.
+
+267
+00:17:05,040 --> 00:17:09,930
+So again we're going to go 
+through all hosts, once more.
+
+268
+00:17:11,810 --> 00:17:15,910
+And then, we are simply
+normalizing things here.
+
+269
+00:17:15,910 --> 00:17:19,327
+So what we're seeing is, 
+the host frequencies (i)
+
+270
+00:17:20,730 --> 00:17:26,420
+equals what we currently have there,
+but divided by this normalizing factor,
+
+271
+00:17:26,420 --> 00:17:30,310
+so divided by some host frequencies.
+
+272
+00:17:31,503 --> 00:17:37,080
+So these are the three steps
+as we outlined them just before.
+
+273
+00:17:37,080 --> 00:17:42,888
+So basically, just to repeat,
+the first step was to calculate
+
+274
+00:17:42,888 --> 00:17:45,014
+these fitnesses, okay.
+
+275
+00:17:46,140 --> 00:17:51,569
+And then when we had the fitnesses,
+we would multiply them,
+
+276
+00:17:51,569 --> 00:17:53,960
+with the current frequencies,
+
+277
+00:17:53,960 --> 00:17:56,702
+and once we've done that,
+we simply normalize,
+
+278
+00:17:56,702 --> 00:18:00,420
+because these current frequencies
+may now, not add up to 1 anymore,
+
+279
+00:18:00,420 --> 00:18:03,310
+so we have to normalized them.
+
+280
+00:18:03,310 --> 00:18:05,269
+So that is what we have here.
+
+281
+00:18:05,269 --> 00:18:08,824
+And so this is essentially now,
+the host selection function.
+
+282
+00:18:09,397 --> 00:18:12,360
+Now all we need to do,
+is we essentially need to do,
+
+283
+00:18:12,360 --> 00:18:15,470
+the exact same thing,
+for the parasite.
+
+284
+00:18:15,470 --> 00:18:19,147
+So we can just go ahead
+and basically now, copy these 2 functions,
+
+285
+00:18:19,147 --> 00:18:21,650
+okay, the whole selection
+and the helper function,
+
+286
+00:18:22,050 --> 00:18:24,783
+get _host_w_f, i, ii.
+
+287
+00:18:25,040 --> 00:18:30,780
+We copy this. And now we just have 
+to rename things accordingly.
+
+288
+00:18:30,780 --> 00:18:36,218
+So here, host_selection, will of course,
+be called, parasite_selection.
+
+289
+00:18:36,218 --> 00:18:39,660
+Sum of the host frequencies,
+our normalizing factor here,
+
+290
+00:18:39,660 --> 00:18:42,960
+will be called,
+sum_parasite_frequencies.
+
+291
+00:18:42,960 --> 00:18:45,491
+Let me actually copied
+this parasite word here.
+
+292
+00:18:46,352 --> 00:18:49,641
+First we're going through
+the parasite frequencies,
+
+293
+00:18:49,641 --> 00:18:54,389
+we're calculating the parasite fitness,
+to do that, we need to go
+
+294
+00:18:54,389 --> 00:18:57,648
+to the host_frequencies,
+in the inner loop,
+
+295
+00:18:57,648 --> 00:19:02,506
+and then we can say okay,
+the parasite fitness equals
+
+296
+00:19:02,506 --> 00:19:08,973
+the parasite fitness
+plus this: get_parasite_w_f.
+
+297
+00:19:08,973 --> 00:19:11,277
+Okay. We'll fix this in a second,
+
+298
+00:19:11,277 --> 00:19:13,825
+And then when we've done that,
+we can now here,
+
+299
+00:19:13,825 --> 00:19:18,877
+multiply the parasite frequencies
+with the parasite fitness here,
+
+300
+00:19:18,877 --> 00:19:20,490
+that we just calculated.
+
+301
+00:19:20,490 --> 00:19:25,295
+And then of course we can properly 
+calculate this normalizing factor,
+
+302
+00:19:25,295 --> 00:19:28,445
+some parasite_frequencies equal
+some parasite_frequencies
+
+303
+00:19:28,445 --> 00:19:32,710
+plus parasite_frequencies (i).
+And then we normalize,
+
+304
+00:19:32,710 --> 00:19:35,515
+so again we go through
+all the parasite frequencies
+
+305
+00:19:35,515 --> 00:19:39,952
+and we normalize those frequencies
+with this normalizing factor
+
+306
+00:19:39,952 --> 00:19:41,686
+that we just calculated.
+
+307
+00:19:41,686 --> 00:19:46,598
+So the exact same thing;
+just using other variables,
+
+308
+00:19:46,598 --> 00:19:48,644
+and another array of course.
+
+309
+00:19:48,644 --> 00:19:53,771
+And here, this is get_parasite_w_f.
+
+310
+00:19:53,771 --> 00:19:57,800
+Now here we need to be careful,
+because this is slightly different.
+
+311
+00:19:57,800 --> 00:20:05,222
+Here when i = ii, when this is true,
+then the fitness will actually be maximal.
+
+312
+00:20:05,470 --> 00:20:10,360
+Because then, the the infection will occur,
+this is good for the parasite.
+
+313
+00:20:11,124 --> 00:20:13,618
+If it doesn't occur,
+then it's bad for the parasite,
+
+314
+00:20:13,618 --> 00:20:18,677
+so here the fitness will be 1-sp.
+
+315
+00:20:19,326 --> 00:20:23,138
+But just make sure that you
+do not only replace this sh with sp,
+
+316
+00:20:23,138 --> 00:20:27,688
+but that you also swap these,
+because it's the opposite right?
+
+317
+00:20:27,688 --> 00:20:31,113
+If they match, if the alleles match,
+
+318
+00:20:31,113 --> 00:20:35,309
+this is now good
+for the fitness of the parasite.
+
+319
+00:20:35,570 --> 00:20:38,281
+And so here obviously,
+we need to multiply this
+
+320
+00:20:38,281 --> 00:20:41,864
+with the corresponding host frequencies.
+
+321
+00:20:42,601 --> 00:20:43,310
+Good.
+
+322
+00:20:43,310 --> 00:20:46,675
+So now we've essentially
+implemented everything.
+
+323
+00:20:46,675 --> 00:20:49,170
+We're still missing the D3 stuff,
+
+324
+00:20:49,170 --> 00:20:53,231
+but let me just save this and I'll go 
+to the browser and open this document,
+
+325
+00:20:53,231 --> 00:20:57,194
+just so that we can see whether 
+we made any mistakes,
+
+326
+00:20:57,194 --> 00:20:59,920
+sort of, typo spelling mistakes.
+
+327
+00:20:59,920 --> 00:21:05,446
+So let me open this file here:
+open file, here it is, co-evolution.
+
+328
+00:21:06,730 --> 00:21:11,680
+And let's go into the JavaScript console,
+developer JavaScript console.
+
+329
+00:21:12,297 --> 00:21:17,312
+Here's an error:
+parasite_host_frequencies is not defined.
+
+330
+00:21:17,312 --> 00:21:20,807
+Okay, let's take a look where this is.
+
+331
+00:21:21,910 --> 00:21:25,500
+Parasite_host_frequencies,
+yeah that doesn't make any sense.
+
+332
+00:21:26,370 --> 00:21:29,365
+Where did I say parasite_host_
+frequencies?
+
+333
+00:21:29,365 --> 00:21:33,040
+Here, parasite_host_frequencies,
+this should obviously be,
+
+334
+00:21:33,040 --> 00:21:35,640
+sum_parasite_frequencies.
+
+335
+00:21:35,640 --> 00:21:41,670
+So I copy-pasted this in the wrong position.
+sum_ parasite_frequencies.
+
+336
+00:21:41,670 --> 00:21:44,642
+Okay, well I'm glad I'm occasionally
+making these mistakes,
+
+337
+00:21:44,642 --> 00:21:49,842
+because I'm very convinced
+that many of you will make
+
+338
+00:21:49,842 --> 00:21:56,409
+similar mistakes and this is just to show
+how you find these mistakes easily.
+
+339
+00:21:56,409 --> 00:21:57,520
+Okay, this was a silly one.
+
+340
+00:21:57,520 --> 00:21:59,707
+So I'm going to reload this.
+
+341
+00:21:59,707 --> 00:22:02,304
+Now it simply says,
+draw_line_chart is not defined.
+
+342
+00:22:02,304 --> 00:22:04,480
+That's, of course, expected
+but just to be sure,
+
+343
+00:22:04,480 --> 00:22:08,920
+let's go back here and comment this out,
+
+344
+00:22:08,920 --> 00:22:10,109
+which is actually a nice tool.
+
+345
+00:22:10,109 --> 00:22:11,832
+So you can use this comment...
+
+346
+00:22:14,081 --> 00:22:17,130
+this double slash here, that you use
+to make comments,
+
+347
+00:22:17,130 --> 00:22:18,640
+such as this one.
+
+348
+00:22:18,640 --> 00:22:25,114
+You can also used this to comment out
+function calls that you don't want
+
+349
+00:22:25,114 --> 00:22:28,896
+to be called for the time being,
+for example, when you're debugging.
+
+350
+00:22:28,896 --> 00:22:31,955
+So if I do this here,
+and now this draw line chart
+
+351
+00:22:31,955 --> 00:22:35,710
+is not going to get called,
+then, if I go back to the browser,
+
+352
+00:22:35,710 --> 00:22:38,760
+there should be no more error,
+and that's indeed the case.
+
+353
+00:22:38,760 --> 00:22:39,910
+There's no more error.
+
+354
+00:22:39,910 --> 00:22:41,664
+So we're all good.
+
+355
+00:22:41,875 --> 00:22:45,189
+Okay, so we can go back
+and uncomment this.
+
+356
+00:22:45,189 --> 00:22:49,437
+But now of course we need
+to bring back this draw line chart,
+
+357
+00:22:49,437 --> 00:22:52,121
+and the D3 function.
+
+358
+00:22:52,121 --> 00:22:57,640
+So we can either go and copy this
+from other files,
+
+359
+00:22:57,640 --> 00:23:01,848
+or I'm going to go once again,
+to the internet as we've done before,
+
+360
+00:23:01,848 --> 00:23:07,455
+I'm going to go to D3 JS, 
+so here's D3 JS.
+
+361
+00:23:07,455 --> 00:23:13,463
+Here's how I link directly 
+to the D3 library.
+
+362
+00:23:13,463 --> 00:23:15,708
+By the way, by the time you look at this,
+
+363
+00:23:15,708 --> 00:23:17,749
+you probably have
+a different version here,
+
+364
+00:23:17,749 --> 00:23:18,570
+but that's fine.
+
+365
+00:23:18,570 --> 00:23:22,675
+Just copy the corresponding link here.
+Okay, I'm going to close this,
+
+366
+00:23:22,675 --> 00:23:27,547
+and I'm going to copy the link here
+into the head as before.
+
+367
+00:23:27,547 --> 00:23:30,042
+And now, what I need,
+is to draw a line chart function.
+
+368
+00:23:30,042 --> 00:23:34,020
+So once again, I'm going to go
+and grab this from the internet.
+
+369
+00:23:34,020 --> 00:23:37,022
+We have natureincode.com.
+
+370
+00:23:37,530 --> 00:23:39,871
+We can go to see code in action.
+
+371
+00:23:39,871 --> 00:23:43,928
+So here, for example, we would have
+frequency dependent selection.
+
+372
+00:23:43,928 --> 00:23:45,980
+And now we can go back here,
+
+373
+00:23:45,980 --> 00:23:49,946
+note the draw a line chart function,
+is built with the D3 JS,
+
+374
+00:23:49,946 --> 00:23:51,410
+and can be found here.
+
+375
+00:23:51,410 --> 00:23:55,035
+So here's again dysfunction,
+and copying dysfunction.
+
+376
+00:23:55,035 --> 00:24:02,363
+And I am placing it up here at the top,
+before my simulation code, okay.
+
+377
+00:24:02,363 --> 00:24:05,261
+So I'm going to put this here,
+and then once again,
+
+378
+00:24:05,261 --> 00:24:06,790
+we have this indentation issue.
+
+379
+00:24:06,790 --> 00:24:09,998
+You could just leave that as is,
+but if you prefer,
+
+380
+00:24:09,998 --> 00:24:15,390
+you can, of course, indent this properly,
+which I'm going to do here.
+
+381
+00:24:15,390 --> 00:24:16,263
+Okay.
+
+382
+00:24:17,122 --> 00:24:19,440
+Save, and now we should have 
+everything in order.
+
+383
+00:24:19,440 --> 00:24:21,598
+So we have D3 library loaded.
+
+384
+00:24:21,598 --> 00:24:25,085
+We have the D3 code
+and it's pre-defined for us.
+
+385
+00:24:25,085 --> 00:24:29,120
+And here's our simulation code;
+everything seems to be working fine.
+
+386
+00:24:29,120 --> 00:24:31,570
+So let's save this.
+Go over here.
+
+387
+00:24:31,570 --> 00:24:36,476
+Let me close this, and close this as well,
+and I reload here the browser.
+
+388
+00:24:36,693 --> 00:24:37,791
+And here it is.
+
+389
+00:24:37,791 --> 00:24:44,718
+This is our host parasite co-evolution
+and you can reload this a couple of times,
+
+390
+00:24:44,718 --> 00:24:47,412
+and you can see this changes
+quite a bit,
+
+391
+00:24:47,412 --> 00:24:51,500
+but it essentially depends 
+on the initial values,
+
+392
+00:24:51,500 --> 00:24:55,450
+which as you recall,
+we initialized at random.
+
+393
+00:24:55,450 --> 00:24:59,247
+And so as you can observe here,
+if all of these values
+
+394
+00:24:59,247 --> 00:25:01,560
+are relatively close to 0.5,
+then the dynamics
+
+395
+00:25:01,560 --> 00:25:04,236
+are going to be less extreme,
+
+396
+00:25:04,236 --> 00:25:08,700
+as if they're quite strongly 
+apart from each other.
+
+397
+00:25:08,700 --> 00:25:11,540
+But again we have
+no stochastic effects here,
+
+398
+00:25:11,540 --> 00:25:16,290
+so everything you see here,
+will remain constant over time forever,
+
+399
+00:25:16,290 --> 00:25:18,846
+because this is a deterministic model.
+
+400
+00:25:18,846 --> 00:25:20,272
+But congratulations!
+
+401
+00:25:20,272 --> 00:25:23,550
+This is the host-parasite co-evolution.
+
+402
+00:25:23,550 --> 00:25:26,537
+You see here, negative frequency
+dependent selection in action.
+
+403
+00:25:26,537 --> 00:25:28,847
+The consequence of that,
+is that you have this
+
+404
+00:25:28,847 --> 00:25:31,400
+cyclical dynamics,
+co-evolutionary dynamics
+
+405
+00:25:31,400 --> 00:25:36,723
+of the alleles frequencies changing
+in response to each other.
+
+406
+00:25:36,977 --> 00:25:38,860
+So this concludes this lecture.
+
+407
+00:25:38,860 --> 00:25:39,720
+Congratulations.
+
+408
+00:25:39,720 --> 00:25:41,090
+If you made it this far.
+
+409
+00:25:41,090 --> 00:25:44,230
+You have now two species
+co-evolving with each other,
+
+410
+00:25:44,230 --> 00:25:47,835
+So in the final lecture of this chapter,
+which is the next lecture,
+
+411
+00:25:47,835 --> 00:25:52,708
+we're going to add a slight modification
+to get even more interesting dynamics.
+
+412
+00:25:52,708 --> 00:25:53,600
+See you there.

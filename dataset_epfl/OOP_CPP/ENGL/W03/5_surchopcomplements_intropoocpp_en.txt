@@ -1,0 +1,250 @@
+In this episode, we will bring you a few complements on the aspects we have left aside in the previous episodes on the topic of operator overloading.
+We will also give you several practical advice.
+First of all, let us remind you how to practically tackle this operator overloading according your programming expertise.
+Indeed, operator overloading is a rather difficult matter, for it is technical and touches the core of the language.
+Also, it is not necessarily useful.
+At the beginning you therefore, do without operator overloading, just like we were doing until now.
+However, this topic is still rather useful practically
+- we hope to have have convinced you of this fact in the previous videos.
+Therefore we naturally advise you to make good use of this tool.
+At the first level of overloading, you will bring simple operations on those of your classes you wish to refine.
+You'll bring these operations (such as addition, multiplication...) without too much details and without considering the corresponding auto-assignment operators (such as += , -= ).
+At this first level, you may also overload the printing operator so that you may print more easily the objects of the classes you have created.
+At the next level, you will consider the auto-assignment operators
+( += , *= ), but you will overload them while ignoring their return value, thus using "void" as the return type.
+Finally, at the last level, you will overload the operators while respecting the prototypes used in the C++ norm.
+For example, auto-assignment operators shall return a reference to an instance of the class.
+This is it for the three levels of overloading
+(four if we include the fact not to overload anything) which we let you choose for your own programs.
+Let us examine a few short examples at the last level of the previous slide.
+In the previous episodes, we have already seen the auto-assignment operator " += " which lets us write expressions such as "p += q".
+On the outer overloading, we have also seen the addition which lets us write expressions such as "r = p + q".
+This here is the addition operator.
+Similarly, we could define the auto-subtraction operator which would let us write "p -= q".
+Considering the subtraction, we also have the "minus sign".
+Here, it is not a subtraction but the additive inverse.
+For example, if we write "r = -p" it is also an operator " - " which will be internally overloaded and which does not take arguments.
+There is no second argument to this operator.
+This is called an "unary operator".
+We have also seen the printing operator which lets us prints the instances of our classes the same way we would print a double or an int.
+We have also seen, regarding the outer multiplication, the left multiplication, by an element of another class.
+For example, here, " p " and " q " are elements of class, such as complex numbers.
+However, here, " x " is an element of another class or a basic-type variable.
+For example, we used a double here.
+We could have, internally, a multiplication by one of these other types.
+For a complex number " p ", we could write "p *= x " where x is a double.
+Here yet another example : we could use the " == " operator and write " p == q ".
+In this case, do not forget to overload tthe " != " [not equal] operator aswell since it is closely tied to the " == " operator.
+Therefore, define one with the other.
+We could also use comparison operators.
+For example, we could write
+" p < q ".
+Here aswell, do not forget to define the operator "less or equal to" and, the same goes for the operators
+"greater than" and "greater or equal to".
+Thus, you will first define one of the four operators and write the three others out of the previously defined one.
+Thus, we ensure the semantic integrity, this means that the four operators will function correctly together.
+A few more examples, here with the auto-increment operator such as " ++p " with this instruction.
+Now, we will discuss the following issues :
+Why have we added a "const" to the retun type of the addition?
+Why have we chosen this return type for the printing operator?
+What is the correct return type for the auto-assignment operator such as " += ".
+Why is there a reference to a class instance here?
+Ultimately, we will offer a few practical advice and will go back to the assignment operator " = ".
+Let us begin with the return type of, for example, the addition operator.
+Why have we added a "const" to the return type of this operator.
+Be reminded that this operator lets us write expressions such as " z3 = z1 + z2".
+Clearly, the return type is thus a complex number.
+Why the "const" then?
+The reason is not to permit expressions such as "++(z1 + z2)"
+(which contains the call to operator+ (z1, z2) ).
+Thus, this is indeed the return type of the operator.
+Then, we could imagine writing something like this, incrementing this return value.
+What sense would it have to do this?
+What sense would it have to increment the addition of z1 and z2?
+The result of the addition of z1 and z2 is a result, a constant.
+Therefore, we cannot increment it.
+This is precisely in order to prevent this kind of instructions that we add the const to the return type.
+Thus, we prevent to write on the left side of the " = " expression.
+For example, without the "const",
+"z1 + z2" would be a complex number which we can put on the left side of an equal sign.
+Here aswell, this kind of expression has no sense at all.
+Thus, to prevent it to be placed on this sign of the equal sign, we define the return type as a 
+"const complexe", that is, a complex number we cannot modify.
+The result of an addition of this complex number.
+We cannot modify the result of an addition.
+Second point :
+Now, why does the printing operator return an "ostream&" ?
+Let us look, for example, a very standard printing.
+For a complex number " z1 " we would write it like this :
+" cout << z1 << endl ".
+Let us take this expression and call it " A ".
+This line is thus of the kind " A << endl ".
+This is indeed a call to the printing operator :
+" operator<< (A, endl) ".
+Now, if we rewrite "A" for what it is, which means " cout << z1", the expression " cout << z1 << endl " is equivalent to "operator<< " where the first argument is the result of "cout << z1 " and the second  argument is "endl".
+But this "cout << z1 " is itself a call to the printing operator with "cout" and " z1 ".
+Thus, "cout << z1 << endl " is equivalent to the call : printing operator of printing operator on "cout" and " z1 " and then endl.
+Here, we see that the return type of " operator<< (cout, z1) " is passed as the first argument of  a " << " operator.
+Therefore, this expression here must be of the same type as the first argument of the " << " operator.
+All this expression must be of the "ostream&" type.
+This is why the return value of the printing operator must be "ostream&" so that we can reuse it in a second call or even a third one.
+If you had used "void" as the return type you can never do successive calls.
+Indeed, if you had used "void" as the return type, you could not write expressions such as 
+"cout << z1 << endl ".
+This second " << " could not resolve since the first expression here would return a "void" which means you will end up with something like "void" followed by "endl"; this makes no sense at all.
+It is thus in order to chain the calls to the printing operator that this printing operator shall return a type compatible with its first argument.
+This is this a stream in which we can write an "ostream" passed by reference, an "ostream&".
+Third complement : what is the return type for the auto-assignment operators such as the operator "+=",
+If we write something like
+"z1 += z2", remember that this is equivalent to the call
+" z1.operator+= (z2) ".
+We see that this call is autonomous; there is no expression before it.
+We have no written something like " z1 = z1.operator+= (z2).
+It is precisely because we do not write this that we have advised you, at the first level of overloading . to simply use "void" as the return type.
+This corresponds to the first level of overloading we have talked about in the introduction.
+However, let it be known that, in C++, every expression both "does something" and "has a value", aswell.
+For example, if we have an expression, we may very well white
+" x = this expression ".
+This means that we can very well write what we have suggested before :
+" z3 = (z1 += z2) ".
+Here, the expression " z1 += z2 " does something, namely, it adds the value of " z2 " to " z1 ".
+However, this expression does also have a value and can as be assigned -for example to " z3 ".
+So, what is this expression's value?
+What you need to know is that the value of the expression " z1 += z2 " is the value of " z1 " after the assignment.
+This whole expression is therefore a complex number since "z1" and "z2" are complex numbers.
+This is why, at an advanced level, the return type of this operator is not "void" anymore but a complex number.
+However, this complex number does exist already.
+It is "z1" after the result of this assignment.
+This means it is not a new complex number but at already existing one.
+Consequently, we will not create a new complex number, but simply pass a reference to an already existing one.
+Those are the reasons why the more advanced return types for auto-assignment operators are references on instances
+(for example a reference on a complex number).
+Now, let us see how to define this all.
+We are writing an inner overloading in the class of the " += " operator.
+Its second argument is the value we wish to add to the current instance.
+At an advanced level, it returns a reference on a complex number.
+We will use a reference every time we return an already existing complex number.
+It is not a new value.
+In this expression here, we return the value of "z1".
+We will define this operator like this : we begin here with the header.
+Then, as we have seen before, we add the value x of z2 to the current attribute x.
+Then, we add the value y of z2 to the current attribute y.
+Now, the difference is that we have a return type now.
+What should we do return?
+The current instance!
+And what is the current instance?
+It is the value stored in our adress.
+Here, "this" is a pointer on the current instance.
+Therefore, " *this " is the value stored in the current instance.
+Here, for example, it means the value of "z1".
+Let us finish with practical considerations which should be important.
+We have already defined the return type as a reference on a complex number since this complex number exists already.
+If we had not added the reference, we would have created a new complex number, a copy of an already existing complex number.
+This would be a unnecessary copy.
+In a general way, we can give you the following advice.
+Be very thorough when overloading operators.
+Be careful not to do unnecessary copies, do not burden your code with useless operations.
+Indeed, operators are generally used very often, in many an expression and will be repeated.
+Therefore, something poorly written in some code as deep as an operator could lead to globally important repercussions on the whole program.
+Thus, use references effictively, and avoid the unnecessary copies such as this example's.
+Here, we have two versions of the auto-assignment operator.
+The standard version, which does not do any supplementary copies, is the version we have proposed in the previous slides.
+Here, we have another version which we will now detail.
+This version does between one and three useless copies.
+We are not going to dive into details but the number of copies depends on your compiler's options.
+Now, let us check this version of the auto-assignment operator.
+First of all, as the return type here, we have chosen to return a complex number instead of a reference to a complex number.
+Then, on the side of the argument here, we have also decided to pass a complex number instead of a constant reference.
+This means that, when we have an instruction such as "z1 += z2" which corresponds to " z1.operator+= (z2) ", we have here a passage by value.
+This could already imply a first copy upon the passage of this argument.
+It can be optimized by the compiler, though it is not certain.
+It could thus possibly result in a first copy here.
+Now, regarding the return value here.
+If let us say we wish to use this return value, this means that we will write an expression such as
+" z3 = (z1 += z2) ".
+Here, because of the return value, a new complex number will be created since we are not using a reference.
+This means another copy will be created.
+Now, let us analyse the body of the definition of this operator.
+Since we have decided to return a complex number here, we need to declare it internally so that we can return it.
+The remaining operations here are as usual but in order to return a complex number, we wish to return the current instance.
+Thus we will create here a third copy.
+We copy the current instance.
+Remember that this is the content pointed by the pointer "this".
+This is indeed the value of the current instance which we copy here into "z3".
+Those are the three possible copies.
+Some of these copies may or may not be optinized by your compiler.
+However, in the better version here we pass firstly by a constant reference.
+This means we do not have any copy here, but a reference on " z2 " which is passed directly; thus no copy.
+Similarly, regarding the return, we do not have any copy either.
+Indeed, we have passed the reference to the current instance.
+Internally, we have not declared any supplementary; thus, we do not have this third copy either.
+To sum up : be very careful when overloading operators.
+Now, we would like to conclude this video on the complements about operator overloading by going back to a rather particular case : the assignment operator " = ".
+This operator, which used, for example, every time we write " a = b " or " z1 = z2 ", is a little peculiar since it is provided by default for all the classes.
+It is a "universal operator".
+[The only one, actually.]
+You do not have to redefine it; it already exists for all the classes you can create.
+As we have already said on the videos on the copy construction and the destruction, its possible redefinition, if you need this operator, is closely tied to the redefinition of the copy constructor.
+The difference between the copy construction and the assignment is that the copy construction is a construction.
+It occurs during an initialization.
+On the other hand, the assignment occurs on already existing instances.
+Just like the copy constructor and the destructor, its default version does a shallow copy.
+We will go back to this notion of shallow copy vs deep copy in the next lessons.
+However, this shallow copy is sufficient in most cases,
+In most cases, you will not need to redefine this assignment operator.
+However, it can sometimes be necessary to plainly suppress this assignment operator.
+Let's assume we have to deal with a huge class.
+Such a class would trigger, whenever an instance is created, the usage of a lot of memory.
+Therefore, we do not wish for these instances to be copiables.
+One instance of this class is plenty sufficient, and we therefore wish to avoid dealing with its copies.
+To that end, we will suppress the assignment operator which is called "operator=".
+We will thus use a syntax we have already encountered when we were suppressing the copy constructor.
+Here is its prototype, in the class (since it is an inner overloading).
+Behind this prototype, we will add " =delete ".
+This will thus prevent any assignment between instances of this huge class.
+Now that we are here, take a look at the prototype of this assignment operator.
+Of course, it is called "operator=".
+It is called when we are dealing with expressions such as " a = b ".
+Let us look at the corresponding call. it is "a.operator= " 
+-- it is an inner overloading.
+We cannot use outer overloading for the assignment operator.
+"a.operator=(b) ": we are taking a parameter of the same type as " a ".
+Consequently, we will have the same class as the one in which we are currently overloading this operator.
+In order to avoid a copy, we will pass the parameter by constant reference.
+In C++, it is perfectly valid to write things such as
+" a = b = c ".
+In plain words, a = the result of ( b = c ).
+Therefore, the expression (b = c) has itself a return value which is the value of "b" after the assignment, that is, the value of "c".
+Its type is, just like for " += " or " -=", the very type of the class in which we are currently overloading this operator.
+For the same reasons, the return value will be passed by reference aswell in order to avoid supplementary copies.
+Finally, we have said that it was not necessary to redefine this operator.
+In the vast majority of cases, the default one will be enough.
+However, if you were to redefine this operator, we advise you to follow this method in C++ 2011 :
+We will use a function called "swap".
+The "swap" function lets us... swap two arguments.
+Therefore, "swap(a, b)" will swap the values of "a" and "b".
+In other words, "a" will contain the value of "b", and "b" will contain the value "a".
+You should redefine this "swap" function for your class.
+For example, in our class, we have the attributes "X" and "Y" of the types "x" and "y".
+We will thus proceed like this :
+The "swap" function does not return anything.
+Its parameters are two instances of our class.
+Since these arguments will be swapped we will naturally pass them by reference.
+For exemple, we could use the "swap" function provided by the "utility "library.
+At the beginning our program, we would thus add " #include utility" in order to use this "swap" function in order to swap the attributes "x" of the instances "a" and "b", the attributes "y" of the instances "a" and "b", and so on for all the attributes we wish to swam.
+Now on to the schema we suggest for the redefinition of the assignment operator.
+It is a little different because of optimizations reasons in C++ 2011.
+These reasons stretch beyond this course's frame but they allow the compiler to either avoid the creation of copies or even to use a so-called move.
+Let us not talk about it for now.
+This is simply a more advanced optimization reason.
+Here, there is indeed a passing by value.
+We will use this "swap" function to swap the content of the current instance with the content of this variabe here, which is the parameter of the assignment operator we are currently redefining.
+Here, all is well: we are writing "a = b", which resorts to a "swap" between "a" (which is the current instance since it is "a.operator= (b), and " *this " plays the role of "a"), and "source" which is either a copy or a move of "b".
+Now, we swap these two values.
+Ultimately, we have indeed stored the value of "b" into "a".
+Be wary though, this swap is done with the local copy "source".
+This means that what happens is not the value of "a" being stored inside "b", but the value of "a" being stored inside "source", where "source" is where we have copied "b".
+Therefore we shall not be polluting "b".
+Finally, for the same reasons as for the operator +=, we return here a reference on the current instance.
+Indeed, we may very well write things like "c = a = b".
+VoilÃ ! This concludes this last video sequence, rather advanced and technical we daresay, on all the complements we wished to share on this sharp topic of "operator overloading".

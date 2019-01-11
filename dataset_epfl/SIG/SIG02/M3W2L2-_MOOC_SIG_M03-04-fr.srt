@@ -1,0 +1,1236 @@
+1
+00:00:30,992 --> 00:00:33,842
+Bienvenue à cette leçon,
+qui va porter sur l'interpolation. 
+
+2
+00:00:34,011 --> 00:00:36,247
+L'interpolation est une méthode 
+
+3
+00:00:36,472 --> 00:00:39,886
+qui va vous permettre 
+de généraliser l'information discrète 
+
+4
+00:00:40,161 --> 00:00:42,493
+acquise sur le territoire.
+
+5
+00:00:44,106 --> 00:00:45,889
+Un ensemble de points échantillonnés,
+
+6
+00:00:46,084 --> 00:00:49,214
+selon l'une des procédures 
+présentées à la leçon précédente,
+
+7
+00:00:49,849 --> 00:00:52,322
+est en mesure de fournir 
+des informations intéressantes 
+
+8
+00:00:52,510 --> 00:00:54,529
+sur le domaine 
+auquel ils appartiennent. 
+
+9
+00:00:54,918 --> 00:00:57,831
+Et en effet, par l'intermédiaire
+d'indicateurs statistiques 
+
+10
+00:00:58,008 --> 00:00:59,376
+comme la médiane ou la moyenne
+
+11
+00:01:00,001 --> 00:01:03,830
+on peut obtenir des informations utiles
+mais globales sur la zone étudiée.
+
+12
+00:01:04,391 --> 00:01:06,510
+Et l'intérêt principal 
+de l'échantillonnage 
+
+13
+00:01:06,681 --> 00:01:09,151
+est de permettre d'estimer 
+la valeur de la variable
+
+14
+00:01:09,364 --> 00:01:11,775
+en tout point du domaine 
+par interpolation.
+
+15
+00:01:12,598 --> 00:01:14,506
+Et quel que soit son mode opératoire,
+
+16
+00:01:14,667 --> 00:01:18,809
+une interpolation est une inférence,
+c'est-à-dire une prédiction arbitraire
+
+17
+00:01:18,996 --> 00:01:21,319
+ou justifiée 
+d'une valeur de la variable
+
+18
+00:01:21,482 --> 00:01:23,356
+en un point non mesuré.
+
+19
+00:01:23,750 --> 00:01:26,337
+Les buts de cette leçon sont 
+d'expliquer le fonctionnement
+
+20
+00:01:26,524 --> 00:01:28,988
+des principales méthodes 
+d'interpolation déterministes
+
+21
+00:01:29,428 --> 00:01:32,928
+et leurs déclinaisons en une approche 
+globale et une approche locale. 
+
+22
+00:01:33,578 --> 00:01:35,732
+Les notions présentées,
+vous permettront d'acquérir
+
+23
+00:01:35,932 --> 00:01:38,201
+la capacité de calculer 
+des valeurs interpolées 
+
+24
+00:01:38,401 --> 00:01:42,717
+sur tout jeu de données qui contient
+des échantillons géoréférencés. 
+
+25
+00:01:52,998 --> 00:01:55,224
+Les méthodes d'interpolation
+dites déterministes
+
+26
+00:01:55,419 --> 00:01:56,703
+présentées dans cette leçon, 
+
+27
+00:01:56,995 --> 00:01:59,305
+sont des méthodes 
+lors de l'application desquelles 
+
+28
+00:01:59,505 --> 00:02:02,319
+aucune étude statistique sur 
+le comportement de la variable 
+
+29
+00:02:02,544 --> 00:02:03,869
+n'est effectuée.
+
+30
+00:02:04,066 --> 00:02:05,910
+Et le choix de la méthode
+la plus appropriée 
+
+31
+00:02:06,097 --> 00:02:08,091
+va reposer sur l'expérience 
+de l'analyste,
+
+32
+00:02:08,604 --> 00:02:11,433
+et sur les connaissances 
+qu'il possède du phénomène étudié. 
+
+33
+00:02:12,564 --> 00:02:15,651
+Il existe deux familles de méthodes 
+d'interpolation déterministes,
+
+34
+00:02:16,112 --> 00:02:18,690
+ce sont les méthodes globales 
+et les méthodes locales.
+
+35
+00:02:19,302 --> 00:02:20,790
+Une méthode est dite globale, 
+
+36
+00:02:20,972 --> 00:02:23,472
+si le modèle spatial 
+du phénomène est construit 
+
+37
+00:02:23,656 --> 00:02:26,316
+en prenant en compte 
+tous les points de mesure existants
+
+38
+00:02:26,485 --> 00:02:27,872
+sur le domaine étudié.
+
+39
+00:02:28,148 --> 00:02:29,709
+Les méthodes locales quant à elles 
+
+40
+00:02:29,932 --> 00:02:32,514
+ne prennent en compte  
+qu'un nombre limité de points d'appui
+
+41
+00:02:32,997 --> 00:02:35,260
+au voisinage du point à estimer. 
+
+42
+00:02:35,946 --> 00:02:38,800
+De plus, elles permettent
+d'attribuer des poids particuliers 
+
+43
+00:02:38,975 --> 00:02:42,001
+à chaque point de mesure 
+notamment en fonction de la distance. 
+
+44
+00:02:51,397 --> 00:02:53,072
+Les méthodes globales sont utilisées
+
+45
+00:02:53,268 --> 00:02:55,393
+pour analyser des tendances 
+de distribution spatiale 
+
+46
+00:02:55,583 --> 00:02:57,708
+d'un phénomène dans un domaine donné.
+
+47
+00:02:58,406 --> 00:03:00,236
+Et nous présentons ici,
+une approche globale
+
+48
+00:03:00,428 --> 00:03:02,790
+qui consiste à calculer 
+un polynôme de degré 1 
+
+49
+00:03:02,967 --> 00:03:04,143
+ou de degré supérieur
+
+50
+00:03:04,602 --> 00:03:06,430
+et qui minimise les écarts 
+aux points de mesure 
+
+51
+00:03:06,606 --> 00:03:08,506
+selon la méthode des moindres carrés. 
+
+52
+00:03:09,683 --> 00:03:11,820
+Il en résulte une surface de tendance,
+
+53
+00:03:11,988 --> 00:03:14,466
+représentative du comportement 
+moyen du phénomène
+
+54
+00:03:14,712 --> 00:03:16,665
+dans le plan des coordonnées X Y 
+
+55
+00:03:16,908 --> 00:03:19,718
+et Z représente ici 
+la variable mesurée. 
+
+56
+00:03:20,684 --> 00:03:22,834
+Les modèles de référence
+qui peuvent être
+
+57
+00:03:23,009 --> 00:03:25,772
+soit un plan soit une 
+surface de degré 2 ou 3 
+
+58
+00:03:26,076 --> 00:03:28,291
+sont trop simples 
+dans la majorité des cas,
+
+59
+00:03:28,466 --> 00:03:30,404
+pour fournir une approximation réaliste
+
+60
+00:03:30,581 --> 00:03:32,670
+de la distribution 
+spatiale de la variable.
+
+61
+00:03:33,175 --> 00:03:35,175
+Mais les surfaces 
+de degré supérieur à 5 
+
+62
+00:03:35,340 --> 00:03:36,831
+ne sont pas faciles à calculer. 
+
+63
+00:03:37,010 --> 00:03:38,497
+C'est la première raison pour laquelle
+
+64
+00:03:38,674 --> 00:03:40,807
+on préfère les méthodes
+d'interpolation locales.
+
+65
+00:03:41,538 --> 00:03:44,663
+Une autre raison plus fondamentale
+est qu'il n'est pas très utile 
+
+66
+00:03:44,830 --> 00:03:46,455
+de faire intervenir 
+des points de mesure 
+
+67
+00:03:46,636 --> 00:03:48,879
+au-delà d'une distance 
+seuil d'auto-corrélation
+
+68
+00:03:49,076 --> 00:03:52,997
+car la dépendance spatiale est
+par hypothèse locale et non globale.
+
+69
+00:04:03,232 --> 00:04:06,319
+Les méthodes d'interpolation locales
+ne prennent en compte 
+
+70
+00:04:06,507 --> 00:04:09,868
+qu'un nombre limité de points de mesure
+au voisinage du point à estimer.
+
+71
+00:04:10,367 --> 00:04:11,084
+De plus, 
+
+72
+00:04:11,327 --> 00:04:13,490
+elles permettent de pondérer 
+ces points de mesure
+
+73
+00:04:13,677 --> 00:04:15,988
+en fonction de leurs 
+distances aux pixels à prédire
+
+74
+00:04:16,201 --> 00:04:17,902
+ou encore éventuellement
+
+75
+00:04:18,109 --> 00:04:20,249
+en fonction d'une information
+de qualité de mesure
+
+76
+00:04:20,447 --> 00:04:23,016
+liée à l'utilisation 
+d'un instrument spécifique. 
+
+77
+00:04:24,494 --> 00:04:26,211
+Plusieurs méthodes existent
+
+78
+00:04:26,401 --> 00:04:29,638
+et leur choix dépend de la densité 
+de l'information que l'on possède,
+
+79
+00:04:30,089 --> 00:04:31,733
+de la précision souhaitée, 
+
+80
+00:04:32,211 --> 00:04:34,646
+de l'objectif principal 
+de l'interpolation
+
+81
+00:04:35,258 --> 00:04:36,455
+et comme évoqué plus tôt, 
+
+82
+00:04:36,655 --> 00:04:39,414
+de la connaissance préalable 
+que l'on a du phénomène. 
+
+83
+00:04:40,422 --> 00:04:43,327
+La première méthode présentée 
+est celle du plus proche voisin. 
+
+84
+00:04:43,741 --> 00:04:46,200
+La valeur attribuée 
+en un point quelconque du domaine 
+
+85
+00:04:46,381 --> 00:04:48,195
+est celle de son plus proche voisin. 
+
+86
+00:04:49,010 --> 00:04:50,570
+La détermination du plus proche voisin 
+
+87
+00:04:50,747 --> 00:04:53,747
+est basée sur l'appartenance 
+du point à interpoler, 
+
+88
+00:04:54,169 --> 00:04:56,702
+à la zone d'influence 
+des points de mesure. 
+
+89
+00:04:57,012 --> 00:05:00,051
+Ces zones d'influence sont déterminées 
+par les médiatrices des segments. 
+
+90
+00:05:00,492 --> 00:05:01,925
+Ces médiatrices délimitent 
+
+91
+00:05:02,126 --> 00:05:04,176
+ce que l'on appelle 
+les polygones de Thiessen. 
+
+92
+00:05:04,378 --> 00:05:07,792
+Et tout point à prédire, 
+situé à l'intérieur d'un polygone, 
+
+93
+00:05:07,978 --> 00:05:09,528
+est sensé prendre la même valeur 
+
+94
+00:05:09,719 --> 00:05:11,191
+que celle du point 
+de mesure correspondant, 
+
+95
+00:05:11,361 --> 00:05:13,527
+soit ici la valeur S2. 
+
+96
+00:05:14,423 --> 00:05:17,455
+Cette méthode transforme en fait 
+le phénomène continu 
+
+97
+00:05:17,771 --> 00:05:20,321
+en un modèle spatialement discret. 
+
+98
+00:05:20,680 --> 00:05:23,864
+La deuxième méthode d'interpolation 
+locale que nous décrivons 
+
+99
+00:05:24,120 --> 00:05:26,245
+est une méthode basée 
+sur un réseau de triangles, 
+
+100
+00:05:26,446 --> 00:05:30,493
+abrégé TIN en anglais, 
+pour Triangulated Irregular Network. 
+
+101
+00:05:30,996 --> 00:05:33,601
+Un TIN est formé en reliant 
+les points d'appui entre eux, 
+
+102
+00:05:33,778 --> 00:05:36,415
+de manière à former 
+un réseau de mailles triangulaires. 
+
+103
+00:05:37,000 --> 00:05:39,776
+Ce TIN est élaboré 
+à partir de la méthode de Delaunay, 
+
+104
+00:05:40,149 --> 00:05:42,608
+dont la particularité 
+est de créer des triangles 
+
+105
+00:05:42,783 --> 00:05:45,319
+dont les angles 
+ne sont pas supérieurs à 90 degrés. 
+
+106
+00:05:45,999 --> 00:05:48,401
+La variation du paramètre 
+à l'intérieur de chaque triangle 
+
+107
+00:05:48,593 --> 00:05:50,304
+est donc supposée linéaire. 
+
+108
+00:05:50,474 --> 00:05:51,912
+Et l'interpolation est réalisée 
+
+109
+00:05:52,102 --> 00:05:54,696
+en établissant l'équation à 3 inconnues 
+
+110
+00:05:54,978 --> 00:05:57,847
+du plan qui est formé par chacune 
+des facettes triangulaires. 
+
+111
+00:05:58,467 --> 00:06:01,325
+Les trois inconnues sont a, b et c. 
+
+112
+00:06:01,503 --> 00:06:03,387
+Et elles sont déterminées 
+par les valeurs connues 
+
+113
+00:06:03,571 --> 00:06:05,186
+des trois sommets du triangle. 
+
+114
+00:06:05,497 --> 00:06:07,110
+Pour mettre en œuvre cette méthode, 
+
+115
+00:06:07,472 --> 00:06:10,021
+on choisit en général 
+des points de mesure caractéristiques, 
+
+116
+00:06:10,264 --> 00:06:12,181
+qui sont situés 
+par exemple sur les crêtes, 
+
+117
+00:06:12,513 --> 00:06:13,926
+ou au fond des talwegs. 
+
+118
+00:06:14,343 --> 00:06:17,732
+À l'origine, l'interpolation par TIN 
+a été développée en cartographie 
+
+119
+00:06:18,247 --> 00:06:20,439
+pour créer manuellement 
+des lignes d'isovaleurs, 
+
+120
+00:06:20,755 --> 00:06:22,540
+comme les courbes de niveaux du relief.
+
+121
+00:06:23,537 --> 00:06:26,381
+Historiquement, le mot spline 
+désigne en anglais, 
+
+122
+00:06:26,615 --> 00:06:28,493
+une latte de bois longue et mince, 
+
+123
+00:06:28,690 --> 00:06:31,103
+utilisée par les jardiniers 
+pour dessiner une courbe 
+
+124
+00:06:31,292 --> 00:06:33,297
+passant par des pieux plantés en terre. 
+
+125
+00:06:34,421 --> 00:06:36,722
+Une application plus récente 
+de la latte de bois 
+
+126
+00:06:36,901 --> 00:06:39,393
+est la règle flexible appelée Cobra, 
+
+127
+00:06:39,705 --> 00:06:42,403
+utilisée pour dessiner 
+une courbe simulant au mieux
+
+128
+00:06:42,593 --> 00:06:44,995
+la répartition linéaire 
+d'une collection de points. 
+
+129
+00:06:46,329 --> 00:06:49,712
+La méthode B-spline 
+est une mathématisation de cette pratique. 
+
+130
+00:06:50,326 --> 00:06:51,983
+Au lieu de rechercher une seule équation 
+
+131
+00:06:52,162 --> 00:06:54,986
+qui modélise une courbe 
+passant par tous les points d'appui, 
+
+132
+00:06:55,404 --> 00:06:58,929
+un polynôme du troisième degré 
+est calculé pour 4 points successifs, 
+
+133
+00:06:59,113 --> 00:07:00,764
+contenus dans une fenêtre mobile, 
+
+134
+00:07:00,999 --> 00:07:03,320
+comme l'illustre la figure à l'écran, 
+
+135
+00:07:03,626 --> 00:07:05,551
+pour le cas à une dimension. 
+
+136
+00:07:06,675 --> 00:07:08,728
+On suppose que pour chaque intervalle, 
+
+137
+00:07:08,930 --> 00:07:11,500
+l'évolution 
+de la variable à prédire Z de X, 
+
+138
+00:07:11,680 --> 00:07:14,813
+est correctement simulée 
+au moyen d'un polynôme P de X. 
+
+139
+00:07:15,383 --> 00:07:19,015
+On glisse ensuite la fenêtre mobile 
+d'un point vers la droite 
+
+140
+00:07:19,370 --> 00:07:22,504
+et on estime à nouveau le polynôme, 
+pour l'intervalle suivant. 
+
+141
+00:07:23,241 --> 00:07:25,253
+Le calcul du polynôme P de X 
+
+142
+00:07:25,433 --> 00:07:27,709
+est élaboré par l'introduction 
+de contraintes 
+
+143
+00:07:27,993 --> 00:07:30,242
+à la jonction 
+de deux polynômes consécutifs. 
+
+144
+00:07:31,352 --> 00:07:34,177
+La première contrainte est l'intervalle 
+dans lequel X est compris, 
+
+145
+00:07:35,120 --> 00:07:38,428
+la deuxième concerne la continuité 
+au changement de segment, 
+
+146
+00:07:39,124 --> 00:07:40,264
+en jaune ici. 
+
+147
+00:07:41,403 --> 00:07:43,600
+La troisième concerne la continuité 
+
+148
+00:07:44,091 --> 00:07:45,646
+au cas où un point d'inflexion
+
+149
+00:07:45,827 --> 00:07:48,340
+se trouve  au point de jonction 
+de deux polynômes. 
+
+150
+00:07:48,985 --> 00:07:51,087
+Dans ce cas, la continuité est assurée 
+
+151
+00:07:51,254 --> 00:07:54,058
+par égalité approximative 
+des dérivées secondes. 
+
+152
+00:07:55,572 --> 00:07:58,810
+Passons maintenant à l'interpolation 
+par moyenne mobile pondérée, 
+
+153
+00:07:59,008 --> 00:08:01,270
+ou Inverse Distance Weighting en anglais,
+
+154
+00:08:01,507 --> 00:08:03,948
+très souvent abrégée IDW. 
+
+155
+00:08:04,611 --> 00:08:06,930
+L'estimation de la variable 
+est calculée en s'appuyant 
+
+156
+00:08:07,106 --> 00:08:09,867
+sur les valeurs de quelques points 
+mesurés dans le voisinage, 
+
+157
+00:08:10,179 --> 00:08:11,984
+et en leur attribuant un poids, 
+
+158
+00:08:12,348 --> 00:08:14,347
+en fonction de la distance notamment. 
+
+159
+00:08:15,475 --> 00:08:17,554
+Cette approche correspond à l'intuition 
+
+160
+00:08:17,741 --> 00:08:19,414
+selon laquelle un point éloigné 
+
+161
+00:08:19,595 --> 00:08:21,596
+a moins d'influence 
+qu'un point rapproché. 
+
+162
+00:08:23,001 --> 00:08:25,067
+Pour mettre en œuvre l'IDW, 
+
+163
+00:08:25,253 --> 00:08:27,030
+il faut répondre à certaines questions. 
+
+164
+00:08:27,845 --> 00:08:29,650
+Quelle taille de voisinage définir? 
+
+165
+00:08:30,284 --> 00:08:32,483
+Combien de points de mesure 
+faut-il inclure? 
+
+166
+00:08:32,756 --> 00:08:35,393
+Quel poids respectif 
+convient-il de leur accorder? 
+
+167
+00:08:36,100 --> 00:08:38,833
+Faut-il tenir compte de l'orientation 
+relative du phénomène? 
+
+168
+00:08:39,005 --> 00:08:42,224
+Et là, c'est la notion d'anisotropie 
+que nous abordons
+
+169
+00:08:42,534 --> 00:08:44,480
+et sur laquelle 
+nous reviendrons plus en détail 
+
+170
+00:08:44,646 --> 00:08:46,280
+lors de la leçon suivante. 
+
+171
+00:08:47,160 --> 00:08:48,714
+La réponse à ces questions essentielles 
+
+172
+00:08:48,887 --> 00:08:50,770
+varie en fonction 
+de la région d'étude. 
+
+173
+00:08:51,089 --> 00:08:53,565
+Elle varie aussi 
+en fonction du phénomène considéré 
+
+174
+00:08:53,742 --> 00:08:55,271
+et de la configuration 
+
+175
+00:08:55,578 --> 00:08:57,488
+de l'échantillon des points de mesure. 
+
+176
+00:08:58,650 --> 00:09:00,189
+Dans le cadre déterministe, 
+
+177
+00:09:00,380 --> 00:09:03,105
+l'analyste doit se baser 
+sur sa propre expérience, 
+
+178
+00:09:03,278 --> 00:09:05,768
+pour fixer des valeurs 
+aux paramètres évoqués. 
+
+179
+00:09:06,227 --> 00:09:08,145
+En ce qui concerne la pondération 
+par exemple, 
+
+180
+00:09:08,470 --> 00:09:12,700
+on considère que plus un point mesuré 
+est éloigné du point interpolé, 
+
+181
+00:09:13,414 --> 00:09:15,059
+moins il a d'influence. 
+
+182
+00:09:15,412 --> 00:09:17,962
+On choisit dans ce cas 
+une fonction inverse de la distance, 
+
+183
+00:09:18,146 --> 00:09:19,953
+ou inverse au carré de la distance.
+
+184
+00:09:21,760 --> 00:09:24,126
+Une fois que le nombre 
+de points d'appui est sélectionné, 
+
+185
+00:09:24,309 --> 00:09:28,792
+soit ici 5 points situés dans le cercle C
+autour de la valeur à prédire, 
+
+186
+00:09:29,467 --> 00:09:31,836
+cette dernière est égale 
+à la moyenne pondérée 
+
+187
+00:09:32,016 --> 00:09:33,488
+de ces 5 points d'appui. 
+
+188
+00:09:34,347 --> 00:09:36,992
+Le poids accordé 
+aux points de contrôle Z de alpha 
+
+189
+00:09:37,432 --> 00:09:40,657
+peut par exemple être proportionnel 
+à 1 sur la distance, 
+
+190
+00:09:40,838 --> 00:09:42,213
+ou 1 sur la distance au carré, 
+
+191
+00:09:42,384 --> 00:09:45,527
+ou encore 1 sur la distance 
+à une puissance plus élevée.
+
+192
+00:09:45,706 --> 00:09:49,697
+Et plus la puissance est élevée, 
+plus l'effet local est accentué. 
+
+193
+00:09:50,897 --> 00:09:54,041
+Les méthodes locales d'interpolation 
+que nous venons de passer en revue 
+
+194
+00:09:54,289 --> 00:09:56,476
+ne contiennent pas 
+de moyens d'estimer l'incertitude 
+
+195
+00:09:56,653 --> 00:09:58,271
+liée aux valeurs estimées. 
+
+196
+00:09:58,992 --> 00:10:00,436
+Pour évaluer cette incertitude, 
+
+197
+00:10:00,606 --> 00:10:03,135
+on doit recourir à une méthode 
+de validation croisée. 
+
+198
+00:10:04,076 --> 00:10:08,023
+Cela consiste à partager l'échantillon 
+de manière aléatoire en deux parties. 
+
+199
+00:10:08,490 --> 00:10:10,465
+Les points de mesure 
+de l'un des deux groupes 
+
+200
+00:10:10,631 --> 00:10:12,134
+servent à l'interpolation. 
+
+201
+00:10:12,374 --> 00:10:14,086
+Alors que les points de mesure du second 
+
+202
+00:10:14,394 --> 00:10:15,594
+servent de tests. 
+
+203
+00:10:16,312 --> 00:10:19,567
+En chaque site test, 
+on va comparer la valeur estimée 
+
+204
+00:10:19,771 --> 00:10:22,659
+avec la valeur mesurée 
+et en déduire l'incertitude. 
+
+205
+00:10:22,999 --> 00:10:26,253
+En général, en calculant la différence 
+entre les moyennes quadratiques
+
+206
+00:10:26,440 --> 00:10:27,693
+des deux distributions. 
+
+207
+00:10:28,612 --> 00:10:29,818
+La moyenne quadratique 
+
+208
+00:10:29,995 --> 00:10:31,857
+est la racine carrée 
+de la moyenne arithmétique 
+
+209
+00:10:32,026 --> 00:10:33,492
+des carrés des valeurs. 
+
+210
+00:10:34,438 --> 00:10:36,481
+La méthode est répétée plusieurs fois 
+
+211
+00:10:36,697 --> 00:10:39,506
+avec à chaque reprise 
+un nouveau jeu de sites d'appui 
+
+212
+00:10:39,730 --> 00:10:42,591
+et de sites tests 
+aléatoirement déterminés, 
+
+213
+00:10:42,759 --> 00:10:45,643
+de manière à éviter tout biais 
+dans la sélection de sites. 
+
+214
+00:10:46,997 --> 00:10:48,996
+Les résultats de cette validation croisée 
+
+215
+00:10:49,169 --> 00:10:51,304
+permettent d'évaluer 
+l'incertitude globale 
+
+216
+00:10:51,485 --> 00:10:54,315
+et l'incertitude locale 
+des valeurs interpolées. 
+
+217
+00:10:55,005 --> 00:10:57,568
+Les méthodes du plus proche voisin 
+du réseau de triangles, 
+
+218
+00:10:57,737 --> 00:11:00,818
+de la fonction B-spline 
+et de la moyenne mobile pondérée, 
+
+219
+00:11:01,006 --> 00:11:03,731
+sont très empiriques et les résultats 
+sont fortement dépendants 
+
+220
+00:11:03,900 --> 00:11:07,214
+de l'expérience de l'analyste 
+mais aussi de sa subjectivité. 
+
+221
+00:11:08,378 --> 00:11:10,941
+Pour les phénomènes qui échappent 
+à la perception visuelle, 
+
+222
+00:11:11,213 --> 00:11:12,509
+la situation peut être critique 
+
+223
+00:11:12,675 --> 00:11:15,486
+dans la mesure où, en l'absence 
+d'information supplémentaire, 
+
+224
+00:11:15,660 --> 00:11:18,311
+rien n'indique 
+si l'interpolation est possible. 
+
+225
+00:11:19,290 --> 00:11:21,156
+Il est important de noter qu'en effet, 
+
+226
+00:11:21,333 --> 00:11:22,825
+en l'absence de toute information, 
+
+227
+00:11:23,010 --> 00:11:25,658
+soit de tout modèle vérifié 
+de comportement, 
+
+228
+00:11:25,974 --> 00:11:27,737
+le choix de la fonction d'interpolation 
+
+229
+00:11:27,946 --> 00:11:31,236
+est totalement arbitraire, 
+comme le montre cette illustration. 
+
+230
+00:11:32,003 --> 00:11:33,006
+En effet, 
+
+231
+00:11:33,563 --> 00:11:36,969
+quel est le comportement de la variable Z 
+entre les points Z1 et Z2 ? 
+
+232
+00:11:37,405 --> 00:11:39,030
+Est-ce que c'est 
+selon la fonction bleue ? 
+
+233
+00:11:39,224 --> 00:11:40,912
+Est-ce que c'est 
+selon la fonction verte ? 
+
+234
+00:11:41,094 --> 00:11:43,141
+Ou encore selon la fonction orange ? 
+
+235
+00:11:44,026 --> 00:11:46,201
+Ce type d'incertitude 
+peut entraîner des coûts
+
+236
+00:11:46,522 --> 00:11:48,504
+inutiles et très élevés, 
+
+237
+00:11:49,038 --> 00:11:51,300
+dans le cas des sondages miniers 
+par exemple. 
+
+238
+00:11:51,655 --> 00:11:54,579
+Et c'est pour les éviter 
+que dès les années 1940, 
+
+239
+00:11:54,990 --> 00:11:56,652
+des travaux de recherche 
+se sont développés 
+
+240
+00:11:56,826 --> 00:11:59,826
+pour proposer le concept 
+de variables régionalisées, 
+
+241
+00:12:00,013 --> 00:12:02,180
+que nous allons étudier 
+dans la prochaine leçon. 
+
+242
+00:12:12,596 --> 00:12:14,721
+Dans cette présentation, 
+nous nous sommes penchés 
+
+243
+00:12:14,912 --> 00:12:17,222
+sur les méthodes 
+d'interpolation déterministes. 
+
+244
+00:12:17,782 --> 00:12:21,369
+Ces méthodes déterministes ne reposent 
+sur aucune étude statistique préalable 
+
+245
+00:12:21,534 --> 00:12:22,672
+du phénomène étudié. 
+
+246
+00:12:23,485 --> 00:12:26,244
+Il en existe 2 grandes catégories, 
+soit les approches globales, 
+
+247
+00:12:26,421 --> 00:12:28,433
+qui permettent 
+de procéder à l'interpolation, 
+
+248
+00:12:28,617 --> 00:12:30,098
+en prenant en compte la totalité 
+
+249
+00:12:30,279 --> 00:12:32,219
+des points de mesure 
+inclus dans un domaine. 
+
+250
+00:12:33,524 --> 00:12:35,042
+Et les approches locales, 
+
+251
+00:12:35,236 --> 00:12:38,146
+qui ne prennent en compte 
+qu'un nombre limité de points d'appui, 
+
+252
+00:12:38,760 --> 00:12:40,697
+au voisinage du point à estimer, 
+
+253
+00:12:40,858 --> 00:12:43,113
+et qui permettent d'attribuer 
+des poids spécifiques 
+
+254
+00:12:43,313 --> 00:12:44,725
+à chaque point de mesure, 
+
+255
+00:12:45,000 --> 00:12:48,727
+notamment en fonction de la distance 
+au point à prédire. 
+
+256
+00:12:50,259 --> 00:12:52,322
+Les méthodes globales 
+sont souvent trop simples 
+
+257
+00:12:52,512 --> 00:12:54,484
+pour fournir une approximation réaliste 
+
+258
+00:12:54,655 --> 00:12:57,388
+de la distribution spatiale 
+de la variable à prédire. 
+
+259
+00:12:57,582 --> 00:12:58,897
+Et c'est la raison pour laquelle 
+
+260
+00:12:59,139 --> 00:13:01,895
+on préfère les méthodes 
+d'interpolation locales. 
+
+261
+00:13:03,183 --> 00:13:04,794
+Mais ces approches locales, 
+
+262
+00:13:05,188 --> 00:13:06,741
+comme l'approche du plus proche voisin, 
+
+263
+00:13:06,922 --> 00:13:08,952
+ou celle de la moyenne mobile pondérée, 
+
+264
+00:13:09,140 --> 00:13:10,239
+sont très empiriques 
+
+265
+00:13:10,428 --> 00:13:13,663
+et dépendent beaucoup 
+de la subjectivité de l'analyste. 
+
+266
+00:13:14,680 --> 00:13:18,653
+Elles produisent par conséquent, 
+souvent des résultats arbitraires, 
+
+267
+00:13:19,019 --> 00:13:22,154
+qui impliquent l'existence 
+d'une importante incertitude. 
+

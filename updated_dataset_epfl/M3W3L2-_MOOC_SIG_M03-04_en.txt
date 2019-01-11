@@ -1,0 +1,92 @@
+Welcome to this lesson on derivative products of the numerical altitude models.
+We will see how to calculate the slope, the orientation and the curvature which are morphometric parameters very interesting for the territory.
+As we have seen in the previous lesson, the primary information provided by a digital ground model is the measured or calculated altitude in a series of points distributed on the field.
+Depending on the type of model used, these points are either irregularly distributed or aligned at the center or on the nodes of a regular grid of the given spatial resolution.
+But, it is possible to produce other information from numerical altitude models.
+Indeed, the geomorphometry focuses on determining global and local variables which characterize the forms of the relief.
+In this lesson, we will present in turn the main global and local relief indicators.
+You should then be able to calculate the value of these geomorphometric variables.
+The geomorphometry is a discipline whose purpose is to determine variables capable of characterizing the forms of relief.
+There is a global approach and a local approach.
+We speak of a global approach when the study area is considered as a set, for which we wish to define one or more characteristics, by means of an indicator calculated on a statistical base.
+Thanks to the global indicators, it is possible to quickly compare the relief of several regions, or of different watersheds.
+The minimum altitude and the maximum altitude are indicators of descriptive statistics, usually used to summarize the properties of a digital ground model.
+The hypsometric curve, here in blue, is an overall indicator which expresses the distribution of the surface of a watershed depending on the altitude between the minimum and maximum values which are illustrated in the top figure
+This curve is used to estimate the hydrological and hydraulic behavior of a basin and its drainage system.
+The average altitude classes, the average slope classes and the distances between vertices of the same altitude class are parameters which allow to characterize globally the roughness of the relief.
+The local geomorphometric approach covers the variable calculation functions which describe a local property as the slope or the orientation.
+This approach can be assimilated to a filtering procedure of the numerical altitude model, by a mobile window, which result is the desired variable.
+The new value of the central pixel or pixel of interest is calculated taking into account the values â€‹â€‹of the pixels which are included in the sliding window, what is also called the neighborhood.
+There are therefore several ways of applying the local approach by varying the size and shape of the sliding window.
+Since the mobile window is always centered on the pixel whose value must be calculated, the operation meets impossible situations for the rows and the columns of the edges.
+This is called "the edge effects" precisely.
+And in this case, the system used can affect the value 0 where the information is missing and produce an erroneous value.
+A simple way to avoid this difficulty is to perform the calculations on a numerical altitude model greater than the study area.
+And it is important to mention that the size of the window, introduces a contextual effect.
+The larger the size, the more influenced the calculated value of the pixel is by the environment.
+Often the enlargement of the window produces a smoothing of the relief.
+We will come back to this later.
+Let's see now, how to calculate the slope, the orientation and the curvature.
+The slope is defined as the inclination of a surface compared to the horizontal plan.
+The orientation is a direction determined with respect to the cardinal points.
+From a mathematical point of view,
+The slope and the orientation are perfectly defined in a point, when the surface is described by an analytic function which represents the gradient of this surface.
+Here, the first term corresponds to the partial second derivative of X and the second, to the partial second derivative of Y.
+In discreet image mode,
+It is necessary to define the slope and orientation for each pixel.
+Although the principle remains the same in essence there are several algorithms to calculate them according to the neighborhood taken into account.
+This principle is the relation between the elevation and the horizontal distance.
+The neighborhood taken into account to present the algorithms is a 3x3 pixels mobile window.
+The first algorithm presented is that of the maximum difference to the neighbors.
+Here, the maximum delta is observed between the pixel Z1 and the pixel of interest Z5.
+And the calculated slope is equal to the arc tangent of 40 divided by the âˆš2, multiplied by the spatial resolution of the model.
+As a reminder, âˆš2 corresponds to the horizontal distance between the center of the pixel Z1 and the center of the pixel of interest Z5.
+The algorithm of the line-column gradient consists in identifying the maximum difference between the pixel of interest Z5 and another pixel located on the same line, here Z6.
+And on the other hand, the maximum difference between the pixel of interest Z5 and another pixel located in the same column, here Z8.
+The line gradient, called G is equal to the difference between the pixel of interest Z5 and the pixel Z6, divided by the resolution of the digital altitude model.
+And the column gradient, called H is equal to the difference between the pixel of interest Z5 and the pixel Z8, divided by the resolution of the digital altitude model.
+And these two gradients allow to calculate, on one hand, the slope in Z5, which is equal to the arc tangent of the square root of (GÂ² + HÂ²) and on the other hand, the orientation, which is equal to Ï€ minus the arc tangent of the ratio between the column gradient H and the line gradient
+G + Ï€ / 2 x (G / |G|).
+Zevenbergen and
+Thorne's algorithm is the most commonly used.
+We calculate a line gradient G and a column gradient H for which the horizontal distance is equal to twice the spatial resolution of the model.
+The slope is equal to the arc tangent of the âˆš (GÂ² + HÂ²).
+And the orientation is equal to Ï€ minus the arc tangent of the ratio between the column gradient H and the line gradient G, plus (Ï€ / 2) x (G / |G|).
+According to Zevenbergen and Thorne's model, the gradients of line G and of column H, are part of the parameters of the equation of a surface, which go exactly through the 9 altitudes of the submatrix which constitute the mobile window.
+The 9 parameters from A to I can be determined from the 9 altitudes of the submatrix of 3 Ã— 3 pixels, by means of Lagrange polynomials.
+To determine the topographical indices that are the slope, the orientation and the curvature, it is necessary to differentiate this equation, so to find the derivatives and resolve the resulting equation for the central point of the submatrix formed of 3 Ã— 3 pixels and which coordinates are X = Y = 0.
+The slope is the first derivative of Z depending on the orientation.
+The relations between these 9 parameters and the 9 altitudes of the submatrix are described here.
+As a reminder, R represents the spatial resolution or the distance between two pixel centers in the direction of the lines and columns and must be of the same unit as Z.
+For more information, we refer you to the article by
+Zevenbergen and Thorne which is mentioned here and the detailed references can be found on the website of our online course.
+The Horn model is based on all the neighbors being part of the neighborhood of the pixel of interest in a 3x3 pixels mobile window.
+This model is also based on a line gradient G and a column gradient H.
+The neighbors closest to the pixel of interest have a weight of 2, and the denominator is the sum of the distances between the pixels involved.
+The slope is equal to the arc tangent of the âˆš (GÂ² + HÂ²).
+And the orientation is equal to Ï€ minus the arc tangent of the ratio between the column gradient H and the line gradient G, plus (Ï€ / 2) x (G / |G|).
+Let's move on to the measurement of convexity and concavity of the ground.
+A surface is said to be convex or concave, when it is entirely on the same side of a tangent plan.
+In the case of convexity, the curvature is positive like here in green and in the case of concavity it is negative.
+The shape of the relief influences the erosion process, and a convex slope will undergo a greater erosion than a concave slope.
+Convexity and concavity are also used to characterize the upper part and the lower part of a landslide.
+And in this case, the curvature must be determined in both directions, vertical and horizontal, this is the reason why we speak of vertical curvature and horizontal curvature.
+To measure the curvature, the Zevenbergen and Thorne's model is generally used.
+The gradients of line G and of column H, used for the calculation of the slope are in this case completed by the parameters D, E and F, described earlier.
+D accounts for the difference in altitude between the pixel of interest and the average of its line neighbors, Z4 and Z6.
+The term E accounts for the difference in altitude between the pixel of interest and the average of its column neighbors, Z2 and Z8
+And finally, the term F allows to account for the differences in altitude between the pixels located at the ends of the diagonals of the mobile window.
+The specific articulation of these 5 parameters allows to obtain either the vertical curvature, whose formula is displayed here, or the horizontal curvature.
+There are two directions of curvature that are orthogonals.
+One in the direction of the slope and it is the vertical curvature with a negative sign.
+And the other, transverse to the slope, is the horizontal curvature with a positive sign.
+Both are second derivatives of Z.
+The cartography of the convexity and the concavity is very sensitive to the variation of the size of the mobile window.
+The larger the window the more the surrounding space is taken into account.
+Depending on the calculation mode, the increase in size of the window will produce a smoothing of the slope or the orientation.
+And with regards to the convexity and the concavity this enlargement of the mobile window will produce a structuring effect which corresponds to a highlight of the dominant forms.
+We have come to the end of this intermediate lesson, devoted to the digital altitude model.
+Firstly, we reviewed the indicators which allow to characterize the relief in whole regions by means of descriptive statistics and some specific tools, such as the hypsometric curve or the roughness indicators.
+We then looked at the technology of mobile windows or sliding windows which allow to determine indicators of local reliefs such as the slope, the orientation or the curvature.
+We have also seen that the variation of the size of the mobile window allows to obtain useful effects in relief mapping, such as the smoothing of the slope or the orientation.
+And these generalization tools of the numerical altitude models are very useful, especially at a time when the resolution of the proposed models by the recent acquisition technologies is becoming finer and finer.

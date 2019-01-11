@@ -1,0 +1,136 @@
+Coding of an application, whatever its nature may be, requires thinking both about the involved data and their types, and about the fundamental functionalities allowing the implementation of the desired processes.
+We started this work during the previous episode for the implementation of the Connect Four game.
+Today, we will push this further and start to focus on the first functionalities needed for the implementation of this game.
+As a reminder, during the previous episode, we had started by working on the representation of the game's grid.
+Our choice was, naturally, to represent it in the form of a two-dimensional array.
+We had also worked on the representation of the content of each of the cells of this grid.
+There are of course many different possible choices to represent this content.
+We kept one for its simplicity: representing the type of each cell as an integer with a certain convention which consists in saying that 0 represents an empty cell, 1 a yellow cell and 2 a red cell.
+To be able to manipulate the contents of these cells explicitly and clearly in the program, we had defined constants to represent these different values and to manipulate them explicitly.
+Let's now focus on the first functionalities useful for the implementation of a Connect Four game.
+When, in my program, I will have declared the grid in the form of a two-dimensional array, it is likely that the first thing
+I will think about is to initialize this grid correctly.
+Indeed, at the beginning of the game for example, it would be best for each of these cells to be empty.
+And so, we must carry out this initialization.
+Another natural function to anticipate is the display of the grid.
+Indeed, for the player to be able to know the evolution of the game with time, it must be possible to display the different cell colors in the game's grid, and at that moment, a display function becomes absolutely necessary.
+In this episode, we will focus on the actual implementation of these two basic functionalities.
+Let's start by the initialization function which we will implement here via a method called "initialise".
+One of the first things to do when we start to think about implementing a method is to try to imagine how we will actually use it.
+So here, if I have first declared my grid in this form, it is natural to imagine the initialization of this grid through a call to an "initialise" method which would take the grid as a parameter, like so.
+Such a call to the "initialise" method would result in the initialization of each of the cells of my game grid with the value "VIDE" [TN: means "EMPTY"].
+Let's now think about the header for the "initialise" method. We have learned that, at this stage of the course, the "static" keyword is associated to every method for reasons which will be explained in the other course on object-oriented
+Java.
+How about the rest of the elements of hte header of the "initialise" method?
+So, to define this header precisely, we have to specify the name of the method -- we chose it here -- the set of arguments that the method will have to receive for it to work, and what we call the return type of the method.
+How do we choose the return type here?
+Here, I called my initialization method by passing it the grid as parameter and I do not expect anything in return from this call. 
+I do not expect to make this call in such a way that, after my grid is initialized, I would receive a value in return.
+The "initialise" method returns nothing, so it is natural to give it a "void" return type.
+It is quite easy to describe the other elements of the header.
+So, we have started writing the code
+"initialise" and the set of arguments is a two- dimensional array which represents the grid.
+So at this stage, I will have completely defined what we refer to as the header of the method.
+It is now time to think about its body, that is, the set of instructions which will carry out the desired behavior, which is to fill the grid with the "VIDE" (empty) value.
+Small aside before continuing, you should note that this specific way of designing the "initialise" method is of course not the only one possible.
+We could easily have imagined alternative designs, for example the one that consists in making the "initialise" method return a grid, without taking the grid to fill in as an argument, and so to replace these two lines by something like this.
+And in this case, the initialise method would not take any arguments, as it would completely build and initialize a grid and then return it.
+Its return type would not be
+"void" anymore, but a grid, so a two-dimensional array.
+In the version that we chose, this works thanks to the fact that arrays are manipulated via references and that we can modify a referenced object through the reference passed as argument.
+This means that the grid that we passed to the "initialise" method will indeed be modified once the method is done executing.
+The algorithm for the initialization of the grid is easy to imagine here.
+For each of the lines of the grid, we will go through each cell, each column, to fill these cells with the empty value, "VIDE".
+Let's start by writing the lines of code that will allow us to initialize a single line of our grid; for example, the first line.
+So here, we need to iterate over all the cells of this line, which can be done naturally with an iteration, a  for-loop, that we can write like this.
+So, for each column of the first line, which we can write in the form
+"grille[0]", we will put the  "VIDE" value into the current column.
+We know that in Java, a two-dimensional array is simply an array of arrays, so here our grid would have the following form, and the first line of the grid is what is accessible under the name "grille[0]".
+So here, simply, for each of the columns of the first line, we populate their content using the value "VIDE".
+"grille[0].length", by the way, gives us the number of cells in the first line of my grid, in this case, 7.
+We know that, in a Java array, the elements are indexed from
+0 to size-1 which explains why we stop strictly before the value 7 and why we start iterating from 0.
+Since the code that we have written here only allows us to initialize one line of our grid, we have to repeat it for each of the other lines.
+So, this routine must be repeated for each line and so it is natural to nest this in another for-loop which will iterate over the number of lines.
+This can be written like so: for each line numbered from 0 to "grille.length", we repeat the instructions that we wrote for the first line.
+So here, a few modifications should be made, such as replacing 0 by the i-th line since we are repeating this for each line, and there we have it.
+There, once a game has been declared in a program, in the form of a two-dimensional integer array, we now know how to initialize it using the "initialise" method.
+Let's now focus on the second base functionality, which is a method allowing us to display the grid, the "affiche" method. 
+As we did earlier for the 
+"initialise" method, let's try to imagine how we would naturally call the "affiche" method.
+So, we can imagine that, after having made a certain number of operations on the grid, we wish to display its content.
+It's quite natural to anticipate this call being of this form.
+So, we pass as a parameter to the "affiche" method the grid to display and we do not expect any return value.
+So, just like for the "initialise" method, we obtain a method header quite analogous to that of the
+"initialise" method, in the sense that we do not expect the
+"affiche" method to return any value, so we define its return type as "void".
+As always at this stage of the course, we use the "static" keyword.
+As parameters for the "affiche" method, we will pass the grid to display.
+Let's now proceed to the coding of the body of the "affiche" method.
+The algorithm is very close to the one we wrote for the "initialise" method, since we have to iterate over each line of the grid and for each of these lines, iterate on each column to display their content in a particular format.
+Here, of course, we will not make any graphical display, but we will make a textual printing in the terminal by adopting a certain number of display conventions.
+For example, we will display an empty cell with a space and red or yellow cells using arbitrary characters such as 'X' or 'O'.
+So we would have a display that would look like this for each line of our grid.
+In Java, these instructions can be written like this: so here I am iterating again but I will switch it up a little compared to my earlier solution by iterating over the whole set of values.
+Here, for each line of my grid, which is written like this, for each cell of this line, I will display its content and for this I will have to stick to my conventions and so write a certain number of tests.
+If the cell is empty, I will display it using a space, which is written like this.
+So here, I don't jump any line,
+I just want to display the space.
+Then I continue with another test, "else if".
+If my cell's value is the red constant, then I display it according to another convention, like so, and finally, I know that I am in the situation where my cell is yellow and so I can display it using another character, 'X' here.
+And here we are!
+Here, for each of the lines of the grid to be displayed separately from the others,
+I must insert a line break after displaying each line.
+An alternative way of coding this would have been to replace the iterations over the whole set of values by conventional "for" iterations, which could be written like so.
+So here, we have chosen to iterate over a set of values which is a little more elegant and explicit.
+So why did we not use this option earlier when we coded the "initialise" method?
+Why did we choose to use
+"conventional" "for" iterations?
+Would you know how to answer this question?
+The answer is simply that in Java, an iteration on a set of values cannot modify the set of values that it iterates over.
+Whereas for the "initialise" method, this is an absolute must, the "initialise" method has to modify the set of cells of the grid.
+There, now our display method is essentially written and we will, as good programmers, comment this method
+Here, the comment is particularly important because the display conventions that we chose are completely arbitrary, and anyone who reads our code should be able to know these conventions without having to read through and understand the whole of the method's body.
+This is why here, we must absolutely comment our choices and indicate that, for us, a big 'O' indicates a red cell and a big 'X' a yellow one.
+Systematic testing of the different features of an application during coding is absolutely essential to produce robust, high-quality code. 
+This is a recommendation that we made right at the beginning of our case study on the Connect Four game.
+We will now stick to these principles and start to test our first features, that is, initialization and display of the grid.
+To test the "initialise" and
+"affiche" methods, we will have to write a small program which calls them, so a "main" method.
+So this "main" method here will of course declare a grid in the form of a two-dimensional integer array and construct it as a matrix of 6 lines and 7 columns.
+Here, we suppose that before this, we have declared the constants for empty ("VIDE"), yellow ("JAUNE") and red ("ROUGE"), and we will thus proceed to the different calls which will allow us to test the methods, in other words the initialization of the grid and its display.
+So, if we displayed the grid immediately after its initialization, we would not be able to test all the cases since the grid would be completely empty; and we could not know if yellow and red cells are displayed correctly.
+For this reason, it is advisable to modify the contents of some cells of the grid, in order to be able to see how the program behaves when it has a yellow cell or a red cell at a given place.
+If our initialization and display methods were correctly written we should obtain an output which looks like this: this will allow us to verify that all the cells of the grid which were not explicitly modified are indeed empty cells, following our convention that we display a space for these and that those that were explicitly modified are displayed according to the conventions that we defined.
+So, basically, here, we should be able to verify that the cell which is at line 2 and column 3 does indeed correspond to a yellow cell, which we chose to represent with a big 'X'.
+The same goes for the second explicitly modified cell, which corresponds here to the cell on line 2 and column 4, this time
+So, the output of the program will allow us to verify most of the functions that we implemented through "initialise" and "affiche".
+The "initialise" and "affiche" methods, as we have coded them, carry out most of the functions that these two methods must implement.
+It is now time to wonder about more cosmetic aspects, about finishing.
+Let's go back to the "affiche" method to see how we could improve its code.
+The "affiche" method, as we have coded it, would allow, for a game grid looking like this, to produce a text display such as the one you see here.
+As you can see, this display is rather basic, and makes it quite hard to distinguish between different columns.
+And so we could imagine improving the display by having something that would look like this.
+So, by explicitly separating the different columns and by numbering these columns to have a much clearer view of the contents of the grid.
+The modifications we must make to obtain this sort of output are visible here and I will now comment on them.
+So here, first modification: we took the precaution, before displaying each line, to display a space and a bar, which corresponds to this output here, for each of the lines.
+Then, once we have displayed all of the cells, we should close the cell with a bar, like so.
+When we have finished displaying the grid, we want to add this line, which will allow us to number the different columns.
+We start by displaying a first '=' symbol below the space preceding the first column, then a for-loop will repeat as many times as the number of columns we have in the grid to display the number of each column
+So, at each iteration here, for each possible column number, given that we are numbering, to be more clear, from 1 to "grille.length", we will display, for each of the possible columns, an '=' symbol followed by the column number.
+So, this for-loop will allow us to display these different elements: and so on.
+When we are done with this for-loop, we find ourselves in the situation where we have displayed
+'=' followed by the last column number possible.
+What remains is to display these two '=' symbols for a little more harmony in the display.
+This is what we are doing here.
+This illustrates an essential point in coding practices: one should always start by working o essential and fundamental functionalities before dealing with little things, before adding cosmetic or finishing touches to our application as we have just done here in this example.
+So we can see that at this stage, our "affiche" method is starting to get big, so we can legitimately ask ourselves the question: should we modularize more?
+And here, this is absolutely feasible.
+We can imagine introducing two new methods which would help the "affiche" method in its job and render it somewhat more concise.
+We could for example have a method
+"afficheLigne" (TN: means "displayRow") whose job would be to display one entire row of this grid and another method, for example "afficheBas" which would display the bottom of our grid.
+We are now at the end of this step.
+You now know how to model a
+Connect Four grid.
+You also know how to initialize it and display its contents.
+We can now move on to the heart of the matter, coding the functionalities which will allow us to play, as we will see in the following episodes.

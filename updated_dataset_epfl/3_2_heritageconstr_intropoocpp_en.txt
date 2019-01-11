@@ -1,0 +1,93 @@
+Let's examine in detail the order constructors are called in a class hierarchy.
+Suppose for example that we have defined a class C, with certain fields and methods, and which inherits from a class B, which has its own data members and its own methods; and which itself inherits from a class A, with its own data members and methods.
+And so we declare here an instance,
+'mon_c' of the class C, by calling a constructor of a class C.
+What happens then, when we declare an instance, like this for example, by calling this constructor?
+This constructor here, in its initialization list, calls a constructor of B, whether this is written explicitly or by calling the default constructor.
+Then of course, comes the initialization of data members.
+So when we call the constructor here, we start by calling the class constructor of the class B.
+The constructor of the class B has in its initialization list, a call to a constructor of its superclass in turn.
+So by calling the constructor of the class B in the constructor of the class C, we first called the constructor of the super-super-class A.
+So the first thing that will be done when a C constructor is called, is the execution of the constructor of the highest class in the hierarchy, the super-super-class here.
+And so this constructor will initialize the data members
+'a1' and 'a2'.
+And so in the construction of a C, we start the construction of a B, which itself launched the construction of an object A.
+The first thing that occurs in the construction of a C, is the construction of its inherited part A, because of the parental relationship with A.
+C inherits all the data members from B,
+B inherits all the data members from A, so in C we find in fact the attributes a1 and a2.
+So, in the construction of C, that not yet completed, we started by constructing the part from A.
+That's the first thing that occurs.
+Once we've finished executing the A constructor, we come back to the initialization list in the B constructor, to initialize the parts that are specific to the class B, and so we initialize the attribute
+'b1' from the class B.
+And after finishing the execution of the B constructor, we continue the execution of the C constructor, and we end with the initialization list of the C constructor, which builds the C part, with its own attributes.
+So after initializing these 3 sections, we've accomplished the construction of C!
+So, in the construction of a sub-sub-class, we start by calling the constructor of the highest class from which the the constructors of the intermediate super classes.
+We end with part built by the constructor of the class that we want to instansiate.
+For destructors, not much is to be said, apart from that they are called in the inverse order.
+Destructors are always called inversely to the order of the constructors.
+In the last example, we first call the C destructor, because it was the
+C constructor that was last called.
+So the first destructor called in the C destructor, which calls the B destructor, which calls in turn the
+A destructor.
+There are two small details that we think are worth the effort to examine before concluding this part on constructors and destructors in inheritance.
+The first is the copy constructor.
+If you have to redefine a copy constructor, which is not necessary in most cases, but if you have to do this operation, then be careful!
+In the copy constructor of a subclass, always remember to explicitly call the superclass copy constructor.
+For example, suppose that we have a class Rectangle that inherits from a class
+FigureGeometrique (= 'GeometricShape'), and this class has an attribute of type 'Position', that has 2 coordinates x and y. and also has for example
+2 constructors, a default constructor, that initializes the position at the origin (0,0), and a constructor that enables you to initialize the coordinates (x,y) of the position.
+Suppose that we create an instance r1 of the class Rectangle, that we initialize with a position, let's say at (1, 2), and a width of 3.5 and a height 4.6.
+Now we make a copy 'r2' of
+'r1'.
+We hope that r2, the copy of r1 has the same position, height, and width as r1.
+But if we write a copy constructor like this, without explicitly calling the superclass copy constructor.
+What happens now, when we try to make a copy of r1 with r2?
+We will call the copy constructor of the class Rectangle.
+This copy constructor of the class Rectangle, doesn't explicitly call in its initialization list a superclass constructor and therefore calls the default constructor of the superclass!
+Thus, what we start by doing in the copy of r1, is initializing the position of r2 at (0, 0).
+So the rectangle r2 will have a position at the origin, by default automatically because of the default superclass constructor.
+Then we copy the width of r1 in the width of r2, and the height of r1 in the height of r2.
+So, by omitting this line, we find r2 with a position at (0, 0).
+What is to be done, is to explicitly call the superclass copy constructor.
+This time, what happens is this: the copy constructor will explicitly call the superclass copy constructor.
+Without writing this explicitly we call the default copy constructor, which then copies r1 as a
+FigureGeometrique.
+I remind you that the copy constructor of FigureGeometrique has the following prototype and therefore passes a FigureGeometrique by constant reference.
+Here 'autre' (= 'other') which is a Rectangle is passed as a FigureGeometrique, which is absolutely okay, because a Rectangle is a FigureGeometric.
+And so this copy constructor copies the FigureGeometrique part of the Rectangle r1, that is to say, copies the data member of type Position into the postion of r2.
+So we will have here a copy of the FigureGeometrique part of r1, which is its postion (1, 2) in the FigueGeometrique part of r2 that is to say, in the inherited
+FigureGeometrique part, Position, of r2.
+Thanks to this explicit call to the copy constructor of the superclass, we have r2 that has the same position as r1.
+And then the copy constructor continues executing as before, by copying the width and height.
+So it is essential to write the explicit call of the
+FigureGeometrique copy constructor, because otherwise, the default copy constructor will intervene, which will cause problems.
+To illustrate this error,
+I'll tell an anecdote from the projects that I give to my students.
+They had to write classes for vectors, mathematical vectors, algebraic vectors, and they made a subclass for unit vectors.
+Some of them thought they were shrewd to redefine a copy constructor for the unit vectors that inherited from the class Vecteur.
+The only thing was, they had forgotten in the copy constructor to call the superclass copy constructor.
+But, in fact the superclass
+Vecteur had a default constructor, that constructed a null vector.
+And so they found that each time they made copies of unit vectors, these vectors were null, which is quite a paradox for a unit vector.
+So, avoid making this error if you redefine a copy constructor in a subclass, and don't forget to call the superclass copy constructor.
+To finish, I would like to come back to an aspect that was changed with C++ 2011.
+I said that constructors were not inherited through an inheritance relationship, and that a subclass inherited the set of data members and methods from its parent class, but not its constructors and its destructors.
+In C++ 2011, they introduced what we call
+"constructor inheritance".
+It is henceforth possible to ask for constructor inheritance.
+By default, we don't have constructor inheritance, but if we add a syntax like this, with the keyword "using", we can add all the constructors of the superclass.
+And then, we can construct the subclass with all the constructors and with all the same arguments as the superclass constructors.
+But be very careful, this is a bit risky.
+I therefore advise you to avoid using the constructor inheritance, because the superclass constructors don't, of course, initialize the data members of the subclass, and so, if we call a superclass constructor in the subclass, which is possible with this new syntax, then we wouldn't have any initialization of the subclass's own data members.
+So therefore I advise you against something like this, and advise you to do this only when you don't have many subclass data members, and when it's appropriate.
+For example, suppose that we have a super class A, that has two  constructors, one that takes a whole number, and one that takes two doubles.
+We also have a subclass B that inherits from A.
+We can therefore, if we want, inherit the constructors of A in B by writing this: "using A : : A", that is to say by using to the constructors called A from the class A.
+This syntax is a bit redundant, but that's how it's done:
+"using A : : A".
+Thus, we have available in B
+2 constructors: one constructor with an int parameter and a constructor with 2 parameters of type double.
+But in B, we introduced supplementary data members, so be careful, the constructors in question will not initialize the other data members of B because they are the constructors of A.
+For this reason I recommend to rarely (or even never) use this function.
+But we wanted to mention it because it was something that was introduced in C++ 2011, and which you could encounter.
+This concludes this series of videos on inheritance.

@@ -1,0 +1,70 @@
+In a previous video, we examined the five steps that follow, in the most general case,
+ a function call.
+In the examples we've seen up until now, the arguments we passed to the function were either simple values, or expressions to evaluate.
+Today, we'll take a closer look at what goes on when the arguments we pass to a function are variables. 
+Let's start with a real example. 
+Here, we have a small program whose first instruction is to declare a variable "val" and to initialize it with a value of 1.
+The 2nd instruction of this program calls the function f, which is defined here, giving it as an argument the variable val which we just defined.
+We have seen in a previous video that at the moment of this function call, there is a link being made between the argument we passed to the function and the list of parameters expected by the function.
+So here, we have two entities.
+We have a variable x used by the function. And the function
+"f" modifies this variable, by incrementing it by one unit.
+The question we ask ourselves now, is this:
+Are x and val in the same memory area?
+In other words, will the modification of x have an effect on val, or not?
+In programming, there are two ways of passing arguments.
+Passing by value and passing by reference.
+Let's examine, in the same example as earlier, what happens in either of these cases.
+So, we have a small function "f" which takes as parameter an integer "x".
+It has a <i>void</i> return type, which simply means that it does not return any value.
+As you can see, there is no <i>return</i> statement.
+And what this function does is to increment the value of its parameter, "x" equals "x+1".
+If a function uses passing of arguments by value, this means that the parameter "x" of the function corresponds to a memory area local to the function.
+This means that, when we invoke the function by passing it as an argument, a variable which is defined elsewhere in the program, for example here, in the main program.
+At the moment we call this function, we will copy the value of the variable passed as an argument into a memory area local to the function.
+This means that when I execute this code, I am going to modify the local area, in which is stored the value of the variable we passed as an argument.
+This is passing by value.
+To indicate that we want to use passing by reference, we have to declare the function header in a specific way, in C++.
+We will indicate, using a specific symbol, the "&" (ampersand), that the function "f" should use references.
+When we define the header of the function in this way, we indicate that, when the function is called, the parameter "x" for this function is a reference to the variable that we passed as an argument. It is just another name for the variable "val" passed as argument. Here, the variable "val" was equal to 1, and the name "x" references the same memory area as the one occupied by "val".
+So in this case, incrementing x will also increment val.
+When we pass an argument by value, the function will work on a copy of the argument, which means that any modification that we make within the function does not affect anything outside the function.
+We are working on a local area, and the argument is not modified. 
+When we use passing by reference, we indicate that the local variable which is passed as an argument corresponds to a reference on the object associated to the argument, when the function is called. So, the main difference is that any modification made within the function also affects the outside, and is visible when the function ends.
+In C++, we indicate that a function uses, for one of its parameters, passing by reference by using a particular symbol, an ampersand (&).
+When we prototype the function, we can use it to indicate that the parameter x is passed by reference.
+In this case, it is a double which is passed by reference.
+To summarize, when we pass by value, the parameter of the function is a memory area local to the function and any modification affects only the local area, and does not affect the variable which was passed as an argument.
+When we pass by reference, we indicate that the parameter for the function is simply an alias, another name for the variable that was passed as argument and that any modification of the parameter will also modify the variable passed as argument. Now, if we return to our little introductory example, we had a small main program which declared a variable "val" containing an integer of value 1.
+Then, there was a function call.
+If we examine the header of the function, there is no particular symbol, no ampersand, which means that we are passing by value. 
+Since we are using passing by value, this means that x, the parameter for the function, is a local memory area and thus that the value of "val" is copied into "x".
+Modifications to "x" will affect only "x".
+If we display "x", we can clearly see that x was modified. However, when we are done executing the function and we display the value of "val", we can clearly see that its original value is unchanged, and that "val" is still equal to 1.
+If we take this same example, but indicate that the function uses passing by reference with the ampersand symbol, we still have a variable local to the <i>main</i> which contains 1. When we make this function call, since there is a passing by reference, we simply indicate that "x" is another name for the argument passed to the function, "val".
+This means that here, whenever
+I modify "x", I also modify "val".
+Displaying "x" clearly shows that x was modified. Displaying "val" also shows that "val" was modified.
+So, in what situations is it useful to use passing by reference?
+Well, simply when we want a function to be able to modify a variable that is passed to it as an argument.
+Suppose for example that I wish to write a function that is able to input an integer.
+So the goal of this function would be to ask the user to input an integer on his keyboard. And of course, we want to retrieve this value in order to use it elsewhere in the program.
+How do we access this input value?
+One way to do this would be to use passing by reference.
+So, in the program that calls this input function, we declare a variable which will store the result of the input, and we pass this variable to the <i>saisie</i> (input) function.
+So when the function is executed, the user will input a number, and this number will be passed as a parameter local to the function. Suppose that the user inputs a 2.
+Then, as we have seen when we pass by reference, the argument that is passed to the function is exactly the same memory area as the parameter. If we input a 2 into "a_lire"
+("to_read"), it will also end up in "i", which means that when the function ends, "i" will contain the value we input, 2.
+Of course, this is not the only way to design an input function.
+The most natural way, and no doubt the best way, is to use the return value to retrieve the result of the input. So here, our input function would have no argument.
+When it is executed, it will ask the user for a value and will assign it to a variable local to the function.
+It will then return it so that it can be used by the outside world.
+And so here, we would need to use assignment to retrieve the return value of the input function and to store it in a variable.
+For example a variable in the main program which will be used elsewhere in the main program.
+So we can see here that we have two options for designing the input function, one of which uses passing by reference.
+We can also take advantage of this mechanism of passing by reference to deal with situations where a function "returns" several results.
+Let's imagine, for example, that we wish to write a function which converts cartesian coordinates to polar coordinates.
+The function would need, as parameters, the two cartesian coordinates. And the point would be to calculate, from these two cartesian coordinates, the two polar coordinates.
+Since in C++, a function can return only one value, we can decide to have the function not return anything.
+But instead, we can pass it, as parameters, two variables by reference which will store the final result.
+This mechanism is also used, for example, to exchange the content of two variables. Passing by reference, here, is essential to carry out this switch.

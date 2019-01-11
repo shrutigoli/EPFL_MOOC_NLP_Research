@@ -1,0 +1,1062 @@
+1
+00:00:00,690 --> 00:00:05,650
+So far, we have concentrated in this
+course on pure functional programming,
+
+2
+00:00:05,650 --> 00:00:10,790
+that is we have always worked just with
+functions and immutable data.
+
+3
+00:00:10,790 --> 00:00:13,520
+However in a reactive system of any size,
+
+4
+00:00:13,520 --> 00:00:16,180
+there's sooner or later some state that
+needs
+
+5
+00:00:16,180 --> 00:00:18,950
+to be changed and maintained, or some
+states
+
+6
+00:00:18,950 --> 00:00:22,390
+changes that need to be signaled and
+propagated.
+
+7
+00:00:22,390 --> 00:00:26,110
+To express this we are going to broaden
+now our notion
+
+8
+00:00:26,110 --> 00:00:30,050
+of functions to work together with mutable
+state.
+
+9
+00:00:30,050 --> 00:00:34,080
+We will see that this combinations has
+quite a few repercussions.
+
+10
+00:00:34,080 --> 00:00:36,260
+On the one hand, it gives us powerful new
+
+11
+00:00:36,260 --> 00:00:40,790
+ways to express ourselves in certain
+categories of systems.
+
+12
+00:00:40,790 --> 00:00:42,890
+On the other hand it poses considerable
+
+13
+00:00:42,890 --> 00:00:46,000
+challenges how to reason about the
+resulting systems.
+
+14
+00:00:48,690 --> 00:00:53,800
+So until now, our programs have been side
+effect free, and one important
+
+15
+00:00:53,800 --> 00:00:59,370
+consequence of this is that we will see
+that the concept of time wasn't important.
+
+16
+00:00:59,370 --> 00:01:00,780
+How do I mean that?
+
+17
+00:01:00,780 --> 00:01:04,070
+Well, for all programs that terminate, any
+sequence
+
+18
+00:01:04,070 --> 00:01:07,390
+of action would have given the same
+result.
+
+19
+00:01:07,390 --> 00:01:11,440
+And that was also reflected in the
+substitution model of computation.
+
+20
+00:01:11,440 --> 00:01:14,050
+So let's quickly remember what that model
+was.
+
+21
+00:01:16,430 --> 00:01:19,200
+In the substitution model, programs can be
+
+22
+00:01:19,200 --> 00:01:23,680
+evaluated simply by rewriting the program
+text.
+
+23
+00:01:23,680 --> 00:01:24,990
+There are a number of rules.
+
+24
+00:01:24,990 --> 00:01:29,190
+The most important rewrite rule covers
+function applications.
+
+25
+00:01:29,190 --> 00:01:30,860
+So here you see the rule.
+
+26
+00:01:30,860 --> 00:01:34,025
+It says that if you have a function
+definition, say
+
+27
+00:01:34,025 --> 00:01:38,860
+a function f with parameters x1 to xn and
+body b.
+
+28
+00:01:38,860 --> 00:01:41,490
+And then later on, you have a call of the
+same function
+
+29
+00:01:41,490 --> 00:01:46,586
+f, with actual values, v1 to vn.
+Then, the program
+
+30
+00:01:46,586 --> 00:01:51,574
+can be rewritten by keeping the
+application and all the other program
+
+31
+00:01:51,574 --> 00:01:56,490
+elements, but replacing the call by the
+body of the function, b.
+
+32
+00:01:56,490 --> 00:02:02,002
+Where all the former parameters, x1 to xn
+are at the same time
+
+33
+00:02:02,002 --> 00:02:06,590
+replaced by the actual values, v1 to vn.
+So that
+
+34
+00:02:06,590 --> 00:02:10,120
+was the central rule that we had for the
+substitution model.
+
+35
+00:02:11,560 --> 00:02:14,480
+Now, let's see that in an action, and in
+an example.
+
+36
+00:02:14,480 --> 00:02:17,820
+Say you have two functions, iterate and
+square.
+
+37
+00:02:17,820 --> 00:02:20,870
+Iterate would apply the given function, f.
+
+38
+00:02:20,870 --> 00:02:26,950
+N times on the given argument x.
+And here you see it's right inside.
+
+39
+00:02:26,950 --> 00:02:28,940
+Square is just the squaring function that
+
+40
+00:02:28,940 --> 00:02:31,790
+takes an argument and multiplies it by
+itself.
+
+41
+00:02:33,370 --> 00:02:37,540
+Let's now look at the call iterate of one
+square and three.
+
+42
+00:02:37,540 --> 00:02:41,770
+That call can be rewritten as follows.
+
+43
+00:02:41,770 --> 00:02:47,330
+The first thing you do is you take the
+right hand side of iterate,
+
+44
+00:02:47,330 --> 00:02:53,400
+and you replace the actual arguments for
+the former parameters n, f, and x.
+
+45
+00:02:53,400 --> 00:02:58,440
+So that would give you this line here.
+The next thing that happens is
+
+46
+00:02:58,440 --> 00:03:01,750
+that you do two auxiliary reductions.
+
+47
+00:03:01,750 --> 00:03:03,460
+The first one would simplify the
+
+48
+00:03:03,460 --> 00:03:07,780
+arithmetic expression one equals zero to
+false.
+
+49
+00:03:07,780 --> 00:03:12,416
+And then this next reduction would
+immediately simplify the if then else
+
+50
+00:03:12,416 --> 00:03:17,130
+by saying, well if false something of
+something takes the else part.
+
+51
+00:03:17,130 --> 00:03:19,190
+So, that's the part that you see here.
+
+52
+00:03:20,270 --> 00:03:23,520
+In the next step then, we would have to
+rewrite the call square
+
+53
+00:03:23,520 --> 00:03:28,198
+of three of the iterator application, so
+that would give you, obviously,
+
+54
+00:03:28,198 --> 00:03:32,360
+three times three by simply expanding the
+right hand side of square.
+
+55
+00:03:33,640 --> 00:03:37,120
+And arithmetic simplification gives you
+this line here, where
+
+56
+00:03:37,120 --> 00:03:40,670
+the three times three has been reduced to
+nine.
+
+57
+00:03:40,670 --> 00:03:44,320
+Now you would have another expansion of
+iterate, so the right hand
+
+58
+00:03:44,320 --> 00:03:48,940
+side of iterate would again show up here,
+with the actual arguments
+
+59
+00:03:48,940 --> 00:03:50,762
+replacing the formal parameters.
+
+60
+00:03:50,762 --> 00:03:54,233
+And some subse, subsequent reductions on
+the
+
+61
+00:03:54,233 --> 00:03:57,348
+if would finally give you, if zero equals
+
+62
+00:03:57,348 --> 00:04:03,477
+zero, that's true, so you would return the
+then part, and that would be nine.
+
+63
+00:04:06,160 --> 00:04:11,560
+One interesting observation here is that
+rewriting can be done anywhere
+
+64
+00:04:11,560 --> 00:04:16,690
+in that term, and all rewritings that
+terminate would lead to the same solution.
+
+65
+00:04:16,690 --> 00:04:19,010
+In fact, that's an important result of
+lambda
+
+66
+00:04:19,010 --> 00:04:23,030
+calculus, which is the theory behind
+functional programming.
+
+67
+00:04:23,030 --> 00:04:25,440
+So let's see that in an example.
+
+68
+00:04:25,440 --> 00:04:31,830
+The first reduction, result of reduction
+in our iterate example was this line here.
+
+69
+00:04:31,830 --> 00:04:37,070
+If one equals zero three else iterate one
+minus one square, square of three.
+
+70
+00:04:37,070 --> 00:04:39,910
+And we rewrote it to this expression here.
+
+71
+00:04:43,100 --> 00:04:46,600
+But that's not the only thing we could do
+with this expression.
+
+72
+00:04:46,600 --> 00:04:50,220
+Alternatively, we could also have
+concentrated on
+
+73
+00:04:50,220 --> 00:04:53,630
+the nested call here and rewritten that
+one.
+
+74
+00:04:53,630 --> 00:04:57,080
+And if we had done that we would have
+gotten this expression here.
+
+75
+00:04:59,900 --> 00:05:05,290
+So now we have two different terms that
+same, same term up here can rewrite too.
+
+76
+00:05:05,290 --> 00:05:10,720
+And the important result here is that it
+doesn't matter which of the two we pick
+
+77
+00:05:10,720 --> 00:05:15,660
+because in the end, both of these terms
+actually will give the same answer, nine.
+
+78
+00:05:18,170 --> 00:05:20,520
+And that idea that I can rewrite anywhere
+
+79
+00:05:20,520 --> 00:05:23,290
+in a term but finally all, all results
+yield
+
+80
+00:05:23,290 --> 00:05:26,900
+the same result, is sometimes called
+confluence because
+
+81
+00:05:26,900 --> 00:05:30,040
+these arrows, they flow together in the
+final result.
+
+82
+00:05:30,040 --> 00:05:35,100
+And this confluence result has been
+discovered by Church and Rosser, so
+
+83
+00:05:35,100 --> 00:05:40,230
+sometimes it's also called The
+Church-Rosser Theorem of lambda calculus.
+
+84
+00:05:44,500 --> 00:05:49,260
+Now all of these observations hold in the
+world of pure functional programming.
+
+85
+00:05:49,260 --> 00:05:51,520
+What I want us to do now is take
+
+86
+00:05:51,520 --> 00:05:55,450
+a step outside that world and introduce
+state and objects.
+
+87
+00:05:56,500 --> 00:05:58,720
+So, why would one want to do that.
+
+88
+00:05:58,720 --> 00:06:02,480
+Well, normally, one describes the world as
+a set of objects.
+
+89
+00:06:02,480 --> 00:06:06,450
+And some of these objects would have state
+that can change over the course of time.
+
+90
+00:06:07,970 --> 00:06:09,470
+So what would, does that mean?
+
+91
+00:06:09,470 --> 00:06:12,650
+An object has stated changes over the
+course of time?
+
+92
+00:06:12,650 --> 00:06:17,550
+It turns out that a very abstract but
+accurate definition is that,
+
+93
+00:06:17,550 --> 00:06:22,140
+an object has state if its behavior is
+influenced by its history.
+
+94
+00:06:23,760 --> 00:06:29,440
+So for instance, if I take a bank account
+as an object, a bank account has state.
+
+95
+00:06:29,440 --> 00:06:35,000
+Because the answer to the question, can I
+withdraw 100 Francs would depend on
+
+96
+00:06:35,000 --> 00:06:37,150
+the previous history of the account.
+
+97
+00:06:37,150 --> 00:06:41,580
+It would say true if I had deposited
+earlier enough money so
+
+98
+00:06:41,580 --> 00:06:45,050
+that I could withdraw 100 Francs, and it
+would say false otherwise.
+
+99
+00:06:50,690 --> 00:06:54,520
+So that was the abstract definition of
+state full objects.
+
+100
+00:06:54,520 --> 00:07:00,620
+In practice, every form of mutable state
+is constructed from some variables.
+
+101
+00:07:00,620 --> 00:07:03,290
+A variable definition in scala is written
+like a value
+
+102
+00:07:03,290 --> 00:07:06,870
+definition, but with the key word var in
+place of val.
+
+103
+00:07:06,870 --> 00:07:12,050
+So we, so you would write var x: String
+equals " abc".
+
+104
+00:07:12,050 --> 00:07:16,030
+And that would give you a variable, x of
+type string, with initial
+
+105
+00:07:16,030 --> 00:07:17,920
+value abc.
+
+106
+00:07:17,920 --> 00:07:19,980
+So just like a value definition, a
+
+107
+00:07:19,980 --> 00:07:23,670
+variable definition, associates a value
+with a name.
+
+108
+00:07:24,690 --> 00:07:27,330
+But if you wrote var, so if you have a
+
+109
+00:07:27,330 --> 00:07:32,580
+variable definition, that association can
+be changed later through an assignment.
+
+110
+00:07:32,580 --> 00:07:36,760
+So, you could afterwards write x equals i,
+and give the new value
+
+111
+00:07:36,760 --> 00:07:41,260
+to the variable x, or you could define a
+count to be 111.
+
+112
+00:07:41,260 --> 00:07:46,650
+And then add one to the count as you used,
+in to do in imperative programming.
+
+113
+00:07:49,500 --> 00:07:53,300
+So in practice objects with state are
+usually represented
+
+114
+00:07:53,300 --> 00:07:56,820
+by objects that have some members that are
+variables.
+
+115
+00:07:56,820 --> 00:08:01,000
+So for instance, here is a class that
+models a bank account.
+
+116
+00:08:01,000 --> 00:08:03,230
+You have a class bank account, and here
+you
+
+117
+00:08:03,230 --> 00:08:07,310
+see a variable balance initialized to
+zero, and the keyword
+
+118
+00:08:07,310 --> 00:08:10,870
+private in front says that that balance
+variable can
+
+119
+00:08:10,870 --> 00:08:14,760
+be accessed only from the methods within
+class bank account,
+
+120
+00:08:14,760 --> 00:08:16,420
+but not from clients of that class.
+
+121
+00:08:17,530 --> 00:08:20,300
+What methods are there in class bank
+account?
+
+122
+00:08:20,300 --> 00:08:24,902
+Well, there's the deposit method, which
+allows one to deposit
+
+123
+00:08:24,902 --> 00:08:29,438
+a given amount of currencies units, that
+amount must be positive.
+
+124
+00:08:29,438 --> 00:08:33,065
+If it is, then it gets added to the
+accounts balance.
+
+125
+00:08:33,065 --> 00:08:37,277
+And conversely, there's the withdrawment
+method that allows
+
+126
+00:08:37,277 --> 00:08:39,851
+one to withdraw an amount that also must
+
+127
+00:08:39,851 --> 00:08:42,815
+be positive, and furthermore, must be less
+
+128
+00:08:42,815 --> 00:08:45,910
+than or equal to the current account
+balance.
+
+129
+00:08:46,980 --> 00:08:50,450
+If that's not the case, if the, for
+instance the amount is bigger than the
+
+130
+00:08:50,450 --> 00:08:53,920
+current balance, then the withdrawal
+method would
+
+131
+00:08:53,920 --> 00:08:57,420
+throw an exception with the error,
+insufficient funds.
+
+132
+00:08:59,290 --> 00:09:04,830
+So in summary, class bank account defines
+one private variable balance,
+
+133
+00:09:04,830 --> 00:09:08,479
+and two methods that can be used to change
+that variable.
+
+134
+00:09:09,880 --> 00:09:14,368
+To create bank accounts, we use the usual
+notation for object creation.
+
+135
+00:09:14,368 --> 00:09:16,600
+So, you would write val account equals new
+
+136
+00:09:16,600 --> 00:09:19,780
+BankAccount and that would give you a new
+account.
+
+137
+00:09:21,650 --> 00:09:27,610
+So let's try out some of these concepts
+using a worksheet in the Scala IDE.
+
+138
+00:09:27,610 --> 00:09:29,700
+What I've done is I've defined a project,
+
+139
+00:09:29,700 --> 00:09:33,550
+Reactive2 for the second week of the
+reactive course.
+
+140
+00:09:33,550 --> 00:09:38,070
+And in there I have defined the class
+BankAccount like you saw it on the slide.
+
+141
+00:09:39,090 --> 00:09:40,830
+One thing you notice is in the
+
+142
+00:09:40,830 --> 00:09:44,510
+syntax coloring, variables actually appear
+in red.
+
+143
+00:09:44,510 --> 00:09:48,190
+Which is a good sign that means pay
+attention.
+
+144
+00:09:48,190 --> 00:09:52,550
+Here's a feature that is, at the same
+time, very powerful, but also dangerous.
+
+145
+00:09:52,550 --> 00:09:53,810
+So pay attention to that.
+
+146
+00:09:55,240 --> 00:09:58,070
+So what we're going to do now is interact
+
+147
+00:09:58,070 --> 00:10:02,070
+with bank accounts using a worksheet and
+this scala IDE.
+
+148
+00:10:02,070 --> 00:10:06,150
+To do that I create a new worksheet, call
+it Account.
+
+149
+00:10:10,230 --> 00:10:13,710
+And the first thing to do is create some
+account.
+
+150
+00:10:19,750 --> 00:10:25,510
+And deposit some initial money, let's say
+50 currency units.
+
+151
+00:10:27,560 --> 00:10:31,070
+And that now would respond that an account
+was created.
+
+152
+00:10:32,510 --> 00:10:39,950
+And what I can do now is withdraw funds.
+Let's withdraw 20 currency units.
+
+153
+00:10:39,950 --> 00:10:44,390
+So what I see here is the 30 that remain.
+Let's do that again.
+
+154
+00:10:48,170 --> 00:10:52,490
+So now it's just ten that remain, and
+let's try
+
+155
+00:10:52,490 --> 00:10:57,830
+to overdraw, and we get an error which
+says insufficient funds.
+
+156
+00:10:58,940 --> 00:11:04,230
+So clearly, accounts are stateful objects,
+because when
+
+157
+00:11:04,230 --> 00:11:09,410
+we perform the same operation, like
+withdraw here twice, the results differ.
+
+158
+00:11:09,410 --> 00:11:12,790
+The first time we cut back 30, the second
+time we cut back ten.
+
+159
+00:11:12,790 --> 00:11:13,560
+And of
+
+160
+00:11:13,560 --> 00:11:18,550
+course that is because the effect of the
+withdraw method depends
+
+161
+00:11:18,550 --> 00:11:23,360
+on the history of the object, what, what
+operations have been performed.
+
+162
+00:11:23,360 --> 00:11:24,650
+Before on that object.
+
+163
+00:11:26,780 --> 00:11:30,790
+So we've seen that statefulness is often
+connected to having variables.
+
+164
+00:11:30,790 --> 00:11:36,300
+Let's see how strong or not strong this
+connection is in a couple of examples.
+
+165
+00:11:36,300 --> 00:11:41,370
+The first example is an implementation of
+streams, that means lazy sequences
+
+166
+00:11:41,370 --> 00:11:44,900
+that you have already seen in the previous
+course in week seven.
+
+167
+00:11:44,900 --> 00:11:47,380
+We have a slight variation here that
+instead of using
+
+168
+00:11:47,380 --> 00:11:52,280
+a lazy val, we implement non-empty streams
+using a mutable variable.
+
+169
+00:11:52,280 --> 00:11:53,320
+Here you see how.
+
+170
+00:11:53,320 --> 00:11:55,560
+So the idea is that we have a function
+
+171
+00:11:55,560 --> 00:11:59,090
+cons, which, which will create a stream
+consisting of
+
+172
+00:11:59,090 --> 00:12:02,750
+a head T, and a computation tail that
+gives
+
+173
+00:12:02,750 --> 00:12:06,390
+you the rest of the stream when it's
+demanded.
+
+174
+00:12:06,390 --> 00:12:09,000
+And the way it's done is that the cons
+function
+
+175
+00:12:09,000 --> 00:12:12,730
+creates a new anonymous class of type
+stream of T.
+
+176
+00:12:12,730 --> 00:12:17,915
+And it has in that object a variable tail
+opt and
+
+177
+00:12:17,915 --> 00:12:23,740
+mutable variable of type option of stream
+of T, which is pre-initialized to none.
+
+178
+00:12:23,740 --> 00:12:28,700
+Now, the tile operation on cons would
+query the variable tail opt,
+
+179
+00:12:28,700 --> 00:12:32,810
+if it is has already some value x that
+value is tail.
+
+180
+00:12:32,810 --> 00:12:37,780
+If it is still set to none, then the tail
+opt will be computed by
+
+181
+00:12:37,780 --> 00:12:43,060
+calling tail, so this reference to tail
+will actually invoke this operation and
+
+182
+00:12:43,060 --> 00:12:46,950
+wrapping it in a some and returning the
+result.
+
+183
+00:12:46,950 --> 00:12:51,360
+So the question now is, is the result of
+cons a stateful object?
+
+184
+00:12:53,130 --> 00:12:55,700
+If you hesitated in your answer, I don't
+blame you.
+
+185
+00:12:55,700 --> 00:12:59,450
+Because in fact, in a sense, both the yes
+and the no are
+
+186
+00:12:59,450 --> 00:13:02,620
+valid responses, depending on what
+assumptions you
+
+187
+00:13:02,620 --> 00:13:05,030
+make on the rest of your system.
+
+188
+00:13:05,030 --> 00:13:08,060
+One common assumption is that streams
+should only be
+
+189
+00:13:08,060 --> 00:13:10,820
+defined over purely functional
+computations.
+
+190
+00:13:10,820 --> 00:13:14,800
+So, the tail operation here should not
+have a side effect.
+
+191
+00:13:14,800 --> 00:13:18,870
+In that case, the optimization to cache
+the first value
+
+192
+00:13:18,870 --> 00:13:22,855
+of tlOPt and reuse it on all previous
+calls to
+
+193
+00:13:22,855 --> 00:13:28,440
+tail is purely a optimization that avoids
+computations, but that
+
+194
+00:13:28,440 --> 00:13:33,190
+does not have an observable effect outside
+the class of streams.
+
+195
+00:13:33,190 --> 00:13:37,330
+So the answer would be that, no streams
+are not stateful objects.
+
+196
+00:13:38,920 --> 00:13:41,310
+On the other hand, if you allow side
+
+197
+00:13:41,310 --> 00:13:44,740
+effect in computations for tail, let's say
+tail could
+
+198
+00:13:44,740 --> 00:13:48,610
+have a printing statement, then you would
+see that
+
+199
+00:13:48,610 --> 00:13:52,770
+the second time tail is caught in this
+string.
+
+200
+00:13:52,770 --> 00:13:54,730
+It would come straight out of the cache,
+
+201
+00:13:54,730 --> 00:13:56,930
+so there would be no side effect
+performed.
+
+202
+00:13:56,930 --> 00:13:58,190
+Whereas, the first time,
+
+203
+00:13:58,190 --> 00:13:59,660
+it would be called the operation
+
+204
+00:13:59,660 --> 00:14:02,566
+would be performed, including the printing
+statement.
+
+205
+00:14:02,566 --> 00:14:05,378
+So that means clearly the operation tail
+
+206
+00:14:05,378 --> 00:14:08,580
+depends on the previous history of the
+object.
+
+207
+00:14:08,580 --> 00:14:12,740
+It would be different depending on whether
+a previous tail was performed or not.
+
+208
+00:14:12,740 --> 00:14:17,950
+So in that sense, the answer would be cons
+is a stateful object, provided
+
+209
+00:14:17,950 --> 00:14:22,780
+that you also allow imperative side effect
+in computations for tail.
+
+210
+00:14:24,120 --> 00:14:27,830
+Here the second example to have you think
+about it.
+
+211
+00:14:27,830 --> 00:14:33,000
+So here we have a class BankAccountProxy,
+and it does not contain any variable.
+
+212
+00:14:33,000 --> 00:14:36,900
+Instead it takes a constructor argument a
+bank account, and
+
+213
+00:14:36,900 --> 00:14:40,640
+its deposit and withdrawal operations
+would simply forward to that account.
+
+214
+00:14:41,710 --> 00:14:45,610
+Question, are instances of
+BankAccountProxy stateful objects?
+
+215
+00:14:46,750 --> 00:14:49,440
+So here the answer is actually more clear
+cut,
+
+216
+00:14:49,440 --> 00:14:54,650
+even though BankAccountProxy doesn't
+contain any variable, its behavior
+
+217
+00:14:54,650 --> 00:14:59,076
+is clearly stateful because it depends on
+the history.
+
+218
+00:14:59,076 --> 00:15:03,510
+all that it does is it forwards to this
+other mutable bank account.
+
+219
+00:15:03,510 --> 00:15:07,410
+So for instance, calling withdraw twice
+would give you
+
+220
+00:15:07,410 --> 00:15:11,580
+different results just as the original
+withdraw would have done.
+
+221
+00:15:11,580 --> 00:15:15,190
+So clearly the bank account proxies are
+stateful objects.
+

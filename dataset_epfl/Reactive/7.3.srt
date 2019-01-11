@@ -1,0 +1,967 @@
+1
+00:00:00,590 --> 00:00:04,780
+In the previous lecture, we have seen how
+the Akka cluster works.
+
+2
+00:00:04,780 --> 00:00:08,940
+And what was evident there is that
+everything takes time.
+
+3
+00:00:08,940 --> 00:00:10,660
+It takes time for a node joining
+
+4
+00:00:10,660 --> 00:00:13,180
+to disseminate the information among the
+rest of
+
+5
+00:00:13,180 --> 00:00:19,160
+the cluster, and then it takes time until
+the welcome message arrives, and so on.
+
+6
+00:00:19,160 --> 00:00:22,740
+And the decisions are taken in some
+
+7
+00:00:22,740 --> 00:00:26,950
+consistent fashion, but they are not taken
+immediately.
+
+8
+00:00:28,770 --> 00:00:32,200
+The cluster is one example of a system
+which is eventually
+
+9
+00:00:32,200 --> 00:00:35,290
+consistent, and in this lecture we will
+look at what that means.
+
+10
+00:00:37,220 --> 00:00:40,330
+When we made our bank account thread-safe
+
+11
+00:00:40,330 --> 00:00:45,760
+by introducing synchronization, we made it
+strongly consistent.
+
+12
+00:00:45,760 --> 00:00:49,490
+That means that after an update to the
+
+13
+00:00:49,490 --> 00:00:53,750
+field all subsequent reads will see the
+new,
+
+14
+00:00:53,750 --> 00:00:54,990
+the updated value.
+
+15
+00:00:56,430 --> 00:01:00,420
+You can see here a minimal example of such
+a system.
+
+16
+00:01:00,420 --> 00:01:07,140
+We have a private field, accesses to which
+are protected by a synchronization.
+
+17
+00:01:07,140 --> 00:01:12,960
+And the update method accepts a function
+which transforms from the current
+
+18
+00:01:12,960 --> 00:01:18,900
+field value to the new one.
+And in the synchronized region we read
+
+19
+00:01:18,900 --> 00:01:21,710
+the field, apply the function, write the
+new
+
+20
+00:01:21,710 --> 00:01:25,090
+value back, and then return the written
+value.
+
+21
+00:01:26,210 --> 00:01:31,490
+Any excess reading this field will also
+synchronize on the same object.
+
+22
+00:01:31,490 --> 00:01:36,280
+That means that all reads and all updates
+are serialized.
+
+23
+00:01:36,280 --> 00:01:39,840
+They are executed in one specific order.
+
+24
+00:01:39,840 --> 00:01:43,970
+And every read observes the value which
+was put in by
+
+25
+00:01:43,970 --> 00:01:49,600
+the most previous update.
+This is called strong consistency, and
+
+26
+00:01:49,600 --> 00:01:54,670
+it can be easily achieved here, because we
+are doing it in a fully local system.
+
+27
+00:01:54,670 --> 00:01:59,740
+The locks offered by Scala's objects only
+work because we are
+
+28
+00:01:59,740 --> 00:02:05,690
+executing all code here in the same Java
+Virtual Machine, on the same computer.
+
+29
+00:02:07,450 --> 00:02:09,130
+But even so we have already
+
+30
+00:02:09,130 --> 00:02:15,930
+discussed that this can be problematic
+because synchronization blocks the thread
+
+31
+00:02:15,930 --> 00:02:22,220
+which wants to execute it potentially.
+And that is not good for CPU utilization.
+
+32
+00:02:23,560 --> 00:02:26,910
+We can remove the need to block the
+calling
+
+33
+00:02:26,910 --> 00:02:31,830
+thread by moving the synchronization into
+another execution context.
+
+34
+00:02:31,830 --> 00:02:34,270
+Here, this synchronized block is
+
+35
+00:02:34,270 --> 00:02:36,420
+executed in a Future.
+
+36
+00:02:36,420 --> 00:02:40,420
+That means that the update method, which
+takes this function,
+
+37
+00:02:40,420 --> 00:02:43,790
+does not return the new value itself, it
+returns a
+
+38
+00:02:43,790 --> 00:02:47,830
+Future of that new value and the thread
+can continue
+
+39
+00:02:47,830 --> 00:02:51,280
+normally without having to wait for the
+update to occur.
+
+40
+00:02:52,440 --> 00:02:58,380
+In order to properly publish the new value
+of the field, we write it here back.
+
+41
+00:02:58,380 --> 00:02:59,380
+And if
+
+42
+00:02:59,380 --> 00:03:03,220
+we mark the variable as volatile, that
+makes sure that other
+
+43
+00:03:03,220 --> 00:03:08,310
+threads see the updated value when they do
+their next read.
+
+44
+00:03:08,310 --> 00:03:13,250
+Therefore, no synchronization is necessary
+for the read message here.
+
+45
+00:03:13,250 --> 00:03:19,750
+By removing the blocking nature of the
+update method, we have also removed
+
+46
+00:03:19,750 --> 00:03:24,530
+strong consistency, because calling update
+and then immediately calling
+
+47
+00:03:24,530 --> 00:03:29,140
+read will probably not give us back the
+new value.
+
+48
+00:03:29,140 --> 00:03:33,020
+It will take some time until the new value
+is visible.
+
+49
+00:03:33,020 --> 00:03:37,210
+This is called weak consistency and that
+means that after an
+
+50
+00:03:37,210 --> 00:03:42,670
+update, certain conditions need to met
+until the new value is visible.
+
+51
+00:03:42,670 --> 00:03:44,770
+And this is called the inconsistency
+window.
+
+52
+00:03:47,140 --> 00:03:51,670
+Eventual consistency is a special kind of
+weak consistency.
+
+53
+00:03:52,780 --> 00:03:58,792
+First of all, it takes awhile until all
+reads return a consistent
+
+54
+00:03:58,792 --> 00:04:04,460
+value, and second, this only really works
+once the system becomes quiescent.
+
+55
+00:04:04,460 --> 00:04:08,940
+So once the updates stop, and then, after
+
+56
+00:04:08,940 --> 00:04:13,210
+awhile, once everyone has communicated the
+new value
+
+57
+00:04:13,210 --> 00:04:16,980
+then everyone is on the same page and
+consistency will be achieved.
+
+58
+00:04:18,270 --> 00:04:21,510
+Let us try this out with a simple actor.
+
+59
+00:04:21,510 --> 00:04:27,500
+This actor, also, the main purpose is to
+hold this field an integer.
+
+60
+00:04:28,950 --> 00:04:33,440
+But the goal is to have different actors
+collaborate and share the
+
+61
+00:04:33,440 --> 00:04:38,420
+value of this field, such that updates can
+be performed on any
+
+62
+00:04:38,420 --> 00:04:39,460
+of these.
+
+63
+00:04:39,460 --> 00:04:43,130
+And eventually, the update will be seen on
+all other copies.
+
+64
+00:04:44,720 --> 00:04:51,090
+For the outside protocol, we need an
+update command, which gives a new value.
+
+65
+00:04:51,090 --> 00:04:56,242
+Then we need a get request, and a result.
+Reply type.
+
+66
+00:04:56,242 --> 00:04:59,320
+The actors, which are part of this
+
+67
+00:04:59,320 --> 00:05:01,430
+distributed store network, will
+
+68
+00:05:01,430 --> 00:05:04,000
+communicate additionally using
+synchronization
+
+69
+00:05:04,000 --> 00:05:09,460
+messages and they will learn of their
+existence using Hello.
+
+70
+00:05:09,460 --> 00:05:14,510
+Now, how can we serialize the updates to
+this field?
+
+71
+00:05:14,510 --> 00:05:18,126
+Because there are multiple copies of this
+field, one in every actor.
+
+72
+00:05:18,126 --> 00:05:24,340
+And once two writes happen on different
+actors, these
+
+73
+00:05:24,340 --> 00:05:27,490
+two actors need to agree upon which value
+to keep.
+
+74
+00:05:28,770 --> 00:05:34,660
+Say, we have an actor D1 here, for
+distributed
+
+75
+00:05:34,660 --> 00:05:39,876
+store one, and
+
+76
+00:05:39,876 --> 00:05:44,470
+D2.
+And this one
+
+77
+00:05:44,470 --> 00:05:49,398
+get's a command, Update
+
+78
+00:05:49,398 --> 00:05:54,071
+42.
+And this one gets
+
+79
+00:05:54,071 --> 00:06:01,056
+another update, 43.
+They will both locally
+
+80
+00:06:01,056 --> 00:06:07,439
+process these messages, and afterwards,
+they will talk and sync up.
+
+81
+00:06:07,439 --> 00:06:11,050
+And they need to keep either the 42 or the
+43.
+
+82
+00:06:11,050 --> 00:06:21,050
+In order to serialize these updates, we
+use here the current time in milliseconds.
+
+83
+00:06:22,340 --> 00:06:25,780
+Whenever an update is made, we capture a
+timestamp
+
+84
+00:06:25,780 --> 00:06:28,830
+and associate it with this value of the
+field.
+
+85
+00:06:30,030 --> 00:06:35,340
+And then when D1 tells D2, I have a new
+value for you, then
+
+86
+00:06:35,340 --> 00:06:40,490
+D2 can check, is this actually a new
+value, or do I have something better?
+
+87
+00:06:40,490 --> 00:06:43,490
+This is a simplified implementation of
+this protocol.
+
+88
+00:06:44,790 --> 00:06:47,350
+Every time an update comes in,
+
+89
+00:06:47,350 --> 00:06:50,873
+we write to the field, and we take a
+current timestamp.
+
+90
+00:06:52,540 --> 00:06:56,660
+When a get request comes in we reply with
+the current field value.
+
+91
+00:06:56,660 --> 00:06:57,840
+So far, so simple.
+
+92
+00:06:59,280 --> 00:07:02,900
+Now when a synchronization message comes
+in with a potentially new
+
+93
+00:07:02,900 --> 00:07:07,770
+value we check that this timestamp is
+newer than what we know.
+
+94
+00:07:07,770 --> 00:07:13,430
+And if that is the case we apply it and
+keep track of the new timestamp.
+
+95
+00:07:13,430 --> 00:07:16,100
+In order to set up this system, a Hello
+
+96
+00:07:16,100 --> 00:07:20,940
+message must be sent from D1 to D2, for
+example.
+
+97
+00:07:20,940 --> 00:07:25,710
+And then D2 knows this a new one, which I
+need to keep updated.
+
+98
+00:07:25,710 --> 00:07:30,840
+So, in reply to the hello, we sent the
+first sync, and whenever we get a new
+
+99
+00:07:30,840 --> 00:07:36,470
+update, an original one, we took everyone
+who wanted to know about it.
+
+100
+00:07:39,380 --> 00:07:41,783
+We can try this out in the Scala Ripple.
+
+101
+00:07:41,783 --> 00:07:48,880
+First, we import all important Akka
+things.
+
+102
+00:07:48,880 --> 00:07:51,410
+Then, of course we need an actor system to
+run things in.
+
+103
+00:07:55,240 --> 00:07:59,640
+And I made this implicit to use something
+called the Actor DSL.
+
+104
+00:08:01,090 --> 00:08:07,930
+This is a small toolbox if you want to
+create actors on the fly in the Ripple.
+
+105
+00:08:07,930 --> 00:08:09,160
+It can be done like this.
+
+106
+00:08:12,830 --> 00:08:16,030
+What this does is, it creates a new actor.
+
+107
+00:08:16,030 --> 00:08:21,260
+I didn't give it a name, hence it got the
+name $A.
+
+108
+00:08:21,260 --> 00:08:25,790
+And the function of this actor is to just
+print out any message that it gets.
+
+109
+00:08:27,370 --> 00:08:31,140
+This is made available as an implicit
+ActorRef so that it will
+
+110
+00:08:31,140 --> 00:08:34,330
+be picked up when we send a message here
+from the prompt.
+
+111
+00:08:36,570 --> 00:08:41,470
+I have loaded the code, in a package,
+which
+
+112
+00:08:41,470 --> 00:08:46,560
+I'm importing real quick.
+And now let us instantiate two such
+
+113
+00:08:46,560 --> 00:08:51,514
+actors.
+Called
+
+114
+00:08:51,514 --> 00:08:56,730
+a, and b.
+If we send a get request
+
+115
+00:08:56,730 --> 00:09:01,950
+to a, it will reply with a result of zero
+to this anonymous
+
+116
+00:09:01,950 --> 00:09:04,870
+actor we had up here, which will print it
+out.
+
+117
+00:09:08,530 --> 00:09:13,844
+The same result for b right now.
+If we now update a,
+
+118
+00:09:13,844 --> 00:09:19,130
+we see that is was updated.
+But b does not know anything about it.
+
+119
+00:09:20,330 --> 00:09:25,670
+Now we can introduce these two actors.
+So, effectively, b sent a hello
+
+120
+00:09:25,670 --> 00:09:31,160
+to a, a should have replied with the
+value, and we see that has worked.
+
+121
+00:09:32,390 --> 00:09:33,880
+Now, if we update
+
+122
+00:09:33,880 --> 00:09:38,800
+b, that is reflected here.
+But
+
+123
+00:09:38,800 --> 00:09:44,180
+now, a was not updated because the, the
+introduction needs to be done
+
+124
+00:09:44,180 --> 00:09:49,540
+both ways.
+Now, the update has propagated back to a.
+
+125
+00:09:51,120 --> 00:09:53,030
+And now we could update on any of the
+
+126
+00:09:53,030 --> 00:09:55,610
+two, and the other one will eventually
+learn of it.
+
+127
+00:09:56,960 --> 00:09:59,260
+After playing with actors in the Ripple,
+
+128
+00:09:59,260 --> 00:10:06,060
+we need to shut down the system, otherwise
+the Ripple will not properly terminate.
+
+129
+00:10:08,980 --> 00:10:14,770
+Actors and eventual consistency are deeply
+related concepts.
+
+130
+00:10:14,770 --> 00:10:18,390
+We have seen that within an actor, we have
+an, so to speak,
+
+131
+00:10:18,390 --> 00:10:21,820
+an island of consistency in an ocean
+
+132
+00:10:21,820 --> 00:10:24,490
+of nondeterminism, which is the messaging
+outside.
+
+133
+00:10:25,610 --> 00:10:30,050
+So everything you do within an actor is
+sequentially consistent.
+
+134
+00:10:30,050 --> 00:10:33,950
+Everything happens like it was on a single
+thread.
+
+135
+00:10:33,950 --> 00:10:35,490
+But as soon as you have actors
+
+136
+00:10:35,490 --> 00:10:40,020
+which collaborate, they can never be
+strongly consistent.
+
+137
+00:10:40,020 --> 00:10:43,810
+They can never agree on a shared thing.
+
+138
+00:10:43,810 --> 00:10:46,690
+Because they always need to exchange
+messages,
+
+139
+00:10:46,690 --> 00:10:49,120
+and a message takes time to travel.
+
+140
+00:10:49,120 --> 00:10:51,610
+So by the time it arrives this date
+
+141
+00:10:51,610 --> 00:10:55,400
+which should be agreed upon might already
+have changed.
+
+142
+00:10:55,400 --> 00:11:00,440
+Therefore, collaborating actors can at
+most be eventually consistent.
+
+143
+00:11:00,440 --> 00:11:04,140
+But that is not automatically the case.
+
+144
+00:11:04,140 --> 00:11:08,370
+You need to work to make the behavior
+eventually consistent.
+
+145
+00:11:09,460 --> 00:11:12,370
+Looking back at the distributed store
+which we
+
+146
+00:11:12,370 --> 00:11:15,330
+have just seen that had a few flaws.
+
+147
+00:11:15,330 --> 00:11:17,900
+For example, if updates come within the
+same
+
+148
+00:11:17,900 --> 00:11:21,480
+millisecond then the merge was not
+properly resolved.
+
+149
+00:11:22,730 --> 00:11:25,725
+Another problem is that message delivery
+is not
+
+150
+00:11:25,725 --> 00:11:29,410
+guaranteed, but there was no resend
+mechanism.
+
+151
+00:11:29,410 --> 00:11:34,870
+And this would also be problematic because
+eventual consistency requires
+
+152
+00:11:34,870 --> 00:11:39,680
+that eventually all updates are
+disseminated to all interested parties.
+
+153
+00:11:39,680 --> 00:11:43,710
+And this usually implies that there needs
+to be a resend mechanism.
+
+154
+00:11:44,930 --> 00:11:50,780
+Another way to do it has been shown in the
+cluster which does not resend
+
+155
+00:11:50,780 --> 00:11:51,710
+because of failures.
+
+156
+00:11:51,710 --> 00:11:55,230
+It just resends pessimistically so to
+speak.
+
+157
+00:11:55,230 --> 00:12:00,190
+The gossip messages are always sent no
+matter whether we know that the
+
+158
+00:12:00,190 --> 00:12:04,770
+other party, for example, needs the update
+or it might all be old news.
+
+159
+00:12:05,770 --> 00:12:10,530
+And the last observation is that in order
+to achieve eventual consistency,
+
+160
+00:12:10,530 --> 00:12:13,910
+the data structures which I shared need to
+be suitable for that.
+
+161
+00:12:14,910 --> 00:12:16,070
+There is a class of such
+
+162
+00:12:16,070 --> 00:12:18,790
+data structures which are called
+commutative or
+
+163
+00:12:18,790 --> 00:12:23,280
+convergent replicated data types described
+in this paper.
+
+164
+00:12:23,280 --> 00:12:28,200
+If you have watched the second part of the
+Actors Are Distributed lecture then
+
+165
+00:12:28,200 --> 00:12:32,640
+you have seen another example of this one,
+which is the cluster membership state.
+
+166
+00:12:33,930 --> 00:12:37,490
+In the following I explain how that data
+type works.
+
+167
+00:12:37,490 --> 00:12:42,315
+But this is optional as was the part of
+the distributive lecture.
+
+168
+00:12:42,315 --> 00:12:48,740
+As a reminder, we had six
+
+169
+00:12:48,740 --> 00:12:53,900
+states.
+It began with joining.
+
+170
+00:12:56,240 --> 00:12:58,110
+And then we had up,
+
+171
+00:13:00,330 --> 00:13:01,160
+leaving.
+
+172
+00:13:03,780 --> 00:13:04,480
+Exiting
+
+173
+00:13:06,860 --> 00:13:12,740
+removed, and we had down.
+The
+
+174
+00:13:12,740 --> 00:13:17,540
+property which makes this data type
+manageable as a convergent
+
+175
+00:13:17,540 --> 00:13:22,380
+data type, is that all transitions form
+
+176
+00:13:22,380 --> 00:13:27,474
+a directed and acyclic
+
+177
+00:13:27,474 --> 00:13:32,690
+graph.
+So the normal way the nodes takes
+
+178
+00:13:32,690 --> 00:13:37,800
+through this is from joining via up,
+leaving, exiting, to removed.
+
+179
+00:13:40,540 --> 00:13:46,190
+But there are other ways.
+For example, from these
+
+180
+00:13:46,190 --> 00:13:51,550
+states, you can always become down, and
+then removed.
+
+181
+00:13:52,640 --> 00:13:57,380
+When cluster nodes exchange gossip
+messages, these messages contain
+
+182
+00:13:57,380 --> 00:14:01,720
+the state of all nodes currently known to
+the cluster.
+
+183
+00:14:01,720 --> 00:14:05,561
+So for each of the members, there will be
+one of these values.
+
+184
+00:14:05,561 --> 00:14:14,426
+For example, we had a cluster here with a
+few nodes.
+
+185
+00:14:14,426 --> 00:14:20,125
+And this one, learns something about say,
+node four.
+
+186
+00:14:20,125 --> 00:14:25,317
+And this one learns something else about
+node four,
+
+187
+00:14:25,317 --> 00:14:30,614
+then the information might spread.
+And let's say,
+
+188
+00:14:30,614 --> 00:14:36,550
+node two learned the green thing first and
+then the red thing.
+
+189
+00:14:37,900 --> 00:14:42,160
+These are two new informations about node
+four which need to be merged.
+
+190
+00:14:43,830 --> 00:14:49,050
+It'll say that the red information was,
+that it was down, and the
+
+191
+00:14:49,050 --> 00:14:54,370
+green one was, that it was leaving.
+
+192
+00:14:55,780 --> 00:15:01,210
+Because this is such a nice graph, we can
+give an order to all the
+
+193
+00:15:01,210 --> 00:15:06,930
+possible pairs of states, saying that down
+takes precedence
+
+194
+00:15:06,930 --> 00:15:12,350
+over leaving, because you can go from
+leaving to down, but not the other way.
+
+195
+00:15:12,350 --> 00:15:15,310
+This gives us the property that a
+conflict,
+
+196
+00:15:15,310 --> 00:15:20,640
+for example, as here, can be resolved
+locally, first.
+
+197
+00:15:20,640 --> 00:15:24,820
+And the second one is that conflict
+resolution is commutative.
+
+198
+00:15:24,820 --> 00:15:28,970
+So it does not matter whether you learn
+this first, or that.
+
+199
+00:15:28,970 --> 00:15:32,310
+The merge result will always be down in
+this case.
+
+200
+00:15:33,570 --> 00:15:39,880
+And this is the property which makes the
+cluster communication eventually converge,
+
+201
+00:15:39,880 --> 00:15:45,930
+even if conflicting information was
+injected at several different points
+
+202
+00:15:45,930 --> 00:15:46,620
+in the cluster.
+

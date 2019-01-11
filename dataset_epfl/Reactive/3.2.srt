@@ -1,0 +1,1307 @@
+1
+00:00:00,570 --> 00:00:05,760
+In the previous lesson, we looked at
+exceptions as an effect.
+
+2
+00:00:05,760 --> 00:00:08,460
+In this lesson, we'll look at latency as
+an effect.
+
+3
+00:00:10,260 --> 00:00:12,950
+This week and next week, we were going
+
+4
+00:00:12,950 --> 00:00:16,380
+to talk about the four essential effects
+in programming.
+
+5
+00:00:16,380 --> 00:00:20,160
+In the previous lesson, we talked about
+Try of T.
+
+6
+00:00:20,160 --> 00:00:23,270
+The effect of exceptions.
+
+7
+00:00:23,270 --> 00:00:25,880
+In this lesson we will look at
+
+8
+00:00:25,880 --> 00:00:29,910
+asynchronous computations and the effect
+of latency.
+
+9
+00:00:29,910 --> 00:00:32,260
+And, what we will do is we're, we'll
+
+10
+00:00:32,260 --> 00:00:37,100
+move here from synchronous computations to
+asynchronous computations.
+
+11
+00:00:37,100 --> 00:00:42,080
+And then in the next week we will look at
+computations that return multiple values.
+
+12
+00:00:42,080 --> 00:00:47,900
+But before that let's quickly revisit what
+we discussed in the previous lesson.
+
+13
+00:00:49,800 --> 00:00:51,240
+In the previous lesson
+
+14
+00:00:51,240 --> 00:00:54,070
+we defined this super simple adventure
+game.
+
+15
+00:00:54,070 --> 00:00:55,250
+Remember that?
+
+16
+00:00:55,250 --> 00:00:58,760
+We had two methods; collectCoins that
+returned a
+
+17
+00:00:58,760 --> 00:01:03,140
+list of coins, and buyTreasure that
+returned a treasure.
+
+18
+00:01:03,140 --> 00:01:05,780
+And then we wrote our simple adventure
+game.
+
+19
+00:01:05,780 --> 00:01:09,140
+And then what we did is we said, well,
+this was not really
+
+20
+00:01:09,140 --> 00:01:15,460
+precise, so we turned the return type into
+try of list of coins.
+
+21
+00:01:15,460 --> 00:01:16,530
+And try of treasure
+
+22
+00:01:16,530 --> 00:01:20,500
+respectively to make clear in the types
+
+23
+00:01:20,500 --> 00:01:24,680
+that the computations could throw an
+exception.
+
+24
+00:01:24,680 --> 00:01:27,780
+And that was the monad of exceptions, try
+of T.
+
+25
+00:01:29,020 --> 00:01:34,190
+Now let's take this very same adventure
+game, and let's massage it.
+
+26
+00:01:34,190 --> 00:01:39,000
+Let's turn that, let's apply a
+homomorphism to this code.
+
+27
+00:01:39,000 --> 00:01:41,070
+And let's create some networking code.
+
+28
+00:01:42,970 --> 00:01:48,990
+Look, we just renamed the method.
+We renamed adventure to socket.
+
+29
+00:01:48,990 --> 00:01:52,370
+And, we renamed collect coins to read from
+memory.
+
+30
+00:01:52,370 --> 00:01:58,780
+We renamed by treasure to send to Europe
+and we get a simple networking stack.
+
+31
+00:01:58,780 --> 00:01:59,840
+Isn't that amazing?
+
+32
+00:02:01,040 --> 00:02:06,350
+But, just like before, things are not as
+rosy as it looks.
+
+33
+00:02:06,350 --> 00:02:08,000
+So if we write the code here that
+
+34
+00:02:08,000 --> 00:02:12,170
+we create the socket, we read from memory
+and then we get
+
+35
+00:02:12,170 --> 00:02:15,960
+the packet that we got from memory, we
+send that to Europe.
+
+36
+00:02:15,960 --> 00:02:18,420
+When we look at this code in more detail,
+
+37
+00:02:18,420 --> 00:02:23,210
+there is again much more going than the
+code shows.
+
+38
+00:02:23,210 --> 00:02:25,530
+There are all kinds of, of effects
+
+39
+00:02:25,530 --> 00:02:29,650
+happening that are not apparent in the
+types.
+
+40
+00:02:29,650 --> 00:02:32,880
+And what we'll do.
+Just like we did last time.
+
+41
+00:02:32,880 --> 00:02:37,740
+We will make this, the types more precise
+to expose the
+
+42
+00:02:37,740 --> 00:02:41,920
+fact that there are side effects happening
+when we run this code.
+
+43
+00:02:43,550 --> 00:02:46,150
+And as I said, the effects that we are
+
+44
+00:02:46,150 --> 00:02:49,738
+interested in this week is the effect of
+latency.
+
+45
+00:02:49,738 --> 00:02:53,430
+And Peter Norvig has collected a nice
+table
+
+46
+00:02:53,430 --> 00:02:57,810
+here of timings for various operations
+that you know,
+
+47
+00:02:57,810 --> 00:03:00,570
+that things take on a typical PC.
+
+48
+00:03:00,570 --> 00:03:04,412
+And in this case we were reading stuff
+from memory and we're sending
+
+49
+00:03:04,412 --> 00:03:08,310
+a packet back and forth to Europe and if
+you look at the table
+
+50
+00:03:08,310 --> 00:03:13,290
+you see that reading a you know, I mega
+byte for memory takes 250
+
+51
+00:03:13,290 --> 00:03:19,360
+nanoseconds and sending a packet from the
+US to Europe and back, takes.
+
+52
+00:03:19,360 --> 00:03:23,710
+Wow.
+150 million nanoseconds.
+
+53
+00:03:23,710 --> 00:03:28,930
+So, let's look at our code again.
+Here's our code.
+
+54
+00:03:28,930 --> 00:03:33,190
+Within comments the effects that are
+really happening.
+
+55
+00:03:33,190 --> 00:03:35,720
+So when we read from memory we are
+
+56
+00:03:35,720 --> 00:03:40,720
+blocked here at this point for 50,000
+nanoseconds and
+
+57
+00:03:40,720 --> 00:03:43,340
+we only continue after, you know, we have
+
+58
+00:03:43,340 --> 00:03:46,670
+blocked for that time and there is no
+exception.
+
+59
+00:03:46,670 --> 00:03:49,000
+And then when we send the packet to Europe
+and
+
+60
+00:03:49,000 --> 00:03:53,760
+back, we are blocked for 150 million
+nanoseconds.
+
+61
+00:03:53,760 --> 00:03:57,900
+And again only after this thing terminates
+successfully
+
+62
+00:03:57,900 --> 00:04:00,260
+we will move on to the next line.
+
+63
+00:04:00,260 --> 00:04:04,270
+And this is a very, very heavy effect.
+
+64
+00:04:04,270 --> 00:04:07,710
+And to make that even more clear, is what
+we are going to do.
+
+65
+00:04:09,150 --> 00:04:14,180
+We are going to translate these
+nanoseconds, which really don't
+
+66
+00:04:14,180 --> 00:04:15,380
+say very much.
+
+67
+00:04:15,380 --> 00:04:19,450
+At least for me, I don't know what 50,000
+nanoseconds is.
+
+68
+00:04:19,450 --> 00:04:28,480
+We're going to translate nanoseconds into
+more human terms, into time units
+
+69
+00:04:28,480 --> 00:04:33,100
+that we can understand as humans, and then
+we can see how bad this really is.
+
+70
+00:04:34,780 --> 00:04:39,346
+What we're going to do is we're going to
+translate one nanosecond into
+
+71
+00:04:39,346 --> 00:04:44,890
+one second and then we convert everything
+to hours, days, and months or years.
+
+72
+00:04:44,890 --> 00:04:45,820
+Okay.
+
+73
+00:04:45,820 --> 00:04:48,650
+Let's have a look at Peter Norvig's table.
+
+74
+00:04:48,650 --> 00:04:50,930
+How that looks like when we do this
+translation.
+
+75
+00:04:52,270 --> 00:04:54,402
+This is quite extreme.
+
+76
+00:04:54,402 --> 00:04:55,662
+Look at this.
+
+77
+00:04:55,662 --> 00:05:02,540
+Reading one megabyte from memory, in human
+terms, takes three days.
+
+78
+00:05:02,540 --> 00:05:04,835
+Okay.
+What was that,
+
+79
+00:05:04,835 --> 00:05:08,840
+150,000 nanoseconds?
+Well, in human terms that is three days.
+
+80
+00:05:08,840 --> 00:05:11,230
+And sending a packet from the US to
+
+81
+00:05:11,230 --> 00:05:15,420
+Europe and back, in human terms, takes
+five years.
+
+82
+00:05:15,420 --> 00:05:20,220
+So if we look at our code again, and we
+update the comments.
+
+83
+00:05:20,220 --> 00:05:25,930
+Instead of nanoseconds, with human terms.
+What we will see is that when we read
+
+84
+00:05:25,930 --> 00:05:30,940
+from memory, it will take us three days.
+That's a long time.
+
+85
+00:05:30,940 --> 00:05:36,080
+So you see, our little hero here starting
+to grow a little beard.
+
+86
+00:05:36,080 --> 00:05:40,510
+And then when you send the packet to
+Europe and back, that takes five years.
+
+87
+00:05:40,510 --> 00:05:44,030
+By that time he, this is an old man.
+
+88
+00:05:44,030 --> 00:05:50,040
+Okay, so this is an effect that we should
+not let, unaccounted for.
+
+89
+00:05:50,040 --> 00:05:52,020
+We really should make this effect the
+
+90
+00:05:52,020 --> 00:05:55,040
+effect of latency and explicit in our
+types.
+
+91
+00:05:57,500 --> 00:06:02,310
+Here's another illustration.
+How slow computers actually are.
+
+92
+00:06:02,310 --> 00:06:06,800
+If we would take the same distance that
+this
+
+93
+00:06:06,800 --> 00:06:10,400
+packet takes from the US to Europe and
+back.
+
+94
+00:06:10,400 --> 00:06:13,140
+If we do, would do that ourselves as
+humans.
+
+95
+00:06:13,140 --> 00:06:17,540
+Well, if you search on Wikipedia for
+people that have done this,
+
+96
+00:06:17,540 --> 00:06:21,650
+it will take say, 12 months to walk, walk
+from coast to coast.
+
+97
+00:06:23,290 --> 00:06:27,070
+apparently people have swam across the
+Atlantic in three months.
+
+98
+00:06:27,070 --> 00:06:30,620
+So, we can swim from here to Europe in
+three months.
+
+99
+00:06:30,620 --> 00:06:33,000
+We take three months to go back.
+
+100
+00:06:33,000 --> 00:06:38,480
+And then 12 months to walk back from the
+East Coast to the West Coast.
+
+101
+00:06:38,480 --> 00:06:42,160
+So, in total, that is two and a half years
+that it takes
+
+102
+00:06:42,160 --> 00:06:46,883
+us to, kind of, you know, take a packet
+from here to Europe and back.
+
+103
+00:06:46,883 --> 00:06:48,850
+Remember that a computer
+
+104
+00:06:48,850 --> 00:06:55,360
+would take five years and three days.
+So humans are twice as fast as computers.
+
+105
+00:06:55,360 --> 00:06:56,300
+That's good to know.
+
+106
+00:06:59,340 --> 00:07:02,270
+So what we have seen is that there's this
+very,
+
+107
+00:07:02,270 --> 00:07:08,190
+very expensive effect of actions that take
+time and may fail.
+
+108
+00:07:09,340 --> 00:07:14,150
+The obvious question is, isn't there a
+monad for that?
+
+109
+00:07:14,150 --> 00:07:17,150
+And of course, there's a monad for that.
+
+110
+00:07:17,150 --> 00:07:19,521
+Which monad?
+The Future monad.
+
+111
+00:07:19,521 --> 00:07:25,282
+Future of T is a monad that handles
+exceptions and latencies.
+
+112
+00:07:25,282 --> 00:07:32,740
+So if you have a computation of type
+Future of T It's something that takes care
+
+113
+00:07:32,740 --> 00:07:38,650
+of the happy path with respect to latency
+and of exceptions.
+
+114
+00:07:41,050 --> 00:07:45,670
+Let's look at how future's defined in the
+standard scala library.
+
+115
+00:07:45,670 --> 00:07:51,390
+Futures are defined in scala.concurrent
+And here is the trait for future.
+
+116
+00:07:51,390 --> 00:07:55,510
+Futures, we will look at the other methods
+in a minute.
+
+117
+00:07:55,510 --> 00:07:58,950
+But this is the main method that's defined
+on futures.
+
+118
+00:07:58,950 --> 00:08:04,800
+Futures are computations that will
+complete in the future.
+
+119
+00:08:04,800 --> 00:08:06,360
+Because again, they are
+
+120
+00:08:06,360 --> 00:08:10,190
+intended to model computations that have
+high latency.
+
+121
+00:08:10,190 --> 00:08:13,650
+And the way we deal with that is we give
+it a
+
+122
+00:08:13,650 --> 00:08:19,430
+callback that will be called as soon as
+the value is available.
+
+123
+00:08:19,430 --> 00:08:22,780
+So that is what asynchronous programming
+typically does.
+
+124
+00:08:22,780 --> 00:08:24,080
+You work with callbacks.
+
+125
+00:08:24,080 --> 00:08:28,000
+So I register a callback on the Future
+that will be
+
+126
+00:08:28,000 --> 00:08:32,300
+called as soon as the value of the Future
+is available.
+
+127
+00:08:32,300 --> 00:08:35,860
+And remember that I said, that futures
+model
+
+128
+00:08:35,860 --> 00:08:41,820
+computations that have latency and
+exceptions and that becomes
+
+129
+00:08:41,820 --> 00:08:47,320
+visible here in the fact that in our
+callback we get a value of type try of T.
+
+130
+00:08:47,320 --> 00:08:50,830
+If the computation has failed, this will
+be a failure,
+
+131
+00:08:50,830 --> 00:08:55,200
+if the computation has succeeded it will
+be the sub-type success.
+
+132
+00:08:56,970 --> 00:08:57,400
+Now there's
+
+133
+00:08:57,400 --> 00:09:01,370
+one thing here that we will be a little
+bit implicit about
+
+134
+00:09:01,370 --> 00:09:06,690
+and this is also defined in scala as an
+implicit parameter because futures
+
+135
+00:09:06,690 --> 00:09:11,220
+run typically on background threads on a
+thread pool or something because if
+
+136
+00:09:11,220 --> 00:09:14,530
+something takes a long time you don't want
+to block any main threads.
+
+137
+00:09:14,530 --> 00:09:17,740
+So you run them on a separate background
+thread.
+
+138
+00:09:17,740 --> 00:09:22,560
+And in order to route the thread pull
+through your computation, Scala uses
+
+139
+00:09:22,560 --> 00:09:25,860
+this implicit parameter that takes an
+ExecutionContext.
+
+140
+00:09:26,910 --> 00:09:31,630
+We will leave this implicit, because to
+understand Futures, you
+
+141
+00:09:31,630 --> 00:09:35,860
+really don't have to worry too much about
+the ExecutionContext.
+
+142
+00:09:35,860 --> 00:09:39,520
+When necessary we will always import the
+
+143
+00:09:39,520 --> 00:09:42,500
+global execution context to make things
+run.
+
+144
+00:09:45,240 --> 00:09:51,080
+Here are two possible design alternatives,
+how futures could have been designed.
+
+145
+00:09:51,080 --> 00:09:54,462
+So, what we have seen in the previous
+slide was that,
+
+146
+00:09:54,462 --> 00:10:00,190
+the onComplete took a function from Try of
+t to unit.
+
+147
+00:10:00,190 --> 00:10:03,120
+Well, the first thing you are going to do
+on a Try
+
+148
+00:10:03,120 --> 00:10:07,360
+of t is to do a switch statement, to do a
+case, right?
+
+149
+00:10:07,360 --> 00:10:10,620
+You are going to say, if its success, do
+this.
+
+150
+00:10:10,620 --> 00:10:14,810
+If its failed, do that.
+So, what you have define is two functions.
+
+151
+00:10:14,810 --> 00:10:18,330
+So, instead of passing Try of t to unit.
+
+152
+00:10:18,330 --> 00:10:21,410
+What we can also do is we can pass in two
+functions.
+
+153
+00:10:21,410 --> 00:10:24,060
+The one for success and the one for
+failed.
+
+154
+00:10:24,060 --> 00:10:27,920
+So, this would be totally isomorphic with
+the previous design.
+
+155
+00:10:27,920 --> 00:10:34,670
+And the second alternative would be to
+take these two callback functions.
+
+156
+00:10:34,670 --> 00:10:36,300
+The one for success and
+
+157
+00:10:36,300 --> 00:10:40,440
+the one for failed and wrap them in their
+own trait.
+
+158
+00:10:40,440 --> 00:10:43,730
+So let's call this trait Observer and an
+
+159
+00:10:43,730 --> 00:10:47,770
+observer is just something that pairs
+these two callbacks.
+
+160
+00:10:48,830 --> 00:10:52,200
+And I think it's clear that this is
+exactly the same.
+
+161
+00:10:52,200 --> 00:10:56,260
+So you can always take a value that has,
+you know, like
+
+162
+00:10:56,260 --> 00:11:01,630
+a sum type, and replace it by the
+functions that you would use
+
+163
+00:11:01,630 --> 00:11:03,630
+to pattern match on that value.
+
+164
+00:11:06,610 --> 00:11:10,050
+Now that we know what Futures are, again,
+just
+
+165
+00:11:10,050 --> 00:11:15,070
+for a reference, I repeat the definition
+of Future here.
+
+166
+00:11:15,070 --> 00:11:19,780
+Let's now rewrite our socket trait using
+futures.
+
+167
+00:11:19,780 --> 00:11:25,950
+So instead of returning a regular byte
+array we now return a future of byte array
+
+168
+00:11:25,950 --> 00:11:31,970
+to indicate that reading from memory will
+take a long time and may fail.
+
+169
+00:11:31,970 --> 00:11:38,250
+And then also, send to Europe here now
+takes, returns a future of array of byte.
+
+170
+00:11:38,250 --> 00:11:42,300
+Again, this now in the type shows that
+sending
+
+171
+00:11:42,300 --> 00:11:46,240
+a packet to Europe takes a long, long
+time.
+
+172
+00:11:46,240 --> 00:11:46,900
+Okay?
+
+173
+00:11:46,900 --> 00:11:49,850
+So whenever you have a computation that
+takes a
+
+174
+00:11:49,850 --> 00:11:54,140
+long time, you should always make it
+return a future.
+
+175
+00:11:54,140 --> 00:11:57,220
+Such that a consumer of your values can
+see
+
+176
+00:11:57,220 --> 00:12:01,795
+in the type that this thing will take a
+long time and that they won't block on it.
+
+177
+00:12:04,330 --> 00:12:08,130
+However, once we rewrite our signatures to
+return
+
+178
+00:12:08,130 --> 00:12:12,150
+futures we also have to adopt our code.
+
+179
+00:12:12,150 --> 00:12:16,260
+To you know, pass around futures and grab
+the values out of the futures.
+
+180
+00:12:16,260 --> 00:12:17,880
+So, how does our coat look like.
+
+181
+00:12:17,880 --> 00:12:25,050
+Let's try here to use onComplete directly.
+So, we have our socket.
+
+182
+00:12:25,050 --> 00:12:30,320
+We read from memory and now we get back a
+future of an array of byte.
+
+183
+00:12:30,320 --> 00:12:34,570
+We want to send that array of bytes to
+Europe and back.
+
+184
+00:12:34,570 --> 00:12:37,330
+But, it's wrapped in a Future.
+
+185
+00:12:37,330 --> 00:12:38,700
+How do we get it out?
+
+186
+00:12:38,700 --> 00:12:42,990
+Well, what we have is, we have our
+onComplete function
+
+187
+00:12:42,990 --> 00:12:46,920
+so we give it two call backs when it's
+success.
+
+188
+00:12:46,920 --> 00:12:50,570
+In that case, we can send the packet to
+Europe and back
+
+189
+00:12:50,570 --> 00:12:55,330
+and if it fails, well, whatever we do
+there we probably propagate the
+
+190
+00:12:55,330 --> 00:13:00,130
+failure directly.
+But, you see here the red
+
+191
+00:13:00,130 --> 00:13:05,230
+squigglies, and now they're green
+squigglies this
+
+192
+00:13:05,230 --> 00:13:10,710
+is not type correct because on complete
+took a function
+
+193
+00:13:10,710 --> 00:13:16,390
+here, the success function, took a, was a
+function here from success to unit.
+
+194
+00:13:16,390 --> 00:13:20,760
+And the whole onComplete.
+The, the whole result
+
+195
+00:13:20,760 --> 00:13:26,220
+of this is of type unit.
+Whereas what we want, is we want it to
+
+196
+00:13:26,220 --> 00:13:32,080
+be of type future of array of byte.
+So that is the result type of this.
+
+197
+00:13:32,080 --> 00:13:37,600
+But unfortunately, the signature of on
+complete doesn't allow
+
+198
+00:13:37,600 --> 00:13:42,990
+us to return the future as such.
+What can we do about that?
+
+199
+00:13:45,020 --> 00:13:52,260
+Well one thing that we can do is that we
+push the rest of the
+
+200
+00:13:52,260 --> 00:13:59,330
+computation inside the success case here.
+So again we read our socket from memory.
+
+201
+00:13:59,330 --> 00:14:06,060
+And now inside the success branch, we can
+continue writing regular code.
+
+202
+00:14:06,060 --> 00:14:10,240
+So we can now say here's our confirmation,
+which of type future of array
+
+203
+00:14:10,240 --> 00:14:15,400
+of byte, which is the result of sending
+the packet to Europe and back.
+
+204
+00:14:15,400 --> 00:14:18,850
+But this is not really helping us because
+now we have to move
+
+205
+00:14:18,850 --> 00:14:22,630
+all the rest of the computation in here
+and you can already see
+
+206
+00:14:22,630 --> 00:14:28,310
+if there's failures and success this will
+become like a very, and I'm
+
+207
+00:14:28,310 --> 00:14:34,310
+waving my hands on purpose here, this will
+be a very spaghetti like code.
+
+208
+00:14:34,310 --> 00:14:35,390
+And spaghetti
+
+209
+00:14:35,390 --> 00:14:38,220
+is great as food but not good as code.
+
+210
+00:14:40,760 --> 00:14:46,060
+We're going to punt on how to write better
+code using Futures
+
+211
+00:14:46,060 --> 00:14:51,760
+for a little bit, because first I want to
+show you how you can create Futures, okay?
+
+212
+00:14:51,760 --> 00:14:53,310
+And how do we create futures?
+
+213
+00:14:53,310 --> 00:14:57,590
+Well, like with all threads, we look at
+the companion object.
+
+214
+00:14:57,590 --> 00:15:03,540
+And here's the companion object for
+futures and there is the apply method.
+
+215
+00:15:03,540 --> 00:15:07,040
+And the apply method takes a body and
+
+216
+00:15:07,040 --> 00:15:11,080
+an implicit execution context and returns
+a Future.
+
+217
+00:15:11,080 --> 00:15:14,420
+And this is the context in which the
+Future is run.
+
+218
+00:15:14,420 --> 00:15:14,730
+'Kay?
+
+219
+00:15:14,730 --> 00:15:16,930
+So, you see that here in the comments.
+
+220
+00:15:16,930 --> 00:15:19,710
+When you create the future using the
+constructor method
+
+221
+00:15:19,710 --> 00:15:23,770
+here, it creates an asynchronous
+computation to which you can
+
+222
+00:15:23,770 --> 00:15:26,950
+give a call back on which you will be
+notified
+
+223
+00:15:26,950 --> 00:15:30,390
+when the value here is ready, when this
+computation terminates.
+
+224
+00:15:32,740 --> 00:15:35,660
+Just like we drilled down into our little
+adventure
+
+225
+00:15:35,660 --> 00:15:42,470
+game, let's look at a possible
+implementation of readFromMemory.
+
+226
+00:15:42,470 --> 00:15:45,390
+And to readFromMemory, and then send
+something
+
+227
+00:15:45,390 --> 00:15:47,240
+to Europe, well, what should we do?
+
+228
+00:15:47,240 --> 00:15:50,680
+Well, let's read email messages from
+memory.
+
+229
+00:15:50,680 --> 00:15:53,850
+So what we will do is we'll define a
+queue, and in
+
+230
+00:15:53,850 --> 00:15:57,840
+the queue we will have a list of messages
+from the various
+
+231
+00:15:57,840 --> 00:16:04,600
+instructors of this course to each other
+and then we read a message from memory.
+
+232
+00:16:04,600 --> 00:16:09,450
+We have to serialize it because we needed
+a byte array to send the packet.
+
+233
+00:16:09,450 --> 00:16:12,080
+And, so we then serialize.
+
+234
+00:16:12,080 --> 00:16:15,660
+We, we grab a serializer and we serialize
+the email.
+
+235
+00:16:15,660 --> 00:16:18,620
+And now we get a byte array.
+
+236
+00:16:18,620 --> 00:16:23,020
+But we have to turn this into a future so
+that, here we recall,
+
+237
+00:16:23,020 --> 00:16:24,710
+the future constructor.
+
+238
+00:16:24,710 --> 00:16:30,260
+So now, even though this will take a long
+time, what was it again, three days.
+
+239
+00:16:30,260 --> 00:16:32,050
+Because we call the future.
+
+240
+00:16:33,270 --> 00:16:34,810
+Factory method here.
+
+241
+00:16:34,810 --> 00:16:37,370
+This will run on the background thread and
+when
+
+242
+00:16:37,370 --> 00:16:40,510
+you call read from memory, you want block
+on that.
+
+243
+00:16:40,510 --> 00:16:48,250
+You can pass a function to onComplete that
+will be called when the value is
+
+244
+00:16:48,250 --> 00:16:53,520
+actually read from memory.
+Well, let's do a little
+
+245
+00:16:53,520 --> 00:16:59,360
+quiz.
+Here is a, our packet.
+
+246
+00:16:59,360 --> 00:17:02,720
+We use our newly defined function,
+readfFromMemory.
+
+247
+00:17:02,720 --> 00:17:08,950
+So now, instead of just an array of byte,
+it returns a future of an array of byte.
+
+248
+00:17:08,950 --> 00:17:13,720
+And now let's call onSuccess twice
+
+249
+00:17:13,720 --> 00:17:20,460
+on this packet.
+And here, we import the execution context.
+
+250
+00:17:20,460 --> 00:17:26,550
+So what will happen is this execution
+context will be used to run this callback
+
+251
+00:17:26,550 --> 00:17:31,730
+and this callback but the question is
+after this code here.
+
+252
+00:17:31,730 --> 00:17:36,790
+Say that both on success callbacks have
+been called.
+
+253
+00:17:36,790 --> 00:17:38,730
+How many messages are left in
+
+254
+00:17:38,730 --> 00:17:42,780
+the email queue?
+Take a few minutes to think about that.
+
+255
+00:17:42,780 --> 00:17:45,620
+What do you think would be the most
+natural answer?
+
+256
+00:17:48,200 --> 00:17:49,290
+All right.
+
+257
+00:17:49,290 --> 00:17:53,880
+So, I was a little bit mean to you,
+because I didn't explain how
+
+258
+00:17:53,880 --> 00:17:58,080
+this work, but I asked you what do you
+think is the most natural answer.
+
+259
+00:17:58,080 --> 00:18:02,220
+Well, what you expect is that once the
+future completes,
+
+260
+00:18:03,930 --> 00:18:08,325
+every time you call onSuccess, you will
+get the same answer so that the future
+
+261
+00:18:08,325 --> 00:18:13,840
+caches the result, right?
+You, the future meant that it's the result
+
+262
+00:18:13,840 --> 00:18:19,630
+of the computation that may happen later
+in time and so what you, what you want is
+
+263
+00:18:19,630 --> 00:18:26,130
+that this thing really represents this
+single value of type array of bytes, okay?
+
+264
+00:18:26,130 --> 00:18:30,440
+So, if you call onSuccess here, you get
+the array of bytes that is read from
+
+265
+00:18:30,440 --> 00:18:34,070
+memory, and this value of packet and when
+
+266
+00:18:34,070 --> 00:18:37,790
+you call onSuccess again, you get the same
+value.
+
+267
+00:18:37,790 --> 00:18:39,000
+It's the same with a regular
+
+268
+00:18:39,000 --> 00:18:42,930
+variable, if you read From a variable
+twice you get the
+
+269
+00:18:42,930 --> 00:18:46,730
+same value if it hasn't been assigned to
+in the meantime.
+
+270
+00:18:48,170 --> 00:18:48,780
+Okay?
+
+271
+00:18:48,780 --> 00:18:56,550
+So the right answer, how many messages are
+left in the e-mail queue, is b.
+
+272
+00:18:56,550 --> 00:18:58,225
+There were three messages in there.
+
+273
+00:18:58,225 --> 00:19:04,020
+I've taken one out, even though I call
+onSuccess twice,
+
+274
+00:19:04,020 --> 00:19:07,390
+only one message is taken out, so b is the
+correct answer.
+

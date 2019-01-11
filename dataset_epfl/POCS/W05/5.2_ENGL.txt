@@ -1,0 +1,218 @@
+We've defined the gold standard for the semantics of transactions to be serializability.
+That means given a schedule of transactions, if you can say, and show, and understand that this schedule is equivalent to a serial execution of the transactions, where transactions don't execute concurrently, but one after the other, completely, then such transactions are called serializable--that's what we desire.
+Now, in this video, we're going to talk about one family of techniques, based on locking, for achieving serializability.
+Specifically, we're going to now introduce the notion of <i>conflict serializability</i>.
+That's a special case of serializability.
+Whenever a schedule is conflict serializable, it's also serializable, but not necessarily vice versa.
+So two schedules are conflict equivalent if they invoke the same actions of the same transactions, and every pair of conflicting actions is ordered in the same way.
+We're going to see by example what that means, exactly.
+We can actually formalize this via the notion of the dependency graphs.
+In any case, conflict equivalence implies equivalence.
+It's a special case, I would say a stronger condition.
+And if a schedule is conflict equivalent to a serial schedule, then we call it <i>conflict serializable</i>.
+So just like serializability means that a schedule is equivalent to a serial schedule,
+<i>conflict serializability</i> means it's conflict equivalent to a serial schedule.
+Now, how do we decide when a schedule is conflict equivalent?
+Let's look at this example.
+There's two transactions, again, shown by this timeline.
+And we can build a dependency graph where each node, or each transaction has a node for itself, and the enter edge from one transaction to another transaction.
+If there is a dependency in the schedule of the following form that either one transaction writes one particular object that another transaction afterwards reads, that means a write-read conflict so to say, that would mean for that object you might get an error from the writing transaction to the reading transaction.
+Also, if one transaction first reads, and the other one afterwards writes, we've got a read-write conflict, and you would make a dependency edge in the dependency graph.
+And similarly, if you've got a write-write conflict.
+There are three kinds of anomalies.
+If one transaction first writes, and the other one afterwards reads the same object again, then we will enter an edge from the first to the second transaction.
+We will also usually label these edges with the kind of object that was the culprit, so to say, which was responsible for the dependency.
+Remember, there is no read-read conflicts.
+If all transactions only read, there's no change to the database, in a sense, then we don't have to worry about concurrency and about changes, because there are no changes, and nothing bad can happen.
+Everybody will read the same version of the database, and nothing's getting changed, and everything is safe.
+So we have write-read, read-write, and write-write conflicts.
+Now, we built this dependency graph that way.
+In this example we've got an edge from T1 to T2 labeled A, because T1 first writes A, and T2 afterwards reads A.
+And we've got an edge from T2 to T1 labeled B, because T2 first writes B, and then T1 reads B.
+You can see that there's a cycle in this dependency graph, and that cycle evidences the problem.
+The edge from T1 to T2, labeled A, shows that there is a write-read conflict between T1 and T2, and to make this serializable you would really need a serialization where T1 is actually going to be for T2, and vice versa: the edge from T2 to T1 says that basically, to make this serializable, we would have to show that it's equivalent to serial schedule where T2 is completely executed before T1.
+So there is this kind of mutual conflict:
+T1 has to be before T2, and T2 has to be before T1, and that's of course not both possible.
+That means whenever we've got a cycle in this dependency graph then it is not conflict serializable, and thus also not, in general, not serializable.
+So let me repeat: we can construct a dependency graph as follows.
+There is one node for each transaction, and there is an edge from the first to the second transaction, but the second transaction never depends on the first by a particular object-- and depends means there's either write-read, a read-write, or a write-write conflict.
+And this dependency graph completely determines, via cyclicity, whether a schedule is conflict serializable.
+That means a schedule is conflict serializable if an only if its dependency graph is acyclic.
+Now there is a nice general technique for determining conflict serializability, or to actually guaranteeing serializable schedules that are also conflict serializable, using locking.
+For that I'll introduce you to the <i>Two-Phase Locking Protocol</i>.
+It works as follows--
+Each transaction must obtain a read lock, or so-called <i>shared</i> lock on an object before it can read, and then an <i>exclusive</i>, or write lock on an object before it can write.
+So the read lock is called <i>shared lock</i> because if one transaction has a read lock, then a second transaction can also get a read lock, but if anybody has a read lock, then nobody can get a write lock.
+And if somebody gets a write lock on something that is purposely unlocked, an <i>exclusive lock</i>, it's exclusive, and nobody else can read or write.
+So these kinds of locks basically will guarantee us to avoid these write-write, read-write, and write-read conflicts.
+And the notion of shared lock basically enables us to have concurrent reads, which are by themselves innocuous.
+A transaction will have a certain kind of lock grow phase, where initially it can get more and more locks, up to a point where it decides to do some more work, and then maybe starts releasing locks, but once it has released a single lock it cannot get another lock.
+For that reason you've got so-called <i>two-phases</i>, a first growth phase, where we only monotonously add more locks, but not remove any, and later a release phase, where we can only release locks, but cannot get any further locks.
+The <i>Two-Phase Locking Protocol</i> is also abbreviated by 2PL, we sometimes call it just 2PL.
+There's an important modified version of the <i>Two-Phase Locking Protocol</i> called a <i>Strict Two-Phase
+Locking Protocol</i>, that works like 2PL, but in addition, there's an additional constraint that says that all locks held by a transaction are released all together at the time the transaction completes.
+That means the second phase, of the release phase of the <i>Two-Phase Locking Protocol</i>, happens all of a sudden, at once.
+So in a sense you don't need a specific free-lock command, but you can allocate more locks, more locks, more locks, you can do work, and at the point you commit or abort, all locks are automatically released.
+And you don't do this by hand, all of them are released at the same point in time.
+Now already the first protocol, the 2PL protocol, allows only schedules whose precedence graph, the dependency graph, is acyclic.
+That means they're conflict serializable and thus serializable.
+So this locking protocol guarantees serializability, which is what we want, after all.
+There is a reason for having the strict two-phase locking protocol, and that's it simplifies transaction aborts.
+So remember this notion of cascading aborts.
+If I have just two-phase locking, not strict two-phase locking,
+I might start releasing some locks before I'm committing, maybe long before I'm committing, and during this time-- from the time I release my first lock to the time I commit, another transaction might obtain that lock on this object, and it might start, for example, reading a value that I've already written.
+So if I'm late to abort,
+I would cause and force the second transaction-- it hasn't read my value, because I released the lock-- also to abort, so I can cause cascading aborts.
+On the other hand, in strict two-phase locking, there is no need for cascading aborts, so handling aborts is much easier.
+There is one thing to mention, though, that in both cases, even for strict two-phase locking, but also for classical two-phase locking, bad locks are possible, because the growth phase, where we allocate locks, is not happening atomically, at one point in time like the release phase is in strict two-phase locking.
+That means, for example,
+I might have two transactions, where both try to allocate two resources, A and B, but the first transaction allocates A first, and then tries to allocate B, and the second tries to allocate B first, and then tries to allocate A.
+So it could happen that both transactions each have one object, and try to wait for the other object, which cannot be released because these two transactions wait individually for each other.
+That means I've got kind of the dining philosopher's problem here, and I get a deadlock.
+So we have to deal with deadlocks separately, and neither of these two protocols avoids them.
+There is basically two important ways of doing this.
+One is deadline detection, the other one is deadlock prevention.
+Deadlock detection, I can basically obtain by yet another dependency graph.
+So what I'm going to do is basically
+I'm going to have, again, a dependency graph with the nodes and transactions, and I'm going to have an edge whenever one transaction waits for an object that another transaction already has allocated.
+That means I'm going to draw an edge from transaction T1 to transaction T2, if T2 owns an object, has a lock-in object, that T1 also wants.
+So I can put again a label on it, for this object, and that means basically
+T1 will be blocked until T2 releases this lock.
+And of course, if I get a cycling, only if I get a cycling in this graph,
+I've got a deadlock.
+So I can easily, while I lock, create this dependency graph, and then I get a cycle, I know
+I have to do something about this.
+What can I do?
+Well, I could kill a transaction.
+The idea is simple, but let's look at an example.
+This actually is slightly a big example, illustrates maybe some other ideas, as well, that we've discussed so far.
+So we've got four transactions here, and what you see is, again, the read and write commands, but now we've also explicitly denoted locking commands.
+There is the S of A, for example, in T1, that actually creates a shared lock on A.
+And the X of B in T2 creates an exclusive lock on B.
+Of course we have to assume that these are possible, otherwise they would not be executed, or the transaction would have to fail.
+So we see that we are creating a shared lock for A, reading A in T1, then we create an exclusive lock for B to write, and write, actually, in T2, for B.
+Then we are going to shared lock for C, in T3, and read C, and next I will need to try to get an exclusive lock on C in T2, that means we plan to write.
+Then we're going to try to get an exclusive lock for B in T4, and, finally, an exclusive lock for A in T3.
+So the dependency graph,
+I'll show it to you first, before we do this final operation of getting exclusivity lock on A.
+And what you see is we'll have three edges.
+There is an edge from T1 to T2, because at the time we created a shared lock for B in T1, there was already an exclusive lock for B.
+That means T1 would have to wait for T2.
+So we make an arrow from T1 to T2, because T1 has to wait for T2, because of B, it wants a lock at B, but it cannot get it, because right now T2 has a lock on B.
+So T1 is right now blocked, basically, until T2 releases the lock.
+Now we also have an edge from T2 to T3, because T2 tries to get an exclusive lock on C while T3 already has a shared lock on C.
+That means T2 now gets blocked until T3 releases the lock on C.
+And then, in transaction T4 we tried to get an exclusive lock on B, but T2 already has a lock on B, actually an exclusive lock, that means T4 is not blocked, and waits for T2.
+We have not reached a deadlock yet, because T3 can still execute.
+But now let's execute this final operation, trying to obtain an exclusive lock on A in T3.
+This will now make T3 wait for T1, because T1 has a lock on A, which means now that we've got a cycle in the dependency graph:
+T3 waits for T1, T1 waits for T2, and T2 waits for T3, and that's a deadlock, so we have to do something.
+We'll have to kill a transaction to be able to continue.
+There is also the possibility of avoiding deadlocks, preventing deadlocks, by using timestamps on transactions.
+That means we could create, at a time any transaction starts, a timestamp, a start timestamp for the transaction, recording when it starts, how old the transaction is, and then essentially using this timestamp to bring a greater notion of fairness to transactions, to avoid starvation.
+A transaction that is older might have higher priority than others, and a transaction that is older might get priority to continue and finish over other transactions.
+There might be several strategies that we could now enforce to deal with this.
+So let's assume that we've got timestamps for each transaction, noting down essentially the time, logical or physical, when the transaction started.
+And this totally old transactions, let's assume that.
+First priority will be that if Ti, transaction Ti, has a higher priority, is maybe older, then Ti will wait for Tj, if Tj has a lock.
+Otherwise, Ti would abort.
+That means a high priority, an older transaction, will wait to get a lock, while if a new transaction tries to obtain a lock that an older transaction already has, it will get killed, so there will be no blocking for that reason.
+So that way, at some point old transactions get really executed, and don't get killed all the time that a new transaction comes and wants something from them.
+The alternative would be the second strategy, where if Ti has a higher priority, then Tj aborts, and otherwise Ti waits.
+So that means sometimes we start transactions, they have to-- again, from scratch-- continue doing everything as they did before, in the same order, basically, as they've executed so far, and just the order in which locks are trying to be obtained is different, and ultimately, everybody gets their turn, and the highest priority transactions, so to say, are sure to ultimately finish and succeed.
+Now here's a problem.
+If we relax the assumption that the database is just static, and a fixed collection of objects that never change, then two-phase locking, even strict two-phase locking do not ensure serializability.
+So if you allow to insert new items, or delete items, then we are getting into trouble.
+And to illustrate this, here's an example.
+Let's look at the schedule at the bottom of this slide.
+First, let's ignore these little stars and primes.
+So in that sense it's a classical schedule.
+Think of this I of A and D of B, which are going to be insertions and deletions, just as writes, for now.
+So what happens?
+We are trying to get a shared read lock and read A, in transaction T1, then I'm trying to write A and write B.
+And then, again, we want to read B in T1, and, finally, write C in T1.
+We have a read-write dependency from T1 to T2, and a write-read dependency from T2 to T1.
+And I just added this write C in T1 to make it not a completely read-only transaction.
+Well, obviously that's one of these classical and nested scenarios, where there is no serial schedule that's equivalent.
+We cannot move T2 first, because of that read-write dependency on A, and we cannot move T1 first, because of that write-read dependency on B.
+So this is obviously not conflict serializable, and thus not serializable.
+We will detect this using locking.
+But now what happens if we are not doing any more writes in T2, but we're actually doing insertions and deletions?
+Now here's the example.
+In this example I use a database schema where we've got the database of a sailing club, and in this database we have records for each sailor in the club, and each sailor has an age, among the things that are stored of him, and the rating--how good a sailor he is, or something like that.
+So now let's try to do the following thing.
+T1 tries to lock all the pages containing sailor records with a shared lock, a read lock, just to find the oldest sailor of rating = 1.
+So what I'm doing is basically with this A* in my schedule below is I'm trying to lock all the A records, the A records being the sailors with rating = 1.
+I do this just to be able to read them, to find out who's the oldest sailor among those with rating = 1.
+Next, we're going to insert a new sailor of rating = 1, an even older one, in T2.
+So this sailor should have been the winner if T2 had happened before T1.
+But since T1 happens before T2, initially, we'll not find this oldest sailor, we find only the second-oldest sailor, the oldest sailor that was already in the database before this new insert.
+The next step is that T2 also tries to delete the oldest sailor of rating = 2, and we call this oldest sailor of rating = 2 "B".
+After that T1 tries to lock all the pages, all the B pages, all the pages that are rating = 2, and find the oldest sailor.
+Well, you'll find only the second-oldest sailor, because the oldest sailor of rating = 2 has just been deleted.
+So we have these dependencies, just like we have classical read-write conflicts, although there are no objects appearing/disappearing.
+So that's a problem, because we cannot easily modify our technique so far to deal with this.
+There are a number of techniques to deal with this in database systems, and I'll just mention them briefly, the two main techniques.
+The first one is <i>index locking</i>.
+Just imagine you've got an index structure over these items, particularly an index structure that finds the sailors by rating, and maybe even sorted by age within the rating.
+And it's a dense index, like a B-tree, such that it covers all the values in our database.
+So I can, for example, then lock a node in that tree index, and if I force my database system to always access the data through this index, and no other way, that means if anybody wants to see the data they have to search the values through that index-- locking a node that basically locks an entire range of values, maybe all the values that correspond to that particular rating, guarantees us that entire range of ratings, also future values of that rating, which would have to be inserted in this B-tree at this point, if we would insert them, are locked.
+So using an index structure I can lock a particular predicate, so to say, and all future tuples that are not in there yet either.
+So that's one way of doing this, but it of course requires that there is a suitable index structure, and that it's used as the only way to access the data so that you don't do anything wrong, because then you're going to lock the index structure, or part of the index structure, right in the data itself.
+The alternative would be
+<i>predicate locking</i>.
+That means basically we're going to have some kind of store that remembers which kind of conditions are on the data we have used to search for, for example--
+For example, if we remember that somebody looked for all of the people of rating = 1, and if I now want to insert somebody of rating = 1
+I will be locked until that first transaction is finished.
+This of course is complicated, because it means-- it requires every time a static analysis of the queries.
+And that has a certain kind of complexity, of course, and challenges associated with it.
+To finalize this video, just to make you remember that conflict serializability is not the same as serializability.
+Whenever a schedule is conflict serializable, it is also serializable, so we are safe.
+But there are serializable schedules that we don't find conflict serializable.
+That means there are schedules that we might lock up, and say they are bad, but they're actually okay.
+Nothing bad can happen.
+Why is that?
+Well, in general, serializability is an undecidable condition of sets of transactional programs, and we have no chance of doing this automatically, finding it out.
+And conflict serializability is a very easy syntactic condition, so there is no chance, there is no hope that conflict serializability guarantees or covers all of serializability.
+That said, here's a notion of a special class of serializable schedules that is more general than conflict serializability, but it's actually still not all of serializability.
+This condition, it's a semantic condition, it's more complicated, more difficult to check, more computationally expensive to check than conflict serializability, but it is actually still decidable,
+I think it is NP-complete.
+So this is not covering serializability, it's a class strictly in between.
+Everything that is view serializable is also serializable, and everything that is conflict serializable is also view serializable.
+But there are view serializable problems which are not conflict serializable, and there are serializable problems which are not view serializable.
+So how does it work?
+Well, I can talk about two schedules being view equivalent, which implies equivalence, but not conflict equivalence.
+If whenever some transaction Ti reads the initial value of A in S1, then Ti also reads the initial value of A, some object A, in S2.
+That means the initial values of each object are read by the same guys, in both schedules.
+What does initial value mean?
+Well we imagine that there is some consistent database, there are no transactions running yet, and now the schedule starts, and several transactions start in some order, and initial value means the state of the database just before any of these transactions started.
+Now the second condition is one of something classical-- if Ti reads the value of some object A written by Tj before, in S1, then Ti also reads the value written by Tj in S2.
+And finally, the corresponding condition for final values, final values being the values that you will have in the database after all these transactions commit, so if Ti writes--transaction Ti writes the final value of A in S1, then it also writes the final value of A in S2, and not somebody else, not another transaction.
+So let's understand this...
+Here are two examples, below.
+The left schedule has three transactions,
+T1 reading A,
+T2 writing A, and then T1 reading A again.
+And, finally, T3 writing A.
+Now, if we look at this, this schedule is not conflict serializable, because obviously, if I just look at T1 and T2, there is a read-write conflict from T1 to T2, and a write-write conflict from T2 to T1.
+So there's a cycle of dependency graph, so this one is not conflict serializable.
+Now if we look at this entire schedule, though, it is equivalent to the schedule on the right side.
+Look at the schedule on the right, it's the same, just that these two writes, of A in T1 and T2 have been reordered, and now it's actually a completely serial schedule.
+T1, as given, finishes before T2 starts,
+T2 finishes before T3 starts.
+So this right schedule is serial, and that's also serializable.
+The left schedule is equivalent to it...why?
+Well, yes, if I would look only into section T1-T2 it wouldn't be equivalent, but we are reordering this write of A of T1 and T2, but what we write is anyway unimportant, because T3 will overwrite it, in the end.
+In both schedules, the final write of object A is done by T3, and that means whoever wrote, in which order before this particular value, it doesn't matter.
+So that connects basically the second and the third condition of this definition.
+That means if the schedule consisted only of the first and the second transactions, but not of the third, then we would indeed have a non-serializable schedule, but adding another transaction, that basically makes certain write orders unimportant, enables us to see that this particular schedule on the left-hand side is equivalent to a serial schedule, the one given on the right-hand side.
+And we can find this using this view equivalent definitions in this case.
+So this is indeed a more general condition, a conflict serializable.
+Serializability needs and it still guaranteed serializability.
+But remember, there are yet other serializable transactions that are not covered by view serializability.
+That concludes this video, and what we've done, in summary, is we have talked about locking techniques for ensuring serializability.
+So locking is a very natural way to do this in systems, obviously, and we're familiar with locking from basic systems programming courses, and there's no magic to it.
+But one thing to keep in mind is there are also other techniques that are not based on locking.
+Actually nowadays, in current, modern database management systems, locking is not the default technique for achieving what people usually use in concurrency control, and I'll go over this in more detail in a different video.
+But locking, in a strong sense, connects to conflict serializability, which is an important definition, purely syntactically enforceable by a dependency graph.
+And you've also seen that it is not all of serializability, there is more to it.

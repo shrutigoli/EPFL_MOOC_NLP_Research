@@ -1,0 +1,1940 @@
+1
+00:00:03,340 --> 00:00:06,433
+Bienvenue, la nature, dans le code,
+nous sommes dans le chapitre 6 leçon 9.
+
+2
+00:00:06,433 --> 00:00:09,293
+Dans cette leçon, nous allons
+mettre en œuvre toute la sélection
+
+3
+00:00:09,293 --> 00:00:12,938
+et les fonctions de sélection du parasite
+puis nous sortons les données
+
+4
+00:00:12,938 --> 00:00:16,886
+que nous avons généré dans le navigateur
+pour voir quel genre de dynamique
+
+5
+00:00:16,886 --> 00:00:20,425
+nous obtenons dans une telle simulation
+évolutive d'hôte-parasite.
+
+6
+00:00:20,570 --> 00:00:24,265
+Avant de faire cela, juste un rappel,
+ceci est notre matrice d'aptitude
+
+7
+00:00:24,265 --> 00:00:26,797
+Nous avons ces  modèles correspondant
+d'allèle,
+
+8
+00:00:26,797 --> 00:00:29,690
+où, si le parasite correspondant
+à l'allèle de l'hôte,
+
+9
+00:00:29,690 --> 00:00:32,332
+il y aura une infection,
+sinon, il n'y aura pas,
+
+10
+00:00:32,332 --> 00:00:34,830
+et ce sont les valeurs de conditionnement
+physique correspondant.
+
+11
+00:00:34,830 --> 00:00:40,080
+Donc, ceci est la matrice d'aptitude,
+et nous référerons à cela un assez souvent.
+
+12
+00:00:40,080 --> 00:00:43,160
+Une autre chose que je veux
+en parler brièvement,
+
+13
+00:00:43,160 --> 00:00:46,125
+et ceci est juste un rappel de
+quelque chose que nous savons déjà.
+
+14
+00:00:46,125 --> 00:00:49,459
+Comment pouvons-nous mettre en œuvre
+maintenant ceci concrètement?
+
+15
+00:00:49,459 --> 00:00:54,974
+Eh bien, avant, nous avons dit la fréquence
+d'un génotype est fondamentalement,
+
+16
+00:00:54,974 --> 00:00:57,900
+dans la prochaine génération,
+c'est fondamentalement la fréquence
+
+17
+00:00:57,900 --> 00:01:02,560
+que nous avons maintenant fois l'aptitude
+et nous appelons cela w.
+
+18
+00:01:02,560 --> 00:01:05,130
+Et puis en fin de compte, étant donné
+qu'il ya beaucoup de génotypes,
+
+19
+00:01:05,130 --> 00:01:06,800
+nous devons normaliser cela,
+
+20
+00:01:08,310 --> 00:01:12,200
+et nous avons utilisé
+ce facteur ici w barre,
+
+21
+00:01:12,200 --> 00:01:15,720
+que nous avons appelé l'aptitude moyenne.
+
+22
+00:01:15,720 --> 00:01:19,059
+Mais il faut savoir que cela est juste
+un facteur de normalisation,
+
+23
+00:01:19,059 --> 00:01:22,439
+essentiellement, la somme de ces termes
+pour chaque génotypes.
+
+24
+00:01:23,554 --> 00:01:26,525
+Bon, donc concrètement qu'est ce que
+cela signifie dans notre modèle ici?
+
+25
+00:01:26,525 --> 00:01:31,395
+Eh bien, imaginez que vous êtes
+un hôte de type A1.
+
+26
+00:01:31,395 --> 00:01:33,344
+Quel est votre condition physique?
+
+27
+00:01:33,344 --> 00:01:38,239
+Donc, l'aptitude de l'hôte, l'un,
+à la prochaine génération est,
+
+28
+00:01:38,628 --> 00:01:41,280
+en utilisant cette formule,
+l'aptitude de cet hôte,
+
+29
+00:01:41,280 --> 00:01:46,044
+lors de la génération précédente ou actuelle,
+ceci est la prochaine génération,
+
+30
+00:01:46,044 --> 00:01:53,907
+fois son aptitude, de sorte que ce sera WH1
+et ensuite normalisées par un terme ici.
+
+31
+00:01:53,907 --> 00:01:58,679
+Maintenant, l'aspect très important à propos
+de toute cette notion de co-évolution,
+
+32
+00:01:58,679 --> 00:02:01,761
+ou la sélection dépendant de la fréquence,
+est que cette valeur d'aptitude,
+
+33
+00:02:01,761 --> 00:02:03,586
+est maintenant, pas fixe.
+
+34
+00:02:03,586 --> 00:02:07,780
+D'accord. C'est ce que nous avons supposé avant,
+nous l'avons donné une certaine valeur,
+
+35
+00:02:07,780 --> 00:02:10,873
+mais maintenant la clé de
+la dépendance de la fréquence,
+
+36
+00:02:10,873 --> 00:02:17,045
+c'est que ceci n'est pas une valeur fixe,
+cela dépendra d'autres fréquences.
+
+37
+00:02:17,045 --> 00:02:20,434
+Dans ce cas particulier, cela dépendra,
+par exemple, des fréquences
+
+38
+00:02:20,434 --> 00:02:22,984
+des parasites qui sont autour.
+
+39
+00:02:22,984 --> 00:02:26,226
+Et donc nous avons besoin
+de calculer, à chaque génération
+
+40
+00:02:26,226 --> 00:02:29,726
+parce que ce sera différent
+à chaque génération.
+
+41
+00:02:30,035 --> 00:02:33,054
+Alors, comment nous calculons cela?
+Eh bien, en supposant que le fait,
+
+42
+00:02:33,054 --> 00:02:39,070
+vous êtes un hôte A1, maintenant vous pouvez
+exécuter en deux types de parasites.
+
+43
+00:02:39,070 --> 00:02:42,085
+Vous pouvez courir dans parasite A1 ici,
+dans notre modèle,
+
+44
+00:02:42,085 --> 00:02:46,090
+ou vous pouvez exécuter en parasite A2.
+
+45
+00:02:47,091 --> 00:02:56,211
+Ceux-ci se produisent, en utilisant cette
+notion, à la fréquence P1 et P2.
+
+46
+00:02:56,829 --> 00:03:00,310
+Donc, nous n'avons plus
+de considérations spatiales,
+
+47
+00:03:00,310 --> 00:03:04,560
+alors l'hypothèse c'est que vous souhaitez
+exécuter dans ces parasites au hasard,
+
+48
+00:03:04,560 --> 00:03:07,701
+et donc la probabilité d'exécuter
+dans un parasite A1,
+
+49
+00:03:07,701 --> 00:03:09,556
+est en fait, sa fréquence.
+
+50
+00:03:09,556 --> 00:03:13,066
+Et de la même manière, la probabilité
+de fonctionner dans un parasite A2,
+
+51
+00:03:13,066 --> 00:03:14,920
+est sa fréquence.
+
+52
+00:03:14,920 --> 00:03:19,780
+Donc, nous pouvons calculer
+l'aptitude de H1.
+
+53
+00:03:19,780 --> 00:03:23,715
+En ce moment-là, c'est simplement
+la probabilité
+
+54
+00:03:23,715 --> 00:03:30,629
+qu'il fonctionne dans un parasite A1, fois
+l'aptitude que vous ferez l'expérience
+
+55
+00:03:30,629 --> 00:03:34,790
+comme cet hôte A1, lorsque vous
+exécutez dans un parasite A1.
+
+56
+00:03:34,790 --> 00:03:38,851
+Donc, ceci est l'élément de la matrice
+d'aptitude à partir de la diapositive précédente.
+
+57
+00:03:39,263 --> 00:03:44,060
+Donc, plus la probabilité que vous exécutez
+dans une P2 ou A2 plutôt,
+
+58
+00:03:44,060 --> 00:03:46,848
+désolé, les parasites, donc FP2.
+
+59
+00:03:46,848 --> 00:03:49,896
+Et puis, le temps d'aptitude
+que vous rencontrez,
+
+60
+00:03:49,896 --> 00:03:58,130
+quand vous en tant que H1, donc quand hôte A1 ,
+expérimente ou interagit avec un parasite
+
+61
+00:03:58,130 --> 00:04:01,440
+du génotype A2.
+
+62
+00:04:01,734 --> 00:04:06,283
+Et encore, cela est également
+de la matrice d'aptitude correspondante.
+
+63
+00:04:06,283 --> 00:04:13,040
+Et supposons, par exemple, nous allons
+faire quelque exemple concret de valeurs.
+
+64
+00:04:13,040 --> 00:04:20,257
+Disons que la fréquence de P1 de parasite A1,
+est maintenant de 20%, donc ce serait 20%.
+
+65
+00:04:20,257 --> 00:04:23,363
+De ce fait, ce serait 80%.
+
+66
+00:04:23,363 --> 00:04:31,915
+Et ici, cette valeur, rappelez-vous,
+vous êtes un hôte; vous serez infecté,
+
+67
+00:04:31,915 --> 00:04:36,325
+parce que nous avons ici, les allèles correspondant,
+les deux ont A1, donc cela signifie
+
+68
+00:04:36,325 --> 00:04:38,713
+si vous regardez l'élément
+dans la matrice d'aptitude,
+
+69
+00:04:39,706 --> 00:04:44,663
+la valeur ici, va être un SH moins,
+quel que soit ce qu'est SH.
+
+70
+00:04:45,465 --> 00:04:47,334
+Corrélativement la valeur ici,
+si vous regardez ça,
+
+71
+00:04:47,334 --> 00:04:52,042
+c'est un, parce que les parasites A2
+ne seront pas en mesure de vous infecter,
+
+72
+00:04:52,042 --> 00:04:56,240
+avec votre A1 génotype comme un hôte.
+Ainsi, la valeur ici, est un.
+
+73
+00:04:56,240 --> 00:04:59,820
+Et pour un moment particulier
+dans le temps,
+
+74
+00:04:59,820 --> 00:05:04,388
+c'est l'aptitude des génotypes H1,
+des génotypes hôtes.
+
+75
+00:05:04,388 --> 00:05:07,844
+Et vous pouvez facilement voir ici,
+que ce sera probablement différente
+
+76
+00:05:07,844 --> 00:05:12,490
+dans chaque génération, parce que
+ces valeurs vont changer les fréquences
+
+77
+00:05:12,490 --> 00:05:15,172
+d'hôte, des parasites.
+
+78
+00:05:15,743 --> 00:05:19,128
+L'aptitude est ici.
+Ceux-ci ne change pas.
+
+79
+00:05:19,128 --> 00:05:20,330
+Ceux-ci sont fixés.
+
+80
+00:05:20,330 --> 00:05:24,994
+L'hypothèse que vous soyez infecté quand
+il y a un allèle correspondant.
+
+81
+00:05:24,994 --> 00:05:27,862
+Vous ne serez pas infecté quand
+il n'y a pas une correspondance.
+
+82
+00:05:27,862 --> 00:05:31,010
+Mais les fréquences changent
+et voilà pourquoi ce besoin
+
+83
+00:05:31,010 --> 00:05:34,049
+d'être recalculé à chaque génération.
+
+84
+00:05:34,049 --> 00:05:38,820
+Donc, ce que nous faisons maintenant en
+JavaScript,est que nous ferons trois étapes.
+
+85
+00:05:38,820 --> 00:05:45,227
+La première est, nous allons calculer
+cette aptitude actuelle, si vous voulez,
+
+86
+00:05:45,715 --> 00:05:48,816
+pour les deux hôtes évidemment,
+puis aussi pour les parasites.
+
+87
+00:05:48,816 --> 00:05:53,591
+Donc cela, nous calculons d'abord,
+puis quand nous avons calculé cela,
+
+88
+00:05:53,591 --> 00:05:57,908
+après avoir le calculé, nous le multiplions
+avec les fréquences actuelles,
+
+89
+00:05:57,908 --> 00:06:04,294
+et nous avons ensuite, normaliser ceci,
+en prenant la somme de ces produits
+
+90
+00:06:04,294 --> 00:06:08,970
+pour les deux hôtes, puis, la normalisation
+par la valeur correspondante.
+
+91
+00:06:08,970 --> 00:06:12,293
+Donc, nous allons le faire.
+Calculons ces aptitudes,
+
+92
+00:06:12,293 --> 00:06:16,260
+ces aptitudes actuels sont multiplié avec
+les fréquences et normaliser ceci,
+
+93
+00:06:16,260 --> 00:06:20,427
+de sorte que nous obtenons les fréquences
+dans la prochaine génération.
+
+94
+00:06:20,427 --> 00:06:22,134
+Bon, ici, nous sommes
+de retour dans notre code.
+
+95
+00:06:22,134 --> 00:06:24,370
+Voici ce que nous avons développé
+dans la dernière leçon.
+
+96
+00:06:24,370 --> 00:06:27,810
+Nous avons ces deux fonctions appelées ici,
+la sélection de l'hôte et la sélection du parasite,
+
+97
+00:06:27,810 --> 00:06:29,870
+mais on n'a pas défini ces deux fonctions.
+
+98
+00:06:29,870 --> 00:06:31,282
+Nous devons le faire maintenant.
+
+99
+00:06:31,282 --> 00:06:34,503
+Et puis, nous devons aussi faire en sorte,
+à la fin, que nous mettons tout
+
+100
+00:06:34,503 --> 00:06:40,150
+les éléments D3 en lieu parce que
+sinon ce "draw_line_chart,"
+
+101
+00:06:40,150 --> 00:06:42,144
+maintenant générerait une erreur.
+
+102
+00:06:42,144 --> 00:06:44,608
+Bon, mais nous allons arriver à cela
+après que nous avons mis en place
+
+103
+00:06:44,608 --> 00:06:47,864
+sélection entiére-la sélection de parasite.
+
+104
+00:06:47,864 --> 00:06:50,029
+Donc, nous allons continuer
+et, à faire cela ici.
+
+105
+00:06:50,029 --> 00:06:54,617
+Je vais donc devoir trouver
+une fonction: selection_d'hôte.
+
+106
+00:06:54,617 --> 00:06:56,271
+Et ce que cette fonction devrait faire,
+
+107
+00:06:56,271 --> 00:07:00,650
+est exactement, ce que je viens
+de décrire sur la diapositive.
+
+108
+00:07:00,650 --> 00:07:04,111
+Je dois donc passer par chacun
+des génotypes hôtes.
+
+109
+00:07:04,111 --> 00:07:09,521
+Et pour chaque génotype de l'hôte,
+je dois calculer l'aptitude actuelle,
+
+110
+00:07:09,521 --> 00:07:13,330
+qui dépendra de la fréquence
+des parasites.
+
+111
+00:07:13,330 --> 00:07:15,818
+Alors laissez-moi continuer
+et faire cela. Je vais aller là-bas,
+
+112
+00:07:15,818 --> 00:07:17,673
+à travers tous les génotypes hôtes.
+
+113
+00:07:17,673 --> 00:07:25,372
+Donc, pour (var i = 0) puis, i & lt;
+host_frequencies.
+
+114
+00:07:25,372 --> 00:07:29,804
+En fait, permettez-moi de copier ceci
+avant que je fais des fautes d'orthographe.
+
+115
+00:07:29,804 --> 00:07:34,294
+Longueur. Ainsi, la longueur de ce tableau,
+qui me donnera tout simplement
+
+116
+00:07:34,294 --> 00:07:36,575
+le nombre de génotypes que nous avons.
+
+117
+00:07:36,575 --> 00:07:38,820
+Qui, dans notre exemple, sera deux.
+
+118
+00:07:38,820 --> 00:07:41,070
+Vous avez deux génotypes hôtes.
+
+119
+00:07:41,070 --> 00:07:44,078
+Et puis i = i + 1.
+
+120
+00:07:45,290 --> 00:07:46,740
+D'accord.
+
+121
+00:07:46,740 --> 00:07:49,676
+Alors maintenant, que devons-nous faire?
+Eh bien, pour chaque génotype de l'hôte,
+
+122
+00:07:49,676 --> 00:07:52,058
+nous avons besoin de calculer
+la condition physique actuelle.
+
+123
+00:07:52,058 --> 00:07:55,392
+Et pour le faire, comme nous venons de
+le voir, nous avons besoin de regarder
+
+124
+00:07:55,392 --> 00:07:58,304
+à chacune des fréquences des parasites.
+
+125
+00:07:58,304 --> 00:08:01,155
+Donc, je vais mettre en place ici,
+une boucle interne,
+
+126
+00:08:01,155 --> 00:08:05,579
+où je vais passer par tous les parasites.
+
+127
+00:08:05,579 --> 00:08:09,796
+En fait, avant de le faire, laissez-moi
+mets en place de cette variable locale,
+
+128
+00:08:09,796 --> 00:08:12,362
+l'aptitude de l'hôte,
+que je veux vraiment calculer.
+
+129
+00:08:12,362 --> 00:08:14,805
+Je vais initialiser ceci à zéro.
+
+130
+00:08:14,805 --> 00:08:19,574
+D'accord. Alors maintenant, je vais ajouter
+cette boucle intérieure ici.
+
+131
+00:08:19,574 --> 00:08:23,483
+Donc, je vais utiliser ii,
+ici comme mon compteur.
+
+132
+00:08:24,211 --> 00:08:25,490
+Comme je l'ai fait avant.
+
+133
+00:08:25,490 --> 00:08:29,966
+Et là, je vais à travers
+les fréquences de parasite.
+
+134
+00:08:31,180 --> 00:08:33,603
+D'accord. Alors maintenant,
+que dois-je faire?
+
+135
+00:08:33,603 --> 00:08:35,990
+Eh bien, comme nous l'avons vu
+auparavant dans les diapos,
+
+136
+00:08:35,990 --> 00:08:41,117
+c'est simplement la somme des produits
+de la fréquence actuelle de parasite
+
+137
+00:08:41,117 --> 00:08:44,332
+fois l'élément correspondant
+dans la matrice d'aptitude.
+
+138
+00:08:44,332 --> 00:08:48,530
+Donc, je vais simplement dire:
+l'aptitude_d'hôte, est égale,
+
+139
+00:08:48,530 --> 00:08:53,224
+bien ce que nous avons avant,
+plus une certaine valeur.
+
+140
+00:08:53,224 --> 00:08:57,394
+Et ces valeurs est le produit entre
+l'élément de la matrice d'aptitude,
+
+141
+00:08:57,394 --> 00:08:59,140
+et la fréquence des parasites.
+
+142
+00:08:59,140 --> 00:09:02,336
+Mais plutôt que d'épeler ceci ici,
+je vais sous-traiter cela,
+
+143
+00:09:02,336 --> 00:09:03,314
+dans une fonction.
+
+144
+00:09:03,314 --> 00:09:11,889
+Et je vais appeler cette fonction
+un get_w_f, parce que je veux simplement
+
+145
+00:09:11,889 --> 00:09:16,278
+le produit de w et f,
+donc l'aptitude et la fréquence.
+
+146
+00:09:16,278 --> 00:09:22,914
+Et je dois passer i et ii, de sorte que la fonction saura
+
+147
+00:09:22,914 --> 00:09:24,930
+les génotypes auxquels je fais allusion.
+
+148
+00:09:24,930 --> 00:09:27,398
+Ainsi, le i est l'hôte.
+
+149
+00:09:27,398 --> 00:09:30,180
+Le premier élément sera
+le génotype de l'hôte.
+
+150
+00:09:30,180 --> 00:09:35,792
+Donc, s'il est nul, alors nous faisons
+référence au génotype d'hôte A1.
+
+151
+00:09:35,792 --> 00:09:39,973
+Si elle c'est un, nous faisons allusion
+à A2 et de même pour le ii,
+
+152
+00:09:39,973 --> 00:09:43,797
+qui est simplement le génotype
+de parasite correspondant.
+
+153
+00:09:43,797 --> 00:09:47,587
+Bon, nous allons mettre en œuvre
+cette fonction d'assistance ici.
+
+154
+00:09:47,587 --> 00:09:53,279
+Donc, la fonction get_w_f.
+
+155
+00:09:53,279 --> 00:09:59,460
+Et je vais utiliser les mêmes noms
+pour les paramètres i et ii.
+
+156
+00:10:01,590 --> 00:10:03,834
+Alors, comment fonctionne ceci?
+
+157
+00:10:03,834 --> 00:10:06,904
+Bien, OK. Ce sont les génotypes, non?
+
+158
+00:10:07,641 --> 00:10:12,700
+Ou plutôt, ils sont en fait les indices,
+dans le tableau correspondant.
+
+159
+00:10:12,700 --> 00:10:15,786
+Mais nous savons qu'ils correspondent
+à des génotypes.
+
+160
+00:10:15,786 --> 00:10:19,001
+Zéro étant A1 et un étant A2 .
+
+161
+00:10:19,001 --> 00:10:23,108
+Ceci est un modèle d'allèles correspondant,
+donc nous pouvons dire, si elles sont les mêmes,
+
+162
+00:10:23,614 --> 00:10:28,709
+d'accord, si i est égal à ii,
+et ceci est bien sûr en utilisant
+
+163
+00:10:28,709 --> 00:10:32,660
+la double égal pour un test d'égalité.
+
+164
+00:10:32,660 --> 00:10:35,651
+Eh bien, comme nous le savons,
+ce que nous devons retourner,
+
+165
+00:10:35,651 --> 00:10:39,046
+c'est l'aptitude dans le cas
+d'une correspondance.
+
+166
+00:10:39,046 --> 00:10:44,307
+Donc, pour l'hôte, cela signifie
+que l'aptitude est 1-sh.
+
+167
+00:10:44,307 --> 00:10:47,113
+Puis fois la fréquence
+de parasite correspondant.
+
+168
+00:10:47,113 --> 00:10:49,492
+Donc, les fréquences parasites.
+
+169
+00:10:50,114 --> 00:10:52,760
+Et bien sûr, cocher l'indice
+correspondant ici, comme ii,
+
+170
+00:10:52,760 --> 00:10:57,348
+parce que le deuxième indice ici,
+est celle du parasite.
+
+171
+00:10:58,155 --> 00:11:04,799
+S'il n'y a pas de correspondance, alors nous savons
+que nous devrions retourner quelque chose.
+
+172
+00:11:04,799 --> 00:11:07,454
+Je vais juste copier ceci et le coller ici.
+
+173
+00:11:07,454 --> 00:11:09,670
+L'aptitude ici, dans ce cas,
+
+174
+00:11:09,670 --> 00:11:11,832
+il n'y a pas de correspondance;
+cela signifie qu'il n'y a pas d'infection.
+
+175
+00:11:11,832 --> 00:11:17,565
+Ainsi, l'hôte a l'aptitude maximale,
+et encore, fois la fréquence de parasite
+
+176
+00:11:17,565 --> 00:11:20,567
+de ce génotype correspondant.
+
+177
+00:11:21,963 --> 00:11:25,700
+Je vais donc faire deux choses
+pour simplifier un peu plus loin.
+
+178
+00:11:25,700 --> 00:11:29,968
+La première est, nous aurons besoin
+exactement de la même fonction plus tard,
+
+179
+00:11:29,968 --> 00:11:34,270
+pour les fréquences d'hôte
+et les aptitudes des parasites.
+
+180
+00:11:34,270 --> 00:11:36,997
+Et ainsi, tout sera inversé ici,
+
+181
+00:11:36,997 --> 00:11:39,140
+mais je vais probablement besoin
+de deux fonctions différentes,
+
+182
+00:11:39,140 --> 00:11:45,350
+donc je vais simplement appeler
+cette fonction: get_host_w_f.
+
+183
+00:11:45,770 --> 00:11:50,740
+pour que ce soit clair, l'aptitude,
+que je calcule ici.
+
+184
+00:11:50,740 --> 00:11:57,618
+Alors get_host_w_f.
+
+185
+00:11:58,560 --> 00:12:00,063
+Et l'autre chose que je veux faire,
+
+186
+00:12:00,063 --> 00:12:02,350
+c'est que je veux simplifier,
+un peu en fait,
+
+187
+00:12:02,350 --> 00:12:05,158
+en utilisant un nouvel opérateur
+que nous n'avons pas rencontré avant,
+
+188
+00:12:05,158 --> 00:12:07,909
+et ce qu'on appelle l'opérateur ternaire.
+
+189
+00:12:07,909 --> 00:12:10,690
+Et cela fonctionne comme suit:
+
+190
+00:12:10,690 --> 00:12:13,640
+Je peux simplifier ceci ici,
+en disant simplement, "retour".
+
+191
+00:12:17,480 --> 00:12:22,895
+Donc ce que je vais faire ici,
+je vais dire, i = ii.
+
+192
+00:12:22,895 --> 00:12:25,420
+Marquer et utiliser
+un espacement approprié.
+
+193
+00:12:25,420 --> 00:12:26,847
+Point d'interrogation.
+
+194
+00:12:27,690 --> 00:12:30,048
+Bon maintenant,
+nous en parlerons dans une seconde.
+
+195
+00:12:30,048 --> 00:12:40,339
+1-sh, et désolé, 1-sh: 1. D'accord.
+
+196
+00:12:40,339 --> 00:12:44,594
+Et puis, fois les fréquences de parasites.
+
+197
+00:12:44,594 --> 00:12:46,132
+Bon, alors qu'est-ce que cela signifie?
+
+198
+00:12:46,132 --> 00:12:49,441
+Donc cela ici, toute cette chose,
+cette expression ici,
+
+199
+00:12:49,441 --> 00:12:51,840
+utilise l'opérateur ternaire,
+
+200
+00:12:51,840 --> 00:12:55,717
+qui est une combinaison
+d'un point d'interrogation et un colon.
+
+201
+00:12:55,717 --> 00:12:57,024
+Ainsi, il a ces trois éléments ici.
+
+202
+00:12:57,024 --> 00:13:04,380
+Le premier élément, puis un point
+d'interrogation, le second, puis un colon,
+
+203
+00:13:04,380 --> 00:13:05,723
+puis le troisième élément.
+
+204
+00:13:05,723 --> 00:13:12,239
+Et fondamentalement, cela est exactement
+la même chose que cela.
+
+205
+00:13:13,180 --> 00:13:16,109
+Je vais donc supprimer
+toutes ces lignes ici,
+
+206
+00:13:16,109 --> 00:13:17,580
+et regarder cela comme beaucoup
+plus simple.
+
+207
+00:13:17,580 --> 00:13:21,861
+Alors, comment lisez-vous cet opérateur ternaire?
+Eh bien cela signifie simplement,
+
+208
+00:13:23,180 --> 00:13:29,510
+si cette expression ici,
+concrètement une condition, est vrai,
+
+209
+00:13:29,510 --> 00:13:35,880
+celle avant le point d'interrogation,
+alors utiliser cette expression ici.
+
+210
+00:13:35,880 --> 00:13:39,617
+Celle après le point d'interrogation,
+ou avant le côlon.
+
+211
+00:13:39,617 --> 00:13:42,760
+Si elle est fausse,
+et il n'y a vraiment que ces 2 options:
+
+212
+00:13:42,760 --> 00:13:44,180
+soit vrai ou faux.
+
+213
+00:13:44,180 --> 00:13:45,387
+Ensuite, utilisez cette valeur.
+
+214
+00:13:45,827 --> 00:13:47,652
+Et ceci est exactement
+ce que nous devons faire ici.
+
+215
+00:13:47,652 --> 00:13:51,020
+Si c'est vraiment une correspondance
+entre les génotypes,
+
+216
+00:13:51,020 --> 00:13:54,200
+alors la remise en forme ici, est 1-sh.
+
+217
+00:13:54,200 --> 00:13:56,787
+Sinon, la remise en forme est un.
+
+218
+00:13:56,787 --> 00:14:01,431
+Donc, fondamentalement,
+c'est une notation très raccourcie
+
+219
+00:14:01,431 --> 00:14:06,195
+pour choisir la valeur d'aptitude correcte,
+
+220
+00:14:06,195 --> 00:14:07,380
+de la matrice d'aptitude
+
+221
+00:14:07,380 --> 00:14:09,877
+Et puis nous le savons, nous avons
+simplement besoin de multiplier ceci,
+
+222
+00:14:09,877 --> 00:14:14,666
+avec les fréquences de parasites
+et c'est maintenant beaucoup plus compact.
+
+223
+00:14:15,650 --> 00:14:17,383
+Bon, maintenant que nous avons mis cela,
+
+224
+00:14:17,383 --> 00:14:20,590
+nous pouvons revenir ici,
+à notre fonction de sélection de l'hôte.
+
+225
+00:14:20,590 --> 00:14:25,791
+Donc, nous avons maintenant calculé le produit
+de la remise en forme et la fréquence,
+
+226
+00:14:26,223 --> 00:14:29,863
+Nous avons créé la somme ici,
+de cette remise en forme hôte,
+
+227
+00:14:29,863 --> 00:14:34,719
+et nous devons nous assurer que nous
+fermons ici, les parenthèses correctement,
+
+228
+00:14:34,719 --> 00:14:39,418
+et encore une fois, grâce à une indentation correcte,
+qui est facile à voir, si l'un est absent.
+
+229
+00:14:40,058 --> 00:14:42,744
+Alors maintenant, j'ai calculé
+l'aptitude d'hôte ici,
+
+230
+00:14:42,744 --> 00:14:45,039
+pour l'hôte actuel.
+
+231
+00:14:45,410 --> 00:14:48,094
+Alors maintenant, ce que nous devons faire,
+comme nous l'avons dit, la deuxième étape est,
+
+232
+00:14:48,094 --> 00:14:55,864
+nous devons multiplier ceci,
+avec la fréquence correspondante
+
+233
+00:14:55,864 --> 00:14:57,550
+que nous avions avant.
+
+234
+00:14:57,550 --> 00:15:02,970
+Voici donc, après cette boucle ici.
+D'accord.
+
+235
+00:15:02,970 --> 00:15:11,382
+Nous pouvons dire simplement, les fréquences
+d'hôte,d'accord,les fréquences d'hôte actuel,
+
+236
+00:15:11,382 --> 00:15:14,889
+donc les fréquences d'hôte, ici, étaient
+dans la boucle extérieure, n'est ce pas?
+
+237
+00:15:14,889 --> 00:15:18,341
+i est égal à ce que nous avions avant,
+
+238
+00:15:21,613 --> 00:15:25,080
+fois cette valeur d'aptitude.
+
+239
+00:15:25,080 --> 00:15:29,597
+D'accord. Ici, cette valeur d'aptitude,
+que nous avons juste calculé.
+
+240
+00:15:30,266 --> 00:15:32,186
+Voilà donc la deuxième étape.
+
+241
+00:15:33,307 --> 00:15:38,565
+Multipliant la fréquence
+de cette aptitude calculée.
+
+242
+00:15:38,565 --> 00:15:40,520
+Quelle est la troisième étape
+que nous devons faire?
+
+243
+00:15:40,520 --> 00:15:42,172
+C'est la normalisation.
+
+244
+00:15:43,070 --> 00:15:47,810
+Maintenant, afin de normaliser, nous avons
+besoin de connaître le facteur de normalisation,
+
+245
+00:15:47,810 --> 00:15:53,173
+et c'est tout simplement la somme
+de toutes ces fréquences d'hôte
+
+246
+00:15:53,173 --> 00:15:54,885
+que nous calculons.
+
+247
+00:15:54,885 --> 00:16:00,364
+Donc, nous mettons en place ici, une variable
+de somme que nous pouvons ensuite utiliser
+
+248
+00:16:00,364 --> 00:16:02,055
+en tant que facteur de normalisation.
+
+249
+00:16:02,055 --> 00:16:04,960
+Donc, je vais tout simplement
+définir ici, une variable locale,
+
+250
+00:16:04,960 --> 00:16:09,450
+appelés "sum_host_frequencies,"
+
+251
+00:16:09,450 --> 00:16:12,171
+Okay, sum_host_frequencies,
+parce que les fréquences d'hôte
+
+252
+00:16:12,171 --> 00:16:14,858
+ne s'ajouter pas nécessairement
+à un à la fin.
+
+253
+00:16:14,858 --> 00:16:19,140
+Certaines fréquences d'hôte, d'accord,
+je vais initialiser ceci à zéro.
+
+254
+00:16:19,522 --> 00:16:21,110
+Et puis, oups, désolé.
+
+255
+00:16:21,110 --> 00:16:25,329
+Et puis, je vais simplement dire, ici-bas,
+
+256
+00:16:25,329 --> 00:16:28,786
+à chaque itération des fréquences d'hôte,
+je vais dire d'accord,
+
+257
+00:16:28,786 --> 00:16:32,506
+certaines fréquences de l'hôte
+doivent être ajoutés.
+
+258
+00:16:33,669 --> 00:16:34,956
+Qu'est ce qui doit être ajouté?
+
+259
+00:16:34,956 --> 00:16:39,368
+Eh bien, tout ce que nous venons
+de calculer, a les fréquences d'hôte.
+
+260
+00:16:41,961 --> 00:16:43,600
+Bon, + fréquences_d'hôte (i).
+
+261
+00:16:45,391 --> 00:16:48,461
+Alors maintenant, essentiellement ce que
+nous faisons, c'est nous résumant tous
+
+262
+00:16:48,461 --> 00:16:50,961
+ces nouvelles fréquences d'hôte
+que nous avons calculé.
+
+263
+00:16:50,961 --> 00:16:53,846
+Et ceci est la troisième étape
+parce que cela nous permet enfin,
+
+264
+00:16:53,846 --> 00:16:59,330
+à normaliser les choses ici, après
+la boucle est entièrement terminée.
+
+265
+00:16:59,330 --> 00:17:01,729
+Alors maintenant, ce que nous allons faire
+c'est,nous allons normaliser
+
+266
+00:17:01,729 --> 00:17:05,040
+et je vais juste faire un commentaire ici,
+ce que nous faisons.
+
+267
+00:17:05,040 --> 00:17:09,930
+Donc nous allons passer sur tous
+les hôtes, une fois de plus.
+
+268
+00:17:11,810 --> 00:17:15,910
+Et puis, nous normalisons simplement
+les choses ici.
+
+269
+00:17:15,910 --> 00:17:19,327
+Donc, ce que nous voyons c'est,
+les fréquences d'hôte (i)
+
+270
+00:17:20,730 --> 00:17:26,420
+égal à ce que nous avons actuellement,
+mais divisé par ce facteur de normalisation,
+
+271
+00:17:26,420 --> 00:17:30,310
+donc divisé par certaines
+fréquences d'hôte.
+
+272
+00:17:31,503 --> 00:17:37,080
+Donc, ce sont les trois étapes comme
+nous les avons souligné juste avant.
+
+273
+00:17:37,080 --> 00:17:42,888
+Donc, en gros, juste pour répéter,
+la première étape consistait à calculer
+
+274
+00:17:42,888 --> 00:17:45,014
+ces aptitudes, d'accord.
+
+275
+00:17:46,140 --> 00:17:51,569
+Et puis, quand nous avions les aptitudes
+nous les multiplier,
+
+276
+00:17:51,569 --> 00:17:53,960
+avec les fréquences actuelles,
+
+277
+00:17:53,960 --> 00:17:56,702
+et une fois que nous l'avons fait,
+nous normalisons simplement,
+
+278
+00:17:56,702 --> 00:18:00,420
+parce que ces fréquences actuelles peuvent
+désormais, non plus s'ajouter jusqu'à 1,
+
+279
+00:18:00,420 --> 00:18:03,310
+donc nous devons les normaliser.
+
+280
+00:18:03,310 --> 00:18:05,269
+Donc, c'est ce que nous avons ici.
+
+281
+00:18:05,269 --> 00:18:08,824
+Et cela est essentiellement,
+la fonction de sélection de l'hôte.
+
+282
+00:18:09,397 --> 00:18:12,360
+Maintenant, tout ce que nous devons faire,
+
+283
+00:18:12,360 --> 00:18:15,470
+c'est exactement la même chose,
+pour le parasite.
+
+284
+00:18:15,470 --> 00:18:19,147
+Donc, nous ne pouvons continuer et,
+maintenant, copier ces 2 fonctions,
+
+285
+00:18:19,147 --> 00:18:21,650
+d'accord, toute la sélection
+t la fonction d'aide,
+
+286
+00:18:22,050 --> 00:18:24,783
+obtenir _host_w_f, i ii.
+
+287
+00:18:25,040 --> 00:18:30,780
+Nous copions cela. Et maintenant nous avons
+juste à renommer les choses en conséquence.
+
+288
+00:18:30,780 --> 00:18:36,218
+Donc, ici, la selection_d'hôte, sera
+bien sûr, appelée, la selection_parasite.
+
+289
+00:18:36,218 --> 00:18:39,660
+La somme des fréquences d'hôte,
+notre facteur de normalisation, ici,
+
+290
+00:18:39,660 --> 00:18:42,960
+sera appelé, sum_parasite_frequencies.
+
+291
+00:18:42,960 --> 00:18:45,491
+Permettez-moi effectivement de copier
+ce mot parasite ici.
+
+292
+00:18:46,352 --> 00:18:49,641
+nous allons d'abord à travers
+les fréquences de parasites,
+
+293
+00:18:49,641 --> 00:18:54,389
+nous calculons l'aptitude de parasite,
+pour le faire, nous avons besoin d'aller
+
+294
+00:18:54,389 --> 00:18:57,648
+aux fréquences_d'hôte,
+dans la boucle interne,
+
+295
+00:18:57,648 --> 00:19:02,506
+et alors nous pouvons dire d'accord,
+l'aptitude du parasite est égale
+
+296
+00:19:02,506 --> 00:19:08,973
+l'aptitude du parasite, plus
+ceci: get_parasite_w_f.
+
+297
+00:19:08,973 --> 00:19:11,277
+D'accord. Nous allons corriger
+cela dans une seconde,
+
+298
+00:19:11,277 --> 00:19:13,825
+Et puis, quand nous l'avons fait,
+nous pouvons maintenant ici,
+
+299
+00:19:13,825 --> 00:19:18,877
+multiplier les fréquences de parasites
+avec l'aptitude du parasite ici,
+
+300
+00:19:18,877 --> 00:19:20,490
+que nous venons de calculer.
+
+301
+00:19:20,490 --> 00:19:25,295
+Et puis bien sûr, nous pouvons calculer
+correctement ce facteur de normalisation,
+
+302
+00:19:25,295 --> 00:19:28,445
+certains fréquences_parasites égal certains
+fréquences_parasites
+
+303
+00:19:28,445 --> 00:19:32,710
+plus fréquences_parasites (i).
+Et puis on normalise,
+
+304
+00:19:32,710 --> 00:19:35,515
+à nouveau, nous passons
+par toutes les fréquences parasites
+
+305
+00:19:35,515 --> 00:19:39,952
+et on normalise les fréquences
+avec ce facteur de normalisation
+
+306
+00:19:39,952 --> 00:19:41,686
+que nous venons de calculer.
+
+307
+00:19:41,686 --> 00:19:46,598
+Donc, exactement la même chose;
+juste en utilisant d'autres variables,
+
+308
+00:19:46,598 --> 00:19:48,644
+et un autre tableau bien sûr.
+
+309
+00:19:48,644 --> 00:19:53,771
+Et ici, cela c'est get_parasite_w_f.
+
+310
+00:19:53,771 --> 00:19:57,800
+Maintenant, ici, nous devons être prudents,
+parce que ce qui est légèrement différent.
+
+311
+00:19:57,800 --> 00:20:05,222
+Ici quand i = ii, lorsque cela est vrai, alors
+l'aptitude sera effectivement maximale.
+
+312
+00:20:05,470 --> 00:20:10,360
+Parce qu'alors, l'infection se produit,
+ce qui est bon pour le parasite.
+
+313
+00:20:11,124 --> 00:20:13,618
+Si cela ne se produit pas,
+alors c'est mauvais pour le parasite,
+
+314
+00:20:13,618 --> 00:20:18,677
+alors ici l'aptitude sera 1-sp.
+
+315
+00:20:19,326 --> 00:20:23,138
+Mais assurez-vous que vous ne remplacez
+pas seulement ce sh avec sp,
+
+316
+00:20:23,138 --> 00:20:27,688
+mais que vous échangez aussi ceux-ci,
+car c'est le droit opposé?
+
+317
+00:20:27,688 --> 00:20:31,113
+Si elles correspondent,
+si les allèles correspondent,
+
+318
+00:20:31,113 --> 00:20:35,309
+cela est maintenant bon pour
+l'aptitude du parasite.
+
+319
+00:20:35,570 --> 00:20:38,281
+Et donc ici de toute évidence,
+nous devons multiplier ceci
+
+320
+00:20:38,281 --> 00:20:41,864
+avec les fréquences d'hôte correspondantes.
+
+321
+00:20:42,601 --> 00:20:43,310
+Bien.
+
+322
+00:20:43,310 --> 00:20:46,675
+Alors maintenant, nous avons
+essentiellement mis en œuvre tout.
+
+323
+00:20:46,675 --> 00:20:49,170
+Nous manquons encore la substance D3,
+
+324
+00:20:49,170 --> 00:20:53,231
+mais permettez-moi d'enregistrer ceci et
+j'irais au navigateur et ouvrir ce document,
+
+325
+00:20:53,231 --> 00:20:57,194
+juste pour que nous puissions voir
+si nous avons fait des erreurs,
+
+326
+00:20:57,194 --> 00:20:59,920
+en quelque sorte,
+typo fautes d'orthographe.
+
+327
+00:20:59,920 --> 00:21:05,446
+Alors permettez-moi d'ouvrir ce fichier ici:
+fichier ouvert, elle est ici, co-évolution.
+
+328
+00:21:06,730 --> 00:21:11,680
+Et allons dans la console JavaScript,
+le développeur console JavaScript.
+
+329
+00:21:12,297 --> 00:21:17,312
+Voici une erreur: fréquences_parasite_hôte
+ne sont pas définis.
+
+330
+00:21:17,312 --> 00:21:20,807
+D'accord, nous allons regarder lorsque
+cela est.
+
+331
+00:21:21,910 --> 00:21:25,500
+fréquences_parasite_hôte,
+ouais cela n'a pas de sens.
+
+332
+00:21:26,370 --> 00:21:29,365
+Où ai-je dit fréquences_parasite_hôte?
+
+333
+00:21:29,365 --> 00:21:33,040
+Ici, fréquences_parasite_hôte,
+cela devrait évidemment être ,
+
+334
+00:21:33,040 --> 00:21:35,640
+somme_parasite_frequencies.
+
+335
+00:21:35,640 --> 00:21:41,670
+Donc, j'ai copie-collé cela dans la mauvaise
+position. Somme_parasite_frequencies.
+
+336
+00:21:41,670 --> 00:21:44,642
+Bon, eh bien, je suis content
+que je fais parfois ces erreurs,
+
+337
+00:21:44,642 --> 00:21:49,842
+parce que je suis très convaincu
+que beaucoup d'entre vous fera
+
+338
+00:21:49,842 --> 00:21:56,409
+les mêmes erreurs et ceci est juste pour montrer
+comment vous trouvez ces erreurs facilement.
+
+339
+00:21:56,409 --> 00:21:57,520
+D'accord, c'était bête cela.
+
+340
+00:21:57,520 --> 00:21:59,707
+Je vais donc recharger ceci.
+
+341
+00:21:59,707 --> 00:22:02,304
+Maintenant, il dit simplement, ligne
+de traçage de graphe n'est pas défini.
+
+342
+00:22:02,304 --> 00:22:04,480
+Cela, bien sûr, est attendu mais
+juste pour être sûr,
+
+343
+00:22:04,480 --> 00:22:08,920
+Revenons ici et commenter ceci,
+
+344
+00:22:08,920 --> 00:22:10,109
+qui est en fait un outil agréable.
+
+345
+00:22:10,109 --> 00:22:11,832
+Vous pouvez donc utiliser ce commentaire,
+
+346
+00:22:14,081 --> 00:22:17,130
+cette double barre oblique ici, que
+vous utilisez pour faire des commentaires,
+
+347
+00:22:17,130 --> 00:22:18,640
+comme celle-ci.
+
+348
+00:22:18,640 --> 00:22:25,114
+Vous pouvez également utilisé ceci pour commenter
+les appels de fonction que vous ne voulez pas
+
+349
+00:22:25,114 --> 00:22:28,896
+qu'elle soit appelée pour le moment,
+par exemple, lorsque vous faites le débogage.
+
+350
+00:22:28,896 --> 00:22:31,955
+Donc, si je le fais ici, et maintenant
+cette ligne de traçage de graphe
+
+351
+00:22:31,955 --> 00:22:35,710
+ne sera pas appelée, puis,
+si je retourne au navigateur,
+
+352
+00:22:35,710 --> 00:22:38,760
+il ne devrait y avoir plus d'erreur,
+et c'est effectivement le cas.
+
+353
+00:22:38,760 --> 00:22:39,910
+Il n'y a plus d'erreur.
+
+354
+00:22:39,910 --> 00:22:41,664
+Donc tout est bon.
+
+355
+00:22:41,875 --> 00:22:45,189
+D'accord, nous pouvons revenir
+en arrière et décommentez cela.
+
+356
+00:22:45,189 --> 00:22:49,437
+Mais maintenant, bien sûr, nous avons besoin
+de ramener la ligne de traçage de graphe
+
+357
+00:22:49,437 --> 00:22:52,121
+et la fonction D3.
+
+358
+00:22:52,121 --> 00:22:57,640
+Donc, nous pouvons soit aller le copier
+à partir d'autres fichiers,
+
+359
+00:22:57,640 --> 00:23:01,848
+ou je vais encore une fois sur l'Internet
+comme nous l'avons fait auparavant,
+
+360
+00:23:01,848 --> 00:23:07,455
+Je vais aller à d3.js, alors voici D3 JS.
+
+361
+00:23:07,455 --> 00:23:13,463
+Voici comment je me connecte directement
+à la bibliothèque D3.
+
+362
+00:23:13,463 --> 00:23:15,708
+Par ailleurs, au moment
+où vous regardez cela,
+
+363
+00:23:15,708 --> 00:23:17,749
+vous avez probablement
+une version différente ici,
+
+364
+00:23:17,749 --> 00:23:18,570
+mais ça va.
+
+365
+00:23:18,570 --> 00:23:22,675
+Il suffit de copier le lien correspondant ici.
+D'accord, je vais fermer ceci,
+
+366
+00:23:22,675 --> 00:23:27,547
+et je vais copier le lien ici dans
+la tête comme avant.
+
+367
+00:23:27,547 --> 00:23:30,042
+Et maintenant, ce que je veux c'est de tracer
+une fonction de graphique linéaire.
+
+368
+00:23:30,042 --> 00:23:34,020
+Donc, encore une fois, je vais aller
+prendre ceci de l'Internet.
+
+369
+00:23:34,020 --> 00:23:37,022
+Nous avons natureincode.com.
+
+370
+00:23:37,530 --> 00:23:39,871
+Nous pouvons aller voir le code en action.
+
+371
+00:23:39,871 --> 00:23:43,928
+Donc, ici, par exemple, nous aurions
+la sélection dépendant de la fréquence.
+
+372
+00:23:43,928 --> 00:23:45,980
+Et maintenant, nous pouvons revenir ici,
+
+373
+00:23:45,980 --> 00:23:49,946
+noter la ligne de traçage de graphe,
+est construit avec le D3 JS,
+
+374
+00:23:49,946 --> 00:23:51,410
+et peut être trouvé ici.
+
+375
+00:23:51,410 --> 00:23:55,035
+Alors, voici encore un dysfonctionnement,
+et le dysfonctionnement de la copie.
+
+376
+00:23:55,035 --> 00:24:02,363
+Et je le place ici en haut, avant mon
+code de simulation, d'accord.
+
+377
+00:24:02,363 --> 00:24:05,261
+Donc, je vais mettre cela ici,
+puis encore une fois,
+
+378
+00:24:05,261 --> 00:24:06,790
+nous avons ce problème d'indentation.
+
+379
+00:24:06,790 --> 00:24:09,998
+Vous pouvez tout simplement laisser cela
+tel quel est, mais si vous préférez,
+
+380
+00:24:09,998 --> 00:24:15,390
+vous pouvez, bien sûr, dentler cela bien,
+que je vais faire ici.
+
+381
+00:24:15,390 --> 00:24:16,263
+Bien.
+
+382
+00:24:17,122 --> 00:24:19,440
+Enregistrer, et maintenant
+nous devrions avoir tout en ordre.
+
+383
+00:24:19,440 --> 00:24:21,598
+Nous avons donc la bibliothèque D3 chargé.
+
+384
+00:24:21,598 --> 00:24:25,085
+Nous avons le code D3
+et il est pré-défini pour nous.
+
+385
+00:24:25,085 --> 00:24:29,120
+Et voici notre code de simulation;
+tout semble bien fonctionner.
+
+386
+00:24:29,120 --> 00:24:31,570
+Donc, nous allons enregistrer cela.
+Allez ici.
+
+387
+00:24:31,570 --> 00:24:36,476
+Permettez-moi de conclure cela, et fermer
+ceci aussi bien, et je recharge ici le navigateur.
+
+388
+00:24:36,693 --> 00:24:37,791
+Et ici il est.
+
+389
+00:24:37,791 --> 00:24:44,718
+Ceci est notre parasite hôte co-évolution
+et vous pouvez recharger ceci plusieurs fois,
+
+390
+00:24:44,718 --> 00:24:47,412
+et vous pouvez voir que cela change un peu,
+
+391
+00:24:47,412 --> 00:24:51,500
+mais il dépend essentiellement
+des valeurs initiales,
+
+392
+00:24:51,500 --> 00:24:55,450
+qui, comme vous vous en souvenez,
+nous avons initialisé au hasard.
+
+393
+00:24:55,450 --> 00:24:59,247
+Et comme vous pouvez le constater ici,
+si toutes ces valeurs
+
+394
+00:24:59,247 --> 00:25:01,560
+sont relativement proches de 0,5,
+alors les dynamiques
+
+395
+00:25:01,560 --> 00:25:04,236
+vont être moins extrême,
+
+396
+00:25:04,236 --> 00:25:08,700
+comme s'ils sont très fortement
+à part les unes des autres.
+
+397
+00:25:08,700 --> 00:25:11,540
+Mais encore une fois, nous n'avons pas
+d'effets stochastiques ici,
+
+398
+00:25:11,540 --> 00:25:16,290
+donc tout ce que vous voyez ici, restera
+constante au fil du temps pour toujours,
+
+399
+00:25:16,290 --> 00:25:18,846
+parce que c'est un modèle déterministe.
+
+400
+00:25:18,846 --> 00:25:20,272
+Mais félicitations!
+
+401
+00:25:20,272 --> 00:25:23,550
+Ceci est la co-évolution hôte-parasite.
+
+402
+00:25:23,550 --> 00:25:26,537
+Vous voyez ici, la sélection négative
+dépendant de la fréquence en action.
+
+403
+00:25:26,537 --> 00:25:28,847
+La conséquence de cela,
+c'est que vous avez cette
+
+404
+00:25:28,847 --> 00:25:31,400
+dynamique cyclique,
+la dynamique de co-évolutionnaire
+
+405
+00:25:31,400 --> 00:25:36,723
+des fréquences alléliques changent
+en réponse à l'autre.
+
+406
+00:25:36,977 --> 00:25:38,860
+Donc ceci conclut cette leçon.
+
+407
+00:25:38,860 --> 00:25:39,720
+Félicitations.
+
+408
+00:25:39,720 --> 00:25:41,090
+Si vous l'avez fait jusqu'ici.
+
+409
+00:25:41,090 --> 00:25:44,230
+Vous avez maintenant deux espèces
+co-évoluant avec l'autre,
+
+410
+00:25:44,230 --> 00:25:47,835
+Donc, dans la leçon finale de ce chapitre,
+qui est la prochaine conférence,
+
+411
+00:25:47,835 --> 00:25:52,708
+nous allons ajouter une légère modification pour
+obtenir une dynamique encore plus intéressantes.
+
+412
+00:25:52,708 --> 00:25:53,600
+À tout à l'heure.
+

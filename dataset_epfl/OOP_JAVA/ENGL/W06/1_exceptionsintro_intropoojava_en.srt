@@ -1,0 +1,1276 @@
+1
+00:00:04,070 --> 00:00:07,650
+The exception handling is an
+important chapter for basic programming.
+
+2
+00:00:07,650 --> 00:00:09,206
+It renders our programs
+
+3
+00:00:09,206 --> 00:00:10,512
+sturdier and more resistant
+
+4
+00:00:10,512 --> 00:00:13,750
+towards abnormal or error
+situations.
+
+5
+00:00:13,750 --> 00:00:16,379
+Exception handling is not per se a concept
+
+6
+00:00:16,379 --> 00:00:20,640
+of object-oriented programming. However,
+its implementation resorts
+
+7
+00:00:20,640 --> 00:00:22,549
+to the use of these concepts.
+
+8
+00:00:22,919 --> 00:00:26,129
+The goal of this episode is to present
+the fundamental aspects
+
+9
+00:00:26,129 --> 00:00:28,669
+of exception handling in Java.
+
+10
+00:00:28,759 --> 00:00:31,999
+In this chapter, we will discuss how
+to handle errors
+
+11
+00:00:31,999 --> 00:00:34,649
+or abnormal situations in a program.
+
+12
+00:00:34,649 --> 00:00:37,979
+We will see that exception handling
+let us anticipate
+
+13
+00:00:37,979 --> 00:00:40,159
+the errors and abnormal situations.
+
+14
+00:00:40,159 --> 00:00:43,340
+Thus, we will be able to react
+appropriately.
+
+15
+00:00:43,740 --> 00:00:47,359
+Let us begin by illustrating the usefulness
+of exception handling
+
+16
+00:00:47,359 --> 00:00:49,339
+through a simple example.
+
+17
+00:00:49,340 --> 00:00:53,840
+We wish to code a function "f" which
+calculates the inverse of a given number.
+
+18
+00:00:53,840 --> 00:00:58,920
+We wish for this function to handle the case
+where the entered value is 0
+
+19
+00:00:58,920 --> 00:01:02,070
+as an abnormal situation,
+an error situation.
+
+20
+00:01:02,070 --> 00:01:05,909
+We also wonder how to handle
+
+21
+00:01:05,909 --> 00:01:07,659
+the error itself.
+
+22
+00:01:07,659 --> 00:01:08,890
+Here is our first attempt :
+
+23
+00:01:08,890 --> 00:01:11,968
+We can have it so that, in case the
+entered value is 0,
+
+24
+00:01:11,968 --> 00:01:14,140
+we return a value chosen in advance.
+
+25
+00:01:14,140 --> 00:01:17,950
+To mimic the fact that this result would be
+close to infinity, we could decide
+
+26
+00:01:17,950 --> 00:01:20,359
+-- in an arbitrary way -- to return
+
+27
+00:01:20,359 --> 00:01:22,230
+the biggest "double" possible.
+
+28
+00:01:22,230 --> 00:01:26,389
+In Java, there are other predefined values
+to mimic the infinity (such as "infinity").
+
+29
+00:01:26,389 --> 00:01:29,559
+However, this is not our point here.
+
+30
+00:01:29,560 --> 00:01:32,769
+Unfortunately, this way to proceed is
+not satisdactory at all.
+
+31
+00:01:32,769 --> 00:01:36,610
+Firstly, this does not let the user know
+
+32
+00:01:36,610 --> 00:01:41,290
+that his input has resulted in an
+abnormal situation for the function "f"
+
+33
+00:01:41,290 --> 00:01:42,780
+since "x" is 0.
+
+34
+00:01:42,780 --> 00:01:46,180
+Here, the user is never warned of this fact.
+
+35
+00:01:46,180 --> 00:01:48,800
+Also, the returned result is
+necessarily inexact.
+
+36
+00:01:48,800 --> 00:01:52,870
+The use of this "f" resorts to an
+arbitrary convention
+
+37
+00:01:52,870 --> 00:01:55,710
+which is not necessarily known
+by other programmers.
+
+38
+00:01:55,709 --> 00:01:59,059
+Here, the choice of the return value
+is such a convention.
+
+39
+00:01:59,060 --> 00:02:02,299
+To overcome this lack of information
+that the user of the function "f" is facing
+
+40
+00:02:02,299 --> 00:02:04,150
+when we are divide by 0,
+
+41
+00:02:04,150 --> 00:02:08,258
+we could imagine to have our function "f"
+print an error message
+
+42
+00:02:08,258 --> 00:02:12,408
+whenever the entered value is 0.
+We would have our function print
+
+43
+00:02:12,408 --> 00:02:14,938
+that there is an error situation :
+a division by 0.
+
+44
+00:02:14,938 --> 00:02:16,810
+However, this does not solve all
+the problems
+
+45
+00:02:16,810 --> 00:02:19,859
+of the previous version. Indeed, we
+still have no idea
+
+46
+00:02:19,859 --> 00:02:22,840
+what we should return in an error situation.
+
+47
+00:02:22,840 --> 00:02:26,288
+This solution can also face criticism since
+it triggers so-called
+
+48
+00:02:26,288 --> 00:02:28,319
+"edge effects".
+
+49
+00:02:28,319 --> 00:02:32,129
+This means that the function "f", which is
+only supposed to return
+
+50
+00:02:32,129 --> 00:02:35,609
+the inverse of a number is now
+generating printings
+
+51
+00:02:35,610 --> 00:02:38,970
+in the terminal; this is not its
+usual task!
+
+52
+00:02:38,970 --> 00:02:42,860
+Indeed, let us imagine we are using
+"f"  within a graphical program.
+
+53
+00:02:42,860 --> 00:02:45,090
+In this case, we do not want for an
+abnormal situation
+
+54
+00:02:45,090 --> 00:02:47,000
+to be reported by a message on
+the terminal
+
+55
+00:02:47,000 --> 00:02:50,579
+but rather by the opening of an
+alert window, for example.
+
+56
+00:02:50,579 --> 00:02:52,319
+Finally, even though the function "f"
+
+57
+00:02:52,318 --> 00:02:55,779
+is the juncture of the program where
+the error is detected,
+
+58
+00:02:55,779 --> 00:02:59,359
+it might not be the place to handle
+
+
+59
+00:02:59,359 --> 00:03:00,640
+this situation properly.
+
+60
+00:03:00,639 --> 00:03:02,549
+Indeed, a division by 0
+
+61
+00:03:02,550 --> 00:03:05,120
+could be harmful enough
+
+62
+00:03:05,120 --> 00:03:06,158
+to require the program to be stopped.
+
+63
+00:03:06,158 --> 00:03:09,698
+Also, it is possible for a division by 0
+to be handled
+
+64
+00:03:09,698 --> 00:03:11,799
+according to the context of utilization.
+
+65
+00:03:11,799 --> 00:03:15,149
+This means that it is the juncture
+of the program calling the function "f",
+
+66
+00:03:15,149 --> 00:03:18,688
+informed of the context, that could
+give the appropriate measures
+
+67
+00:03:18,688 --> 00:03:21,980
+in case there is a division by 0.
+
+68
+00:03:21,980 --> 00:03:25,809
+A last option would be to rewrite
+the function "f"
+
+69
+00:03:25,809 --> 00:03:29,439
+so that it rather returns an error code
+
+70
+00:03:29,438 --> 00:03:33,459
+indicating if the division has been
+computed correctly.
+
+71
+00:03:33,459 --> 00:03:39,018
+Then, it will return the result of the
+division only in a normal situation,
+
+72
+00:03:39,018 --> 00:03:42,028
+when there is no error with the parameter.
+
+73
+00:03:42,028 --> 00:03:45,468
+This way to proceed is better
+than the previous ones.
+
+74
+00:03:45,468 --> 00:03:48,750
+Indeed, this way, the function calling "f"
+
+75
+00:03:48,750 --> 00:03:51,009
+is able to decide what to do
+in case of error.
+
+76
+00:03:51,009 --> 00:03:54,628
+The function "f" itself should not be the one
+taking this decision;
+
+77
+00:03:54,628 --> 00:03:57,969
+it should simply inform its caller
+upon the execution.
+
+78
+00:03:57,969 --> 00:04:01,618
+Then, the caller will decide what to
+do in case of error.
+
+79
+00:04:01,618 --> 00:04:04,778
+Unfortunately, this way to proceed
+renders the use of the function
+
+80
+00:04:04,778 --> 00:04:06,799
+much less intuitive.
+
+81
+00:04:06,800 --> 00:04:08,230
+Instead of writing something simple
+
+82
+00:04:08,229 --> 00:04:10,048
+which would mean
+
+83
+00:04:10,049 --> 00:04:13,918
+let us store into "y" the result of
+the inversion of "x"
+
+84
+00:04:13,918 --> 00:04:16,969
+computed by the method "f", we should
+resort to
+
+85
+00:04:16,970 --> 00:04:18,749
+more complex instructions.
+
+86
+00:04:18,749 --> 00:04:22,168
+First, we should know that "f" returns
+an error code
+
+87
+00:04:22,168 --> 00:04:26,209
+and that the normal utilization result
+is stored in the second parameter.
+
+88
+00:04:26,209 --> 00:04:28,119
+This is clearly less intuitive
+
+89
+00:04:28,119 --> 00:04:30,028
+than this way of writing things.
+
+90
+00:04:30,028 --> 00:04:33,368
+Moreover, when a method calls another
+which then calls another
+
+91
+00:04:33,368 --> 00:04:37,009
+and so on, each call could potentially
+result in an error code.
+
+92
+00:04:37,009 --> 00:04:39,869
+In this case, we must then handle
+the combinations
+
+93
+00:04:39,869 --> 00:04:44,550
+of all these error codes. Obviously, this
+quickly becomes unpleasant.
+
+94
+00:04:44,550 --> 00:04:47,520
+Now, we wish to get our hands on
+a mechanism
+
+95
+00:04:47,520 --> 00:04:50,478
+which would let us report an
+error situation
+
+96
+00:04:50,478 --> 00:04:53,218
+without triggering any of these undesired
+edge effects.
+
+97
+00:04:53,218 --> 00:04:56,748
+We also wish to possess a mechanism
+letting us handle the error
+
+98
+00:04:56,748 --> 00:05:00,209
+at another place than the one
+where it is detected.
+
+99
+00:05:00,209 --> 00:05:02,900
+This should all be done while keeping
+utilization flexibility,
+
+100
+00:05:02,900 --> 00:05:05,669
+an intuitive intuition of the different
+functionalities
+
+101
+00:05:05,669 --> 00:05:07,628
+we wish to have in our programs.
+
+102
+00:05:07,629 --> 00:05:10,499
+Execption handling meets all 
+our needs.
+
+103
+00:05:10,499 --> 00:05:14,768
+At the place where the error is detected, we
+will be able to trigger an "exception".
+
+104
+00:05:14,768 --> 00:05:18,250
+This "exception" can then be handled at another
+place in the program.
+
+105
+00:05:18,250 --> 00:05:21,140
+Also, we are not compelled to explicitly
+integrate any error code
+
+106
+00:05:21,140 --> 00:05:24,389
+in the different functionalities we wish
+to implement.
+
+107
+00:05:24,389 --> 00:05:28,628
+The mechanism of exception handling
+works according
+
+108
+00:05:28,628 --> 00:05:31,620
+to the three points
+developped here.
+
+109
+00:05:31,620 --> 00:05:34,800
+Whenever an error or abnormal
+situation is detected
+
+110
+00:05:34,800 --> 00:05:36,120
+somewhere in the program,
+
+111
+00:05:36,120 --> 00:05:40,168
+we will warn the rest of the program
+by "throwing an object"
+
+112
+00:05:40,168 --> 00:05:43,759
+containing all the useful informations
+so that we can potentially handle
+
+113
+00:05:43,759 --> 00:05:46,129
+this error or abormal situation
+
+114
+00:05:46,129 --> 00:05:48,129
+elsewhere in the program.
+
+115
+00:05:48,129 --> 00:05:51,819
+"Throwing" or "triggering an exception" concretely
+means creating an object
+
+116
+00:05:51,819 --> 00:05:55,028
+which becomes available for
+the rest of the program.
+
+117
+00:05:55,028 --> 00:05:57,699
+This object can then be "caught",
+which means "used",
+
+118
+00:05:57,699 --> 00:06:02,129
+elsewhere in program so that we can
+handle this abnormal situation,
+
+119
+00:06:02,129 --> 00:06:05,288
+completely or partialy.
+
+120
+00:06:05,288 --> 00:06:09,058
+Finally, if the "thrown object"
+is never "caught",
+
+121
+00:06:09,059 --> 00:06:11,580
+it will trigger the stop
+of the program.
+
+122
+00:06:11,579 --> 00:06:15,788
+An unhandled thrown exception always
+triggers the stopping of the program.
+
+123
+00:06:15,788 --> 00:06:18,538
+Let us illustrate this with a concrete example.
+
+124
+00:06:18,538 --> 00:06:21,800
+Let us imagine, for example, that
+we have a main program
+
+125
+00:06:21,800 --> 00:06:23,939
+working with temperatures.
+
+126
+00:06:23,939 --> 00:06:27,629
+These temperatures are aquired
+through, for example, a meter.
+
+127
+00:06:27,629 --> 00:06:32,090
+These temperatures are then stored
+in an array. Our program's task
+
+128
+00:06:32,089 --> 00:06:36,969
+is to draw a graphic of the inverse
+of all the aquired temperatures.
+
+129
+00:06:36,969 --> 00:06:39,549
+Let us imagine these temperatures
+are aquired
+
+130
+00:06:39,550 --> 00:06:42,790
+through a not fully reliable meter.
+
+131
+00:06:42,790 --> 00:06:45,189
+Therefore, every once in a while, it
+could fail to measure
+
+132
+00:06:45,189 --> 00:06:47,079
+the temperature correctly
+
+133
+00:06:47,079 --> 00:06:49,050
+and would, for instance, add null values
+
+134
+00:06:49,050 --> 00:06:51,309
+into our temperature array.
+
+135
+00:06:51,309 --> 00:06:55,370
+The main program realizes its processing
+by calling
+
+136
+00:06:55,370 --> 00:06:59,258
+another function called "graphiqueInverse"
+(TN: means "invertPlot").
+
+137
+00:06:59,258 --> 00:07:03,360
+This function will iterate on all the temperatures
+of a provided array
+
+138
+00:07:03,360 --> 00:07:06,590
+and display the graph of their inverse.
+
+139
+00:07:09,210 --> 00:07:13,668
+This method thus resorts to another
+method
+
+140
+00:07:13,668 --> 00:07:16,549
+which calculates the inverse
+of a double.
+
+141
+00:07:16,550 --> 00:07:20,509
+The method "inverse" is absolutely not
+aware of its utilization context.
+
+142
+00:07:20,509 --> 00:07:23,038
+It does know not what to do
+
+143
+00:07:23,038 --> 00:07:25,348
+if the provided value is zero.
+
+144
+00:07:25,348 --> 00:07:28,209
+It corresponds to this value
+in the array.
+
+145
+00:07:28,209 --> 00:07:29,120
+However,
+
+146
+00:07:29,120 --> 00:07:33,120
+the main program knows in
+what context this method is called
+
+147
+00:07:33,120 --> 00:07:36,268
+and is therefore able to
+solve the problem.
+
+148
+00:07:36,268 --> 00:07:37,589
+For example, it could decide
+
+149
+00:07:37,589 --> 00:07:40,562
+that if the display of the temperatures
+has failed,
+
+150
+00:07:40,562 --> 00:07:43,245
+which means that the aquired
+temperatures were corrputed,
+
+151
+00:07:43,245 --> 00:07:45,218
+then we must recover them anew.
+
+152
+00:07:45,218 --> 00:07:48,620
+The idea motivating exception
+handling is that the part of the program
+
+153
+00:07:48,620 --> 00:07:50,819
+detecting an abnormal situation,
+
+154
+00:07:50,819 --> 00:07:53,268
+while remaining unable to treat it locally,
+
+155
+00:07:53,268 --> 00:07:56,711
+will report it to
+the rest of the program
+
+156
+00:07:58,441 --> 00:08:00,664
+by "throwing an exception".
+
+157
+00:08:05,434 --> 00:08:09,538
+The "exception" is a particular object
+provided to the rest of the program.
+
+158
+00:08:09,538 --> 00:08:14,158
+If this thrown object is not caught
+anywhere else in the program,
+
+159
+00:08:14,160 --> 00:08:17,080
+its execution will be canceled :
+we could not handle the error.
+
+160
+00:08:17,079 --> 00:08:20,569
+Obviously we can also have another
+part of the program,
+
+161
+00:08:20,569 --> 00:08:22,569
+aware of the error's context,
+
+162
+00:08:22,569 --> 00:08:25,459
+"catch" this object and
+dealing with it appropriately.
+
+163
+00:08:25,459 --> 00:08:30,098
+The main program will have to show
+that it is receptive
+
+164
+00:08:30,098 --> 00:08:32,929
+to the "thrown" objects, and that it can
+receive with them.
+
+165
+00:08:32,929 --> 00:08:34,219
+In this case,
+
+166
+00:08:34,220 --> 00:08:37,058
+it will be able to "catch" the object
+
+167
+00:08:40,758 --> 00:08:42,479
+and deal with it
+
+168
+00:08:44,899 --> 00:08:50,779
+if, of course, the object has been thrown
+during the execution of the receptive block.
+
+169
+00:08:50,779 --> 00:08:52,879
+In order to develop such a process,
+
+170
+00:08:52,879 --> 00:08:55,669
+we need to realize four
+elementary tasks.
+
+171
+00:08:55,669 --> 00:08:57,958
+The first is the signalment of
+an error.
+
+172
+00:08:57,958 --> 00:09:00,308
+This is what our "inverse" method was doing
+
+173
+00:09:00,308 --> 00:09:05,088
+when it was "throwing" an object to
+warn the rest of the program of this abnormal situation.
+
+174
+00:09:05,088 --> 00:09:10,490
+The error signalement was thus what was
+going on at this step of our example.
+
+175
+00:09:10,490 --> 00:09:14,879
+The second task is to mark the areas
+receptive to the errors.
+
+176
+00:09:14,879 --> 00:09:18,299
+This is what our main program
+was doing here
+
+177
+00:09:18,299 --> 00:09:21,559
+to indicate it is able to "catch"
+and deal with such an object
+
+178
+00:09:21,559 --> 00:09:23,959
+corresponding to an abnormal sitatuion.
+
+179
+00:09:23,960 --> 00:09:27,749
+To each area receptive to errors,
+abnormal situations,
+
+180
+00:09:27,749 --> 00:09:30,359
+we need to provide a tool to actually
+deal with these errors.
+
+181
+00:09:30,359 --> 00:09:33,339
+This means "catching" the object
+and dealing with it.
+
+182
+00:09:33,340 --> 00:09:34,690
+In our example,
+
+183
+00:09:34,690 --> 00:09:37,730
+each receptive block has
+been provided
+
+184
+00:09:37,730 --> 00:09:42,180
+with a set of instructions able to
+deal with the object, catching it.
+
+185
+00:09:42,179 --> 00:09:45,759
+Finally, in certain cases, it can
+be necessary to do some cleaning
+
+186
+00:09:45,759 --> 00:09:48,489
+after a block receptive to errors.
+For example, 
+
+187
+00:09:48,489 --> 00:09:50,809
+we could need to liberate some resources
+
+188
+00:09:50,808 --> 00:09:53,410
+which have been used but not
+properly liberated
+
+189
+00:09:53,410 --> 00:09:55,860
+due to an abnormal situation.
+
+190
+00:09:55,860 --> 00:10:01,570
+To each of these four tasks, there is
+a coresponding Java keyword.
+
+191
+00:10:01,570 --> 00:10:06,899
+In order to to report the error,
+we use the keyword "throw".
+
+192
+00:10:06,899 --> 00:10:14,389
+In order to make the areas receptive
+to erros, we use "try".
+
+193
+00:10:14,389 --> 00:10:18,159
+In order to provide the block receptive
+to errors
+
+194
+00:10:18,159 --> 00:10:21,539
+wich a handling bock, we
+use the keyword "catch".
+
+195
+00:10:21,539 --> 00:10:23,149
+And finally, 
+
+196
+00:10:23,149 --> 00:10:26,079
+in order to make some room,
+we use the keyword "finally".
+
+197
+00:10:26,079 --> 00:10:29,259
+The detailed description on the
+use of these keywords
+
+198
+00:10:29,259 --> 00:10:32,230
+will be presented in the next episode.
+
+199
+00:10:32,230 --> 00:10:33,920
+To make things clear,
+
+200
+00:10:34,580 --> 00:10:37,950
+the program area detecting the
+error will "throw" the object
+
+201
+00:10:37,950 --> 00:10:41,290
+thanks to the reserved keyword "throw".
+
+202
+00:10:41,289 --> 00:10:44,810
+Later, we will see what is "thrown" exactly.
+
+203
+00:10:45,430 --> 00:10:48,789
+The area receptive to the throw objects
+
+204
+00:10:48,789 --> 00:10:53,879
+is delimited with the reserved
+keyword "try".
+
+205
+00:10:53,879 --> 00:10:58,349
+This means each block receptive to errors
+is indicated with this keyword.
+
+206
+00:10:58,350 --> 00:11:00,880
+Then, to each of these blocks,
+
+207
+00:11:00,880 --> 00:11:04,263
+we must associate a block able
+to deal with the error.
+
+208
+00:11:04,263 --> 00:11:08,296
+The error will be caught with
+the keyword "catch".
+
+209
+00:11:08,296 --> 00:11:11,029
+As said, we will see the precise
+syntax
+
+210
+00:11:11,029 --> 00:11:12,620
+in the following episodes.
+
+211
+00:11:12,620 --> 00:11:16,340
+As you have probably noticed through
+our little example,
+
+212
+00:11:16,340 --> 00:11:19,110
+the reporting of the errors thanks
+to the keyword "throw"
+
+213
+00:11:19,110 --> 00:11:22,629
+and the solving of these mistakes through
+the blocks "try" and "catch"
+
+214
+00:11:22,629 --> 00:11:26,220
+generally happen at distinct
+areas in the code.
+
+215
+00:11:26,220 --> 00:11:29,720
+Actually, this is precisely the appeal
+of exception handling.
+
+216
+00:11:29,720 --> 00:11:30,949
+In our example,
+
+217
+00:11:30,948 --> 00:11:33,069
+the "throw" is placed in the "inverse" method.
+
+218
+00:11:33,070 --> 00:11:36,990
+The blocks "try" and "catch" are
+placed in the main program.
+
+219
+00:11:36,990 --> 00:11:39,969
+In the next episodes, we will see that
+to each "try",
+
+220
+00:11:39,969 --> 00:11:43,392
+a "catch" must be associated or
+possibly even
+
+221
+00:11:43,392 --> 00:11:45,155
+several "catch" blocks.
+
+222
+00:11:45,155 --> 00:11:48,620
+To sum up, an exception is thus a
+way to report an event
+
+223
+00:11:48,620 --> 00:11:52,218
+requiring particular attention
+in the program
+
+224
+00:11:52,218 --> 00:11:54,518
+This event can be a severe mistake
+
+225
+00:11:54,518 --> 00:11:56,259
+requiring for the whole program to be stopped
+
+226
+00:11:56,259 --> 00:12:00,349
+or simply an unusual situation which we
+
+227
+00:12:00,349 --> 00:12:02,860
+will solve appropriately.
+
+228
+00:12:02,860 --> 00:12:05,919
+This was the case in our previous example.
+There, a division by zero
+
+229
+00:12:05,919 --> 00:12:08,556
+corresponded to an unusual situation.
+
+230
+00:12:08,556 --> 00:12:11,103
+Here, it does not correspond to
+a dramatic situation
+
+231
+00:12:11,103 --> 00:12:13,400
+and can be solved, for example, by
+retaking the measures
+
+232
+00:12:13,400 --> 00:12:15,260
+without having to shut down the program.
+
+233
+00:12:15,259 --> 00:12:18,060
+Exception handling will be a tool
+letting us improve
+
+234
+00:12:18,060 --> 00:12:21,589
+the sturdiness of our programs and will
+make it possible to separate the code
+
+235
+00:12:21,589 --> 00:12:23,730
+dedicated to error handling
+
+236
+00:12:23,730 --> 00:12:25,819
+from the code realizing the
+other processing
+
+237
+00:12:25,819 --> 00:12:28,850
+happening in a normal situation.
+
+238
+00:12:28,850 --> 00:12:32,249
+Exception handling will also
+let us
+
+239
+00:12:32,249 --> 00:12:34,769
+force an answer to particular errors.
+
+240
+00:12:34,769 --> 00:12:36,039
+For example, here,
+
+241
+00:12:36,039 --> 00:12:39,500
+with an unusual situation we need
+to solve appropriately.
+
+242
+00:12:39,500 --> 00:12:42,639
+Unlike the solution presented at
+the beginning of this sequence,
+
+243
+00:12:42,639 --> 00:12:44,870
+where we were dealing the abornoam situations
+
+244
+00:12:44,870 --> 00:12:48,930
+so that the methods of functions return
+error codes,
+
+245
+00:12:48,930 --> 00:12:52,359
+exception handling provides quite
+a few advantages.
+
+246
+00:12:52,840 --> 00:12:55,260
+Among the most important is that
+the writing will be easier,
+
+247
+00:12:55,260 --> 00:12:56,819
+more intuitive, more readable.
+
+248
+00:12:56,819 --> 00:12:59,548
+For example, our method calculating
+the inverse
+
+249
+00:12:59,548 --> 00:13:03,268
+can still be used in a very natural way.
+
+250
+00:13:03,269 --> 00:13:05,330
+Thus, it is not necessary
+
+251
+00:13:05,330 --> 00:13:08,690
+to pollute the code by
+adding
+
+252
+00:13:08,690 --> 00:13:12,330
+other parameters solely
+dedicated to error handling.
+
+253
+00:13:13,710 --> 00:13:17,109
+The propagation of the exception
+to higher call levels
+
+254
+00:13:17,109 --> 00:13:18,949
+will be done automatically.
+
+255
+00:13:18,949 --> 00:13:22,552
+It is thus not necessary for every
+intermediate call level
+
+256
+00:13:22,552 --> 00:13:24,595
+to deal with the error.
+
+257
+00:13:24,595 --> 00:13:27,789
+For example, if the exception thrown
+by the "inverse" method
+
+258
+00:13:27,789 --> 00:13:31,560
+is not caught by the calling method,
+named "graphiqueInverse",
+
+259
+00:13:31,560 --> 00:13:33,893
+the object will be automatically
+
+260
+00:13:33,893 --> 00:13:36,246
+thorwn to the upper call level
+
+261
+00:13:36,246 --> 00:13:39,730
+which will then be able to deal with
+it like the main program.
+
+262
+00:13:39,730 --> 00:13:43,149
+An error can now occur at
+any call level
+
+263
+00:13:43,149 --> 00:13:46,510
+while still being carried over to
+the rest of the program.
+
+264
+00:13:46,970 --> 00:13:48,210
+As we have just seen,
+
+265
+00:13:48,210 --> 00:13:51,079
+exception handling presents
+many an advantage
+
+266
+00:13:51,079 --> 00:13:52,578
+in order to solve error situations,
+
+267
+00:13:52,578 --> 00:13:55,079
+abnormal situations in our program.
+
+268
+00:13:55,080 --> 00:13:58,028
+However, the underlying mechanisms
+do come with a certain cost.
+
+269
+00:13:58,028 --> 00:14:00,970
+Thus arises a methodological rule
+
+270
+00:14:00,970 --> 00:14:03,510
+which will be discussed in the
+following episodes.
+
+271
+00:14:03,510 --> 00:14:05,060
+The rule is this the following:
+
+272
+00:14:05,059 --> 00:14:07,280
+If an error can be dealt with locally
+
+273
+00:14:07,280 --> 00:14:10,019
+(this means that, at a certain place,
+we are fully informed
+
+274
+00:14:10,019 --> 00:14:11,948
+on how to solve the error),
+
+275
+00:14:11,948 --> 00:14:14,419
+then we should immediately
+do it locally
+
+276
+00:14:14,419 --> 00:14:17,069
+without using the mechanism
+of exceptions.

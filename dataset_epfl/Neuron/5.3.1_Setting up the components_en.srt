@@ -1,0 +1,709 @@
+﻿1
+00:00:05,357 --> 00:00:08,532
+Hi. In the next two tutorials,
+we're going to learn
+
+2
+00:00:08,745 --> 00:00:12,120
+how to optimize the parameters
+of the electrical model
+
+3
+00:00:12,300 --> 00:00:15,163
+so that they fit
+electrical constraints.
+
+4
+00:00:15,401 --> 00:00:19,276
+In the first part I will
+discuss how to set up
+
+5
+00:00:19,474 --> 00:00:22,311
+all the different components
+necessary for this optimization.
+
+6
+00:00:22,507 --> 00:00:25,919
+So we will learn how to set up
+the model and how to build
+
+7
+00:00:26,120 --> 00:00:28,320
+to the evaluator.
+
+8
+00:00:28,510 --> 00:00:31,985
+So to start using BluePyOpt,
+we imported it in the same way
+
+9
+00:00:32,178 --> 00:00:35,228
+as we did with NEURON,
+and in this case we also
+
+10
+00:00:35,451 --> 00:00:38,014
+import a supply
+called "ephys"
+
+11
+00:00:38,209 --> 00:00:41,497
+of BluePyOpt which contains
+some extra functionality that's
+
+12
+00:00:41,703 --> 00:00:44,703
+very specific to electrical models.
+
+13
+00:00:44,947 --> 00:00:48,684
+To optimize the model parameters,
+we first have to define the model
+
+14
+00:00:48,890 --> 00:00:50,440
+in BluePyOpt.
+
+15
+00:00:50,634 --> 00:00:52,684
+We do this by creating a template.
+
+16
+00:00:52,867 --> 00:00:54,942
+This template consists of
+a shape of the cell
+
+17
+00:00:55,124 --> 00:00:58,274
+which is a morphology,
+a description of the ion channels
+
+18
+00:00:58,481 --> 00:01:01,481
+which are the mechanisms,
+and we also have to define
+
+19
+00:01:01,675 --> 00:01:04,675
+which parameters
+are free in the model.
+
+20
+00:01:05,532 --> 00:01:08,432
+First we're going to add
+a morphology of the cell.
+
+21
+00:01:08,675 --> 00:01:11,913
+NEURON can load different
+standardized descriptions
+
+22
+00:01:12,128 --> 00:01:14,490
+of neuron morphologies.
+
+23
+00:01:14,708 --> 00:01:16,533
+An example is SWC format.
+
+24
+00:01:16,716 --> 00:01:21,516
+And I've added a link to exact
+description of this format here.
+
+25
+00:01:21,900 --> 00:01:25,100
+Here you see a description
+of such a morphology.
+
+26
+00:01:25,319 --> 00:01:28,819
+I'm not going to go into detail
+but basically it describes
+
+27
+00:01:29,049 --> 00:01:33,524
+a morphology with a soma
+with a radius of 10μm
+
+28
+00:01:33,745 --> 00:01:40,495
+and also a dendrite which
+has a length of 100μm.
+
+29
+00:01:40,929 --> 00:01:45,604
+Here you can see an example
+of such SWC description.
+
+30
+00:01:45,887 --> 00:01:47,687
+I'm not going to go
+into the details
+
+31
+00:01:47,870 --> 00:01:50,445
+but it basically describes
+a morphology with a soma
+
+32
+00:01:50,649 --> 00:01:53,899
+with a radius of 10μm, and
+a single dendritic section
+
+33
+00:01:54,125 --> 00:01:56,488
+with a length of 100μm.
+
+34
+00:01:56,858 --> 00:01:59,858
+And that dendrite also
+has a radius of 2μm.
+
+35
+00:02:01,213 --> 00:02:02,588
+We can plot this morphology
+
+36
+00:02:02,785 --> 00:02:05,110
+using the neuronal
+morphology analysis tool
+
+37
+00:02:05,290 --> 00:02:07,190
+or Neuro M.
+
+38
+00:02:08,270 --> 00:02:11,458
+It's as simple as just specifying
+the location of the SWC file
+
+39
+00:02:11,660 --> 00:02:14,660
+and calling the Draw function
+of the Neuron M.
+
+40
+00:02:15,070 --> 00:02:18,933
+As you can see we have
+a soma and a dendrite.
+
+41
+00:02:20,964 --> 00:02:24,251
+Now we want to use this
+morphology in BluePyOpt.
+
+42
+00:02:24,461 --> 00:02:27,674
+For this we create an Nrnfile morphology object
+
+43
+00:02:27,864 --> 00:02:30,864
+which points to the SWC file.
+
+44
+00:02:31,591 --> 00:02:34,978
+By default the neuron morphology
+has the following section lists.
+
+45
+00:02:35,388 --> 00:02:38,850
+Somatic, axonal, apical, and basal,
+which point to the different
+
+46
+00:02:39,070 --> 00:02:41,720
+locations along the morphology.
+
+47
+00:02:41,903 --> 00:02:46,353
+Later on, we will have to specify
+where certain channels are added
+
+48
+00:02:46,585 --> 00:02:49,585
+or where certain injections
+are occurring.
+
+49
+00:02:49,807 --> 00:02:52,069
+For this we'll define
+the location objects.
+
+50
+00:02:52,252 --> 00:02:55,727
+For example, we can define
+a somatic location object
+
+51
+00:02:55,930 --> 00:03:00,205
+which points to all the sections,
+which in this case it's just one
+
+52
+00:03:00,381 --> 00:03:02,031
+of the soma.
+
+53
+00:03:02,955 --> 00:03:06,080
+If you want to point to
+all the basal sections
+
+54
+00:03:06,286 --> 00:03:11,948
+we create also an object, we call
+it the Dendritic Location Object.
+
+55
+00:03:12,951 --> 00:03:16,013
+Now we need to specify which
+ion channels are present on
+
+56
+00:03:16,218 --> 00:03:18,193
+the membrane of this morphology.
+
+57
+00:03:18,421 --> 00:03:20,696
+The NEURON simulator has
+the built-in implementation
+
+58
+00:03:20,872 --> 00:03:24,247
+of the Hodgkin Huxley Sodium,
+Potassium and Leak channels.
+
+59
+00:03:24,451 --> 00:03:27,889
+Let's add this mechanism,
+which is called HH to the soma.
+
+60
+00:03:29,178 --> 00:03:31,728
+The name field can be
+chosen by the user.
+
+61
+00:03:31,932 --> 00:03:34,245
+This name should be unique.
+
+62
+00:03:34,441 --> 00:03:39,629
+The suffix points to the same field
+in the NMODL file of the channel
+
+63
+00:03:39,836 --> 00:03:42,761
+and locations specify which
+
+64
+00:03:42,967 --> 00:03:45,667
+sections the mechanism
+will be added to.
+
+65
+00:03:46,568 --> 00:03:49,568
+So, now we have specified
+the shape of the neuron
+
+66
+00:03:49,792 --> 00:03:54,492
+and we have the set where we
+want to add all the ion channels.
+
+67
+00:03:55,498 --> 00:03:59,860
+The next step is to define which
+parameters we want to optimize.
+
+68
+00:04:00,459 --> 00:04:04,971
+A parameter can be in two states,
+it can be frozen, or not frozen.
+
+69
+00:04:05,186 --> 00:04:08,136
+When a parameter is frozen,
+it has an exact value,
+
+70
+00:04:08,341 --> 00:04:10,391
+otherwise it only has some bounds
+
+71
+00:04:10,580 --> 00:04:13,305
+but the exact value
+is not known yet.
+
+72
+00:04:14,474 --> 00:04:17,612
+Let's first define a parameter
+that's going to set
+
+73
+00:04:17,807 --> 00:04:20,807
+the capacitance of the cell.
+
+74
+00:04:22,761 --> 00:04:25,136
+In this tutorial we'll focus on
+optimizing the parameters
+
+75
+00:04:25,312 --> 00:04:26,637
+of the soma.
+
+76
+00:04:26,844 --> 00:04:30,819
+So we'll also fix the leakage
+conductance of the dendrite
+
+77
+00:04:31,010 --> 00:04:33,210
+and we'll make it
+passive by disabling
+
+78
+00:04:33,379 --> 00:04:36,379
+the sodium and
+potassium conductances.
+
+79
+00:04:37,608 --> 00:04:40,133
+Now we set the bounds for
+the maximum conductances of
+
+80
+00:04:40,345 --> 00:04:42,857
+the sodium and potassium
+channels in the soma.
+
+81
+00:04:43,046 --> 00:04:45,471
+These two parameters
+will be optimized later
+
+82
+00:04:45,650 --> 00:04:49,400
+and here you can see the bounds
+in which the algorithm is allowed
+
+83
+00:04:49,580 --> 00:04:52,580
+to change the parameter.
+
+84
+00:04:54,564 --> 00:04:57,376
+We put all the components,
+so our morphology mechanism
+
+85
+00:04:57,562 --> 00:05:00,937
+and parameters, together
+into a cell model object.
+
+86
+00:05:03,999 --> 00:05:06,587
+This cell model object
+can also be printed out
+
+87
+00:05:06,786 --> 00:05:10,473
+and it shows you a summary of all
+the object we have defined before.
+
+88
+00:05:11,741 --> 00:05:14,154
+So now we have a cell model
+
+89
+00:05:14,353 --> 00:05:17,128
+but we have to define which
+constraints you want to apply
+
+90
+00:05:17,323 --> 00:05:18,936
+to the cell model.
+
+91
+00:05:19,148 --> 00:05:20,886
+To optimize the parameters
+of the model
+
+92
+00:05:21,087 --> 00:05:23,600
+we need to create an object
+that will translate parameter values
+
+93
+00:05:23,782 --> 00:05:25,520
+into fitness scores.
+
+94
+00:05:25,715 --> 00:05:28,327
+This object will need to know
+which protocols to inject
+
+95
+00:05:28,524 --> 00:05:31,499
+which parameters to optimize, etc.
+
+96
+00:05:32,099 --> 00:05:34,337
+So we first start by defining
+the protocols.
+
+97
+00:05:34,533 --> 00:05:38,108
+A protocol consists of a set
+of stimuli and a set of responses.
+
+98
+00:05:38,307 --> 00:05:39,882
+These responses will later be used
+
+99
+00:05:40,078 --> 00:05:42,953
+calculate a score
+of parameter values.
+
+100
+00:05:43,230 --> 00:05:45,655
+Let's create two protocols.
+
+101
+00:05:45,877 --> 00:05:49,377
+Two square current pulses
+at the location
+
+102
+00:05:49,587 --> 00:05:52,987
+of the middle of the soma,
+with different amplitude.
+
+103
+00:05:53,582 --> 00:05:56,107
+We first need to create
+a location object.
+
+104
+00:05:56,280 --> 00:06:01,155
+So again, this object will point
+to all the compartments inside
+
+105
+00:06:01,350 --> 00:06:04,225
+the somatic section list.
+
+106
+00:06:04,448 --> 00:06:08,160
+Then we define the stimuli
+recordings and protocols.
+
+107
+00:06:08,372 --> 00:06:11,585
+For each protocol we add...
+(so the recording protocols
+
+108
+00:06:11,757 --> 00:06:14,195
+are defined here)
+we add a stimulus
+
+109
+00:06:14,407 --> 00:06:15,870
+and the recording.
+
+110
+00:06:17,032 --> 00:06:22,307
+This inner square pulse stimulus
+is basically a current clamp
+
+111
+00:06:22,514 --> 00:06:25,514
+that injects a square
+current injection.
+
+112
+00:06:25,845 --> 00:06:30,170
+And we also add recording and we say
+that the location to record from 
+
+113
+00:06:30,376 --> 00:06:32,589
+is the middle of the soma
+and this location object
+
+114
+00:06:32,795 --> 00:06:35,795
+is something we've defined before.
+
+115
+00:06:36,493 --> 00:06:39,906
+Then we put these two protocols
+that we've defined here,
+
+116
+00:06:40,119 --> 00:06:45,544
+so we have a protocol that's going
+to inject 0.1nA and another protocol
+
+117
+00:06:45,735 --> 00:06:50,423
+is going to inject 0.5nA, into
+an object that puts them
+
+118
+00:06:50,637 --> 00:06:52,462
+together: a sequence protocol,
+
+119
+00:06:52,695 --> 00:06:55,045
+so that, basically,
+it's first going to run
+
+120
+00:06:55,230 --> 00:06:58,292
+step one, and then step two,
+and it's going to put everything
+
+121
+00:06:58,506 --> 00:07:01,468
+into one protocol definition.
+
+122
+00:07:02,246 --> 00:07:05,246
+With a cell model in hand,
+and the protocols defined
+
+123
+00:07:05,518 --> 00:07:08,418
+we can now apply the protocol
+to a cell.
+
+124
+00:07:09,051 --> 00:07:13,413
+First we define an object
+that represents the simulator
+
+125
+00:07:13,602 --> 00:07:16,602
+so in this case it's
+the NEURON simulator.
+
+126
+00:07:16,938 --> 00:07:21,525
+We also have to define
+a certain set of parameter values
+
+127
+00:07:21,726 --> 00:07:24,726
+we want to evaluate,
+so for example
+
+128
+00:07:24,945 --> 00:07:26,957
+in this case we're going to evaluate
+
+129
+00:07:27,161 --> 00:07:31,486
+a GK bar of 0.1 and
+the GNA bar of 0.25.
+
+130
+00:07:32,177 --> 00:07:34,740
+So we basically say
+"run our protocol
+
+131
+00:07:34,941 --> 00:07:37,941
+on the certain cell
+model with these parameters".
+
+132
+00:07:38,908 --> 00:07:42,083
+Running our model returned
+a response object.
+
+133
+00:07:42,413 --> 00:07:44,838
+And now we can plot
+the responses.
+
+134
+00:07:45,040 --> 00:07:47,140
+So basically this response object
+
+135
+00:07:47,318 --> 00:07:50,530
+can be accessed by
+our recording name
+
+136
+00:07:50,722 --> 00:07:54,172
+and if you want to plot
+the time or the voltage
+
+137
+00:07:54,385 --> 00:07:57,572
+so we basically create the function
+that, given a set of responses,
+
+138
+00:07:57,749 --> 00:08:00,474
+automatically puts them,
+and you see that here
+
+139
+00:08:00,653 --> 00:08:04,215
+we have the first current injection
+we have one action potential that's
+
+140
+00:08:04,411 --> 00:08:05,936
+being generated,
+
+141
+00:08:06,126 --> 00:08:09,126
+and in the second one we
+have five action potentials.
+
+142
+00:08:12,025 --> 00:08:14,500
+We can also change
+the parameter values
+
+143
+00:08:14,729 --> 00:08:17,129
+so if we change them to 0.1, 0.1
+
+144
+00:08:17,349 --> 00:08:20,174
+we see that we actually get
+a different response which was
+
+145
+00:08:20,356 --> 00:08:22,943
+of course to be expected.
+
+146
+00:08:23,182 --> 00:08:25,157
+So now we have a little
+exercise for you.
+
+147
+00:08:25,359 --> 00:08:30,459
+Try to find the values of GNABAR
+that produce three spikes
+
+148
+00:08:30,648 --> 00:08:35,135
+in the first trace, and five spikes
+in the second trace.
+
+149
+00:08:35,369 --> 00:08:40,569
+When you're searching for this
+don't change the value of the GKBAR.
+

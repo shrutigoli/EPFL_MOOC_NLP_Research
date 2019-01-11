@@ -1,0 +1,64 @@
+This episode aims to present a few complements on the "final" modifier, specifically in the relation to inheritance.
+The "final" modifier can be applied to variables to indicate that they shall not be modified; it can be applied to classes as well, to indicate that they cannot be extended; and it can also be applied to methods to indicate that they can not be overridden in an inheritance relation.
+"final" is very useful for variables and less common for methods and classes.
+The "final" modifier was already presented generally for variables in our previous MOOC covering introduction to Java programming.
+We will thus first begin with its application to a new context, notably how to apply final to methods and classes.
+Let's start with "final methods".
+A "final method" is a method declared as such at the moment it is defined in the class.
+All we need to do is impose it the "final" modifier.
+What this means is that that specific method cannot be overridden in any subclass.
+Let's go back to our example with the "Personnage" hierarchy. Suppose that we want to give our hierarchy a "vieillir" method
+(TN: means "to grow old") and that we wish to make sure that this method is always the same for all possible characters in the game
+For example, the "veillir" method would consist in decrementing the characters health points by one point each time.
+By defining the method as "final" in the
+"Personnage" superclass, we prevent every subclass of
+"Personnage", such as the "Sorcier" subclass for example (TN: means "Sorcerer"), from redefining this method differently.
+If for example we try to make our
+"Sorcier"'s age a little faster than the other characters by redefining the "vieillir" method in that subclass, we'll get an error from the compiler telling us that this is illegal due to the fact that the "vieillir" method is defined as final in the superclass.
+The "final" modifier can also be applied to classes.
+In that case, it indicates that it is impossible to define a subclass to this class, so it is impossible to extend that class by inheritance.
+Declaring a class as final is done by adding the reserved word "final" in front of the declaration of the class which, aside from that, is written as we are used to.
+In our example, if we wish, for one reason or another, for the "Sorcier" class never to have a subclass, then we simply need to declare it as final, which means that if, later on, we try to create a class extending the "Sorcier" class, inheriting from the "Sorcier" class, then we will get an error message from the compiler.
+Methods of final classes appear to be quite annoying -- indeed, they restrict extension programmers who would want to extend an existing hierarchy or extend methods inherited from above.
+For example, the predefined class "String" from the Java API is actually declared as final, meaning that you will never be able to write a "MyString" class inheriting from "String" and which might improve some methods by overriding or adding some.
+That being said, having a final keyword has the advantage of clearly fixing the behavior of a class or method.
+Indeed, suppose that it would be possible to do this, that it would be possible to create a "MyString" subclass extending the predefined class "String".
+And suppose that the programmer of the "MyString" class decides to override methods from the "String" class in their subclass, for example, the "substring()" method which extracts a substring from the character string.
+In fact, nothing would force this programmer -- even if it would be discouraged -- to do this, to respect the known syntax of "substring()".
+So, he could code a substring method that would have a completely different behavior to the one defined in the "String" class.
+This is obviously something that should not be done, something bad, but it is quite possible, there are no fail-safes to prevent it.
+It would then be possible for example to declare a String-type variable and assign it an object of type "MyString", then calling the substring method on this object. And since we always have dynamic binding in Java, it is the substring method from the "MyString" class which would be called, giving rise to potentially unexpected behavior.
+Someone who reads this code could be under the impression that they are working with "String"s and expect a certain behavior for the substring method and this behavior would not actually be present because of this override.
+In order to avoid this sort of effects, you should set the behavior of a class by declaring it as "final", as done in the case of the String class.
+This fail-safe does make us lose some liberties that could be interesting; for example, the extension programmer could chose to redefine the substring method by improving its algorithm and preserving its semantics, meaning that the behavior would be identical to that of the String class.
+Unfortunately, this would not be possible, since the "String" class is "final".
+There, now you know the meaning of the "final"  keyword when it applies to a method or to a class.
+You probably also know it for variables.
+We will come back to this point mainly when variables contain a reference to an object.
+The "final" modifier can also be applied to variables, whether they are local variables, method parameters or what we call "instance variables", i.e class attributes.
+It is then impossible to assign a value more than once to this variable.
+In the specific case where it is an attribute that is final, then it can be initialized in the constructor of the class, but it cannot be modified later on.
+For example if, in a given class, we define an attribute as "final", like so, then it is possible to initialize it at this level, at the moment it is declared.
+It is also possible to define it in the constructors of the class, any constructor, like this, but careful, these are two mutually exclusive options, you must chose one or the other.
+So for example, I can chose only the option with the constructor and in this case, the correct program will look like this.
+If I go with this option, every constructor of the class will have to include a statement initializing this final attribute, or there will be an error message from the compiler indicating that this final variable was not initialized.
+Once it is initialized, this final attribute, like any other final variable, cannot be modified anymore, meaning that here for example, if we imagine that a little later on in the constructor here, we try to modify the value of this attribute, then we will get an error message from the compiler.
+But careful, be sure to note that when a final variable contains a reference to an object, then we cannot assign a new value to that variable, but nothing prevents us from modifying the referenced object via that variable.
+Let's examine this very point with an example.
+So here, we have a "Conteneur" class which contains an integer attribute named "valeur" (TN: means "value").
+The "Conteneur" class has only one public method, "setValeur" allowing us to modify the value of the attribute
+Next, we have a small main program which declares an object of type "Conteneur" and which assigns a value to its integer attribute.
+The state of the memory after the execution of this line of code will thus be like this: in the variable 'c', we have a reference to an object of type "Conteneur", whose valeur attribute has a value of 42.
+The main program calls a method, modifier, which takes 'c' as a parameter.
+The modifier method is special in that the "Conteneur" passed as parameter is declared as "final".
+We could thus imagine that "final" means that the object passed as parameter cannot be modified in the modifier method.
+However, it depends what we mean by this.
+We cannot, indeed, modify the argument itself for example by assigning a new reference to it, however the object referenced can be modified via 'c', even if 'c' is passed as a "final parameter", meaning that after the execution of this line, well, the referenced object will indeed have been modified.
+Basically, the fact that the parameter is "final" prevents the variable that is passed as an argument from pointing to another object, so this is not possible, it is not possible to modify the reference itself; however, nothing prevents us from modifying the referenced object via this final parameter.
+This is of course valid for every "final" variable containing a reference to an object, whether it is an attribute, a local variable, or a method parameter.
+So essentially, when we assign an object to a final variable, this does not mean that the object is protected from any modification from the outside, it simply means that the variable can reference only this object.
+Finally, a small detail which you may have picked up, since Java uses only passing by value and since no parameter can be modified within a method with the modification being preserved outside of the method, what can be the point of declaring this parameter as final?
+The answer is indeed that this is a syntactic fail-safe in the case of this example, since it makes no sense to write this sort of thing, since the parameter cannot be modified by the method.
+Well, the point of declaring these as final is that if we try to do this sort of thing, the compiler will react and tell us that something strange is happening inside our method.
+The fact that we declared it as final allows the compiler to alert us of errors.
+And this concludes our small complement on the final modifier in Java.

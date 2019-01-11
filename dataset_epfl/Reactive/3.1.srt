@@ -1,0 +1,1331 @@
+1
+00:00:00,740 --> 00:00:04,790
+Hi, this is Eric Meijer from Mello Park,
+California.
+
+2
+00:00:04,790 --> 00:00:06,530
+Welcome to week three and four
+
+3
+00:00:06,530 --> 00:00:09,270
+of the introduction to reactive
+programming course.
+
+4
+00:00:10,710 --> 00:00:14,570
+I hope you had a lot of fun with Martin's
+first two weeks.
+
+5
+00:00:14,570 --> 00:00:16,090
+And in the next two weeks we will
+
+6
+00:00:16,090 --> 00:00:20,919
+talk a lot about futures, promises,
+observables, and observers.
+
+7
+00:00:22,090 --> 00:00:25,510
+In these lessons, we will mention the word
+monad quite a lot.
+
+8
+00:00:25,510 --> 00:00:28,150
+Just like we did in the first two weeks.
+
+9
+00:00:28,150 --> 00:00:32,960
+When I use the word monads, it will always
+be in the informal sense.
+
+10
+00:00:32,960 --> 00:00:38,980
+That is, I mean, with the monad, a type
+that has map flat map unit.
+
+11
+00:00:38,980 --> 00:00:44,590
+And it's really used to make the return
+type of a function more expressive.
+
+12
+00:00:44,590 --> 00:00:48,610
+In fact, I will never worry about a monad
+loss.
+
+13
+00:00:48,610 --> 00:00:50,380
+If you have followed week one,
+
+14
+00:00:50,380 --> 00:00:52,660
+you know that Try of T has the shape of a
+
+15
+00:00:52,660 --> 00:00:57,650
+monad, but that it satisfies only two of
+the three monad laws.
+
+16
+00:00:57,650 --> 00:01:02,390
+Regardless of that, I will still speak of
+Try of T as a monad.
+
+17
+00:01:04,160 --> 00:01:05,980
+I hope that you all have as much fun
+
+18
+00:01:05,980 --> 00:01:09,700
+following these lessons as I have making
+and recording them.
+
+19
+00:01:09,700 --> 00:01:12,500
+Enough talking, let's have some fun
+learning.
+
+20
+00:01:13,660 --> 00:01:15,890
+When we look at programming.
+
+21
+00:01:15,890 --> 00:01:19,750
+I consider the following four essential
+effects.
+
+22
+00:01:19,750 --> 00:01:21,590
+And these will be the four effects that we
+
+23
+00:01:21,590 --> 00:01:27,910
+will discuss in the two lectures on
+futures and observables.
+
+24
+00:01:27,910 --> 00:01:31,350
+But before we can talk about futures and
+observables.
+
+25
+00:01:31,350 --> 00:01:34,010
+Which are about asynchronous computation.
+
+26
+00:01:34,010 --> 00:01:41,560
+I want to first revisit, try and iterables
+which are about synchronous computations.
+
+27
+00:01:41,560 --> 00:01:44,980
+And since this is the first lecture of our
+series,
+
+28
+00:01:44,980 --> 00:01:49,440
+we're going to start by looking at try and
+T.
+
+29
+00:01:49,440 --> 00:01:52,840
+So we're going to first look at
+synchronous computations.
+
+30
+00:01:52,840 --> 00:01:54,810
+That return a single value.
+
+31
+00:01:54,810 --> 00:01:56,800
+These are the computations that we are
+used
+
+32
+00:01:56,800 --> 00:02:00,100
+to, that most of our programs deal with.
+
+33
+00:02:00,100 --> 00:02:02,880
+The code that we're going to use to
+illustrate
+
+34
+00:02:02,880 --> 00:02:07,580
+our first effect is a very super simple
+adventure game.
+
+35
+00:02:07,580 --> 00:02:12,180
+Here's the trait that defines such a game.
+We have two methods.
+
+36
+00:02:12,180 --> 00:02:15,620
+Collect coins, which returns a list of
+coins.
+
+37
+00:02:15,620 --> 00:02:18,530
+And once we have a list of coins, we can
+buy treasure.
+
+38
+00:02:19,580 --> 00:02:24,540
+And, given these two methods and this
+trait, we can write our game as follows.
+
+39
+00:02:24,540 --> 00:02:29,040
+We create a new instance of adventure by
+calling the factory method.
+
+40
+00:02:29,040 --> 00:02:32,900
+And then we collect our coins.
+Once we've got our coins,
+
+41
+00:02:32,900 --> 00:02:35,710
+we can start to buy treasure with the
+coins.
+
+42
+00:02:37,130 --> 00:02:39,430
+This looks all really, really simple.
+
+43
+00:02:39,430 --> 00:02:43,900
+But, it's really not as simple as you
+would think at first sight.
+
+44
+00:02:43,900 --> 00:02:46,130
+Because things can fail.
+
+45
+00:02:46,130 --> 00:02:48,910
+How can things fail, well, you, if you
+played any video
+
+46
+00:02:48,910 --> 00:02:52,660
+games, you'd know that the action hero can
+die and game over.
+
+47
+00:02:52,660 --> 00:02:53,240
+Right.
+
+48
+00:02:53,240 --> 00:02:58,160
+So let's look at a little bit more detail,
+how collect coins and buy treasure
+
+49
+00:02:58,160 --> 00:02:58,900
+are implemented.
+
+50
+00:03:01,650 --> 00:03:06,580
+Here's a very simple implementation,
+possible implementation of collect coins.
+
+51
+00:03:06,580 --> 00:03:12,320
+If we get eaten by a monster, then we
+throw a new game over exception,
+
+52
+00:03:12,320 --> 00:03:16,860
+and otherwise we have got a list of coins,
+so say that we
+
+53
+00:03:16,860 --> 00:03:21,790
+return gold, gold and silver.
+As you see here, that the
+
+54
+00:03:21,790 --> 00:03:26,970
+code in that we write doesn't know
+anything about the fact
+
+55
+00:03:26,970 --> 00:03:29,000
+that an exception can be thrown.
+
+56
+00:03:29,000 --> 00:03:32,200
+It just sees that it returns a list of
+coins.
+
+57
+00:03:32,200 --> 00:03:34,740
+And here you, when you call the method,
+there's
+
+58
+00:03:34,740 --> 00:03:39,520
+no indication at all that say collect
+coins may fail.
+
+59
+00:03:42,185 --> 00:03:45,720
+Let's now drill into, buy treasure a
+little bit.
+
+60
+00:03:45,720 --> 00:03:46,391
+So, here's
+
+61
+00:03:46,391 --> 00:03:46,940
+[INAUDIBLE]
+
+62
+00:03:46,940 --> 00:03:50,520
+possible implementation of buy treasure
+that will fail.
+
+63
+00:03:50,520 --> 00:03:51,800
+And when will it fail?
+
+64
+00:03:51,800 --> 00:03:53,210
+Well, let's see.
+
+65
+00:03:53,210 --> 00:03:54,890
+If we have our coins.
+
+66
+00:03:54,890 --> 00:03:59,720
+We sum the value of the coins and if
+that's less than the cost of treasure.
+
+67
+00:03:59,720 --> 00:04:02,890
+Well, then game over.
+Nice try.
+
+68
+00:04:02,890 --> 00:04:06,260
+So, now we have two implementations of the
+methods.
+
+69
+00:04:06,260 --> 00:04:09,850
+Collect coins and buy treasure that can
+both, both fail.
+
+70
+00:04:11,110 --> 00:04:12,190
+And even though the code
+
+71
+00:04:12,190 --> 00:04:14,130
+looks really, really clean.
+
+72
+00:04:14,130 --> 00:04:18,970
+Something magic is happening in between
+these goals.
+
+73
+00:04:18,970 --> 00:04:20,339
+Let's make that explicit.
+
+74
+00:04:23,120 --> 00:04:28,060
+If we really look what's going on, then we
+will see that after we call
+
+75
+00:04:28,060 --> 00:04:33,400
+adventure collect coins, we are blocking,
+at this point, until
+
+76
+00:04:33,400 --> 00:04:38,230
+we have collected all the coins and we
+only continue if there was no exception.
+
+77
+00:04:39,760 --> 00:04:44,460
+Similarly, after we have called buy
+Treasure, we block
+
+78
+00:04:44,460 --> 00:04:48,130
+until the treasure is bought, and we only
+continue if
+
+79
+00:04:48,130 --> 00:04:49,760
+there's no exception.
+
+80
+00:04:49,760 --> 00:04:53,280
+So this code only shows the happy path,
+
+81
+00:04:53,280 --> 00:04:56,000
+but it doesn't show at all the unhappy
+path.
+
+82
+00:04:56,000 --> 00:04:59,830
+It doesn't show at all what happens when
+there are exceptions.
+
+83
+00:04:59,830 --> 00:05:01,910
+So let's make that explicit.
+
+84
+00:05:01,910 --> 00:05:04,180
+Because this is not really fair.
+
+85
+00:05:04,180 --> 00:05:07,010
+We, we're writing code here that meets
+your exceptions, but
+
+86
+00:05:07,010 --> 00:05:10,210
+it doesn't show up in the structure of our
+code.
+
+87
+00:05:10,210 --> 00:05:11,750
+And that's never a good thing.
+
+88
+00:05:14,030 --> 00:05:17,860
+So instead of having a function from T to
+S.
+
+89
+00:05:17,860 --> 00:05:19,250
+That may throw.
+
+90
+00:05:19,250 --> 00:05:21,130
+What we want is, we want to make the
+
+91
+00:05:21,130 --> 00:05:26,000
+fact that this function can throw explicit
+in its type.
+
+92
+00:05:26,000 --> 00:05:28,600
+And the way we do that is by using the
+standard Scala
+
+93
+00:05:28,600 --> 00:05:33,610
+type Try of T, and in this case, we
+instantiate it with S.
+
+94
+00:05:33,610 --> 00:05:38,180
+So we say one thing, but we really mean
+this thing.
+
+95
+00:05:38,180 --> 00:05:39,270
+And we're going to make
+
+96
+00:05:39,270 --> 00:05:42,570
+this explicit now and what we're going to
+do next
+
+97
+00:05:42,570 --> 00:05:46,000
+is we're going to look at how Try is
+defined.
+
+98
+00:05:48,530 --> 00:05:51,790
+To make the Try type available in our
+
+99
+00:05:51,790 --> 00:05:55,710
+codes we import it and here's the
+definition.
+
+100
+00:05:55,710 --> 00:05:56,680
+Try is defined as a
+
+101
+00:05:56,680 --> 00:05:56,930
+[UNKNOWN]
+
+102
+00:05:56,930 --> 00:06:01,770
+type, with one case here that is Success.
+
+103
+00:06:01,770 --> 00:06:05,600
+And in case we have Success, we just have
+the element of type T.
+
+104
+00:06:05,600 --> 00:06:07,520
+And the other possibility is that we have
+
+105
+00:06:07,520 --> 00:06:10,640
+a Failure, in which case we have a
+Throwable.
+
+106
+00:06:10,640 --> 00:06:16,870
+If we use the Try type to make the chance
+of exceptions explicit, the signature
+
+107
+00:06:16,870 --> 00:06:22,230
+of collectCoins changes as follows.
+Instead of just returning a List of Coins,
+
+108
+00:06:22,230 --> 00:06:26,830
+we now return a Try of List of Coins.
+What does that mean?
+
+109
+00:06:26,830 --> 00:06:32,330
+Well, it means that we can either return
+failure which was an exception,
+
+110
+00:06:32,330 --> 00:06:38,100
+game over or we return Success of T which
+is just the List.
+
+111
+00:06:38,100 --> 00:06:40,420
+Similarly buyTreasure.
+
+112
+00:06:40,420 --> 00:06:45,580
+Takes just a regular list still.
+But now it returns a Try of Treasure.
+
+113
+00:06:45,580 --> 00:06:47,270
+Again, meaning that either
+
+114
+00:06:47,270 --> 00:06:50,970
+it fails, giving an exception, or it has
+
+115
+00:06:50,970 --> 00:06:54,550
+success and then we just return the
+treasure.
+
+116
+00:06:54,550 --> 00:06:57,870
+As we would love to get as the result of
+this game.
+
+117
+00:07:00,560 --> 00:07:02,700
+When we're dealing with failure explicitly
+in our
+
+118
+00:07:02,700 --> 00:07:06,140
+code, our code gets a little bit more
+ugly.
+
+119
+00:07:06,140 --> 00:07:08,540
+Because we have to be explicit about it.
+
+120
+00:07:08,540 --> 00:07:11,830
+So, let's look at the code, how our code
+looks like.
+
+121
+00:07:11,830 --> 00:07:14,790
+The, again, we create the adventure.
+
+122
+00:07:14,790 --> 00:07:19,560
+We collect our coins, and the type of that
+is now Try of List of Coins.
+
+123
+00:07:21,060 --> 00:07:25,160
+But now, we can not just call buy treasure
+anymore.
+
+124
+00:07:25,160 --> 00:07:25,820
+Because buy
+
+125
+00:07:25,820 --> 00:07:30,210
+treasure expects a list of coins, but what
+we got
+
+126
+00:07:30,210 --> 00:07:34,780
+here from collect coins is a try of list
+of coins.
+
+127
+00:07:34,780 --> 00:07:35,780
+So what do we have to do.
+
+128
+00:07:35,780 --> 00:07:38,810
+Well, we have to pattern match now on
+coins.
+
+129
+00:07:38,810 --> 00:07:44,470
+And if it was a success we can grab the
+value and pass that into buy treasure.
+
+130
+00:07:44,470 --> 00:07:51,330
+But if we failed we will fail again.
+Now let's further type check this because
+
+131
+00:07:51,330 --> 00:07:55,410
+the type of this guy, as I say here,
+should be try of treasure.
+
+132
+00:07:55,410 --> 00:07:56,250
+Is that correct?
+
+133
+00:07:56,250 --> 00:08:01,730
+Well, that is correct because this buy
+treasure here
+
+134
+00:08:01,730 --> 00:08:05,430
+will return a try of treasure or it will
+fail.
+
+135
+00:08:05,430 --> 00:08:08,720
+So this is all still type correct.
+But you see here.
+
+136
+00:08:08,720 --> 00:08:12,950
+It looks kind of ugly because we have to
+be explicit about the errors.
+
+137
+00:08:15,510 --> 00:08:18,380
+To make our code look nicer we're going to
+use some
+
+138
+00:08:18,380 --> 00:08:22,210
+of the higher order functions that are
+defined on the try type.
+
+139
+00:08:22,210 --> 00:08:27,440
+And here's a list, a partial list of the
+functions that are defined on try.
+
+140
+00:08:27,440 --> 00:08:32,530
+Let's look at this one here filter, map,
+
+141
+00:08:32,530 --> 00:08:36,680
+flatten and of course, our friend flat
+map.
+
+142
+00:08:36,680 --> 00:08:41,530
+What flat map does, is it takes a try of t
+and a function
+
+143
+00:08:41,530 --> 00:08:46,490
+that takes a t and a try of s and returns
+a try of s.
+
+144
+00:08:46,490 --> 00:08:50,380
+And this is exactly the function that we
+wanted in our previous code.
+
+145
+00:08:50,380 --> 00:08:54,665
+Remember.
+When we collected the coins that returned
+
+146
+00:08:54,665 --> 00:09:00,431
+a try of list of coins so with flatMap we
+can get directly at the list of coins
+
+147
+00:09:00,431 --> 00:09:05,910
+and flatMap will then take care of
+propagating all the errors for us.
+
+148
+00:09:08,590 --> 00:09:13,630
+As you probably already have noticed.
+The fact that try of t has a flatMap
+
+149
+00:09:13,630 --> 00:09:23,250
+operator means that try of t is a monad.
+And it's a monad that handles exceptions.
+
+150
+00:09:23,250 --> 00:09:24,760
+And what is really a monad?
+
+151
+00:09:24,760 --> 00:09:28,560
+You can, you know, pontificate about what
+monads are but really
+
+152
+00:09:28,560 --> 00:09:34,610
+monads are types with operators that guide
+you through the happy path.
+
+153
+00:09:34,610 --> 00:09:35,320
+Okay.
+
+154
+00:09:35,320 --> 00:09:38,050
+And so in this case, flatMap will guide us
+through
+
+155
+00:09:38,050 --> 00:09:42,230
+the happy path, and deal with handling the
+exceptions for us.
+
+156
+00:09:42,230 --> 00:09:45,012
+But the nice thing about Try, the nice
+thing about
+
+157
+00:09:45,012 --> 00:09:48,540
+a monad, is that the effects are visible
+in the type.
+
+158
+00:09:48,540 --> 00:09:49,790
+Because before.
+
+159
+00:09:49,790 --> 00:09:53,290
+When we just had a return type of type T,
+
+160
+00:09:53,290 --> 00:09:56,850
+we were hiding the fact that our
+computations could fail.
+
+161
+00:09:56,850 --> 00:09:59,630
+By using try of T as our return type,
+
+162
+00:09:59,630 --> 00:10:02,960
+it's now clear that things can fail, but
+we
+
+163
+00:10:02,960 --> 00:10:05,070
+don't want to deal with failure all the
+time.
+
+164
+00:10:05,070 --> 00:10:07,640
+We want to see that things can fail, but
+we want
+
+165
+00:10:07,640 --> 00:10:11,950
+to automate handling of that and that's
+what monads give you.
+
+166
+00:10:11,950 --> 00:10:16,860
+And in this case again, Try is a monad
+that handles exceptions.
+
+167
+00:10:16,860 --> 00:10:21,670
+It leads us through the happy path, when
+the exceptions don't happen.
+
+168
+00:10:21,670 --> 00:10:25,100
+And it will take care of all the
+propagation
+
+169
+00:10:25,100 --> 00:10:25,850
+of the errors.
+
+170
+00:10:27,820 --> 00:10:33,620
+So what flatMap does is, it, it's kind of
+a Dolby for our code.
+
+171
+00:10:33,620 --> 00:10:35,550
+It gives us noise reduction.
+
+172
+00:10:35,550 --> 00:10:37,550
+Remember that ugly code that we have to,
+
+173
+00:10:37,550 --> 00:10:40,080
+had to write with all the pattern
+matching?
+
+174
+00:10:40,080 --> 00:10:42,750
+Look how beautiful it looks now with
+flatMap.
+
+175
+00:10:42,750 --> 00:10:47,710
+What we do is, we create our adventure,
+then we collect our coins.
+
+176
+00:10:47,710 --> 00:10:50,220
+This is of type try of list
+
+177
+00:10:50,220 --> 00:10:54,180
+of coins but with flatMap we get here
+access to the
+
+178
+00:10:54,180 --> 00:10:58,900
+list of coins that we can then use to buy
+treasure.
+
+179
+00:10:58,900 --> 00:11:02,390
+And any exceptions are automatically
+propagated
+
+180
+00:11:02,390 --> 00:11:05,640
+by the implementation for flatMap for us.
+
+181
+00:11:05,640 --> 00:11:08,270
+flatMap is the plumber for the happy path.
+Of
+
+182
+00:11:10,830 --> 00:11:14,020
+course, you remember from earlier lectures
+that if
+
+183
+00:11:14,020 --> 00:11:17,760
+you have a monad, you can use
+comprehension syntax.
+
+184
+00:11:17,760 --> 00:11:20,520
+So we can write the same example here.
+
+185
+00:11:20,520 --> 00:11:23,750
+Using the four comprehensions as follows.
+
+186
+00:11:23,750 --> 00:11:28,030
+We get a we collect our coins and then we
+can
+
+187
+00:11:28,030 --> 00:11:31,900
+get the coins, with using the coins we can
+buy treasure.
+
+188
+00:11:31,900 --> 00:11:35,310
+We get the treasure and then we yield our
+treasure.
+
+189
+00:11:35,310 --> 00:11:36,010
+One way to
+
+190
+00:11:36,010 --> 00:11:40,080
+remember how these four comprehensions
+work, is that on the right hand
+
+191
+00:11:40,080 --> 00:11:45,660
+side of the arrow you have something of
+type try of T.
+
+192
+00:11:45,660 --> 00:11:49,660
+And then on the left of the arrow, you
+have something of type T.
+
+193
+00:11:49,660 --> 00:11:55,230
+So the arrow takes the value of type T out
+of the monad.
+
+194
+00:11:55,230 --> 00:11:56,730
+And that's why there's an arrow there.
+
+195
+00:11:56,730 --> 00:12:01,000
+So it reduces the type, it takes the value
+out of the monad.
+
+196
+00:12:01,000 --> 00:12:05,049
+That's a little thing that you can use to
+remember how this thing works.
+
+197
+00:12:08,450 --> 00:12:12,520
+Let's look at how some of the operators on
+Try of T are defined.
+
+198
+00:12:12,520 --> 00:12:15,930
+In particular, we want to look how map is
+defined.
+
+199
+00:12:15,930 --> 00:12:18,650
+And in order to use, to do that, we first,
+
+200
+00:12:18,650 --> 00:12:22,370
+of course, have to look at the companion
+object for Try.
+
+201
+00:12:22,370 --> 00:12:24,620
+And in particular the constructor
+functions.
+
+202
+00:12:24,620 --> 00:12:26,950
+So here's the constructor function.
+
+203
+00:12:26,950 --> 00:12:29,790
+And what it does, it takes a block that
+returns
+
+204
+00:12:29,790 --> 00:12:33,290
+a T and it turns that into a try of T.
+
+205
+00:12:34,380 --> 00:12:39,960
+Now this is very subtle, because when you
+want to do a try of T, you, you.
+
+206
+00:12:39,960 --> 00:12:43,250
+you know, you want to have a computation
+that you can pass in.
+
+207
+00:12:43,250 --> 00:12:47,120
+In order to, you know, do here the try
+catch on that.
+
+208
+00:12:47,120 --> 00:12:51,420
+So it's essential that you have this call
+by name parameter here.
+
+209
+00:12:51,420 --> 00:12:55,410
+So what you do, is you take the block and
+you try
+
+210
+00:12:55,410 --> 00:12:59,870
+to execute it and if it succeeds then you
+just wrap it into
+
+211
+00:12:59,870 --> 00:13:03,630
+the success constructor and in case it
+fails.
+
+212
+00:13:03,630 --> 00:13:08,170
+And that is done by the try catch
+construct.
+
+213
+00:13:08,170 --> 00:13:09,920
+In case it fails, in case it draws an
+
+214
+00:13:09,920 --> 00:13:13,620
+exception, you wrap the exception in the
+failure construction.
+
+215
+00:13:15,510 --> 00:13:19,860
+Once we have the factory method, we can
+define map as follows.
+
+216
+00:13:19,860 --> 00:13:25,130
+What we do is, we match on this, which is
+of type Try of T.
+
+217
+00:13:25,130 --> 00:13:28,790
+If this is of type Success of value, then
+we
+
+218
+00:13:28,790 --> 00:13:31,570
+were in a successful, we were in the happy
+path.
+
+219
+00:13:31,570 --> 00:13:35,440
+So then we can try to call f with the
+value.
+
+220
+00:13:35,440 --> 00:13:38,430
+But we have to now use the constructor
+here.
+
+221
+00:13:38,430 --> 00:13:43,720
+To make sure that when f of value throws,
+that we wrap it into failure.
+
+222
+00:13:43,720 --> 00:13:46,430
+And when f of value succeeds without any
+
+223
+00:13:46,430 --> 00:13:49,770
+exceptions we wrap it into the success
+constructor.
+
+224
+00:13:49,770 --> 00:13:50,160
+And if we
+
+225
+00:13:50,160 --> 00:13:52,950
+failed, we just propagate the failure.
+
+226
+00:13:52,950 --> 00:13:56,680
+So here you see what I mean when the happy
+part is
+
+227
+00:13:56,680 --> 00:14:01,809
+taken care for us and the exceptions are
+propagated under the covers.
+
+228
+00:14:03,230 --> 00:14:08,600
+One way to look at Try is that it
+materializes exceptions.
+
+229
+00:14:08,600 --> 00:14:11,920
+The exceptions here are implicit.
+
+230
+00:14:11,920 --> 00:14:15,340
+This type doesn't say anything about
+exceptions, but on
+
+231
+00:14:15,340 --> 00:14:18,720
+this side here, all the exceptions are
+made explicit.
+
+232
+00:14:18,720 --> 00:14:20,520
+The exceptions are turned.
+
+233
+00:14:20,520 --> 00:14:24,130
+From something that happens in the control
+flow of your program
+
+234
+00:14:24,130 --> 00:14:28,700
+into an actual data value that you can
+patch a match on.
+
+235
+00:14:28,700 --> 00:14:33,790
+So a more kind of official word for that
+is materialize.
+
+236
+00:14:33,790 --> 00:14:35,240
+And we will see this notion of
+
+237
+00:14:35,240 --> 00:14:39,570
+materialize appear, reappear later on in
+these lectures.
+
+238
+00:14:41,385 --> 00:14:45,920
+Let's finish off with a quiz and where we
+implement flatMap.
+
+239
+00:14:45,920 --> 00:14:51,650
+So, what we are going to try is to define
+flatMap for try of t.
+
+240
+00:14:51,650 --> 00:14:58,000
+So, the signature of flatMap is flatMap
+takes a function from t to try of s.
+
+241
+00:14:58,000 --> 00:15:04,240
+And remember the this is of type try of t
+and what we need to return is a try of s.
+
+242
+00:15:04,240 --> 00:15:06,960
+So, take a few seconds to think about
+
+243
+00:15:06,960 --> 00:15:09,770
+which answer a, b or c is the right one.
+
+244
+00:15:12,430 --> 00:15:13,435
+Good.
+
+245
+00:15:13,435 --> 00:15:17,030
+Let's see which answer was the correct
+one.
+
+246
+00:15:17,030 --> 00:15:22,350
+And we are going to do that as usual by
+inspecting all the choices one by one.
+
+247
+00:15:22,350 --> 00:15:23,390
+Let's look at the first one.
+
+248
+00:15:24,960 --> 00:15:29,700
+And the trick, this is the beauty of
+functional programming, that often by
+
+249
+00:15:29,700 --> 00:15:34,500
+looking at the types, you can already see
+when something is correct or not.
+
+250
+00:15:34,500 --> 00:15:35,890
+Let's look at this guy here.
+
+251
+00:15:37,890 --> 00:15:42,250
+this looks kind of type correct, because
+if I call f with value.
+
+252
+00:15:43,250 --> 00:15:48,146
+well the value is of type t, f was of type
+t to try of s.
+
+253
+00:15:48,146 --> 00:15:54,040
+So this is indeed of type try
+
+254
+00:15:54,040 --> 00:15:58,730
+of s.
+However, what we don't do here is we
+
+255
+00:15:58,730 --> 00:16:03,570
+don't catch any exceptions so if f of
+value throws an exception.
+
+256
+00:16:04,990 --> 00:16:07,250
+It's not materialized.
+
+257
+00:16:07,250 --> 00:16:11,430
+And so it doesn't appear as a value in the
+output.
+
+258
+00:16:11,430 --> 00:16:13,240
+So this one is wrong.
+
+259
+00:16:15,560 --> 00:16:22,080
+Now let's look at the second solution.
+What this does, is this
+
+260
+00:16:22,080 --> 00:16:27,730
+tries now to wrap the result of f of value
+in a try.
+
+261
+00:16:28,810 --> 00:16:32,610
+But remember what the, the type of try
+was.
+
+262
+00:16:32,610 --> 00:16:35,850
+Try, and I'm going to remind you.
+
+263
+00:16:35,850 --> 00:16:40,356
+Try took something of type T or, well, is
+like, a,
+
+264
+00:16:40,356 --> 00:16:43,720
+a call by name parameter of type T but
+for,
+
+265
+00:16:43,720 --> 00:16:45,680
+for here we can be a little bit more
+simple.
+
+266
+00:16:45,680 --> 00:16:51,930
+So it's f of values of type T, and it
+returned something of type try of T.
+
+267
+00:16:53,440 --> 00:16:54,040
+Okay?
+
+268
+00:16:54,040 --> 00:16:59,270
+But f of value is of type try of S, so if
+I wrap that in another try, the result
+
+269
+00:16:59,270 --> 00:17:05,190
+type will be.
+Try of try of S,
+
+270
+00:17:05,190 --> 00:17:07,660
+which is one try too much.
+
+271
+00:17:07,660 --> 00:17:12,900
+So this one is not the expected type, so
+this one is wrong.
+
+272
+00:17:12,900 --> 00:17:17,860
+So hopefully the third answer is right but
+who knows maybe you know, I
+
+273
+00:17:17,860 --> 00:17:22,860
+made a mistake, I am just a human so I can
+throw exceptions as well.
+
+274
+00:17:23,870 --> 00:17:27,450
+Let's look at this guy.
+So, what are we going to do?
+
+275
+00:17:27,450 --> 00:17:30,150
+Well, we're going to do the pattern match,
+
+276
+00:17:30,150 --> 00:17:35,490
+just like all the other ones.
+If the, this is success,
+
+277
+00:17:35,490 --> 00:17:41,000
+well what we're going to do, we're going
+to call f of value.
+
+278
+00:17:41,000 --> 00:17:43,910
+And but we're going to wrap that in a try
+catch.
+
+279
+00:17:43,910 --> 00:17:49,970
+So in case f of value throws, then we know
+that we have to materialize the exception.
+
+280
+00:17:49,970 --> 00:17:55,180
+And if it doesn't throw, this returns a
+value of Try of S and we're good.
+
+281
+00:17:55,180 --> 00:17:59,160
+And if this was failure then we
+immediately propagate to failure.
+
+282
+00:17:59,160 --> 00:18:01,070
+So the last answer c.
+
+283
+00:18:01,070 --> 00:18:02,360
+Is the correct answer.
+

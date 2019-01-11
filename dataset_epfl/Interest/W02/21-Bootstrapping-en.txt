@@ -1,0 +1,80 @@
+In this part, we learn how to estimate the term structure from a given set of market quotes
+on instruments including coupon bonds, LIBOR, forward rates, and swap rates.
+We will distinguish between exact methods and smoothing methods.
+Exact methods will give us discount curves that exactly reproduce the market data.
+But this comes at the cost of somewhat irregular forward curves.
+If we insist on the regular forward curves we use a smoothing method which gives us smooth yield curves.
+But at the cost of not exactly matching the market data.
+We will eventually see what PCA,
+Principal Component Analysis tells us about the basic shapes of the yield curve.
+We now start with the bootstrapping method, which is an exact method.
+It is a very simple method and it is most used among trading desks.
+The idea is to build up the term structure from shorter maturities to longer maturities.
+And it is most instructive to learn about the Bootstraping method from an example.
+We look at this following data from the U.S market on October 1st, 2012.
+We are given LIBOR rates, futures rates, and swap rates.
+The day count convention is actual by 360.
+The aim is to find the discount curve for all the reset cash flow dates
+ that exactly matches these quotes.
+Let's look at the first block of market data, the LIBOR rates.
+They're given for overnight, 1 month, and 3 months maturities.
+We denote these maturity dates by S-1, S-2, and S-3.
+In terms of the day count convention, the year fractions are given here.
+The corresponding zero coupon bond prices are given in this 1 to 1 relation.
+The next block contains quotes on futures prices.
+Recall that the futures price for a maturity date Ti+1 is quoted as:
+100 x (1 - the futures rate) which is the futures rate for the period with reset date
+Ti and maturity date Ti+1.
+We have 5 futures prices.
+The reset date for the first futures is
+T-1 is equal to the 
+19th of December, 2012.
+We use futures rates as proxies for forward rates as shown here.
+When looking at the maturity spectrum, notice that we have a maturity overlap as shown here.
+The first reset date of the first futures contract lies between S-2 and S-3 the maturities of the LIBOR rates.
+From this, we get
+The LIBOR rate for T-1 by linearly interpolating
+The S-2 LIBOR, and the S-3 LIBOR rates.
+From the T-1 LIBOR rate, we then get the T-1 bond and then we derive the T-2 bond using this formula which relates forward rates to ratios of zero coupon bonds.
+By iterative usage of this formula,
+We eventually get the T-3, T-4, T-5 and T-6 zero coupon bond prices.
+The third block contains swap rates for 9 different lengths.
+These swaps pay annual coupons at the following 30 dates.
+The dates marked in red, are the dates on which the 9 swaps mature.
+For these 9 dates, we are given swap rates.
+What we will do next is we will use linear interpolation to get swap rates for the black dates
+U-6, U-8, U-9, and so on and so forth.
+We will get the swap rate for U-1 as shown on the following page.
+Again we note that there is a maturity overlap and U-1 falls between T-4 and T-5 which are maturity dates of the futures.
+From the futures quotes, we derived the corresponding zero coupon bond prices.
+So we are given the T-4 bond and the T-5 bond prices.
+From these, we infer the T-4 and the
+T-5 simple spot rates and then we use linear interpolation of these 2 simple spot rates to get the simple spot rate with maturity U-1.
+The simple spot rate with maturity U-1 gives us the U-1 bond price, and then we can use the swap rate formula which relates the swap rate for maturity U-2 to the U-1 and U-2 bond prices.
+We can solve this equation for the U-2 bond price as shown here.
+For the remaining cash flow dates we use linear interpolation to obtain the corresponding swap rates.
+We can then invert the swap rate formula to derive iteratively the U-n bond price in terms of the previous bond prices and the corresponding swap rates as shown here.
+We eventually obtain the U-n bond prices for all the remaining maturities n from 3 to 30.
+Setting the initial value of the discount curve equal to 1 we thus have constructed the discount curve for 40 maturity time points as shown here.
+Recall that the blue maturities
+S-1, S-2, S-3 correspond to the LIBOR rates.
+The red maturities T-1 up to T-6 correspond to the futures rate, and the green maturities U-1 up to U-30 correspond to the swap rates.
+We also see again the overlap of these maturity spectra.
+The T maturities overlap with the S maturities and the green swap maturities overlap with the red T maturities.
+The figure on the left hand side shows us the discount curve as a function of time to maturity.
+We see that the bulk of the maturity dates correspond to the swap contracts.
+If we zoom in to the first 3 years this is what we see on the right hand side.
+We see the short end of the discount curve.
+So here we can nicely distinguish between the LIBOR maturity dates, the futures reset and maturity dates, and then the first cash flow dates of the swap contracts.
+The figure on the left hand side shows 3 curves.
+The first curve is the yield curve, that corresponds to the discount curve.
+The second curve is the curve of simple spot rates both of which look decently smooth.
+But if we look at the forward curve, this is the middle curve here, we see some saw tooth.
+If we again zoom in to the first
+3 years, this is what is shown on the right hand side, we see irregularities also showing up here.
+So in sum the bootstrapping gives us an entire term structure from relatively few instruments.
+We had 3 LIBOR, 
+5 futures contracts, and 9 swap contracts.
+The method exactly reconstructs these market prices and this is desirable for interest rate risk management and trading desks because they have to marked to market their books.
+But the implied forward curve is irregular and sensitive to bond price variations.
+Bootstrapping is an example of an exact estimation method.

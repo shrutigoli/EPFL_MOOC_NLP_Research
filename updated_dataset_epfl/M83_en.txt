@@ -1,0 +1,92 @@
+Hello, this part of the course on digital models is dedicated to modeling and interpolation.
+Modeling and interpolation consist of establishing a model from field measurements in order to create a surface that allows to interpolate altitudes of new points. 
+To establish a digital terrain model the basic principle consist of finding the best surface that will pass through measurement points, also called support points. 
+I take here a small example in 2D with an altimeter profile where I have prior crude measurements
+- these are my small circles here- and I will look for the best curve passing through these points. 
+I take here an interpolation curve that pass through my points and in this way I have a method called exact with my interpolation curve. 
+We can speak about an approximate method when the selected curve does not necessarily pass through the support points.
+Here we talk about an approximative method. 
+For the digital terrain model we talk about a 2D or 2-and-a-half-D. 
+We don't have the true 3D, we will explain this principle with the following small example.
+I draw here a terrain profile with an overhang here and when modeling this terrain, 
+-I draw here measurement points in red- we cannot take into account the effect of the overhang because we will then model our surface by small facets triangles or a grid. 
+I draw here a curve which will pass through these points and we don't allow to put modeling points here inside the overhang because we will find ourselves in a model where, for a a planimetric value a value of X,Y we have two different values of Z.
+This is not possible with most digital terrain models
+We summarize here this principle of modeling with a 2D surface. 
+Firstly, we have point measurements. 
+I draw my measurement points in red, so the small circles here.
+From these measures, 
+I will establish a model that is my 2D surface, my continuous surface in this case, what is already marked in brown and after I can interpolate the new values for example here on my drawing
+I take a point E, it has Y,X coordinates of which I don't know the altitude and then the intersection with my surface will give me altitude HE so there I have my interpolated point
+E(Y,X) HE.
+A terrain model will rely on raw measurements. 
+We recall here what we saw in the course "Geomatic Elements" namely topometric methods which allow to measure points and lines in the territory. 
+The restitution of the digital terrain will first go through a set of points as seen here in the figure to the right with small crosses. 
+These are the points determined by the Y, X and H coordinates. 
+The density of these points depend on the terrain. 
+If the terrain is rough or if the terrain is relatively flat.  
+With a rough terrain, we will have a high density of points. 
+With a flat terrain, we will have a weak or a low density of points. 
+We will also add characteristic lines, namely breaklines or structure lines of the terrain. 
+We see in this example to the right, typically the roadside as a prominent feature of the landscape that will be a structural line. 
+We also have ridge or bank elements that are prominent elements that will return in terrain modeling. 
+To illustrate the principle of raw data input we see the orthophoto with contour lines where we find these structural landscape elements like the road, like the small descending stream here and some elements that have resulted in here the restitution of characteristic curves. 
+After the sound recovery method of terrain points and lines, we have here an approach with new survey technologies where we do a survey of mass or of high density.
+We have methods called laser scanning or photogrammetry with digital processing that can restore a very high density of points with several points per square meter. 
+The problem with this "blind" surveying is that we measure all of the terrain. 
+We recall here the digital surface model meaning, we measure the points that are on the ground but we also end up with points that will be on constructions or vegetation. 
+It will be, from this scatterplot to make a filter and a classification.
+We see in this example here, the survey of a small village with a wine-growing region, with some forests. 
+We have here this classification with buildings in red, areas of terrain in brown and high vegetation in green. 
+The principle of the classification is illustrated with this small example in 2D. 
+We have here the raw measurements. 
+First we see the points that are on the terrain. 
+We also have the elements of construction. 
+We see here the roof with its characteristic shape and finally we have low vegetation and taller vegetation. 
+It is algorithms that separate these different groups of points in order to separate the ground surface for the terrain model and above-ground elements such as vegetation and buildings for their own modeling. 
+Modeling consists, on the basis of raw measurements or terrain measurements to construct a surface with help of elements such as a regular grid or triangles. 
+First, we have observations, namely our raw points with their altitude, and I can model my surface either with a regular grid that I draw here on my plane or with a triangulated model that will link my different nodes or observation points. 
+Finally what interests me is to be able to interpolate an elevation for a new points with known coordinates X,Y. 
+I will first deal with the regular grid. 
+The first operation consist of determining the spatial resolution or choose the grid section. 
+This resolution depend on the application, why I want to use my digital terrain model and it also depends on the density of the measured points as well as the morphology of the terrain. 
+In this example here, I will take one grid a little larger than what is drawn. 
+I take it here in red, with three squares and so I have chosen my spatial resolution, namely here one cell and here we see that the density is about one point per grid.
+How are we going to interpolate the nodes of the grid? 
+There are many methods. 
+I take here a graphic example with the node there. 
+I can, in a first step, take the elevation of the nearest point so, the closest neighbour.
+For example this altitude 531 that I assign here or I can take an average. 
+In that case, I will consider points near my node, and take a weighted average in terms of the distance between the node and the measurement points. 
+We can use more rigorous methods so-called estimation methods such as kriging. 
+Another way to model the terrain consists of constructing a network of triangles based on the raw measurements. 
+A triangle is composed on three nodes three peaks and three sides or edges. 
+The question that arises is how to select these edges?
+We see here in this pre-established example the triangles that are drawn but I could have also connected my point 531 to point 570 and have here a triangle like this instead of linking here my nodes 531, 541 to 550.
+We will now see how to appropriately choose these edges.  
+One method of establishing this triangulated network was developed by the mathematician Delaunay.  
+It consists of considering the circumscribed circle passing through three nodes and the task is to control that the circle contains no other point. 
+We see in this example a triangle said Delaunay, with my circle and I see that inside the circle there are no points. 
+In this example here, if I look at this circle
+I see that I have a point inside we are in a case that does not conform to the Delaunay triangulation.
+The Delaunay triangulation is used to triangulate a network of points in accordance with the condition of Delaunay meaning that the circumscribed circles of the triangle don't  contain any points. 
+Here is the internal process of an algorithm.
+We add a point to the network, 
+The circumscribed circle have a facet and a trace.
+If another point is included inside this circle then the facet is reversed, otherwise it is conserved. 
+In addition, we often associate the Voronoi diagram to the Delaunay triangulation. 
+Geometrically, this association leads to the fact that the bisectors of the facets are also the sides of the Voronoi diagram. 
+As well as the peaks of the diagram are the center or the circumscribed circles of the triangulation. 
+How are we going to integrate the structural elements of the landscape?
+I bring back here my example of photogrammetry and I zoom into the restitution with the set of points - my small crosses here - that I draw as well as a structural element namely a structural line that I will draw in red, in this example.
+The triangulation will be constructed with the condition that it does not cut this structural element so the triangles will be constructed without ever cutting my red structural line.
+Finally, what interests us in the digital terrain model is to interpolate the elevation for points only known in planimetry.
+We take here the example with this point E and a bi-linear interpolation from a grid. 
+We have four known points in altimetry
+A, B, C, D.
+For each of these points, I have a known elevation that I refer to in this figure. 
+I can also draw the lines that connect two nodes of this grid and then I have my point E somewhere in between, that I will draw here in red.
+And at point E, I can also draw a line here that will cut the sides of my grid that I can note here vertically and finally this will give me here a line in space and starting from my point E, 
+I will find my intersection and I will have the elevation HE with this bi-linear interpolation from the points of the grid. 
+To summarize this part on interpolation and modeling we repeat here that the acquisition of raw data is either by photogrammetry/ othopometry with the restitution of characteristic points and lines or with a survey of mass or high density with Lidar techniques or with digital photogrammetry.
+Finally the modeling is a surface called 2-and-a-half-D this is not real 3D and we approach this surface either with a regular grid, or with triangles. 

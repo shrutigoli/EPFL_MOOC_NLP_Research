@@ -1,0 +1,275 @@
+Welcome back.
+Nature, In Code.
+We are in Chapter 5, Lecture 4.
+In this lecture, we need to implement the function that gets us a Mating Partner.
+Now, in the real world, if one takes a look at human art, music, books, theater and so on, it seems this is not always a straightforward process.
+But, in JavaScript, it is.
+So let's go ahead and implement it.
+So this is where we left off.
+Things are working in principle but we are calling two functions here,
+Pick Mating Partner and Get Offspring that we have not implemented yet.
+So here, in this lecture, our goal is to implement this Pick Mating Partner 
+Okay, so idea is that we pass these two co-ordinates if you will, the grid, the indices ii and i, and then we want to pick a Mating Partner given these co-ordinates and the max distance.
+So, we will have a function here somewhere, function pick_mating_partner.
+Okay, that has two parameters, namely i and ii.
+And, I would like to return here a Mating Partner.
+So given these values and given the mating distance that we define in the global vars
+So, how can we do this?
+So, lets zoom in on a 3X3 grid here.
+Okay, 1..2..
+And this our focal individual here living at the coordinates i and ii.
+And we can, for example, assume that these coordinates happen to be 5 and 4.
+Okay, so why 3X3 subgrid?
+Well, simply because for the time being we are now assuming the max mating distance here is 1.
+So this would be the acceptable mating range, if you will.
+So, how can we now map these elements, these cells, to this coordinate system?
+Well, it is relatively straightforward.
+If we are decreasing "i" by 1, we will go up for increasing it by 1, we go down.
+So, for example, up here, this would be i-1, ii would still be the same.
+Down here, this would be i+1, ii would still be the same.
+Conversely, if we want to the right here, or to the left, we are going to keep i constant, but we are decreasing ii by 1 here, and we are increasing ii by 1 here.
+And by the way, there is nothing inherent which dimension of the array, the first or the second maps to the horizontal and to the vertical space.
+I prefer to think about, you know, this way, with i going. with first coordinate being vertical, and the second dimension being horizontal.
+But, you know, you can think about however you want to if you find it easier to flip this model mentally 90 degrees. it will be the exact same thing.
+Okay, so the concrete values here would be 4 and 4 and here, for example, would be 6 and 4.
+Conversely, here would be
+5 and 4+1, so 5
+5, and 4-1, so 3.
+And then the corner cases are also easy to implement.
+So, this would be i-1, alright?
+Going up. and ii-1, going to the left.
+Correspondingly here, this would be i-1 going up but ii+1 going to the right.
+Here it would be i+1 going down, and ii+1, going to the right.
+And i+1, going down and ii-1, going to the left.
+So the values here would be
+4 and 3,
+4 and 5,
+6 and 5 and 6 and 3.
+So, these are the acceptable values here in the particular situation.
+And if we think about the coordinates of the Mating Partner, of our focal individual (i, ii) as j and jj. then it is relatively easy to see that the following conditions here have to be true.
+So, j must be equal to or larger than i-1.
+Why?
+Well, it has to be at least i-1, because otherwise, if it would be smaller, we would go out of bounce here going upwards.
+Correspondingly, on the other side, j has to be equal or smaller than i+1, why?
+Well, if it were larger, we would go out of bounce down here.
+So these are sort of the minimum and the maximum boundaries for i or for j, rather.
+And the exact same is true to think about jj.
+So jj has to be larger than or equal to ii-1.
+So, this is now the minimum value going to the left it cannot be smaller than that, otherwise, we would, you know, go out of bounce on the left.
+And the same is true here on the right. jj has to be smaller or equal to ii+1
+Otherwise, we would go out of bounce here on the right side.
+So, just to be clear, these are now the main values and these are the max values.
+The other thing I want to mention is that we can make this more generic
+It was easier to see that the reason we have -1 here and +1 here, is because the maximum Mating Distance is 1.
+The maximum
+Mating Distance generically, is simply d, and so we can replace this 1 here with d, if we want to make this more generic.
+And now, we can put into d whatever we would like to.
+So, for example, imagine d being equal to 2.
+So, that would now mean that d, the minimum value here would be i-2 going up, and i+2 going down, or ii-2 going to the left and ii+2 going to the right.
+So, these are the acceptable ranges.
+These, of course, have to be integer values because they are indices of this two dimensional array.
+And we can now implement this in JavaScript.
+Okay, so with this knowledge in hand, we can now implement this.
+So, we can setup these variables, j and jj, and these would be the coordinates of the Mating Partner.
+So, let us start with j.
+So, I now know there is an acceptable range and I would like to just pick a random number of this acceptable range and concretely a random integer because these are going to be indices of the array.
+So, what I am going to do is I am going to outsource this as well.
+I am simply going to say, give me a random integer here so I am going to call the function get_random_int, and I am going to pass two arguments here
+Namely, the minimum value and the maximum value possible.
+So, as we now know that the minimum value is simply i-d, or rather, here in our quote, max_mating_distance, because that is what we named our variable.
+And the second value, the maximum value here of this random integer would simply be i plus the max mating distance.
+Okay? max_mating_distance.
+And with the exact same logic, we can simply now copy this line and say, jj is going to call the same function, but of course here, the correct minimum and maximum values are ii-max_mating_distance and ii+max_mating_distance.
+So, what I need to implement now is simply this get_random_int function.
+So I am going to do this here. function_get_random_int
+Okay?
+And the two parameters, I am simply going to name them "min" and "max" because these are the min and max values.
+So I am being given here two values, two integers.
+One is a minimum value, one is a maximum value,
+And what I need to do, is,
+I need to return here a random integer that is within the acceptable range of this minimum value and this maximum value.
+So, how could I do this?
+We have all the JavaScript knowledge that we need to implement this method.
+We always start with Math.random if we want a random number.
+Math.Random, however, has two problems, or three rather, for us.
+First of all, it returns floating point number.
+We do not want that, we want an integer/
+The second is that, its range is 1, right?
+It goes from 0 to 1.
+Our range needs typically to be much larger.
+Let us say we have a Minimum Value 3 and a Maximum Value of 6.
+The range needs to be much larger, right?
+It needs to go from 3 to 6.
+That's a range of 3.
+Or, you know, if you actually look at the integer, it is actually a range of 4, so to speak, because it has 4 values,
+3, 4, 5 and 6.
+And then the last issue is that
+Math, Random always starts at 0.
+It has a range of 1, but it is always fixed at 0.
+Our ranges start at very different values.
+Whatever the min values, in fact.
+Okay, so how do we now take this Math, Random and correct these three problems?
+Well, let us fix the range first because that is relatively easy.
+We just multiply it by the range that we need. 
+In our case, we have to multiply it with
+{max-min} + 1.
+Why? 
+Well again, take this example of min value of 3 and a max value of 6.
+So the range here is three, in the floating point world or really four, we have four values.
+I am in the integer world
+3, 4, 5 and 6.
+So, max minus min spans the range correctly but then we need to add 1 to account for this fourth value.
+And so now, we have to correct range but it is still floating point, so now we need to floor this.
+Okay, 
+Math, Floor which we have used before, which simply takes a floating point, a value, and reduces it or decreases it to the closest integer.
+So again, in the case of a minimum of 3 and a maximum of 6, this would be 6 minus 3 so that is 3 plus 1 is 4
+So, we are multiplying
+Math,random times 4 so we have a range of 0 to 3.999999999
+We floor that, so that means we now get a value 0, 1, 2 and 3.
+They are the possible values.
+Now, there is only one thing that is wrong about this which is, we have to correct range, it returns integer values but it returns the wrong ones because we are starting at 0, but in fact, we have to start at min.
+So we simply add min.
+So now the correct values that will be returned are 3, 4, 5 and 6.
+Okay, now we are simply going to add here of course, that return statement that does in fact, returns this value.
+Now that we have implemented this get_random int function we are practically there.
+So, we now have a j, and we have a jj.
+But there is one more problem here and that has to do with the borders.
+So, let us take a look.
+So the problem has to do with borders and recall there here, on this grid, we see borders but we do not want borders, right?
+If we have an individual here, and this individual moves to the right or rather, if we just want to consides its right side neighbor, well there is no neighbor here but we said, okay, the borders basically does not exist. if you go over here, you would enter over here.
+So, really this cell here is the right side border of this cell.
+And if this is an individual living here, and the Mating Distance would be one then we know, the Mating Neighborhood is this area here.
+So we can say that but of course, we also have to implement it, and how are we going to implement it?
+Well, the trick really, or the problem is that here, in an array of ten elements, this would be an index of 9.
+If we now said, okay we want to move to the next one, then we are simply going to add 1 then we are going to add up an index 10 and the index 10 in an array of ten elements does not exist.
+As you recall, indices start at 0, and so, the largest index for an array with ten elements is 9.
+So, this would throw an error.
+Vice versa, on the other hand, if we are here, at index 0, and we want to go to left, we would subtract -1. and then, we would be at index -1, that would also throw an error in JavaScript.
+So we somehow have to map these wrong indices that we calculate to the correct indices.
+So how are we going to do this?
+The best way to think of this is to map out this array so, again, we are going to assume here ten elements.
+So, 0..1..2..3..
+7..8 and 9 and we could now say, okay, this is essentially here this box of cells.
+Okay, so these are cells here or simply the elements in the array.
+And if we are here, for example, and we want to go to the left that is easy, right?
+-1, and we are there.
+We want to go to the right,
++1 and we are there.
+So, that is straightforward.
+But, what about the issue here?
+So here, we would like to go 1 to the right.
+Okay, +1, yeah that is 10.
+That is not good.
+Same issue here.
+From 0, -1 to the left, we are at -1, that is not good.
+Really what we want is we want to kind of bend this array here, so that it becomes a circle.
+So, think of it like this here
+So, we would now bend and reattach the loose ends to each other, and this was our previous border here.
+So this is Element 0, and so on.
+Here is a couple of elements and then eventually here, this is Element 9.
+And now, it should just go this way.
+So, if you go from zero over here, then you would actually land at nine.
+And if you go from nine over here, you would simply land at zero.
+So now this border does not exist anymore we can just jump ahead here in this circle to the left and to the right, however far we want to we will never run into this issue.
+So how do we do this?
+Well, we can actually, kind of, implement exactly this circle by simply imagining that our array would continue over here
+Okay, so this would be the same array.
+So, here will be 0..1..
+2..and so on.
+Simply take the array and put it here.
+Same thing over here, imagine the array here would continue or would be attached to the left
+So this would, in this case, just this array over here.
+And so now, it is relatively easier to see right here, we go -1, here we go -2, here we go -3
+Vice versa, here we go +1, here we ho +2, here we go +3,
+So the problem is, mathematically speaking, that 0 to -1, we get to -1.
+From 0 to -2, we get to -2.
+From 0 to -3, we get to -3.
+These are not correct values in terms of the array.
+We need to map those values, the indices, to these indices.
+Okay, and then we would have implemented this circle.
+Same over here, right?
+From 10 plus 1, we would be at index 10.
+Sorry, 9 plus 1.
+9 plus 2, we would be at Index 11.
+9 plus 3, we would be at index 12 and so on.
+These are not correct indices for the array.
+What we need to do, is we need to map those to the correct arrays here.
+0, 1 and 2.
+So, how do we do this?
+Well, I think it is relatively straightforward to see here.
+What we need to do is, we need to start from this new index and first check if it is incorrect, if it is incorrect, well then, it is either going to be negative or larger than the maximum available value.
+So, if it is on the negative end, then, what we are going to do is we are going to take this new index that we calculated, and we are now simply going to add the length of the array, which in this example here, is 10.
+So, for example, we would take this -2 value here and we would simply add 10.
+And this, of course, would give us the correct mapping, 8.
+Over here, we are testing this and we realise, okay, the index is too high,
+What we are going to do is very similar.
+I am going to take this new index that we calculated but that is too high.
+And we are going to subtract here the length from this value.
+And so, as an example here, let us take 11.
+So, obviously too high.
+We are going to subtract 10, which gives us the correct mapping the correct index, 1.
+So, this is the best way to think of it and we are now ready to implement this on JavaScript.
+Okay, now that we know how to solve this, let us implement this, okay?
+So, we now know we cannot work with this j and jj values, as such, because they might be out of bounce.
+So, what I am going to do is something that is very straightforward.
+I am simply going to pass these two values, j and jj, to a function that checks whether they are indeed in the correct bounce, and if they are not, that they will be replaced by the correct index.
+So, what I am going to do here, simply I am going to say j equals get_bounded index.
+So, this is a function we are going to define and I am going to pass j, okay?
+So, what this does, is this simply passes the j value that I got here, to this function, that checks if everything is alright and if it is not alright, it is going to fix it and then whatever it returns,
+I can be sure this is now an okay value.
+So, I am going to do the exact same thing with jj.
+So, I am going to say, jj equals get_bounded_index and I am going to pass jj here.
+So again, whatever comes out of this function, after it dealt with jj is a good (inaudible) value for jj.
+So, I am going to store it in here and then, when I am done, then I can finally return this Mating Partner which lives on grid [j] [jj].
+Alright, so what we need to do is we need to implement this function get_bounded_index.
+Let us do this here.
+So, function get_bounded_index. and so, I am going to call this this parameter here, simply, index.
+That is the value that I will get.
+So now I have to make sure that this index is correct.
+So, what do I need to do?
+Well, I need to check first whether the index is correct itself.
+It can be wrong in two ways, it can either be smaller than zero or it could be larger than grid length.
+In this case, I would need to fix the value.
+If none of those two conditions are true then the index is already quite alright.
+And I cannot just return that.
+So, what I am going to do is I am going to just temporarily store the index here in this variable bounded_index
+Okay, and this bounded index is ultimately what I am going to return.
+Okay, bounded_index.
+Now here, at the moment, this would be a relatively silly function it would simply get the index, it would store in it the variable and the immediately return that variable.
+So it would not actually do anything.
+So, this will be the default case if the index is indeed okay.
+What I am going to implement now is the scenario where it is not okay.
+So, it can be not okay in two possible cases.
+So, it could either be that the index is smaller than zero, okay?
+Smaller than zero.
+So, as we have seen before, what we need to do in this case, is we simply need to take the index
+Okay, on the slides, we are going to call this new index and we need to add the length of the grid. which is stored in the global variable grid_length.
+Okay, so that is our corrected bounded index.
+So I am going to store that in bounded index.
+The other option is that the index is too large.
+So, I am simply going to say if index is larger or equal to grid_length.
+Do not forget the equal because if it is equal to grid length it is also too large because we recall again, that indices of array start at zero, so the max value is not the length of the array but the length minus one.
+So, if it is actually equal to the length, it is already too large.
+Okay, so in this case, we have seen that the correct way to address this issue here would simply be, to say, take the index, and now subtract grid_length from it.
+ Minus, grid_lenth.
+Alright, so down here, now I know that bounded index is correct.
+Either nothing has happened, if none of these "if" statements were true then it is fine.
+If the index was smaller, it is now corrected.
+If it is too large, it is now corrected as well.
+Notice also, that I am not using
+"if-else".
+The "else" here would not be correct because if I say if the index is negative,
+"else" then this would include even the correct indices.
+This is why, I am simply adding a second "if".
+So, I am first checking if this condition is true, then I am checking, if this condition is true.
+I know that these are exclusive, so, all good here.
+Alright, so, this concludes this lecture.
+We have now correctly implemented the Mating Partner Functionality by simply saying we have to define here the correct bounce of our sub-grid that is the Mating Area the acceptable Mating Area.
+Then, we need to get the corresponding random integers. for this sub-grid and this we implement with this "get_random_int" function.
+And then, we corrected for the fact that these indices may be out of bound and we did this by using this "get_bounded_index" function.
+So, that seems like a lot of code or at least a lot of logic here and this true, but remeber, you can now reuse this code in any spatial simulation that you are going to implement. independent of the question at hand.
+Here, we have an evolutionary question.
+We care about spatial models, we care about (inaudible) and so on but you could use this exact same code to implement any process in space.
+So that is quite powerful knowledge right here.
+Alright, so in the next lecture, we will have to take care of the final function that we have not implemented yet, that is, to get Offspring Function.
+So, we will do this in the next lecture and I will see you there.

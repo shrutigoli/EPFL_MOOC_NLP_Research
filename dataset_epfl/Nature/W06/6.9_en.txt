@@ -1,0 +1,260 @@
+Welcome back, Nature, In Code, we're in Chapter 6 lecture 9.
+In this lecture we'll implement the whole selection and the parasite selection functions and then we'll output the data that we generated in the browser to see what kind of dynamics we get in such a host-parasite core evolutionary simulation.
+Before we do this, just a reminder, this is our fitness matrix.
+We have these matching allele model, where if the parasite matches the allele of the host, there will be an infection, otherwise, there won't be, and these are the corresponding fitness values.
+So this is fitness matrix, and we'll refer to this a quite often.
+Another thing I want to talk about briefly, and this is just a reminder of something we already know.
+How do we now implement this actually concretely?
+Well, before, we said the frequency of a genotype is basically, in the next generation, it's basically the frequency that we have now times a fitness and we call this w.
+And then ultimately, given that there are many genotypes, we need to normalize this, and we used this factor here w bar, which we called the average fitness.
+But be aware that this is just a normalizing factor, basically, the sum of these terms for each genotypes
+Good, so concretely what does this mean in our model here?
+Well, imagine you are a host of Type A1.
+What is your fitness?
+So fitness of the host, one, in the next generation is, using this formula, the fitness of this host, in the previous generation or current, and this is next generation, times it's fitness, so this will be wH1 and then normalized by some term here.
+Now, the really important aspect about this entire concept of co-evolution, or frequency dependent selection, is that this fitness value, is now, not fixed.
+Okay. This is what we assumed before, we gave this some value, but now the key about frequency dependence, is that, this is not a fixed value, this will depend on other frequencies.
+In this particular case, it will depend, for example, on the frequencies of the parasites that are around.
+And so we need to calculate this, at each generation because this will be different at each generation.
+So how do we calculate this?
+Well, assuming the fact, you are an A1 host, now you can run into two types of parasites.
+You can run into parasite A1 here, in our model, or you can run into parasite A2.
+These occur, using this notion here, at frequency P1 and frequency P2.
+So we don't have any spatial considerations anymore, so the assumption is that you'd run into these parasites randomly, and so the probability to run into an A1 parasite, is in fact, its frequency.
+And in the same way, the probability to run into an A2 parasite, is its frequency.
+So we can calculate the H1 fitness.
+At this particular moment, it simply the probability that he run into an A1 parasite, times the fitness that you will experience as this A1 host, when you run into an A1 parasite.
+So this is the element of the fitness matrix from the previous slide.
+So, plus the probability that you run into a P2 or an A2 rather, sorry, parasites, so FP2.
+And then, times the fitness that you experience, when you as an H1-- so as an A1 host, experiences or interacts with a parasite of genotype A2.
+And again, this is also from the corresponding fitness matrix.
+And let's assume, for example, let's make some concrete example of values.
+Let's say the P1 frequency of A1 parasite, is now 20%, so this would be 20%.
+Correspondingly, this would be 80%.
+And here, this value, remember, you are a host; you will be infected, because we have here, matching alleles, both have A1, so that means if you look up the element in the fitness matrix, the value here, is going to be one minus SH, whatever SH is.
+Correspondingly the value here, if you look this up, is one, because the A2 parasites will not be able to infect you, with your A1 genotype as a host.
+So the value here, is one.
+And so for particular moment in time, this is the fitness of the H1 genotypes, host genotypes.
+And you can easily see here, that this will probably be different in each generation because these values will change the frequencies of the host-- of the parasites, will change.
+The fitness is here.
+Those don't change.
+These are fixed.
+The assumption that you get infected when there's a matching allele.
+You don't get infected when there's not a match.
+But the frequencies change and that's why this needs to be recalculated at each generation.
+So what we're now doing in JavaScript, is we're going to do three steps.
+The first is, we're going to calculate this current fitness, if you will, for both hosts obviously, then also for both parasites.
+So this, we calculate first, then when we have calculated this, after we've calculated it, we multiply it with the current frequencies, and we then, normalize this, by taking the sum of these products for both hosts, and then, normalizing it by the corresponding value.
+So let's do this.
+Let's calculate these fitnesses, these current fitness multiplied with the frequencies and normalize this, so that we get the frequencies in the next generation.
+Alright, so here we're back in our code.
+This is what we developed in the last lecture.
+We have these two functions called here, host selection and parasite selection, but we haven't defined these two functions.
+We need to do that now.
+And then, we also need to make sure, at the end, that we put all the D3 elements into place because otherwise this draw_line_chart, would now generate an error.
+Good, but we'll get to this after we've implemented whole selection-parasite selection.
+So let's go ahead and and do this here.
+So I'm going to have to find a function: host_selection.
+And what this function should do, is exactly, basically, what I just described on the slide.
+So I need to go through each of the host genotypes.
+And for each host genotype,
+I need to calculate the current fitness, which will depend on the parasite frequencies.
+So let me go ahead and do this. 
+I'm going to go here, through all host genotypes.
+So for (var i = 0) and then, i &lt; host_frequencies.
+Actually let me copy this before I make any spelling mistakes.
+Length. So the length of this array, which will simply give me the number of genotypes that we have.
+Which in our example here, will be too.
+You have two host genotypes.
+And then i = i + 1.
+Alright.
+So now, what do we need to do?
+Well, for each host genotype, we need to calculate the current fitness.
+And to do that, as we've just seen, we need to take a look at each of the parasite frequencies.
+So I'm going to put up here, an inner loop, where I'm going to go through all the parasites.
+Actually before I do that, let me set up of this local variable, host fitness, that I actually want to calculate.
+I'm going to initialize this at zero.
+Okay. So now, I'm going to add this inner loop here.
+So I'm going to use ii, here as my counter.
+As I have before.
+And here I'm going through the parasite frequencies.
+Okay. So now what do I need to do?
+Well, as we've seen before in the slides, it is simply the sum of the products of the current parasite frequency times the corresponding element in the fitness matrix.
+So I'm simply going to say: host_fitness equals, well what we have before, plus some value.
+And this values is the product between the element of the fitness matrix, and the parasite frequency.
+But rather than spelling this out here
+I'm actually an outsourced this, into a function.
+And I'm going to call this function a get_w_f, because I simply want the product of w and f, so the fitness and the frequency.
+And I need to pass i and ii, so that the function will know which genotypes I'm referring to.
+So the i is the host.
+The first element will be the host genotype.
+So if it's zero, then we're referring to the A1 host genotype.
+If it's one, we're referring to the A2 and the same for the ii, which is simply the corresponding parasite genotype.
+Alright,so let's implement this helper function here.
+So function get_w_f.
+And I'm going to use the same names for the parameters i and ii.
+So, how should this work?
+Well, okay.
+These are the genotypes, right?
+Or rather, they are actually the indices, in the corresponding array.
+But we know that they correspond to genotypes.
+Zero being A1 and one being A2.
+This is a matching alleles model, so we can say, if they are the same, okay, if i equals ii, and this is of course using the double equal for an equality test.
+Well then, as we know, what we need to return, is the fitness in the case of a match.
+So for the host, this means the fitness is 1-sh.
+And then times the corresponding parasite frequency.
+So parasite frequencies.
+And of course, tick the corresponding index here, as ii, because the second index here, is the one for the parasite.
+If there's no match, so else, then we know that we should return something else.
+I'm just going to copy this and paste it here.
+The fitness here, in this case, there's no match; this is means there's no infection.
+So the host has maximal fitness one, and again, times the parasite frequency of that corresponding genotype.
+So I'm going to do two things to simplify this a little further.
+The first is, we'll need basically the exact same function later on, for the host frequencies and the parasite fitnesses.
+And so, everything will be reversed here, but I will probably need two different functions, so I'm going to just call this function: get_host_w_f.
+So just that it's clear, which fitness it is, that I'm actually calculating here.
+So get_host_w_f.
+And the other thing that I want to do, is I want to simplify this, quite a bit actually, by using a new operator that we haven't encountered before, and this is called the ternary operator.
+And it works as follows:
+I can simplify this here, by simply saying, "return".
+So what I'm going to do here is,
+I'm going to say, i = ii.
+Mark and use proper spacing.
+Question mark.
+Okay now, we'll talk about this in a second.
+1-sh, and sorry, 1-sh : 1.
+Okay.
+And then, times the parasite frequencies.
+Okay, so what does this mean?
+So this here, this whole thing, this expression here, is using the ternary operator, which is a combination of a question mark and a colon.
+So it has these three elements here.
+The first element, then a question mark, the second, then a colon, and then the third element.
+And basically, this is the exact same thing as this.
+So I'm going to delete all these lines here, and look at this as much simpler.
+So how do you read this ternary operator?
+Well it simply means, if this expression here, concretely a condition, is true, the one before the question mark, then use this expression here.
+The one right after the question mark, or before the colon.
+If it's false, and there's really only these 2 options: it's either true or false.
+Then use this value.
+And this is exactly what we need to do here.
+If it's really a match between the genotypes, then the fitness here, is 1-sh.
+Otherwise the fitness is one.
+So basically, this is a very shorthand notation for picking the corresponding-- the correct fitness value, from the fitness matrix.
+And then we know, we simply need to multiply this, with the parasite frequencies and that's now much more compact.
+Alright, so now that we implemented this, we can go back here, to our host selection function.
+So, we have now calculated the product of the fitness and the frequency,
+We've created the sum here, of this host fitness, and we need to ensure that we're closing here, the brackets correctly, and again, thanks to proper indentation, that's easy to see, if one is missing.
+So now, I've calculated the host fitness here, for the current host.
+So now what we need to do, as we said, the second step is, we need to multiply this, with the corresponding frequency that we had before.
+So here, after this loop here.
+Okay.
+We can simply say, the host frequencies, okay, current host frequencies, so host frequencies, in here, were in the outer loop, right? i equals what we had before, times this fitness value.
+Okay. Here, this fitness value, that we just calculated.
+So that's the second step.
+Multiplying the frequency with this calculated fitness.
+What's the third step that we need to do?
+It's the normalization.
+Now in order to normalize, we need to know the normalizing factor, and that's just simply the sum of all these host frequencies that we calculate.
+So let's set up here, a sum variable that we can then use as a normalizing factor.
+So I'm simply going to define here, a local variable, called sum_host_frequencies
+Okay, sum_host_frequencies, because the host frequencies wouldn't add up at the end to one necessarily.
+Some host frequencies, okay,
+I'm going to initialize this at zero.
+And then, whoops, sorry.
+And then, I'm simply going to say, down here, in each iteration of the host frequencies,
+I'm going to say okay, some host frequencies need to be added.
+What needs to be added?
+Well, whatever we just calculated, has the host frequencies.
+Alright, + host_frequencies (i).
+So now, essentially what we're doing is, we're summing up all these new host frequencies that we calculated.
+And this is the third step because that allows us finally, to normalize things here, after the loop is entirely finished.
+So now, what we're going to do is, we're going to normalize and I'm just going to make a comment here, that this is what we're doing.
+So again we're going to go through all hosts, once more.
+And then, we are simply normalizing things here.
+So what we're seeing is, the host frequencies (i) equals what we currently have there, but divided by this normalizing factor, so divided by some host frequencies.
+So these are the three steps as we outlined them just before.
+So basically, just to repeat, the first step was to calculate these fitnesses, okay.
+And then when we had the fitnesses, we would multiply them, with the current frequencies, and once we've done that, we simply normalize, because these current frequencies may now, not add up to 1 anymore, so we have to normalized them.
+So that is what we have here.
+And so this is essentially now, the host selection function.
+Now all we need to do, is we essentially need to do, the exact same thing, for the parasite.
+So we can just go ahead and basically now, copy these 2 functions, okay, the whole selection and the helper function, get _host_w_f, i, ii.
+We copy this. And now we just have to rename things accordingly.
+So here, host_selection, will of course, be called, parasite_selection.
+Sum of the host frequencies, our normalizing factor here, will be called, sum_parasite_frequencies.
+Let me actually copied this parasite word here.
+First we're going through the parasite frequencies, we're calculating the parasite fitness, to do that, we need to go to the host_frequencies, in the inner loop, and then we can say okay, the parasite fitness equals the parasite fitness plus this: get_parasite_w_f.
+Okay. We'll fix this in a second,
+And then when we've done that, we can now here, multiply the parasite frequencies with the parasite fitness here, that we just calculated.
+And then of course we can properly calculate this normalizing factor, some parasite_frequencies equal some parasite_frequencies plus parasite_frequencies (i).
+And then we normalize, so again we go through all the parasite frequencies and we normalize those frequencies with this normalizing factor that we just calculated.
+So the exact same thing; just using other variables, and another array of course.
+And here, this is get_parasite_w_f.
+Now here we need to be careful, because this is slightly different.
+Here when i = ii, when this is true, then the fitness will actually be maximal.
+Because then, the the infection will occur, this is good for the parasite.
+If it doesn't occur, then it's bad for the parasite, so here the fitness will be 1-sp.
+But just make sure that you do not only replace this sh with sp, but that you also swap these, because it's the opposite right?
+If they match, if the alleles match, this is now good for the fitness of the parasite.
+And so here obviously, we need to multiply this with the corresponding host frequencies.
+Good.
+So now we've essentially implemented everything.
+We're still missing the D3 stuff, but let me just save this and I'll go to the browser and open this document, just so that we can see whether we made any mistakes, sort of, typo spelling mistakes.
+So let me open this file here: open file, here it is, co-evolution.
+And let's go into the JavaScript console, developer JavaScript console.
+Here's an error: parasite_host_frequencies is not defined.
+Okay, let's take a look where this is.
+Parasite_host_frequencies, yeah that doesn't make any sense.
+Where did I say parasite_host_ frequencies?
+Here, parasite_host_frequencies, this should obviously be, sum_parasite_frequencies.
+So I copy-pasted this in the wrong position. sum_ parasite_frequencies.
+Okay, well I'm glad I'm occasionally making these mistakes, because I'm very convinced that many of you will make similar mistakes and this is just to show how you find these mistakes easily.
+Okay, this was a silly one.
+So I'm going to reload this.
+Now it simply says, draw_line_chart is not defined.
+That's, of course, expected but just to be sure, let's go back here and comment this out, which is actually a nice tool.
+So you can use this comment... this double slash here, that you use to make comments, such as this one.
+You can also used this to comment out function calls that you don't want to be called for the time being, for example, when you're debugging.
+So if I do this here, and now this draw line chart is not going to get called, then, if I go back to the browser, there should be no more error, and that's indeed the case.
+There's no more error.
+So we're all good.
+Okay, so we can go back and uncomment this.
+But now of course we need to bring back this draw line chart, and the D3 function.
+So we can either go and copy this from other files, or I'm going to go once again, to the internet as we've done before,
+I'm going to go to D3 JS, so here's D3 JS.
+Here's how I link directly to the D3 library.
+By the way, by the time you look at this, you probably have a different version here, but that's fine.
+Just copy the corresponding link here.
+Okay, I'm going to close this, and I'm going to copy the link here into the head as before.
+And now, what I need, is to draw a line chart function.
+So once again, I'm going to go and grab this from the internet.
+We have natureincode.com.
+We can go to see code in action.
+So here, for example, we would have frequency dependent selection.
+And now we can go back here, note the draw a line chart function, is built with the D3 JS, and can be found here.
+So here's again dysfunction, and copying dysfunction.
+And I am placing it up here at the top, before my simulation code, okay.
+So I'm going to put this here, and then once again, we have this indentation issue.
+You could just leave that as is, but if you prefer, you can, of course, indent this properly, which I'm going to do here.
+Okay.
+Save, and now we should have everything in order.
+So we have D3 library loaded.
+We have the D3 code and it's pre-defined for us.
+And here's our simulation code; everything seems to be working fine.
+So let's save this.
+Go over here.
+Let me close this, and close this as well, and I reload here the browser.
+And here it is.
+This is our host parasite co-evolution and you can reload this a couple of times, and you can see this changes quite a bit, but it essentially depends on the initial values, which as you recall, we initialized at random.
+And so as you can observe here, if all of these values are relatively close to 0.5, then the dynamics are going to be less extreme, as if they're quite strongly apart from each other.
+But again we have no stochastic effects here, so everything you see here, will remain constant over time forever, because this is a deterministic model.
+But congratulations!
+This is the host-parasite co-evolution.
+You see here, negative frequency dependent selection in action.
+The consequence of that, is that you have this cyclical dynamics, co-evolutionary dynamics of the alleles frequencies changing in response to each other.
+So this concludes this lecture.
+Congratulations.
+If you made it this far.
+You have now two species co-evolving with each other,
+So in the final lecture of this chapter, which is the next lecture, we're going to add a slight modification to get even more interesting dynamics.
+See you there.

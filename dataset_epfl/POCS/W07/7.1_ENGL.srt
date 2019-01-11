@@ -1,0 +1,1438 @@
+1
+00:00:03,885 --> 00:00:05,577
+Hi, I'm Ed Bugnion,
+
+2
+00:00:05,578 --> 00:00:06,750
+welcome to POCS.
+
+3
+00:00:06,751 --> 00:00:10,025
+This week in POCS we'll be talking about
+two related and important concepts.
+
+4
+00:00:10,026 --> 00:00:12,386
+The first one is virtualization,
+
+5
+00:00:12,387 --> 00:00:14,929
+which is a broadly used technique
+in computer systems,
+
+6
+00:00:15,366 --> 00:00:17,613
+and the second one is virtual machines,
+
+7
+00:00:17,614 --> 00:00:20,315
+which is the application
+of the virtualization technique
+
+8
+00:00:20,730 --> 00:00:23,902
+as applied to a computer's
+desktops or servers.
+
+9
+00:00:24,040 --> 00:00:28,773
+I've actually spent many years,
+probably well over a decade of my career
+
+10
+00:00:28,774 --> 00:00:30,762
+in the area of virtualization.
+
+11
+00:00:30,763 --> 00:00:34,435
+Hope to share some of those
+perspectives with you this week.
+
+12
+00:00:34,436 --> 00:00:35,687
+This is a pretty broad area,
+
+13
+00:00:35,688 --> 00:00:37,781
+so we've broken it up
+into different topics.
+
+14
+00:00:38,092 --> 00:00:40,487
+The first one, which is the module
+you're watching right now,
+
+15
+00:00:40,488 --> 00:00:43,279
+will only focus on
+an introduction and overview
+
+16
+00:00:43,280 --> 00:00:45,699
+of the broad topic of virtualization.
+
+17
+00:00:46,057 --> 00:00:47,889
+Some of that topic content comes from
+
+18
+00:00:47,890 --> 00:00:50,180
+the Saltzer and Kaashoek textbook.
+
+19
+00:00:50,181 --> 00:00:52,477
+Now the other modules are not available
+
+20
+00:00:52,478 --> 00:00:54,499
+in the Saltzer and Kaashoek textbook.
+
+21
+00:00:54,500 --> 00:00:58,071
+I'll first walk you through
+a history of virtual machines...
+
+22
+00:00:58,072 --> 00:01:00,361
+why we are where we are today.
+
+23
+00:01:00,362 --> 00:01:02,752
+That's kind of an interesting
+history to think about.
+
+24
+00:01:02,753 --> 00:01:06,910
+Then we'll go into the area
+of VMM construction,
+
+25
+00:01:06,911 --> 00:01:09,696
+and we'll do that
+in a system-independent manner,
+
+26
+00:01:09,697 --> 00:01:12,828
+just looking at the fundamental
+principles that are required
+
+27
+00:01:13,211 --> 00:01:15,554
+in order to build
+a virtual machine monitor
+
+28
+00:01:15,555 --> 00:01:18,062
+that can efficiently run virtual machines.
+
+29
+00:01:18,620 --> 00:01:20,376
+And then we'll go from theory to practice
+
+30
+00:01:20,377 --> 00:01:22,644
+in the next two modules.
+
+31
+00:01:22,645 --> 00:01:24,466
+There's a first case study,
+
+32
+00:01:24,467 --> 00:01:26,236
+which is of a system called <i>Disco</i>,
+
+33
+00:01:26,237 --> 00:01:28,211
+which I worked on in the 90's at Stanford.
+
+34
+00:01:28,932 --> 00:01:31,603
+And this was a precursor to ESX server,
+
+35
+00:01:31,604 --> 00:01:33,995
+which is covered in the paper
+from Carl Waldspurger
+
+36
+00:01:34,313 --> 00:01:36,642
+So I recommend that you watch this module
+
+37
+00:01:36,643 --> 00:01:38,922
+on memory resource management in Disco
+
+38
+00:01:38,923 --> 00:01:40,298
+before reading the paper.
+
+39
+00:01:40,782 --> 00:01:44,746
+And then finally, the last module
+is an optional module.
+
+40
+00:01:44,747 --> 00:01:47,631
+It is a case study on VMM 1.0,
+
+41
+00:01:47,632 --> 00:01:52,735
+which is a system that I worked on
+at VMware in 1998 and 1999.
+
+42
+00:01:52,736 --> 00:01:56,683
+It's also described in a recent paper,
+and again, this is an optional module,
+
+43
+00:01:56,684 --> 00:01:59,804
+and it'll give you a sense of how
+you can build a virtual machine monitor
+
+44
+00:01:59,805 --> 00:02:01,910
+that is commercial grade,
+even on an architecture
+
+45
+00:02:01,911 --> 00:02:05,888
+that is not designed with
+architectural support for virtualization.
+
+46
+00:02:06,526 --> 00:02:08,002
+So let's get started.
+
+47
+00:02:08,502 --> 00:02:10,551
+And let's get started
+with a basic definition
+
+48
+00:02:10,553 --> 00:02:14,436
+of what virtualization is about,
+and why it is important.
+
+49
+00:02:15,034 --> 00:02:17,068
+Virtualization is not a principle
+
+50
+00:02:17,069 --> 00:02:19,679
+in the same way that we've raised
+
+51
+00:02:19,680 --> 00:02:23,375
+other aspects of computer systems
+to the level of principles.
+
+52
+00:02:23,376 --> 00:02:27,101
+It's not as important
+as abstraction or as modularity,
+
+53
+00:02:27,102 --> 00:02:30,356
+but it actually <i>uses</i>
+abstraction and modularity.
+
+54
+00:02:31,089 --> 00:02:34,317
+It creates an abstraction
+in a virtualized...
+
+55
+00:02:34,904 --> 00:02:37,661
+a resource that is virtualized
+is an abstraction,
+
+56
+00:02:38,160 --> 00:02:40,080
+from a computer systems perspective.
+
+57
+00:02:40,081 --> 00:02:43,574
+And that abstraction is used
+in order to enforce modularity.
+
+58
+00:02:43,575 --> 00:02:46,333
+Virtualization is associated with
+an enforced modularity,
+
+59
+00:02:46,991 --> 00:02:48,775
+and that enforced modularity, of course,
+
+60
+00:02:48,776 --> 00:02:51,076
+is enabled through the use of layering.
+
+61
+00:02:51,077 --> 00:02:54,420
+So we use layering and we use indirection
+
+62
+00:02:54,421 --> 00:02:56,208
+in order to create an abstraction,
+
+63
+00:02:56,209 --> 00:02:59,123
+and that abstraction enforces modularity.
+
+64
+00:02:59,745 --> 00:03:03,486
+Now, there are additional fundamental
+principles of computer systems
+
+65
+00:03:03,487 --> 00:03:05,607
+that are brought into the mix,
+in order to create
+
+66
+00:03:05,608 --> 00:03:08,600
+a virtualized environment,
+in particular a virtual machine,
+
+67
+00:03:08,601 --> 00:03:11,466
+and one worth mentioning
+is interpretation.
+
+68
+00:03:12,177 --> 00:03:14,204
+In order to create a computer
+that is virtualized,
+
+69
+00:03:14,602 --> 00:03:18,130
+that computer has a processing unit,
+and that processing unit,
+
+70
+00:03:18,131 --> 00:03:21,289
+and the instructions in that processing
+unit need to be interpreted in some way,
+
+71
+00:03:21,290 --> 00:03:22,856
+and so interpretation is fundamental
+
+72
+00:03:22,857 --> 00:03:27,231
+to the art of building efficient
+virtual machine monitors.
+
+73
+00:03:28,009 --> 00:03:30,106
+Now, why do you virtualize?
+
+74
+00:03:30,107 --> 00:03:32,934
+Well, there are actually
+a number of motivations.
+
+75
+00:03:34,197 --> 00:03:37,052
+The original motivation
+for virtualization,
+
+76
+00:03:37,053 --> 00:03:40,695
+whether it applies to computers,
+or storage, or networking,
+
+77
+00:03:40,696 --> 00:03:42,637
+or other parts of computer systems,
+
+78
+00:03:42,638 --> 00:03:44,859
+has been largely to reduce complexity,
+
+79
+00:03:44,860 --> 00:03:49,105
+and that is one of the overriding themes
+that we have in this class,
+
+80
+00:03:49,106 --> 00:03:53,457
+is that complexity
+is the single largest evil
+
+81
+00:03:53,458 --> 00:03:55,369
+that one must constantly fight
+
+82
+00:03:55,370 --> 00:03:58,503
+in order to create systems
+that are ever more powerful
+
+83
+00:03:58,504 --> 00:04:01,075
+and have additional new capabilities.
+
+84
+00:04:01,076 --> 00:04:04,894
+So virtualization is an efficient
+and effective technique
+
+85
+00:04:04,895 --> 00:04:07,797
+to reduce the complexity
+in computer systems.
+
+86
+00:04:08,378 --> 00:04:10,968
+More recently, virtualization
+has been extremely popular
+
+87
+00:04:10,969 --> 00:04:13,696
+because it enables automation.
+
+88
+00:04:13,697 --> 00:04:18,226
+There's one important saying
+that applies to data centers,
+
+89
+00:04:19,035 --> 00:04:21,925
+that says, "screwdrivers don't scale."
+
+90
+00:04:22,103 --> 00:04:24,804
+Which basically means that
+the physical world,
+
+91
+00:04:24,805 --> 00:04:26,598
+that any manipulation
+of the physical world,
+
+92
+00:04:26,599 --> 00:04:30,141
+is impossible to scale,
+and impossible to automate.
+
+93
+00:04:30,142 --> 00:04:34,871
+If you apply virtualization
+on top of physical resources
+
+94
+00:04:34,872 --> 00:04:39,334
+then the idea, or the premise,
+is that you can start manipulating
+
+95
+00:04:39,335 --> 00:04:43,693
+these virtual abstractions
+as if they were physical resources
+
+96
+00:04:43,694 --> 00:04:46,763
+without having to touch
+either physical screwdrivers,
+
+97
+00:04:46,764 --> 00:04:50,404
+or the moral equivalent of screwdrivers.
+
+98
+00:04:52,161 --> 00:04:56,728
+Now, as I mentioned earlier,
+virtualization is a broad technique,
+
+99
+00:04:56,729 --> 00:04:59,618
+virtual machine is a specific use
+of that technique,
+
+100
+00:04:59,619 --> 00:05:02,768
+so I'm first actually going to define
+virtualization in the broad sense,
+
+101
+00:05:02,769 --> 00:05:05,542
+and then we'll go back
+to virtual machines.
+
+102
+00:05:05,543 --> 00:05:09,398
+So virtualization is a layer,
+
+103
+00:05:09,399 --> 00:05:13,582
+and it is a layer that exports
+the same abstraction
+
+104
+00:05:13,583 --> 00:05:16,183
+as the layer that it relies upon.
+
+105
+00:05:16,605 --> 00:05:19,994
+It doesn't get any simpler,
+or any more basic than that,
+
+106
+00:05:19,995 --> 00:05:21,853
+but that is actually fundamental.
+
+107
+00:05:22,152 --> 00:05:25,440
+So if you picture this representation,
+
+108
+00:05:25,865 --> 00:05:29,118
+you take any physical resource, "X",
+
+109
+00:05:29,119 --> 00:05:30,960
+picture, for now, a disk drive.
+
+110
+00:05:31,621 --> 00:05:34,154
+A virtualization layer
+
+111
+00:05:34,155 --> 00:05:35,749
+is a piece of software
+
+112
+00:05:35,750 --> 00:05:39,098
+that takes one or more of those
+physical "X" resources,
+
+113
+00:05:39,099 --> 00:05:44,555
+those disk drives,
+and exports an abstraction of a disk.
+
+114
+00:05:45,261 --> 00:05:50,085
+Now that disk, that virtual X,
+that virtual disk, is not a physical disk,
+
+115
+00:05:50,086 --> 00:05:52,615
+but it is something
+that is functionally equivalent
+
+116
+00:05:52,968 --> 00:05:56,701
+to the underlying characteristics
+of a disk drive...
+
+117
+00:05:56,702 --> 00:05:59,241
+If X is, of course, a disk drive.
+
+118
+00:05:59,446 --> 00:06:02,433
+Now you can substitute X
+to being an address space,
+
+119
+00:06:02,434 --> 00:06:06,236
+a CPU, a messaging interface, a port,
+
+120
+00:06:07,126 --> 00:06:09,159
+and you get the same idea.
+
+121
+00:06:09,996 --> 00:06:14,463
+So one of the key common themes
+around virtualization
+
+122
+00:06:14,464 --> 00:06:17,518
+is that the piece of soft
+that creates the abstraction
+
+123
+00:06:17,519 --> 00:06:21,589
+hides the physical names from
+the consumer of that abstraction.
+
+124
+00:06:21,590 --> 00:06:24,572
+So as a consumer
+of the virtual X resource,
+
+125
+00:06:24,573 --> 00:06:26,900
+you actually should never
+be able to determine
+
+126
+00:06:26,901 --> 00:06:30,538
+what are the underlying
+resources they consume
+
+127
+00:06:30,539 --> 00:06:32,548
+in order to create this abstraction,
+
+128
+00:06:32,549 --> 00:06:35,493
+and this is both useful,
+as an implementation technique,
+
+129
+00:06:35,494 --> 00:06:38,326
+but more importantly it is fundamental
+
+130
+00:06:38,327 --> 00:06:41,993
+because it allows
+the decoupling of the responsibility.
+
+131
+00:06:41,994 --> 00:06:44,851
+The consumer of the abstraction
+uses the abstraction
+
+132
+00:06:44,852 --> 00:06:48,533
+as if it was a well-understood
+physical building block.
+
+133
+00:06:49,087 --> 00:06:52,412
+The producer of the abstraction,
+the software layer between the two,
+
+134
+00:06:52,413 --> 00:06:55,415
+has full flexibility
+to change the mappings
+
+135
+00:06:55,416 --> 00:06:57,689
+between the virtual names
+and the physical names,
+
+136
+00:06:57,690 --> 00:07:01,106
+at any point in time,
+and that is the level of flexibility
+
+137
+00:07:01,107 --> 00:07:04,475
+that is enabled by the fact that
+the physical names are hidden
+
+138
+00:07:04,476 --> 00:07:06,312
+from the underlying abstraction.
+
+139
+00:07:07,326 --> 00:07:09,584
+Now, because we hide the physical names
+
+140
+00:07:10,426 --> 00:07:12,909
+we naturally enforce modularity.
+
+141
+00:07:13,115 --> 00:07:15,922
+For example, we'll talk about
+multiplexing as a technique,
+
+142
+00:07:15,923 --> 00:07:17,641
+as part of virtualization.
+
+143
+00:07:17,642 --> 00:07:21,269
+We can multiplex one resource
+into multiple independent resources,
+
+144
+00:07:21,270 --> 00:07:24,165
+and those are naturally
+isolated from each other,
+
+145
+00:07:24,166 --> 00:07:28,931
+because each virtual resource
+operates on virtual names,
+
+146
+00:07:28,932 --> 00:07:31,256
+and the physical names,
+
+147
+00:07:31,257 --> 00:07:35,495
+are never available to the consumer
+of the virtual resource.
+
+148
+00:07:37,040 --> 00:07:39,569
+Now, I mentioned multiplexing...
+there actually are three ways
+
+149
+00:07:39,570 --> 00:07:44,891
+in which we can create
+virtualized abstractions,
+
+150
+00:07:45,776 --> 00:07:51,659
+and these are broadly named as
+multiplexing, aggregation and emulation.
+
+151
+00:07:51,660 --> 00:07:54,571
+The textbook actually goes over
+those techniques in detail.
+
+152
+00:07:54,572 --> 00:07:58,852
+I'm going to give you a brief overview
+of how these three techniques apply,
+
+153
+00:07:58,853 --> 00:08:00,652
+with some specific examples.
+
+154
+00:08:01,163 --> 00:08:04,036
+So, to illustrate
+how virtualization is used,
+
+155
+00:08:04,037 --> 00:08:06,826
+the Saltzer and Kaashoek textbook
+has a couple of examples
+
+156
+00:08:06,827 --> 00:08:08,928
+which come from the field
+of operating systems,
+
+157
+00:08:08,929 --> 00:08:13,240
+so the use of virtualization
+within an actual operating system.
+
+158
+00:08:13,241 --> 00:08:16,051
+And the first example
+that they provide is that of threads,
+
+159
+00:08:16,052 --> 00:08:18,492
+so if you think about it
+in this particular way,
+
+160
+00:08:18,493 --> 00:08:21,069
+an operating system and its scheduler,
+
+161
+00:08:21,070 --> 00:08:23,788
+a multiplex is a finite set of resources,
+
+162
+00:08:23,789 --> 00:08:25,306
+a finite set of cores,
+
+163
+00:08:25,307 --> 00:08:27,528
+and onto a larger set of threads,
+
+164
+00:08:27,529 --> 00:08:30,513
+and it's scheduled these threads
+onto those limited set of cores.
+
+165
+00:08:30,514 --> 00:08:34,321
+So you can think of a thread
+as a virtual CPU, and indeed,
+
+166
+00:08:34,322 --> 00:08:39,758
+a thread resembles the characteristics
+of the physical CPU,
+
+167
+00:08:39,759 --> 00:08:43,208
+in particular critically,
+it has the same register file
+
+168
+00:08:43,210 --> 00:08:46,133
+as the physical CPU,
+
+169
+00:08:46,504 --> 00:08:48,799
+and it runs the same
+instructions and architecture
+
+170
+00:08:48,800 --> 00:08:51,082
+as the physical CPU.
+
+171
+00:08:51,362 --> 00:08:56,814
+So a thread, by that definition,
+is a multiplexed instance of a core.
+
+172
+00:08:57,234 --> 00:08:59,540
+Now, a thread is actually
+a little bit more than simply
+
+173
+00:08:59,541 --> 00:09:01,069
+a multiplexed instance of a core,
+
+174
+00:09:01,070 --> 00:09:03,187
+because a thread can issue system calls,
+
+175
+00:09:03,188 --> 00:09:04,942
+and so it is an augmented abstraction...
+
+176
+00:09:04,943 --> 00:09:08,223
+is not only a virtualized
+instance of a core,
+
+177
+00:09:08,224 --> 00:09:09,871
+it is a virtualized instance of a core
+
+178
+00:09:09,872 --> 00:09:13,085
+augmented with the ability
+to perform system calls.
+
+179
+00:09:13,468 --> 00:09:15,908
+The second example
+that is provided in the book
+
+180
+00:09:15,909 --> 00:09:17,765
+is that of virtual memory.
+
+181
+00:09:17,766 --> 00:09:19,019
+And I want to emphasize,
+
+182
+00:09:19,020 --> 00:09:21,734
+and certainly I think no one
+can overemphasize
+
+183
+00:09:21,735 --> 00:09:24,395
+the importance of virtual memory
+in computer systems.
+
+184
+00:09:24,396 --> 00:09:28,237
+Some people even argue
+it's the single biggest improvement
+
+185
+00:09:28,238 --> 00:09:31,132
+over the original von Neumann
+architectural model.
+
+186
+00:09:31,133 --> 00:09:33,421
+Not only can we store
+instructions in memory,
+
+187
+00:09:33,422 --> 00:09:37,196
+but these instructions
+can operate on virtual addresses
+
+188
+00:09:37,197 --> 00:09:38,956
+rather than physical addresses.
+
+189
+00:09:38,957 --> 00:09:42,914
+And every computer has architectural
+support for virtual memory
+
+190
+00:09:42,915 --> 00:09:45,779
+in the form of a TLB,
+which caches these translations
+
+191
+00:09:45,780 --> 00:09:48,465
+between virtual names, and physical names.
+
+192
+00:09:48,923 --> 00:09:51,254
+So if you think about an address space,
+
+193
+00:09:51,877 --> 00:09:53,618
+a virtual address space,
+
+194
+00:09:53,619 --> 00:09:58,547
+it is a multiplex abstraction
+of the underlying physical resource,
+
+195
+00:09:58,548 --> 00:10:02,693
+which is that of byte-addressable,
+or word-addressable memory.
+
+196
+00:10:03,785 --> 00:10:06,807
+There are other examples
+of the use of virtualization
+
+197
+00:10:06,808 --> 00:10:10,109
+beyond simply threads and virtual memory,
+
+198
+00:10:10,110 --> 00:10:13,813
+for example sockets, pipes,
+virtual disks, are all examples
+
+199
+00:10:13,814 --> 00:10:17,941
+of virtualized instances
+or virtualized abstractions
+
+200
+00:10:17,942 --> 00:10:20,106
+that are created by an operating system,
+
+201
+00:10:20,107 --> 00:10:22,630
+and exposed by the operating system,
+
+202
+00:10:22,631 --> 00:10:25,733
+that have a corresponding physical analog.
+
+203
+00:10:26,530 --> 00:10:32,611
+Now, there are three mechanisms
+that are used to achieve virtualization:
+
+204
+00:10:33,287 --> 00:10:35,662
+multiplexing, aggregation and emulation.
+
+205
+00:10:35,663 --> 00:10:37,146
+I'm just going to spend a few minutes
+
+206
+00:10:37,147 --> 00:10:40,581
+going over some of these basic techniques,
+
+207
+00:10:40,582 --> 00:10:43,290
+and give some basic examples.
+
+208
+00:10:43,566 --> 00:10:46,483
+So I mentioned earlier the three
+mechanisms used to virtualize,
+
+209
+00:10:46,484 --> 00:10:48,662
+so let's talk about them
+in a little bit of detail.
+
+210
+00:10:48,663 --> 00:10:50,790
+The first one, and by far
+the most important one,
+
+211
+00:10:50,791 --> 00:10:52,188
+is called <i>multiplexing</i>,
+
+212
+00:10:52,189 --> 00:10:56,509
+and multiplexing exposes
+a single resource multiple times.
+
+213
+00:10:56,510 --> 00:10:58,007
+But there's a level of indirection,
+
+214
+00:10:58,008 --> 00:11:01,110
+and that level of indirection ensures
+that each virtual resource
+
+215
+00:11:01,111 --> 00:11:03,548
+is isolated from each other.
+
+216
+00:11:04,348 --> 00:11:07,087
+Multiplexing is often implemented
+with hardware support.
+
+217
+00:11:07,088 --> 00:11:10,578
+And the canonical example for that,
+of course, is virtual memory,
+
+218
+00:11:10,579 --> 00:11:13,556
+in which the operating system,
+with hardware support,
+
+219
+00:11:13,557 --> 00:11:17,627
+multiplexes physical memory
+at a page-level granularity,
+
+220
+00:11:17,628 --> 00:11:20,583
+and exposes that into virtual resources,
+
+221
+00:11:20,584 --> 00:11:23,845
+which are the address space
+of the various processes.
+
+222
+00:11:26,365 --> 00:11:29,143
+Now the second mechanism
+provides the inverse function.
+
+223
+00:11:29,337 --> 00:11:31,125
+Rather than taking
+one physical resource
+
+224
+00:11:31,126 --> 00:11:32,816
+and exposing it multiple times,
+
+225
+00:11:32,817 --> 00:11:34,363
+you take multiple physical resources,
+
+226
+00:11:34,364 --> 00:11:36,622
+and you expose them as a single resource.
+
+227
+00:11:37,275 --> 00:11:40,241
+Sometimes you do that
+just to simplify management,
+
+228
+00:11:40,242 --> 00:11:43,926
+but generally you actually do that
+to provide enhanced capabilities
+
+229
+00:11:43,927 --> 00:11:45,313
+to the aggregate resources,
+
+230
+00:11:45,314 --> 00:11:48,531
+capabilities not found
+in the underlying physical resource.
+
+231
+00:11:49,230 --> 00:11:53,069
+And RAID is the canonical
+example of aggregation.
+
+232
+00:11:53,540 --> 00:11:58,068
+You turn multiple unreliables,
+small and slow disks,
+
+233
+00:11:58,069 --> 00:12:02,182
+into one very reliable,
+bigger, and faster disk.
+
+234
+00:12:02,536 --> 00:12:05,899
+Of course, you can only do that
+if you RAID enough disks together,
+
+235
+00:12:05,900 --> 00:12:07,828
+but the mechanism allows you to aggregate
+
+236
+00:12:07,829 --> 00:12:09,820
+and get the enhanced capabilities.
+
+237
+00:12:10,126 --> 00:12:12,077
+There are other examples of aggregation,
+
+238
+00:12:12,277 --> 00:12:14,877
+for example, the networking domain
+where you turn multiple links
+
+239
+00:12:15,257 --> 00:12:19,874
+into one virtual link
+with higher aggregate capacity.
+
+240
+00:12:21,149 --> 00:12:22,921
+And then, finally,
+there's a third mechanism
+
+241
+00:12:22,922 --> 00:12:25,665
+which is the big hammer
+of computer systems,
+
+242
+00:12:26,112 --> 00:12:28,559
+which is virtualization
+through emulation...
+
+243
+00:12:28,560 --> 00:12:29,816
+you add a level of interaction,
+
+244
+00:12:29,817 --> 00:12:32,857
+and you do that through
+general-purpose software.
+
+245
+00:12:34,286 --> 00:12:37,335
+This is the ability for software
+to emulate a virtual resource
+
+246
+00:12:37,336 --> 00:12:39,306
+that is different from
+the physical resource.
+
+247
+00:12:39,541 --> 00:12:42,667
+It turns out there are actually
+many examples of this, all around us,
+
+248
+00:12:42,916 --> 00:12:45,535
+in particular how you emulate i/o devices,
+
+249
+00:12:45,536 --> 00:12:47,934
+such as disk tapes
+or communication channels
+
+250
+00:12:47,935 --> 00:12:52,149
+using different physical resources
+than you expose as a virtual resource.
+
+251
+00:12:52,663 --> 00:12:54,996
+And the approach is also used
+in the computing domain,
+
+252
+00:12:54,997 --> 00:12:59,002
+for example to emulate
+a legacy architecture on a newer one...
+
+253
+00:12:59,003 --> 00:13:00,638
+Apple did that very successfully
+
+254
+00:13:00,639 --> 00:13:03,428
+to allow the transition
+from Power PC CPU's
+
+255
+00:13:03,429 --> 00:13:05,568
+onto X86 CPU's.
+
+256
+00:13:05,983 --> 00:13:09,014
+So I mentioned that emulation
+is the big hammer for virtualization.
+
+257
+00:13:09,524 --> 00:13:12,592
+It always works in theory;
+it's not always fast in practice.
+
+258
+00:13:12,956 --> 00:13:15,001
+And before that I mentioned
+that multiplexing
+
+259
+00:13:15,002 --> 00:13:18,515
+often relies on hardware support
+for performance,
+
+260
+00:13:18,727 --> 00:13:20,678
+and that brings us to the topic
+
+261
+00:13:20,679 --> 00:13:23,268
+of architectural support
+for virtualization.
+
+262
+00:13:23,638 --> 00:13:26,913
+And by that we're trying to define,
+or put a characteristic or a label
+
+263
+00:13:26,914 --> 00:13:29,096
+on a hardware component,
+
+264
+00:13:29,097 --> 00:13:31,964
+whether than hardware component
+was designed to support
+
+265
+00:13:31,965 --> 00:13:34,475
+a particular form of virtualization.
+
+266
+00:13:35,107 --> 00:13:39,193
+A classic example is the memory
+management unit of a processor.
+
+267
+00:13:39,324 --> 00:13:43,169
+Since the 1960's it's had
+hardware support for virtualization,
+
+268
+00:13:43,170 --> 00:13:45,939
+and it has architectural support
+for virtual memory
+
+269
+00:13:45,940 --> 00:13:48,211
+built into the memory management unit.
+
+270
+00:13:48,212 --> 00:13:49,764
+The concept of [harder] virtualization
+
+271
+00:13:49,765 --> 00:13:53,162
+has taken on a more important meaning
+over the last few years,
+
+272
+00:13:53,163 --> 00:13:57,164
+as we've added support
+or advanced capabilities of virtualization
+
+273
+00:13:57,165 --> 00:13:59,835
+into various pieces of a computer system,
+
+274
+00:13:59,836 --> 00:14:04,050
+for example, the CPU, the memory
+management unit, or the i/o devices,
+
+275
+00:14:04,051 --> 00:14:07,198
+and that has specifically been driven
+by the rising importance
+
+276
+00:14:07,199 --> 00:14:10,005
+in virtual machines in computer systems.
+
+277
+00:14:10,533 --> 00:14:14,376
+Now that brings us to a closing thought
+for this first module.
+
+278
+00:14:14,780 --> 00:14:17,548
+A few weeks ago, in the layering cycle,
+
+279
+00:14:17,549 --> 00:14:20,489
+we talked about
+the value of adding a layer
+
+280
+00:14:20,490 --> 00:14:21,988
+in a computer system stack
+
+281
+00:14:21,989 --> 00:14:26,107
+in order to built a new feature
+or deliver additional capabilities,
+
+282
+00:14:26,423 --> 00:14:29,838
+and this week we're talking about
+a specific way of creating a new layer,
+
+283
+00:14:29,839 --> 00:14:33,866
+one that re-exports the same interface
+as the underlying resource
+
+284
+00:14:33,867 --> 00:14:35,387
+that it relies on.
+
+285
+00:14:35,388 --> 00:14:38,407
+And so for every particular problem
+that you're faced with,
+
+286
+00:14:38,408 --> 00:14:41,149
+you have the choice...
+First of all, whether it is wise
+
+287
+00:14:41,150 --> 00:14:44,047
+or appropriate, to add
+a new layer of abstraction,
+
+288
+00:14:44,048 --> 00:14:47,835
+and by doing so, whether you should
+expose a new abstraction,
+
+289
+00:14:47,836 --> 00:14:49,222
+different from the underlying one,
+
+290
+00:14:49,223 --> 00:14:53,067
+or re-expose the same abstraction
+as the underlying one,
+
+291
+00:14:53,068 --> 00:14:55,330
+and create a form of virtualization
+
+292
+00:14:55,331 --> 00:14:58,077
+for the particular problem
+that you're trying to solve.
+
+293
+00:14:58,315 --> 00:15:00,320
+Now, we've also seen in this module
+
+294
+00:15:00,321 --> 00:15:03,366
+that virtualization applies
+to a very broad set of topics,
+
+295
+00:15:03,367 --> 00:15:05,380
+not just virtual machines...
+
+296
+00:15:05,381 --> 00:15:07,539
+a computer system, a disk, a database,
+
+297
+00:15:07,540 --> 00:15:09,473
+broadcast domains have been virtualized.
+
+298
+00:15:09,474 --> 00:15:11,744
+Anywhere you look
+in the field of computer systems,
+
+299
+00:15:11,745 --> 00:15:13,527
+the notion that you can virtualize,
+
+300
+00:15:13,528 --> 00:15:15,163
+and apply the virtualization principle,
+
+301
+00:15:15,164 --> 00:15:18,077
+has been applied
+at least one or a few times.
+
+302
+00:15:18,078 --> 00:15:20,788
+So, as we break for this first module,
+
+303
+00:15:20,789 --> 00:15:22,907
+let me leave you with a closing thought,
+
+304
+00:15:22,908 --> 00:15:25,088
+and something to think about at home.
+
+305
+00:15:25,897 --> 00:15:27,690
+For any given problem,
+
+306
+00:15:27,691 --> 00:15:30,679
+one that you are familiar with,
+in your domain,
+
+307
+00:15:30,680 --> 00:15:34,410
+should you actually create a new layer,
+with a different abstraction?
+
+308
+00:15:34,411 --> 00:15:38,043
+And when should you actually
+try to expose the same abstraction
+
+309
+00:15:38,044 --> 00:15:40,430
+by virtualizing it?
+What are the trade-offs,
+
+310
+00:15:40,431 --> 00:15:43,320
+and the pros and cons
+in each particular approach?
+
+311
+00:15:43,584 --> 00:15:45,799
+So that's something for you
+to think about at home,
+
+312
+00:15:45,800 --> 00:15:48,881
+and next up we'll talk about
+the history of virtual machines.

@@ -1,0 +1,124 @@
+We saw bootstrapping as an example of an exact method.
+In this part, we will now formalize the exact method and see how it can be written as a linear equation.
+We will highlight some issues, and propose some solutions to these issues.
+One solution as we will see is the bootstrapping method.
+I will also show you another alternative solution to it which which builds on the pseudo-inverse of the cash flow matrix.
+Formally speaking, the market data that is given to us at the spot date t-0 is stacked into a vector P of n market prices.
+Each of these instruments yields a cashflow c-ij so that the value of instrument i is given as the sum of the discounted cash flows c-ij.
+Now the special thing about this sum is that we will sum up all possible cash flow dates, and there are N of them, even though instrument i may not have a cash flow at that date.
+We will then simply put c-ij = 0.
+So the market gives us the 'P-i's and it gives us the 'c-ij's the cash flows on the date t-j.
+What is not known is the discount curve.
+We stack the discount curve into the vector D and we rewrite this equation here as this matrix equation.
+The next step is now to bring the data into this form.
+While this is pretty straightforward if the market data describes prices of coupon bearing bonds, this is less so in cases where market data represents LIBOR, forward rates, and swap rates.
+Let's start with coupon bond market data.
+As an example, we look at these quotes of UK government bonds on the 4th of September, 1996.
+We have 9 bonds, and they come with coupons ranging from 7% to 12.25% on a principal of 100.
+We see in the middle columns, the next coupon dates.
+And we see in this column here the maturity dates of the corresponding bonds.
+We also see the dirty prices.
+So if we start to count and order the cash flow dates, we see that it's bond 3 that pays the next coupon.
+The next bond is bond 9.
+And the third cash flow comes from bond 5.
+We also see from that table that bond 1 is the soonest to mature bond.
+The next coupon date coincides with it's maturity date.
+So there is only one cash flow left for this bond.
+UK government bonds have semi-annual cash flows.
+So bond 2 has 3 cash flows left and so on and so forth.
+If we summarize this UK government bonds data on the 4th of September, 1996, our prices of coupon bearing bonds that pay semi-annual coupons.
+The day count convention is actual over 365.
+The number of market prices given R is 9 and the number of cash flow dates if we sum them up, bond 1 had
+1 cash flow left bond 2 had 3 cash flows left and so on and so forth; summing up gives us 
+104 cash flow dates.
+The first one is the one from bond 3.
+The second one is the one from bond 9 and the third one is the one from bond 5 as seen on the previous slide.
+We can summarize these cash flows into the matrix C.
+In the first row, we see the
+cash flow of bond 1 which matures and pays the principal plus the 10% coupon rate.
+Remember that coupons are paid semi-annually, rates are annualized so the interest paid on the maturity date is 5.
+Similarly the 2nd bond will pay a coupon of 4.875
+The third bond, which is the bond with the earliest next coupon payment pays 6.125 and so on and so forth.
+Recall that in total we have
+104 cash flow dates.
+So what we see on this slide are the first 10 columns of a 9 x 104 cash flow matrix.
+We also see that it is sparse, that is, most of the entries are 0.
+Now let us bring into the price cash flow form the LIBOR and forward rates.
+The LIBOR rate prevailing at t-0 with maturity date T can be cast in the form, by giving it a price
+P of 1 at t-0.
+And giving it a cash flow of 1 + ( Î´ x the rate(L) ) at maturity T.
+A forward rate, remember, was derived from a forward rate agreement which corresponds to a cash flow of -1 at time T-1and cash flow of 1 + ( Î´ x the forward rate(F) ) at T-2.
+The present value of these cash flows at time t-0 is 0.
+This carries over to swap contracts as follows.
+Let the fixed rate be K and let t-0 up to T-n denote the reset and settlement dates.
+Where for the sake of notation, we assume that the delta(Î´) here is constant.
+If K is the swap rate then this relation here holds.
+So if the swap is spot starting if T-0 = t-0 this is just value 1, we take it to the left hand side and we see that we get a price cash flow scheme of price (p) = 1, cash flows = Î´.K and 1 + ( Î´.K ) at maturity.
+If the swap is forward starting, we take this equation literally as is the price is 0, of a cash flow of -1 at time T-0 plus cash flows of (Î´.K) at times T-j and 1 + (Î´.K) at times T-n.
+Summarizing these formalizations at the spot date t-0,
+LIBOR and spot starting swaps have a notional price of 1.
+Forward rate agreements and forward starting swaps have a notional price of 0.
+Let us now come back to the example with the US money and swap market data from 1st of October, 2012 that is the example we saw on the bootstrapping example.
+Remember the day count convention is actual over 360.
+We are given 3 LIBOR rates, 
+5 futures quotes, and 9 swap rates.
+We thus have 17 market prices.
+The corresponding cash flows are
+3 for the LIBOR, 6 for the futures and 30 for the swaps adding up to 39.
+The ordered cash flow dates are, t-1 is the 2nd of October which is the overnight LIBOR maturity. t-2 is the 5th of November which is the 1 month LIBOR. t-3 is the 19th of December which is the first reset date of the first futures contract here, and so on and so forth.
+If we stack these cash flows into the 17 x 39 cash flow matrix C it will look like this.
+In the first row, we have the cash flow of the overnight LIBOR.
+Second row, we see the cash flow of the one month LIBOR.
+In the third row, we have the cash flow of the 3 month LIBOR.
+In the fourth row here, we see the cash flow -1 which is from the first futures contract and the cash flow of the corresponding
+ cash flow at the maturity.
+Similarly for the remaining futures contract in this middle of the matrix and then in this first row corresponding to the swap contracts we have the 2 year swap which pays
+2 annual coupons as shown here.
+The next swap has a length of 
+3 years and it pays 3 coupons and so on and so forth.
+Again what we see here is not the full matrix, we just see the first 12 columns, in fact, of 39 in total.
+Again we see that the matrix is full of zeros and is sparse.
+On the other hand, it is also obvious that this matrix has full rank; the 17 rows linearly independent.
+The linear system for the discount curve hence has at least a solution, it has in fact infinitely many.
+Summarizing these exact methods typically leads to linear systems for the discount curve D.
+Which are under determined because the number of equations n is much smaller than the number of unknowns(N) in general.
+As a consequence, there exist many discount curve solutions. from which one is to choose.
+Now let's recall the bootstrapping example from the previous section.
+A moment's reflection shows that we in fact synthetically created new market instruments by the linear interpolation of swap rates and LIBOR rates.
+We actually created just as many new market instuments as there are equations missing.
+N-n
+The extended market data then gave us N X N cash flow matrix that was invertible.
+And so we could solve for the unique discount curve in that case.
+Bootstrapping is one possibility to deal with the issue of an under determined linear system.
+As an alternative solution, we will now see what the pseudo-inverse of the cash flow matrix can tell us.
+Here is the idea.
+Instead of estimating the discount function D directly, we estimate instead, a vector of weighted increments of the discount curve as shown here.
+The first entry is the t-1 bond price minus 1 which is the t-0 bond price divided by the square root of the time to maturity.
+The second entry is the difference between the t-2 bond, and the t-1 bond divided by the square root of the difference of their maturities and so on and so forth to the t-n bond price minus the t-(n-1) bond price again weighted.
+We can write this in matrix form as product of a weighting matrix W multiplying M applied to d minus the first basis vector.
+The weighting matrix W is the diagonal matrix with these entries on the diagonal and M is this matrix as shown here.
+There is in fact a 1-1 relation between this vector of weighted increments Î´ and the original discount curve d as shown here.
+Where the inverse of M can be explicitly computed as shown here.
+We can thus reformulate and restate the linear matching problem as this linear system here which is now an equation for the vector Î´.
+Remember that market data gives us the cash flow matrix C,
+M is an auxiliary explicitly given matrix,
+W is the diagonal matrix consisting of the weights derived from the maturity dates.
+P is the vector of market prices.
+Again, these are more unknowns than there are equations.
+But typically, the small n x N-matrix A has full rank because
+C has full rank.
+So we can form the pseudo inverse which gives us a particular solution to the linear system that we saw on the previous slide.
+By the definition of the pseudo inverse, this is in fact the unique solution of the linear system with minimal Euclidean norm.
+If we write down what this
+Euclidean norm looks like we now understand in hind sight why we have weighted these bond price increments by the square root of the difference of the maturity dates.
+Indeed the square here implies that we can omit the square root and multiply instead these expressions with delta(Î´).
+So this gives us a first order proxy of the integral of the derivative of the discount curve squared with respect to maturity.
+We thus obtain the smoothest possible discount curve according to this criterion.
+Let us revisit the example that we saw in the bootstrapping example.
+US market data from the 1st of
+October, 2012 we had 39 cash flow dates, including the spot date we had
+40 points on the discount curve.
+The discount curve is shown here on the left hand side and zoomed in on the right hand side as a function of time to maturity.
+The implied yield curve and the forward curve is still irregular but the comparison shows it is smoother than the one that we got from the bootstrapping.
+Summarizing the pseudo inverse provides a valuable alternative to the bootstrapping method.
+It is an exact method that is very simple to implement and that yields the smoothest possible yield curves.
